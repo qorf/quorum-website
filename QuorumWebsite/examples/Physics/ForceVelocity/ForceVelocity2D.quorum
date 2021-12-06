@@ -1,0 +1,143 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Compute.Vector2
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Game.Graphics.OrthographicCamera
+use Libraries.Interface.Events.CollisionListener2D
+use Libraries.Interface.Events.CollisionEvent2D
+use Libraries.Sound.Audio
+
+class Main is Game, KeyboardListener, CollisionListener2D
+
+   boolean platformMovesUp = false
+   number totalSeconds = 0.0
+
+   Drawable platformRight
+   Drawable platformLeft
+   Drawable character
+   Vector2 gravity
+   Vector2 linearVelocity
+   Vector2 jump
+   Color color
+
+   Audio jumpSound
+   Audio impactSound
+   Audio platformSound
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+    // We want to think of the screen as a 30 by 30 meter area.
+       OrthographicCamera camera
+       camera:SetToOrthographic(30, 30)
+       SetCamera2D(camera)
+
+       AddCollisionListener(me)
+       AddKeyboardListener(me)
+       EnablePhysics2D(true)
+
+       platformLeft:SetName("platformLeft")
+       platformLeft:LoadFilledRectangle(13, 2, color:Green())
+       platformLeft:SetPosition(0, 9)
+       Add(platformLeft)
+       platformLeft:EnablePhysics(true)
+       platformLeft:SetNonResponsive()
+
+       platformRight:SetName("platformRight")
+       platformRight:LoadFilledRectangle(13, 2, color:Green())
+       platformRight:SetPosition(17, 10)
+       Add(platformRight)
+       platformRight:EnablePhysics(true)
+       platformRight:SetNonResponsive()
+
+       character:SetName("character")
+       character:LoadFilledCircle(30, color:Blue())
+       character:Scale(1.5/30)
+       character:SetPosition(0, 11)
+       Add(character)
+       character:EnablePhysics(true)
+       character:SetResponsive()
+
+       linearVelocity:Set(5, 0)
+       character:SetLinearVelocity(linearVelocity)
+
+       jump:Set(50, 800)
+       gravity:Set(0, -9)
+       SetGravity2D(gravity)
+
+       jumpSound:Load("/media/Fwip.ogg")
+       impactSound:Load("/media/Boing.ogg")
+       platformSound:Load("/media/Bing.ogg")
+
+       jumpSound:SetVolume(0.5)
+       impactSound:SetVolume(0.4)
+   end
+
+   action Update(number seconds)
+       totalSeconds = totalSeconds + seconds
+   // These if statements make a threshold of how far up and down the platform can travel
+       if platformRight:GetY() > 24
+           platformMovesUp = false
+       end
+       if platformRight:GetY() <= 3
+           platformMovesUp = true
+       end
+   // The platform moves either up or down
+       if totalSeconds  >= 0.01
+           if platformMovesUp
+               platformRight:MoveY(0.08)
+           else
+               platformRight:MoveY(-0.08)
+           end
+           totalSeconds = 0
+       end
+   /*
+       To make the game endless, we move our character back to the left side 
+       of the screen after he goes off the right side. 
+   */
+       if (character:GetX() >= 30)
+           character:SetPosition(-1, character:GetY())
+   /*
+       We set the height of the left platform to be the right platform's height so that it 
+       seems like our character is continuing on the same platform as the one they were on
+       when they went off the right side. 
+   */
+           platformLeft:SetY(platformRight:GetY())
+    //  This math causes the height of the right platform to cycle through some different options.
+           platformRight:SetY((platformRight:GetY()mod 19) + 11)
+           totalSeconds = 0
+    // The platform switches directions when we go to a new screen. 
+           platformMovesUp = true not= platformMovesUp
+       end
+    // The platform sound changes depending on how close the two platforms are to each other. 
+       platformSound:SetY(platformRight:GetY() - platformLeft:GetY())
+       platformSound:Play()
+   end
+
+   action PressedKey(KeyboardEvent event)
+        // When space is pressed, the circle jumps!
+       if event:keyCode = event:SPACE
+           character:ApplyForceToCenter(jump)
+           jumpSound:Play()
+       end
+       // The ball will spin counterclockwise when the left arrow key is pressed.
+       if event:keyCode = event:LEFT
+           character:ApplyTorque(2000)
+       end
+   /*
+       The ball will spin clockwise when the right arrow key is pressed. If the ball was already 
+       spinning counterclockwise, then pressing the right arrow key will cause it to slow its spinning.
+   */
+       if event:keyCode = event:RIGHT
+           character:ApplyTorque(-2000)
+       end
+   end
+
+   action BeginCollision(CollisionEvent2D event)
+       impactSound:Play()
+   end
+end

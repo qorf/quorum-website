@@ -1,0 +1,167 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Compute.Vector2
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Game.Graphics.OrthographicCamera
+use Libraries.Interface.Events.CollisionListener2D
+use Libraries.Interface.Events.CollisionEvent2D
+use Libraries.Sound.Audio
+use Libraries.Compute.Math
+use Libraries.Game.Graphics.Camera
+use Libraries.System.File
+
+class Main is Game, KeyboardListener, CollisionListener2D
+
+   Math math
+   Drawable ground
+   Drawable bunny
+
+   Vector2 gravity
+   Vector2 character
+   Color color
+
+   Audio jumpSound
+   Audio impactSound
+   Audio movingSound
+
+   Camera camera = undefined
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+       AddCollisionListener(me)
+       AddKeyboardListener(me)
+       EnablePhysics2D(true)
+
+       ground:SetName("ground")
+       ground:LoadFilledRectangle(20, 1)
+       ground:SetPosition(0, 0)
+       ground:SetColor(color:Green())
+       Add(ground)
+       ground:EnablePhysics(true)
+       ground:SetUnmovable()
+       ground:SetFriction(1)
+
+       bunny:SetName("bunny")
+       //Load on website root
+       File file
+       file:SetWorkingDirectory("/") 
+       file:SetPath("media/HourOfCode.png")
+       bunny:Load(file)
+       bunny:SetPosition(1, 1)
+       bunny:SetSize(2,2)
+       Add(bunny)
+       bunny:EnablePhysics(true)
+       bunny:SetResponsive()
+
+       bunny:SetFriction(0.2)
+       bunny:SetRestitution(0.75)
+       bunny:SetMass(10)
+
+       gravity:Set(0, -9.8)
+       SetGravity2D(gravity)
+
+    // We make invisible walls so that everything stays on screen. 
+       CreateInvisibleWall(-2, 0)
+       CreateInvisibleWall(21, 0)
+       CreateInvisibleWall(0, 21)
+
+    // We create a tower of boxes. 
+       GenerateBox(0.6,1,color:Red())
+       GenerateBox(-0.6,1,color:Red())
+       GenerateBox(0,2, color:Orange())
+       GenerateBox(0.6,3,color:Yellow())
+       GenerateBox(-0.6,3,color:Yellow())
+       GenerateBox(0,4, color:Green())
+       GenerateBox(0.6,5,color:Blue())
+       GenerateBox(-0.6,5,color:Blue())
+       GenerateBox(0,6, color:Purple())
+
+       jumpSound:Load("/media/Fwip.ogg")
+       impactSound:Load("/media/Boing.ogg")
+       movingSound:Load("/media/Bing.ogg")
+
+       movingSound:SetListenerX(2)
+       movingSound:SetListenerY(2)
+       jumpSound:SetVolume(0.5)
+       impactSound:SetVolume(0.3)
+   end
+
+   action Update(number seconds)
+        camera = GetCamera2D()
+        camera:SetWidth(20)
+        camera:SetHeight(20)
+        camera:SetPosition(10, 10, camera:GetPosition():GetZ())
+        camera:Update()
+    // If the bunny is noticably moving, we play a sound to represent the bunny's position. 
+        if math:AbsoluteValue(bunny:GetLinearVelocity():GetX()) > 1 or math:AbsoluteValue(bunny:GetLinearVelocity():GetY()) > 1
+            movingSound:SetBalance(bunny:GetX())
+            movingSound:SetPitch(bunny:GetY())
+            movingSound:SetVolume(0.5)
+            movingSound:Play()
+        end
+
+   end
+
+   action PressedKey(KeyboardEvent event)
+       if event:keyCode = event:SPACE
+           Vector2 force
+           force:Set(12800, 10000)
+           bunny:ApplyForceToCenter(force)
+           jumpSound:Play()
+       end
+   end
+
+   action BeginCollision(CollisionEvent2D event)
+       impactSound:Play()
+   end
+
+   /*
+   To balance the tower of boxes, we make every other level have longer than tall boxes. 
+   The displaceFromGround parameter tells us how many levels of boxes up to place a box. 
+   For example, if it equals 2, then the box is placed two box heights up from the bottom of the screen. 
+   displaceFromCenter tells us how many box lengths from x = 11.5 we want the box to be placed horizontally. 
+   For example, if we want two boxes centered ontop of a box at center (x = 11.5) then we can use 
+   displaceFromCenter = 0.6 for one and -0.6 for the other. This will place them so that the gap between them 
+   is 0.8 box lengths centered at 11.5. 
+   */
+   action GenerateBox(number displaceFromCenter, integer displaceFromGround, Color color)
+       Drawable box
+       integer boxSize = 2
+
+       if displaceFromGround mod 2 = 0
+           box:LoadFilledRectangle(boxSize + 1, boxSize)
+           box:SetPosition(11.5 + displaceFromCenter*(boxSize), (boxSize)*displaceFromGround)
+       else
+           box:LoadFilledRectangle(boxSize, boxSize)
+           box:SetPosition(12 + displaceFromCenter*(boxSize), (boxSize)*displaceFromGround)
+       end
+       box:SetColor(color)
+       Add(box)
+       box:EnablePhysics(true)
+       box:SetFriction(1)
+       box:SetResponsive()
+       box:SetMass(5)
+   end
+
+    action CreateInvisibleWall(integer x, integer y)
+        Drawable invisibleWall
+    /*
+    We need two invisible walls for the sides that are taller than long, and one for the top that is longer than tall. 
+    The side walls' positions both have y = 0, so that is how we can tell which type is necessary. 
+    */
+        if y <= 0
+            invisibleWall:LoadRectangle(1, 22)
+        else
+            invisibleWall:LoadRectangle(21, 1)
+        end
+        invisibleWall:SetPosition(x , y)
+        Add(invisibleWall)
+        invisibleWall:EnablePhysics(true)
+        invisibleWall:SetUnmovable()
+    end
+end

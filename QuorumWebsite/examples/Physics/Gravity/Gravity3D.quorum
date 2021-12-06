@@ -1,0 +1,80 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Interface.Events.CollisionEvent3D
+use Libraries.Sound.Audio
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Game.Graphics.AmbientLight
+
+class Main is Game, CollisionListener3D
+   Model ground
+   Model box
+   Audio fallSound
+   Audio boomSound
+   Color color
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+
+        DirectionalLight light
+        light:SetColor(0.8, 0.8, 0.8, 1)
+        light:SetDirection(GetCamera3D():GetDirection())
+        Add(light)
+
+        AmbientLight ambient
+        ambient:SetColor(0.4, 0.4, 0.4, 1)
+        SetAmbientLight(ambient)
+   /*
+       This flag enables 3 dimensional physics for the game. Make sure to set 
+       this when you want to add physics.
+   */
+       EnablePhysics3D(true)
+
+       ground:SetName("Ground")
+       ground:LoadBox(15, 1, 20, color:Green())
+       ground:SetPosition(0,-2,0)
+       Add(ground)
+   /*
+       We must enable physics for each Item3D object that will interact 
+       with other Item3D objects.
+   */
+       ground:EnablePhysics(true)
+   /*
+       Neither gravity, collision, nor any programmatic method should be able 
+       to move the ground; its responsiveness needs to be set to unmovable.
+   */
+       ground:SetUnmovable()
+
+       box:SetName("Box")
+       box:LoadBox(1,1,1, color:Blue())
+       box:SetPosition(0,1,0)
+       Add(box)
+       box:EnablePhysics(true)
+   /*
+       The box is responds to gravity and impact with the ground, so we will 
+       set to be responsive. 
+   */
+       box:SetResponsive()
+   /*
+       Finally, we set gravity 
+       (This is an approximation of actual gravity)
+   */
+       SetGravity3D(0, -10, 0)
+
+       fallSound:Load("/media/Fall.ogg")
+       boomSound:Load("/media/Boom.ogg")
+       fallSound:Play()
+
+       AddCollisionListener(me)
+   end
+
+   action BeginCollision(CollisionEvent3D event)
+       fallSound:Pause()
+       boomSound:SetVolume(0.1)
+       boomSound:Play()
+   end
+end

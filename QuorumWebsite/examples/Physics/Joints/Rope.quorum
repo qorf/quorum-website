@@ -1,0 +1,162 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Compute.Vector2
+use Libraries.Game.Graphics.Color
+use Libraries.Game.Physics.Joints.WeldJoint2D
+use Libraries.Game.Physics.Joints.RopeJoint2D
+use Libraries.Sound.Audio
+
+class Main is Game, KeyboardListener
+
+   Drawable unmovableBox
+   Drawable movingBox
+   Vector2 from
+   Vector2 to
+   RopeJoint2D ropeJoint
+   Audio bingSound
+   number timePassed = 0
+
+   //  We want to create two boxes, one that is fixed and one that can move, and connect them with a rope.
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+       EnablePhysics2D(true)
+       AddKeyboardListener(me)
+       Color color
+
+       //  First we setup the box that is responsive.
+       movingBox:LoadFilledRectangle(40,40)
+       movingBox:SetPosition(150, 300)
+       movingBox:SetColor(color:Purple())
+       movingBox:EnablePhysics(true)
+       movingBox:SetResponsive()
+       movingBox:SetMass(1)
+       movingBox:SetFriction(0.2)
+       movingBox:SetLinearDamping(0.9)
+       Add(movingBox)
+
+       //  Then we need to setup the non-responsive box.
+       unmovableBox:LoadFilledRectangle(40,40)
+       unmovableBox:SetPosition(370,300)
+       unmovableBox:SetColor(color:Blue())
+       unmovableBox:EnablePhysics(true)
+       unmovableBox:SetMass(1)
+       Add(unmovableBox)
+
+  /*
+       We will use this CreateRope action to connect the two boxes with a rope.
+       The code for this is below CreateGame. The parameters are the two items
+       to be connected and the two points that they connect at. 
+  */
+       from:Set(movingBox:GetX() + 40, movingBox:GetY())
+       to:Set(unmovableBox:GetX(), unmovableBox:GetY())
+       CreateRope(movingBox, unmovableBox, from, to)
+  /*
+       The rope joint helps stabilize the rope. Setting the maximum length of
+       the rope joint to be less than the length of the rope makes means that
+       even with some stretch, the rope should not extend to the breaking point
+       without a very large force.
+  */
+       ropeJoint:Initialize(movingBox, unmovableBox, from, to, 180)
+       GetCurrentLayer2D():AddJoint(ropeJoint)
+
+       Vector2 gravity
+       gravity:Set(0, -130)
+       SetGravity2D(gravity)
+       bingSound:Load("/media/Bing.ogg")
+    end
+
+    action Update(number seconds)
+        timePassed = timePassed + seconds
+        if timePassed > 0.5
+            bingSound:SetPitch(movingBox:GetY()/100)
+            bingSound:SetBalance(movingBox:GetX())
+            bingSound:Play()
+            timePassed = 0
+        end
+    end
+
+  /*
+    This CreateRope action makes a "rope" between two items by making many small
+    boxes and connecting them with weld joints. The weld joints have frequency so
+    that movement is allowed around the connection point. The boxes and weld joints
+    together make a sort of chain which acts like a rope on screen.
+  */
+    action CreateRope(Drawable itemA, Drawable itemB, Vector2 anchorA, Vector2 anchorB)
+       Drawable previousLink = itemA
+       Color color
+       Vector2 anchor = anchorA
+  /*
+       The distance is rounded up when it is cast as an integer so that the
+       rope does not end up too short.
+  */
+       integer length = cast(integer, anchorA:Distance(anchorB)+1)
+
+       integer i = 0
+       repeat while i <= length/5
+           //  Here we setup one of the individual boxes making up the rope.
+            Drawable link
+            WeldJoint2D weldJoint
+
+            if i not= length/5
+                link:LoadFilledRectangle(5, 2)
+                link:SetPosition(anchor:GetX(), anchor:GetY())
+                if (i mod 2 ) = 0
+                    link:SetColor(color:Blue())
+                else
+                    link:SetColor(color:Purple())
+                end
+                link:EnablePhysics(true)
+                link:SetResponsive()
+                link:SetMass(0.1)
+                link:SetFriction(0.2)
+                //  Linear Damping is set to model a little air resistance.
+                link:SetLinearDamping(0.9)
+                Add(link)
+            else
+                link = itemB
+            end
+
+            //  A weld joint is created between two of the items.
+            weldJoint:Initialize(previousLink, link, anchor)
+            weldJoint:SetFrequency(0.1)
+            weldJoint:SetDampingRatio(0.2)
+            GetCurrentLayer2D():AddJoint(weldJoint)
+
+  /*
+            The anchor is moved to the next position. The rope is being created
+            horizontally here, so only the x coordinate is updated.
+  */
+            anchor:SetX(anchor:GetX() + 5)
+            previousLink = link
+            i = i + 1
+        end
+    end
+
+    action PressedKey(KeyboardEvent event)
+        Vector2 velocity
+        if event:keyCode = event:LEFT
+            velocity:Set(-220, 0)
+            movingBox:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:RIGHT
+            velocity:Set(220, 0)
+            movingBox:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:UP
+            velocity:Set(0, 220)
+            movingBox:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:DOWN
+            velocity:Set(0, -220)
+            movingBox:SetLinearVelocity(velocity)
+        end
+    end
+end

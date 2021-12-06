@@ -1,0 +1,164 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Drawable
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Compute.Vector2
+use Libraries.Game.Graphics.Color
+use Libraries.Game.Physics.Joints.DistanceJoint2D
+use Libraries.Game.Physics.Joints.WeldJoint2D
+use Libraries.Sound.Audio
+use Libraries.Interface.Events.CollisionEvent2D
+use Libraries.Interface.Events.CollisionListener2D
+
+class Main is Game, KeyboardListener, CollisionListener2D
+   Drawable slinkyBottom
+   Drawable slinkyTop
+   integer groundHeight = 550
+   integer startLocation = 20
+   integer slinkyHeight = 5
+   integer slinkyLength = 90
+   integer numberOfSteps = 6
+   Audio slinkySound
+   number collisionCount = 0
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+       EnablePhysics2D(true)
+       AddKeyboardListener(me)
+       AddCollisionListener(me)
+       Color color
+
+  /*
+       The ground will be a staircase, so we need steps that decrease in height.
+       This code creates the steps from left to right and by decreasing height.
+  */
+       integer i = 1
+       repeat while i <= numberOfSteps
+            Drawable ground
+            ground:LoadFilledRectangle(GetScreenWidth() / numberOfSteps, groundHeight/numberOfSteps * (numberOfSteps-i))
+            ground:SetPosition((i - 1) * (GetScreenWidth() / numberOfSteps), 0)
+            if (i mod 2) = 1
+                ground:SetColor(color:Red())
+            else
+                ground:SetColor(color:Yellow())
+            end
+            ground:EnablePhysics(true)
+            ground:SetUnmovable()
+            ground:SetFriction(0.8)
+            Add(ground)
+            i = i + 1
+        end
+
+        //  We save the slinky top and bottom so that we can move them with key presses.
+        slinkyTop = CreateSlinky(18, slinkyBottom)
+        Vector2 gravity
+        gravity:Set(0, -170)
+        SetGravity2D(gravity)
+        slinkySound:Load("/media/Clang.ogg")
+        slinkySound:SetVolume(0.4)
+    end
+
+  /*
+    This action creates a slinky by creating boxes that connect one to another
+    with a weld joint and a spring (distance) joint. The boxes are stacked and
+    each connects to the box above and below it. The joints are setup so that 
+    there is a weld joint on one edge and a spring joint on the other. Which side
+    each kind of joint is alternates so that the slinky is alternatingly pushed up 
+    on one side by the spring joint, and held together on the other by the weld
+    joint.
+  */
+    action CreateSlinky(integer sizeOfSlinky, Drawable bottom) returns Drawable
+        Drawable previousLink = bottom
+        Color color
+
+        integer i = 0
+        repeat while i < sizeOfSlinky
+            Drawable link
+            WeldJoint2D weldJoint
+            DistanceJoint2D springJoint
+            Vector2 anchor
+
+            //  First another box is added to the slinky stack.
+            if i = 0
+                link = bottom
+            end
+            link:LoadFilledRectangle(slinkyLength, slinkyHeight)
+            link:SetPosition(startLocation, groundHeight + i * slinkyHeight - groundHeight/numberOfSteps)
+            if (i mod 2 ) = 0
+                link:SetColor(color:Blue())
+            else
+                link:SetColor(color:Purple())
+            end
+            link:EnablePhysics(true)
+            link:SetResponsive()
+            link:SetMass(5)
+            link:SetFriction(0.8)
+            Add(link)
+            if i > 0
+                // Then the weld and spring joints are added to opposite touching edges.
+                anchor:Set(startLocation + slinkyLength * ((i + 1) mod 2),
+                groundHeight + i * slinkyHeight - groundHeight/numberOfSteps)
+                weldJoint:Initialize(previousLink, link, anchor)
+                weldJoint:SetFrequency(0.1)
+                weldJoint:SetDampingRatio(0.2)
+                anchor:SetX(startLocation + slinkyLength * (i  mod 2))
+                springJoint:Initialize(previousLink, link, anchor, anchor)
+                springJoint:SetDistance(slinkyHeight)
+                springJoint:SetFrequency(1)
+                //  We make sure to add the joints to the layer so they can work.
+                GetCurrentLayer2D():AddJoint(springJoint)
+                GetCurrentLayer2D():AddJoint(weldJoint)
+            end
+            previousLink = link
+            i = i + 1
+        end
+        return previousLink
+    end
+
+    //  A sound plays when slinky collides with the steps or itself half of the time. 
+    action BeginCollision(CollisionEvent2D event)
+        collisionCount = collisionCount + 1
+        if (collisionCount > 2)
+            slinkySound:SetX(event:GetItemB():GetX())
+            slinkySound:SetBalance(event:GetItemB():GetX())
+            slinkySound:SetY(event:GetItemB():GetY())
+            slinkySound:SetPitch(event:GetItemB():GetY()/120)
+            slinkySound:Play() 
+            collisionCount = 0
+        end
+   end
+
+  /*
+    We set the linear velocity of both the top and bottom pieces of the slinky,
+    so no matter which side is up, the top side is moved.
+  */
+    action PressedKey(KeyboardEvent event)
+        Vector2 velocity
+        if event:keyCode = event:LEFT
+            velocity:Set(-220, 0)
+            slinkyTop:SetLinearVelocity(velocity)
+            slinkyBottom:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:RIGHT
+            velocity:Set(220, 0)
+            slinkyTop:SetLinearVelocity(velocity)
+            slinkyBottom:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:UP
+            velocity:Set(0, 220)
+            slinkyTop:SetLinearVelocity(velocity)
+            slinkyBottom:SetLinearVelocity(velocity)
+        end
+
+        if event:keyCode = event:DOWN
+            velocity:Set(0, -220)
+            slinkyTop:SetLinearVelocity(velocity)
+            slinkyBottom:SetLinearVelocity(velocity)
+        end
+    end
+end
