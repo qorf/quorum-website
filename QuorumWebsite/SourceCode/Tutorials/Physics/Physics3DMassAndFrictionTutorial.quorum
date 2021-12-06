@@ -1,0 +1,335 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class Physics3DMassAndFrictionTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Physics Mass, Friction and More In 3D - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Physics Mass, Friction and More In 3D", 1)
+        headDiv:AddText("Understanding mass, friction, and more in a 3D physics enabled Quorum game")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //the section on general information
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "In this tutorial, we will create a game where a Quorum bunny crashes into a tower of boxes with its deadly hops. "
+                            +   "Along the way, we will learn about new physics properties and concepts. "
+                            +   "The first concepts necessary for the bunny to knock over the boxes are ")
+        bodyDiv:AddLink(    "mass", "https://en.wikipedia.org/wiki/Mass")
+        bodyDiv:AddText(    " and ")
+        bodyDiv:AddLink(    "density", "https://en.wikipedia.org/wiki/Density")
+        bodyDiv:AddText(    ". ")
+
+        //the section on Mass and Density
+        bodyDiv:AddHeading("Mass and Density", 2)
+        bodyDiv:AddParagraph(   "Up until now, all physics objects’ masses have been determined using a default mass of 1 kilogram. "
+                            +   "We can change this by setting either mass or density. "
+                            +   "Mass is how much stuff something is made of. "
+                            +   "It is related to weight. "
+                            +   "As mass increases, so does weight. "
+                            +   "Weight also relies on gravity (think of astronauts on the moon and how they weigh less there even though they have not changed themselves.) "
+                            +   "We can think of mass as how much our objects weigh as long as we remember that changing gravity will also affect their weight. "
+                            +   "Mass is set per item using this action: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number mass = 5" + cr
+                                                            + "itemName:SetMass(mass)"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Here mass is a number representing how many kilograms an item is. "
+                            +   "To help us understand the units of mass better, consider a few examples. "
+                            +   "The mass of a typical person is about 70 kg. "
+                            +   "The mass of a car might be between 1000 to 2000 kg, and the mass of a commercial airliner might be between about 40,000 kg and 75,000 kg. "
+                            +   "When mass is set this way, density is automatically calculated. "
+                            +   "Density is another way to think about mass. "
+                            +   "It is how much mass an item has per units cubed, where a unit is a length of one. "
+                            +   "By units cubed, we mean a one unit by one unit by one unit cube. "
+                            +   "We can set density for an item using: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number density = 5" + cr
+                                                            + "itemName:SetDensity(density)"))
+        bodyDiv:AddParagraph(    "density is a number representing the number of kilograms per units cubed. "
+                            +   "If density is set like this, mass will be automatically calculated for the item. ")
+        
+        //the section on friction
+        bodyDiv:AddHeading("Friction", 2)
+
+        bodyDiv:AddParagraph( "")
+        bodyDiv:AddText(    "In the previous tutorial on ")
+        bodyDiv:AddLink(    "force and velocity", "/tutorials/physics/forceandvelocity3D.html")
+        bodyDiv:AddText(    ", the character was able to move across the platforms without slowing down. "
+                            +   "The physics property that provides resistance to movement across something is called ")
+        bodyDiv:AddLink("friction", "https://en.wikipedia.org/wiki/Friction")
+        bodyDiv:AddText(    ". Sliding on ice or a puck moving in air hockey are examples of movement with very little friction. "
+                            +   "Pushing furniture on heavy carpet is an example of movement with high friction. "
+                            +   "To set an item’s friction we use: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number friction = 0.5" + cr
+                                                            + "itemName:SetFriction(friction)"))
+        bodyDiv:AddParagraph(   "Here friction is a number between zero and one. "
+                            +   "Zero means no friction and one is the highest amount of friction. "
+                            +   "If we set friction to be a number higher than one, the system will treat it the same as if we set it to one. ")
+        
+        //the section on Restitution
+        bodyDiv:AddHeading("Restitution", 2)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "We want our bunny to be relatively bouncy. "
+                            +   "To achieve this, we need a new physics property called ")
+        bodyDiv:AddLink(    "restitution", "https://en.wikipedia.org/wiki/Coefficient_of_restitution")                    
+        bodyDiv:AddText(    ". Restitution can be thought of as the bounciness of an item. "
+                            +   "Like friction, restitution is set per item using: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number restitution = 0.4" + cr
+                                                            + "itemName:SetRestitution(restitution)"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Here restitution is a number representing how much bounce is preserved on impact. "
+                            +   "To understand this fully, we need a new concept: ")
+        bodyDiv:AddLink(    "energy", "https://en.wikipedia.org/wiki/Energy")                     
+        bodyDiv:AddText(    ". When an item falls, the movement is a result of gaining ")
+        bodyDiv:AddLink(    "kinetic energy", "https://en.wikipedia.org/wiki/Kinetic_energy")
+        bodyDiv:AddText(    ". Kinetic means movement, basically. "
+                            +   "When the item is at the height of its fall before starting to move downward, it has no kinetic energy (it is not moving). "
+                            +   "Instead it has ")
+        bodyDiv:AddLink(    "potential energy", "https://en.wikipedia.org/wiki/Potential_energy")
+        bodyDiv:AddText(    ". During the fall, the item trades its potential energy for kinetic energy. "
+                            +   "When the item starts to bounce back up, it is trading its kinetic energy for potential energy. "
+                            +   "The restitution value, then, is multiplied by the energy at impact to affect how much kinetic energy the item has when it starts to bounce up. "
+                            +   "For example, a restitution of one means that the item retains all of its kinetic energy when it bounces. "
+                            +   "A restitution of zero means that the item loses all its kinetic energy, and therefore does not bounce. "
+                            +   "Realistic restitution, then, would be somewhere between zero and one, but it is possible to have a restitution greater than one. ")
+        bodyDiv:AddParagraph("")
+         
+        //the section containing the platformer game code
+        bodyDiv:AddHeading("Code", 2)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Here is a ")
+        bodyDiv:AddLink(    "zip file" , "/files/games/Mass3D.zip" )
+        bodyDiv:AddText(    " containing a Quorum project that uses the code below. "
+                            +   "Read through, then use the following code to discover mass, friction, and restitution. ")
+        bodyDiv:AddParagraph("")
+
+        CodeBlock cb1
+        Span s1 
+        Span s2 
+        Span s3
+        Span s4
+        Span s5
+        cb1:AddText("use Libraries.Game.Game" + cr 
+                    +   "use Libraries.Game.Graphics.Model"+ cr 
+                    +   "use Libraries.Compute.Vector3" + cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr
+                    +   "use Libraries.Interface.Events.CollisionListener3D" + cr
+                    +   "use Libraries.Interface.Events.CollisionEvent3D" + cr
+                    +   "use Libraries.Sound.Audio" + cr
+                    +   "use Libraries.Compute.Math" + cr + cr
+                    +   "class Main is Game, KeyboardListener, CollisionListener3D" + cr + cr
+                    +   "   Math math" + cr   
+                    +   "   Model ground" + cr
+                    +   "   Model bunny" + cr + cr
+                    +   "   number depth = 8" + cr
+                    +   "   number length = 20" + cr
+                    +   "   number height = -3" + cr + cr
+                    +   "   Vector3 gravity" + cr
+                    +   "   Vector3 character" + cr
+                    +   "   Color color" + cr + cr
+                    +   "   Audio jumpSound" + cr
+                    +   "   Audio impactSound" + cr
+                    +   "   Audio movingSound" + cr + cr 
+                    +   "   action Main" + cr 
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr
+                    +   "       AddCollisionListener(me)" + cr
+                    +   "       AddKeyboardListener(me)" + cr
+                    +   "       EnablePhysics3D(true)" + cr + cr
+                    +   "       ground:SetName(" + dq + "ground" + dq +")" + cr
+                    +   "       ground:LoadBox(length, 1, length, color:Green())" + cr
+                    +   "       ground:SetPosition(0, height, depth)" + cr
+                    +   "       Add(ground)" + cr
+                    +   "       ground:EnablePhysics(true)" + cr
+                    +   "       ground:SetUnmovable()" + cr 
+                    +   "       ground:SetFriction(1)" + cr + cr
+                    +   "       bunny:SetName(" + dq + "bunny" + dq + ")" + cr
+                    +   "       bunny:LoadSphere(1, 1, 1, " + dq + "media/HourOfCodeDark.jpg" + dq + ")" + cr
+                    +   "       bunny:SetPosition(-5, height + 0.5, 0)" + cr
+                    +   "       Add(bunny)" + cr
+                    +   "       bunny:EnablePhysics(true)" + cr
+                    +   "       bunny:SetResponsive()" + cr + cr
+                    +   "       bunny:SetFriction(0.2)" + cr
+                    +   "       bunny:SetRestitution(0.75)" + cr
+                    +   "       bunny:SetMass(2)" + cr + cr
+                    +   "       gravity:Set(0, -10, 0)" + cr
+                    +   "       SetGravity3D(gravity)" + cr + cr)
+        s4:AddText("    // We make boundary walls so that everything stays on screen. " + cr)
+        s4:AddClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText(    "       CreateBoundaryWall(-length/2, height, depth)" + cr
+                    +   "       CreateBoundaryWall(length/2, height, depth)" + cr
+                    +   "       CreateBoundaryWall(0, height, length/2  + depth/2)" + cr 
+                    +   "       CreateBoundaryWall(0, length + 1, depth)" + cr + cr)
+        s5:AddText("    // We create a tower of boxes. " + cr)
+        s5:AddClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText(    "       GenerateBox(0.7,1,color:Red())" + cr
+                    +   "       GenerateBox(-0.7,1,color:Red())" + cr
+                    +   "       GenerateBox(0,2, color:Yellow())" + cr
+                    +   "       GenerateBox(0.7,3,color:Blue())" + cr
+                    +   "       GenerateBox(-0.7,3,color:Blue())" + cr
+                    +   "       GenerateBox(0,4, color:Purple())" + cr + cr
+                    +   "       jumpSound:Load(" + dq + "media/Fwip.ogg" + dq + ")" + cr
+                    +   "       impactSound:Load(" + dq + "media/Boing.ogg" + dq + ")" + cr
+                    +   "       movingSound:Load(" + dq + "media/Bing.ogg" + dq + ")" + cr + cr
+                    +   "       jumpSound:SetVolume(0.5)" + cr
+                    +   "       impactSound:SetVolume(0.3)" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr)
+        s3:AddText("    // If the bunny is noticably moving, we play a sound to represent the bunny's position. " + cr)
+        s3:AddClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText(   "       if math:AbsoluteValue(bunny:GetLinearVelocity():GetX()) > 0.5 or math:AbsoluteValue(bunny:GetLinearVelocity():GetY()) > 0.5" + cr
+                    +   "           movingSound:SetBalance(bunny:GetX())" + cr
+                    +   "           movingSound:SetPitch(bunny:GetY())" + cr
+                    +   "           movingSound:Play()" + cr
+                    +   "       end" + cr
+                    +   "   end" + cr + cr
+                    +   "   action PressedKey(KeyboardEvent event)" + cr
+                    +   "       if event:keyCode = event:SPACE" + cr
+                    +   "           Vector3 force" + cr
+                    +   "           force:Set(450, 860, 450)" + cr
+                    +   "           bunny:ApplyForceToCenter(force)" + cr
+                    +   "           jumpSound:Play()" + cr
+                    +   "       end" + cr
+                    +   "   end" + cr + cr
+                    +   "   action BeginCollision(CollisionEvent3D event)" + cr
+                    +   "       impactSound:Play()" + cr
+                    +   "   end" + cr + cr)
+        s1:AddText( "   /*" + cr
+                    +   "   To balance the tower of boxes, we make every other level have wider boxes. The" + cr
+                    +   "   displaceFromGround parameter tells us how many levels of boxes up to place a box. For " + cr
+                    +   "   example, if it equals 2, then the box is placed two box heights up from the bottom of " + cr
+                    +   "   the screen. displaceFromCenter tells us how many box lengths from the center we want " + cr
+                    +   "   the box to be placed horizontally. For example, if we want two boxes centered ontop of " + cr
+                    +   "   a box then we can use displaceFromCenter = 0.7 for one and -0.7 for the other. " + cr
+                    +   "   This will place them so that the gap between them is 0.7 box lengths from the center. " + cr
+                    +   "   */" + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("   action GenerateBox(number displaceFromCenter, integer displaceFromGround, Color color)" + cr
+                    +   "       Model box" + cr
+                    +   "       number boxSize = 1.5" + cr 
+                    +   "       number center = 3" + cr + cr
+                    +   "       if displaceFromGround mod 2 = 0" + cr
+                    +   "           box:LoadBox(boxSize * 3.5, boxSize, boxSize * 1.5, color)" + cr
+                    +   "           box:SetPosition(center + displaceFromCenter*(boxSize * 1.5), (boxSize )*displaceFromGround + height + boxSize/2, 7)" + cr 
+                    +   "       else" + cr
+                    +   "           box:LoadBox(boxSize * 1.5, boxSize, boxSize * 1.5, color)" + cr
+                    +   "           box:SetPosition(center + displaceFromCenter*(boxSize * 1.5), (boxSize)*displaceFromGround + height + boxSize/2, 7)" + cr
+                    +   "       end" + cr
+                    +   "       Add(box)" + cr
+                    +   "       box:EnablePhysics(true)" + cr
+                    +   "       box:SetFriction(1)" + cr
+                    +   "       box:SetResponsive()" + cr
+                    +   "       box:SetMass(0.3)" + cr
+                    +   "   end" + cr + cr
+                    +   "   action CreateBoundaryWall(number x, number y, number z)" + cr
+                    +   "       Model boundaryWall" + cr)
+        s2:AddText( "   /*" + cr
+                    +   "   We need two invisible walls for the sides that are taller than long, one for the top that is longer than tall," + cr
+                    +   "   and one in the back that is about equally long and tall. The side walls' positions both have y = 0, and the back " + cr
+                    +   "   wall is the only one with z > depth. That is how we can tell which type is called for. " + cr
+                    +   "   */" + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText("       if z > depth" + cr
+                    +   "           boundaryWall:LoadBox(length + 2, length, 1, color:White())" + cr
+                    +   "       elseif y <= 0" + cr
+                    +   "           boundaryWall:LoadBox(1, length, length + 1, color:White())" + cr
+                    +   "       else" + cr
+                    +   "           boundaryWall:LoadBox(length, 1, length + 1, color:White())" + cr
+                    +   "       end" + cr
+                    +   "       boundaryWall:SetPosition(x , y, z)" + cr
+                    +   "       Add(boundaryWall)" + cr
+                    +   "       boundaryWall:EnablePhysics(true)" + cr
+                    +   "       boundaryWall:SetUnmovable()" + cr
+                    +   "   end" + cr
+                    +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        //the section on running the program
+//        bodyDiv:AddHeading("Run the Program", 2)
+//        bodyDiv:AddParagraph(   "If we run this game, we should have a Quorum bunny sitting on the left side of the screen on the ground and a stack of boxes on the right side of the screen. "
+//                                +   "Pressing the spacebar will cause the bunny to jump across the screen, hitting the stack of boxes. "
+//                                +   "The boxes should be knocked off the stack in response to the collision. ")
+//        
+//        SideBySideIDE addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("physics3DMass")
+//        addStatementIDE:GetIDETitle():AddText("Mass, Friction, and More In 3D")
+//        addStatementIDE:SetGameEnvironment(true)
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to add physics effects like 3D mass and friction to games written in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Mass, Friction, and More In 3D"
+    end
+
+    action GetImageLocation returns text
+        return "media/physics/Mass.png"
+    end
+
+    action GetName returns text
+        return "Mass, Friction, and More In 3D"
+    end
+
+    action GetShortDescription returns text
+        return "how to use mass, friction and more in a 3D game"
+    end
+
+    action GetLocation returns text
+        return "tutorials/physics/massandfriction3D.html"
+    end
+end

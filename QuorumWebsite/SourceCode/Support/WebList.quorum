@@ -1,0 +1,160 @@
+package Libraries.Web.Page
+use Libraries.Containers.List
+
+class WebList is WebTag
+    boolean isOrdered = false
+
+    action Generate returns text
+        text result = ""
+
+        if isOrdered
+            result = "<ol " 
+        else
+            result = "<ul " 
+        end
+
+        Attributes attributes = parent:WebTag:GetAttributes()
+        attributeText = attributes:Generate()
+        result = result + attributeText + ">"
+        result = result + me:GenerateNestedTags()
+
+        if isOrdered
+            result = result + "</ol>"
+        else
+            result = result + "</ul>"
+        end
+        return result
+    end
+
+    /*
+        This action adds a ListItem with the specified text and to an UnorderedList object.
+
+        Attribute: Parameter listItemText specifies the text that will appear in the ListItem object
+
+        Attribute: Returns the generated ListItem object for any further manipulation
+
+        Attribute: Example
+
+        use Libraries.Web.Page.all
+        class Main
+            action Main
+                WebPage page
+                UnorderedList ul
+
+                
+                ul:AddListItem("List Item")
+                page:Add(ul)
+
+                text value = page:Generate()
+                output value
+            end
+        end
+    */
+    action AddListItem(text listItemText) returns ListItem
+        ListItem listItem
+        listItem:AddText(listItemText)
+        parent:WebTag:tags:Add(listItem)
+        return listItem
+    end
+
+    action AddListItem(integer nesting, text listItemText) returns ListItem
+        ListItem listItem
+        listItem:AddText(listItemText)
+        
+        List<WebTag> tags = parent:WebTag:tags
+        WebTag tag = tags:Get(nesting)
+        //if this has an item under it, it's a list of some kind
+        //if it doesn't, then we need to add one
+        integer value = tag:GetNumberOfNestedTags()
+        if value > 1
+           WebTag nestedTag = tag:GetTag(1)
+           nestedTag:AddNestedTag(listItem)
+        else
+            if IsOrdered()
+                OrderedList list
+                list:AddNestedTag(listItem)
+                tag:AddNestedTag(list)
+            else
+                UnorderedList list
+                list:AddNestedTag(listItem)
+                tag:AddNestedTag(list)
+            end
+        end
+
+        return listItem
+    end
+
+    /*
+        This action adds a ListItem that has a Link inside of it with the specified link text and location to an UnorderedList object.
+
+        Attribute: Parameter linkText specifies the text that will appear in the ListItem object as a link
+
+        Attribute: Parameter linkDestination specifies where the link leads to
+
+        Attribute: Returns the generated ListItem object (which has the Link object inside of it) for any further manipulation
+
+        Attribute: Example
+
+        use Libraries.Web.Page.all
+        class Main
+            action Main
+                WebPage page
+                UnorderedList ul
+
+                
+                ul:AddListItemLink("Quorum Reference Page", "www.quorumlanguage.com/reference.php")
+                page:Add(ul)
+
+                text value = page:Generate()
+                output value
+            end
+        end
+    */
+    action AddListItemLink(text linkText, text linkDestination) returns ListItem
+        Link link
+        link:SetAddress(linkDestination)
+        link:AddText(linkText)
+        ListItem listItem
+        listItem:Add(link)
+        parent:WebTag:tags:Add(listItem)
+        return listItem
+    end
+
+    action AddListItemLink(integer nesting, text linkText, text linkDestination) returns ListItem
+        Link link
+        link:SetAddress(linkDestination)
+        link:AddText(linkText)
+        ListItem listItem
+        listItem:Add(link)
+        
+        List<WebTag> tags = parent:WebTag:tags
+        WebTag tag = tags:Get(nesting)
+        //if this has an item under it, it's a list of some kind
+        //if it doesn't, then we need to add one
+        integer value = tag:GetNumberOfNestedTags()
+        if value > 0
+           WebTag nestedTag = tag:GetTag(0)
+           nestedTag:AddNestedTag(listItem)
+        else
+            if IsOrdered()
+                OrderedList list
+                list:AddNestedTag(listItem)
+                tag:AddNestedTag(list)
+            else
+                UnorderedList list
+                list:AddNestedTag(listItem)
+                tag:AddNestedTag(list)
+            end
+        end
+
+        return listItem
+    end
+
+    action IsOrdered returns boolean
+        return isOrdered
+    end
+
+    action SetOrdered(boolean isOrdered)
+        me:isOrdered = isOrdered
+    end
+end

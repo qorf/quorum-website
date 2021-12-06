@@ -1,0 +1,438 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.NavigationDivision
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.InlineFrame
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.Label
+use Libraries.Web.Page.TextArea
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Heading
+
+class HourOfCode is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    text MEDIA_FOLDER = "media/hourofcode/"
+    integer SELECTED = 1
+
+    action Setup(text nextPart, text title, text header, text subHeader, text moveOnText, text youtubeAddress, integer selected)
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle(title)
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+        
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading(header, 1)
+        headDiv:AddText(subHeader)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:AddClassAttribute("bodyContainerHOC")
+        bodyDiv:AddClassAttribute("box-size-fix topmargin")
+
+       
+        bodyDiv:Add(NavigationArea(selected))
+        bodyDiv:Add(ContentBox(youtubeAddress))
+
+        Image codeDotOrgTrackerImage
+        codeDotOrgTrackerImage:SetAddress("http://code.org/api/hour/begin_quorum.png/")
+        codeDotOrgTrackerImage:SetStyle("display:none")
+
+        bodyDiv:Add(codeDotOrgTrackerImage)
+
+        mainRegion:Add(bodyDiv)
+        Add(CompletedModal(nextPart, moveOnText))
+        Add(NoCodeModal())
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+
+    action CompletedModal (text nextPart, text moveOnText) returns Division
+        Division modal
+        modal:SetIdentifier("modal")
+        modal:AddAttribute("aria-hidden", "true")
+        modal:AddAttribute("aria-labelledby", "modalTitle")
+        modal:AddAttribute("aria-describedby", "modalDescription")
+        modal:AddAttribute("aria-live", "polite")
+        modal:AddAttribute("role", "dialog")
+        
+        Division modalDescription
+        modalDescription:SetIdentifier("modalDescription")
+        modalDescription:AddClassAttribute("screenReaderContent")
+        modalDescription:AddText("Beginning of dialog window. It congratulates you on completing this exercise. Escape will cancel an close the window.")
+        
+        modal:Add(modalDescription)
+        
+        Division overlayContent
+        overlayContent:SetIdentifier("overlay-content")
+        
+        Heading congrats
+        congrats:SetScale(3)
+        congrats:AddText("Congratulations, you've completed this exercise!")
+        congrats:SetIdentifier("modalTitle")
+        congrats:AddClassAttribute("overlay-text")
+
+        overlayContent:Add(congrats)
+        
+        Paragraph modaltext
+        modaltext:AddClassAttribute("overlay-text")
+        modaltext:AddText("Would you like to...")
+
+        overlayContent:Add(modaltext)
+        
+        Link nextPartLink
+        nextPartLink:SetAddress(nextPart)
+        nextPartLink:AddClassAttribute("overlay-option")
+        nextPartLink:AddText(moveOnText)
+
+        overlayContent:Add(nextPartLink)
+        
+        Button closeButton
+        closeButton:SetIdentifier("modalCloseButton")
+        closeButton:AddClassAttribute("modalCloseButton overlay-option")
+        closeButton:SetOnClick("javascript:void(0)")
+        closeButton:SetTitle("Close Dialog Window")
+        closeButton:AddText("Stay on this page")
+        
+        overlayContent:Add(closeButton)
+        
+        Paragraph navigate
+        navigate:AddClassAttribute("overlay-text")
+        navigate:AddText("You can always navigate to any page at a later time.")
+        
+        overlayContent:Add(navigate)
+
+        modal:Add(overlayContent)
+        
+        return modal
+    end
+
+
+    action NoCodeModal returns Division
+        Division modal
+        modal:SetIdentifier("noCodeModal")
+        modal:AddAttribute("aria-hidden", "true")
+        modal:AddAttribute("aria-labelledby", "noCodeModalTitle")
+        modal:AddAttribute("aria-describedby", "noCodeModalDescription")
+        modal:AddAttribute("aria-live", "assertive")
+        modal:AddAttribute("role", "dialog")
+        
+        Division modalDescription
+        modalDescription:SetIdentifier("noCodeModalDescription")
+        modalDescription:AddClassAttribute("screenReaderContent")
+        modalDescription:AddText("Beginning of dialog window. It asks that code be input before running.")
+        
+        modal:Add(modalDescription)
+        
+        Division overlayContent
+        overlayContent:SetIdentifier("overlay-content")
+        
+        Heading noCode
+        noCode:SetScale(3)
+        noCode:AddText("There isn't any code")
+        noCode:SetIdentifier("noCodeModalTitle")
+        noCode:AddClassAttribute("overlay-text")
+
+        overlayContent:Add(noCode)
+        
+        Paragraph modaltext
+        modaltext:AddClassAttribute("overlay-text")
+        modaltext:AddText("Type in some code and then press the run button to see what it does")
+
+        overlayContent:Add(modaltext)
+        
+        Button closeButton
+        closeButton:SetIdentifier("noCodeModalCloseButton")
+        closeButton:AddClassAttribute("modalCloseButton overlay-option")
+        closeButton:SetOnClick("javascript:void(0)")
+        closeButton:SetTitle("Close Dialog Window")
+        closeButton:AddText("Okay!")
+        
+        overlayContent:Add(closeButton)
+
+        modal:Add(overlayContent)
+        
+        return modal
+    end
+
+
+    action NavigationArea (integer selected) returns Division
+        Division sidebarDiv
+        sidebarDiv:SetIdentifier("sidebar")
+
+        NavigationDivision navDiv
+        navDiv:SetIdentifier("sidebar-navigation")
+        
+        UnorderedList navigationItems
+        
+        Link item1Link
+        Link item2Link
+        Link item3Link
+        Link item4Link
+        Link item5Link
+        Link item6Link
+        Link item7Link
+        
+        item1Link:SetAddress("part1.html")
+        item2Link:SetAddress("part2.html")
+        item3Link:SetAddress("part3.html")
+        item4Link:SetAddress("part4.html")
+        item5Link:SetAddress("part5.html")
+        item6Link:SetAddress("part6.html")
+        item7Link:SetAddress("part7.html")
+
+        item1Link:AddText("Part 1: Got a New Gig")
+        item2Link:AddText("Part 2: Sayin' Stuff")
+        item3Link:AddText("Part 3: This or That")
+        item4Link:AddText("Part 4: Clothing Picker")
+        item5Link:AddText("Part 5: Choose My Clothing!")
+        item6Link:AddText("Part 6: Mutate the Bugs")
+        item7Link:AddText("Part 7: The End of the World")
+        
+
+        ListItem listItem1
+        ListItem listItem2
+        ListItem listItem3
+        ListItem listItem4
+        ListItem listItem5
+        ListItem listItem6
+        ListItem listItem7
+
+        
+        listItem1:SetIdentifier("sidebar-part1")
+        listItem2:SetIdentifier("sidebar-part2")
+        listItem3:SetIdentifier("sidebar-part3")
+        listItem4:SetIdentifier("sidebar-part4")
+        listItem5:SetIdentifier("sidebar-part5")
+        listItem6:SetIdentifier("sidebar-part6")
+        listItem7:SetIdentifier("sidebar-part7")
+        
+        listItem1:AddClassAttribute("sidebar-link")
+        listItem2:AddClassAttribute("sidebar-link")
+        listItem3:AddClassAttribute("sidebar-link")
+        listItem4:AddClassAttribute("sidebar-link")
+        listItem5:AddClassAttribute("sidebar-link")
+        listItem6:AddClassAttribute("sidebar-link")
+        listItem7:AddClassAttribute("sidebar-link")
+
+
+        if selected = 1
+            listItem1:AddClassAttribute("sidebar-selected")
+        elseif selected = 2
+            listItem2:AddClassAttribute("sidebar-selected")
+        elseif selected = 3
+            listItem3:AddClassAttribute("sidebar-selected")
+        elseif selected = 4
+            listItem4:AddClassAttribute("sidebar-selected")
+        elseif selected = 5
+            listItem5:AddClassAttribute("sidebar-selected")
+        elseif selected = 6
+            listItem6:AddClassAttribute("sidebar-selected")
+        elseif selected = 7
+            listItem7:AddClassAttribute("sidebar-selected")
+        end
+
+       
+
+        listItem1:Add(item1Link)
+        listItem2:Add(item2Link)
+        listItem3:Add(item3Link)
+        listItem4:Add(item4Link)
+        listItem5:Add(item5Link)
+        listItem6:Add(item6Link)
+        listItem7:Add(item7Link)
+        
+        navigationItems:Add(listItem1)
+        navigationItems:Add(listItem2)
+        navigationItems:Add(listItem3)
+        navigationItems:Add(listItem4)
+        navigationItems:Add(listItem5)
+        navigationItems:Add(listItem6)
+        navigationItems:Add(listItem7)
+
+        navDiv:Add(navigationItems)
+
+        sidebarDiv:Add(navDiv)
+
+        Link finishLink
+        finishLink:SetIdentifier("finish")
+        finishLink:AddImage("/media/HourOfCodeDark.png", "")
+        finishLink:SetAddress("http://code.org/api/hour/finish")
+        finishLink:AddText("I'm done with my Hour of Code!")
+        
+        sidebarDiv:Add(finishLink)
+        return sidebarDiv
+    end
+
+    action ContentBox(text youtubeAddress) returns Division
+        Division contentBox
+        contentBox:SetIdentifier("content-box")
+        
+        Division videoContainer
+        videoContainer:SetIdentifier("video-container")
+
+        Division videoHeader
+        videoHeader:SetIdentifier("video-header")
+        Paragraph value = videoHeader:AddParagraph("Mary's Video Log")
+        value:SetClassAttribute("hourOfCodeIDELabel")
+
+        InlineFrame videoIFrame
+        videoIFrame:SetIdentifier("youtubeiframe")
+        videoIFrame:SetAddress(youtubeAddress)
+        videoIFrame:AddAttribute("frameborder", "0")
+        videoIFrame:AddAttribute("allowfullscreen", "")
+
+        videoContainer:Add(videoHeader)
+        videoContainer:Add(videoIFrame)
+
+
+        Division slideContentBox
+        slideContentBox:SetIdentifier("slide-content-box")
+        
+        Division slideNavigation
+        slideNavigation:SetIdentifier("slide-navigation")
+        
+        Division slideBoxWrapper
+        slideBoxWrapper:SetIdentifier("slide-box-wrapper")
+        slideBoxWrapper:AddAttribute("role", "description")
+        slideBoxWrapper:AddAttribute("aria-live", "polite")
+        
+        Button leftArrowButton
+        leftArrowButton:SetIdentifier("leftArrow")
+        leftArrowButton:AddClassAttribute("leftArrow-disabled")
+        leftArrowButton:AddAttribute("aria-hidden" , "true")
+        leftArrowButton:AddAttribute("aria-label" , "Previous Slide")
+
+        Division slideBox
+        slideBox:SetIdentifier("slide-box")
+
+        slideBoxWrapper:Add(leftArrowButton)
+        slideBoxWrapper:Add(slideBox)
+        
+        Button rightArrowButton
+        rightArrowButton:SetIdentifier("rightArrow")
+        rightArrowButton:AddAttribute("aria-label" , "Next Slide")
+
+        slideContentBox:Add(slideNavigation)
+        slideContentBox:Add(slideBoxWrapper)
+        slideContentBox:Add(rightArrowButton)
+      
+        contentBox:Add(videoContainer)
+        contentBox:Add(slideContentBox)
+        
+        AddHourOfCodeIDE(contentBox, "hour-of-code-IDE", "Type your Code Here!", "")
+        
+        //contentBox:Add(HourOfCodeIDE())
+        //contentBox:Add(OutputContainer())
+
+        return contentBox
+    end
+
+    action AddHourOfCodeIDE(Division div, text ideName, text title, text subtitle)
+        SideBySideIDE ide
+        ide:SetHourOfCodeEnvironment(true)
+        ide:SetDevelopmentLabel(title)
+        ide:SetUniqueIdentifier(ideName)
+        ide:Setup()
+        ide:GetIDESubtitle():AddText(subtitle)
+        div:Add(ide)
+    end
+
+    action HourOfCodeIDE returns Division
+        Division maindiv
+        maindiv:SetIdentifier("hour-of-code-IDE")
+        maindiv:AddClassAttribute("small-IDE")
+        
+        Division inputHeader
+        inputHeader:SetIdentifier("input-header")
+        Paragraph value = inputHeader:AddParagraph("Type your Code Here!")
+        value:SetClassAttribute("hourOfCodeIDELabel")
+
+        maindiv:Add(inputHeader)
+
+        Label textarealabel
+        textarealabel:AddAttribute("for", "hour-of-code-IDE-input")
+        textarealabel:AddClassAttribute("hidden")
+        textarealabel:AddText("Code input area")
+        
+        TextArea ideTextArea
+        ideTextArea:SetIdentifier("hour-of-code-IDE-input")
+        ideTextArea:AddClassAttribute("inputArea small-IDE-input")
+        ideTextArea:AddAttribute("role", "textbox")
+        ideTextArea:AddAttribute("aria-multiline", "true")
+        
+        maindiv:Add(textarealabel)
+        maindiv:Add(ideTextArea)
+        
+        Button runButton
+        runButton:SetIdentifier("hour-of-code-run-button")
+        runButton:AddText("Click Here to Run Your Code")
+        
+        maindiv:Add(runButton)
+
+        return maindiv
+    end
+
+    action OutputContainer returns Division
+        Division outputContainer
+        outputContainer:SetIdentifier("hour-of-code-IDE-output-container")
+
+
+        Heading outputLabel
+        outputLabel:SetScale(2)
+        outputLabel:AddText("Code output")
+        outputLabel:AddClassAttribute("hidden")
+        outputLabel:SetIdentifier("output-label")
+        outputContainer:Add(outputLabel)
+
+        Image monitorImage
+        monitorImage:SetIdentifier("outputMonitor")
+        monitorImage:SetAddress(MEDIA_FOLDER + "outputMonitor.png")
+        monitorImage:SetAlternate("An image of a monitor surrounding the code output")
+        monitorImage:AddAttribute("aria-hidden", "true")
+        
+        outputContainer:Add(monitorImage)
+        
+        PreformattedText outputArea
+        outputArea:SetIdentifier("hour-of-code-IDE-output")
+        outputArea:AddClassAttribute("outputArea")
+        outputArea:AddAttribute("role", "log")
+        outputArea:AddAttribute("aria-labeledby", "output-label")
+        outputArea:AddAttribute("aria-live", "assertive")
+
+        outputContainer:Add(outputArea)
+
+        return outputContainer
+    end
+
+    action GetMetaDescription returns text
+        return "Join Mary in her adventure learning the Quorum programming language."
+    end
+end

@@ -1,0 +1,244 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class GamesCamerasTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Cameras - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Cameras in Quorum", 1)
+        headDiv:AddText("This tutorial tells you how use cameras in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to Using Cameras in Quorum", 2)
+
+        bodyDiv:AddParagraph(      "This tutorial will cover user controls for moving, zooming, and rotating the camera in both 2D and 3D, "
+                            +   "and will discuss orthographic versus perspective cameras. "
+                            +   "Cameras are used to control which view of the virtual game world is shown on the computer screen." )
+
+        bodyDiv:AddText(   "To assist with this tutorial, we can download this ")
+        bodyDiv:AddLink("zip file", "/files/games/CameraWorld2D.zip")
+        bodyDiv:AddText(             " which contains a project with a small 2D scene to explore using the camera, and this ")
+        bodyDiv:AddLink("zip file", "/files/games/CameraWorld.zip")
+        bodyDiv:AddText(             " which contains a project with a small 3D scene to explore.")
+
+
+
+        //the section on moving cameras
+        bodyDiv:AddHeading("Moving the Camera", 2)
+
+        //the section on 2D movement
+        bodyDiv:AddHeading("2D Movement", 3)
+        bodyDiv:AddParagraph(   "Cameras in Quorum can be used on both 2D and 3D scenes. To begin, let’s open the 2D project we downloaded." )
+        bodyDiv:AddParagraph(   "This is a 2D scene with a tree, but if we run the code as-is, no tree is in view. That is because the tree is past the edge of our game screen. "
+                            +   "The first thing we want to know how to do with a 2D camera is move it so that we can see more of our scene." )
+        bodyDiv:AddParagraph(   "Before we start using our 2D camera, we have to understand one concept: a camera (whether it is a 2D or a 3D camera) is a 3D object. "
+                            +   "Think about it like taking a picture of a painting: even though the object you are capturing is flat, the camera has to be positioned in 3D space. "
+                            +   "For this reason, our 2D camera's position requires 3 parameters: an x value, a y value, and a z value. "
+                            +   "The next section is a description of the Quorum 3D coordinate system and the 2D camera tutorial continues on afterwards.")
+
+        //the section on 3D coordinate system
+        bodyDiv:AddHeading("Quorum's 3D Coordinate System", 3)
+        bodyDiv:AddParagraph(   "Before we can begin to use 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
+                            +   "3D objects are called 3D because they have three dimensions. A 2D object has width and height and a 3D object adds depth. "
+                            +   "In 2D animation, the position and size of an object on the screen can be explained using two measurements: "
+                            +   "one horizontal across the center of the screen (the x-axis) and one vertical across the center of the screen (the y-axis). "
+                            +   "When we add a third measurement for 3D, it runs from the user through the screen, getting farther away (we call this the z-axis). "
+                            +   "All 3D modeling is based on these three axes, but different programs use them differently." )
+        bodyDiv:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
+                            +   "the y-axis is positive in the up direction and the x-axis is positive to the right. The difference between the two is the z-axis. "
+                            +   "In the left-handed system, the z-axis is positive away from the user. In the right-handed system, the z-axis is positive toward the user. "
+                            +   "Quorum uses the left-handed coordinate system. This is important because if we want an object to move closer or farther away, "
+                            +   "we need to know if we should increase or decrease the z coordinate. "
+                            +   "Below is an image that represents the left-handed coordinate system using a computer monitor.")
+        bodyDiv:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+
+        bodyDiv:AddParagraph(   "Each Quorum game has a default camera, but we can adjust the camera settings. "
+                            +   "Our project already has a camera set up, but let’s look at the lines of code that are needed every time a camera is used.")
+        bodyDiv:AddParagraph(   "First, Quorum needs to know where to find the camera class, so we need to include this use statement:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Use Libraries.Game.Graphics.Camera"))
+        bodyDiv:AddParagraph(   "Then, our camera class must be instantiated:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Camera camera = undefined"))
+        bodyDiv:AddParagraph(   "Before this camera can be manipulated, it needs to know what kind of camera to use. We get this by calling the GetCamera() action inside Create Game:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Camera = GetCamera2D()"))
+        bodyDiv:AddParagraph(   "Most objects need to be added to our game using the Add() action, but cameras are special. With only these lines of code, our camera is already set up. "
+                            +   "Now that our camera is set up, write this line of code in your CreateGame section to use our camera’s Move action to shift the view.")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "camera:Move(500, 0, 0)"))
+        bodyDiv:AddParagraph(   "This image is a result of that code:")
+        bodyDiv:AddImage("/media/games/camera_move_2D.png", "This is an image of the camera move in 2D")
+
+        //the section on 3D movement
+        bodyDiv:AddHeading("3D Movement", 2)
+        bodyDiv:AddParagraph(   "In our Drawing in 3D tutorial, we learned basic camera set-up for a 3D game. This tutorial will build on what we learned previously, "
+                            +   "and will introduce the other things a camera can do. The first thing we should learn to do with our camera is move it. "
+                            +   "We have already learned how to set the camera’s initial position and point the camera where we would like, "
+                            +   "the next important camera action to learn is called Move." )
+        bodyDiv:AddParagraph(   "Let’s run the 3D program (CameraWorld) we have downloaded (F6). Below is an image of the game screen, with a green field with a tree and a box on it:")
+        bodyDiv:AddImage("/media/games/camera_3D.png", "This is an image of the camera 3D")
+        bodyDiv:AddParagraph(   "Using our camera’s Move action, we can see this scene from behind. Recall that Quorum uses a left-handed coordinate system, "
+                            +   "so in order to move the camera from it’s initial position, which in this case is (0, 100, -200), "
+                            +   "we need to move it in a positive direction along the z-axis. Let’s try moving it by 400." )
+        bodyDiv:AddParagraph(   "In the CreateGame action write this line of code after the Add actions:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "camera:Move(0, 0, 400)"))
+        bodyDiv:AddParagraph(   "If we run this program right now, we will not be able to see any of the objects in our scene. "
+                            +   "That is because our camera has another important property in addition to its position: its direction. "
+                            +   "Right now, our camera is behind all of our models, and looking even farther into empty space. "
+                            +   "Recall the LookAt action we used in the 3D drawing tutorial. We can use this to turn the camera around to look at our scene. "
+                            +   "Let’s write this line of code right after the Move action:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "camera:LookAt(0, 0, 0)"))
+        bodyDiv:AddParagraph(   "This is what results when we run the code with these two additional lines:")
+        bodyDiv:AddImage("/media/games/camera_move_3D.png", "This is an image of the camera move 3D")
+        bodyDiv:AddParagraph(   "We can move the camera in any direction by using the Move action. It needs three numbers representing the amount to shift by on the x, y, and z axes. "
+                            +   "Each time we move the camera, we need to remember to adjust the direction it is pointing in." )
+        bodyDiv:AddParagraph(   "Now that we can move our camera, let’s delete those two lines of code we wrote and learn the next important camera ability: Zoom.")
+
+        //the section on zooming
+        bodyDiv:AddHeading("Zooming", 2)
+        bodyDiv:AddParagraph(   "If we want to get a closer look at our objects, we need to zoom in. In order to Zoom, we will call our camera’s SetZoom action. "
+                            +   "When we pass a number larger than one to the SetZoom action, our camera zooms in. When we pass a decimal value, our camera zooms out. "
+                            +   "In 2D, our camera will zoom in on the center of our screen. In 3D, the camera will zoom in the direction it is facing, "
+                            +   "so we need to use the LookAt action to make sure our camera will zoom where we want it to. Write the zoom code in the CreateGame action." )
+
+        Paragraph p2
+        CodeBlock cb1
+        cb1:AddText("GetGlobalPosition()")
+        p2:AddText("Below is the code necessary to zoom in on our box (Note that the model action ")
+        p2:Add(cb1)
+        p2:AddText(" returns the position (x, y, and z) of a model within the 3D space as a Vector3. A Vector3 is just a convenient way to pass 3 numbers.):")
+        bodyDiv:Add(p2)
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "camera:LookAt(logo:GetGlobalPosition())" + cr
+                                                        +   "camera:SetZoom(2.5)"))
+        bodyDiv:AddParagraph(   "And this is what results from our code:")
+        bodyDiv:AddImage("/media/games/camera_zoom_3D.png", "This is an image of the camera zoom 3D")
+        bodyDiv:AddParagraph(   "Now we can zoom in on objects in our game scene!" )
+        bodyDiv:AddParagraph(  "Once again, we need to clear what we just wrote so that we can try another way to manipulate the camera: Rotation!")
+
+        //the section on rotating the camera
+        bodyDiv:AddHeading("Rotating the Camera", 2)
+        bodyDiv:AddParagraph(   "Whether our camera is viewing a 2D or a 3D scene, it is a 3D object. This means that when we rotate our camera, it is rotating in 3D space. "
+                            +   "For rotation in both 2D and 3D, we need to use our camera’s Rotate action. Rotation in 3D is a little more complex than 2D rotation. "
+                            +   "In order to rotate our camera, we need to give it an axis or a line to rotate around. This will let Quorum know how we want our camera to rotate.")
+
+        //the section on 2D rotation
+        bodyDiv:AddHeading("2D Rotation", 3)
+        bodyDiv:AddParagraph(   "When we rotate our camera in a 2D scene, we should only rotate our camera around the z axis. "
+                            +   "This means that our action call should look like this:" + cr + cr)
+        Bold CSPtitle
+        CSPtitle:AddText("Rotate(number of degrees, 0, 0, positive or negative 1 to indicate direction (clockwise or counterclockwise))." + cr + cr )
+        bodyDiv:Add(CSPtitle)
+        bodyDiv:AddParagraph( "In our 2D example, let’s try rotating our camera 45 degrees clockwise. In the CreateGame action, after the add statements, write:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "camera:Move(500, 0, 0)" + cr
+                                                        +   "camera:Rotate(45, 0, 0, 1)"))
+        bodyDiv:AddParagraph(   "This is the result of those added lines of code:")
+        bodyDiv:AddImage("/media/games/camera_rotate_2D.png", "This is an image of the camera rotate 2D")
+        bodyDiv:AddParagraph(   "Now that we understand camera rotation for 2D scenes, let’s try camera rotation for 3D.")
+
+        //the section on 3D rotation
+        bodyDiv:AddHeading("3D Rotation", 3)
+        bodyDiv:AddParagraph(   "Let's open the 3D example scene again for this part of the tutorial. Be sure to comment out or delete the last zoom. "
+                            +   "To try out basic rotation for 3D, let’s rotate our camera to look at our scene upside-down.")
+        bodyDiv:AddParagraph(   "We are still writing this code in the same place: our CreateGame action after the Add statements. "
+                            +   "We can write these two lines of code to see the scene upside-down:")
+
+
+        CodeBlock cb2
+        Span s1
+        cb2:AddText(    "camera:Rotate(180, 0, 0, 1) ")
+        s1:AddText(     "//This action requires 3 parameters: the number of rotation degrees, an x value, a y value, and a z value " + cr)
+        s1:SetClassAttribute("comment")
+        cb2:Add(s1)
+        cb2:AddText(    "camera:LookAt(0, 0, 0)") 
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+
+        bodyDiv:AddParagraph(   "The results of that code look like this:")
+        bodyDiv:AddImage("/media/games/camera_rotate_3D.png", "This is an image of the camera rotate 3D")
+        bodyDiv:AddParagraph(   "Now, we can get rid of the code that turned our world upside-down and try another type of rotation that is useful in a 3D game called RotateAround. "
+                            +   "This action allows us to rotate around a point on our screen. "
+                            +   "In order to better see the effect of this action, let’s write this code in our Update action:")
+        bodyDiv:AddParagraph(   "RotateAround is an action that requires three parameters: a Vector3 (think of this as a way to represent a point in 3D) "
+                            +   "that represents the point we want our camera to rotate around, a Vector3 that represents the axis we want to Rotate about (like the previous Rotate) "
+                            +   "and the number of degrees to rotate. Let’s rotate around our tree by the y axis, "
+                            +   "and keep the number of degrees since it will rotate by this much every frame. Here is what our code should be:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action Update(number seconds)" + cr
+                                                        +   "    Vector3 treeCorner" + cr
+                                                        +   "    Vector3 zaxis" + cr
+                                                        +   "    treeCorner:Set(0, 0, 50)  " + cr
+                                                        +   "    zaxis:Set(0, 1, 0)" + cr
+                                                        +   "    camera:RotateAround(treeCorner, zaxis, 1)" + cr
+                                                        +   "end"))
+        bodyDiv:AddParagraph(   "Now, if we run our code (F6), our camera rotates around our scene with the tree at the center.")
+
+        //the section on ortographic cameras and perspective cameras
+        bodyDiv:AddHeading("Orthographic Cameras and Perspective Cameras", 2)
+        bodyDiv:AddParagraph(   "Quorum and most other 3D game engines support two types of cameras: orthographic and perspective. "
+                            +   "In general, an orthographic camera is for 2D scenes, and a perspective camera is for 3D scenes. An orthographic camera does not show depth. "
+                            +   "A perspective camera will make objects that are farther away look smaller, and objects that are closer to the camera look larger." )
+        bodyDiv:AddParagraph(  "In general, the default settings: perspective for 3D scenes and orthographic for 2D scenes, will be suitable, "
+                            +   "but for more information on the PerspectiveCamera and OrthographicCamera classes, see the Library pages.")
+
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to code cameras in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Cameras"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Cameras.png"
+    end
+
+    action GetName returns text
+        return "Cameras"
+    end
+
+    action GetShortDescription returns text
+        return "how to use cameras"
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/cameras.html"
+    end
+end

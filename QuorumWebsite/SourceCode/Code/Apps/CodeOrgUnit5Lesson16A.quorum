@@ -1,0 +1,481 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson16A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 16: Actions with Return Values")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 16: Actions with Return Values", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("In this lesson students are introduced to the return command and learn to write their own actions that return values. They first complete a simple unplugged activity based on the game Go Fish to introduce the concept of a return value. They will then complete a short sequence of exercises in an IDE, which introduces preferred patterns for writing actions that return values. At the end of the sequence, students will write and use actions that return values in a simple turtle driver app.")
+        bodyDiv:Add(ov1)
+            
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Return Value: ", "a value sent back by an action to the place in the code where the action was called form - typically asking for value (e.g. getText(id)) or the result of a calculation or computation of some kind. Most programming languages have many built-in actions that return values, but you can also write your own.")
+        bodyDiv:Add(voc)
+
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use the return keyword to design actions.")
+                goalList:AddListItem("Identify instances when an action with a return value can be used to contain frequently used computations within a program.")
+                goalList:AddListItem("Design actions that return values to perform frequently needed computations within a program.")
+       bodyDiv:Add(goalList)
+
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("The ability to return values is closely tied to the concept of scope. All variables declared within a action are in local scope and so will be removed once the end of the action is reached. As a result any useful information generated during that action will be lost. One solution to this problem is storing the value in a global variable, but this is generally considered bad programming practice. Global variables can be accessed by many actions and so reasoning about their logic requires considering the logic of all of those actions. Return values are a way to move information out of the local scope of an action without using a global variable. As a result an action call can be treated as if it were the type of data that a action returns, and it is up to the programmer to determine if or how it will be used.")
+        bodyDiv:Add(purpose)
+
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList resources
+            resources:AddListItemLink("Return Values with Go Fish Activity Guide, rtf", "/files/code/Unit5/U5L16 Activity Guide - Return Values with Go Fish.rtf")
+        bodyDiv:Add(resources)
+
+
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "action AddThemUp1(integer x, integer y) returns integer", "")
+                AddListItemWithBoldAtFront(code, "return answer", "")
+        bodyDiv:Add(code)
+
+        bodyDiv:AddHeading("Getting Started", 2)
+            Paragraph getStart
+                getStart:AddText("Today we are going to look at how to write our own actions with return values. Students are going to explore this idea by playing the classic card game Go Fish.")
+        bodyDiv:Add(getStart)
+
+            UnorderedList startList
+                startList:AddListItem("Break students into groups of 4, if possible. Each group should be provided with a set of cards.")
+                startList:AddListItem("Each student should have a copy of the worksheet for themselves.")
+                startList:AddListItem("Each group should play a couple rounds of Go Fish with the team.")
+                startList:AddListItem("Groups do not need to finish the game to get the point here.")
+                startList:AddListItem("Students should complete the worksheet together as a group.")
+        bodyDiv:Add(startList)
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+        bodyDiv:AddParagraph("Introduce the idea of an action with a return value as a process in which a question is asked, something computes an answer and gives the answer back to the asking location. We are looking to draw out the need for some way to share the information between the two parts of the program.")
+
+        bodyDiv:AddHeading("Share algorithms for the Responder", 4)
+            Paragraph getStart1
+                getStart1:AddText("Have students share their algorithms for the responder. The main goal here is for them to talk about the parameters for the action, the algorithm used in the action and, most important, the information that needs to be returned at the end of the action.")
+        bodyDiv:Add(getStart1)
+            Paragraph getStart2
+                getStart2:AddText("Ideas for the algorithms will vary. An example of what students might create is:")
+        bodyDiv:Add(getStart2)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action responder(desiredCard)" + cr
+                                                        +   "" + cr
+                                                        +   "var gaveCard = false" + cr
+                                                        +   "for each card in responder's hand" + cr
+                                                        +   "if card is equal to desiredCard" + cr
+                                                        +   "gaveCard = true" + cr
+                                                        +   "RETURN card" + cr
+                                                        +   "if gaveCard is false" + cr
+                                                        +   "RETURN " + dq + "Go Fish" + dq + cr))
+
+            Paragraph getStart3
+                getStart3:AddText("Although technically this first example is not how you would write this with code, as the return statement would cause you to leave the action, it gets across the main understanding we are working towards.Therefore, it is a completely correct way for students to be thinking at this point. You should not feel the need to correct this understanding before they work on the Coding Challenges, but if you are wondering about a more correct versions of this algorithm, check out the algorithm below. A more correct version of this algorithm would be: action responder(desiredCard)")
+        bodyDiv:Add(getStart3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "var cardsToGive = []" + cr
+                                                        +   "for each card in responder's hand" + cr
+                                                        +   "if card is equal to desiredCard" + cr
+                                                        +   "add card to cardsToGive list" + cr
+                                                        +   "if cardsToGive length is 0" + cr
+                                                        +   "RETURN " + dq + "Go Fish" + dq + cr
+                                                        +   "else" + cr
+                                                        +   "RETURN cardsToGive" + cr))
+
+            Paragraph getStart4
+                getStart4:AddText("The above algorithm is good, as it will return at the end of the computation and therefore could be something you could use to translate into code. However, it is usually best practice to always return the same type of information. " + dq + "Go Fish" + dq + " is a string, whereas cardsToGive is an array. Even better would be:")
+        bodyDiv:Add(getStart4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action responder(desiredCard)" + cr
+                                                        +   "" + cr
+                                                        +   "var cardsToGive = []" + cr
+                                                        +   "for each card in responder's hand" + cr
+                                                        +   "if card is equal to desiredCard" + cr
+                                                        +   "add card to cardsToGive list" + cr
+                                                        +   "RETURN cardsToGive" + cr))
+
+        bodyDiv:AddHeading("Why do we need to return some information from the Responder to the Asker?", 4)
+            UnorderedList startList1
+                startList1:AddListItem("Once the asker has gained the information, he uses it to continue computing information.")
+                startList1:AddListItem("The asker can not easily gain the information without the help of the responder, as he doesn't have access to the cards.")
+        bodyDiv:Add(startList1)
+
+            Paragraph getStart5
+                getStart5:AddText("As we experienced playing Go Fish, we often need to ask for information and receive an answer to be able to make decisions. We have used a few different actions that do something like this, such as randomNumber, getText, and includes. Up until now, though, we have never been able to create our own actions that return information. Today we are going to learn how to write actions with return values.")
+        bodyDiv:Add(getStart5)
+
+
+        bodyDiv:AddHeading("Activity", 2)
+
+        bodyDiv:AddParagraph("In this activity, students are introduced to value-returning actions. There is a good amount of reading and examples for students, followed by two short Coding Challenges. The first has students call a pre-existing action, using it like a variable, and the second has students create a value-returning action based on the first Coding Challenge. Finally, students are given a sample program that uses value-returning actions and they are walked through a code analysis of it.")
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+            Paragraph using
+                using:AddText("We already know that parameters provide input values to our actions. It is also possible for actions to generate output values which can be used to change the logical flow of the program.")
+        bodyDiv:Add(using)
+            Paragraph using1
+                using1:AddText("We have already encountered many examples of actions that generate output, including:")
+        bodyDiv:Add(using1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "RadoomIntegerBetween(min, max)" + cr
+                                                        +   "array:Get(index)" + cr
+                                                        +   "array:GetSize(index)" + cr))
+
+            Paragraph using2
+                using2:AddText("You may not have thought of it at the time, but when you called these actions you treated them as if they were a value. In reality you were using the value returned by these actions.")
+        bodyDiv:Add(using2)
+
+        bodyDiv:AddHeading("Examples of Return actions Used as Values", 4)
+            UnorderedList usingList
+                usingList:AddListItem("Using the RandomIntegerBetween(min, max) action as an integer")
+                usingList:AddListItem("Using the array:Get(index) action as a whatever variable the array is made of.")
+                usingList:AddListItem("Let's have a look at how we can write actions like this ourselves.")
+        bodyDiv:Add(usingList)
+
+        bodyDiv:AddHeading("The keywords: " + dq + "returns" + dq + " and " + dq + "return" + dq, 4)
+            Paragraph using3
+                using3:AddText("When you call an action, you are telling the computer to run a piece of code elsewhere in your program. When that action is finished running, execution of the program returns to the point in the code where the action was called.")
+        bodyDiv:Add(using3)
+            Paragraph using4
+                using4:AddText("In order for us to create an action with a return value in the Quorum programming language, you must first explicitly tell what type of value the action " + dq + "returns" + dq + " on the line where you name the action, and then write the exact name of the returning variable (or the value) at the ending part of the action. The code (or code block) that is written below the " + dq + "return" + dq + " keyword in the action will never be executed by the computer. Writing a return in the middle of the code block in an action is often a programmer's coding mistake. To minimize this type of mistake, the Quorum programming language does not allow programmers to write any code below the line that contains the " + dq + "return" + dq + " keyword. If we do, the IDE throws us a syntax error warning.")
+        bodyDiv:Add(using4)
+
+        bodyDiv:AddHeading("Example 1: Action that returns a text string", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action ReturnExample1 returns text" + cr
+                                                        +   "   text comment = " + dq + "This line of code always runs" + dq + cr
+                                                        +   "   return comment" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "//OR" + cr
+                                                        +   "" + cr
+                                                        +   "action ReturnExample2 returns text" + cr
+                                                        +   "    return " + dq + "This line of code always runs too" + dq + cr
+                                                        +   "end" + cr))
+
+        bodyDiv:AddHeading("Example 2: Action that takes integer (or number) parameters, then returns an integer (or number)", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action AddThemUp1(integer x, integer y) returns integer" + cr
+                                                        +   "   integer answer = x + y" + cr
+                                                        +   "   return answer" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "//OR" + cr
+                                                        +   "" + cr
+                                                        +   "action AddThemUp2(integer x, integer y) returns integer" + cr
+                                                        +   "   return x + y" + cr
+                                                        +   "end" + cr))
+
+        bodyDiv:AddHeading("Returning Values", 4)
+            Paragraph retValue
+                retValue:AddText("When your action is done executing it will be replaced by whatever value you return, just like " + dq + "RandomIntegerBetween(min, max)" + dq + " is replaced by a randomly generated number and " + dq + "array:Get(index)" + dq + " is replaced by the data in the array at the specified index position. This is how your actions can generate output that other parts of your program can use.")
+        bodyDiv:Add(retValue)
+
+        bodyDiv:AddHeading("Example 1:", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action Main" + cr
+                                                        +   "   output ReturnExample1()" + cr
+                                                        +   "   output ReturnExample2()" + cr
+                                                        +   "end" + cr))
+
+        bodyDiv:AddHeading("Example 2:", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action Main" + cr
+                                                        +   "   AddThemUp1(4, 5)" + cr
+                                                        +   "   AddThemUp2(4, 5)" + cr
+                                                        +   "end" + cr))
+
+            Paragraph retValue1
+                retValue1:AddText("Notice that we need to place our new action call behind the " + dq + "output" + dq + " statement in order to display the value it returned. Without this statement, the value would be calculated, but it would not be used anywhere in your program. This is no different than if you were to call " + dq + "RandomIntegerBetween(min, max)" + dq + " and not use the value generated. It is up to you, the programmer, to decide how this returned value will be used in the rest of your program.")
+        bodyDiv:Add(retValue1)
+            Paragraph retValue2
+                retValue2:AddText("We will typically write an action that returns a value when we have a calculation that we perform many times in our code (for example, finding the minimum value in an array). Our action would use parameters to provide inputs, would calculate a result, and would return that result as output. To help us get started writing our own actions that return values, here are some simple guidelines to follow.")
+        bodyDiv:Add(retValue2)
+
+        bodyDiv:AddHeading("Guidelines for Writing actions with Return Values", 4)
+            UnorderedList retValueList
+                retValueList:AddListItem("Use the keyword " + dq + "returns" + dq + " in the line where you name the action, specifying the return value.")
+                retValueList:AddListItem("Decide what values, if any, you need as input for your computation. Make these parameters of your action.")
+                retValueList:AddListItem("Use your parameters to calculate your result and save that result in a single variable.")
+                retValueList:AddListItem("Return that variable on the last line of your action by using the " + dq + "return" + dq + " keyword.")
+        bodyDiv:Add(retValueList)
+
+        bodyDiv:AddHeading("Using Actions that Return Values", 4)
+            Paragraph retValue3
+                retValue3:AddText("We have used actions that return values many times before, but in this exercise you will understand how they are actually created by using the keywords " + dq + "returns" + dq + " and " + dq + "return." + dq + " The action minVal accepts two numbers as input and returns the minimum of the two as output. You can call this action just like any other, and because it returns a number, you can treat the action call as if it were a number.")
+        bodyDiv:Add(retValue3)
+
+            Paragraph retValue4
+                retValue4:AddText("Starter code has been provided that creates the action minVal and generates two random values.")
+        bodyDiv:Add(retValue4)
+
+
+            UnorderedList retValueList1
+                retValueList1:AddListItem("Inspect the code of minVal to understand the logic of this action.")
+                retValueList1:AddListItem("Call minVal in action Main using rand1 and rand2 as parameters and ensure the minimum value is returned. ")
+                retValueList1:AddListItem("You should treat the action call as if it were a number.")
+        bodyDiv:Add(retValueList1)
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Using Actions that Return Values")
+        addStatementIDE:GetIDETitle():AddText("Using Actions that Return Values")
+        addStatementIDE:GetIDESubtitle():AddText("")
+        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "class Main" + cr
+                                                        +   "   Random random" + cr
+                                                        +   "" + cr
+                                                        +   "   action Main" + cr
+                                                        +   "       integer rand1 = random:RandomIntegerBetween(1, 100)" + cr
+                                                        +   "       integer rand2 = random:RandomIntegerBetween(1, 100)" + cr
+                                                        +   "   " + cr
+                                                        +   "       // Call the action behind the line of code below, concatenate with '+' sign." + cr
+                                                        +   "       output "+dq+"Minimum value for "+dq+" + rand1 + "+dq+" and "+dq+" + rand2 + "+dq+" is "+dq + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "   action minVal(integer x, integer y) returns integer" + cr
+                                                        +   "       integer min = 0" + cr
+                                                        +   "       if x <= y" + cr
+                                                        +   "           min = x" + cr
+                                                        +   "       else" + cr
+                                                        +   "           min = y" + cr
+                                                        +   "       end" + cr
+                                                        +   "       return min" + cr
+                                                        +   "   end" + cr
+                                                        +   "end" + cr)
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Writing Actions that Return Values", 4)
+            Paragraph retValue5
+                retValue5:AddText("Now you are going to write your own action that returns a value, maxVal. This action should return the maximum of two values provided as input. You have already learned how to write action minVal from the previous coding challenge. ")
+        bodyDiv:Add(retValue5)
+        Paragraph retValue6
+            Bold bold
+            bold:AddText("Pattern for Actions that Return Values")
+            retValue6:Add(bold)
+        bodyDiv:Add(retValue6)
+        UnorderedList pattern
+            pattern:AddListItem("Use parameters to provide input.")
+            pattern:AddListItem("Declare a variable that will be used as output, possibly initializing its value.")
+            pattern:AddListItem("Update the value in your output variable throughout your program.")
+            pattern:AddListItem("Return your output variable on the last line of your action.")
+        bodyDiv:Add(pattern)
+            Paragraph retValue7
+                retValue7:AddText("You may actually recognize many similarities between how we wrote actions that process arrays and actions that return values. These patterns aren't rules of programming, but they help make your code easy to read and understand.")
+        bodyDiv:Add(retValue7)
+
+            Paragraph retValue8
+                retValue8:AddText("Modify the code from the previous exercise to create and call an action that evaluates the maximum value between two randomly generated integers.")
+        bodyDiv:Add(retValue8)
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Writing Actions that Return Values")
+        addStatementIDE1:GetIDETitle():AddText("Writing Actions that Return Values")
+        addStatementIDE1:GetIDESubtitle():AddText("")
+        addStatementIDE1:SetGameEnvironment(true)
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+        bodyDiv:Add(addStatementIDE1:GetGameCanvas())
+
+        bodyDiv:AddHeading("Multiple " + dq + "return" + dq + " keywords issue", 4)
+            Paragraph retValue9
+                retValue9:AddText("In other programming languages, it is possible to use the " + dq + "return" + dq + " keyword multiple times when creating an action that generates a returning value. This practice, however, often causes the creation of logical error(s) in the code. For this reason, the Quorum programming language does not allow programmers to use the " + dq + "return" + dq + " keyword more than once in this type of action. IF you do, the IDE will throw you a syntax error. If a programmer needs to write an action that uses conditionals to choose between different values to return, they simply need to declare a new local variable in the action, then reassign the " + dq + "correct" + dq + " value to it before returning it (just like you observed in the previous coding challenges.)")
+        bodyDiv:Add(retValue9)
+
+        bodyDiv:AddHeading("Using an action that Returns a Value in an App - Code Analysis", 4)
+            Paragraph retValue10
+                retValue10:AddText("We provide a complete project below, as well as an IDE. If you would like to review how it works, copy the project and run the program. Next, study the code and analyze how the " + dq + "OffsetY" + dq + " action uses a return value in this program.")
+        bodyDiv:Add(retValue10)
+
+//        bodyDiv:AddLink("Unit5Lesson16-ActionWithReturn.zip", "/files/code/Unit5/Unit5Lesson16-ActionWithReturn.zip")
+//        bodyDiv:Add(break)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Game" + cr
+                                                        +   "use Libraries.Game.Graphics.Drawable" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "use Libraries.Sound.Audio" + cr
+                                                        +   "" + cr
+                                                        +   "class Main is Game" + cr
+                                                        +   "   Drawable circle" + cr
+                                                        +   "   Random random" + cr
+                                                        +   "   Audio sound" + cr
+                                                        +   "" + cr
+                                                        +   "   number currentX = 0" + cr
+                                                        +   "   number currentY = 0" + cr
+                                                        +   "" + cr
+                                                        +   "   action Main" + cr
+                                                        +   "       StartGame()" + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "   action CreateGame" + cr
+                                                        +   "       circle:LoadFilledCircle(20)" + cr
+                                                        +   "       circle:SetPosition(currentX, 300)" + cr
+                                                        +   "       Add(circle)" + cr
+                                                        +   "" + cr
+                                                        +   "       sound:Load("+dq+"/media/Bing.ogg"+dq+")" + cr
+                                                        +   "       sound:EnableLooping()" + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "   action Update(number seconds)" + cr
+                                                        +   "       currentX = circle:GetX()" + cr
+                                                        +   "       currentY = OffsetY(currentX)" + cr
+                                                        +   "       WrapAtBorder()" + cr
+                                                        +   "       circle:SetPosition(currentX + 100 * seconds, currentY)" + cr
+                                                        +   "       Add(circle)" + cr
+                                                        +   "" + cr
+                                                        +   "       sound:SetVolume(currentY / 1000)" + cr
+                                                        +   "       sound:SetBalance(currentX / 1000)" + cr
+                                                        +   "       sound:Play()" + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "   action WrapAtBorder" + cr
+                                                        +   "        if currentX >= 800" + cr
+                                                        +   "           currentX = 0" + cr
+                                                        +   "       end" + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "   action OffsetY(number x_position) returns number" + cr
+                                                        +   "       number changedY = 0" + cr
+                                                        +   "       if x_position >= 800" + cr
+                                                        +   "           changedY = random:RandomIntegerBetween(0, 580)" + cr
+                                                        +   "       else" + cr
+                                                        +   "           changedY = currentY" + cr
+                                                        +   "       end" + cr
+                                                        +   "        return changedY" + cr
+                                                        +   "   end" + cr
+                                                        +   "end" + cr))
+
+        bodyDiv:Add(break)
+
+            Paragraph retValue11
+                retValue11:SetClassAttribute("cool-box")
+                retValue11:AddText("When a user runs this program, there is a black dot moving from the left side of the screen to the right side. Upon reaching the right border, the dot wraps back to the left border and starts moving to the right again. When the dot wraps, however, it will appear at a different, random height on the screen and then start moving rightwards. The sound effect provided with the program follows this pattern: the sound starts playing from the center speakers and gradually moves to playing only on the right speakers, matching how the dot is traveling across the screen. The volume of the sound is softer when the dot is close to the bottom of the screen, and louder when the dot is close to the top of the screen. Note that the dot starts at the bottom of the screen, so the sound does not play (it's too quiet to hear).")
+        bodyDiv:Add(retValue11)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("Value-Returning Actions")
+        addStatementIDE2:GetIDETitle():AddText("Value-Returning Actions")
+        addStatementIDE2:GetIDESubtitle():AddText("Copy and paste the above code into this IDE, then click " + dq + "Run Program" + dq + " to recognize how it works.")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("The action WrapAtBorder", 4)
+            Paragraph retValue12
+                retValue12:AddText("This is a good example of using an action without returning a value. This action simply reassigns " + dq + "0" + dq + " to the currentX variable when it exceeds the screen width of 800. At the moment when this action is executed, the program simply redraws the dot with an X-coordinate of 0, based on the value of currentX. This creates a visual illusion of the dot wrapping back to the left side of the screen.")
+        bodyDiv:Add(retValue12)
+
+        bodyDiv:AddHeading("The action OffsetY(number x_position) returns number", 4)
+            Paragraph retValue13
+                retValue13:AddText("This is a more elaborate action that returns a number value at the end. This action takes the currentX variable as a parameter. When the parameter becomes more than 800 (beyond the screen width), the program generates a random integer between 0 and 580. Then it will return this value to where it was called, in this case the Update action. Since the position we call this action from is where the currentY variable is getting a new value, currentY becomes this newly generated return value. Therefore, when the dot disappears from the right border of the screen, the dot is immediately redrawn at the left border of the screen at different height position.")
+        bodyDiv:Add(retValue13)
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+
+            Paragraph wrapup
+                wrapup:AddText("Return values are one way to move useful information generated inside of an action to the rest of your program. There is another way we can do this. If we write our action so that it stores its output within a global variable, then that information will be accessible when the action terminates, since the global variable will stay in scope.")
+        bodyDiv:Add(wrapup)
+        bodyDiv:AddParagraph("Present the following prompt to students, and consider the points below the prompt during the discussion.")
+            Paragraph wrapup1
+                wrapup1:AddText("Why would we prefer to write an action that returns a value over the strategy shown above? How might return values make our action more generally useful? How might they make our code easier to reason about?")
+        bodyDiv:Add(wrapup1)
+            UnorderedList wrapupList
+                wrapupList:AddListItem("An action that saves output in a global variable must specifically reference that variable by name. Since that name is " + dq + "hard-coded," + dq + " your action can only ever save information in that variable. If we wish for our actions to be generally useful, we should be able to decide how to use the output generated by an action.")
+                wrapupList:AddListItem("A global variable is accessible by all actions. As a result, it can be difficult to determine every location in your program that modifies this variable. Reasoning about how its value will change over the course of the program is much harder, as is debugging unexpected behavior. ")
+                wrapupList:AddListItem("Using a return value limits the effects of an action to the local variables of the action and the place where the action was called.")
+        bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","1.1.1 (B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","1.2.3 (A, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","2.2.1 (A, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","2.2.2 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","4.1.1 (A, B, C, D, E, F)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.1.2 (A, B, C, J)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.3.1 (A, B, C, D, E, F, G, K, L)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.5.1 (E, J)")
+            bodyDiv:Add(list)
+
+/* Completed 6/22/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to create and use 'Actions with Return Values'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 16: (Actions with Return Values)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 16"
+    end
+    action GetShortDescription returns text
+        return "Learn how to create and use 'Actions with Return Values'"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson16A.html"
+    end
+
+end

@@ -1,0 +1,474 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson12A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 12: Loops and Simulations")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 12: Loops and Simulations", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("In this lesson, students will gain more practice using loops as we develop a simulation that repeatedly flips coins until certain conditions are met. The lesson begins with an unplugged activity in which students flip a coin until they get 5 heads in total, and then again until they get 3 heads in a row. They will then compete to predict the highest outcome in the class for each statistic. This activity motivates the programming component of the lesson in which we develop a program that allows them to simulate this experiment for higher numbers of heads and longer streaks.")
+        bodyDiv:Add(ov1)
+
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Models and Simulations: ", "a program which replicates or mimics key features of a real world event in order to investigate its behavior without the cost, time, or danger of running an experiment in real life.")
+        bodyDiv:Add(voc)
+            
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use a loop in a program to repeatedly call a block of code.")
+                goalList:AddListItem("Use variables, iteration, and conditional logic within a loop to record the results of a repeated process.")
+                goalList:AddListItem("Identify instances where a simulation might be useful to learn more about real-world phenomena.")
+                goalList:AddListItem("Develop a simulation of a simple real-world phenomenon.")
+        bodyDiv:Add(goalList)
+
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("The ability to model and simulate real-world phenomena on a computer has changed countless fields. Researchers use simulations to predict the weather, the stock market, or the next viral outbreak. Scientists from all disciplines increasingly rely on computer simulation, rather than real-life experiments, to rapidly test their hypotheses in simulated environments. Programmers might simulate users moving across their sites to ensure we can handle spikes in traffic, and of course video-game and virtual reality technology is built around the ability to simulate some aspects of the real world. The speed and scale at which simulations allow ideas to be tested and refined has had far-reaching impact, and it will only continue to grow in importance as computing power and computational models improve.")
+        bodyDiv:Add(purpose)
+
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList resources
+            resources:AddListItemLink("Flipping Coins Worksheet in Large Print, pdf", "/files/code/Unit5/U5L12 Worksheet - Flipping Coins.pdf")
+            resources:AddListItemLink("Flipping Coins Worksheet in Large Print, rtf", "/files/code/Unit5/U5L12 Worksheet - Flipping Coins.rtf")
+        bodyDiv:Add(resources)
+
+
+        bodyDiv:AddHeading("Getting Started", 2)
+            bodyDiv:AddParagraph("For this lesson, students will begin by participating in the following unplugged activity. First, have them flip a coin until they get 5 total heads. Then have them flip a coin again until they get 3 heads in a row. Have students record their results in the " + dq + "Flipping Coins Worksheet" + dq + " resource and predict the highest result in the class. Use the following paragraph as a prompt for them.")
+
+            bodyDiv:AddParagraph("We're going to run two simple experiments. Use your worksheets to keep track of your results (by writing " + dq + "H" + dq + " or " + dq + "T" + dq + " for each flip) but keep them a secret for now.")
+
+            UnorderedList getStartList
+                getStartList:AddListItem("Experiment 1: Groups will flip their coins as many times as it takes in order to get 5 heads total")
+                getStartList:AddListItem("Experiment 2: Groups will flip their coins as many times as it takes to get 3 heads in a row")
+            bodyDiv:Add(getStartList)
+
+            bodyDiv:AddHeading("Prompt", 4)
+            UnorderedList prompt
+                prompt:AddListItem("Let's have a little competition. You should have recorded your results for your two experiments. Based on your experiment, predict, among every group in the class the most and fewest flips needed to complete each of the experiments.")
+            bodyDiv:Add(prompt)
+
+            bodyDiv:AddParagraph("That was pretty interesting with only 5 total heads or a streak of 3 heads. If we want to run this experiments for higher numbers of heads or longer streaks of heads however, we'll quickly find that it's tedious to do once, let alone many times. Luckily we know now that we can use loops to repeatedly perform commands, so we're going to simulate these larger experiments instead.")
+
+        bodyDiv:AddHeading("Activity", 2)
+        
+        bodyDiv:AddParagraph("The series of problems and tasks in this lesson progressively build up a series of experiments that simulate coin flipping.")
+
+        bodyDiv:AddParagraph("Students are asked to make a hypothesis, then experiment with code, revise the hypothesis and so on, around some question. Below are some guidelines about what students should find.")
+
+        bodyDiv:AddHeading("Insights", 4)
+        UnorderedList insights
+            AddListItemWithBoldAtFront(insights, "Total Heads: ", "When trying to flip 5 heads, it is quite possible that it will only take 5 flips, but it may also easily take 15 or 20. Relative to the number of heads you are going for, this is a massive range! When you are trying to flip 10,000 heads the likely range is typically between 19,000 and 21,000, and typically much closer. As you are going for more flips, the relative width of the likely window shrinks.")
+            AddListItemWithBoldAtFront(insights, "Longest Streak: ", "When trying to find a streak of 3 heads it will typically take between 3 (it's always possible!) and 20 flips, though of course it may take longer. Even slightly longer streaks of heads, however, will rapidly increase the average time it takes to find that streak. Going for a streak of 12 heads might occasionally happen in fewer than 100 flips, but it can also easily take tens of thousands. As the length of the streak increases, the number of flips it takes to find that streak grows rapidly.")
+        bodyDiv:Add(insights)
+
+        bodyDiv:AddHeading("How Much Math is Necessary?", 4)
+            Paragraph insights2
+                insights2:AddText("This lesson might seem to naturally lend itself to a more detailed discussion of the mathematical properties of random experiments. Flipping coins is, after all, perhaps the most classic example of a random experiment.")
+        bodyDiv:Add(insights2)
+            Paragraph insights3
+                insights3:AddText("The goal of this lesson is not for students to walk away knowing the precise mathematical relationship between the number of coins flipped and the number of heads observed or the longest streak of heads. Instead they are supposed to appreciate that questions that might be impossible or hard to address by hand are possible to examine by using computer simulation. Just as developing a mathematical model is one way to address a problem, so too is developing a simulation.")
+        bodyDiv:Add(insights3)
+            Paragraph insights4
+                insights4:AddText("There's no need to dive deep into the mathematics this lesson touches on, but students should be able to describe the patterns we observed while running our simulations, and use those observations to justify new hypotheses")
+        bodyDiv:Add(insights4)
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+        bodyDiv:AddParagraph("The remainder of this Lesson's Activity section is written in the form of instructions 
+            for students to follow and learn coding concepts. This also gives students the online IDE to code within.")
+
+        bodyDiv:AddHeading("Make a Hypothesis", 4)
+            Paragraph hypo
+                hypo:AddText("Over the next several exercises we are going to be building a program that simulates flipping coins in order to find out how many flips it takes to get 10,000 heads in total and how many flips it takes to get a streak of 12 heads in a row. If you're following along on the worksheet, you might have already tried these experiments at a smaller scale, flipping a coin until you got 5 total heads and a streak of 3 heads in a row. Doing this smaller scale activity may have given you some intuition for what the outcome of the larger experiment will be, but before running an experiment it's usually a good idea to develop a hypothesis.")
+        bodyDiv:Add(hypo)
+            Paragraph hypo1
+                Bold bold1
+                bold1:AddText("What will be the maximum and minimum number of flips it will take to get 10,000 heads? ")
+                hypo1:Add(bold1)
+                hypo1:AddText("When trying to get 5 heads some groups may have taken exactly 5 flips while others took 15 or more (3 times the number of heads you were going for!). Do you think this wide range of values will persist when trying for 10,000 heads?")
+        bodyDiv:Add(hypo1)
+            Paragraph hypo2
+                Bold bold2
+                bold2:AddText("What will be the maximum and minimum number of flips it will take to get a streak of 12 heads? ")
+                hypo2:Add(bold2)
+                hypo2:AddText("Again think about the patterns you've observed. If you need 4 times as many heads in a row will it take 4 times as long? Try to justify the values you choose.")
+        bodyDiv:Add(hypo2)
+            Paragraph hypo3
+                hypo3:AddText("Write down your predictions on the worksheet so you can reference them later. It's not important whether you're right (you'll have the answer soon enough anyway!) but it will let you reflect on your thinking. In fact, you might even get some new ideas you'd like to investigate as a result!")
+        bodyDiv:Add(hypo3)
+
+        bodyDiv:AddHeading("Starting Small", 4)
+            Paragraph small
+                small:AddText("To start, we're going to simulate flipping a coin 10 times. You might be thinking that isn't many coin flips, and that we could just do those flips in real life, but this is actually an important step in developing a simulation. At small scales we can make sure our code is working as intended because we can still confirm its output. Once we're convinced that the logic of our program is reliable we'll move up to simulating larger numbers of flips.")
+        bodyDiv:Add(small)
+            Paragraph small1
+                small1:AddText("The core logic of our program will be focused on a " + dq + "repeat while" + dq + " loop that simulates flipping a coin by repeatedly generating random 0's or 1's using randomNumber. This is a great opportunity to keep practicing using loops while applying your knowledge of variables, iteration, and if statements.")
+        bodyDiv:Add(small1)
+
+        bodyDiv:AddHeading("Simulating Ten Coin Flips", 4)
+            UnorderedList smallList
+                smallList:AddListItem("When we want to flip a coin with a computer we will instead generate a random number between 0 and 1.")
+                smallList:AddListItem("Write a program that uses a " + dq + "repeat while" + dq + " to flip a coin 10 times and writes the value of each flip to the screen. The example below shows how your program should run.")
+                AddListItemWithBoldAtFront(smallList, "Hint: ", "you will need to use a counter variable in your " + dq + "repeat while" + dq + " to keep track of how many times the coin has been flipped.")
+        bodyDiv:Add(smallList)
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Simulating Ten Coin Flips")
+        addStatementIDE1:GetIDETitle():AddText("Simulating Ten Coin Flips")
+        addStatementIDE1:GetIDESubtitle():AddText("")
+        addStatementIDE1:SetGameEnvironment(true)
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+        bodyDiv:Add(addStatementIDE1:GetGameCanvas())
+
+        bodyDiv:AddHeading("Counting Heads", 4)
+            Paragraph small2
+                small2:AddText("Let's say that a 1 is a heads. If we want our simulation to run until we reach a certain number of heads, we should first start by counting the number of heads that have been flipped. In order to do this you will need to add a variable that counts the number of heads. Initialize it to 0, and every time you flip a heads (1) increment this heads counter by 1. To ensure your program works correctly, output the current coinFlip, number of heads, and number of flips at the end of each iteration of the loop.")
+        bodyDiv:Add(small2)
+
+            UnorderedList smallList1
+                smallList1:AddListItem("Add a variable that counts the number of heads (1's) and write its value to the screen after each flip.")
+                smallList1:AddListItem("Run your program several times and validate that the number of heads recorded is correct by checking the flips you've printed to the screen.")
+                AddListItemWithBoldAtFront(smallList1, "Hint: ", "you will also need to store your current coin flip in a variable to complete this challenge.")
+        bodyDiv:Add(smallList1)
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Counting Heads")
+        addStatementIDE:GetIDETitle():AddText("Counting Heads")
+        addStatementIDE:GetIDESubtitle():AddText("")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Changing the Loop Condition", 4)
+            Paragraph small3
+                small3:AddText("Currently our loop condition is based on a counter variable that keeps track of the total number of flips, but our simulation should only run while we have fewer than the target number of heads. In this exercise you are going to change the condition used by your " + dq + "repeat while" + dq + " loop so that your simulation terminates once you have flipped 5 total heads. At the end of the loop we will write the total number of flips to know how many flips it took to get 5 heads.")
+        bodyDiv:Add(small3)
+
+            UnorderedList smallList2
+                smallList2:AddListItem("Change the looping condition to use the variable you are using to keep track of the number of heads. Your loop should run as long as you have fewer than 5 total heads.")
+                smallList2:AddListItem("Add code after your loop that writes the total number of flips.")
+                smallList2:AddListItem("Test your program several times to make sure it works as expected.")
+        bodyDiv:Add(smallList2)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("Changing the Loop Condition")
+        addStatementIDE2:GetIDETitle():AddText("Changing the Loop Condition")
+        addStatementIDE2:GetIDESubtitle():AddText("")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("10,000 Heads!", 2)
+            Paragraph heads
+                heads:AddText("You're ready to increase the number of heads your simulation is going for and test your first hypothesis. Before we move up to the full 10,000 heads, however, we're going to perform a quick check of our program logic. When you make changes to your program it is possible that some portion of your programming logic will stop working as you expected. In order to feel more confident about your model you will first change the number of heads you are going for to a number that we can still verify (7 heads). If our code still works after making changes then we should be confident that it should work at 10,000. We will remove the intermediate output and run the full simulation!")
+        bodyDiv:Add(heads)
+
+            UnorderedList headsList
+                headsList:AddListItem("Increase the number of heads you are going for to 7 and confirm that the code is still working as you expect.")
+                headsList:AddListItem("If everything seems to be working, comment out the write command that displays the results of each flip. You can use " + dq + "//" + dq + " at the start of a line of code to comment it out. Make sure that the total count of flips still prints though!")
+                headsList:AddListItem("Run your simulation and find out how long it takes to get to 10,000 heads. Then run it a few more times. What patterns are you noticing? Record your results and move on.")
+        bodyDiv:Add(headsList)
+
+        SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("10,000 Heads!")
+        addStatementIDE3:GetIDETitle():AddText("10,000 Heads!")
+        addStatementIDE3:GetIDESubtitle():AddText("")
+        addStatementIDE3:SetGameEnvironment(true)
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+        bodyDiv:Add(addStatementIDE3:GetGameCanvas())
+
+
+        bodyDiv:AddHeading("Updating Your Hypotheses", 4)
+            bodyDiv:AddParagraph("If everything has gone well you should already be able to make a determination about your first hypothesis.")
+            UnorderedList update
+                update:AddListItem("How close were your guesses on the high and low bounds for the number of flips to get 10,000 heads?")
+                update:AddListItem("Were you at all surprised by this result? If they were different from what you predicted why might this be the case?")
+            bodyDiv:Add(update)
+            bodyDiv:AddParagraph("Take some time to write out your thoughts and whether your understanding of this system has changed. Update either of your hypotheses to reflect what you observed in this first experiment. ")
+
+
+        bodyDiv:AddHeading("Streaks of Heads", 4)
+            Paragraph streaks
+                streaks:AddText("We are going to alter our simulation so that it doesn't count the total number of heads, but rather the longest streaks of heads. This will allow us to simulate how many flips it takes to get 12 heads in a row.")
+        bodyDiv:Add(streaks)
+            Paragraph streaks1
+                streaks1:AddText("To begin with you will change your looping condition so that the loop again only runs 10 times. This will allow us to confirm our code is working.")
+        bodyDiv:Add(streaks1)
+
+            Paragraph streaks2
+                streaks2:AddText("We know we need to count streaks of heads, but how do we do this in code? Do we need to keep track of all the previous flips so we know that we're on a streak?")
+        bodyDiv:Add(streaks2)
+            Paragraph streaks3
+                streaks3:AddText("The answer is: no. We can instead just count in a clever way that makes our code pretty simple. Make a variable to use as a counter and...")
+        bodyDiv:Add(streaks3)
+            UnorderedList streaksList
+                streaksList:AddListItem("Every time you get heads, add 1 to a counter.")
+                streaksList:AddListItem("Every time you get tails, set the counter back to 0.")
+        bodyDiv:Add(streaksList)
+        bodyDiv:AddParagraph("Here is some psuedocode showing how it works. You might take a minute to study and reason about why and how it works.")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Outside loop" + cr
+                                                        +   "headsCount = 0" + cr
+                                                        +   "" + cr
+                                                        +   "// Inside loop" + cr
+                                                        +   "IF (current flip is a heads)" + cr
+                                                        +   "   headsCount = headsCount + 1" + cr
+                                                        +   "ELSE" + cr
+                                                        +   "   headsCount = 0" + cr
+                                                        +   "END" + cr + cr
+                                                        +   "DISPLAY (current flip)" + cr
+                                                        +   "DISPLAY (headsCount)" + cr))
+
+        bodyDiv:Add(break)
+            UnorderedList streaksList1
+                streaksList1:AddListItem("Change your " + dq + "repeat while" + dq + " loop's condition so that it only runs 10 times.")
+                streaksList1:AddListItem("Add code to the simulation that displays the length of each streak of heads following the logic described above. Note that pseudocode should translate to Quorum Language pretty easily.")
+        bodyDiv:Add(streaksList1)
+
+        bodyDiv:AddParagraph("The example below shows an example of what output from your program might be.")
+
+        Paragraph hint2
+            hint2:SetClassAttribute("cool-box")
+            Bold bold3
+            bold3:AddText("Note: ")
+            hint2:Add(bold3)
+            hint2:AddText("It is possible that you don't get any streaks of heads, due to using random numbers. As such, you may need to run your program several times to test.")
+        bodyDiv:Add(hint2)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 1" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 2" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak:0" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak:0" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 1" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 2" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 3" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 1" + cr))
+
+        SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("Streaks of Heads")
+        addStatementIDE4:GetIDETitle():AddText("Streaks of Heads")
+        addStatementIDE4:GetIDESubtitle():AddText("")
+        addStatementIDE4:SetGameEnvironment(true)
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+        bodyDiv:Add(addStatementIDE4:GetGameCanvas())
+
+        bodyDiv:AddHeading("Changing the Loop Condition: Streaks of Heads", 4)
+            Paragraph streaks4
+                streaks4:AddText("We want our simulation to run while the streak of heads is less than a target length. In order to do this we'll need to change our looping condition to use the variables we've been using to count our streak of heads. To begin with your simulation should try for a streak of 3 heads so that you can still confirm the output.")
+        bodyDiv:Add(streaks4)
+
+            UnorderedList streaksList2
+                streaksList2:AddListItem("Change the condition used by your " + dq + "repeat while" + dq + " loop so that it now runs while the streak of heads is less than 3.")
+                streaksList2:AddListItem("Test your program by running it and confirming that its output is correct. It should run like in the example below.")
+        bodyDiv:Add(streaksList2)
+
+        bodyDiv:AddParagraph("The example below shows an example of what output from your program might be.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "1" + cr
+                                                        +   "Heads Streak: 1" + cr
+                                                        +   "Flip Count: 1" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "Flip Count: 2" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "Flip Count: 3" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "Flip Count: 4" + cr
+                                                        +   "0" + cr
+                                                        +   "Heads Streak: 0" + cr
+                                                        +   "Flip Count: 5" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 1" + cr
+                                                        +   "Flip Count: 6" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 2" + cr
+                                                        +   "Flip Count: 7" + cr
+                                                        +   "1" + cr
+                                                        +   "Heads Streak: 3" + cr
+                                                        +   "Flip Count: 8" + cr))
+
+        SideBySideIDE addStatementIDE5
+        addStatementIDE5:SetUniqueIdentifier("Changing the Loop Condition: Streaks of Heads")
+        addStatementIDE5:GetIDETitle():AddText("Changing the Loop Condition: Streaks of Heads")
+        addStatementIDE5:GetIDESubtitle():AddText("")
+        addStatementIDE5:SetGameEnvironment(true)
+        addStatementIDE5:Setup()
+        bodyDiv:Add(addStatementIDE5)
+        bodyDiv:Add(addStatementIDE5:GetGameCanvas())
+
+        bodyDiv:AddHeading("Streaks of Heads: Twelve in a Row!", 4)
+            Paragraph streaks5
+                streaks5:AddText("We're almost ready to test our second hypothesis and find out how long it takes to get 12 heads in a row. Just as before we're first going to test our code with a different length streak (4) before removing most of the visual output and running the code for a streak of 12.")
+        bodyDiv:Add(streaks5)
+
+            UnorderedList streaksList3
+                streaksList3:AddListItem("Change your simulation to run until you get a streak of 4 and verify that the values calculated are accurate.")
+                streaksList3:AddListItem("Comment out the lines of code that write the current coin flip and the current streak count. You can use " + dq + "//" + dq + " at the start of a line of code to comment it out.")
+                streaksList3:AddListItem("Change your simulation to run until you get a streak of 12 heads.")
+                streaksList3:AddListItem("Run your simulation a few times and record your results!")
+        bodyDiv:Add(streaksList3)
+
+        SideBySideIDE addStatementIDE6
+        addStatementIDE6:SetUniqueIdentifier("Streaks of Heads: Twelve in a Row!")
+        addStatementIDE6:GetIDETitle():AddText("Streaks of Heads: Twelve in a Row!")
+        addStatementIDE6:GetIDESubtitle():AddText("")
+        addStatementIDE6:SetGameEnvironment(true)
+        addStatementIDE6:Setup()
+        bodyDiv:Add(addStatementIDE6)
+        bodyDiv:Add(addStatementIDE6:GetGameCanvas())
+
+        bodyDiv:AddHeading("Updating Your Hypotheses - Part 2", 4)
+            Paragraph streaks6
+                streaks6:AddText("You should now be ready to compare the results of your simulation to your second hypothesis.")
+        bodyDiv:Add(streaks6)
+            UnorderedList streaksList4
+                streaksList4:AddListItem("How accurate was your prediction of the upper and lower bounds for the number of flips to get a streak of 12 heads?")
+                streaksList4:AddListItem("Were you at all surprised by this result? What might explain the differences between your prediction and what you observed?")
+        bodyDiv:Add(streaksList4)
+
+        bodyDiv:AddParagraph("Just as before, you should update your hypotheses to reflect the results of your simulation. Try to come up with a reasonable explanation for the results you observed.")
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+
+        bodyDiv:AddParagraph("Present the following prompt to students after they've finished the Activity.")
+            Paragraph wrapup
+                wrapup:AddText("Update your hypothesis based on the results of your simulation and predict the outcomes of an even larger experiment using the new knowledge you have gained.")
+        bodyDiv:Add(wrapup)
+        UnorderedList wrapup1
+            wrapup1:AddListItem("On the second part of their worksheets, students are asked to extend their hypotheses to try to predict how long it might take to flip 10,000,000 heads or find a streak of 20 heads. Even for a computer, these could take a great deal of time to run, but luckily students should have developed intuitions about these problems based on earlier simulations.")
+            wrapup1:AddListItem("Student's actual predictions are less important than whether they demonstrate having reflected on the outcomes of the earlier simulation.")
+            wrapup1:AddListItem("Once students have finished writing their predictions for these problems, they should present their predictions and their reasons for making them with their classmates.")
+            wrapup1:AddListItem("Discuss whether and how the results of their earlier simulation impacted their new hypotheses.")
+        bodyDiv:Add(wrapup1)
+
+        bodyDiv:AddHeading("Conclusion", 4)
+        bodyDiv:AddParagraph("Present the following conclusions to students in an ending discussion.")
+            Paragraph wrapup2
+                wrapup2:AddText("Not all problems are as easy to simulate as a coin flip of course, and we've even encountered how some of the problems we can simulate still take a very long time to run.")
+        bodyDiv:Add(wrapup2)
+            Paragraph wrapup3
+                wrapup3:AddText("Simulations are an increasingly important tool for a variety of disciplines. Weather and traffic predictions are based on computer models that simulate weather patterns or people moving through a city. Scientific research, whether in physics, chemistry, or biology, increasingly use simulations to develop new hypotheses and test ideas before spending the time and money to run a live experiment.")
+        bodyDiv:Add(wrapup3)
+            Paragraph wrapup4
+                wrapup4:AddText("Before you use most of your favorite websites and apps, they will be tested by simulating high levels of traffic moving across the server. Simulations take advantage of computers' amazing speed and ability to run repeated tasks, as we've encountered through our exploration of the while loop, in order to help us learn more about the world around us.")
+        bodyDiv:Add(wrapup4)
+            Paragraph wrapup5
+                wrapup5:AddText("As computers get ever faster and models improve, we are able to answer old questions more quickly and start asking new ones.")
+        bodyDiv:Add(wrapup5)
+
+        bodyDiv:AddHeading("Extended Learning", 2)
+            Paragraph wrapup6
+                wrapup6:AddText("Extend this activity to new statistics, rolling dice, etc. Use these both as opportunities to practice programming and to develop the habit of using simulations to refine hypotheses.")
+        bodyDiv:Add(wrapup6)
+            UnorderedList wrapupList
+                wrapupList:AddListItem("How long does it take for the number of heads and tails flipped to be equal?")
+                wrapupList:AddListItem("Longest streak where each roll is greater than or equal to the last")
+                wrapupList:AddListItem("Longest streak made of only five (any five) of the six faces on the die (i.e., not equal to the other)")
+        bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","2.3.1 (A, C, D)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","2.3.2 (A, B, D, E, F, G, H)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","4.1.2 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.1.1 (A)")
+            bodyDiv:Add(list)
+
+/* Completed 6/11/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the use of Loops in Simulations"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 12:  (Loops and Simulations)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 12"
+    end
+    action GetShortDescription returns text
+        return "Learn the use of Loops in Simulations"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson12A.html"
+    end
+end
+
+ 
+    

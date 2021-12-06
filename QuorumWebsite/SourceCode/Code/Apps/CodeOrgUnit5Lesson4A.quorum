@@ -1,0 +1,674 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson4A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 4: Controlling Memory with Variables")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 4: Controlling Memory with Variables", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("This lesson gets into the basic mechanics of working with variables in programs. 
+                The lesson shows students how to create and assign values to variables and navigates 
+                through a series of common misconceptions about variables and how they work. Along 
+                the way, the lesson tries to build up the student's mental model of how computers 
+                and programs work, which is essential for being able to reason about programs.")
+        bodyDiv:Add(ov1)
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Data Type: ", "All values in a programming language have a &quottype&quot - such as integer, number, text, or boolean - that dictates how the computer will interpret it. For example, 7 + 5 is interpreted differently than &quot7&quot + &quot5&quot")
+                AddListItemWithBoldAtFront(voc, "Expression: ", "Any valid unit of code that resolves to a value.")
+                AddListItemWithBoldAtFront(voc, "Variable: ", "A placeholder for a piece of information that can change.")
+                //AddListItemWithBoldAtFront(voc, "variable", " - A memory slot that works lke a container for the values")
+                //AddListItemWithBoldAtFront(voc, "Declaring a variable", " - The process of creating a variable")
+                //AddListItemWithBoldAtFront(voc, "expression", " - A line or a blokc of code you write for programming")
+                //AddListItemWithBoldAtFront(voc, "Syntax rules", " - Rules and grammers for wrting valid computer program")
+                //AddListItemWithBoldAtFront(voc, "type", " - The type tells the computer what kind of variable we are creating")
+                //AddListItemWithBoldAtFront(voc, "White Space", " - Blank space in the code")
+                //AddListItemWithBoldAtFront(voc, "operator '='", "  - This operator is pronounced 'Gets or Receves'")
+                //AddListItemWithBoldAtFront(voc, "operator '"+dq+"'", " - This operator is used for text value")
+                //AddListItemWithBoldAtFront(voc, "integer variable", " - A whole number")
+                //AddListItemWithBoldAtFront(voc, "text variable", " - A text like expression")
+                //AddListItemWithBoldAtFront(voc, "camel naming convention", " -  One way to wrtie a variable name - example: thisIsCamelNamingConvention")
+                //AddListItemWithBoldAtFront(voc, "number variable", " - The variable that takes nueric expression with decimal point")
+                //AddListItemWithBoldAtFront(voc, "boolean variable", " - The variable that accep only true or false")
+                //AddListItemWithBoldAtFront(voc, "Arithlmetrics", " - Simple mathematical calculation")
+                //AddListItemWithBoldAtFront(voc, "Concatenation", " - The function in coding that annect the adjacent expression in one expression")
+                //AddListItemWithBoldAtFront(voc, "Console Mode", " - Consol mode on the on-line IDE only uses the output in the console output.")
+                //AddListItemWithBoldAtFront(voc, "input statement", " - One way for the user to input their choices in the console mode program")
+                //AddListItemWithBoldAtFront(voc, "'say' command", " - This command can be used to have the computer talk aloud")
+                //AddListItemWithBoldAtFront(voc, "Type Conversion' / " + dq + "Type Casting", " - a process to convert one type of variable into another type")
+                //AddListItemWithBoldAtFront(voc, "text processor", " - The computer hardware that process the text information")
+                //AddListItemWithBoldAtFront(voc, "number processor", " - The computer hardware that process the number information")
+                //AddListItemWithBoldAtFront(voc, "Calculable Variable/Value", " - The cariable and values that computer understands as methematical value")
+        bodyDiv:Add(voc)
+            
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use variables in a program to store values.")
+                goalList:AddListItem("Store the value returned by an Action (e.g. RandomIntegerBetween(1, 10)) in a variable for use in a program.")
+                goalList:AddListItem("Debug problems related to variable re-assignment.")
+                goalList:AddListItem("Write arithmetic expressions that involve variables.")
+                goalList:AddListItem("Reason about multi-line segments of code in which variables are re-assigned multiple times.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("Developing a good mental model for how variables work in computer 
+                programs is absolutely essential to long-term success as a programmer. However, because 
+                most students have had years worth of math classes before taking this course, there are two 
+                major misconceptions that early students often have about variables. We suggest that you try to 
+                avoid relating this material to mathematics at all. Some of the words and symbols are the 
+                same, but:")
+        bodyDiv:Add(purpose)
+        UnorderedList purp
+            purp:AddListItem("When we are assigning values to a variable name, say &quotgets&quot in place of the &quot=&quot sign. For example, &quotinteger age = 15&quot would be read as &quotthe integer variable age <i>gets</i> the value of 15.&quot When assigning a value to a variable the &quot=&quot sign is an instruction to store a value in memory, NOT a statement of equality")
+            purp:AddListItem("&quotVariables&quot in computer science are just named pieces of memory, NOT unknowns in an equation or symbols for undetermined values.")
+        bodyDiv:Add(purp)
+        bodyDiv:AddParagraph("Thus, lines of code that assign values to variables and expressions that use variables are really instructions to retrieve and store values in memory. And those values change while the program executes. Consider the following lines of code:")
+        //UnorderedList purp2
+        //    purp2:AddListItem("<b>a = a + b</b>")
+         //   purp2:AddListItem("<b>b = a + b</b>")
+        //bodyDiv:Add(purp2)
+        
+            //Paragraph purpose1
+              //  purpose1:AddText("The = sign in programming is an instruction to store a value in memory, NOT a statement of equality. 'Variables' in computer programming are just named pieces of memory, NOT unknowns in an equation or symbols for undetermined values. Thus, lines of code that assign values to variables and expressions that use variables are really instructions to retrieve and store values in memory. And those values change while the program executes. Being able to reason about what's happening in consecutive lines of code like the ones below correlates highly with a person's success in programming because you must have a good mental model for program execution and what the computer is doing.")
+        //bodyDiv:Add(purpose1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "a = a + b" + cr
+                                                        +   "b = a + b" + cr))
+        bodyDiv:AddParagraph("Being able to reason about what's happening in consecutive lines of code like these correlates highly with a person's success in programming because you must have a good mental model for program execution and what the computer is doing.")
+/*
+        bodyDiv:AddHeading("Incroduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "integer myInteger = 12", "")
+                AddListItemWithBoldAtFront(code, "text myText = â€œHello World!â€?", "")
+                AddListItemWithBoldAtFront(code, "integer answer = firstInteger + secondInteger", "")
+                AddListItemWithBoldAtFront(code, "text phoneNumber = input(â€œPlease type your phone number.â€?)", "")
+                AddListItemWithBoldAtFront(code, "integer castedInteger = cast(integer, textInteger)", "")
+                AddListItemWithBoldAtFront(code, "integer generatedInteger = randomInteger:RandomIntegerBetween(1, 100)", "")
+        bodyDiv:Add(code)
+*/
+
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddParagraph("You are now pretty well acquainted with the basic mechanics of making event-driven apps. There is a pattern to writing these programs that you should be used to:")
+        UnorderedList getStart
+            getStart:AddListItem("Add User Interface (UI) elements/objects to the screen")
+            getStart:AddListItem("Give the UI elements/objects meaningful names or IDs")
+            getStart:AddListItem("Add event handlers to those UI elements/objects")
+        bodyDiv:Add(getStart)
+        bodyDiv:AddParagraph("However there's a whole bunch of things that we can't do in our apps yet. The next step is to learn how to control the computer's memory to remember things while the program is running.")
+        bodyDiv:AddParagraph("Most apps keep track of some information that changes and updates as you use the app. For example, a simple game can keep track of your score and the number of lives you have left as you play.")        
+        bodyDiv:AddParagraph("Note that keeping track of data while a program is running is different from remembering things in the long term across multiple uses of the app, things like storing the all-time high score or remembering your user profile. Most programs need to use memory for even basic processing tasks. ")
+        bodyDiv:AddParagraph("But you will want to write programs that keep track of data. These apps/programs use and control the computer's memory to do this, and learning how to use memory in programs is a powerful skill to have. Today we'll start!")
+
+
+        bodyDiv:AddHeading("Activity 1: Controlling Memory with Variables", 2)
+        bodyDiv:AddParagraph("The programming tasks in this lesson acquaint students with the basics of working with variables and building up a mental model for how programs use
+        and manage memory. To keep things simple, the output will mostly be simple text displayed to the screen.")
+        bodyDiv:AddParagraph("This lesson gets into the basic mechanics of controlling the computer's memory, by working with variables in programs.")
+        bodyDiv:AddParagraph("We're going to focus on some bare-bones examples so that students get 
+        the basic ideas behind creating and using variables. We will be displaying text in the console rather than enhancing an app for now.")
+        bodyDiv:AddParagraph("Understanding the typical pitfalls of learning variables for the first time, combined 
+        with establishing a good mental model, will make working with memory and variables in the future much easier.")
+        UnorderedList act1a
+            act1a:AddListItem("To <b>create</b> a chunk of memory to use in a program you must indicate the &quottype&quot of data that will be stored in that memory location (e.g. integer, number, text, boolean) ")
+            act1a:AddListItem("To <b>assign</b> a value to a variable means to store a value in memory; you will use the &quot=&quot sign.")
+            act1a:AddListItem("Variable <b>re-assignment</b> typically means to change the value of a variable based on its current value (e.g. adding a point to the variable score: score = score + 1)")
+        bodyDiv:Add(act1a)
+        bodyDiv:AddParagraph("In the next two lessons students will learn how to work with variables and then incorporate them into a game to keep score.")
+        bodyDiv:AddParagraph("In this lesson students will learn to: ")
+        UnorderedList act2a
+            AddListItemWithBoldAtFront(act2a, "Move memory around ", "- learning some of the basic mechanics and properties of working with variables.")
+            AddListItemWithBoldAtFront(act2a, "Basic mechanics ", "- students will complete some bare-bones examples to understand the basic ideas behind creating and using memory through variables.")
+            AddListItemWithBoldAtFront(act2a, "Establish a good &quotmental model&quot for working with variables ", "- learning the imprtance of having a good mental model before you get in too deep will allow students to go further and faster later on.")
+            AddListItemWithBoldAtFront(act2a, "Getting past misconceptions ", "- understanding the typical pitfalls of learning variables for the first time, combined with establishing a good mental model will make working with memory and variables much easier in the future.")
+        bodyDiv:Add(act2a)
+        bodyDiv:AddParagraph("")
+
+        /*
+            Paragraph getStart
+                getStart:AddText("Do you remember  the time when we created an action for setting multiple labels in the last lesson? In order for us to avoid the cluttering of our code, we needed to use a variable called " + dq + "comment'. Creating the variable in the code made it easy for us to handle the lengthy expression of the on-screen instruction. In that part of the code, we needed to use the identical lengthy instruction in two places in our code. In stead of writing the same instruction twice, we made the variable " + dq + "comment' to store the instruction in the computer's memory. Then we had it represent the lengthy instruction  wherever we needed to use it.")
+        bodyDiv:Add(getStart)
+            Paragraph getStart1
+                getStart1:AddText("However there's a whole bunch of things that we can't do in our apps/programs yet. The next step is to learn how to control the computer's memory to remember things while the program is running. Most apps keep track of some information that changes and updates as you use the app. For example, a simple game can keep track of your score and the number of lives you have left as you play. Note that keeping track of data while a program is running is different from remembering things in the long term across multiple uses of the app, things like storing the all-time high score or remembering your user profile.")
+        bodyDiv:Add(getStart1)
+            Paragraph getStart2
+                getStart2:AddText("Most programs need to use memory for even basic processing tasks. The IDE (on-line or off-line) already keeps track of a lot of things for you in memory without you doing anything, like the position and styling of elements on the screen, especially if they are moving around. But you will want to write programs that keep track of data that's not â€œbuilt-intoâ€? the programming environment. These apps use and control the computer's memory to do this, and learning how to use memory in programs is a powerful skill to have. ")
+        bodyDiv:Add(getStart2)
+        */
+        InlineFrame inlineFrame
+        inlineFrame:SetAddress("https://www.youtube.com/embed/G41G_PEWFjE")
+        inlineFrame:SetHeight("480")
+        inlineFrame:SetWidth("854")
+        bodyDiv:Add(inlineFrame)
+        UnorderedList video
+        video:AddListItemLink("Video: Intro to Variables - Part 1", 
+        "https://www.youtube.com/watch?v=G41G_PEWFjE")
+        bodyDiv:Add(video)
+
+        bodyDiv:AddHeading("Activity 1: Student Instructions ", 3)
+        bodyDiv:AddParagraph("Let's get started with the most basic example of using and controlling the computer's memory with variables.")
+        CodeBlock cb1a
+        Span s1a
+        Span s1b
+        Span s2a
+        Span s2b
+            s1a:SetClassAttribute("comment")
+            s2a:SetClassAttribute("comment")
+            s1b:SetClassAttribute("comment")
+            s2b:SetClassAttribute("comment")
+            s1a:AddText("//Creates an integer type variable named &quotscore&quot and assigns the value of &quot0&quot to it" + cr)
+            s1b:AddText("//Creates a text type variable named &quotteamName&quot and assigns the value of &quotTigers&quot to it" + cr)
+            s2a:AddText("//Displays a message that includes the &quotteamName&quot and the current &quotscore&quot to the output screen" + cr)
+            cb1a:Add(s1b)
+            cb1a:AddText("text teamName = &quotTigers&quot" + cr + cr)
+            cb1a:Add(s1a)
+            cb1a:AddText("integer score = 0" + cr + cr)
+            cb1a:Add(s2a)
+            cb1a:AddText("output &quotThe &quot + teamName + &quot current score is: &quot + score " + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1a))
+        bodyDiv:AddHeading("<u>Coding Challenge: Declare a Variable</u>", 4)
+        bodyDiv:AddParagraph("Create/Declare an integer variable &quotlives,&quot assign it a value, and then display it to the console using a descriptive message that indicates what value is being displayed. Use the example above to help you.")
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Declaring a Variable")
+        addStatementIDE1:GetIDETitle():AddText("Declaring a Variable")
+        addStatementIDE1:GetIDESubtitle():AddText("")
+        addStatementIDE1:SetGameEnvironment(true)
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+        bodyDiv:Add(addStatementIDE1:GetGameCanvas()) 
+
+        bodyDiv:AddHeading("<u>Debugging Challenge: Fix the Error</u>", 4)
+        bodyDiv:AddParagraph("See if you can find the error in the following code block. If you are having trouble locating the error try running the program, fix the error and run it again.")
+        
+  SideBySideIDE addStatementIDE1a
+        addStatementIDE1a:SetUniqueIdentifier("Debugging with Variable")
+        addStatementIDE1a:GetIDETitle():AddText("Debugging with Variables")
+        addStatementIDE1a:SetGameEnvironment(false)
+        addStatementIDE1a:GetIDEInputArea():AddText("integer apples = 5
+integer blueberries = 12
+
+output Aples
+output blueberries ")
+        addStatementIDE1a:Setup()
+        bodyDiv:Add(addStatementIDE1a)
+        bodyDiv:AddParagraph("When you get the program running correctly the output should be: ")   
+        CodeBlock cb2a
+            cb2a:AddText("5" + cr)
+            cb2a:AddText("12" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2a))
+        bodyDiv:AddParagraph("When you are displaying the &quotvalue&quot of a variable to the output screen you <i>should NOT</i> use quotes. Notice the difference between these two statements - the comments next to each line explains the differences: ")
+        CodeBlock cb2b
+        Span span2a
+        Span span2b
+            span2a:SetClassAttribute("comment")
+            span2b:SetClassAttribute("comment")
+            span2a:AddText("//will display the literal characters s-c-o-r-e" + cr)
+            span2b:AddText("//will retreive the value of score and display it")
+            cb2b:AddText("output &quotscore&quot  ")
+            cb2b:Add(span2a)
+            cb2b:AddText("output score  ")
+            cb2b:Add(span2b)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2b))
+
+        bodyDiv:AddHeading("Activity 2: Controlling Memory - Other ways to store values", 2)
+        CodeBlock var
+            var:AddText("integer score = 0")
+        CodeBlock var2
+            var2:AddText("integer newScore = score + 1")
+        bodyDiv:AddText("When assigning values to variables we know that the &quot=&quot sign is not a statement of mathematical equality. It is an instruction to move memory around. One tip to help you remember this is to read a variable declaration statement like ")
+        bodyDiv:Add(var)
+        bodyDiv:AddText(" as: <b>&quotThe variable score <i>gets</i> the value 0&quot</b> or maybe just <b>&quotscore <i>gets</i> 0&quot</b> to be brief. Another example: ")
+        bodyDiv:Add(var2)
+        bodyDiv:AddText(" should be read as <b>&quotnewScore gets score plus 1.&quot</b>")
+        bodyDiv:AddParagraph("When you read the = sign as &quotgets,&quot and say it out loud that way, you'll prevent confusing yourself, and other programmers will know what you are talking about.")
+        bodyDiv:AddParagraph("As we're about to see there are other ways to store values in variables besides just hard-coding single numbers. But in all cases, even when it's more complicated, using the word &quotgets&quot when you see a variable assignment will help you create a mental model of what's happening.")
+
+        InlineFrame inlineFrameB
+        inlineFrameB:SetAddress("https://www.youtube.com/embed/ijjVDBPwA1o")
+        inlineFrameB:SetHeight("480")
+        inlineFrameB:SetWidth("854")
+        bodyDiv:Add(inlineFrameB)
+        UnorderedList videoB
+        videoB:AddListItemLink("Video: Intro to Variables - Part 2", 
+        "https://www.youtube.com/watch?v=ijjVDBPwA1o")
+        bodyDiv:Add(videoB)
+
+        bodyDiv:AddHeading("Activity 2: Student Instructions", 3)
+        bodyDiv:AddParagraph("A common thing to want to do is store the result of an arithmetic expression. The 4 basic arithmetic operations + - * / are available.")
+        CodeBlock arith
+        Span add
+        Span sub
+        Span mult
+        Span div
+        Span paren
+            add:SetClassAttribute("comment")
+            sub:SetClassAttribute("comment")
+            mult:SetClassAttribute("comment")
+            div:SetClassAttribute("comment")
+            paren:SetClassAttribute("comment")
+            add:AddText("//stores 10 in &quotresult&quot" + cr + cr)
+            sub:AddText("//stores 4 in &quotvalue&quot" + cr + cr)
+            mult:AddText("//stores 21 in &quotscore&quot" + cr + cr)
+            div:AddText("//stores 3.5 in &quotbonus&quot" + cr + cr)
+            paren:AddText("//stores 14 in &quotaverage&quot" + cr + cr)
+            arith:AddText("integer result = 7 + 3  ")
+            arith:Add(add)
+            arith:AddText("integer value = 7 - 3  ")
+            arith:Add(sub)
+            arith:AddText("integer score = 7 * 3  ")
+            arith:Add(mult)
+            arith:AddText("number bonus = 7.0 / 2.0  ")
+            arith:Add(div)
+            arith:AddText("integer average = (10 + 15 + 10 + 20 + 15) / 5  ")
+            arith:Add(paren)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(arith))
+        bodyDiv:AddParagraph("The expression itself is NOT stored in the variable, rather with arithmetic instructions like these you are asking to compute the expression first, and <b>then</b> store the answer (a single number) in the variable.")
+
+        bodyDiv:AddHeading("<u>Text and Variables Together</u>", 4)
+        CodeBlock concat
+            concat:AddText("output &quotThe &quot + teamName + &quot current score is: &quot + score")
+        bodyDiv:AddText("Sometimes it's useful to display text along with the value of a variable in the same line of output. To do this you use the &quot+&quot sign to attach a variable to text. We used this concept in the first example with the  ")
+        bodyDiv:Add(concat)
+        bodyDiv:AddText(" statement.")
+        bodyDiv:AddParagraph("If <b>both operands are numbers</b> &quot+&quot means to add those two numbers together.")
+        CodeBlock var3
+        Span var3a
+        Span var3b
+            var3a:SetClassAttribute("comment")
+            var3b:SetClassAttribute("comment")
+            var3a:AddText("//stores the sum of 5 + 7 (12) in the variable num1" + cr )
+            var3b:AddText("//outputs the sum of variable num1's value (12) and 10 to the screen, in this case 22" + cr)
+            var3:AddText("integer num1 = 5 + 7  ")
+            var3:Add(var3a)
+            var3:AddText("output num1 + 10  ")
+            var3:Add(var3b)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(var3))
+        bodyDiv:AddParagraph("If <b>either of the operands is a string</b> &quot+&quot treats both operands as if they were strings and combines them to create a single string. This is potentially confusing behavior especially if the text <i>looks</i> like numbers. For example this code block will display <b>16100</b> to the screen.")
+        CodeBlock var4
+            var4:AddText("integer num = 100" + cr)
+            var4:AddText("output &quot16&quot + num" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(var4))
+        bodyDiv:AddParagraph("This is because Quorum Programming Language sees that you are trying to display a mix of text and variable values. &quot16&quot (in quotes) is a string of ASCII characters not a number. And so everything is converted to text and the characters in the result of &quot16&quot + &quot100&quot comes out to &quot16100&quot.")
+        bodyDiv:AddParagraph("<b>Tip:</b> It's common to want to sandwich a variable between some text when displaying it. You can &quotadd&quot together multiple pieces of text and variables using the &quot+&quot operator. For example, you can do this: ")
+        CodeBlock var5
+            var5:AddText("integer numLikes = 7" + cr)
+            var5:AddText("output &quotSo far &quot + numLikes + &quot people like this page.&quot" + cr)
+            var5:AddText("say &quotSo far &quot + numLikes + &quot people like this page.&quot" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(var5))
+
+        bodyDiv:AddHeading("<u>Coding Challenge: Combining Text and Variables</u>", 4)
+        bodyDiv:AddParagraph("We have given you the starting code shown below. You should modify the code by combining text and variables to output/say this single line of text <i>&quotYou have 3 lives left with score: 0.&quot</i> ")
+        
+        SideBySideIDE addStatementIDE1b
+        addStatementIDE1b:SetUniqueIdentifier("Combining Text and Variables")
+        addStatementIDE1b:GetIDETitle():AddText("Combining Text and Variables")
+        addStatementIDE1b:SetGameEnvironment(false)
+        addStatementIDE1b:GetIDEInputArea():AddText("integer score = 0
+integer lives = 3
+
+output &quotchange this text&quot
+say &quotchange this text&quot
+ ")
+        addStatementIDE1b:Setup()
+        bodyDiv:Add(addStatementIDE1b)
+
+        bodyDiv:AddHeading("<u>Expessions with Variables</u>", 4)
+        bodyDiv:AddParagraph("Arithmetic becomes much more interesting when we use other variables in our expressions. For example you can do this: ")
+        CodeBlock expr1
+            expr1:AddText("number quiz1 = 99.5" + cr)
+            expr1:AddText("number quiz2 = 89.0" + cr)
+            expr1:AddText("number quiz3 = 93.5" + cr)
+            expr1:AddText("number avg = (quiz1 + quiz2 + quiz3) / 3" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(expr1))
+        bodyDiv:AddParagraph("The end result of an expression with variables is the same 
+        as one without. The major difference is that values are retrieved from memory in 
+        order to do the calculation rather than simply hard-coded. To compute the expression the computer will: ")
+        OrderedList mentalModel
+            mentalModel:AddListItem("Retrieve each of the values of the variables used in the expression.")
+            mentalModel:AddListItem("Evaluate the arithmetic expression.")
+            mentalModel:AddListItem("Store the computed value in memory.")
+        bodyDiv:Add(mentalModel)
+
+        bodyDiv:AddHeading("Coding Challenge: Calculating the &quotTotal Score&quot", 4)
+        bodyDiv:AddParagraph("In the starting code we have provided you with variables that might be the kinds of things you would keep track of in a game <b>totalTime</b>, <b>points</b>, and <b>lives.</b>")
+        bodyDiv:AddParagraph("Right now the <b>totalScore</b> is set to 0. We want you to compute a totalScore so that the person is rewarded for having a lot of points and lives, but penalized for taking a lot of time.")
+        bodyDiv:AddParagraph("Write an expression to calculate the player's total score and store that calculation in the <b>totalScore</b> variable. The calculation you should use is: <b>the player's points <i>times</i> their lives <i>divided</i> by the totalTime</b>.")
+                
+        SideBySideIDE addStatementIDE1c
+        addStatementIDE1c:SetUniqueIdentifier("Calculating the Total Score")
+        addStatementIDE1c:GetIDETitle():AddText("<u>Calculating the Total Score</u>")
+        addStatementIDE1c:SetGameEnvironment(false)
+        addStatementIDE1c:GetIDEInputArea():AddText("integer points = 15
+integer lives = 3
+integer totalTime = 9
+
+output &quotPoints: &quot + points
+output &quotLives: &quot + lives
+output &quotTotal Time: &quot + totalTime
+output&quot------------------------------------&quot
+integer totalScore = 0
+output &quotYour total score is: &quot + totalScore
+ ")
+        addStatementIDE1c:Setup()
+        bodyDiv:Add(addStatementIDE1c)
+
+        bodyDiv:AddParagraph("For the values provided the program output should be: ")
+        CodeBlock chlg1
+            chlg1:AddText("Points: 15" + cr)
+            chlg1:AddText("Lives: 3" + cr)
+            chlg1:AddText("Total Time: 9" + cr)
+            chlg1:AddText("------------------------------------" + cr)
+            chlg1:AddText("Your total score is: 5" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(chlg1))
+
+        bodyDiv:AddHeading("<u>Other Ways to Assign Values to Variables</u>", 4)
+        CodeBlock cbC
+            cbC:AddText("integer randomInt = random:RandomIntegerBetween(1, 10)")
+        bodyDiv:AddParagraph("Programs become much more interesting when the values in variables change while the program is running. We can also assign to a variable the value returned by an action. Remember our random number generator from Lesson 2 where we used the following line of code: ")
+        bodyDiv:Add(cbC)
+        bodyDiv:AddParagraph("Because the RandomIntegerBetween() action <i>evaluates to an integer</i>, it means that we can treat it <i>as though it were a number</i>.")
+ 
+        bodyDiv:AddHeading("<u>Coding Challenge: Dice Game</u>", 4)
+        bodyDiv:AddParagraph("Using the template below, create a program that simulates the rolling of two dice and reports (displays) their individual values as well as the sum. The program should: ")
+        UnorderedList dice
+            dice:AddListItem("Generate two random integers between 1 and 6 and store each result in its own variable")
+            dice:AddListItem("Output and Say the individual values of the two dice")
+            dice:AddListItem("Output and Say the sum of the two dice")
+        bodyDiv:Add(dice)
+        bodyDiv:AddParagraph("Every time you run the program the result will be a little different.")
+        bodyDiv:AddParagraph("We have given you starting code that explains what to do for the first die. The rest of the code is up to you! When you are done the output in the app display should be similar to this: ")
+        CodeBlock dice1
+            dice1:AddText("Rolling Dice!" + cr)
+            dice1:AddText("You rolled a: 5" + cr)
+            dice1:AddText("and a: 2" + cr)
+            dice1:AddText("For a total of: 7")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(dice1))
+          
+        SideBySideIDE addStatementIDE1d
+        addStatementIDE1d:SetUniqueIdentifier("Dice Game")
+        addStatementIDE1d:GetIDETitle():AddText("Dice Game")
+        addStatementIDE1d:SetGameEnvironment(false)
+        addStatementIDE1d:GetIDEInputArea():AddText("use Libraries.Compute.Random
+
+Random random
+
+integer roll1 = random:RandomIntegerBetween(1, 6)
+
+
+//Add the rest of the code here.
+ ")
+        addStatementIDE1d:Setup()
+        bodyDiv:Add(addStatementIDE1d)
+
+        bodyDiv:AddHeading("<u>Getting User Input</u>", 4)
+        bodyDiv:AddParagraph("Programs become even more interesting when we can interact with the user. To store user input into a variable we would use the following line of code: ")
+        CodeBlock userIn
+            userIn:AddText("text name = input(&quotWhat is your name?&quot)")
+        bodyDiv:Add(userIn)
+        bodyDiv:AddParagraph("This will prompt the user with the message &quotWhat is your name?&quot and store the user's input into the text type variable &quotname.&quot Since all user input is read in as a text type, we will have to manipulate the input to change the data type for our specific purpose. For instance if we want to store user input in an integer type variable we would have to place a &quotcast&quot on the input like this: ")
+        CodeBlock userIn2
+            userIn2:AddText("integer age = cast(integer, input(&quotWhat is your age?&quot))")
+        bodyDiv:Add(userIn2)
+        bodyDiv:AddParagraph("This will prompt the user with the message &quotWhat is your age?&quot and then cast (change) the user input to an integer type and finally store the value in the integer type variable &quotage.&quot")
+        bodyDiv:AddParagraph("<b>Note:</b> If you try and &quotcast&quot the text value &quotbob&quot to an integer type value, you will receive what is called a cast error since &quotbob&quot is NOT an integer, but a name.")
+
+        bodyDiv:AddHeading("<u>Coding Challenge: Simple Calculator</u>", 4)
+        bodyDiv:AddParagraph("Let's use the technique of casting user input to make a simple calculator. Write a program that will: ")
+        UnorderedList calc
+            calc:AddListItem("Ask the user to enter a number and store the &quotcasted&quot input to an integer type variable")
+            calc:AddListItem("Then ask the user to enter a second number, again storing the &quotcasted&quot input to an integer type variable")
+            calc:AddListItem("Display the result of some calculation (e.g. add the two integers, multiply the two integers, etc.)")
+        bodyDiv:Add(calc)
+        bodyDiv:AddParagraph("We have given you starting code that shows you how to get the first number, the rest of the code is up to you.")
+        bodyDiv:AddParagraph("<b>Debugging Tip: </b>Every start parenthesis &quot(&quot needs and end parethesis &quot)&quot.")
+
+        SideBySideIDE addStatementIDE1e
+        addStatementIDE1e:SetUniqueIdentifier("Simple Calculator")
+        addStatementIDE1e:GetIDETitle():AddText("Simple Calculator")
+        addStatementIDE1e:SetGameEnvironment(false)
+        addStatementIDE1e:GetIDEInputArea():AddText("integer num1 = cast(integer, input(&quotEnter the first number for the calculation: &quot))
+
+//Add the rest of the code here
+ ")
+        addStatementIDE1e:Setup()
+        bodyDiv:Add(addStatementIDE1e)
+
+        bodyDiv:AddHeading("<u>Variable Reassignment - Part 1</u>", 4)
+        bodyDiv:AddParagraph("So far we have only set a variable's value once. But it's called a <i>variable</i> for a reason - its value can change (or vary) throughout a program. This is useful and necessary for keeping track of things like a score in a game.")
+        bodyDiv:AddParagraph("To re-assign a value to a variable all you have to do is maintain a mental model of what's happening:")
+        UnorderedList variables
+            variables:AddListItem("Variables are containers for information")
+            variables:AddListItem("The = sign is an instruction to set the value")
+            variables:AddListItem("A series of assignment statements is a list of instructions to execute one at a time - it's not a series of equations that define the state of the world.")
+        bodyDiv:Add(variables)
+
+        bodyDiv:AddParagraph("<b>Make a Prediction: </b>Study the code in the online IDE below and make a prediction about what will happen when you run the code. What will the values of <b>a</b> and <b>b</b> be at the end of the program?")
+        bodyDiv:AddParagraph("Add an output statement at the end of the code for both variables to see if you were correct. If not, go back and add output statements for the variables throughout the code so that you can see the change in the variable's value as it occurs.")
+        bodyDiv:AddParagraph("")
+        CodeBlock a
+            a:AddText("integer a = 3")
+        bodyDiv:AddText("<b>Notice: </b>In the code below, after the integer type variable &quota&quot has been created using ")
+        bodyDiv:Add(a)
+        bodyDiv:AddText(" to change a variable's value, you only need to refer to the variable by its name. The type &quotinteger&quot only needs to be used once - when the variable is being created (declared) for the first time. It is a common mistake to use the type everytime you want to use a variable, but just remember that when you include the type you are <i>creating a new variable</i>. The computer will give you an error if you try to <i>create</i> the same variable more than once.")
+
+        SideBySideIDE addStatementIDE1f
+        addStatementIDE1f:SetUniqueIdentifier("Make a Prediction: Variable Re-assignment")
+        addStatementIDE1f:GetIDETitle():AddText("Make a Prediction: Variable Re-assignment")
+        addStatementIDE1f:SetGameEnvironment(false)
+        addStatementIDE1f:GetIDEInputArea():AddText("integer a = 3
+integer b = 5
+integer c = a + b
+b = b + c
+a = b + a
+
+//After you have made a prediction add your output statements here
+
+ ")
+        addStatementIDE1f:Setup()
+        bodyDiv:Add(addStatementIDE1f)
+
+        bodyDiv:AddHeading("<u>Variable Reassignment - Part 2: Updating Values</u>", 4)
+        bodyDiv:AddParagraph("All of our examples so far have shown how to set the value of a variable by using combinations of numbers and other variables. But what if you wanted to do something like <b>add 10 to the <i>current</i> value of a variable</b>?")
+        bodyDiv:AddParagraph("Because updating the value in a variable is just moving memory around, the process has to go something like this: ")
+        UnorderedList update
+            update:AddListItem("Read the current value of a variable")
+            update:AddListItem("Add 10 to it")
+            update:AddListItem("Store the new value back into the same variable")
+        bodyDiv:Add(update)
+        bodyDiv:AddParagraph("The technical term for this is called <b>variable re-assignment</b> - when you change the value of a variable based on its current contents. To increase the value of &quotnum1&quot by 10 you would need to do this: ")
+        CodeBlock update2
+            update2:AddText("num1 = num1 + 10")
+        bodyDiv:Add(update2)
+        bodyDiv:AddParagraph("<b>Make a Prediction: </b>We start you out with some code again. Trace the code and predict what you think the output will be at each step. Run the program and see if you were right. Add an output statement at the very end to see the last value of <b>someNum</b> and see if your full prediction is correct.")
+
+        SideBySideIDE addStatementIDE1g
+        addStatementIDE1g:SetUniqueIdentifier("Make a Prediction: Updating Values")
+        addStatementIDE1g:GetIDETitle():AddText("Make a Prediction: Updating Values")
+        addStatementIDE1g:SetGameEnvironment(false)
+        addStatementIDE1g:GetIDEInputArea():AddText("integer someNum = 7
+
+someNum = someNum + 1
+output &quotThe value of someNum is now: &quot + someNum
+
+someNum = someNum - 3
+output &quotThe value of someNum is now: &quot + someNum
+
+someNum = someNum + someNum
+output &quotThe value of someNum is now: &quot + someNum
+
+someNum = someNum * someNum
+
+ ")
+        addStatementIDE1g:Setup()
+        bodyDiv:Add(addStatementIDE1g)
+
+        bodyDiv:AddHeading("<u>Coding Challenge: Moving Memory</u>", 4)
+        bodyDiv:AddParagraph("The next two challenges present coding tasks related to &quotmoving memory&quot around in your program")
+        bodyDiv:AddParagraph("<b>Goal:</b> Set the value of the variables to make the output display the defined <b>&quotExpected Output&quot</b>")
+        UnorderedList rules
+            rules:AddListItem("You may only add lines of code that re-assign values of the variables provided")
+            rules:AddListItem("You may only use the assignment ( = ) and arithmetic operators ( + - * / )")
+            rules:AddListItem("You may not type or introduce any numbers")
+            rules:AddListItem("You may not add or create any new variables")
+            rules:AddListItem("You may not change or alter the output statement at all")
+        bodyDiv:Add(rules)
+        bodyDiv:AddParagraph("<b>Example: Provided Code</b>")
+
+        CodeBlock chlg2
+        Span chlg2a
+            chlg2a:SetClassAttribute("comment")
+            chlg2a:AddText("//your code goes here" + cr + cr)
+            chlg2:AddText("integer x = 2" + cr)
+            chlg2:AddText("integer y = 3" + cr)
+            chlg2:Add(chlg2a)
+            chlg2:AddText("output &quotThe value of y is: &quot + y + &quot(y should be 5)&quot" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(chlg2))
+
+        bodyDiv:AddParagraph("<b>Example: Possible Solution</b>")
+        CodeBlock chlg3
+        Span chlg3a
+            chlg3a:SetClassAttribute("comment")
+            chlg3a:AddText("//your code goes here" + cr)
+            chlg3:AddText("integer x = 2" + cr)
+            chlg3:AddText("integer y = 3" + cr)
+            chlg3:Add(chlg3a)
+            chlg3:AddText("y = y + x" + cr)
+            chlg3:AddText("output &quotThe value of y is: &quot + y + &quot(y should be 5)&quot" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(chlg3))
+
+        bodyDiv:AddParagraph("Now you try one. Use the starter code below to display the expected output: ")
+      
+        SideBySideIDE addStatementIDE1h
+        addStatementIDE1h:SetUniqueIdentifier("Moving Memory - Level 1")
+        addStatementIDE1h:GetIDETitle():AddText("Moving Memory - Level 1")
+        addStatementIDE1h:SetGameEnvironment(false)
+        addStatementIDE1h:GetIDEInputArea():AddText("integer x = 2
+integer y = 3
+
+//your code goes here
+
+output &quotThe value of x is: &quot + x + &quot(x should be 7)&quot
+ ")
+        addStatementIDE1h:Setup()
+        bodyDiv:Add(addStatementIDE1h) 
+
+        bodyDiv:AddParagraph("Okay let's try one that is a little bit harder: ")
+        SideBySideIDE addStatementIDE1i
+        addStatementIDE1i:SetUniqueIdentifier("Moving Memory - Level 2")
+        addStatementIDE1i:GetIDETitle():AddText("Moving Memory - Level 2")
+        addStatementIDE1i:SetGameEnvironment(false)
+        addStatementIDE1i:GetIDEInputArea():AddText("integer x = 5
+integer y = 11
+integer z = 4
+
+//your code goes here
+
+output &quotThe value of x is: &quot + x + &quot(x should be 2)&quot
+output &quotThe value of y is: &quot + y + &quot(y should be 6)&quot
+output &quotThe value of z is: &quot + z + &quot(z should be 8)&quot
+ ")
+        addStatementIDE1i:Setup()
+        bodyDiv:Add(addStatementIDE1i)  
+        bodyDiv:AddParagraph("")
+        Paragraph hint
+            hint:SetClassAttribute("cool-box")
+            hint:AddText("<b>Hint: </b>This one requires you to be a little clever. Think about setting the value of one variable that you could then use to easily set the value of the other variables. Then the trick is to figure out how to use the variables you've been given to make that useful value.")
+        bodyDiv:Add(hint)
+
+        bodyDiv:AddParagraph("Hopefully you now understand the gist of working with variables. The example below is something that definitely wouldn't make sense in math class, but you should be able to reason about it as a piece of code. Because it's code, you can also insert statements to display the value of the variables as they change. You don't have to guess!")
+        CodeBlock notMath
+            notMath:AddText("integer num = 0" + cr)
+            notMath:AddText("num = num + 1" + cr)
+            notMath:AddText("num = num + 1" + cr)
+            notMath:AddText("num = num + 1" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(notMath))
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddParagraph("This lesson was subtly one of the most important for you as a programmer. Being able to predict the value of a variable by tracing the code means that you have a good mental model for how programs execute code and how machines work.")
+        bodyDiv:AddParagraph("Some research has shown that being able to answer questions about simple variable re-assignment correlates highly with doing well in programming overall. So you're on your way!")
+
+        bodyDiv:AddHeading("Extended Learning", 2)
+        bodyDiv:AddParagraph("Students can make their own program that prompts the user for some numeric values and then performs an action. The user input values could be used to print a calculation to the screen, or they could be used to control a program (such a the number of times to repeat an action).")
+
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CPP.L2:5, CPP.L3A:3, CPP.L3A:4, CPP.L3A:5")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CT.L2:12, CT.L3A:1, CT.L3A:3")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.2.1(C, F)")
+        bodyDiv:Add(list)
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the skill for Controlling Memory with Variables'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 4: (Controlling Memory with Variables)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 4"
+    end
+    action GetShortDescription returns text
+        return "Learn about Controlling Memory with Variables"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson4A.html"
+    end
+
+end
+
+ 
+    

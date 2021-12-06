@@ -1,0 +1,1154 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson2A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 2: Event-Driven Programs")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 2: Event-Driven Programs", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+        Bold run
+            run:AddText(dq + "Run, Test, Debug!" + dq)
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("In this lesson students will create an " + dq + "Event-Driven 
+                Program" + dq + " from scratch using Quorum Programming Language. 
+                Students will learn the concept of " + dq + "Object Oriented Programming"
+                + dq + " through the creation of this project. The " + dq + "Musical 
+                Keyboard" + dq + " program will be built in steps (section by section), 
+                allowing students to run their programs and test the functionality of 
+                each section along the way while incorporating the concept of ")
+                ov1:Add(run)
+                ov1:AddText(" introduced in Lesson 1.")
+                //Students will learn the concept of an 'Object Oriented Programming (OOP)' as Quorum is one of these languages. The project we create is called 'Musical Keyboard'. We will create this project/program step any step as we learn many aspect of OOP. We will use graphics as well as audio in this project. As you are asked to complete and construct this project/program section by section, you will have chance to run the program as you expand the functionality of the program. This practice tis very common when you are creating a lengthy program. This practice naturally gives you a chance to experience the debugging process - for syntax error as well as for logical error - without using the IDE's debugging mode. This lesson covers so many basic concepts and knowledge in one lengthy lesson. You may want to divide the lesson in two or three sessions. If you have a peer who is learning this lesson together, it would be beneficial for both of you to divide this lesson in two parts - Audio handling and Graphics handling. Then one of you can do the audio part and the other can do the Graphics part. In the final stage of completing one multimedia project, you two can combine the code as well as sharing the knowledge learned in the process to each other. This lesson is also organized in the way that you need to test your program in each phase of the development. You will need to complete four activities through the course of this lesson. Be sure to run your code at the end of each activity or even more frequently as you think is necessary. You goal is for each testing is have no syntax errors and no logical errors(eg. the program should run as expected)")
+        bodyDiv:Add(ov1)
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Class: ", "A template for creating (or &quotinstantiating&quot) objects within a program. ")
+                AddListItemWithBoldAtFront(voc, "Object: ", "A particular instance of a class.")
+                AddListItemWithBoldAtFront(voc, "Debugging: ", "Finding and fixing problems in an algorithm or program.")
+//                AddListItemWithBoldAtFront(voc, "Event-driven program: ", "a program designed to run blocks of code or functions in response to specified events (e.g. a mouse click).")
+//                AddListItemWithBoldAtFront(voc, "Event handling: ", " an overarching term for the coding tasks involved in making a program respond to events by triggering actions.")
+                //AddListItemWithBoldAtFront(voc, "Object: ", "an instance of a class that contains the fields and actions of that class.")
+                //AddListItemWithBoldAtFront(voc, "Instantiating an object: ", "Creating an object from a class")
+                //AddListItemWithBoldAtFront(voc, "Quorum Game Engine (QGE): ", "the basic template  used to build from in this lesson.")
+                //AddListItemWithBoldAtFront(voc, "Object Oriented Programming (OOP)", " - (described in detail in this lesson)")
+                //AddListItemWithBoldAtFront(voc, "Update Loop: ", "The mechanism in the QGE that repeats actions in a loop continuously until terminated.")
+                //AddListItemWithBoldAtFront(voc, "Error message: ", "The message a programmer would see in the IDE when his/her code has some type of error (excluding the logical error).")
+                //AddListItemWithBoldAtFront(voc, "Compiler error: ", "A syntatical error in your code that is found by building your code in the IDE.")
+                //AddListItemWithBoldAtFront(voc, "Runtime error: ", "The error the program that is only discovered when the program is run. It can be the result of a logical error.")
+        bodyDiv:Add(voc)
+            
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Understand the basic principles and concepts of &quotObject Oriented Programming&quot.")
+                goalList:AddListItem("Review and expand on &quotEvent-Driven Programming&quot.")
+                goalList:AddListItem("Use the Quorum Game Engine to build an event-driven program.")
+                goalList:AddListItem("Recognize debugging as an important step in developing a program.")
+                goalList:AddListItem("Instantiate an object from a class.")
+                goalList:AddListItem("Call an action on an object.")
+                goalList:AddListItem("Understand the screen dimensions and positioning of a visual image.")
+                goalList:AddListItem("Load a visual image to an object.")
+                goalList:AddListItem("Load an audio file to an object.")
+                goalList:AddListItem("Create movements with an object on the screen.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("It takes a lot of time and effort to write a computer program. 
+                The length of a modern computer program, such as a game, could contain millions of 
+                lines of code. Programmers spend days, weeks, and months building a single program. 
+                Programmers may choose to focus on writing one specific section of a program at a time
+                and test the program as they complete each section to make sure the output 
+                matches what is expected. This lesson allows students to experience the basics of programming 
+                and the programming process by focusing on each action of the program separately.")
+        bodyDiv:Add(purpose)
+
+/*
+
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "Drawable keyC", "")
+                AddListItemWithBoldAtFront(code, "Audio noteC", "")
+                AddListItemWithBoldAtFront(code, "Color color", "")
+                AddListItemWithBoldAtFront(code, "Color red = color:Red()", "")
+                AddListItemWithBoldAtFront(code, "integer rotateC = 0", "")
+                AddListItemWithBoldAtFront(code, "keyC:LoadFilledRectangle(50, 50, red)", "")
+                AddListItemWithBoldAtFront(code, "keyC:SetPosition(80, 200)", "")
+                AddListItemWithBoldAtFront(code, "Add(keyC)", "")
+                AddListItemWithBoldAtFront(code, "keyC:Rotate(360*seconds*rotateC)", "")
+                AddListItemWithBoldAtFront(code, "action PressedKey(KeyboardEvent event)", "")
+                AddListItemWithBoldAtFront(code, "if event:keyCode = event:A", "")
+                AddListItemWithBoldAtFront(code, "noteC:Play()", "")
+                AddListItemWithBoldAtFront(code, "rotateC = 1", "")
+                AddListItemWithBoldAtFront(code, "action ReleasedKey(KeyboardEvent event)", "")
+                AddListItemWithBoldAtFront(code, "noteC:Stop()", "")
+        bodyDiv:Add(code)
+
+        bodyDiv:AddHeading("Goodbye, Turtle!", 2)
+            Paragraph byeTurtle
+                byeTurtle:AddText("Using the turtle as a form of output was helpful as we learned about UI elements and event handlers. But it's time to move on. Goodbye, fair turtle! We'll miss you.")
+        bodyDiv:Add(byeTurtle)
+            Paragraph byeTurtle1
+                byeTurtle1:AddText("From here on, we are diving into real computer programming with the Quorum Programming Language. We will create our own program from scratch using a blank main.quorum file/class. It is normal to feel overwhelmed at the vast range of knowledge to learn, concepts to understand, and techniques to master,  but …  don't worry, we will introduce these elements a little by little and repeatedly in this unit. You will be a beginning programmer by the end of this unit.")
+        bodyDiv:Add(byeTurtle1)
+*/
+
+        bodyDiv:AddHeading("Getting Started", 2)
+//        bodyDiv:AddHeading("Understanding &quotObject Oriented Language&quot", 4)
+            Paragraph ool
+                ool:AddText("Quorum Programming Language is an &quotObject Oriented Language&quot. To get a better idea of what an &quotObject Oriented Language&quot is let’s consider at the code example below:")
+        bodyDiv:Add(ool)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "" + cr
+                                                        +   "integer randomInt = random:RandomIntegerBetween(1, 10)" + cr
+                                                        +   "output randomInt"))
+
+        bodyDiv:AddHeading("Reading the code line by line: ", 4)
+            OrderedList obList
+                obList:AddListItem("On the first line, we wrote the &quotuse statement&quot to include the &quotRandom class&quot in this project. The &quotuse statement&quot is always followed by the word Libraries. The &quotRandom class&quot will support the &quotclass Main&quot that we are writing our code in.")
+                obList:AddListItem("On the second line, we wrote &quotRandom random.&quot The first Random, capital R, is the class name and the second, lowercase r, is the object name. In Quorum we declare objects in this manner. Note this object has a type (the class name), and a name (that we will use to reference it in our code).")
+                UnorderedList obList3
+                    ListItem obList3a
+                        obList3a:AddText("On the third line, we wrote &quotinteger randomInt = random:RandomIntegerBetween(1, 10).&quot This line has two different parts: ")
+                        obList3:AddListItem("The first part is &quotinteger randomInt.&quot This creates a container (or variable) that holds a specfic value. Variables have two parts, a type(integer) and a name(randomInt). The &quot=&quot sign is an operator that assigns the expression on the right side to the expression on the left side. We will explore &quottypes, variables and values&quot in more detail in lesson 4.")
+                        obList3:AddListItem("The second part of this line of code is the focus of this lesson, &quotrandom:RandomIntegerBetween(1, 10).&quot The object we created on line 2, &quotrandom,&quot is accessing (or calling) the action &quotRandomIntegerBetween()&quot from the Random class with the parameters of 1 and 10. When this line of code is executed it will return a random integer between 1 and 10 by accessing an action that has already been written to acheive this goal in the Random class.")
+                        obList3:AddListItem("When these two parts are combined, the random integer between 1 and 10 is returned and then assigned to the variable &quotrandomInt.&quot")
+                    obList3a:Add(obList3)
+                obList:Add(obList3a)
+                //obList:AddListItem("On the third line, we wrote &quotinteger randomInt = random:RandomIntegerBetween(1, 10)&quot. This line has two different parts. The first part is &quotinteger randomInt&quot. It is a container (or variable) that holds a specfic value. Variables have two parts, a type(integer) and a name(randomInt). The &quot=&quot sign is an operator that assigns the expression on the right side to the expression on the left side. We will talk more in detail about &quottypes, variables and values&quot in a future lesson in this unit.")
+                //obList:AddListItem("")
+                //obList:AddListItem("When we put the two parts together the result when the code runs is that a pseudorandom number between 1 an 10 is chosen and then that value is assigned to the container randomInt.")
+                obList:AddListItem("The last line outputs (prints) the random integer &quotvalue&quot that the variable &quotrandomInt&quot contains to the output window.")
+        bodyDiv:Add(obList)
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("Objects are useful in programming because they allow 
+                programmers to create many objects from one class. In this lesson and 
+                the next lesson, students will use classes to instantiate several 
+                &quotobjects.&quot Students will use these &quotobjects&quot 
+                to create a program that will turn their computer keyboard into a 
+                musical keyboard.")
+        bodyDiv:AddHeading("Student Instructions: ", 3)
+            Paragraph proj1
+                proj1:AddText("For our programming project we will: ")
+            bodyDiv:Add(proj1)
+                OrderedList keyboardAlgorithm
+                keyboardAlgorithm:AddListItem("Create &quotDrawable&quot square-shaped objects to represent each key.")
+                keyboardAlgorithm:AddListItem("Assign a &quotColor&quot to each key.")
+                keyboardAlgorithm:AddListItem("Assign a specific &quotAudio&quot tone to each key.")
+                keyboardAlgorithm:AddListItem("Make each key turn (rotate) each time the user presses a key.")
+                keyboardAlgorithm:AddListItem("We will assign KeyboardEvent elements to all of the keys so that the computer 
+                makes a note sound and rotates the key when the user presses the associated key on the keyboard.")
+            bodyDiv:Add(keyboardAlgorithm)
+
+            bodyDiv:AddParagraph("A sample screen image is shown below:")
+
+            bodyDiv:AddImage("/files/code/Unit5/MusicalKeyboardC-A.png", "A picture showing 6 squares with different colors. The squares are laid out in a horizontal pane with a little space in-between them.")
+
+            Paragraph proj2
+                proj2:AddText("Now that you understand what we are aiming to create in this lesson, lets get started with our first step - creating the &quotDrawable&quot objects and loading them to the screen.")//download and open the template program below in the 'Sodbeans' if you reusing off-line IDE. Then you can open the 'main.quorum' file class to see the content on the edit screen. This is the class Main for this project and it is the only class.")
+            bodyDiv:Add(proj2)
+       
+        bodyDiv:AddHeading("Step 1: Creating the Keys", 4)
+
+            Paragraph proj
+                proj:AddText("In this first step, we begin by creating five keys that will 
+                play the notes C, D, E, F, G and A individually. If you are familiar 
+                with piano keys, these are the white keys in the middle area as shown 
+                in the picture below:")
+        bodyDiv:Add(proj)
+
+        bodyDiv:AddImage("/files/code/Unit5/KeyboiardC-A.png", "A picture showing the letters C, D, E, F, G, A on the corresponding keys on a section of a piano keyboard.")
+
+        bodyDiv:AddHeading("Instantiating an &quotObject&quot from the &quotDrawable&quot Class", 4)
+            Paragraph obj
+                obj:AddText("We will begin by creating a square-shaped &quotobject&quot that will represent 
+                a single piano key in our program. We create this square-shaped &quotobject&quot using 
+                the Drawable class. Creating an &quotobject&quot that inherits properties and functionality 
+                from a specific class is referred to as &quotInstantiation.&quot
+                The first thing we 
+                need to do to make this possible is to add the appropriate &quotuse statement&quot at 
+                the beginning of our program. Since we are creating Drawable objects in this step, we will 
+                add the &quotLibraries.Game.Graphics.Drawable&quot class to our program. This will allow 
+                us to create or &quotInstantiate&quot Drawable objects in our program. Using the provided template 
+                to get started, go ahead and add the Drawable class at the beginning of your own project now.")
+        bodyDiv:Add(obj)
+ SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Creating the Keyboard")
+        addStatementIDE:GetIDETitle():AddText("Creating the Keyboard")
+        addStatementIDE:SetGameEnvironment(false)
+        addStatementIDE:GetIDEInputArea():AddText("
+use Libraries.Game.Game
+// Add additional classes from Quroum Standard Libraries
+
+class Main is Game
+   // Instantiate the Drawable objects
+
+   // Instantiate the Audio objects
+
+   // Instantiate the Color objects
+
+   
+   // Declare a global integer that controls the spinning movement of the key
+   
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+       // Load and add the images to the screen 
+
+       // Load the Audio files to the Audio objects to be played later
+
+       // Add the Keyboard Listener
+
+   end
+
+   action Update(number seconds)
+       // Call the Rotate() action on each Drawable object when the corresponding key is pressed
+
+   end
+
+   // Create an Action for the keyboard event when a specific key is PRESSED
+
+       // Play the loaded audio file
+
+       // Start the rotation movement
+
+   // Create an Action for the keyboard event when a specific key is RELEASED
+
+       // Stop playing the loaded audio file
+
+       // Stop the rotation movement
+end
+
+")
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+/*
+        bodyDiv:AddLink("Download the template for the Musical Keyboard if you are using off-line IDE", "/files/code/Unit5/Unit5-MusicalKeyboard-Template.zip")
+
+            Paragraph proj3
+                proj3:AddText("If you are using on-line IDE, we would recommend that you create an account with the Quorum website so that you can save the project and come back to work on it a few days later. If it is difficult for you to create an account, you can copy and paste the entire code into a simple word processing program such as Notepad (or WordPad(in Windows), TextEdit or Test Wrangler(in OSX/Apple computers), Notes (in iOS devices such as iPhone/iPad), or an equivalent App in Android devices. (We do not recommend you to use sophisticated word processor like 'MS Word' or 'Apple Pages' for this task.) In this way, you can copy and paste the previously worked code back into the on-line IDE at Quorum website, then start adding more lines of code when you come back. In the following part, we have provided two templates: The first template is the Quorum Game Engine' template. That you can copy and paste as it is to see the starting code in the online IDE. The second template is the template for this project 'Musical Keyboard'. This template would produce the same result as the 'QGE' at this point. ")
+       bodyDiv:Add(proj3)
+
+        CodeBlock cb1
+        cb1:AddText("use Libraries.Game.Game
+class Main is Game" + cr + cr)
+        cb1:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb1:AddText("   action CreateGame" + cr
+                +   "   end" + cr + cr)
+        cb1:AddText("   action Update(number seconds)" + cr
+                +   "   end" + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE:GetIDETitle():AddText("Making a Default Game")
+        addStatementIDE:GetIDESubtitle():AddText("After running the default template, the visual output area below should display a gray background.")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Template for Musical Keyboard project for on-line IDE users", 4)
+
+        CodeBlock cb1_1
+        cb1_1:AddText("use Libraries.Game.Game" + cr 
+                +    "// Adding additional classes from Quroum Standard Libraries" + cr + cr)
+        cb1_1:AddText("class Main is Game" + cr 
+                +   "   // Instatiating the Drawable objects"+ cr + cr
+                +   "   // Instantiating the Audio objects"+ cr + cr
+                +   "   // Instatiating the Color objects"+ cr + cr
+                +   "   //Declaring a global integer that controls the spinning movement of the"+ cr
+                +   "   //key mathematically when a key is pressed and released."+ cr
+
+        cb1_1:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb1_1:AddText("   action CreateGame" + cr
+                +   "       // Loading and adding the images to the screen" +  cr + cr
+                +   "       // Loading the Audio files to the Audio objects to be played later" +  cr + cr
+                +   "       // Adding Keyboard Listener" +  cr + cr
+                +   "   end" + cr + cr)
+        cb1_1:AddText("   action Update(number seconds)" + cr
+                +   "       // Calling the action Rotate() on each Drawable object when the corresponding key is pressed" + cr + cr
+                +   "   end" + cr + cr
+                +   "   // Creating anction ofr the keyboard event when a specific key is pressed" + cr + cr
+                +   "       // Make note C to play the loaded audio file" + cr + cr
+                +   "       // Mathematically trigering the rotation movement for the Drawable obejct - keyC" + cr + cr
+                +   "   // Creating an action for the keyboard event when a specific key is released" + cr + cr
+                +   "       // Making the noteC to stop playing the audio file" + cr + cr
+                +   "       // Mathematically stopping the rotation movement of the Drawable obejct - keyC" + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1_1))
+*/
+
+            
+            Paragraph obj1
+                obj1:AddText("The Drawable class is essential for placing graphics in your program. In a way, an object from 
+                the Drawable class works like an empty drawing pad. You will need to instantiate a separate
+                Drawable object for each graphic element (piano key) and give each object you instantiate a unique and identifiable name. Using easily identifiable names for the objects you create
+                will make your code much easier to read and debug. We recommend that you use a lower case letter to start the name of an object. For example " + dq + "keyC" + dq + " instead of " + dq + "KeyC." + dq + " Typically we reserve expressions that start with an Uppercase letter for naming Actions. To learn more about the naming conventions in Quorum Language, you can visit - ")
+        bodyDiv:Add(obj1)
+        obj1:AddLink(" Tutorial: Quorum Code Naming Conventions", "https://quorumlanguage.com/tutorials/language/codingGuidelines.html")
+        obj1:AddText(".")
+            UnorderedList objList
+                AddListItemWithBoldAtFront(objList, "Note:", " You cannot use a name starting with an integer (1, 2, 3, ...). There are also some special characters (?, &, ...) that you cannot use in your names.")
+        bodyDiv:Add(objList)
+        bodyDiv:AddParagraph("")
+        CodeBlock cb1
+            cb1:AddText("ClassName objectName")
+                bodyDiv:AddText("When you instantiate an object from a class, you will use the following syntax ") 
+                bodyDiv:Add(cb1)
+                bodyDiv:AddText(". Instantiate your own <b>Drawable</b> objects for each of your piano keys in the provided template under the &quotclass Main is Game&quot section. Below
+                is an example of instantiating one Drawable object, named keyC, that will represent the &quotC&quot key on our piano.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Drawable keyC" + cr
+                                                        +   "")) 
+
+        bodyDiv:AddHeading("Screen Dimension", 4)
+            Paragraph screen
+                screen:AddText("The &quotScreen Dimension&quot or &quotScreen Size&quot 
+                is normally expressed by its width and height in pixels. As we learned in Unit 2, 
+                a pixel (short for &quotPicture Element&quot) is a tiny square or dot 
+                which contains a single point of color of a larger image. The Quorum 
+                Game/Visual screen has an 800 pixel width and a 600 pixel height. 
+                To display an image on this screen, we need to use simple Mathematics 
+                to evaluate if an image fits on the screen, and then estimate how large 
+                the image needs to be in comparison to the entire screen size and where 
+                the image should be placed within the display screen dimensions.")
+        bodyDiv:Add(screen)
+        bodyDiv:AddHeading("Pro Tip", 4)
+            Paragraph screen1
+                screen1:SetClassAttribute("cool-box")
+                screen1:AddText("Think of the upper-right quadrant of an X-Y graph in Mathematics. 
+                The screen coordinate of (0, 0) - where the value of X (width) is 0 and the value 
+                of Y (height) is 0 - is the lower-left corner of the screen. From that point, 
+                the value of X increases to the right and the value of Y increases upward.  
+                Therefore the (X, Y) coordinate of the lower-right corner is (800, 0), 
+                the upper-right corner is (800, 600), and upper-left corner is (0, 600).")
+        bodyDiv:Add(screen1)
+
+        bodyDiv:AddImage("/files/code/Unit5/OnlineGameScreen-blank.png", "A picture showing the blank online screen with '800 pixels wide' written horizontally a the bottom side, and '600 pixels tall' along the left side of the Quorum online IDE's output scren area.")
+
+            Paragraph screen2
+                screen2:AddText("In the following section, we will learn how to use this (X, Y) coordinate system to set the size of our graphics and then load them to the &quotVisual Output&quot screen.")
+        bodyDiv:Add(screen2)
+
+        bodyDiv:AddHeading("Loading and Displaying a Drawable object", 4)
+            //Paragraph load
+               // load:AddText("Previously, we have written lines of code for the 'use statement' and the 'instantiation of the Drawable object' at the appropriate places in the template. Because we have written these essential lines, we can now use the object to 'Load' an image to itself, then place the image-loaded object at the place of your choice in the Quorum game/visual screen.")
+        //bodyDiv:Add(load)
+        CodeBlock cbA
+            cbA:AddText("keyC:LoadFilledRectangle(30, 30)")
+        CodeBlock cbB
+            cbB:AddText("Add(keyC)")
+        bodyDiv:AddText("To load an image or graphic to the <b>Drawable</b> object, we will need 
+        to call the action &quotLoadFilledRectangle(x-width, y-height)&quot on the 
+        object &quotkeyC&quot that you instantiated from the Drawable class in the 
+        previous step ")
+        bodyDiv:Add(cbA)
+        bodyDiv:AddText(". The parameters for this action will be the width followed by the height in pixels. Now that we have Loaded our image/graphic to the Drawable object, we can Display the object using the ")
+        bodyDiv:Add(cbB)
+        bodyDiv:AddText(" command. The Load and Display actions are called within the &quotaction CreateGame&quot block as shown below.")
+        bodyDiv:AddParagraph("")
+        CodeBlock cb2
+        cb2:AddText("use Libraries.Game.Game" + cr)
+        cb2:AddText("use Libraries.Game.Graphics.Drawable" + cr + cr)
+        cb2:AddText("class Main is Game" + cr )
+        cb2:AddText("   Drawable keyC" + cr + cr)
+        cb2:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb2:AddText("   action CreateGame" + cr
+                +   "       keyC:LoadFilledRectangle(30, 30)" + cr
+                +   "       Add(keyC)" +cr
+                +   "   end" + cr + cr)
+        cb2:AddText("   action Update(number seconds)" + cr
+                +   "   end" + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        bodyDiv:AddHeading("&quotRun, Test, Debug!&quot", 4)
+            Paragraph load2
+                load2:SetClassAttribute("cool-box")
+                load2:AddText("Programmers often write their code section by section, 
+                and then test/run each section to make sure that the section is achieving 
+                the desired behavior. If we try running the code as it is now, we 
+                should have a small black rectangular shape (30 pixels wide and 30 
+                pixels high) in the lower left corner of the gray screen.")
+        bodyDiv:Add(load2)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("Loading an Image to the Screen")
+        addStatementIDE2:GetIDETitle():AddText("Loading an Image to the Screen")
+        addStatementIDE2:GetIDESubtitle():AddText("Run, Test, Debug!")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("Step 2: Adding Color and Setting the Position for a Drawable object", 4)
+            Paragraph setP
+                setP:AddText("When we ran our code in the previous step the Drawable object 
+                was filled with black color and displayed in the lower left hand corner, at 
+                position (0, 0) by default.")
+        bodyDiv:Add(setP)
+        CodeBlock cbC
+        cbC:AddText("keyC:SetPosition(100, 200)")
+        bodyDiv:AddText("We can set (choose) where our Drawable object will be displayed on the 
+        &quotVisual Output&quot screen by calling the SetPosition(X, Y) action on 
+        our Drawable object &quotkeyC&quot before we &quotAdd&quot the 
+        image-loaded object to the screen. For example when setting the position for &quotkeyC&quot we can use
+        the following line of code: ")
+        bodyDiv:Add(cbC)
+
+        bodyDiv:AddHeading("Pro Tip: Screen Dimensions", 4)
+        Paragraph para1
+            para1:SetClassAttribute("cool-box")
+            para1:AddText("Keep the Screen Dimensions 
+            (800 x 600) in mind when setting the position for your Drawable 
+            object and note that the lower left corner of the Drawable object is used as a 
+            reference point when Adding an image to the screen. Therefor, setting the Position 
+            to (800, 600) will Add the Drawable object outside of the &quotVisual 
+            Output&quot screen dimensions.")
+        bodyDiv:Add(para1)
+
+        CodeBlock cbD
+            cbD:AddText("use Libraries.Game.Graphics.Color")
+        bodyDiv:AddText("To add a color to the rectangle image, we need to add the ")
+        bodyDiv:Add(cbD)
+        bodyDiv:AddText(" line at the top of our program. &quotUsing&quot the Color 
+        class will allow us to instantiate a &quotColor&quot object. When using multiple 
+        colors in your program it is best to start by instantiating a general Color object 
+        &quotcolor&quot first, and then instantiate specific Color objects (eg. 
+        &quotred&quot, &quotblue&quot) which will use the general color object to 
+        load a specific color as shown in the example below: ")
+        bodyDiv:AddParagraph("")
+
+            //Paragraph setP3
+              //  setP3:AddText("Just like the way we used the Drawable class, we now will use the Color class to 'instantiate an object' in the same area we instantiated the Drawable object. In case of the color object, we can use the two step system to make it easier to handle the color later on in the code. The way we do it is that 1.) We instantiate an general color object first, 2.) we institute specific color object with its name next, then have the general color object to place the specific color in it. The code below shows an example of instantiating the general color object in the first line, then instantiating the specific color object 'red' and 'blue' in the second and the third lines:")
+        //bodyDiv:Add(setP3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Color color" + cr
+                                                        +   "Color red = color:Red()" + cr 
+                                                        +   "Color blue = color:Blue()" + cr
+                                                        +   "")) 
+        
+        bodyDiv:AddParagraph("")
+        CodeBlock cbE
+            cbE:AddText("keyC:LoadFilledRectangle(30, 30, red)")
+        bodyDiv:AddText("We can then add the color to the Drawable object by adding a third parameter to the existing &quotLoadFilledRectangle()&quot action. For example: ")
+        bodyDiv:Add(cbE)
+
+            Paragraph setP5
+                setP5:AddText("So far your code should be similar to this: ")
+        bodyDiv:Add(setP5)
+
+        CodeBlock cb3
+        cb3:AddText("use Libraries.Game.Game" + cr)
+        cb3:AddText("use Libraries.Game.Graphics.Drawable" + cr)
+        cb3:AddText("use Libraries.Game.Graphics.Color" + cr + cr)
+        cb3:AddText("class Main is Game" + cr )
+        cb3:AddText("   // Instatiating Drawable objects" + cr )
+        cb3:AddText("   Drawable keyC" + cr + cr)
+        cb3:AddText("   // Instantiating Color objects" + cr 
+                +   "   Color color" + cr
+                +   "   Color red = color:Red()" + cr
+                +   "   Color blue = color:Blue()" + cr + cr)
+        cb3:AddText("   // Instatiating Audio objects" + cr + cr)
+        cb3:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb3:AddText("   action CreateGame" + cr
+                +   "       //Loading and adding the images to the screen"  + cr
+                +   "       keyC:LoadFilledRectangle(30, 30, red)" + cr
+                +   "       keyC:SetPosition(100, 200)" + cr
+                +   "       Add(keyC)" +cr + cr
+                +   "       //Loading audio files to the audio objects" + cr + cr
+                +   "   end" + cr + cr)
+        cb3:AddText("   action Update(number seconds)" + cr
+                +   "   end" + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        bodyDiv:AddParagraph("Try running your code to make sure that everything is working as you would expect.")
+
+        SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("Setting the position and assigning a color to the Drawable object")
+        addStatementIDE3:GetIDETitle():AddText("Setting the position and assigning a color to the Drawable object")
+        addStatementIDE3:GetIDESubtitle():AddText("Run, Test, Debug!")
+        addStatementIDE3:SetGameEnvironment(true)
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+        bodyDiv:Add(addStatementIDE3:GetGameCanvas())
+
+        bodyDiv:AddHeading("Complete the Visual Keyboard", 4)
+            Paragraph chlg4
+                chlg4:AddText("Using what we have learned so far, finish building the Visual Keyboard. You will need to:")
+        bodyDiv:Add(chlg4)
+            UnorderedList ch4List
+                ch4List:AddListItem("Instantiate Drawable objects for the rest of the piano keys.")
+                ch4List:AddListItem("Instantiate Color objects for filling the remaining keys. (eg. yellow, green, orange, purple). Be sure to use the general Color object &quotcolor&quot to instantiate the specific color for example: &quotColor yellow = color:Yellow().&quot")
+                ch4List:AddListItem("Call the &quotLoadFilledRectangle(X, Y, color)&quot action on each Drawable object.")
+                ch4List:AddListItem("Call the &quotSetPosition(X, Y)&quot action on each Drawable object.")
+                ch4List:AddListItem("Add each image-loaded Drawable object to the screen using the &quotAdd(object name)&quot action.")
+        bodyDiv:Add(ch4List)
+
+        bodyDiv:AddHeading("Pro Tip: Visual Elements", 4)
+            Paragraph tTipScreen
+                tTipScreen:SetClassAttribute("cool-box")
+                tTipScreen:AddText("If you do not have the benefit of seeing the screen, 
+                it is recommended that you have someone check your screen after you successfully 
+                run your program. The visual elements of a screen based program are challenging 
+                but essential for this type of programming. You will need to do a lot of mental 
+                picturing and mathematics so that your image-loaded objects are not overlapping.  
+                If you do not have a person to check your screen, just aim for avoiding error 
+                messages at this point.")
+        bodyDiv:Add(tTipScreen)
+
+        SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("Setting the initial visual environment for the project")
+        addStatementIDE4:GetIDETitle():AddText("Setting the initial visual environment for the project")
+        addStatementIDE4:GetIDESubtitle():AddText("You can copy and paste the code from the previous section, then add the rest of your code to it.")
+        addStatementIDE4:SetGameEnvironment(true)
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+        bodyDiv:Add(addStatementIDE4:GetGameCanvas())
+        /*
+        bodyDiv:AddHeading("Interpreting Error Messages", 2)
+            Paragraph error
+                error:AddText("By any chance, did you receive an 'error message' in the area below the 'Build/Run' button in on-line IDE, or in the 'output' tab area at the bottom of the off-line IDE when you build or run the program for testing? It is very normal to see the error message. Even a professional programmers always deals with 'error messages' on their program. ")
+        bodyDiv:Add(error)
+            Paragraph error1
+                error1:AddText("The problem with this error message is that it does not always tell you what is the exact error you made! for example, if you made one mistake in spelling on one of your object. That is the only mistake you made in the entire code. Even when this is true, the error massage could tell you that you have 10 errors in 10 different lines. ")
+        bodyDiv:Add(error1)
+            Paragraph error2
+                error2:AddText("The 'error message' is generated based on how the computer thinks about your code in its logical process. Any program has or should have the mechanism inside that all lines of code are related to some other lines of code. In a way, that is what the computer programming (or source code file) is. Because of this nature of the coding, when the computer detect one mistake in one line, it thinks that you made mistake in all the other lines that is related to original line of code.")
+        bodyDiv:Add(error2)
+            Paragraph error3
+                error3:AddText("One way to deal with the error message is that you pay close attention to the first line of the error message. The first line in error message tells you where you made a mistake first in your coding. The first mistake means that first one from the top of your entire code. So if I were you, I would check that line first and think about all the other lines that are related to that original line of code. Many times, when you fix the first mistake, all the other 'error message' disappears next time you build or run the program. If you unfortunately have more than one mistake, you just need to repeat building/running the program again and again while fixing one error at a time (Of cause you may find two or more mistakes on your own at a time and fix them)")
+        bodyDiv:Add(error3)
+            Paragraph error4
+                error4:AddText("Some other common errors are:")
+        bodyDiv:Add(error4)
+            UnorderedList errorList
+                AddListItemWithBoldAtFront(errorList, "Missing 'end'", " - The 'error message' tells you you are missing 'end' at the bottom of your program. When you receive this 'error message' do not just add the 'end' at the bottom of your project. Instead look through you entire code and find out if every structure you created (if, repeat, action, class) has its own 'end'. You will find out which structure you have forgotten to place the 'end'.")
+                AddListItemWithBoldAtFront(errorList, "Concept errors", " - Sometimes you would receive an 'error message' 'such and such is already declared' or 'I could not find such and such variable'. This error is caused most likely by your mistake of declaring a variable with same name repeatedly or instantiating an object with same name repeatedly. Other reason could be that you made a mistake in placing a certain string of code in wrong place. This mistake can only be fixed by re-visiting the part of the lesson and adjusting your understanding of the specific coding concept.")
+        bodyDiv:Add(errorList)*/
+
+        bodyDiv:AddHeading("Step 3: Loading and Adding Audio objects", 4)
+        CodeBlock cbF
+            cbF:AddText("use Libraries.Sound.Audio")
+        CodeBlock cbG
+            cbG:AddText("Audio noteC")
+        bodyDiv:AddText("When using Audio in our program we will need to add the ")
+        bodyDiv:Add(cbF)
+        bodyDiv:AddText("line at the beginning of the code and instantiate an &quotAudio 
+        object&quot for each note ")
+        bodyDiv:Add(cbG)
+        bodyDiv:AddText(". After our Audio object has been instantiated we can 
+        load an audio file to the object in the &quotaction CreateGame&quot section. 
+        In order for us to &quotLoad&quot an audio file to an Audio object, we will use the 
+        &quotLoad(&quotlocation/address of audio file&quot)&quot action on the Audio object. The 
+        location/address is a text value and must be enclosed in double quotes within the parentheses. You can use
+        the following audio file locations (file paths) for loading audio to your Audio objects.")
+        UnorderedList audioList
+            audioList:AddListItem("noteC - (&quot/media/code/Guitar-C.ogg&quot)")
+            audioList:AddListItem("noteD - (&quot/media/code/Guitar-D.ogg&quot)")
+            audioList:AddListItem("noteE - (&quot/media/code/Guitar-E.ogg&quot)")
+            audioList:AddListItem("noteF - (&quot/media/code/Guitar-F.ogg&quot)")
+            audioList:AddListItem("noteG - (&quot/media/code/Guitar-G.ogg&quot)")
+            audioList:AddListItem("noteA - (&quot/media/code/Guitar-A.ogg&quot)")
+        bodyDiv:Add(audioList)
+        CodeBlock cbH
+            cbH:AddText("noteC:Load(&quot/media/code/Guitar-C.ogg&quot)")
+        bodyDiv:AddText("For example to Load the Audio for the &quotC&quot note we would type ")
+        bodyDiv:Add(cbH)
+        bodyDiv:AddText(".")
+
+        /*
+        bodyDiv:AddHeading("'use statement' for the Audio class", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Sound.Audio" + cr
+                                                        +   "")) 
+
+        bodyDiv:AddHeading("Instantiating an audio object", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Audio noteC" + cr
+                                                        +   "")) 
+
+        bodyDiv:AddHeading("Loading an audio file to an 'audio object'", 4)
+            Paragraph aud1
+                aud1:AddText("In case of the Drawable objects, we have used the pre-determined action 'LoadFilledRectangle()'. In case of the Audio objects, we will load audio clip files that that are included in the project. If you are using the off-line IDE 'Sodbeans', you can find these files in the project pane. ")
+        bodyDiv:Add(aud1)
+
+        bodyDiv:AddHeading("Teacher's Tip: on Project pane", 5)
+            Paragraph tTip
+                tTip:SetClassAttribute("cool-box")
+                tTip:AddText("For a student who uses screen readers, press [command + 1] (on OSX) or [control + 1] (on Windows)to move screen focus to the Project pane. Use the [Up/Down arrow keys] to find the project. Expand the project by [Right allow key]to reveal the 'Source Code' folder and 'media' folder. Expand the 'media' folder then the 'code' folder to find the audio files.")
+        bodyDiv:Add(tTip)
+
+        bodyDiv:AddImage("/files/code/Unit5/AudioFilesLocation.png", "A picture showing the location of the audio files in the project. The prject has two second level folders 'Souce Code' and 'media'. The media folder has third level folder called 'code'. all audio files are located in this 'code' folder.")
+
+            Paragraph aud2
+                aud2:AddText("In order for us to load an audio file to an audio object, we need to use action 'Load(“location of file�?)' from the Audio class. The location is also called the address (of the specific file). The address contains the information on entire name of the file (including the file extension) as well as the name of folders the file is in. The code below shows how we call this action for one of the 'audio object' ")
+        bodyDiv:Add(aud2)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "noteC:Load(" + dq + "/media/code/Gitor-C.ogg" + dq + ")" + cr
+                                                        +   "")) 
+
+        bodyDiv:AddLink("Visit theis link for further learning for Audio", "https://quorumlanguage.com/lessons/chapter2/lab2_4.html")
+        */
+
+        bodyDiv:AddHeading("Load the Audio Files for your Musical Keyboard", 4)
+            Paragraph chlg5
+                chlg5:AddText("Finish adding and loading the rest of the Audio for your Musical Keyboard. You will need to:")
+        bodyDiv:Add(chlg5)
+            UnorderedList ch5List
+                ch5List:AddListItem("Add the &quotuse statement&quot for the Audio class at the beginning of the program.")
+                ch5List:AddListItem("Instantiate the Audio objects for note C, D, E, F, G and A in the class Main is Game section.")
+                ch5List:AddListItem("Call the Load(&quotlocation/address of the audio file&quot) action on each Audio object in the &quotaction CreateGame&quot section.")
+        bodyDiv:Add(ch5List)
+
+        SideBySideIDE addStatementIDE5
+        addStatementIDE5:SetUniqueIdentifier("Loading and Adding Audio")
+        addStatementIDE5:GetIDETitle():AddText("Loading and Adding Audio")
+        addStatementIDE5:GetIDESubtitle():AddText("Copy and Paste the code you have been working on, then add the code for the Audio.")
+        addStatementIDE5:SetGameEnvironment(true)
+        addStatementIDE5:Setup()
+        bodyDiv:Add(addStatementIDE5)
+        bodyDiv:Add(addStatementIDE5:GetGameCanvas())
+        
+       /*
+        bodyDiv:AddHeading("What is a 'Runtime Errors'?", 2)
+            Paragraph runtime
+                runtime:AddText("There are two kinds of errors in computer programming. One kind is 'Compiler Error'. The 'compiler error' is the one the computer or the IDE can detect for you by giving you an error message when you 'build/compile' the program. This is the normal error message we talked about previously. When you 'run' the program, the computer/IDE will 'build/compile' your code first, so you would technically get the same 'compiler error' in that case also.")
+        bodyDiv:Add(runtime)
+            Paragraph runtime1
+                runtime1:AddText("'Runtime Errors' is the error that a programmer can find only at the time he/she 'runs' the program. In other words, the programmer cannot find 'Runtime Error' when he/she only compiles/builds the program. In this case, the computer would not detect the error in your code because your code perfectly makes sense to the computer but… The computer gets confused while running your code because one or more part of your code is mis-written.")
+        bodyDiv:Add(runtime1)
+            Paragraph runtime2
+                runtime2:AddText("Most of the time, the 'runtime error' is caused by the fact that the computer;IDE cannot find the file that is associated with your main code at the address you wrote in your code. Lets say you wrote 'noteC:Load(“/media/cod/Guitor-C.wav�?)' in your code. But, real address of this audio file is '/media/code/Guitor-C.wav'. Do you see your mistake? You simply forgot to type a letter 'e' in the word 'code' in this address. Don't worry, you are not the only one. We - programmers - makes this mistake all the time!")
+        bodyDiv:Add(runtime2)
+      */
+        bodyDiv:AddParagraph("The Musical Keyboard program should not be playing any Audio at this point. We have only <i>loaded</i> the Audio
+        to the Drawable object, now we need to tell the Audio to Play. We do not want to 
+        &quotAdd&quot the audio-loaded object to the 
+        project as we did for the Drawable object because we do not want to continuously listen to the audio every time we start the program. 
+        Rather, we would like the user to determine when the Audio starts and stops playing using 
+        &quotKeyboardEvents&quot to trigger the audio files to play or stop playing.")
+                Paragraph kAudio
+                    kAudio:AddText("We will use the following template with the added &quotKeyboardListener&quot and &quotPressedKey() / ReleasedKey()&quot actions
+                     which will allow us to add Keyboard Events to the Musical Keyboard. These Keyboard Events will 
+                    trigger the note to Play when the associated keyboard key is &quotPressed&quot
+                    and stop the audio when the associated keyboard key is &quotReleased.&quot In this
+                    example we are using the following keyboard keys to control the corresponding Audio notes:")
+        bodyDiv:Add(kAudio)
+        UnorderedList kAudio2
+            kAudio2:AddListItem("A = C note")
+            kAudio2:AddListItem("S = D note")
+            kAudio2:AddListItem("D = E note")
+            kAudio2:AddListItem("F = F note")
+            kAudio2:AddListItem("G = G note")
+            kAudio2:AddListItem("H = A note")
+        bodyDiv:Add(kAudio2)
+
+        CodeBlock cb4
+        cb4:AddText("use Libraries.Game.Game" + cr)
+        cb4:AddText("use Libraries.Sound.Audio" + cr)
+        cb4:AddText("use Libraries.Interface.Events.KeyboardEvent" + cr)
+        cb4:AddText("use Libraries.Interface.Events.KeyboardListener" + cr + cr)
+        cb4:AddText("class Main is Game, KeyboardListener" + cr )
+        cb4:AddText("   // Instatiating Audio objects" + cr )
+        cb4:AddText("   Audio noteC" + cr + cr)
+        cb4:AddText("   // Instantiating Color objects" + cr + cr)
+        cb4:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb4:AddText("   action CreateGame" + cr
+                +   "       //Loading the Audio files to the Audio objects to be played later"  + cr
+                +   "       noteC:Load(" + dq +"media/code/Guitor-C.ogg" + dq +")" + cr + cr
+                +   "       //Making the project to 'listen for' any keyboard input from the user" + cr + cr
+                +   "       AddKeyboardListener(me)" + cr + cr
+                +   "   end" + cr + cr)
+        cb4:AddText("   action Update(number seconds)" + cr
+                +   "   end" + cr + cr)
+        cb4:AddText("   action PressedKey(KeyboardEvent event)" + cr
+                +   "       if event:keyCode = event:A" + cr
+                +   "           noteC:Play()" + cr + cr
+                +   "       elseif event:keyCode = event:S" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:D" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:F" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:G" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:H" + cr
+                +   "   " + cr
+                +   "       end" + cr
+                +   "   end" + cr + cr)
+        cb4:AddText("   action ReleasedKey(KeyboardEvent event)" + cr
+                +   "       if event:keyCode = event:A" + cr
+                +   "           noteC:Stop()" + cr + cr
+                +   "       elseif event:keyCode = event:S" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:D" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:F" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:G" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:H" + cr
+                +   "   " + cr
+                +   "       end" + cr
+                +   "   end" + cr + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        
+        bodyDiv:AddHeading("Step 4: Adding Keyboard Events", 4)
+        CodeBlock cbI
+            cbI:AddText("class Main is Game, KeyboardListener")
+        CodeBlock cbJ
+            cbJ:AddText("AddKeyboardListener(me)")
+        CodeBlock cbK
+            cbK:AddText("action PressedKey()")
+        CodeBlock cbL
+            cbL:AddText("action ReleasedKey()")
+        bodyDiv:AddText("We will use elements of &quotEvent Driven Programming&quot 
+                in the same way we learned in Lesson 1. Begin by adding the 
+                &quotKeyboardListener&quot and &quotKeyboardEvent&quot libraries at 
+                the beginning of the program. To make this program a &quotKeyboard Event Driven 
+                Program&quot add KeyboardListener to the &quotclass Main is Game&quot line: ")
+        bodyDiv:Add(cbI)
+        bodyDiv:AddText(" and add the ")
+        bodyDiv:Add(cbJ)
+        bodyDiv:AddText(" line at the bottom of the &quotclass Main is Game, KeyboardListener&quot 
+        section to set the Keyboard to &quotlisten&quot for Keyboard events such as Pressing 
+        a key or Releasing a key to occur. The ")
+        bodyDiv:Add(cbK)
+        bodyDiv:AddText(" and ")
+        bodyDiv:Add(cbL)
+        bodyDiv:AddText(" action blocks will control the &quotEvent&quot that occurs in response to a key Press 
+                or key Release and will need to be added to the bottom of the program, before the final end statement. These actions
+                will contain several &quotif-statement&quot structures which will be 
+                described in detail later in this Unit. For this lesson we have included the 
+                &quotif-statement&quot structure blocks in the template for you to use. Each key Press and key
+                Release will have its own if-statement code block. For example in the following code block 
+                &quotif&quot the &quotA&quot key 
+                on the keyboard is &quotPressed,&quot then the noteC Audio object will &quotPlay.&quot")
+                
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action PressedKey(KeyboardEvent event)" + cr
+                                                        +   "   if event:keyCode = event:A" + cr
+                                                        +   "       noteC:Play()" + cr))    
+                
+        /*bodyDiv:AddText("        It usually contains 'if-statement' inside of the action. Make it sure you 
+                have 'end' for this action. For this lesson, we have prepared the 'if 
+                conditional' part as a template for you to use. The 'if-conditional' 
+                part start with 'if' and end with the first 'end'. You can copy and paste 
+                this part inside your 'action PressedKey()' structure to make your code work. 
+                If you use the other keys - different from the template, you need to replace 
+                them with your choice of keys.")
+            
+        bodyDiv:AddHeading("New Code and Concept: 'class Main is Game, KeyboardListener' ", 4)
+            Paragraph kAudio2
+                kAudio2:AddText("In the default QGE, this part only says 'class Main is Game'. In order for us to make this program into 'Keyboard Event Driven Program', we need to add 'KeyboardListener'. We use the 'comma' to separate the 'Game' and 'KeyboardListener' in this expression. By adding this code 'KeyboardListener' on this line, we set the environment of the 'class Main' ready to listen for a specific pattern of keyboard input the user types on the keyboard.")
+        bodyDiv:Add(kAudio2)
+
+        bodyDiv:AddHeading("New Code and Concept: 'AddKeyboardListener(me)'", 4)
+            Paragraph kAudio3
+                kAudio3:AddText("We place this code 'AddKeyboardListener(me)' in the 'action CreateGame' area of the code. This is actually an action originated from the KeyboardListner class. Now your code is fully capable for listening for a specific pattern(s) of keyboard input from the user.")
+        bodyDiv:Add(kAudio3)
+
+        bodyDiv:AddHeading("New Code and Concept: 'action ReleasedKey(KeyboardEvent event)'", 4)
+            Paragraph kAudio4
+                kAudio4:AddText("This is somewhat an eye opening concept for many of us. Many programs/Apps and the computer like devices not only detect when a key is pressed, but also when the already-held-down key is released! Incredible! This line of code - 'action ReleasedKey(KeyboardEvent event)'- calls the action to make your project to detect when the key is released. Since it is an action, be sure to place 'end' for it appropriately. Just like the part for 'action PressedKey()', inside of this 'action ReleasedKey()' is a template of 'if-conditional' you can use.")
+        bodyDiv:Add(kAudio4)
+
+        bodyDiv:AddHeading("New actions for Audio objects: 'Play()' and 'Stop()'", 4)
+            Paragraph kAudio5
+                kAudio5:AddText("You call these actions on your audio object - separately for each object - to play and stop the audio for each key.")
+        bodyDiv:Add(kAudio5)
+        */
+        //bodyDiv:AddHeading("Activity 3: Making the program into 'Event Driven Program' and Adding audio elements", 2)
+        bodyDiv:AddHeading("Make the Musical Keyboard &quotEvent Driven&quot", 4)
+            Paragraph act3
+                act3:AddText("Finish adding Keyboard Events for each Audio object (note) to Play 
+                when the associated key on the keyboard is &quotPressed&quot and for each Audio 
+                object (note) to Stop when the associated key on the keyboard is 
+                &quotReleased.&quot You can copy and paste the code sections you 
+                have been working on into the provided IDE below before finishing the 
+                &quotPressedKey()&quot and &quotReleasedKey()&quot action blocks.")
+        bodyDiv:Add(act3)
+
+        SideBySideIDE addStatementIDE6
+        addStatementIDE6:SetUniqueIdentifier("Add Audio Keyboard Events")
+        addStatementIDE6:GetIDETitle():AddText("Add Audio Keyboard Events")
+        addStatementIDE6:GetIDESubtitle():AddText("Copy and Paste the code you have been working on, then add keyboard events that trigger the Audio to Play when the associated key is Pressed and Stop the Audio when the associated key is Released.")
+        addStatementIDE6:SetGameEnvironment(true)
+        addStatementIDE6:Setup()
+        bodyDiv:Add(addStatementIDE6)
+        bodyDiv:Add(addStatementIDE6:GetGameCanvas())
+
+        //bodyDiv:AddHeading("Writing code in the 'action Update(number seconds)'", 2)
+        bodyDiv:AddHeading("Step 5: Adding Event-Driven Rotation to the Drawable objects", 4)
+        CodeBlock cbM
+            cbM:AddText("action Update(number seconds)")
+        bodyDiv:AddText("We will use the ")
+        bodyDiv:Add(cbM)
+        bodyDiv:AddText("section to give movement to our Drawable objects (piano keys). 
+        The movement of the Drawable object on the screen is not 
+        actually a &quotmovement,&quot but a change in the position of the object 
+        which is continuously <i>Updated</i> using the &quotUpdate&quot action.")
+        bodyDiv:AddParagraph("")
+
+        //bodyDiv:AddLink("Visist this page 'Getting Started' for more information on update loop", "https://quorumlanguage.com/tutorials/games/gamesStarted.html")
+
+            Paragraph update1
+                update1:AddText("When we write code for movement to occur in the &quotaction Update()&quot section, 
+                we are telling the computer to draw a slightly different picture with each &quotupdate.&quot
+                Computers today can draw a new image on the screen so rapidly - 60 times per second or 
+                more - that the image or graphic appears to be moving. Modern video games are all made possible 
+                using this same basic principle. Programmers often use mathematics and an &quotupdate loop&quot 
+                to create &quotmovement.&quot The &quotupdate loop&quot is very similar to the concept of 
+                &quotrepeat&quot which we learned about in Unit 3. The update loop occurs within the 
+                &quotaction Update()&quot section. When you run the program, the code written inside the 
+                &quotaction Update()&quot section will be executed by your computer every 60th of a second or more - 
+                depending on the capability of your computer system.")
+        bodyDiv:Add(update1)
+
+        //bodyDiv:AddHeading("Adding the code in your 'update loop' so that one of your rectangular image spins every time a key for an audio is pressed", 2)
+        /*    Paragraph update2
+                update2:AddText("In the section below, we will look at the code and the structure that make your rectangular object to spin when you press the key that you used to play a sound. In a way, we are connecting the keyboard event (for the audio) to the visual elements of your project. ")
+        bodyDiv:Add(update2)
+
+        CodeBlock cb5
+        cb5:AddText("use Libraries.Game.Game" + cr)
+        cb5:AddText("use Libraries.Sound.Audio" + cr)
+        cb5:AddText("use Libraries.Interface.Events.KeyboardEvent" + cr)
+        cb5:AddText("use Libraries.Interface.Events.KeyboardListener" + cr + cr)
+        cb5:AddText("class Main is Game, KeyboardListener" + cr )
+        cb5:AddText("   // Instatiating Drawable objects" + cr
+                +   "   Drawable keyC" +cr + cr)
+        cb5:AddText("   // Instantiating Color objects" + cr + cr)
+        cb5:AddText("   // Instatiating Audio objects" + cr + cr)
+        cb5:AddText("   " + cr 
+                +   "   //Declaring a global integer that controls the spinning movement of the " + cr
+                +   "   //key mathematically when a key is pressed and released." + cr
+                +   "   " + cr
+                +   "" + cr
+                +   "   integer rotateC = 0" + cr
+                +   "" + cr + cr)
+        cb5:AddText("   action Main" + cr
+                +   "       StartGame()" + cr
+                +   "   end" + cr + cr)
+        cb5:AddText("   action CreateGame" + cr
+                +   "       //Loading and Adding Drawable objects to the screen" + cr
+                +   "       keyC:LoadFilledRectangle(50, 50, red)" + cr
+                +   "        keyC:SetPosition(80, 200)" + cr
+                +   "       Add(keyC)" + cr
+                +   "" + cr
+                +   "       //Loading the Audio files to the Audio objects to be played later"  + cr
+                +   "       noteC:Load(" + dq +"media/code/Guitor-C.ogg" + dq +")" + cr + cr
+                +   "       //Making the project to 'listen for' any keyboard input from the user" + cr + cr
+                +   "       AddKeyboardListener(me)" + cr + cr
+                +   "   end" + cr + cr)
+        cb5:AddText("   action Update(number seconds)" + cr + cr
+                +   "   // Calling the action 'Rotate() on each Drawable object when the corresponding key is pressed'" + cr
+                +   "   keyC:Rotate(360*seconds*rotateC)" + cr
+                +   "" + cr
+                +   "   end" + cr
+                +   "end" + cr + cr)
+        cb5:AddText("   action PressedKey(KeyboardEvent event)" + cr
+                +   "       if event:keyCode = event:A" + cr
+                +   "           noteC:Play()" + cr + cr
+                +   "       // Mathematically trigering the rotation movement for the Drawable obejct - keyC" + cr
+                +   "       rotateC = 1" + cr
+                +   "       " + cr
+                +   "       elseif event:keyCode = event:S" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:D" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:F" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:G" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:H" + cr
+                +   "   " + cr
+                +   "       end" + cr
+                +   "   end" + cr + cr)
+        cb5:AddText("   action ReleasedKey(KeyboardEvent event)" + cr
+                +   "       if event:keyCode = event:A" + cr
+                +   "           noteC:Stop()" + cr 
+                +   "   "+ cr
+                +   "       // Mathematically stopping the rotation movement of the Drawable object - keyC"+ cr
+                +   "       rotateC = 0"+ cr + cr
+                +   "       elseif event:keyCode = event:S" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:D" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:F" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:G" + cr
+                +   "   " + cr
+                +   "       elseif event:keyCode = event:H" + cr
+                +   "   " + cr
+                +   "       end" + cr
+                +   "   end" + cr + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        */
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("To add Rotation to our keyboard event we start by creating an integer 
+        variable &quotrotateC&quot and setting it to zero. Variables will be discussed 
+        in further detail later in this unit, for now all we need to know is that this 
+        &quotvariable&quot will be used to control whether the Drawable object is 
+        &quotrotating&quot (key pressed) or &quotnot rotating&quot (key released). We 
+        create and set this variable as shown in the example below: ")
+        CodeBlock cbN
+            cbN:AddText("class Main is Game, KeyboardListener" + cr + cr)
+            cbN:AddText("   integer rotateC = 0" + cr + cr)
+            cbN:AddText("   action Main" + cr)
+            cbN:AddText("       StartGame()" + cr)
+            cbN:AddText("   end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cbN))
+        bodyDiv:Add(break)
+
+        bodyDiv:AddText("Next we will add the &quotRotate(degrees)&quot action to our Drawable object in the &quotaction Update()&quot section
+        which will rotate our &quotkeyC&quot Drawable object 360 degrees 
+        per second when rotateC = 1.")
+        CodeBlock cbO
+            cbO:AddText("action Update(number seconds)" + cr)
+            cbO:AddText("   keyC:Rotate(360*seconds*rotateC)" + cr)
+            cbO:AddText("end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cbO))
+        bodyDiv:Add(break)
+
+        bodyDiv:AddText("Since we have set the variable &quotrotateC&quot to 
+        0, the parameter for the Rotate action becomes 0 as well (anything multiplied by 0 
+        equals 0), so by default the Drawable object is not going to appear to be moving. The change 
+        in &quotrotateC's&quot value will change the parameter for this action 
+        causing the Drawable object to appear to be moving. To do this we will change &quotrotateC's&quot 
+        value to 1 when the associated key is being pressed, (in the PressedKey() action) and change 
+        the value of &quotrotateC&quot to 0 when the associated key is released, (in the ReleasedKey() action) as shown below:")
+        CodeBlock cbP
+            cbP:AddText("   action PressedKey(KeyboardEvent event)" + cr)
+            cbP:AddText("       if event:keyCode = event:A" + cr)
+            cbP:AddText("           noteC:Play()" + cr)
+            cbP:AddText("           rotateC = 1" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:S" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:D" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:F" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:G" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:H" + cr + cr)
+            cbP:AddText("       end" + cr)
+            cbP:AddText("   end" + cr + cr)
+            cbP:AddText("   action ReleasedKey(KeyboardEvent event)" + cr)
+            cbP:AddText("       if event:keyCode = event:A" + cr)
+            cbP:AddText("           noteC:Stop()" + cr)
+            cbP:AddText("           rotateC = 0" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:S" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:D" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:F" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:G" + cr + cr)
+            cbP:AddText("       elseif event:keyCode = event:H" + cr + cr)
+            cbP:AddText("       end" + cr)
+            cbP:AddText("   end")
+    bodyDiv:Add(preformatter:GeneratePreformattedCode(cbP))
+
+
+        /*bodyDiv:AddHeading("No new 'use statement' this time", 4)
+            Paragraph update3
+                update3:AddText("At this stage of coding,  we are not instantiating any new object from a new class. Rather, we will call a new action 'Rotate(degree)' on existing Drawable objects. So we do not need to add new use statement")
+        bodyDiv:Add(update3)
+
+        bodyDiv:AddHeading("New Code: 'integer rotateC = 0' in the are below the 'class Main' - not in any action area", 4)
+            Paragraph update4
+                update4:AddText("We place this line 'integer rotateC = 0' in 'class Main' area. From the aspect of programming concept, the 'rotateC' is called 'variable'. With this expression this point, we are temporarily giving the 'value' of '0' to the 'variable rotateC' The variable is a powerful and important concept to learn. We will discuss about the 'variables' in detail later - starting in lesson 4. . For now lets just add this line of code to your on-going project at the area shown in the example above. We will use this variable to make the spinning movement on or off later on in your code.")
+        bodyDiv:Add(update4)
+
+        bodyDiv:AddHeading("New action: 'keyC:Rotate(360*seconds*rotateC)' in the 'action Update(number seconds)'", 4)
+            Paragraph update5
+                update5:AddText("In this expression, we are calling action 'Rotate(degree)' on an object 'keyC'. The 'keyC' is an Drawable object that you have already placed on your screen as a rectangular image. The 'degree' is the number parameter for this action. The action 'Rotate(degree)' will make the image rotate/spin by the degree that you specified in the parenthesis. But, how fast?  We control the rate of the spin by the mathematical formula we placed as a parameter inside of the parenthesis. The formula is '360 * second * rotateC'. The star or asterisk in Quorum programming language represents the multiplication sign in mathematics. What this formula does is that the image will spin 360 degree every one second if the value in 'rotateC' is 1. But wait… We set the 'value' for the 'variable rotateC' to '0' initially. Therefore, this mathematical formula - for now - only produce the answer value of '0' Thus, your rectangular image will not budge if you do not do something more.")
+        bodyDiv:Add(update5)
+
+        bodyDiv:AddHeading("New Code: 'rotateC = 1' in the 'action PressedKey()',  and 'rotateC = 0' in the 'action ReleasedKey()'", 4)
+            Paragraph update6
+                update6:AddText("This is one of the coding techniques we use to activate and to deactivate the movement of an image-loaded object. Because we have the 'rotateC = 1' in the 'action PressedKey()', your code will assign new value '1' to the variable 'rotateC' when the user press key 'A' on the keyboard. This change in turn produces a positive number through the mathematic formula for the parameter for the 'keyC:Rotate()' - that is written in 'action Update(number second)'. The whole process works like a well planned chain-reaction. At the end, your code will start drawing slightly rotated picture for the image (for keyC) moment after moment. The user of your program will start seeing the keyC rotating with the speed of 360 degree per second. With the same logical and mathematical process, the image 'keyC' will stop moving when the user release the key 'A' on the keyboard. This is because the 'value' of the 'variable rotateC' changes to '0' when the user releases the key 'A'.")
+        bodyDiv:Add(update6)
+        */
+        
+        //bodyDiv:AddHeading("Activity 4 - Finishing Touch: Make your Drawable image spin as the user press a key and hear the note play.", 2)
+        bodyDiv:AddHeading("Add Event Driven Rotation to the Drawable Objects", 4)
+        bodyDiv:AddParagraph("Finish adding Event Driven rotation to the rest of the piano keys. You will need to: ")
+            OrderedList updateList
+                updateList:AddListItem("Copy and paste the code you have been working on into the IDE below.")
+                updateList:AddListItem("Create (declare) a variable for controlling the rotation of each Drawable object (rotateC, rotateD, rotateE, etc.) and set (initialize) the variable to 0 so that the Drawable object is <i>not</i> rotating by default.")
+                updateList:AddListItem("Call the &quotRotate(degree)&quot action on all of the Drawable objects in the &quotaction Update()&quot section. Be sure to use the equation in the previous section which allows us to control the rotation by changing the value of our rotate variable to 0 (off) or 1 (on).")
+                updateList:AddListItem("Write the code for each Key Press in the associated if-statement block (eg. rotateC = 1) within the &quotaction PressedKey()&quot section, and write the code for each Key Release in the associated if-statement block (eg. rotateC = 0) within the &quotaction ReleasedKey()&quot section.")
+        bodyDiv:Add(updateList)
+
+        SideBySideIDE addStatementIDE7
+        addStatementIDE7:SetUniqueIdentifier("Add Visual Keyboard Events")
+        addStatementIDE7:GetIDETitle():AddText("Add Visual Keyboard Events")
+        addStatementIDE7:GetIDESubtitle():AddText("Copy and paste the code you have been working on, then add the code to trigger the piano key to Rotate when the associated key is Pressed and Stop the Rotation when the associated key is Released.")
+        addStatementIDE7:SetGameEnvironment(true)
+        addStatementIDE7:Setup()
+        bodyDiv:Add(addStatementIDE7)
+        bodyDiv:Add(addStatementIDE7:GetGameCanvas())
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddParagraph("This lesson is one of the first times students will likely have consistently generated and responded to error messages. Students may (incorrectly) view error messages as &quotbad,&quot when in reality they are an entirely normal part of programming and extremely useful when debugging code.")
+        bodyDiv:AddParagraph("In fact, logical error messages, which can be &quotsilent&quot and don't generate error messages are much worse, since they are much harder to catch. Use this early moment to normalize getting error messages and needing to debug code.")
+        bodyDiv:AddParagraph("<b>Prompt: </b><i>Today was one of the first times we have encountered error messages in our programs and had to start thinking about debugging our code. Is it &quotbad&quot to generate an error message? Will every error in our programs generate an error? Why might a programmer actually &quotlike&quot to get an error message?</i>")
+        bodyDiv:AddParagraph("<b>Discuss: </b>Give students an opportunity to share their thoughts, either in small groups or as a class. Points that might come up: ")
+        UnorderedList discuss
+            discuss:AddListItem("Even expert programmers make errors, so <b>debugging</b> is a critical step of writing any program.")
+            discuss:AddListItem("Since we can assume that all code will have some errors in it, we'd much prefer the computer to catch those errors for us. Error messages are how the computer gives you a helping hand in writing your program, and often they'll include helpful information about how you can fix your code.")
+            discuss:AddListItem("Of course, not every error will generate an error message because sometimes we write functional code that does something different than we want. In order to catch these <b>logical errors</b>, we'll need to understand how our code is supposed to run and then test it to make sure that it executes as intended.")
+            discuss:AddListItem("In either case, this process of finding and fixing errors in your code is entirely normal and is just as important a skill as writing the code in the first place.")
+        bodyDiv:Add(discuss)
+        bodyDiv:AddParagraph("We're making a big deal out of error messages and debugging because they are often hurdles for new learners. You just need to have the right attitude about writing code - debugging is part of the process. You will get used to a pattern of: ")
+        UnorderedList remarks
+            remarks:AddListItem("Write a section of code")
+            remarks:AddListItem("Test it to make sure it does what you think")
+            remarks:AddListItem("Debug if necessary")
+            remarks:AddListItem("Write the next section of code")
+        bodyDiv:Add(remarks)
+        bodyDiv:AddParagraph("If you follow this pattern when writing programs, the errors you make will tend to be smaller and easier to catch.")
+        //bodyDiv:AddParagraph("You have just created an 'Event Driven Program' from the scratch with the use of an 'Object Oriented Language (Quorum Language in this case)'. If you are successful in your tasks, you should have a program that plays a note C, D, E, F, G and A with electric guitar sounds as you press the assigned key on the keyboard. You should also see the image for the specific key is spinning the the sound is playing. The following is one example of a tune you can play with the Musical Keyboard program you have created. Try to find out what the tune is:")
+            //Paragraph wrapup2
+                //wrapup2:AddText("C C G G A A G (pause) F F E E D D C")
+        //bodyDiv:Add(wrapup2)
+        bodyDiv:AddHeading("Assessment", 2)
+        OrderedList assess
+        ListItem assess1
+            assess1:AddText("Which of the following statements about debugging and program errors is FALSE?")
+            UnorderedList assess1a
+                assess1a:AddListItem("Error messages help programmers identify problems in their code.")
+                assess1a:AddListItem("Not all errors in a program will generate an error message.")
+                assess1a:AddListItem("Debugging is the process of locating and correcting errors in a program.")
+                assess1a:AddListItem("It is common for programs to contain errors the first time they are written.")
+                assess1a:AddListItem("A program that does not generate any error messages can be assumed to run as intended.")
+            assess1:Add(assess1a)
+        assess:Add(assess1)
+        ListItem assess2
+            assess2:AddText("The instantiated objects in your Musical Keyboard program were all created with unique names or &quotidentifiers.&quot Given what you know about how event handlers work, why is it important for each of these &quotidentifiers&quot to be unique?")
+        assess:Add(assess2)
+        bodyDiv:Add(assess)
+
+        //Finish WrapUP
+        //Add Assessment
+        //Finish Standards Alignment
+
+
+
+        /*
+        bodyDiv:AddHeading("Exemplar Solution:", 4)
+            Paragraph sol
+                sol:AddText("Following is one example/possibility of the coding solution for this lesson")
+        bodyDiv:Add(sol)
+            UnorderedList solList
+                solList:AddListItemLink("Exemplar Solution", "/files/code/Unit5/Unit5Lesson2chlg4-7 - solution.rtf")
+                solList:AddListItemLink("Exemplar Solution (Program)", "/files/code/Unit5/Unit5-MusicalKeyboard.zip")
+        bodyDiv:Add(solList)
+        */
+            //Paragraph wrapup3
+              //  wrapup3:AddText("In the next lesson, we will expand this Musical Keyboard to wider audio range as well as making it more user friendly.")
+        //bodyDiv:Add(wrapup3)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CPP.L2:5, CPP.L3A:3, CPP.L3A:4, CPP.L3A:5")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CT.L2:12, CT.L2:6, CT.L3A:1, CT.L3B:4")                
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.1.1(B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.2.1(A)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.2.3(A)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.2.4(A, D, E)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.1(B, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.2(J)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.3(D)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.4.1(C, E, F, M)")
+
+        bodyDiv:Add(list)
+
+/* Completed 4/8/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the concept of 'Obeject Oritented Programming Language' and how to use it in Quorum Programming Language'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 2 (Using an Object Oriented Programming Language)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 2"
+    end
+    action GetShortDescription returns text
+        return "Learn about Object Oriented Programming Language"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson2A.html"
+    end
+
+end
+
+ 
+    

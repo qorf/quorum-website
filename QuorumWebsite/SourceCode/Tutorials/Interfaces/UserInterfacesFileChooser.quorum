@@ -1,0 +1,180 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+
+class UserInterfacesFileChooser is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("File Chooser Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: File Chooser", 1)
+        headDiv:AddText("This tutorial tells you how to use File Choosers in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Introduction to File Choosers in Quorum", 2)
+        bodyDiv:AddParagraph("As noted in the name, File Choosers are meant to be used when interacting with Files and it is important to have at least a small understanding of how Files work in Quorum to use them. For this tutorial we will be doing minimal interaction with Files as the focus of this tutorial is with the File Chooser GUI component instead of the Files themselves which deal more with the internals of the System.")
+        bodyDiv:AddHeading("Files in Quorum", 3)
+        Paragraph files
+        files:AddText("The File class is used to access and gather information about files on disk. They can represent a file or a directory, and actions are provided for both manipulation and gathering of file data (such as file name, last time modified, etc). But a File object is not used for modifying the contents of files, but actions are provided that allow this functionality through other classes. For more information on the File class and modifying the contents of files, see the ")
+        files:AddLink("File", "/Libraries/System/File.html")
+        files:AddText(", ")
+        files:AddLink("FileReader", "/Libraries/System/FileReader.html")
+        files:AddText(", ")
+        files:AddLink("FileWriter", "/Libraries/System/FileWriter.html")
+        files:AddText(", and ")
+        files:AddLink("FileRandomAccess", "/Libraries/System/FileRandomAccess.html")
+        files:AddText(" documentation.")
+        bodyDiv:Add(files)
+        bodyDiv:AddHeading("What is a File Chooser?", 3)
+        bodyDiv:AddParagraph("A File Chooser is an interface tool that gives users a way to navigate the File System, usually in the form of a system dialog. In Quorum, the File Chooser class gives you the actions necessary to open a File Chooser dialog but the dialog itself is provided by the Operating System. How the dialog looks and functions may vary from system to system but generally a dialog will appear where you can view the Files and Folders on the system and then you will be able to choose a file and the dialog will return the file the user chose.")
+        bodyDiv:AddHeading("File Filters", 4)
+        bodyDiv:AddParagraph("A File Filter is a class that represents a filter for files in an open or save dialog. It does not do much on its own, but is used in relation to the FileChooser class. An example of a filter in action may be in a File Chooser dialog that is meant for opening an image. You may when the user to only select a valid image file so you can add a filter so only files with a "+dq+"png"+dq+" will be shown and allowed to be selected. We will show how to use filters with file choosers in Quorum in later section in this tutorial. ")
+        bodyDiv:AddHeading("Making File Chooser Dialogs", 2)
+        bodyDiv:AddParagraph("For this  tutorial we will be using buttons and behaviors to trigger the File Chooser Dialogs. We will start by making three Behavior classes that will open one of three File Chooser Dialogs.")
+        bodyDiv:AddParagraph("The three File Chooser Dialogs are the Open File Dialogs, the Save File Dialog, and the Choose Folder Dialog. The difference between them is that the Dialog will look slightly different and that depends on the OS and exact appearance depends on the OS, for the Quorum side all we need to worry about is calling the right actions with the right parameters and getting the return value.")
+        bodyDiv:AddHeading("Open File Dialog", 4)
+        bodyDiv:AddParagraph("The first Behavior we will make will call the Open File Dialog. We will make a Quorum class file for it and we will name it "+dq+"openFile.quorum."+ dq)
+        bodyDiv:AddParagraph("For all three of these behaviors we will need the File Chooser and File Libraries. You can include them with the following use statements:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.FileChooser"+cr+"use Libraries.System.File"))
+        bodyDiv:AddParagraph("We want to open the file chooser when the button is clicked so we will overwrite the Run action. To open the File Chooser all we need to do is make a FileChooser object and then call the OpenFileDialog action. But OpenFileDialog returns the File that was chosen so we need to make a File object that will hold the returned file. Then if the user chooses a file to open we will output the absolute path of the file and its name. The full openFile Behavior is provided in the code block below:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                        "use Libraries.Interface.Behaviors.Behavior" + cr
+                                        +"use Libraries.Interface.Events.BehaviorEvent" + cr
+                                        +"use Libraries.Interface.Controls.FileChooser" + cr
+                                        +"use Libraries.System.File" + cr + cr
+                                        +"class openFile is Behavior" + cr
+                                        +"    action Run(BehaviorEvent event)" + cr
+                                        +"        FileChooser chooser" + cr
+                                        +"        File file = chooser:OpenFileDialog()" + cr + cr
+                                        +"        if file not= undefined" + cr
+                                        +"            output file:GetAbsolutePath()" + cr
+                                        +"            output file:GetFileName()" + cr
+                                        +"        end" + cr
+                                        +"    end" + cr
+                                        +"end"))
+        bodyDiv:AddHeading("Save File Dialog", 4)
+        bodyDiv:AddParagraph("Now we will make the behavior that will call the Save File Dialog, we will make a new Quorum class file and name it "+dq+"saveFile.quorum."+dq+" This behavior is almost exactly the same as openFile but with the name saveFile and replacing the OpenFileDialog action with the SaveFileDialog action. The call for the Save File Dialog is shown in the following line of code:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("File file = chooser:SaveFileDialog()"))
+        bodyDiv:AddParagraph("In the Save File Dialog the user provides a name for the File and they choose a directory. This is useful when you want to the user to create a new File at a location they want. To create a new file and then write to it you can go to the File class documentation to learn how.")
+        bodyDiv:AddHeading("Choose Folder Dialog", 4)
+        bodyDiv:AddParagraph("Lastly we will make the behavior that will open the Choose Folder Dialog, we make another new Quorum class file and name it "+dq+"chooseFolder.quorum."+dq+" This dialog is opened a bit differently because you need provide a file as a parameter. The file parameter is used as the location where the Dialog will open to. The other two Dialogs also can take a File as parameter for location, but if none is provided or the File’s Path was not set then it will open to either to default of the system or the path to your project. ")
+        bodyDiv:AddParagraph("In the following code block is the chooseFolder behavior but with the use statements excluded. You will notice that other than calling the ChooseFolderDialog action we also add a new output statement that will output true if the File is a directory. ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                        +"use Libraries.Interface.Events.BehaviorEvent" + cr
+                                        +"use Libraries.Interface.Controls.FileChooser" + cr
+                                        +"use Libraries.System.File" + cr + cr
+                                        +"class chooseFolder is Behavior" + cr
+                                        +"    action Run(BehaviorEvent event)" + cr
+                                        +"        FileChooser chooser" + cr
+                                        +"        File location" + cr
+                                        +"        File folder = chooser:ChooseFolderDialog(location)" + cr + cr
+                                        +"        if file not= undefined" + cr
+                                        +"            output folder:GetAbsolutePath()" + cr
+                                        +"            output folder:GetFileName()" + cr
+                                        +"            output folder:isDirectory()" + cr
+                                        +"        end" + cr
+                                        +"    end" + cr
+                                        +"end"))
+        bodyDiv:AddHeading("Adding a File Filter", 4)
+        bodyDiv:AddParagraph("File Chooser dialogs have an option to add File Filter which will force the user to choose a file or only view Files with a specific file extension. You do need to add it for this tutorial but to use File Filter you will need the FileFilter library which you can include using the following use statement:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.FileFilter"))
+        bodyDiv:AddParagraph("To show how you set the filter and use it for a dialog an example of how you would add one so the user can only select Quorum files is shown below:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("FileFilter filter" + cr
+                                        +"filter:Add("+dq+"quorum"+dq+")" + cr
+                                        +"File file = chooser:OpenFileDialog(filter)"))
+        bodyDiv:AddParagraph("Since the File Filter only works on files only the Open File and Save File Dialogs can accept a filter. If you need to add a Filter and a Location then the first parameter for the action call will be the location and the second parameter is the filter. ")
+        bodyDiv:AddHeading("Adding Buttons to Open File Choosers", 3)
+        bodyDiv:AddParagraph("To open the File Choosers we will simply make Buttons that when clicked will call a behavior that will open the file choosers for us. We will make Three Buttons for the three different dialogs you can open. The code for this will be in the CreateGame action of the main class and is provided below:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                        "action CreateGame" + cr
+                                        +"    Button open" + cr
+                                        +"    Button save" + cr
+                                        +"    Button folder" + cr + cr
+
+                                        +"    open:SetName("+dq+"Open File"+dq+")" + cr
+                                        +"    save:SetName("+dq+"Save File"+dq+")" + cr
+                                        +"    folder:SetName("+dq+"Choose Folder"+dq+")" + cr + cr
+
+                                        +"    open:SetPosition(300, 400)" + cr
+                                        +"    save:SetPosition(300, 350)" + cr
+                                        +"    folder:SetPosition(300, 300)" + cr + cr
+
+                                        +"    openFile openBehavior" + cr
+                                        +"    open:SetBehavior(openBehavior)" + cr + cr
+
+                                        +"    saveFile saveBehavior" + cr
+                                        +"    save:SetBehavior(saveBehavior)" + cr + cr
+
+                                        +"    chooseFolder foldBehavior" + cr
+                                        +"    folder:SetBehavior(foldBehavior)" + cr + cr
+
+                                        +"    open:SetNextFocus(save)" + cr
+                                        +"    save:SetNextFocus(folder)" + cr
+                                        +"    folder:SetNextFocus(open)" + cr
+                                        +"    open:SetPreviousFocus(folder)" + cr
+                                        +"    save:SetPreviousFocus(open)" + cr
+                                        +"    folder:SetPreviousFocus(save)" + cr
+                                        +"    SetFocus(open)" + cr + cr
+
+                                        +"    Add(open)" + cr
+                                        +"    Add(save)" + cr
+                                        +"    Add(folder)" + cr
+                                        +"end"))
+        bodyDiv:AddParagraph("Note that we also added to a Focus Cycle to ensure that our application is accessible.")
+        bodyDiv:AddParagraph("Now we can run the program and there will be three Buttons and you can activate a Button to open one of the File Chooser Dialogs. After interacting with the Dialogs the File chosen will be returned and the program will output the absolute path to the File and the File’s name. ")
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about File Choosers in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "File Choosers"
+    end
+
+    action GetName returns text
+        return "File Choosers"
+    end
+
+    action GetShortDescription returns text
+        return "how to use File Choosers"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/fileChooser.html"
+    end
+end

@@ -1,0 +1,142 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class Lab6_5 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Lab 6.5: Understand Focus")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Lab 6.5: Understanding Focus", 1)
+        headDiv:AddText("Understanding how common focus systems work")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Objectives", 2)
+        bodyDiv:AddParagraph("The goal of this lab is to understand the following concepts:")
+        UnorderedList unorderedList0
+        bodyDiv:Add(unorderedList0)
+        ListItem listItem1
+        unorderedList0:Add(listItem1)
+        listItem1:AddText("Using a class hierarchical system")
+        ListItem listItem2
+        unorderedList0:Add(listItem2)
+        listItem2:AddText("How to instantiate blueprint actions")
+        ListItem listItem3
+        unorderedList0:Add(listItem3)
+        listItem3:AddText("How to use the Libraries.Accessibility classes")
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("In lab 6.4 we built a screen reader that told us what key on the keyboard was pressed. In Quorum, we can write screen readers that do even more. In this lab we will make another screen reader that will tell us when a new window, button, or any other component has gained focus.")
+        bodyDiv:AddHeading("Task 1: Getting Started", 2)
+        bodyDiv:AddParagraph("Start Sodbeans. Create a new “Quorum Application” project, and name it Lab6_5. In the Main.quorum file, it should contain a Main class and Main action.")
+        bodyDiv:AddParagraph("We will need to create an additional class in this project. In the New File dialog, create a new file by selecting “Quorum” and “Quorum Class” in the Categories and File Types windows, respectively. Then, name the new file Observer in the New Quorum Class dialog.")
+        bodyDiv:AddParagraph("Don't forget to include the appropriate libraries!")
+        bodyDiv:AddHeading("Task 2: Inheriting from the FocusObserver Class", 2)
+        bodyDiv:AddParagraph("Just like in Lab 6.4, our Observer class will need to inherit the variables and actions of an observer class. The class we need to include in order to get the events that involve the focus changing is the FocusObserver class. Just as in the last lab, use the is keyword to inherit from the FocusObserver class.")
+        PreformattedText pre4
+        bodyDiv:Add(pre4)
+        pre4:AddAttribute("class", "code")
+        CodeBlock code5
+        code5:AddText(
+"use Libraries.Accessibility.all 
+use Libraries.Sound.Speech
+
+class Observer is FocusObserver
+end")
+        pre4:Add(code5)
+        bodyDiv:AddParagraph("Just as in Lab 6.4, our Observer class is going to need an instance of the Speech class to say things quickly.")
+        bodyDiv:AddParagraph("We will also need to implement the blueprint action ReceiveEvent in our Observer class. In Lab 6.4 we used the GetDescription action to explain the event, but you can also get the individual aspects of the event and make your own sentence to describe the event. The FocusEvent class has quite a few actions that you can use to get individual information about the event.")
+        UnorderedList unorderedList6
+        bodyDiv:Add(unorderedList6)
+        ListItem listItem7
+        unorderedList6:Add(listItem7)
+        listItem7:AddText("GetCategory(): For FocusEvents this will always be " + dq + "Focus" + dq + ".")
+        ListItem listItem8
+        unorderedList6:Add(listItem8)
+        listItem8:AddText("GetAction(): This returns a short indication of what was focused (e.g. Desktop, SwitchWindow, MouseCaptureStart).")
+        ListItem listItem9
+        unorderedList6:Add(listItem9)
+        listItem9:AddText("GetComponent(): This returns a short description of the type of element that was focused (e.g. Button, Window, MenuItem).")
+        ListItem listItem10
+        unorderedList6:Add(listItem10)
+        listItem10:AddText("GetComponentName(): This returns the name of the component that was focused(e.g. Cancel, Sodbeans 3.5, File).")
+        ListItem listItem11
+        unorderedList6:Add(listItem11)
+        listItem11:AddText("GetKeyboardShortcut(): This returns the keyboard shortcut of the component that was focused.")
+        ListItem listItem12
+        unorderedList6:Add(listItem12)
+        listItem12:AddText("GetChildCount(): This returns the number of children the event has For example, when you focus on a list it will tell you the number of items that list has in it.")
+        ListItem listItem13
+        unorderedList6:Add(listItem13)
+        listItem13:AddText("GetChild(integer index): This returns an AccessibleChild representing the child at the index of the parameter, if it is a valid index.")
+        bodyDiv:AddParagraph("Use any or all of these actions to create a description of the event and use the Speech object to say it.")
+        PreformattedText pre14
+        bodyDiv:Add(pre14)
+        pre14:AddAttribute("class", "code")
+        CodeBlock code15
+        code15:AddText(
+"action ReceiveEvent(FocusEvent event)
+    speech:Say(" + dq + "The " + dq + " + event:GetComponent() + " + dq + ", " + dq + " + event:GetComponentName() + " + dq + ", was focused. Its keyboard shortcut is " + dq + " + event:GetKeyboardShortcut() + " + dq + "." + dq + ")
+end")
+        pre14:Add(code15)
+        bodyDiv:AddParagraph("Above is an example of how you could combine the parts of the event to make a sentence to describe it.")
+        bodyDiv:AddHeading("Task 3: Using the Observer class", 2)
+        bodyDiv:AddParagraph("Now that we have implemented the Observer class, we can add an instance of it to our of AccessibilityManager. You can then start the AccessibilityManager and begin listening for events just as you did in Lab 6.4.")
+        bodyDiv:AddHeading("Sample Output", 2)
+        bodyDiv:AddParagraph("When you run the program it should not do anything until you focus on something (open a new window or click a button or menu). Once you do that it should say out loud the sentence you created.")
+        bodyDiv:AddParagraph("When you are done, debug and fix any errors, then show your code to your instructor.")
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetSummaryName returns text
+        return "Understanding Focus"
+    end
+    action GetName returns text
+        return "Lab 6.5"
+    end
+    action GetShortDescription returns text
+        return "an introduction to using focus."
+    end
+    action GetLocation returns text
+        return "lessons/chapter6/lab6_5.html"
+    end
+end

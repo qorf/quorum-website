@@ -1,0 +1,672 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class UserInterfacesInputSet is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("InputSet Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: InputSet", 1)
+        headDiv:AddText("This tutorial tells you how to use InputSets in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to InputSets and InputTables", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will learn how to use 
+            InputSets and InputTables in Quorum. InputSets are used to uniquely identify 
+            input, such as keyboard or mouse, and expand existing functionality in the 
+            language. These are used in conjunction with InputTables, which associate 
+            these inputs with Behaviors we intend to work across a set of items. For 
+            example, we could use an InputSet to trigger when the user clicks the 
+            mouse on a creature in a game, and then use an InputTable to tell it 
+            how to respond to that input.")
+        bodyDiv:AddParagraph("InputSets have several advantages compared to 
+            event listeners, but they do not replace them. Notably, unlike listeners, 
+            they can be used to make input act consistently across groups of similar 
+            Items by default. For example, buttons in a user interface should have 
+            default behaviors, like slightly changing colors when clicked to visually 
+            show that it happened.")
+        bodyDiv:AddParagraph("InputTables have similar advantages. With 
+            listeners and the event system, the programmer could make whatever they 
+            wished, but input tables make it easier to remap those commands in 
+            different ways. For example, they can be used to set multiple inputs to 
+            trigger the same Behaviors or as a way to remap keyboard or mouse input 
+            across an entire system.")
+
+        bodyDiv:AddHeading("Using the Default InputTable", 2)
+
+        Paragraph defaultTableParagraph = bodyDiv:AddParagraph("Let's make a program which will perform a 
+            task by default when given a particular kind of input. We could choose 
+            any input, but for example, we will create a Behavior that outputs the 
+            name of the currently focused Item when the spacebar is pressed. The 
+            Behavior we will use is shown in the code block below. We can review 
+            how Behaviors work in the ")
+            defaultTableParagraph:AddLink("Behavior tutorial","/tutorials/ui/behavior.html")
+            defaultTableParagraph:AddText(". We can also review the ")
+            defaultTableParagraph:AddLink("Focus tutorial","/tutorials/ui/focus.html")
+            defaultTableParagraph:AddText(".")
+
+        CodeBlock codeBlock1
+        Span codeBlock1Comment1
+        codeBlock1Comment1:SetClassAttribute("comment")
+        codeBlock1:AddText("use Libraries.Interface.Behaviors.Behavior" + cr)
+        codeBlock1:AddText("use Libraries.Interface.Events.BehaviorEvent" + cr)
+        codeBlock1:AddText("use Libraries.Interface.Item" + cr)
+        codeBlock1:AddText(""+ cr)
+
+        codeBlock1:AddText("class OutputBehavior is Behavior"+ cr)
+        codeBlock1:AddText("    action Run(BehaviorEvent event)"+ cr)
+        codeBlock1:AddText("        Item item = event:GetItem()"+ cr)
+        codeBlock1:AddText(""+ cr)
+        codeBlock1Comment1:AddText("        // There may not be a focused Item. Output something different"+ cr)
+        codeBlock1Comment1:AddText("        // if there was something focused."+ cr)
+        codeBlock1:Add(codeBlock1Comment1)
+        codeBlock1:AddText("        if item = undefined"+ cr)
+        codeBlock1:AddText("            output " + dq + "No item is in focus." + dq + cr)
+        codeBlock1:AddText("        else"+ cr)
+        codeBlock1:AddText("            output item:GetName() + " + dq + " is focused." + dq + cr)
+        codeBlock1:AddText("        end"+ cr)
+        codeBlock1:AddText("    end"+ cr)
+        codeBlock1:AddText("end"+ cr)
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock1))
+
+        bodyDiv:AddParagraph("Now we'll create our main class. Inside it, 
+            we'll make an InputSet that triggers this Behavior. We'll also 
+            want to make a KeyboardEvent, which is used to provide values 
+            that represent the keys on the keyboard (e.g., spacebar). 
+            The fields will look like this:")
+
+        CodeBlock codeBlock2
+        codeBlock2:AddText("InputSet spaceSet" + cr)
+        codeBlock2:AddText("KeyboardEvent keys" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock2))
+
+        bodyDiv:AddParagraph("Inside our CreateGame action, we need to tell 
+            Quorum that we want to use these input sets. To do this, we set our 
+            InputSet to accept a particular input from the keyboard using the 
+            SetKeyboardInput action. We'll use our keys
+            variable to provide the SPACE constant from the 
+            KeyboardEvent class.")
+
+        bodyDiv:AddParagraph("After we've set up our InputSet, we need 
+            to get the default InputTable from the system. We can retrieve this table 
+            using the Game's GetDefaultInputTable action. The default 
+            InputTable applies Behaviors whenever input is received in a structured 
+            and organized way.")
+
+        bodyDiv:AddParagraph("Now that we have our InputTable, we can set it 
+            to trigger our Behavior when the spacebar is pressed: ")
+
+        CodeBlock codeBlock3
+        codeBlock3:AddText("OutputBehavior outputBehavior" + cr)
+        codeBlock3:AddText("defaultTable:Add(spaceSet, outputBehavior)" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock3))
+
+        bodyDiv:AddParagraph("The default InputTable will now trigger 
+            when the spacebar is pressed. In the provided code sample, we've 
+            included some Drawables and set them up to allow for Focus 
+            in our Game.")
+
+        CodeBlock codeBlock4
+        Span codeBlock4Comment1
+        Span codeBlock4Comment2
+        Span codeBlock4Comment3
+
+        codeBlock4Comment1:SetClassAttribute("comment")
+        codeBlock4Comment2:SetClassAttribute("comment")
+        codeBlock4Comment3:SetClassAttribute("comment")
+
+        codeBlock4:AddText("use Libraries.Game.Game" + cr)
+        codeBlock4:AddText("use Libraries.Game.InputSet" + cr)
+        codeBlock4:AddText("use Libraries.Interface.Events.KeyboardEvent" + cr)
+        codeBlock4:AddText("use Libraries.Game.InputTable" + cr)
+        codeBlock4:AddText("use Libraries.Game.Graphics.Drawable" + cr)
+        codeBlock4:AddText("use Libraries.Game.Graphics.Color" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("class Main is Game" + cr)
+        codeBlock4:AddText("    InputSet spaceSet" + cr)
+        codeBlock4:AddText("    KeyboardEvent keys" + cr)
+        codeBlock4:AddText("    Color color" + cr)
+        codeBlock4:AddText("    Drawable square" + cr)
+        codeBlock4:AddText("    Drawable circle" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("    action Main" + cr)
+        codeBlock4:AddText("        StartGame()" + cr)
+        codeBlock4:AddText("    end" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("    action CreateGame" + cr)
+        codeBlock4Comment1:AddText("        // Set up our InputSet to trigger when the spacebar is pressed." + cr)
+        codeBlock4:Add(codeBlock4Comment1)
+        codeBlock4:AddText("        spaceSet:SetKeyboardInput(keys:SPACE)" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4Comment2:AddText("        // Get the default InputTable from the Game." + cr)
+        codeBlock4:Add(codeBlock4Comment2)
+        codeBlock4:AddText("        InputTable defaultTable = GetDefaultInputTable()" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4Comment3:AddText("       // Create our Behavior and make it trigger every time the spacebar is pressed." + cr)
+        codeBlock4:Add(codeBlock4Comment3)
+        codeBlock4:AddText("       OutputBehavior outputBehavior" + cr)
+        codeBlock4:AddText("       defaultTable:Add(spaceSet, outputBehavior)" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("       square:LoadFilledRectangle(100, 100, color:Orange())" + cr)
+        codeBlock4:AddText("       square:SetName(" + dq + "Square" + dq + ")" + cr)
+        codeBlock4:AddText("       square:SetFocusable(true)" + cr)
+        codeBlock4:AddText("       square:SetPosition(200, 250)" + cr)
+        codeBlock4:AddText("       Add(square)" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("       circle:LoadFilledCircle(50, color:Purple())" + cr)
+        codeBlock4:AddText("       circle:SetName(" + dq + "Circle" + dq + ")" + cr)
+        codeBlock4:AddText("       circle:SetFocusable(true)" + cr)
+        codeBlock4:AddText("       circle:SetPosition(500, 250)" + cr)
+        codeBlock4:AddText("       Add(circle)" + cr)
+        codeBlock4:AddText("" + cr)
+        codeBlock4:AddText("       square:SetNextFocus(circle)" + cr)
+        codeBlock4:AddText("       square:SetPreviousFocus(circle)" + cr)
+        codeBlock4:AddText("       circle:SetNextFocus(square)" + cr)
+        codeBlock4:AddText("       circle:SetPreviousFocus(square)" + cr)
+        codeBlock4:AddText("       SetFocus(square)" + cr)
+        codeBlock4:AddText("    end" + cr)
+        codeBlock4:AddText("end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock4))
+
+        bodyDiv:AddHeading("InputTables and Input Groups", 2)
+        bodyDiv:AddParagraph("The default InputTable can be useful for 
+            default behaviors as a whole and, perhaps, even more so for assigning 
+            Behaviors to specific kinds of items. The reason this is the case is 
+            because different kinds of user interface components, like textboxes 
+            or buttons, act in unique ways and therefore might use unique 
+            default behaviors. ")
+        bodyDiv:AddParagraph("In this code, we've added a circle and a 
+            square, and they're set to cycle the focus between them. Now let's set 
+            them to use special input. To start, let's make new Behaviors that 
+            we'll use for these Drawables. The first Behavior is listed below. 
+            This one will rotate the item by 45 degrees, which we'll use for 
+            our square.")
+
+//add this code example in.
+//use Libraries.Interface.Behaviors.Behavior
+//use Libraries.Interface.Events.BehaviorEvent
+//use Libraries.Interface.Item
+//use Libraries.Interface.Item2D
+//
+//class RotationBehavior is Behavior
+//    action Run(BehaviorEvent event)
+//        Item item = event:GetItem()
+//
+//        // There may not be a focused Item. If not, put something in the console
+//        // so that we know what happened.
+//        if item = undefined
+//            output "Couldn't rotate because no item was focused."
+//        elseif item is Item2D
+//            // Cast our item to an Item2D (Drawable is a kind of Item2D)
+//            // and then rotate it.
+//            Item2D item2D = cast(Item2D, item)
+//            item2D:Rotate(45)
+//            output item2D:GetName() + " set to " + item2D:GetRotation() + " degrees."
+//        end
+//    end
+//end
+
+        CodeBlock codeBlock5
+        codeBlock5:AddText("use Libraries.Interface.Behaviors.Behavior" + cr)
+        codeBlock5:AddText("use Libraries.Interface.Events.BehaviorEvent" + cr)
+        codeBlock5:AddText("use Libraries.Interface.Item" + cr)
+        codeBlock5:AddText("use Libraries.Interface.Item2D" + cr)
+        codeBlock5:AddText("" + cr)
+        codeBlock5:AddText("class RotationBehavior is Behavior" + cr)
+        codeBlock5:AddText("    action Run(BehaviorEvent event)" + cr)
+        codeBlock5:AddText("        Item item = event:GetItem()" + cr)
+        codeBlock5:AddText("" + cr)
+        Span codeBlock5Comment1
+        codeBlock5Comment1:SetClassAttribute("comment")
+        codeBlock5Comment1:AddText("        // There may not be a focused Item. If not, put something in the console"+ cr)
+        codeBlock5:Add(codeBlock5Comment1)
+        Span codeBlock5Comment2
+        codeBlock5Comment2:SetClassAttribute("comment")
+        codeBlock5Comment2:AddText("        // so that we know what happened."+ cr)
+        codeBlock5:Add(codeBlock5Comment2)
+        codeBlock5:AddText("        if item = undefined" + cr)
+        codeBlock5:AddText("            output "+dq+"Couldn't rotate because no item was focused."+dq+"" + cr)
+        codeBlock5:AddText("        elseif item is Item2D" + cr)
+        Span codeBlock5Comment3
+        codeBlock5Comment3:SetClassAttribute("comment")
+        codeBlock5Comment3:AddText("            // Cast our item to an Item2D (Drawable is a kind of Item2D)"+ cr)
+        codeBlock5:Add(codeBlock5Comment3)
+        Span codeBlock5Comment4
+        codeBlock5Comment4:SetClassAttribute("comment")
+        codeBlock5Comment4:AddText("            // and then rotate it."+ cr)
+        codeBlock5:Add(codeBlock5Comment4)
+        codeBlock5:AddText("            Item2D item2D = cast(Item2D, item)" + cr)
+        codeBlock5:AddText("            item2D:Rotate(45)" + cr)
+        codeBlock5:AddText("            output item2D:GetName() + "+dq+" set to "+dq+" + item2D:GetRotation() + "+dq+" degrees."+dq+"" + cr)
+        codeBlock5:AddText("        end" + cr)
+        codeBlock5:AddText("    end" + cr)
+        codeBlock5:AddText("end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock5))
+
+
+        bodyDiv:AddParagraph("Our second Behavior is a sort of toggle. Each 
+            time it's activated, it will alternate between making the object smaller or 
+            larger by using the Scale action. We'll use this one for our circle. The 
+            code for this Behavior is listed below:")
+
+
+//use Libraries.Interface.Behaviors.Behavior
+//use Libraries.Interface.Events.BehaviorEvent
+//use Libraries.Interface.Item
+//use Libraries.Interface.Item2D
+//
+//class ScaleBehavior is Behavior
+//
+//    boolean scaledUp = false
+//
+//    action Run(BehaviorEvent event)
+//        Item item = event:GetItem()
+//
+//        // There may not be a focused Item. If not, put something in the console
+//        // so that we know what happened.
+//        if item = undefined
+//            output "Couldn't scale because no item was focused."
+//        elseif item is Item2D
+//            // Cast our item to an Item2D (Drawable is a kind of Item2D)
+//            // and then scale it.
+//            Item2D item2D = cast(Item2D, item)
+//            if scaledUp
+//                item2D:SetScaleFromCenter(1.0)
+//            else
+//                item2D:SetScaleFromCenter(1.5)
+//            end
+//            scaledUp = not scaledUp
+//            output item2D:GetName() + " scaled to " + item2D:GetScaleX() + " times its normal size."
+//        end
+//    end
+//end
+
+        CodeBlock codeBlock6
+        codeBlock6:AddText("use Libraries.Interface.Behaviors.Behavior" + cr)
+        codeBlock6:AddText("use Libraries.Interface.Events.BehaviorEvent" + cr)
+        codeBlock6:AddText("use Libraries.Interface.Item" + cr)
+        codeBlock6:AddText("use Libraries.Interface.Item2D" + cr)
+        codeBlock6:AddText("" + cr)
+        codeBlock6:AddText("class ScaleBehavior is Behavior" + cr)
+        codeBlock6:AddText("" + cr)
+        codeBlock6:AddText("    boolean scaledUp = false" + cr)
+        codeBlock6:AddText("" + cr)
+        codeBlock6:AddText("    action Run(BehaviorEvent event)" + cr)
+        codeBlock6:AddText("        Item item = event:GetItem()" + cr)
+        codeBlock6:AddText("" + cr)
+        Span codeBlock6Comment1
+        codeBlock6Comment1:SetClassAttribute("comment")
+        codeBlock6Comment1:AddText("        // There may not be a focused Item. If not, put something in the console"+ cr)
+        codeBlock6:Add(codeBlock6Comment1)
+        Span codeBlock6Comment2
+        codeBlock6Comment2:SetClassAttribute("comment")
+        codeBlock6Comment2:AddText("        // so that we know what happened."+ cr)
+        codeBlock6:Add(codeBlock6Comment2)
+        codeBlock6:AddText("        if item = undefined" + cr)
+        codeBlock6:AddText("            output "+dq+"Couldn't scale because no item was focused."+dq+"" + cr)
+        codeBlock6:AddText("        elseif item is Item2D" + cr)
+        Span codeBlock6Comment3
+        codeBlock6Comment3:SetClassAttribute("comment")
+        codeBlock6Comment3:AddText("            // Cast our item to an Item2D (Drawable is a kind of Item2D)"+ cr)
+        codeBlock6:Add(codeBlock6Comment3)
+        Span codeBlock6Comment4
+        codeBlock6Comment4:SetClassAttribute("comment")
+        codeBlock6Comment4:AddText("            // and then scale it."+ cr)
+        codeBlock6:Add(codeBlock6Comment4)
+        codeBlock6:AddText("            Item2D item2D = cast(Item2D, item)" + cr)
+        codeBlock6:AddText("            if scaledUp" + cr)
+        codeBlock6:AddText("                item2D:SetScaleFromCenter(1.0)" + cr)
+        codeBlock6:AddText("            else" + cr)
+        codeBlock6:AddText("                item2D:SetScaleFromCenter(1.5)" + cr)
+        codeBlock6:AddText("            end" + cr)
+        codeBlock6:AddText("            scaledUp = not scaledUp" + cr)
+        codeBlock6:AddText("            output item2D:GetName() + "+dq+" scaled to "+dq+" + item2D:GetScaleX() + "+dq+" times its normal size."+dq+"" + cr)
+        codeBlock6:AddText("        end" + cr)
+        codeBlock6:AddText("    end" + cr)
+        codeBlock6:AddText("end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock6))
+
+        bodyDiv:AddParagraph("Using these two Behaviors, we can specific 
+            functionality to specific kinds of items in our user interface. For 
+            example, suppose we would like to apply the RotationBehavior only 
+            to the square and the ScaleBehavior only to the circle. If this was 
+            our goal, we could use the SetInputGroup(text) action from our 
+            Drawables. The input groups are available to any Item, and are 
+            used to identify what InputTable should be applied to them. For our 
+            code, we'll set the following input groups:")
+
+        CodeBlock codeBlock8
+        codeBlock8:AddText("square:SetInputGroup(" + dq + "Square" + dq + ")" + cr)
+        codeBlock8:AddText("circle:SetInputGroup(" + dq + "Circle" + dq + ")" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock8))
+
+        bodyDiv:AddParagraph("Now that we have set the input groups, we can 
+            make InputTables that correspond to them. When we create these tables, 
+            we'll use the SetIdentifier action in the InputTable. The 
+            important part is that we need to match these identifiers to the input 
+            groups of the Items we want them to correspond to, like so:")
+
+        CodeBlock codeBlock9
+        codeBlock9:AddText("InputTable squareTable" + cr)
+        codeBlock9:AddText("squareTable:SetIdentifier("+dq+"Square"+dq+")" + cr)
+        codeBlock9:AddText("InputTable circleTable" + cr)
+        codeBlock9:AddText("circleTable:SetIdentifier("+dq+"Circle"+dq+")" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock9))
+
+        bodyDiv:AddParagraph("Once our tables are created and their 
+            identifiers are set, we can add our InputSets and Behaviors to them. 
+            To do this, we use the Game's AddInputTable action to add 
+            the tables to the Game. Note that we didn't need to do this for the 
+            default InputTable because it's already part of the Game, but these 
+            new tables must be added in order to tell our interface that we are 
+            adding a custom user interface component. When we do so, our main 
+            class looks like this:")
+
+
+
+//use Libraries.Game.Game
+//use Libraries.Game.InputSet
+//use Libraries.Interface.Events.KeyboardEvent
+//use Libraries.Game.InputTable
+//use Libraries.Game.Graphics.Drawable
+//use Libraries.Game.Graphics.Color
+//
+//class Main is Game
+//
+//    InputSet spaceSet
+//    KeyboardEvent keys
+//
+//    Color color
+//    Drawable square
+//    Drawable circle
+//
+//    action Main
+//        StartGame()
+//    end
+//
+//    action CreateGame
+//        // Set up our InputSet to trigger when the spacebar is pressed.
+//        spaceSet:SetKeyboardInput(keys:SPACE)
+//
+//        // Get the default InputTable from the Game.
+//        InputTable defaultTable = GetDefaultInputTable()
+//        
+//        // Create our Behavior and make it trigger every time the spacebar is pressed.
+//        OutputBehavior outputBehavior
+//        defaultTable:Add(spaceSet, outputBehavior)
+//
+//        square:LoadFilledRectangle(100, 100, color:Orange())
+//        square:SetName("Square")
+//        square:SetFocusable(true)
+//        square:SetPosition(200, 250)
+//        Add(square)
+//
+//        circle:LoadFilledCircle(50, color:Purple())
+//        circle:SetName("Circle")
+//        circle:SetFocusable(true)
+//        circle:SetPosition(500, 250)
+//        Add(circle)
+//        
+//        // Setup our Drawables with the focus system.
+//        square:SetNextFocus(circle)
+//        square:SetPreviousFocus(circle)
+//        circle:SetNextFocus(square)
+//        circle:SetPreviousFocus(square)
+//        SetFocus(square)
+//
+//        // Setup our Drawables' input groups and make InputTables with matching IDs.
+//        square:SetInputGroup("Square")
+//        circle:SetInputGroup("Circle")
+//
+//        InputTable squareTable
+//        squareTable:SetIdentifier("Square")
+//        InputTable circleTable
+//        circleTable:SetIdentifier("Circle")
+//
+//        // Create our behaviors. In this example, we use the same InputSet from
+//        // earlier for our square, and we'll use the Enter key for the circle.
+//        RotationBehavior rotationBehavior
+//        ScaleBehavior scaleBehavior
+//        InputSet enterSet
+//        enterSet:SetKeyboardInput(keys:ENTER)
+//        squareTable:Add(spaceSet, rotationBehavior)
+//        circleTable:Add(enterSet, scaleBehavior)
+//        
+//        AddInputTable(squareTable)
+//        AddInputTable(circleTable)
+//    end
+//end
+
+        CodeBlock codeBlock7
+        codeBlock7:AddText("use Libraries.Game.Game" + cr)
+        codeBlock7:AddText("use Libraries.Game.InputSet" + cr)
+        codeBlock7:AddText("use Libraries.Interface.Events.KeyboardEvent" + cr)
+        codeBlock7:AddText("use Libraries.Game.InputTable" + cr)
+        codeBlock7:AddText("use Libraries.Game.Graphics.Drawable" + cr)
+        codeBlock7:AddText("use Libraries.Game.Graphics.Color" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("class Main is Game" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("    InputSet spaceSet" + cr)
+        codeBlock7:AddText("    KeyboardEvent keys" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("    Color color" + cr)
+        codeBlock7:AddText("    Drawable square" + cr)
+        codeBlock7:AddText("    Drawable circle" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("    action Main" + cr)
+        codeBlock7:AddText("        StartGame()" + cr)
+        codeBlock7:AddText("    end" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("    action CreateGame" + cr)
+        Span codeBlock7Comment1
+        codeBlock7Comment1:SetClassAttribute("comment")
+        codeBlock7Comment1:AddText("        // Set up our InputSet to trigger when the spacebar is pressed."+ cr)
+        codeBlock7:Add(codeBlock7Comment1)
+        codeBlock7:AddText("        spaceSet:SetKeyboardInput(keys:SPACE)" + cr)
+        codeBlock7:AddText("" + cr)
+        Span codeBlock7Comment2
+        codeBlock7Comment2:SetClassAttribute("comment")
+        codeBlock7Comment2:AddText("        // Get the default InputTable from the Game."+ cr)
+        codeBlock7:Add(codeBlock7Comment2)
+        codeBlock7:AddText("        InputTable defaultTable = GetDefaultInputTable()" + cr)
+        codeBlock7:AddText("        " + cr)
+        Span codeBlock7Comment3
+        codeBlock7Comment3:SetClassAttribute("comment")
+        codeBlock7Comment3:AddText("        // Create our Behavior and make it trigger every time the spacebar is pressed."+ cr)
+        codeBlock7:Add(codeBlock7Comment3)
+        codeBlock7:AddText("        OutputBehavior outputBehavior" + cr)
+        codeBlock7:AddText("        defaultTable:Add(spaceSet, outputBehavior)" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("        square:LoadFilledRectangle(100, 100, color:Orange())" + cr)
+        codeBlock7:AddText("        square:SetName("+dq+"Square"+dq+")" + cr)
+        codeBlock7:AddText("        square:SetFocusable(true)" + cr)
+        codeBlock7:AddText("        square:SetPosition(200, 250)" + cr)
+        codeBlock7:AddText("        Add(square)" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("        circle:LoadFilledCircle(50, color:Purple())" + cr)
+        codeBlock7:AddText("        circle:SetName("+dq+"Circle"+dq+")" + cr)
+        codeBlock7:AddText("        circle:SetFocusable(true)" + cr)
+        codeBlock7:AddText("        circle:SetPosition(500, 250)" + cr)
+        codeBlock7:AddText("        Add(circle)" + cr)
+        codeBlock7:AddText("        " + cr)
+        Span codeBlock7Comment4
+        codeBlock7Comment4:SetClassAttribute("comment")
+        codeBlock7Comment4:AddText("        // Setup our Drawables with the focus system."+ cr)
+        codeBlock7:Add(codeBlock7Comment4)
+        codeBlock7:AddText("        square:SetNextFocus(circle)" + cr)
+        codeBlock7:AddText("        square:SetPreviousFocus(circle)" + cr)
+        codeBlock7:AddText("        circle:SetNextFocus(square)" + cr)
+        codeBlock7:AddText("        circle:SetPreviousFocus(square)" + cr)
+        codeBlock7:AddText("        SetFocus(square)" + cr)
+        codeBlock7:AddText("" + cr)
+        Span codeBlock7Comment5
+        codeBlock7Comment5:SetClassAttribute("comment")
+        codeBlock7Comment5:AddText("        // Setup our Drawables' input groups and make InputTables with matching IDs."+ cr)
+        codeBlock7:Add(codeBlock7Comment5)
+        codeBlock7:AddText("        square:SetInputGroup("+dq+"Square"+dq+")" + cr)
+        codeBlock7:AddText("        circle:SetInputGroup("+dq+"Circle"+dq+")" + cr)
+        codeBlock7:AddText("" + cr)
+        codeBlock7:AddText("        InputTable squareTable" + cr)
+        codeBlock7:AddText("        squareTable:SetIdentifier("+dq+"Square"+dq+")" + cr)
+        codeBlock7:AddText("        InputTable circleTable" + cr)
+        codeBlock7:AddText("        circleTable:SetIdentifier("+dq+"Circle"+dq+")" + cr)
+        codeBlock7:AddText("" + cr)
+        Span codeBlock7Comment6
+        codeBlock7Comment6:SetClassAttribute("comment")
+        codeBlock7Comment6:AddText("        // Create our behaviors. In this example, we use the same InputSet from"+ cr)
+        codeBlock7:Add(codeBlock7Comment6)
+        Span codeBlock7Comment7
+        codeBlock7Comment7:SetClassAttribute("comment")
+        codeBlock7Comment7:AddText("        // earlier for our square, and we'll use the Enter key for the circle."+ cr)
+        codeBlock7:Add(codeBlock7Comment7)
+        codeBlock7:AddText("        RotationBehavior rotationBehavior" + cr)
+        codeBlock7:AddText("        ScaleBehavior scaleBehavior" + cr)
+        codeBlock7:AddText("        InputSet enterSet" + cr)
+        codeBlock7:AddText("        enterSet:SetKeyboardInput(keys:ENTER)" + cr)
+        codeBlock7:AddText("        squareTable:Add(enterSet, rotationBehavior)" + cr)
+        codeBlock7:AddText("        circleTable:Add(enterSet, scaleBehavior)" + cr)
+        codeBlock7:AddText("        " + cr)
+        codeBlock7:AddText("        AddInputTable(squareTable)" + cr)
+        codeBlock7:AddText("        AddInputTable(circleTable)" + cr)
+        codeBlock7:AddText("    end" + cr)
+        codeBlock7:AddText("end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock7))
+
+        bodyDiv:AddParagraph("In our example, we use the same InputSet that 
+            we used previously for our OutputBehavior to trigger our RotationBehavior, 
+            while we use a new InputSet using the Enter key to trigger our Scale 
+            behavior.")
+
+        bodyDiv:AddParagraph("Notice, however, that when our square is 
+            focused, the spacebar no longer triggers the OutputBehavior. This is 
+            because the square's related InputTable has its own Behavior it 
+            triggers on spacebar presses, which takes priority over the default 
+            InputTable. For the circle, however, the spacebar still triggers the 
+            InputTable, because the circle's table does not intercept the spacebar.")
+
+        bodyDiv:AddHeading("Input Triggers", 2)
+
+        bodyDiv:AddParagraph("When using InputTables, we may want to our 
+Behaviors on different conditions. When using InputSets, we have three 
+different " + dq + "triggers" + dq + " that we can use to respond to input:")
+        UnorderedList triggerList
+        triggerList:AddListItem("<b>BEGIN</b>: The Behavior triggers as soon as the input is received, such as when a key is first pressed for keyboard events, or when the mouse begins to mouse over an Item for mouse movement events. This is the default trigger, and will be used if no other trigger is set.")
+        triggerList:AddListItem("<b>FINISH</b>: The Behavior triggers when the input ends, such as when a key is released for keyboard events, or when the mouse moves off of an Item for mouse movement events.")
+        triggerList:AddListItem("<b>CONTINUE</b>: The Behavior triggers as the input continues. For example, this will trigger on each frame of animation while a key is pressed for keyboard input, or trigger on each frame that the mouse is moving for a mouse movement event.")
+        bodyDiv:Add(triggerList)
+
+        bodyDiv:AddParagraph("To set an InputSet to trigger on one of these 
+            conditions, we use the SetInputTrigger action, providing it 
+            one of the above constants within the class, as shown here:")
+
+        CodeBlock codeBlock11
+        codeBlock11:AddText("InputSet enterSet" + cr)
+        codeBlock11:AddText("enterSet:SetKeyboardInput(keys:ENTER)" + cr)
+        codeBlock11:AddText("enterSet:SetInputTrigger(enterSet:CONTINUE)" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock11))
+
+        bodyDiv:AddHeading("Keyboard Modifiers", 2)
+
+        bodyDiv:AddParagraph("When using InputSets on desktop platforms, 
+            we may also want to trigger Behaviors only if certain keyboard modifiers 
+            are being held down. For example, we may want to do something different 
+            if the user presses " + dq + "space" + dq + " or  " + dq + "control-space," 
+            + dq + " or if the user is holding down the shift key while clicking 
+            on something.")
+
+        bodyDiv:AddParagraph("The following keyboard modifiers may be used:")
+        UnorderedList modifierList
+        modifierList:AddListItem("SHIFT")
+        modifierList:AddListItem("ALT")
+        modifierList:AddListItem("CONTROL")
+        modifierList:AddListItem("META (Command on Mac, Windows key on Windows - Note that the Windows key is typically not allowed for user applications, as it is reserved for the operating system.)")
+        bodyDiv:Add(modifierList)
+
+        bodyDiv:AddParagraph("We can add modifiers to an InputSet using the 
+AddModifier action, and remove modifiers with the RemoveModifier
+ action. For example, the below code shows an example of how to 
+set an InputSet to trigger on a control-left-click.")
+
+        CodeBlock codeBlock12
+        codeBlock12:AddText("MouseEvent mouse" + cr)
+        codeBlock12:AddText("InputSet controlClick" + cr)
+        codeBlock12:AddText("controlClick:SetMouseInput(mouse:LEFT)" + cr)
+        codeBlock12:AddText("controlClick:AddModifier(controlClick:CONTROL)" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock12))
+
+        bodyDiv:AddHeading("Double-Click and EventCounts", 2)
+        bodyDiv:AddParagraph("While using InputSets, we often trigger 
+Behaviors only when an input occurs multiple times in short succession. 
+This occurs most often with double-clicks, but can appear in other forms 
+of input as well (e.g., double-taps on keyboard keys or a touch screen).")
+        bodyDiv:AddParagraph("By default, InputSets trigger on the first 
+input, but we can adjust this using the SetEventCount action. 
+For example, the below code can be used to create an InputSet that triggers 
+on a double-left-click:")
+        
+        CodeBlock codeBlock13
+        codeBlock13:AddText("MouseEvent mouse" + cr)
+        codeBlock13:AddText("InputSet doubleClick" + cr)
+        codeBlock13:AddText("doubleClick:SetMouseInput(mouse:LEFT)" + cr)
+        codeBlock13:AddText("doubleClick:SetEventCount(2)" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock13))
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about InputSets in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "InputSets"
+    end
+
+    action GetName returns text
+        return "InputSets"
+    end
+
+    action GetShortDescription returns text
+        return "how to use InputSets"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/inputSet.html"
+    end
+end

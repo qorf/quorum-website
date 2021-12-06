@@ -1,0 +1,153 @@
+
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+
+class AudioChangingAudioTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Changing the Audio - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Changing The Audio", 1)
+        headDiv:AddText("This tutorial teaches you how to change audio through volume and pitch in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Changing The Audio: Controlling Volume and Pitch", 2)
+
+
+        bodyDiv:AddParagraph(   "We are able to set the volume and pitch of our Audio objects as they are playing by calling the SetVolume and SetPitch actions. "
+                            +   "These actions both take number parameters that represent the percent change in the pitch. "
+                            +   "For example, a number of 0.5 passed to SetVolume will set the new volume at 50% of the maximum volume. "
+                            +   "A number of 1.2 passed to SetPitch will raise the pitch 20% above the normal pitch. "
+                            +   "Examples of these actions follow: ")
+
+
+        CodeBlock cb13
+        Span s9
+        Span s91
+        cb13:AddText(   "use Libraries.Sound.Audio" + cr
+                    +   "Audio audio" + cr 
+                    +   "audio:Load(" + dq + "Sounds/Clang.ogg" + dq + ")" + cr + cr )
+        s9:AddText(     "// this line sets the volume of our Audio object at 50% its maximum volume." + cr)
+        s9:SetClassAttribute("comment")
+        cb13:Add(s9)
+        cb13:AddText(   "audio:SetVolume(0.5)" + cr + cr )
+
+        s91:AddText(     "// this line sets the pitch of our Audio object at 120% the normal pitch" + cr)
+        s91:SetClassAttribute("comment")
+        cb13:Add(s91)
+        cb13:AddText(   "audio:SetPitch(1.2)" + cr + cr 
+                    +   "audio:PlayUntilDone()" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb13))
+
+        bodyDiv:AddParagraph(   "If we want to know what the current settings of the volume and pitch of our Audio objects are, we can use the GetVolume and GetPitch actions, respectively. "
+                            +   "These actions return a number that represents the value of the volume or pitch and can be used with their corresponding Set actions to change the values of the volume and/or pitch over time. "
+                            +   "An example of this follows: ")
+
+        CodeBlock cb14
+        Span s10
+        Span s101
+        Span s102
+        Span s103
+        cb14:AddText(   "use Libraries.Sound.Audio" + cr
+                    +   "Audio audio" + cr 
+                    +   "audio:Load(" + dq + "Sounds/song.ogg" + dq + ")" + cr 
+                    +   "audio:Play()" + cr + cr )
+        s10:AddText(    "// this loop keeps our sound playing until it is done" + cr)
+        s10:SetClassAttribute("comment")
+        cb14:Add(s10)
+        cb14:AddText(   "repeat while audio:IsPlaying()" + cr )
+
+        s101:AddText(   "   // this conditional checks if the current volume is greater than 0. If it is, it decreases the volume" + cr)
+        s101:SetClassAttribute("comment")
+        cb14:Add(s101)
+        cb14:AddText(   "   if audio:GetVolume() > 0.0" + cr )
+
+        s102:AddText(   "   // this line calculates the new volume by getting the current volume and subtracting 0.00001% (one hundred-thousandth of a percent)" + cr)
+        s102:SetClassAttribute("comment")
+        cb14:Add(s102)
+        cb14:AddText(   "   number newVolume = audio:GetVolume() - 0.0000001" + cr + cr )
+
+        s103:AddText(   "   // this line sets the volumen to newVolume, which will have the effect of fading the sound out quickly." + cr)
+        s103:SetClassAttribute("comment")
+        cb14:Add(s103)
+        cb14:AddText(   "   audio:SetVolume(newVolume)" + cr 
+                    +   "   end" + cr  
+                    +   "end" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb14))
+
+
+        SideBySideIDE changingTheAudioIDE
+        changingTheAudioIDE:SetUniqueIdentifier("changingTheAudio")
+        changingTheAudioIDE:Setup()
+        changingTheAudioIDE:GetIDETitle():AddText("Activity: Changing the Audio")
+        changingTheAudioIDE:GetIDESubtitle():AddText("Call the SetVolume and SetPitch actions to set the volume and pitch of our Audio objects. ")
+        bodyDiv:Add(changingTheAudioIDE)
+
+        bodyDiv:AddHeading("Changing where the sound is played:", 2)
+        bodyDiv:AddHeading("Balance, Fade and Rotation", 3)
+
+        bodyDiv:AddParagraph("When using these actions, we should be aware of a few things.")
+        
+        UnorderedList goalList
+        goalList:AddListItem("First, the default volume of an Audio object is its maximum volume. This means that the volume can never be set higher than that default volume. Passing a number parameter that is greater than 1 to the SetVolume action will have no effect.")
+        goalList:AddListItem("Second, changing the pitch of the Audio object also affects the speed of playback. Making the pitch lower causes the sound to play slower; likewise, making the pitch higher causes the sound to play faster.")
+        bodyDiv:Add(goalList)
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to code sound applications using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Sound"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+                return "Changing the Audio: Controlling Volume and Pitch"
+    end
+
+    action GetShortDescription returns text
+        return "how to play audio files Quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/dsp/audiochangingaudiotutorial.html"
+    end
+end

@@ -1,0 +1,317 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Link
+
+use Libraries.Web.Page.AttributeAccepter 
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Attribute 
+
+class MouseEventsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Mouse Events - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Mouse Events", 1)
+        headDiv:AddText("This tutorial shows how to use mouse events in Quorum.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading(     "Introduction to Mouse Events in Quorum", 2)
+
+        bodyDiv:AddParagraph(   "In this tutorial, we will learn about mouse events.")
+
+
+        bodyDiv:AddHeading(     "Using MouseEvents", 3)
+        bodyDiv:AddParagraph(   "We can also use events for mouse input. There are three possible listeners for MouseEvents.")
+
+
+        UnorderedList goalList
+
+        ListItem li
+        li:AddText("A ")
+        Bold mouseListenerTitle
+        mouseListenerTitle:AddText("MouseListener")
+        li:Add(mouseListenerTitle)
+        li:AddText(    " is used to listen for when mouse buttons are clicked or released.")
+        goalList:Add(li)
+
+        ListItem li2
+        li2:AddText("A ")
+        Bold mouseMovementListenerTitle
+        mouseMovementListenerTitle:AddText("MouseMovementListener")
+        li2:Add(mouseMovementListenerTitle)
+        li2:AddText(    " is used to listen for when the mouse is moved or dragged.")
+        goalList:Add(li2)
+
+        ListItem li3
+        li3:AddText("A ")
+        Bold mouseWheelListenerTitle
+        mouseWheelListenerTitle:AddText("MouseWheelListener")
+        li3:Add(mouseWheelListenerTitle)
+        li3:AddText(    " is used to detect when the mouse wheel is scrolled up or down.")
+        goalList:Add(li3)
+
+        bodyDiv:Add(goalList)
+
+
+
+        /*
+            Mouse Listeners
+
+        */
+        bodyDiv:AddHeading(     "Using MouseListeners", 3)
+        bodyDiv:AddParagraph(   "In this next sample program, we will use a MouseListener to make a square change color 
+            while we are clicking on it, and return it to its previous color when we release the mouse button. Try the 
+            total code out below in the browser or Quorum Studio:")
+        
+        AddIDE(bodyDiv, "gamesEventsMouseIDE", "Activity: Clicking with the Mouse", 
+            "Try clicking the mouse.", "examples/Games/Events/Mouse.quorum")
+        
+
+        Paragraph p9
+        CodeBlock cb14
+        cb14:AddText(" class Main is Game, MouseListener ")
+        p9:AddText( "Notice that when we create our class using the line ")
+        p9:Add(cb14)
+        p9:AddText( ", we inherit from MouseListener, similar to how we inherit from KeyboardListener to listen for KeyboardEvents. "
+                +   " We also need to call AddMouseListener to notify the engine like we did before.")
+        bodyDiv:Add(p9)
+
+        CodeBlock cb15
+        Span s6
+        s6:AddText(     "// Ensure this object will receive mouse events when it is clicked." + cr)
+        s6:SetClassAttribute("comment")
+        cb15:Add(s6)
+        cb15:AddText(   "AddMouseListener(me)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb15))
+
+        bodyDiv:AddParagraph(   "In this case, instead of adding the listener directly to the Game class, 
+            we show an alternative approach where we add the listener directly to an Item (the square). "
+            +   "Functionally the engine calls the predefined actions of the class (if they are specified), 
+                however in this case, the listener only applies if the square was clicked. "
+            +   "If we wanted different behavior for different objects, we can and add them anywhere. "
+            )
+
+        bodyDiv:AddText(        "In any class that inherits from MouseListener, the ClickedMouse action 
+            will automatically be called when the user clicks the mouse. "
+            +   "This action must take a MouseEvent as a parameter. "
+            +   "The MouseEvent can contain lots of information, including what mouse button was clicked or the X,Y coordinates of the mouse when the event occurred. "
+            +   "To see everything that a MouseEvent can contain, see its full documentation ")
+        bodyDiv:AddLink( "here" , "/Libraries/Interface/Events/MouseEvent.html" ) 
+        bodyDiv:AddText(".")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action ClickedMouse(MouseEvent event)" + cr
+                                                        + "   SetColor(clickColor)" + cr 
+                                                        + "end"))
+ 
+        bodyDiv:AddParagraph(    "Similarly, a class that inherits from MouseListener can use the ReleasedMouse action to automatically call code when the user releases a mouse button. "
+                            +   "This action must also take a MouseEvent as a parameter.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action ReleasedMouse(MouseEvent event)" + cr
+                                                        + "   SetColor(releaseColor)" + cr 
+                                                        + "end"))
+
+        bodyDiv:AddParagraph(   "The image on the left is when the game starts and the image on the right is when the image is clicked on")
+
+        bodyDiv:AddImage("/media/games/Red_Square.png", "This is an image of a red square")
+
+        bodyDiv:AddImage("/media/games/Green_Square.png", "This is an image of a green square")
+
+        bodyDiv:AddParagraph(   "The code in Main is used to additionally position and draw our square on the screen. ")
+
+
+
+        /*
+            Mouse Movement
+
+        */
+        bodyDiv:AddHeading(     "Using MouseMovementListeners", 3)
+
+        bodyDiv:AddParagraph(   "MouseEvents can also be used with MouseMovementListeners to detect when 
+            the mouse is moved or dragged (which means that the mouse was moved while a mouse button was held down). " 
+            +   "In this next sample, we will make a square rotate when the mouse when the mouse is moved and 
+            make the square move when dragged.")
+
+        AddIDE(bodyDiv, "gamesEventsMouseMoveIDE", "Activity: Moving with the Mouse", 
+            "Try moving or dragging the mouse.", "examples/Games/Events/MouseMove.quorum")
+        
+
+        Paragraph p11
+        CodeBlock cb18
+        cb18:AddText(   "class Main is Game, MouseMovementListener")
+        p11:AddText(     "Just like the other listeners, when we create our class with the line ")
+        p11:Add(cb18)
+        p11:AddText(     ", we need to inherit from the listener we are using, which in this case is the MouseMovementListener
+            and the Game. This lets us create our two special actions that will be called automatically for us. ")
+        bodyDiv:Add(p11)
+
+        Paragraph p12
+        CodeBlock cb19
+        CodeBlock cb20
+        cb19:AddText(   " event:GetX()")
+        cb20:AddText(   " event:GetY()")
+        p12:AddText(     "The first of these two actions is MovedMouse. "
+                +       "This action will be called anytime the mouse is moved and there are no buttons held down on the mouse. "
+                +       "In our example, we use ")
+        p12:Add(cb19)
+        p12:AddText(     " and ")
+        p12:Add(cb20)
+        p12:AddText(     " to get the x, y coordinates of the mouse after it has moved. ")
+        bodyDiv:Add(p12)
+
+        CodeBlock cb21
+        Span s9
+        Span s91
+        s9:AddText(     "// This action will be called on a mouse event" + cr
+                    +   "   // because the mouse was moved with no mouse buttons being held down" + cr )
+        s9:SetClassAttribute("comment")
+        cb21:Add(s9)
+        cb21:AddText(   "   action MovedMouse(MouseEvent event)" + cr )
+        s91:AddText(     "       // This code rotates the square." + cr)
+        s91:SetClassAttribute("comment")
+        cb21:Add(s91)
+        cb21:AddText(   "       number x = event:GetX()" + cr 
+                    +   "       square:Rotate(x * 0.1)"  + cr 
+                    +   "   end"  + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb21))
+
+        Paragraph p13
+        CodeBlock cb22
+        CodeBlock cb23
+        cb22:AddText(   " event:GetMovementX()")
+        cb23:AddText(   " event:GetMovementY()")
+        p13:AddText(    "The other action that will be automatically called by inheriting from MouseMovementListener is the DraggedMouse action. "
+                    +   "This action is called when the mouse is moved while holding down a button. "
+                    +   "In our example, we use ")
+        p13:Add(cb22)
+        p13:AddText(    " and ")
+        p13:Add(cb23)
+        p13:AddText(    " to get the distance traveled by the mouse since the last time the mouse was moved or dragged.")
+        bodyDiv:Add(p13)
+
+
+        CodeBlock cb24
+        Span s10
+        Span s101
+        s10:AddText(    "// This action is called when moving the mouse while holding down a button." + cr)
+        s10:SetClassAttribute("comment")
+        cb24:Add(s10)
+        cb24:AddText(   "   action DraggedMouse(MouseEvent event)"  + cr )
+        s101:AddText(    "       // This code drags the square" + cr)
+        s101:SetClassAttribute("comment")
+        cb24:Add(s101)
+        cb24:AddText(   "       number x = event:GetMovementX()" + cr 
+                    +   "       number y = event:GetMovementY()"  + cr 
+                    +   "       square:Move(x, y)"  + cr 
+                    +   "   end"  + cr  )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb24))
+
+        Paragraph p14
+        CodeBlock cb26
+        cb26:AddText(   " AddMouseMovementListener(me)")
+        p14:AddText(    "The most important thing in our Main class is the line ")
+        p14:Add(cb26)
+        p14:AddText(    ". This line tells the game engine to notify us every time the mouse is moved or dragged. ")
+        bodyDiv:Add(p14)
+
+
+
+        /*
+            Mouse Wheel Listeners
+
+        */
+        bodyDiv:AddHeading(     "Using MouseWheelListeners", 3)
+
+        bodyDiv:AddParagraph(   "The last type of listener for MouseEvents is the MouseWheelListener. " 
+                            +   "In this sample, we will use a MouseWheelListener to rotate a triangle on the screen when the user scrolls the mouse wheel.")
+        
+        AddIDE(bodyDiv, "gamesEventsMouseWheelIDE", "Activity: Wheeling with the Mouse", 
+            "Try the mouse wheel.", "examples/Games/Events/MouseWheel.quorum")
+
+
+        Paragraph p15
+        CodeBlock cb28
+        CodeBlock cb29
+        CodeBlock cb30
+        cb28:AddText(   " action ScrolledMouse(MouseEvent event) ")
+        cb29:AddText(   " event:scrollAmount ")
+        cb30:AddText(   " scrollAmount ")
+        p15:AddText(     "Inside our class there is one action, ")
+        p15:Add(cb28)
+        p15:AddText(    ". This is the only action that will be called when using a MouseWheelListener. Inside this action we use ")
+        p15:Add(cb29) 
+        p15:AddText(    ". (Note that it is lower-case without parenthesis - we are directly using a variable inside event, instead of calling an action.) The ")
+        p15:Add(cb30)
+        p15:AddText(    "value represents how far the mouse wheel has been scrolled. "
+                    +   "If the wheel was scrolled up, it will be positive, and if it was scrolled down, it will be negative. "
+                    +   "The faster the wheel was scrolled, the larger the number will be.")
+        bodyDiv:Add(p15)
+
+
+        Paragraph p16
+        CodeBlock cb32
+        cb32:AddText(   " AddMouseWheelListener(me) ")
+        p16:AddText(    "To make the game inform our listener of events, we need to add it. We can see this in our example code on the line ")
+        p16:Add(cb32)
+        p16:AddText(    ".")
+        bodyDiv:Add(p16)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to capture events from a mouse using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Mouse Events"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Events.png"
+    end
+
+    action GetName returns text
+        return "Mouse Events in Quorum"
+    end
+
+    action GetShortDescription returns text
+        return "How to use mouse events events in our games."
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/mouseEvents.html"
+    end
+end

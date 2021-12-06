@@ -1,0 +1,250 @@
+
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+
+class Audio3DPositionalAudioTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Positional Audio - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Positional Audio", 1)
+        headDiv:AddText("This tutorial teaches you how to position audio in 3D with Quorum.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+bodyDiv:AddHeading("3D Sound: Positional Audio", 2)
+
+        bodyDiv:AddParagraph( "Quorum audio objects have the ability to be set in a position in a virtual 3D space. "
+                            + "3D space is often represented in math and other applications with 3D (x, y, z) coordinate system. "
+                            + "An example of a 3D coordinate system is below.")
+ 
+        bodyDiv:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system with x, y, and z axes.")
+
+        bodyDiv:AddParagraph( "Quorum uses a virtual 3D coordinate system very much like this one to set sounds in 3D space. "
+                            + "Audio objects have x, y, and z-coordinates that can be set through the SetX, SetY, and SetZ actions. "
+                            + "These three actions each take a single number parameter that represents the value of that coordinate. "
+                            + "Audio objects also have corresponding GetX, GetY, and GetZ actions that return the requested coordinate.")
+ 
+       bodyDiv:AddParagraph(  "Using positional audio can allow us to do some cool things in our programs. "
+                            + "For example, we can use an audio object in a game, set its initial position, and then update its position in the game update loop. "
+                            + "An example is below.")
+
+        CodeBlock cb18
+        Span s14
+        Span s141
+        Span s142
+        cb18:AddText(   "use Libraries.Game.Game" +cr 
+                    +   "use Libraries.Sound.Audio" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "   Audio audio" + cr + cr
+                    +   "   action Main" + cr
+                    +   "       StartGame()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr 
+                    +   "       audio:Load(" + dq + "Sounds/Firework.ogg" + dq + ")" + cr + cr )
+
+        s14:AddText(    "       // give the audio some initial coordinates" + cr)
+        s14:SetClassAttribute("comment")
+        cb18:Add(s14)
+        cb18:AddText(   "       audio:SetX(-1)" + cr 
+                    +   "       audio:SetY(-1)" + cr 
+                    +   "       audio:SetZ(-1)" + cr + cr 
+                    +   "       audio:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr )
+
+        s141:AddText(   "       // calculate the new x, y, and z coordinates based off the current coordinates." + cr
+                    +   "      //In this example, the x, y, and z coordinates are increased by 0.25 every second." + cr)
+        s141:SetClassAttribute("comment")
+        cb18:Add(s141)
+        cb18:AddText(   "       number newX = audio:GetX() + 0.30 * seconds" + cr 
+                    +   "       number newY = audio:GetY() + 0.30 * seconds" + cr 
+                    +   "       number newZ = audio:GetZ() + 0.30 * seconds" + cr + cr )
+
+        s142:AddText(   "       // using the newly calculated coordinates, update the position of the object" + cr)
+        s142:SetClassAttribute("comment")
+        cb18:Add(s142)
+        cb18:AddText(   "       audio:SetX(newX)" + cr 
+                    +   "       audio:SetY(newY)" + cr 
+                    +   "       audio:SetZ(newZ)" + cr 
+                    +   "   end" + cr 
+                    +   "end" + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb18))
+
+
+        SideBySideIDE positionalAudioIDE
+        positionalAudioIDE:SetUniqueIdentifier("positionalAudio")
+        positionalAudioIDE:Setup()
+        positionalAudioIDE:GetIDETitle():AddText("Activity: 3D Sound: Positional Audio")
+        positionalAudioIDE:GetIDESubtitle():AddText("Using positional audio can allow us to do some cool things in our programs")
+        bodyDiv:Add(positionalAudioIDE)
+
+
+        bodyDiv:AddHeading("Audio3D", 2)
+
+        bodyDiv:AddText( "The Quorum game engine also supports Audio3D objects, which inherit from the Item3D class and the Audio class. "
+                            + "An Audio3D object can be moved, positioned, and rotated just like a Model in 3-space, and it can use all of the Audio actions. "
+                            + "We can add Audio3D objects directly to our models so that the positional audio will be calculated for us. "
+                            + "Our Audio3D objects share the same coordinate system as all other Item3D objects and can exist on the same ")
+ 
+        bodyDiv:AddLink( "Layer", "/tutorials/games/layers.html")
+        bodyDiv:AddText( " .")
+
+
+        bodyDiv:AddHeading("Doppler Shift", 3)
+
+        bodyDiv:AddText( "Audio3D objects have their Doppler shift (the change in pitch based on listener position, for more information, see ")
+
+        bodyDiv:AddLink( "here", "https://en.wikipedia.org/wiki/Doppler_effect")
+        bodyDiv:AddText( ") calculated and enabled by default. At any time we can disable Doppler by calling the Audio3D DisableDoppler() action. " 
+                +   "Once it has been disabled, the Audio3D action EnableDoppler() will turn it back on. "
+                +   "We should remember that these actions can only be called on an instantiated Audio3D object. For example:")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("audio:DisableDoppler()" + cr + "audio:EnableDoppler()"))
+
+
+        bodyDiv:AddHeading("Listener Position and Direction", 3)
+
+        bodyDiv:AddText( "Recall this from our ")
+        bodyDiv:AddLink( "Camera ", "/tutorials/games/cameras.html")
+
+        bodyDiv:AddText( "tutorial: A camera object has both a position and a direction that it uses to display a scene. "
+                +   "Our Audio3D objects have a similar feature called a listener. That listener has a position and a direction that it uses to represent a scene. "
+                +   "The default listener position is at (0, 0, 0), with the direction (0, 0, 1). Both of these can be changed to track the movement of a player in the game. "
+                +   "The actions that we use to change the position are Audio3D actions that should be called on our audio object. Below is an example of how we can call these actions on our Audio3D object:")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("audio:SetListenerPosition(0, 1, -1)" + cr + "audio:SetListenerDirection(0, -1, 1)"))
+
+        bodyDiv:AddParagraph(   "We can also represent our position and direction as a Vector3.")
+        bodyDiv:AddParagraph(   "Below is an example of a program that adds a sound to a moving box. "
+                            +   "The default settings for Doppler (on) and Listener are used, but we can try any of the code fragments from the two previous sections to understand how Doppler and Listener position/direction affect our game.")
+
+        CodeBlock cb19
+        Span s15
+        Span s151
+        cb19:AddText(   "use Libraries.Game.Game" +cr 
+                    +   "use Libraries.Game.Graphics.Model" +cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr 
+                    +   "use Libraries.Game.Audio3D" + cr + cr
+                    +   "class Main is Game" + cr 
+                    +   "   Audio3D audio" + cr
+                    +   "   Model model" + cr + cr
+                    +   "   action Main" + cr
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr 
+                    +   "       Color color" + cr 
+                    +   "       model:LoadBox(0.5, 0.5, 0.5, color:Green())" + cr 
+                    +   "       Add(model)" + cr 
+                    +   "       audio:Load(" + dq + "Sounds/Robot.ogg" + dq + ")" + cr 
+                    +   "       audio:EnableLooping()" + cr )
+
+        s15:AddText(    "       //adds the audio to the model so position is automatically calculated" + cr)
+        s15:SetClassAttribute("comment")
+        cb19:Add(s15)
+        cb19:AddText(   "       model:Add(audio)" + cr + cr  
+                    +   "       model:SetX(-5)" + cr + cr
+                    +   "       audio:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr )
+
+        s151:AddText(   "       //Moves the model a small amount in each frame" + cr)
+        s151:SetClassAttribute("comment")
+        cb19:Add(s151)
+        cb19:AddText(   "       model:Move(0.025, 0, 0)" + cr + cr 
+                    +   "   end" + cr 
+                    +   "end" + cr  )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb19))
+
+        SideBySideIDE audio3DIDE
+        audio3DIDE:SetUniqueIdentifier("audio3D")
+        audio3DIDE:Setup()
+        audio3DIDE:GetIDETitle():AddText("Activity: Audio3D")
+        audio3DIDE:GetIDESubtitle():AddText("Using the Doppler Shift and also Listener Position and Direction")
+        bodyDiv:Add(audio3DIDE)
+
+
+        bodyDiv:AddHeading("Common Problems", 2)
+
+        bodyDiv:AddHeading("When I run my program, I get an error telling me that the file extension is unsupported.", 4)
+
+        bodyDiv:AddParagraph(   "Quorum can only play audio files in the " + dq + ".wav" + dq + " or " + dq + ".ogg" + dq + " formats. "
+                            +   "Ensure that the audio file is one of these formats. "
+                            +   "If it is not, there are many free programs available that will convert the file to one of these formats. ")
+ 
+        bodyDiv:AddHeading("When I run my program, I get an error telling me that I can't play audio before it is loaded.", 4)
+
+        bodyDiv:AddParagraph(   "In order to play an audio object, a file must be loaded to it. "
+                            +   "Ensure that a file is loaded to the audio object before calling its Play action. ")
+
+        bodyDiv:AddHeading("I have called SetBalance/SetPitch/Rotate on my audio object, but it did not have any effect.", 4)
+
+        bodyDiv:AddParagraph(   "The SetBalance, SetPitch, and Rotate actions only work on mono sounds. Ensure that the sound is not stereo. "
+                            +   "If it is, there are many free programs available that will convert sound files from stereo to mono.")
+
+        bodyDiv:AddHeading("I have called SetX/SetY/SetZ on my audio object, but it did not have any effect.", 4)
+
+        bodyDiv:AddParagraph(   "The SetX, SetY, and SetZ actions only work on mono sounds. Ensure that the sound is not stereo. "
+                            +   "If it is, there are many free programs available that will convert sound files from stereo to mono.")
+
+
+//
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to code sound applications using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Sound"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+        return "3D Sound: Positional Audio"
+    end
+
+    action GetShortDescription returns text
+        return "how to play audio files Quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/dsp/audio3dpositionalaudiotutorial.html"
+    end
+end

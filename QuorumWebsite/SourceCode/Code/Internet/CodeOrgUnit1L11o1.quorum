@@ -1,0 +1,245 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+
+class CodeOrgUnit1L11o1 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 1 Lesson 11 (Optional 1): Algorithms Detour - Minimum Spanning Tree")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("The Internet - Lesson 11 (Optional 1): Algorithms Detour - Minimum Spanning Tree", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        Division box
+        box:SetClassAttribute("cool-box")
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph overview
+            overview:AddText("In this and the subsequent lesson, we consider some of the strategies used to construct networks and find paths for data in them. While this has a connection to ideas about the Internet, the focus of these lessons is on algorithms, formal techniques, and processes for solving problems. Students will explore and solve the Minimum Spanning Tree (MST) problem, first, in an unplugged fashion on paper. The real challenge is not in solving a particular instance of the minimum spanning tree, but to develop an algorithm, a clear series of steps, that if followed properly, will solve any instance of the problem. There is a possible misconception to look out for: the MST has a definite, verifiable optimal solution, as opposed to the Text Compression problem (from Unit 1), which does not.")
+        bodyDiv:Add(overview)
+
+//        bodyDiv:AddHeading("Vocabulary", 2)
+//            UnorderedList vocab
+//                AddListItemWithBoldAtFront(vocab, "Graph: ", "a diagram that shows the nodes and edges of a problem")
+//                AddListItemWithBoldAtFront(vocab, "Node: ", "sometimes called a vertex; typically represented as a labeled circle")
+//                AddListItemWithBoldAtFront(vocab, "Edge: ", "a line connecting two nodes")
+//                AddListItemWithBoldAtFront(vocab, "Cost: ", "sometimes called the weight; the number associated with an edge that indicates distance, time, or economic cost")
+//                AddListItemWithBoldAtFront(vocab, "Cycle: ", "a set of edges that, begin at one node and can be followed through other nodes back where you started")
+//                AddListItemWithBoldAtFront(vocab, "Tree: ", "a set of edges that connects nodes together in a way that does not form a cycle")
+//        bodyDiv:Add(vocab)
+
+        bodyDiv:AddHeading("Goals", 2)
+                bodyDiv:AddParagraph("Students will be able to:")
+
+        UnorderedList goalList
+            goalList:AddListItem("Write an algorithm for solving the minimum spanning tree (MST) problem.")
+            goalList:AddListItem("Use the terms algorithm, graph, node, and edge correctly.")
+            goalList:AddListItem("Identify the minimum spanning tree on a given graph.")
+            goalList:AddListItem("Explain the benefits of developing an algorithm for solving a problem versus solving an instance of a problem")
+        bodyDiv:Add(goalList)
+
+//        bodyDiv:AddHeading("Background", 2)
+//            Paragraph background
+//            background:AddText("One of the more common (and interesting) fields investigated in computer science is graph theory. Graph theory investigates connections - between people, locations, computers, ideas, information, or anything else. The Minimum Spanning Tree (MST) is a problem in the field of graph theory. The MST problem is especially interesting because it might have multiple ‘best’ solutions.")
+//        bodyDiv:Add(background)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("The MST is a problem in a field of study known as Graph Theory in mathematics and Computer Science. Problems involving graphs come up a lot in Computer Science, not only related to networking problems, but also in describing more sophisticated or interconnected relationships between data and information, for example, complicated scheduling problems, logistics, or even sociology problems, or interactions between molecules. Many real-world problems can be expressed or visualized as graphs. The MST problem is interesting because it has an optimal best solution, and the algorithm for finding the MST on a graph is relatively straightforward to understand. The interesting thing about the MST is that a graph might have multiple " + dq + "best" + dq + " solutions, and there are several different algorithms for finding them.")
+        bodyDiv:Add(purpose)
+
+        bodyDiv:AddHeading("Resources", 2)
+            UnorderedList resources
+            resources:AddListItemLink("Activity Guide - Algorithms, Graphs and the MST Problem", "/files/code/Activity Guide - Algorithms, Graphs, and the MST Problem - tviTip.docx")
+        bodyDiv:Add(resources)
+
+//        bodyDiv:AddHeading("Lesson", 2)
+//            UnorderedList lesson
+//                lesson:AddListItem("Investigate graph problems")
+//                lesson:AddListItem("Create an algorithm for solving a minimum spanning tree problem")
+//                lesson:AddListItem("Compare your algorithm to Kruskal’s algorithm")
+//        bodyDiv:Add(lesson)
+
+        bodyDiv:AddHeading("Getting Started", 2)
+            Paragraph starting
+                starting:AddText("How much do you think the Internet costs to build and maintain? Let's say that you are in charge of not one router, but several, and your job is to connect them so that a) any packet can get from any router to any other router in your system, and b) you want to build these connections as cheaply as possible. Say you are in charge of 4 routers placed at various locations in a region. The diagram below shows the possible connections that could be made between any pair of routers and the associated cost of building a connection between them (in millions of dollars).")
+        bodyDiv:Add(starting)
+
+        bodyDiv:AddImage("/files/code/U2L06-graph-1.png", "The Router Map")
+
+        bodyDiv:AddHeading("Teacher's Tip: Description of Router Map", 4)
+            Paragraph tviTip1
+                tviTip1:SetClassAttribute("cool-box")
+                tviTip1:AddText("The Router Map diagram shown on this page consists of four small circles - each representing one router. The routers are named A, B, C and D. The routers A, B, and D form a large triangle, and the last router C is placed in the middle of this triangle. A dotted line is shown in between each routers to show the direct connection of the routers. The connections are A-B, A-C, A-D,B-C, B-D and C-D - indicating all possible direct connections among the four routers. The map also shows the cost of building each connection: A-B costs 2 million dollars, A-C costs 2 million, A-D costs 5 million, B-C costs 3 million, B-D costs 2 million, and C-D costs 1 million.")
+        bodyDiv:Add(tviTip1)
+
+            UnorderedList question1
+                AddListItemWithBoldAtFront(question1, "Question 1 - ", "Which connections would you choose to build to keep the total cost down?")
+                AddListItemWithBoldAtFront(question1, "Question 2 - ", "Can you come up with a clear strategy, or process, for finding the minimal-cost connections you need, not only for this network, but any network, especially if the network were bigger?")
+        bodyDiv:Add(question1)
+
+        bodyDiv:AddHeading("Activity", 2)
+
+        bodyDiv:AddParagraph("Using the Activity Guide, discuss the following points with students.")
+            UnorderedList actList
+                actList:AddListItem("What are algorithms and why do we want them?")
+                actList:AddListItem("Define the following terms for graph problems: Graph, Node, Edge, Cost, Cycle, Tree")
+                actList:AddListItem("Explain the Minimum Spanning Tree problem")
+        bodyDiv:Add(actList)
+
+        bodyDiv:AddParagraph("Next, give students some time to experiment with finding the MST on the Activity Guide's example graphs, and ask students to write an algorithm, or series of steps, that would find the MST for any graph")
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+                bodyDiv:AddParagraph("The minimum spanning tree for the first graph on the worksheet had a total cost of 25, and there were two possible solutions to the minimum spanning tree. Try to act out the algorithm on the original graph, or a new one that you just make up.")
+                bodyDiv:AddParagraph("<b>Discuss:</b> Compare and contrast your strategies with the one your peers presented. Was your algorithm clearly written and easy to understand? Were there two different algorithms that still solved the problem correctly?")
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+            UnorderedList protip2
+                protip2:AddListItem("How do you know when to stop? i.e. How do you know you’ve found the minimum?")
+                protip2:AddListItem("Which edge should you start with?")
+                protip2:AddListItem("Can you define a strategy for considering an edge, then either keeping it or discarding it?")
+                protip2:AddListItem("This is a different concept form the one we learned in the ‘text-compression’. While text compression does not have clear algorithms, the MST has definite algorithms.")
+                protip2:AddListItem("The minimum spanning tree has a definite best solution. The algorithm will always find the optimal solution. The interesting part is that since it’s possible that in choosing the next edge you have to pick randomly from a set of choices that are equally good, it means that the MSTs produced by the same algorithm might be different trees but they will have the same total cost.")
+        bodyDiv:Add(protip2)
+
+        bodyDiv:AddHeading("Assessment", 2)
+
+        bodyDiv:AddHeading("Teacher's Tip: Router Map Diagrams", 4)
+            Paragraph tviTip3
+                tviTip3:SetClassAttribute("cool-box")
+                tviTip3:AddText("This assessment is done with the " + dq + "Code Studio" + dq + " program on the corresponding section of the Code.org CSP curriculum - high school level. If you would prefer to use a tactile map, you may benefit from using the ")
+                tviTip3:AddLink("tactile image enhancer machine (link) ", "https://www.youtube.com/watch?v=a8tTFVMTf7o")
+                tviTip3:AddText("that makes these diagram into accessible tactile graphics. We have provided the template that could be used with the tactile image enhancer machine in the following links: ")
+                tviTip3:AddLink("Question 1 diagram (link), ", "/files/code/U2L06-graph-3-LP.jpg")
+                tviTip3:AddLink("Question 2 diagram (link)", "/files/code/U2L06-graph-4-LP.png")
+        bodyDiv:Add(tviTip3)
+
+            Paragraph assessQ
+                assessQ:AddText("1. Label the graph with the appropriate terms.")
+        bodyDiv:Add(assessQ)
+        bodyDiv:AddImage("/files/code/U2L06-graph-3.jpg", "Assessment 1 - router map diagram")
+
+            UnorderedList assessQ1
+                assessQ1:AddListItem("Node")
+                assessQ1:AddListItem("Edge")
+                assessQ1:AddListItem("Weight")
+                assessQ1:AddListItem("Tree")
+                assessQ1:AddListItem("Cycle")
+        bodyDiv:Add(assessQ1)
+
+        bodyDiv:AddHeading("Teacher’s Tip: Description of the Diagram (above)", 4)
+            Paragraph tTip1
+                tTip1:SetClassAttribute("cool-box")
+                tTip1:AddText("The diagram is a router connection map. The base of the map consists of 8 small circles - each representing a router location. The routers named a, b, c, d, e and f form a circular connection. Inside of this circle, there are routers g and h. Most of the routers connect to two adjacent two routers (connected by the line drawing), while some of them connect to multiple routers. One number is written on each of the connection lines. We have prepared the list of the router connection and the number written on each connection line in a downloadable ")
+                tTip1:AddLink("Router Connection List (link). " + cr, "/files/code/U1-Opt-RouterConnectionList.rtf")
+                tTip1:AddText("On this base map, 5 blank boxes (named A, B, C, D and E) are provided for you to fit the following answer keys. You are to choose the name of this map in box " + dq + "A," + dq + " the name of the connection line for the box " + dq + "B," + dq + " and the name for the small circle - that represent one router - for the box " + dq + "C." + dq + " Additionally, the lines that connect the routers e, g and h are colored yellow. You are to choose the name of this circular connect for the box " + dq + "D." + dq + " Finally, you are to choose the name of the number written on each line for the box " + dq + "E." + dq)
+        bodyDiv:Add(tTip1)
+
+            Paragraph assessQ2
+                assessQ2:AddText("2. Multiple Choice. What does a minimum spanning tree tell you about a graph?")
+        bodyDiv:Add(assessQ2)
+            UnorderedList aQ2List
+                aQ2List:AddListItem("A. The shortest path from a particular point in the graph to another point in the graph.")
+                aQ2List:AddListItem("B. The shortest path between any two points for all points in the graph")
+                aQ2List:AddListItem("C. The fewest number and smallest total distance of connections necessary to connect all points in a graph")
+                aQ2List:AddListItem("D. Whether or not the graph represents a network")
+                aQ2List:AddListItem("E. The fewest number and smallest total distance of connections necessary to travel from one point to all the other points without having to visit a point twice")
+        bodyDiv:Add(aQ2List)
+
+            Paragraph assessQ3
+                assessQ3:AddText("3. The images below all show the same map (or graph) as the one depicted above, but have different paths between the points highlighted. Please choose the image that is highlighting a Minimum Spanning Tree for the map. Note: The " + dq + "distance" + dq + " between points is depicted by the number of line segments connecting any two points.")
+        bodyDiv:Add(assessQ3)
+        bodyDiv:AddImage("/files/code/U2L06-graph-4.png", "Assessment 3-Router map diagrams")
+
+        bodyDiv:AddHeading("Teacher's Tip: Description of the Five Diagrams (above)", 4)
+            Paragraph tTip2
+                tTip2:AddText("The diagram above contains five identical graphs. Each graph has the same connections used in question 1, but have different connection line values. These differences are reflected in this downloadable ")
+                tTip2:AddLink("Router Connection List 2 (link)", "/files/code/U1-Opt-RouterConnectionList2.rtf")
+                tTip2:AddText(". Additionally, on each of the five graphs, a different router connection is highlighted. Below are the connections.")
+        bodyDiv:Add(tTip2)
+
+            UnorderedList diagramList
+                diagramList:AddListItem("The graph " + dq + "A" + dq + " shows the connection between: a-b, b-g, g-h, h-c, h-d, h-e and e-f")
+                diagramList:AddListItem("The graph " + dq + "B" + dq + " shows the connection between: a-b, b-c, c-h, h-d, d-e, e-f and f-a")
+                diagramList:AddListItem("The graph " + dq + "C" + dq + " shows the connection between: a-f, f-e, e-h, h-d, h-g, g-b and b-c")
+                diagramList:AddListItem("The graph " + dq + "D" + dq + " shows the connection between: a-b, b-c, b-g, a-f, f-e, e-h and h-d")
+                diagramList:AddListItem("The graph " + dq + "E" + dq + " shows the connection between: a-b, b-c, c-d, d-h, h-g, g-e, e-f and f-a")
+        bodyDiv:Add(diagramList)
+
+        bodyDiv:AddHeading("Extended Learning", 2)
+            Paragraph extL
+                extL:AddText("You might check out some real pseudocode and a visualization of the minimum spanning tree using the link below.")
+            bodyDiv:Add(extL)
+            UnorderedList extList
+                extList:AddListItemLink("Visit Kruskal's Algorithms", "https://en.wikipedia.org/wiki/Kruskal%27s_algorithm")
+                extList:AddListItem("You can see some of the other algorithms for solving the MST problem as well.")
+        bodyDiv:Add(extList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+        UnorderedList list
+        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2011): ", "CT.L3B:3, CT.L3B:4, CT.L3B:6")
+        AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.1 (B, H, I)")
+        AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.2 (A, B, C, F, I)")
+        bodyDiv:Add(list)
+
+/* Completed 12/3/17 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learning the importance of setting the minimum span in the router connection structure as a part of Computer Science Principles curriculum in Quorum Computer Science Principles curriculum page (this page correspond to the Code.org high school Computer Science Principles curriculum page). This page is accessible for the blind and visually impaired."
+    end
+
+    action GetSummaryName returns text
+        return "Lesson 11 (Optional 1: Algorithm Detour - Minimum Span)"
+    end
+    action GetName returns text
+        return "Lesson 11 (Optional 1)"
+    end
+    action GetShortDescription returns text
+        return "the importance of setting the minimum span in the router connection structure"
+    end
+    action GetLocation returns text
+        return "lessons/code/internet/InternetLesson11o1.html"
+    end
+
+end

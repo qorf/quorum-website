@@ -1,0 +1,775 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson15A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 15: Processing Arrays")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 15: Processing Arrays", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("This lesson introduces us to algorithms that process lists of data. Students will do two unplugged activities related to algorithms and program some of them themselves. The " + dq + "repeat times" + dq + " loop is re-introduced to implement these algorithms because it's straightforward to use to process all the elements of a list. The lesson begins with an unplugged activity in which students write an algorithm to find the minimum value in a hand of cards. They then move to an IDE to write programs that use loops and arrays. Students are shown how to use a " + dq + "repeat while" + dq + " loop to visit every element in an array. They then use this pattern to process an array in increasingly complex ways. At the end of the progression, students will write actions which process arrays to find or alter information, including finding the minimum value - a problem they worked on in the unplugged activity. Finally, an unplugged activity has students reason about linear vs. binary search and attempt to write pseudocode for a binary search.")
+        bodyDiv:Add(ov1)
+            
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+        Bold bold5
+        bold5:AddText("Note: ")
+        bodyDiv:Add(bold5)
+        bodyDiv:AddText("the one vocab word for this lesson, the " + dq + "for loop," + dq + " is a concept that students are expected to know for the AP exam. However, Quorum does not have its own version of the for loop, so this lesson uses the " + dq + "repeat while" + dq + " loop instead, which can execute any algorithms/instructions a for loop can in a similar manner.")
+            UnorderedList voc
+//                AddListItemWithBoldAtFront(voc, "Boolean Flag", " - A Coding technique to use a boolean variable as a indicateer for a certain condition.")
+                AddListItemWithBoldAtFront(voc, "For loop: ", "a typical looping construct designed to make it easy to repeat a section of code using a counter variable. The for loop combines the creation of a variable, a boolean looping condition, and an update to the variable in one statement. Below is an example of a format you would expect to encounter in other programming languages.")
+        bodyDiv:Add(voc)
+
+        bodyDiv:Add(break)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("for(integer counter = 0; counter < 5; counter = counter + 1)"))
+        bodyDiv:AddParagraph("Again, the for loop above does not exist in Quorum. However, the form above represents the same as the following repeat while loop.")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("integer counter = 0" + cr + cr
+                                                        + "repeat while counter < 5" + cr
+                                                        + "" + cr
+                                                        + "    counter = counter + 1" + cr
+                                                        + "end"))
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use a " + dq + "repeat while" + dq + " loop in a program to implement an algorithm that processes all elements of an array.")
+                goalList:AddListItem("Write code that implements a linear search on an unsorted array of numbers.")
+                goalList:AddListItem("Write code to find the minimum value in an unsorted list of numbers.")
+                goalList:AddListItem("Explain how binary search is more efficient than linear search but can only be used on sorted lists.")
+       bodyDiv:Add(goalList)
+
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("There are many situations where we want to repeat a section of code a predetermined number of times. Although this can be done with a " + dq + "repeat times" + dq + " loop, we could alternatively use a " + dq + "repeat while" + dq + " loop by maintaining a variable to keep track of how many times the loop has executed. While there are many small pieces to keep track of, particularly the counter variable and incrementing, this allows us to use variables for our boolean condition. One of the most common uses of for loops in programming is to process arrays. The " + dq + "repeat while" + dq + " loop allows programmers to easily step through all the elements in an array. This basic pattern is at the core of many algorithms used to process a list of items. Whether you are trying to find a name in a list, find the closest store to your current location, or compute the total money in your account based on past transactions, a loop will probably be used at some point to access all the elements in a list.")
+        bodyDiv:Add(purpose)
+
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList resources
+            resources:AddListItemLink("Minimum Card Algorithm Activity Guide, rtf", "/files/code/Unit5/U5L15 Activity Guide - Minimum Card Algorithm.rtf")
+            resources:AddListItemLink("Card Search Algorithm Activity Guide, rtf", "/files/code/Unit5/U5L15 Activity Guide - Card Search Algorithm.rtf")
+
+            bodyDiv:Add(resources)
+
+
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "output arrayOfRandom:Get(index)", "")
+                AddListItemWithBoldAtFront(code, "repeat while index <= arrayOfRandom:GetSize() - 1", "")
+        bodyDiv:Add(code)
+
+
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddParagraph("Introduce students to thinking about processing lists of information by recalling the FindMin problem they wrote an algorithm for in Unit 3 Lesson 2. In particular, introduce the common pattern of using a loop to visit every element in a list. Consider the following remarks when presenting these ideas to students.")
+
+        UnorderedList remarks
+            remarks:AddListItem("Remember in a lesson a while back when we wrote algorithms for playing cards using the " + dq + "Human Machine Language?" + dq)
+            remarks:AddListItem("Notice how a row of cards is kind of like a list.")
+            remarks:AddListItem("Today we're going to begin to write code to process lists of data. Processing large lists of data is one of the most powerful things computer programs can do. Many of the most important algorithms in computer science have their roots in processing lists of data.")
+            remarks:AddListItem("So as a warm-up today, lets think back to algorithms that process lists with a short activity.")
+
+        bodyDiv:AddParagraph("Students might want help with language as they write out their algorithms. In particular, they might recognize that trying to clearly articulate which hands to use to pick up which cards is challenging. It's good if they recognize this. Here are some suggestions you can make:")
+            UnorderedList startList
+                startList:AddListItem("You may refer to the " + dq + "first" + dq + " and " + dq + "last" + dq + " cards in the row as part of your instructions.")
+                startList:AddListItem("You may also give an instruction to move a hand some number of cards (or positions) to the left or right.")
+                startList:AddListItem("You can give an instruction to put a card down on the table in one of the open positions, or put it back where it was originally picked up from.")
+        bodyDiv:Add(startList)
+
+        bodyDiv:AddParagraph("To start, distribute the " + dq + "Minimum Card Algorithm Activity Guide" + dq + " resource and place students into pairs or small groups. Have students read the instructions and write their algorithm out on paper, then test it out with each other. If time permits, have them test out their algorithms with other groups or demonstrate one in front of the class.")
+
+            Paragraph getStart3
+                getStart3:AddText("Here are two examples of algorithms we might write. These are not the " + dq + "correct answers" + dq + " per se - there are many ways we might go about it - but they should give you the gist of what you might be searching for.")
+        bodyDiv:Add(getStart3)
+
+        bodyDiv:AddHeading("Min Card Sample Algorithms", 3)
+        bodyDiv:AddHeading("SAMPLE ALGORITHM 1 (using a numbered list of instructions):", 4)
+            OrderedList miniList
+                miniList:AddListItem("Put your left hand on the first card in the row and your right hand on the card next to it.")
+                miniList:AddListItem("Pick up the card your left hand is on.")
+                miniList:AddListItem("Pick up the card your right hand is on.")
+                miniList:AddListItem("IF the card in your right hand is less than the card in your left hand, ")
+                miniList:AddListItem("THEN swap the cards (so the smaller one is in your left hand).")
+                miniList:AddListItem("Put the card in your right hand back down on the table.")
+                miniList:AddListItem("IF there is another card in the row to the right of your right hand, ")
+                miniList:AddListItem("THEN move your right hand one position to the right, and go back and repeat step 3 (with your right hand now on a new card).")
+                miniList:AddListItem("OTHERWISE: say " + dq + "I found it!" + dq + " and hold the card in your left hand up in the air.")
+        bodyDiv:Add(miniList)
+            Paragraph mini
+                mini:AddText("Since we have learned about loops in the course, your students might write pseudocode with a loop construct in it.")
+        bodyDiv:Add(mini)
+        bodyDiv:AddHeading("SAMPLE ALGORITHM 2 (using a loop construct):", 4)
+            OrderedList miniList1
+                miniList1:AddListItem("Pick up the first card in your left hand.")
+                miniList1:AddListItem("FOR EACH card IN the row of cards (ALTERNATIVE: WHILE there are more cards in the row)")
+                miniList1:AddListItem("Pick up the next card with your right hand.")
+                miniList1:AddListItem("IF the card in your right hand is less than the card in your left hand,")
+                miniList1:AddListItem("THEN swap the cards (so the smaller one is in your left hand).")
+                miniList1:AddListItem("Put the (larger) card in your right hand back down on the table.")
+                miniList1:AddListItem("(after the loop) Say " + dq + "I found it!" + dq + " and hold the card in your left hand up in the air.")
+        bodyDiv:Add(miniList)
+
+        bodyDiv:AddHeading("Video: CS Principles: Processing Lists", 4)
+
+        InlineFrame inlineFrame
+        inlineFrame:SetAddress("https://www.youtube.com/embed/RQ6GJt9f2vg")
+        inlineFrame:SetHeight("480")
+        inlineFrame:SetWidth("854")
+        bodyDiv:Add(inlineFrame)
+
+        UnorderedList vid
+            vid:AddListItemLink("Video: CS Principles: Processing Lists", "https://www.youtube.com/watch?v=RQ6GJt9f2vg")
+        bodyDiv:Add(vid)
+
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("This lesson focuses  on Arrays like the previous two lessons have, but goes more in-depth into the usage of Arrays and introduces a few new actions of the Array class. Additionally, loops are essential to this lesson, as they are extremely useful in processing Arrays. As such, you may need to remind students of the concepts and syntax of the " + dq + "repeat while" + dq + " and " + dq + "repeat times" + dq + " loops. Consider the following concepts for review.")
+        bodyDiv:AddParagraph("It's very common to want to repeat a set of commands a particular number of times. Recently, we have been using the " + dq + "repeat while" + dq + " to do this by creating a counting variable, setting the boolean expression, and incrementing the value of the counter by 1 each time. We've also used much simpler loop syntax " + dq + "repeat times" + dq + " before. The code syntax is very simple:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer counter  = 0" + cr
+                                                        +   "" + cr
+                                                        +   "repeat while counter < 5" + cr
+                                                        +   "   output " + dq + "Hello World" + dq + cr
+                                                        +   "   counter = counter + 1" + cr
+                                                        +   "end" + cr))
+
+            Paragraph review1
+                review1:AddText("As you know, we can use variables as indexes in an array. We can take advantage of this fact to create a " + dq + "repeat while" + dq + " which visits every index in an array. You are going to use a loop of this kind to display all the values in an array.")
+        bodyDiv:Add(review1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer counter  = 0" + cr
+                                                        +   "" + cr
+                                                        +   "repeat while counter <= array:GetSize() - 1" + cr
+                                                        +   "   counter = counter + 1" + cr
+                                                        +   "end" + cr))
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+
+        bodyDiv:AddParagraph("In this lesson, we will combine our knowledge of Arrays with our knowledge of loops to analyze the data stored within an Array. As such, you may want to briefly review those topics if you struggled with the lessons on either Arrays or loops.")
+
+        bodyDiv:AddHeading("Processing Arrays using Loops", 4)
+            Paragraph review2
+                review2:AddText("Below the following starter code, add code that retrieves all information in the array and outputs to the console display. You need to use the following elements for this added code: the " + dq + "counter" + dq + " variable, the " + dq + "repeat while" + dq + " loop structure, and the Array class's " + dq + "Get(integer location)" + dq + " action.")
+        bodyDiv:Add(review2)
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Processing Arrays using Loops")
+        addStatementIDE:GetIDETitle():AddText("Processing Arrays using Loops")
+        addStatementIDE:GetIDESubtitle():AddText("")
+        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "" + cr
+                                                        +   "Array&lt;text&gt; arrayOfNames" + cr
+                                                        +   "" + cr
+                                                        +   "arrayOfNames:Add("+dq+"John"+dq+")" + cr
+                                                        +   "arrayOfNames:Add("+dq+"Sue"+dq+")" + cr
+                                                        +   "arrayOfNames:Add("+dq+"Bill"+dq+")" + cr
+                                                        +   "arrayOfNames:Add("+dq+"Mary"+dq+")" + cr
+                                                        +   "arrayOfNames:Add("+dq+"Jason"+dq+")" + cr)
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Updating Values in an Array with a " + dq + "repeat while" + dq, 4)
+        bodyDiv:AddParagraph("Since we predefined our list in the challenge above to only have five elements, you may have simply repeated while the counter was less than five. However, there is a better method: using the Array class's " + dq + "GetSize" + dq + " action. Using this, we set up our loop to work no matter what size the Array is. Just remember that the " + dq + "GetSize" + dq + " action returns the number of elements, but the last index will actually be one less than the number of elements because the first index starts at 0. A template for this type of loop is shown below.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Array&lt;integer&gt; myArray" + cr
+            + "integer counter = 0" + cr + cr
+            + "repeat while counter <= myArray:GetSize() - 1" + cr
+            + "    counter = counter + 1" + cr
+            + "end"))
+
+            Paragraph upWhile
+                upWhile:AddText("The " + dq + "repeat while" + dq + " loop above is actually so common that we will rarely deviate from this loop setup.")
+        bodyDiv:Add(upWhile)
+            Paragraph upWhile1
+                upWhile1:AddText("This " + dq + "repeat while" + dq + " setup basically means " + dq + "for every possible index in myArray..." + dq + " and we use it as a basic building block for processing arrays. Common array-processing techniques like searching for a value, updating all values, or calculating simple stats on an array will all be completed using a " + dq + "repeat while" + dq + " written with the syntax above. In fact, we're going to experience that right now as we use a loop to add 5 to every value in an array.")
+        bodyDiv:Add(upWhile1)
+
+        bodyDiv:AddHeading("Adding to Every Value in an Array", 4)
+            Paragraph upWhile2
+                upWhile2:AddText("Starter code has been provided that creates an Array of random values. You are also given an empty " + dq + "repeat while" + dq + " that loops over every index in the array. Add code inside this loop to add 5 to the value at every location in the Array.")
+        bodyDiv:Add(upWhile2)
+
+            Paragraph upWhile3
+                Bold bold
+                bold:AddText("Hint: ")
+                upWhile3:Add(bold)
+                upWhile3:AddText("Use the Array class's " + dq + "Set(integer index, integer newValue)" + dq + " and " + dq + "Get(integer index)" + dq + " actions together to update the value in a given index. Confirm that your code works by displaying the new values in your Array after they are updated within your loop. The values before the loop will already be output to the screen for you. Below is a sample result. Notice how, after the array has been processed, all of the values are 5 greater than the originals.")
+        bodyDiv:Add(upWhile3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("58" + cr
+            + "55" + cr
+            + "46" + cr
+            + "85"+ cr
+            + "1" + cr
+            + "Integers after processing are:" + cr
+            + "63" + cr
+            + "60" + cr
+            + "51" + cr
+            + "90" + cr
+            + "6"))
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Adding to Every Value in an Array")
+        addStatementIDE1:GetIDETitle():AddText("Adding to Every Value in an Array")
+        addStatementIDE1:GetIDESubtitle():AddText("")
+        addStatementIDE1:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom" + cr
+                                                        +   "" + cr
+                                                        +   "integer index = 0" + cr
+                                                        +   "repeat 5 times" + cr
+                                                        +   "   integer randomInt = random:RandomIntegerBetween(1, 100)" + cr
+                                                        +   "   arrayOfRandom:Add(randomInt)" + cr
+                                                        +   "   output arrayOfRandom:Get(index)" + cr
+                                                        +   "   index = index + 1" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "output "+dq+"Integers after processing are:"+dq + cr
+                                                        +   "index = 0" + cr + cr
+                                                        +   "repeat while index <= arrayOfRandom:GetSize() - 1" + cr
+                                                        +   "" + cr
+                                                        +   "end" + cr)
+        addStatementIDE1:SetGameEnvironment(true)
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+        bodyDiv:Add(addStatementIDE1:GetGameCanvas())
+
+        bodyDiv:AddHeading("Additional Array Arithmetic", 4)
+            Paragraph upWhile4
+                upWhile4:AddText("Modify the code above so that the processed integer value is about half of the original value instead of adding five. Since we're using integers, halving an odd number will drop the decimal point (i.e. 25 -> 12).")
+        bodyDiv:Add(upWhile4)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("Additional Array Arithmetic")
+        addStatementIDE2:GetIDETitle():AddText("Additional Array Arithmetic")
+        addStatementIDE2:GetIDESubtitle():AddText("")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("Using " + dq + "repeat while" + dq + " with if", 4)
+            Paragraph whileIf
+                whileIf:AddText("Sometimes we want to find values in an Array that meet certain conditions. We can add an if-statement inside our loop to individually check every value within the Array. To practice this, we will create a loop that will display every value in the array greater than 50.")
+        bodyDiv:Add(whileIf)
+
+            Paragraph whileIf1
+                whileIf1:AddText("Starter code has been been provided that creates an Array of random values between 1 and 100.")
+        bodyDiv:Add(whileIf1)
+
+        bodyDiv:AddParagraph("Here's a quick list of what you need to do for this challenge:")
+                                                
+            UnorderedList whileIfList
+                whileIfList:AddListItem("Reset the value of the variable " + dq + "index" + dq + " to 0")
+                whileIfList:AddListItem("Add a loop that references every index in the Array")
+                whileIfList:AddListItem("Add an if-statement inside the loop that displays every value in the Array greater than 50")
+        bodyDiv:Add(whileIfList)
+
+        bodyDiv:Add(break)
+
+            Paragraph whileIf2
+                whileIf2:SetClassAttribute("cool-box")
+                Bold bold1
+                bold1:AddText("Note: ")
+                whileIf2:Add(bold1)
+                whileIf2:AddText("Because the original Array is being constructed with random values it's possible that it might not have any values greater than 50. As such, you should run the program a few times to make sure it works.")
+        bodyDiv:Add(whileIf2)
+
+        SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("Using " + dq + "repeat while" + dq + " with if")
+        addStatementIDE3:GetIDETitle():AddText("Using " + dq + "repeat while" + dq + " with if")
+        addStatementIDE3:GetIDESubtitle():AddText("")
+        addStatementIDE3:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom" + cr
+                                                        +   "" + cr
+                                                        +   "integer index = 0" + cr
+                                                        +   "repeat 5 times" + cr
+                                                        +   "    integer randomInt = random:RandomIntegerBetween(1, 100)" + cr
+                                                        +   "    arrayOfRandom:Add(randomInt)" + cr
+                                                        +   "    output arrayOfRandom:Get(index)" + cr
+                                                        +   "    index = index + 1" + cr
+                                                        +   "end" + cr + cr
+                                                        +   "output " + dq + "The values greater than 50 are below:" + dq)
+        addStatementIDE3:SetGameEnvironment(true)
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+        bodyDiv:Add(addStatementIDE3:GetGameCanvas())
+
+        bodyDiv:AddHeading("Algorithms and General-Purpose Actions", 4)
+            Paragraph whileIf3
+                whileIf3:AddText("Over the next several challenges we will be creating a general-purpose action to determine if a value is contained within an Array. Over the course of these challenges, keep an eye out for the general pattern we are using, because you'll get to use it again to create actions of your own.")
+        bodyDiv:Add(whileIf3)
+            Paragraph whileIf4
+                whileIf4:AddText("To begin, we'll start simple. We'll write code that checks whether an Array contains a specific value. At every index, your program should display " + dq + "true" + dq + " if the value at that index is a 5 and " + dq + "false" + dq + " otherwise.")
+        bodyDiv:Add(whileIf4)
+
+            Paragraph whileIf5
+                whileIf5:AddText("The starter code for this exercise is similar to previous exercises, but you'll notice that we generate integers between 1 and 5. You are also given the " + dq + "repeat while" + dq + " loop for your use.")
+        bodyDiv:Add(whileIf5)
+
+            bodyDiv:AddParagraph("Here are the steps for this challenge:")
+                                   
+            UnorderedList whileIfList1
+                whileIfList1:AddListItem("Declare a boolean called " + dq + "bool" + dq)
+                whileIfList1:AddListItem("Reset the " + dq + "index" + dq + " variable to 0")
+                whileIfList1:AddListItem("Add an if-statement inside the " + dq + "repeat while" + dq + " loop to check if the value of the Array at the current index is 5.")
+                whileIfList1:AddListItem("If the value is equal to 5, set " + dq + "bool" + dq + " to true. Otherwise, set " + dq + "bool" + dq + " to false.")
+                whileIfList1:AddListItem("Output the updated " + dq + "bool" + dq + " variable")
+                whileIfList1:AddListItem("Test your code to make sure it is working as you intend. An example output is below.")
+        bodyDiv:Add(whileIfList1)
+
+        bodyDiv:Add(break)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("2" + cr
+            + "4" + cr
+            + "5" + cr
+            + "1" + cr
+            + "3" + cr
+            + "Is the value at the index position '5'?" + cr
+            + "false" + cr
+            + "false" + cr
+            + "true" + cr
+            + "false" + cr
+            + "false"))
+
+        bodyDiv:Add(break)
+
+                    Paragraph p2
+                p2:SetClassAttribute("cool-box")
+                Bold bold2
+                bold2:AddText("Note: ")
+                p2:Add(bold2)
+                p2:AddText("Because the original Array is being constructed with random values it's possible that it might not have any values equal to 5. As such, you should run the program a few times to make sure it works.")
+        bodyDiv:Add(p2)
+
+        SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("Algorithms and General-Purpose Actions")
+        addStatementIDE4:GetIDETitle():AddText("Algorithms and General-Purpose Actions")
+        addStatementIDE4:GetIDESubtitle():AddText("")
+        addStatementIDE4:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom" + cr
+                                                        +   "" + cr
+                                                        +   "integer index = 0" + cr
+                                                        +   "repeat 5 times" + cr
+                                                        +   "   integer randomInt = random:RandomIntegerBetween(1, 5)" + cr
+                                                        +   "   arrayOfRandom:Add(randomInt)" + cr
+                                                        +   "   output arrayOfRandom:Get(index)" + cr
+                                                        +   "   index = index + 1" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "output "+dq+"Is the value at the index position '5'?"+dq + cr
+                                                        +   "" + cr
+                                                        +   "repeat while index <= arrayOfRandom:GetSize() - 1" + cr
+                                                        +   "" + cr
+                                                        +   "end" + cr)
+        addStatementIDE4:SetGameEnvironment(true)
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+        bodyDiv:Add(addStatementIDE4:GetGameCanvas())
+
+        bodyDiv:AddHeading("Counting Occurrences of a Value", 4)
+            Paragraph whileIf6
+                whileIf6:AddText("Instead of displaying a true/false value for every item in the list, let's compute one value and display it. A common thing to want to do is count the number of times a value occurs. We can do this with a very small change to the code we've already got.")
+        bodyDiv:Add(whileIf6)
+
+            Paragraph whileIf7
+                whileIf7:AddText("The following starter code is again similar to the previous exercises. We've also created a variable called fiveCount.")
+        bodyDiv:Add(whileIf7)
+
+
+        bodyDiv:AddParagraph("Here are the steps for this challenge:")
+            UnorderedList whileIfList2
+                whileIfList2:AddListItem("Add an if-statement inside the loop to increment fiveCount if the value is equal to 5. (Hint: this will be exactly the same as the if-statement you wrote in the previous level, but will run different code inside the if-statement. Also, you won't need the " + dq + "else" + dq + " condition).")
+                whileIfList2:AddListItem("Run and re-run your code to make sure that it's accurately counting the number of 5's in the array. Since the Array is getting a random set of values every time you run the program, you might have to run it a bunch of times to thoroughly test it. Make sure you get it to run at least once when no 5's appear in the Array.")
+                whileIfList2:AddListItem("Finally, change the first loop in the program to add 100 items to the array instead of 5. Since there are so many values, you should also comment out (using " + dq + "//" + dq + ") the statement of " + dq + "output arrayOfRandom:Ge(index)." + dq + " Your code should still work to count the number of 5's, no matter how big the original array is!")
+        bodyDiv:Add(whileIfList2)
+
+        SideBySideIDE addStatementIDE5
+        addStatementIDE5:SetUniqueIdentifier("Counting Occurrences of a Value")
+        addStatementIDE5:GetIDETitle():AddText("Counting Occurrences of a Value")
+        addStatementIDE5:GetIDESubtitle():AddText("")
+        addStatementIDE5:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom" + cr
+                                                        +   "" + cr
+                                                        +   "integer index = 0" + cr
+                                                        +   "repeat 5 times" + cr
+                                                        +   "   integer randomInt = random:RandomIntegerBetween(1, 5)" + cr
+                                                        +   "   arrayOfRandom:Add(randomInt)" + cr
+                                                        +   "   output arrayOfRandom:Get(index)" + cr
+                                                        +   "   index = index + 1" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "output "+dq+"The total occurrence of '5' is:"+dq + cr
+                                                        +   "index = 0" + cr
+                                                        +   "integer fiveCount = 0" + cr + cr
+                                                        +   "repeat while index <= arrayOfRandom:GetSize() - 1" + cr
+                                                        +   "" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "output fiveCount" + cr)
+        addStatementIDE5:SetGameEnvironment(true)
+        addStatementIDE5:Setup()
+        bodyDiv:Add(addStatementIDE5)
+        bodyDiv:Add(addStatementIDE5:GetGameCanvas())
+
+        bodyDiv:AddHeading("Output a Single True/False Value", 4)
+            Paragraph whileIf8
+                whileIf8:AddText("Sometimes we don't care about the count and just want to know if the Array contains a 5 or not. Let's try to display a single true/false indicating whether the list contains a 5. There are two cases to consider:")
+        bodyDiv:Add(whileIf8)
+            UnorderedList whileIfList3
+                whileIfList3:AddListItem("The list does not contain any 5's; you need to display " + dq + "false" + dq)
+                whileIfList3:AddListItem("The list contains at least one 5; you need to display " + dq + "true" + dq)
+        bodyDiv:Add(whileIfList3)
+
+        bodyDiv:Add(break)
+            Paragraph whileIf8_1
+                whileIf8_1:SetClassAttribute("cool-box")
+                Bold bold3
+                bold3:AddText("Hint: ")
+                whileIf8_1:Add(bold3)
+                whileIf8_1:AddText("One way to do this is to reference your " + dq + "fiveCount" + dq + " variable after the Array has been processed.")
+        bodyDiv:Add(whileIf8_1)
+
+            Paragraph whileIf9
+                whileIf9:AddText("Copy and modify the previous exercise's code so that the program only outputs true if there is at least one occurrence of " + dq + "5" + dq + " in the Array. Also, modify the first loop to again only create 5 integers and again output each newly created integer, so you can check your results.")
+        bodyDiv:Add(whileIf9)
+
+        SideBySideIDE addStatementIDE6
+        addStatementIDE6:SetUniqueIdentifier("Output a Single True/False Value")
+        addStatementIDE6:GetIDETitle():AddText("Output a Single True/False Value")
+        addStatementIDE6:GetIDESubtitle():AddText("")
+        addStatementIDE6:SetGameEnvironment(true)
+        addStatementIDE6:Setup()
+        bodyDiv:Add(addStatementIDE6)
+        bodyDiv:Add(addStatementIDE6:GetGameCanvas())
+
+        bodyDiv:AddHeading("Using a Boolean Variable as a Flag", 4)
+            Paragraph flag
+                flag:AddText("We are going to do a challenge that is similar to the last exercise but, rather than counting the number of 5's in the array, we're going to use a different interesting programming technique for processing arrays that might prove useful to you in the future.")
+        bodyDiv:Add(flag)
+
+        bodyDiv:AddHeading("Using a Boolean Flag", 4)
+            Paragraph flag1
+                flag1:AddText("The technique is generally referred to as using a boolean " + dq + "flag." + dq + " To understand this idea, think about how some mailboxes work: the flag starts down, and when a person wants to let the mail carrier know there is something to pick up, she puts the flag up to notify the mail carrier that there is outgoing mail in the box.")
+        bodyDiv:Add(flag1)
+            Paragraph flag1_1
+                flag1_1:AddText("We can use a variable to do something similar when programming. Rather than incrementing an integer variable every time we find a 5 in the Array, we will use a boolean variable that acts like a flag. We will create the boolean before the loop and assign it false to start (flag is down). Then, as we process the Array, if we find a 5, set the boolean variable to true (put the flag up). Here is some pseudocode:")
+        bodyDiv:Add(flag1_1)
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "var flag = FALSE" + cr
+                                                        +   "FOR EACH item IN list" + cr
+                                                        +   "   IF (item EQUALS 5)" + cr
+                                                        +   "       flag = TRUE" + cr
+                                                        +   "" + cr
+                                                        +   "DISPLAY (flag)" + cr))
+
+            Paragraph flag2
+                flag2:AddText("Notice that it doesn't matter if we find more than one 5; it will simply keep setting the flag to true. However, if there are no 5's, the if statement in the loop will never execute, and so the variable will remain the value it was initialized to, which was false.")
+        bodyDiv:Add(flag2)
+
+            Paragraph flag3
+                flag3:AddText("Modify the previous code so that the boolean is assigned true only when a " + dq + "5" + dq + " occurs. Be careful not to reset the boolean value to false if an index's value is not " + dq + "5." + dq + " Then output the boolean flag after processing the Array to display whether or there was a " + dq + "5" + dq + " was in the list.")
+        bodyDiv:Add(flag3)
+
+        SideBySideIDE addStatementIDE7
+        addStatementIDE7:SetUniqueIdentifier("Using a Boolean Flag")
+        addStatementIDE7:GetIDETitle():AddText("Using a Boolean Flag")
+        addStatementIDE7:GetIDESubtitle():AddText("")
+        addStatementIDE7:SetGameEnvironment(true)
+        addStatementIDE7:Setup()
+        bodyDiv:Add(addStatementIDE7)
+        bodyDiv:Add(addStatementIDE7:GetGameCanvas())
+
+        bodyDiv:AddHeading("Generalize Search by Making It Into an Action", 4)
+            Paragraph flag4
+                flag4:AddText("You've just written code to search for a value in a list! If we could generalize this behavior, it might be useful to us in the future - it's probably something that we will want to do over and over again.")
+        bodyDiv:Add(flag4)
+            Paragraph flag5
+                flag5:AddText("Over the next few Coding Challenges, we'll build up a very useful, general action for searching for any value in any list. But we'll do it one step at a time...")
+        bodyDiv:Add(flag5)
+
+            Paragraph flag6
+                flag6:AddText("The following is the starter code for the next few exercises. This code creates three Arrays, with each Array named slightly differently. For the first exercise, you only need to consider " + dq + "arrayOfRandom1." + dq)
+        bodyDiv:Add(flag6)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "Random random" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom1" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom2" + cr
+                                                        +   "Array&lt;integer&gt; arrayOfRandom3" + cr
+                                                        +   "" + cr
+                                                        +   " integer index = 0" + cr
+                                                        +   "" + cr
+                                                        +   "   repeat 10 times" + cr
+                                                        +   "       integer randomInt = random:RandomIntegerBetween(1, 10)" + cr
+                                                        +   "       arrayOfRandom1:Add(randomInt)" + cr
+                                                        +   "       randomInt = random:RandomIntegerBetween(1, 10)" + cr
+                                                        +   "       arrayOfRandom2:Add(randomInt)" + cr
+                                                        +   "       randomInt = random:RandomIntegerBetween(1, 10)" + cr
+                                                        +   "       arrayOfRandom3:Add(randomInt)" + cr
+                                                        +   "   end" + cr
+                                                        +   "" + cr
+                                                        +   "output "+dq+"Did we have '5'?:"+dq + cr
+                                                        +   "boolean five = false" + cr
+                                                        +   "index = 0" + cr
+                                                        +   "repeat while index <= arrayOfRandom1:GetSize() - 1" + cr
+                                                        +   "   if arrayOfRandom1:Get(index) = 5" + cr
+                                                        +   "        five = true" + cr
+                                                        +   "   end" + cr
+                                                        +   "   index = index + 1" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "output five" + cr))
+
+        bodyDiv:AddParagraph("Here are the requirements for this step.")
+
+            UnorderedList flagList
+                flagList:AddListItem("Run the starter code to verify that it works correctly.")
+                flagList:AddListItem("Create a new action named " + dq + "search."+ dq + " Note: Remember that we need to establish formal code structure with " + dq + "class Main" + dq + " and " + dq + "action Main" + dq + " when we start writing actions")
+                flagList:AddListItem("Move the code that checks for a 5 inside the action. Note: You must move the boolean variable inside the action as well, or it won't reset each time you call the action!")
+                flagList:AddListItem("Call the action to make sure your code still works. The actual behavior will be the same as when you ran it the first time. The difference now is that you're calling an action to do it.")
+        bodyDiv:Add(flagList)
+
+        SideBySideIDE addStatementIDE8
+        addStatementIDE8:SetUniqueIdentifier("Generalize Search")
+        addStatementIDE8:GetIDETitle():AddText("Generalize Search")
+        addStatementIDE8:GetIDESubtitle():AddText("")
+        addStatementIDE8:SetGameEnvironment(true)
+        addStatementIDE8:Setup()
+        bodyDiv:Add(addStatementIDE8)
+        bodyDiv:Add(addStatementIDE8:GetGameCanvas())
+
+        bodyDiv:AddHeading("Generalize Search by Making It Into an Action - Part 2", 4)
+            Paragraph flag9
+                flag9:AddText("Right now, our action just searches for a 5 in " + dq + "arrayOfRandom1." + dq + " We would like to be able to use this action to search through any Array, so we will be adding a parameter to allow us to specify which Array should be searched.")
+        bodyDiv:Add(flag9)
+
+            UnorderedList flagList1
+                flagList1:AddListItem("Add a parameter to the search action called list")
+                flagList1:AddListItem("Modify the code inside the action so that it loops over list (the parameter) instead of only over " + dq + "arrayOfRandom1" + dq)
+                flagList1:AddListItem("Call your action with each of the Arrays provided at the top of the program")
+        bodyDiv:Add(flagList1)
+
+        SideBySideIDE addStatementIDE9
+        addStatementIDE9:SetUniqueIdentifier("Generalize Search - Part 2")
+        addStatementIDE9:GetIDETitle():AddText("Generalize Search - Part 2")
+        addStatementIDE9:GetIDESubtitle():AddText("")
+        addStatementIDE9:SetGameEnvironment(true)
+        addStatementIDE9:Setup()
+        bodyDiv:Add(addStatementIDE9)
+        bodyDiv:Add(addStatementIDE9:GetGameCanvas())
+
+        bodyDiv:AddHeading("Generalize Search by Making It Into an Action - Part 3", 4)
+            Paragraph genSearch
+                genSearch:AddText("In order to make a general search action, we should be able to search for any value, not just 5. We can do this by making the value to search for a parameter as well.")
+        bodyDiv:Add(genSearch)
+
+            UnorderedList genList
+                genList:AddListItem("Add a second parameter to your search action to represent the item to search for. This example uses the name " + dq + "searchValue." + dq)
+                genList:AddListItem("Update the code inside the action to check for " + dq + "searchValue" + dq + " instead of 5.")
+                genList:AddListItem("Call your search action to search for different values inside of each Array.")
+                genList:AddListItem("The output statement is now inaccurate. Change it to say " + dq + "Array has searchValue: " + dq + " followed by the value in our boolean flag.")
+        bodyDiv:Add(genList)
+
+        SideBySideIDE addStatementIDE10
+        addStatementIDE10:SetUniqueIdentifier("Generalize Search - Part 3")
+        addStatementIDE10:GetIDETitle():AddText("Generalize Search - Part 3")
+        addStatementIDE10:GetIDESubtitle():AddText("")
+        addStatementIDE10:SetGameEnvironment(true)
+        addStatementIDE10:Setup()
+        bodyDiv:Add(addStatementIDE10)
+        bodyDiv:Add(addStatementIDE10:GetGameCanvas())
+
+        bodyDiv:AddHeading("Reusing an Action Pattern: Find Minimum", 4)
+            Paragraph genSearch1
+                genSearch1:AddText("Nice work! You've just written an action that implements an algorithm to process an array! If you feel comfortable with the basic pattern you used to create this action, you can quickly create actions for many other useful algorithms that work on arrays.")
+        bodyDiv:Add(genSearch1)
+
+        bodyDiv:AddHeading("Basic Action Pattern", 4)
+            UnorderedList genList1
+                genList1:AddListItem("Create an action that accepts an Array as input.")
+                genList1:AddListItem("Create a " + dq + "flag" + dq + " variable and set its default value before looping through the Array.")
+                genList1:AddListItem("Loop through your Array with a " + dq + "repeat while" + dq + " loop that visits every index in the Array.")
+                genList1:AddListItem("Update your flag as necessary with every iteration of your loop.")
+                genList1:AddListItem("Display your flag at the end of the loop.")
+                genList1:AddListItem("Let's use this pattern to write an action that finds and displays the smallest value in an Array.")
+                genList1:AddListItem("Instead of using a true/false flag to indicate whether we found a value, we'll use a variable to keep track of the smallest value we've come across in the array so far.")
+        bodyDiv:Add(genList1)
+
+            Paragraph genSearch2
+                genSearch2:AddText("Starter code has been provided which outlines and calls findMinVal with different inputs. Your job will be to finish writing the action.")
+        bodyDiv:Add(genSearch2)
+
+        bodyDiv:AddParagraph("Here are the instructions for this step.")                                                
+            UnorderedList genList2
+                genList2:AddListItem("Before programming, try to develop an algorithm that you could use to find the minimum value in an Array.")
+                genList2:AddListItem("Use the pattern outlined above as a guide.")
+                genList2:AddListItem("You'll want to use the minVal variable to keep track of the smallest value you've found so far.")
+                genList2:AddListItem("You'll need to write an if-statement that checks whether the current value in the Array is less than minVal. If it is, then update the smallest value.")
+                genList2:AddListItem("Run the code to ensure it is working as you intend.")
+        bodyDiv:Add(genList2)
+
+        SideBySideIDE addStatementIDE11
+        addStatementIDE11:SetUniqueIdentifier("Find Minimum")
+        addStatementIDE11:GetIDETitle():AddText("Find Minimum")
+        addStatementIDE11:GetIDESubtitle():AddText("")
+        addStatementIDE11:GetIDEInputArea():AddText("use Libraries.Containers.Array" + cr
+                                                        +   "use Libraries.Compute.Random" + cr
+                                                        +   "" + cr
+                                                        +   "class Main" + cr
+                                                        +   "   Random random" + cr
+                                                        +   "   Array&lt;integer&gt; arrayOfCards" + cr
+                                                        +   "" + cr
+                                                        +   "   action Main" + cr
+                                                        +   "        integer index = 0" + cr
+                                                        +   "" + cr
+                                                        +   "       repeat 10 times" + cr
+                                                        +   "           arrayOfCards:Add(random:RandomIntegerBetween(1, 13))" + cr
+                                                        +   "           output arrayOfCards:Get(index)" + cr
+                                                        +   "           index = index + 1" + cr
+                                                        +   "       end" + cr
+                                                        +   "" + cr
+                                                        +   "       FindMinVal()" + cr
+                                                        +   "    end" + cr + cr
+                                                        +   "   action FindMinVal" + cr
+                                                        +   "" + cr
+                                                        +   "   end" + cr
+                                                        +   "end" + cr)
+        addStatementIDE11:SetGameEnvironment(true)
+        addStatementIDE11:Setup()
+        bodyDiv:Add(addStatementIDE11)
+        bodyDiv:Add(addStatementIDE11:GetGameCanvas())
+
+        bodyDiv:AddHeading("Unplugged Activity: Card Search Algorithm", 3)
+        bodyDiv:AddParagraph("Now that students are finished with the Coding Challenges, distribute the " + dq + "Card Search Algorithm Activity Guide" + dq + " resource. Then present them the following as a prompt.")
+            Paragraph genSearch3
+                genSearch3:AddText("In the lesson we programmed a linear search (scan all the values in the list from beginning to end until you find what you're searching for). " + dq + "Binary search" + dq + " uses a different algorithm, that is faster, but requires that the list be in sorted order ahead of time, whereas a linear search will work for any list. Demonstrate why this algorithm can only be performed on sorted arrays and justify the fact that it is faster.")
+        bodyDiv:Add(genSearch3)
+
+            Paragraph genSearch4
+                genSearch4:AddText("Note: The wrap-up for this lesson focuses primarily on the outcomes from the Card Search activity.")
+        bodyDiv:Add(genSearch4)
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+            Paragraph wrapup
+                wrapup:AddText("The only algorithms the CSP framework mentioned by name are " + dq + "linear search" + dq + " and " + dq + "binary search." + dq + " Students should be able to reason about an algorithm's " + dq + "efficiency." + dq + " They should understand the connection (and differences) between designing an algorithm and actually writing (implementing) the algorithm in code.")
+        bodyDiv:Add(wrapup)
+            Paragraph wrapup1
+                wrapup1:AddText("When you talk about how " + dq + "long" + dq + " or how much " + dq + "time" + dq + " an algorithm takes to run, time is usually a measure of the number of operations a computer needs to perform to complete the task. You can measure the amount of time it takes to run an algorithm on a clock, but it's often not a useful measure, because the speed of the computer hardware obscures whether the algorithm is good or not.")
+        bodyDiv:Add(wrapup1)
+            Paragraph wrapup2
+                wrapup2:AddText("There are several essential knowledge statements from the framework that directly tie to information about algorithms, efficiency and linear vs. binary search, which we'll use.")
+        bodyDiv:Add(wrapup2)
+
+        bodyDiv:AddHeading("Wrap Up Activity", 4)
+            Paragraph wrapup3
+                wrapup3:AddText("Have students pair up with a peer and take one of the 5 statements (D, E, F, G, H) listed below, which are taken directly from the CSP Framework under " + dq + "4.2.4 Evaluate algorithms analytically and empirically for efficiency, correctness, and clarity. [P4]" + dq)
+        bodyDiv:Add(wrapup3)
+            Paragraph wrapup4
+                wrapup4:AddText("Come up with a brief (60 second) explanation of that statement and relate it to something you experienced as part of this lesson.")
+        bodyDiv:Add(wrapup4)
+            UnorderedList wrapupList
+                AddListItemWithBoldAtFront(wrapupList, "4.2.4D Different correct algorithms for the same problem can have different efficiencies.", "  - Both linear search and binary search solve the same problem, but they have different efficiencies.")
+                AddListItemWithBoldAtFront(wrapupList, "4.2.4E Sometimes more efficient algorithms are more complex.", "  - Binary search is more efficient than linear search, but even though it might be easy to understand at a high level, it is much more challenging to write code for.")
+                AddListItemWithBoldAtFront(wrapupList, "4.2.4F Finding an efficient algorithm for a problem can help solve larger instances of the problem.", "  - The algorithms we wrote work for any size input.")
+                AddListItemWithBoldAtFront(wrapupList, "4.2.4G Efficiency includes both execution time and memory usage.", "  - Execution " + dq + "time" + dq + " here means number of operations that need to be performed in the worst case.")
+                AddListItemWithBoldAtFront(wrapupList, "4.2.4H Linear search can be used when searching for an item in any list; binary search can be used only when the list is sorted.", "  - Emphasis should be placed on the fact that binary search only works when the list is sorted. It's a fact often forgotten.")
+        bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","1.2.3 (A)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","4.1.1 (A, B, C, D)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","4.2.4 (D, E, F, H)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.1.2 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.3.1 (K, L)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.5.1 (E, J)")
+            bodyDiv:Add(list)
+
+/* Completed 5/26/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to process Arrays'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 15: (Processing Arrays)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 15"
+    end
+    action GetShortDescription returns text
+        return "Learn how to process Arrays"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson15A.html"
+    end
+
+end

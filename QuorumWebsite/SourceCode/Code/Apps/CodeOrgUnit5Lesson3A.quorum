@@ -1,0 +1,1026 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson3A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 3: Building an Event-Driven Program")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 3: Building an Event-Driven Program", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("This lesson gives students time to familiarize themselves with the process of making event-driven programs before we move on to deeper content.
+        They will design and create a program on a topic of their choosing. There are some constraints on the project
+        to help guide students in their thinking. Students are also encouraged to do independent work, but alongside a 
+        &quotcoding buddy&quot or &quotthought partner&quot to be a help along the way.")
+        bodyDiv:AddParagraph("<b>Note: </b>This activity is not intended to be a Practice PT but could be used similarly. The aim is to give students
+        an opportunity to get comfortable with the Quorum Game Engine and the structure of event-driven programming in a creative way. Another goal is to
+        intentionally build an environment of informal collaboration, even when doing individual work.")
+
+//        bodyDiv:AddHeading("Vocabulary", 2)
+//        UnorderedList vocab
+//            AddListItemWithBoldAtFront(vocab, "Event-Driven Program: ", "a program designed to run blocks of code or functions in response to specified events (e.g. a mouse click)")
+//            AddListItemWithBoldAtFront(vocab, "Event Handling: ", "an overarching term for the coding tasks involved in making a program respond to events by triggering functions.")
+//            AddListItemWithBoldAtFront(vocab, "User Interface: ", "the &quotUser Interface&quot or UI of a program/app refers to how a person (user) interacts with the computer or app.")
+//        bodyDiv:Add(vocab)
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+        UnorderedList goal
+            goal:AddListItem("Develop and Design a plan for an event-driven program.")
+            goal:AddListItem("Collaborate with a &quotthought partner&quot during the implementation of a project.")
+            goal:AddListItem("Create an event-driven program using UI elements/objects and event handling.")
+        bodyDiv:Add(goal)
+
+        bodyDiv:AddHeading("Purpose", 2)
+        bodyDiv:AddParagraph("This lesson is not heavy on new CS content. It is primarily 
+        a time to reinforce programming skills while prototyping a simple event-driven 
+        program. The lesson does, however, fall at the intersection of the Big Ideas 
+        of <b>Creativity and Programming</b>. The fact that students will share ideas 
+        before programming their projects and will provide feedback using a peer rubric 
+        also mirrors some of the practices of collaboration that students can employ 
+        on the Create Performance Task.")
+        bodyDiv:AddParagraph("As for the project itself, it probably bears the closest 
+        resemblance to creating a &quotcomputational artifact&quot as outlined in the 
+        Explore Performance Task -- Creating something to communicate an idea 
+        not-textually.")
+        
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList resource
+            resource:AddListItemLink("Activity Guide - Event-Driven Program, pdf", "/files/code/Unit5/U5L03 Activity Guide - Event-driven App.pdf")
+            resource:AddListItemLink("Activity Guide - Event-Driven Program, docx", "/files/code/Unit5/U5L03 Activity Guide - Event-driven App.docx")
+        bodyDiv:Add(resource)
+
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddParagraph("Today students will get a chance to make a program of their own design that uses objects and lets them practice using event handlers by programming some simple user interactions. We want to have students spend most of their time working on it, so let's get to it.")
+        UnorderedList getStart
+            getStart:AddListItem("Distribute the Activity Guide.")
+            getStart:AddListItem("Pair students with a &quotcoding buddy&quot for this project.")
+            getStart:AddListItem("Students will make a project independently, but have a partner with whom they can get instant and rapid feedback and help.")
+            getStart:AddListItem("Refer to the first two lessons in this Unit which you might use as review and kickoff to the project.")
+        bodyDiv:Add(getStart)
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("In the last two lessons students worked with the Quorum Game Engine and Event-Driven Programming. This lesson is all about students getting a chance to use those new skills to make their own event-driven program. Encourage students to use their creativity and personal interests to make their program unique. Here are some steps to get students started: ")
+        UnorderedList act1
+            act1:AddListItem("Choose the theme of your program")
+            act1:AddListItem("Complete the Planning Guide")
+            act1:AddListItem("Share your plan with a classmate")
+            act1:AddListItem("Code your program/app")
+            act1:AddListItem("Give and receive feedback on programs.")
+        bodyDiv:Add(act1)
+        
+        bodyDiv:AddHeading("Quick Recap", 4)
+        bodyDiv:AddParagraph("Before having students embark on making their own program from scratch, recap these few important things: ")
+        UnorderedList recap
+            recap:AddListItem("When instantiating objects from a Class use names/IDs that are easily identifiable and include the appropriate &quotuse&quot statement at the beginning of your program for the associated Class/Library.")
+            recap:AddListItem("Build your code section by section and use the <b>&quotRun, Test, Debug!&quot</b> concept throughout your coding process to ensure that everything is behaving as you would expect and/or catch anything that is not behvaing as you would expect early on.")
+            recap:AddListItem("Don't forget to add a KeyboardListener to &quotlisten for&quot keyboard input from the user.")
+        bodyDiv:Add(recap)
+        
+        bodyDiv:AddHeading("Student Instructions", 3)
+        bodyDiv:AddParagraph("As you are about to embark on your first solo project we thought it would be a good time to give you some tips.")
+        OrderedList tips
+            ListItem tip1
+                tip1:AddText("<b>Have a &quotcoding buddy&quot and/or &quotthought partner&quot: </b>working on your own doesn't mean working by yourself. It's very useful to have someone nearby who you can use as a &quotthought partner.&quot Many professionals work at the same table or desk, even if they are working on completely different projects, because of the benefits of having someone nearby. There is a lot to remember and a lot to try to keep straight, so it's helpful to have someone nearby who can provide another perspective. Here are a few things that &quotThought Partners&quot might do: ")
+                UnorderedList tip1a
+                        tip1a:AddListItem("Bounce ideas off each other")
+                        tip1a:AddListItem("Share insights or discoveries they've made through their own programming")
+                        tip1a:AddListItem("Answer each other's questions in the moment")
+                        tip1a:AddListItem("Help double-check code and provide a second pair of eyes for debugging")
+                tip1:Add(tip1a)
+            tips:Add(tip1)
+            ListItem tip2
+                tip2:AddText("<b>Persistence Pays off: </b>When you are learning to program you will inevitably run into problems. Like anything else, over time you stop making the same mistakes you made as a novice. Remember: ")
+                UnorderedList tip2a
+                    tip2a:AddListItem("Programs rarely work correctly the first time.")
+                    tip2a:AddListItem("The whole point is to build something up in small increments.")
+                    tip2a:AddListItem("You can't break anything. Add code, try it out. Doesn't work? Get rid of it and try something else.")
+                    tip2a:AddListItem("Add. Run. Test. Debug.")
+                tip2:Add(tip2a)
+            tips:Add(tip2)
+        bodyDiv:Add(tips)
+
+        bodyDiv:AddParagraph("You will be creating your own program which will give you practice 
+        designing user interfaces and writing event-driven programs. Complete the Planning 
+        Sheets and Peer Review before beginning to write your code. We have provided 
+        the Quorum Game Engine template and a list of Audio files that you can Load to your 
+        Audio objects to help you get started on programming your project.")
+        bodyDiv:AddHeading("Available Audio Files:", 4)
+        UnorderedList audioList
+            audioList:AddListItem("/media/code/Bing.ogg")
+            audioList:AddListItem("/media/code/Boing.ogg")
+            audioList:AddListItem("/media/code/StadiumCheer.ogg")
+            //audioList:AddListItem("/media/code/break.ogg")
+            audioList:AddListItem("/media/code/ping.wav")
+            audioList:AddListItem("/media/code/Guitar-A-sharp.ogg")
+            audioList:AddListItem("/media/code/Guitar-A.ogg")
+            audioList:AddListItem("/media/code/Guitar-B.ogg")
+            audioList:AddListItem("/media/code/Guitar-C-sharp.ogg")
+            audioList:AddListItem("/media/code/Guitar-C.ogg")
+            audioList:AddListItem("/media/code/Guitar-D-sharp.ogg")
+            audioList:AddListItem("/media/code/Guitar-D.ogg")
+            audioList:AddListItem("/media/code/Guitar-E.ogg")
+            audioList:AddListItem("/media/code/Guitar-F-sharp.ogg")
+            audioList:AddListItem("/media/code/Guitar-F.ogg")
+            audioList:AddListItem("/media/code/Guitar-G-sharp.ogg")
+            audioList:AddListItem("/media/code/Guitar-G.ogg")
+            audioList:AddListItem("/media/Ambulance.wav")
+            audioList:AddListItem("/media/Boom.ogg")
+            audioList:AddListItem("/media/Chime.ogg")
+            audioList:AddListItem("/media/Clang.ogg")
+            audioList:AddListItem("/media/Fall.ogg")
+            audioList:AddListItem("/media/Firework.ogg")
+            audioList:AddListItem("/media/Fwip.ogg")
+            audioList:AddListItem("/media/Modem.ogg")
+            audioList:AddListItem("/media/Motorcycle.ogg")
+            audioList:AddListItem("/media/Police.wav")
+            audioList:AddListItem("/media/Robot.ogg")
+            audioList:AddListItem("/media/song.ogg")
+            audioList:AddListItem("/media/longSong.ogg")
+        bodyDiv:Add(audioList)
+        
+        
+         SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Create your own Event-Driven Program")
+        addStatementIDE:GetIDETitle():AddText("Create your own Event-Driven Program")
+        addStatementIDE:SetGameEnvironment(false)
+        addStatementIDE:GetIDEInputArea():AddText("
+use Libraries.Game.Game
+// Add additional classes from Quroum Standard Libraries
+
+class Main is Game
+   // Instantiate objects
+   
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+       // Load and add any images to the screen 
+
+       // Load any Audio files to your Audio objects
+
+       // Add the Keyboard Listener
+
+   end
+
+   action Update(number seconds)
+       // Call actions for continuously &quotmoving&quot images/Drawables 
+
+   end
+
+   // Create an Action for the keyboard event when specific keys are PRESSED
+        //(e.g. start movement, start audio)
+
+   // Create an Action for the keyboard event when specific keys are RELEASED
+        //(e.g. stop movement, stop audio)
+end
+
+")
+
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddHeading("Incorporate peer feedback", 4)
+        bodyDiv:AddParagraph("Give students a chance to respond to the feedback they receive on their program. They should pick at least one piece of feedback to implement in their program. This could be done outside of class, if desired.")
+        /*
+        bodyDiv:AddHeading("AP Practice - Create PT - Process", 4)
+        bodyDiv:AddParagraph("One component of the <b>AP Performance Task</b> is describing the development process used for your program.")
+        bodyDiv:AddHeading("2. Written Responses", 4)
+        Paragraph apPractice
+            apPractice:SetClassAttribute("cool-box")
+            apPractice:AddText("2b. Describe the incremental and iterative development 
+            process of your program, focusing on two distinct points in that process. 
+            Describe the difficulties and/or opportunities you encountered and how 
+            they were resolved or incorporated. In your description clearly indicate 
+            whether the development described was collaborative or independent. At 
+            least one of these points must refer to independent program development. 
+            <i>(Must not exceed 200 words)</i>")
+        bodyDiv:Add(apPractice)
+        bodyDiv:AddParagraph("Have students complete the Create PT prep question.")
+        */
+        bodyDiv:AddHeading("Assessment", 2)
+        bodyDiv:AddParagraph("<b>Rubric:</b> Use the provided rubric (in the Activity Guide) or one of your own creation, to assess students' submissions.")
+        bodyDiv:AddParagraph("<b>Extended Assessment:</b> If you want to make the project more like a practice performance task you could have students write responses to applicable reflection prompts from the real Performance tasks.")
+        bodyDiv:AddParagraph("You might modify these slightly for this context, but useful prompts are: ")
+        UnorderedList prompts
+            ListItem prompts1
+            prompts1:AddText("From <b>Create PT</b>: ")
+                UnorderedList prompts1a
+                    prompts1a:AddListItem("2b. &quotDescribe the incremental and iterative development process of your program, focusing on two distinct points in that process. Describe the difficulties and/or opportunities you encountered and how they were resolved or incorporated. In your description clearly indicate whether the development described was collaborative or independent. At least one of these points must refer to independent program development; the second could refer to either collaborative or independent program development. <i>(Approximately 200 words)</i>&quot")
+                prompts1:Add(prompts1a)
+            prompts:Add(prompts1)
+            ListItem prompts2
+            prompts2:AddText("From <b>Explore PT</b>: ")
+                UnorderedList prompts2a
+                    prompts2a:AddListItem("2b. &quotDescribe your development process, explicitly identifying the computing tools and techniques you used to create your artifact. Your description must be detailed enough so that a person unfamiliar with those tools and techniques will understand your process. <i>(Approximately 100 words)</i>.&quot")
+                prompts2:Add(prompts2a)
+            prompts:Add(prompts2)
+        bodyDiv:Add(prompts)
+
+        /*
+
+            Paragraph ov1
+                ov1:AddText("In this lesson students will explore how to create a fully functional 
+                and user friendly Multi-screen App/Program. At the end of the lesson they will 
+                have a program that any user can start using or playing by running the 
+                program. In the process of making this program, students will build on their knowledge 
+                of Event Driven Programming and Object Oriented Programming. Students will also continue 
+                working to create a programming habit of &quotRun, Test, Debug!&quot at each stage of
+                their App/Program development. Students may work with a partner or group on this project. 
+                Since the content of this lesson covers a wide variety of programming concepts - some of which 
+                have not been introduced yet - we provide students with a template to build from.")
+        bodyDiv:Add(ov1)
+            
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Multi-Screen App/Program: ", "An Application or Program that has many different screens. The screen that is showing will depend on the which stage of the App/Program the user is in, with each stage presenting a different functionality for the entire App/Program.")
+                AddListItemWithBoldAtFront(voc, "&quotRun, Test, Debug!&quot: ", "A good habit for programmers to get used to.")
+        bodyDiv:Add(voc)
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("In this assignment we will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Develop and design a plan for a multi-screen application")
+                goalList:AddListItem("Learn to create actions using Object Oriented Programming (OOP)")
+                goalList:AddListItem("Collaborate with a &quotthought partner&quot during the implementation of a project")
+                goalList:AddListItem("Create a multi-screen application using Quorum Game Engine (QGE)")
+                goalList:AddListItem("Establish a good habit of " + dq + "Run, Test, Debug!'")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("This lesson falls at the intersection of the Big Ideas of <b>Creativity and 
+                Programming</b>. The fact that students will share ideas before programming their projects 
+                and can then provide feedback also mirrors some of the practices of collaboration that 
+                students will employ on the Create Performance Task. This lesson is designed to show 
+                students the mind-set required in developing a fully functional App/Program, before 
+                they are able to experience the rewarding result.")
+        bodyDiv:Add(purpose)
+
+
+/*
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "drawableObjet:Show()", "")
+                AddListItemWithBoldAtFront(code, "drawableObjet:Hide()", "")
+                AddListItemWithBoldAtFront(code, "audioObjectEnableLooping()", "")
+                AddListItemWithBoldAtFront(code, "fontObject:LoadFont(text style)", "")
+                AddListItemWithBoldAtFront(code, "fontObject:SetSize(integer size)", "")
+                AddListItemWithBoldAtFront(code, "fontObject:SetColor(Color color)", "")
+                AddListItemWithBoldAtFront(code, "labelObject:SetFont(Font font)", "")
+                AddListItemWithBoldAtFront(code, "labelObject:SetWidth(integer labelWidth)", "")
+                AddListItemWithBoldAtFront(code, "labelObject:SetText(text comments)", "")
+                AddListItemWithBoldAtFront(code, "labelObject:SetDescription(text comments)", "")
+                AddListItemWithBoldAtFront(code, "labelObject:SetPosition(positionX, positionY)", "")
+        bodyDiv:Add(code)
+
+        bodyDiv:AddHeading("Review: Managing Complexity by Creating and Calling " + dq + "Actions'- " + dq + "Code Optimization'", 2)
+            Paragraph codeOpt
+                codeOpt:AddText("When you downloaded the solution for the previous lesson (lesson 2), you  might have noticed that many lines look very similar to each other, or a block of code (with multiple lines) looks very similar to the other blocks of code. When you start noticing this, it is the time for you to think about what you learned in Unit 3. Yes, we need to use our " + dq + "abstraction skill' to bundle a bunch of codes together to make them into an " + dq + "action', then set it aside in the bottom part of your code. Now you can only call the " + dq + "actions' in the main part of your code. This process would make your code much easier for you to manage your code, as you add more functionality to your program. We will review this process by comparing the two code examples that do exactly the same on the user's end. Let's download the two text files below. We will examine how the code is modified from the first code to the second code in detail together.")
+        bodyDiv:Add(codeOpt)
+
+            UnorderedList codeOptList
+                codeOptList:AddListItemLink("Unit5-MusicalKeyboard-unorganized.txt", "/files/code/Unit5/Unit5-MusicalKeyboard-unorganized.txt")
+                codeOptList:AddListItemLink("Unit5-MusicalKeyboard-optimized.txt", "/files/code/Unit5/Unit5-MusicalKeyboard-optimized.txt")
+        bodyDiv:Add(codeOptList)
+
+        bodyDiv:AddHeading("Teacher's Tip: On choice of word processing program when opening a computer programming codes", 5)
+            Paragraph tTipCode
+                tTipCode:SetClassAttribute("cool-box")
+                tTipCode:AddText("When you are opening a computer programming code in a word processor, the " + dq + "word wrapping' function of the word processor makes it very difficult for you to differentiate where a line of the code starts and ends in some parts of the actual code. For this reason, we would recommend you to use the simpler word processing program - such as " + dq + "Notepad' on Windows or " + dq + "Text Wrangler' on OSX. These programs do not have the word wrapping function unless you set it specifically. This may be especially important tip if you are using screen readers to read the computer codes.")
+        bodyDiv:Add(tTipCode)
+
+        bodyDiv:AddHeading("Creating and Calling " + dq + "action LoadAllNoteSounds'", 4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   // Loading the Audio files to the Audio objects to be played later" + cr
+                                                        +   "   noteC:Load("+dq+"media/code/Guitor-C.ogg"+dq+")" + cr
+                                                        +   "   noteD:Load("+dq+"media/code/Guitor-D.ogg"+dq+")" + cr
+                                                        +   "   noteE:Load("+dq+"media/code/Guitor-E.ogg"+dq+")" + cr
+                                                        +   "   noteF:Load("+dq+"media/code/Guitor-F.ogg"+dq+")" + cr
+                                                        +   "   noteG:Load("+dq+"media/code/Guitor-G.ogg"+dq+")" + cr
+                                                        +   "   noteA:Load("+dq+"media/code/Guitor-A.ogg"+dq+")" ))
+
+            Paragraph loadAll
+                loadAll:AddText("In the first code example file, lets look at the part of the code - shown above. This program needs to have all these lines of code, But… we do not need to do it at this specific position in the file. If we increase the number of notes (that we will do in this lesson), having this block of code here might make it very difficult for you to read and understand your own code, as you add more and more functionality to your code. The solution is that we will make simple action that bundles these lines of code, then place it at the bottom of the file so that we do not need to see them all the time. Finally, we only calls the action at the original position so that the entire code runs the exactly the same way. Look through the second code example - " + dq + "Unit5-MusicalKeyboard-optimized.txt' - to find how it is done. The sections below also show the parts that concerns this process. This process is called " + dq + "Code Optimization'")
+        bodyDiv:Add(loadAll)
+
+        bodyDiv:AddHeading("Creating the " + dq + "action LoadAllNoteSounds' at the bottom of the file", 5)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Creating actions for loading audio to the 'note' obejcts" + cr
+                                                        +   "action LoadAllNoteSounds" + cr
+                                                        +   "   noteC:Load("+dq+"media/code/Guitor-C.ogg"+dq+")" + cr
+                                                        +   "   noteD:Load("+dq+"media/code/Guitor-D.ogg"+dq+")" + cr
+                                                        +   "   noteE:Load("+dq+"media/code/Guitor-E.ogg"+dq+")" + cr
+                                                        +   "   noteF:Load("+dq+"media/code/Guitor-F.ogg"+dq+")" + cr
+                                                        +   "   noteG:Load("+dq+"media/code/Guitor-G.ogg"+dq+")" + cr
+                                                        +   "   noteA:Load("+dq+"media/code/Guitor-A.ogg"+dq+")" 
+                                                        +   "end" + cr))
+
+        bodyDiv:AddHeading("Calling the " + dq + "LoadAllNoteSounds()' at the original loaction of the code", 5)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Calling action for Loading the audio for each note" + cr
+                                                        +   "LoadAllNoteSounds()" + cr
+                                                        +   "" + cr
+                                                        +   "AddKeyboardListener(me)" + cr))
+
+        bodyDiv:AddHeading("Creating and Calling " + dq + "action LoadAndPosition(Drawable key, integer width, integer height, Color boxColor, number xPosition, number yPosition)'", 4)
+            Paragraph loAndPo
+                loAndPo:AddText("Once again, we will look at a part of the code from the first code example - Unit5-MusicalKeyboard-unorganized.txt. You would find the blocks of the codes- shown below - are structurally identical to each other except for the name of the Drawable object, numbers and colors. In fact, this pattern of structure is repeated 6 times in the file.")
+        bodyDiv:Add(loAndPo)
+                                
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Loading and addinng the images to the screen" + cr
+                                                        +   "keyC:LoadFilledRectangle(50, 50, red)" + cr
+                                                        +   "keyC:SetPosition(80, 200)" + cr
+                                                        +   "Add(keyC)" + cr
+                                                        +   "" + cr
+                                                        +   "keyD:LoadFilledRectangle(50, 50, blue)" + cr
+                                                        +   "keyD:SetPosition(80*2, 200)" + cr
+                                                        +   "Add(keyD)"))
+
+            Paragraph loAndPo1
+                loAndPo1:AddText("Once again, it is time for " + dq + "Code Optimization'. This time, we will use another concept we have already learned in Unit 3 - " + dq + "Creating Action with Multiple Parameters'. In this optimization process, we will start with identifying the parts (in the repeated code block) that cannot be changed, and the parts that can be changed. The following are the parts that cannot be changed:")
+        bodyDiv:Add(loAndPo1)
+            UnorderedList loAndPoList
+                loAndPoList:AddListItem(":LoadFilledRectangle()")
+                loAndPoList:AddListItem(":SetPosition()")
+                loAndPoList:AddListItem("Add()")
+        bodyDiv:Add(loAndPoList)
+
+            Paragraph loAndPo2
+                loAndPo2:AddText("These parts above are all coming from Quorum standard libraries. There is nothing we can do to change thee expressions in this code. The good new is that all other parts -  the name of the Drawable object, numbers and colors - can be changed based on how you want to write this program. Let's look at these parts in detail - by taking close look into the code block concerning " + dq + "keyC'.")
+        bodyDiv:Add(loAndPo2)
+            UnorderedList loAndPoList1
+                AddListItemWithBoldAtFront(loAndPoList1, "" + dq + "keyC'", " - This is the name of this " + dq + "Drawable' object.")
+                AddListItemWithBoldAtFront(loAndPoList1, "first number '50' ", "- This is the width of the rectangle that we try to draw. And it is an " + dq + "integer variable'")
+                AddListItemWithBoldAtFront(loAndPoList1, "second number '50'", "  - This is the height of the rectangle that we try to draw. And it is an " + dq + "integer variable'")
+                AddListItemWithBoldAtFront(loAndPoList1, "" + dq + "red'", " - This is the color we like to add to the rectangle. and it is " + dq + "Color' object")
+                AddListItemWithBoldAtFront(loAndPoList1, "'80'", " - This is the X coordinate position of the screen where we would like to add the object " + dq + "keyC'. And it is " + dq + "number variable'.")
+                AddListItemWithBoldAtFront(loAndPoList1, "" + dq + "200'", " - This is the Y coordinate position of the screen where we would like to add the object " + dq + "keyC'. And it is " + dq + "number variable'.")
+        bodyDiv:Add(loAndPoList1)
+            Paragraph loAndPo3
+                loAndPo3:AddText("As we learned in Unit 3, when we create an " + dq + "Action with Parameters' in Quorum Programming Language, we need to specify the " + dq + "type' of parameters and their names that we would like to use in the parenthesis. Therefore, the first line of created action would be the code shown below:")
+        bodyDiv:Add(loAndPo3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// action that helps the drawable objects to set its dimensions, postiion and color" + cr
+                                                        +   "action LoadAndPosition(Drawable key, integer width, integer height, Color boxColor, number xPosition, number yPosition)"))
+
+            Paragraph loAndPo4
+                loAndPo4:AddText("When we specify the type of parameter and give it a name in the parenthesis, you can think of this process like creating the object and the variables that can be used only inside of this action. Based on this idea, we will simply substitute the real object name and the value with the names of the parameters we just created on the first line of the action creation. You can find this action the second code example - " + dq + "Unit5-MusicalKeyboard-optimized.txt'. The part is also shown below.")
+        bodyDiv:Add(loAndPo4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// action that helps the drawable objects to set its dimensions, postiion and color" + cr
+                                                        +   "action LoadAndPosition(Drawable key, integer width, integer height, Color boxColor, number xPosition, number yPosition)" + cr
+                                                        +   "   key:LoadFilledRectangle(width, height, boxColor)" + cr
+                                                        +   "   key:SetPosition(xPosition, yPosition)" + cr
+                                                        +   "   Add(key)" + cr
+                                                        +   "end"))
+
+            Paragraph loAndPo5
+                loAndPo5:AddText("Now only thing you need to do - once you created this action, is to call the action in the original location of the code blocks. Then in the parenthesis after the action name, place the proper object, numbers and color in the exact order as decided by your action. You can find this process - calling the action with parameters in the second code example - " + dq + "Unit5-MusicalKeyboard-optimized.txt.'. The part is also shown below.")
+        bodyDiv:Add(loAndPo5)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  " " + cr
+                                                        +   "   //Calling the action - you created in this file - to make it easy to Load" + cr
+                                                        +   "   //and Position the Drawable objects" + cr
+                                                        +   "" + cr
+                                                        +   "LoadAndPosition(keyC, 50, 50, red, 80, 200)" + cr
+                                                        +   "LoadAndPosition(keyD, 50, 50, blue, 80*2, 200)" + cr
+                                                        +   "LoadAndPosition(keyE, 50, 50, yellow, 80*3, 200)" + cr
+                                                        +   "LoadAndPosition(keyF, 50, 50, green, 80*4, 200)" + cr
+                                                        +   "LoadAndPosition(keyG, 50, 50, orange, 80*5, 200)" + cr
+                                                        +   "LoadAndPosition(keyA, 50, 50, navy, 80*6, 200)"))
+
+            Paragraph loAndPo6
+                loAndPo6:AddText("When you become accustomed to creating this type of action and using it in your code, you will very quickly find out how easy it becomes to write the repetitive and complicated parts of you code in lesser time and with fewer lines.")
+        bodyDiv:Add(loAndPo6)
+
+        bodyDiv:AddHeading("Project: Concert Guitarist - Multi Screen App", 2)
+            Paragraph project
+                project:AddText("In this lesson, we will expand the App that we created in the lesson 2, and make it into a user friendly fun application that contains the instruction for the users, as well as the way of starting and ending the application. Our App will also have multi screen for each stage of the App. We will set up the structure in our code for the user to go from one screen to another. Creating this App will require the programmer - " + dq + "you' - to have good understanding of the computer programming and the programming language " + dq + "Quorum'. Some parts of this programming uses the concept that you will learn in depth in the lessons after this one. For this reason, we are providing a template code. We will also provide easy template code blocks as we need them through the course of this lesson. Let's look at the App template to start with! If you are using the off-line IDE (recommended especially for this lesson), you can download the template code in " + dq + "zip file format' below, then open the unzipped folder in the off-line IDE. If you are using on-line IDE, you can download the template code in " + dq + "txt file format' below, then copy and paste the entire content of the file into the on-line IDE. Do not forget to save your project as you go through the several phase of this lesson if you are using the on-line IDE.")
+        bodyDiv:Add(project)
+            UnorderedList projectList
+                projectList:AddListItemLink("Unit5-ConcertGuitarist-Template.zip", "/files/code/Unit5/Unit5-ConcertGuitarist-Template.zip")
+                projectList:AddListItemLink("Unit5-ConcertGuitarist-Template.txt", "/files/code/Unit5/Unit5-ConcertGuitarist-Template.txt")
+        bodyDiv:Add(projectList)
+            Paragraph project1
+                project1:AddText("This template code is complete code that runs just fine by itself. Lets run the code and see what happens! Do you see the familiar colored rectangles on the gray screen? Yes, we added more of them to cover whole chromatic scale for an octave and half. Now your key board has been turned into a piano like keyboard. We only use the home row keys and upper low keys for this keyboard function. the key " + dq + "A' is equivalent to the key " + dq + "middle-C' of piano keyboard. We your computer's home row keys from " + dq + "A' to " + dq + ",' for the diatonic scale from middle-C to high-F (C,D,E,F,G,A,B,hC,hD,hE and hF). Some of your computer's upper low keys (W, E, T, Y, U, O and P) are also used as " + dq + "half step keys' in piano keyboard. If you are a musician, you can play many popular tunes with this set of keys.")
+        bodyDiv:Add(project1)
+
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-CG-TempKeys.png", "A pciture showing the colored rectangles on the gray background")
+            
+            Paragraph project2
+                project2:AddText("Although this code is completely working code, it is far from the program to be called as user friendly App. When the user start this App just to see what this App does, then user sees the bunch of rectangles appears on the screen abruptly, the user would not know what to do with it, nor he/she cannot even make sense out of it! Then your App will be quickly " + dq + "deleted' … This is a sad thing for the programmer.")
+        bodyDiv:Add(project2)
+            Paragraph project3
+                project3:AddText("In this lesson, we will add the starting screen for this App. On this screen we will have the instruction for the user in how to use this App. On the second screen, we will have the picture of a great concert hall with background music where the user can play tunes with an electric guitar sounds. Finally, we will have the third screen for the user to make a choice in whether ending or continuing their App experience. We will make each screen accessible to everyone by adding audio interface function to them. The pictures below shows the example of each screen.")
+        bodyDiv:Add(project3)
+
+        bodyDiv:AddHeading("Welcome Screen", 5)
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-CG-WelcomeScreen.png", "An welcome screen with the uer instruction") 
+
+        bodyDiv:AddHeading("Concert Hall Screen", 5)
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-CG-ConcertScreen.png", "A picture of Concert Hall as a background. The picture contains the rectangular key on the foreground")
+
+        bodyDiv:AddHeading("Than you Screen", 5)
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-CG-ThanksScreen.png", "A Thak you screen with the user instruction")
+
+        bodyDiv:AddHeading("Steps of Creating Event Driven Program", 2)
+        bodyDiv:AddHeading("1. Designing the flow of the program at the beginning of the creation", 4)
+            Paragraph steps
+                steps:AddText("When you are creating an " + dq + "Event Driven App/Program', It is important to make a destine for the entire program's flow of the event at the beginning stage of the App/Program creation. This is design becomes the map for you to how to write the entire program.")
+        bodyDiv:Add(steps)
+        bodyDiv:AddHeading("2. Define the Event - by creating the actions that are needed to execute the event", 4)
+            Paragraph steps1
+                steps1:AddText("Some event requires a code block instead of a single line of code for the event to properly function. You may need to write the action for the code block for each event before you associate the code block to the event.")
+        bodyDiv:Add(steps1)
+        bodyDiv:AddHeading("3. Add the Event - by calling the action", 4)
+            Paragraph steps2
+                steps2:AddText("You now add a line of code, or the code block bundled in one action for the " + dq + "Event (Keyboard Event in this lesson)' to be executed by the computer.")
+        bodyDiv:Add(steps2)
+        bodyDiv:AddHeading("4. Run, Test, Debug!", 4)
+            Paragraph steps3
+                steps3:AddText("When you do the task 2 and 3 for each part of the code creation (that may or may not include the " + dq + "Event'), your code becomes valid executable code even if you have not finished the entire code. when you reach the such stage in your code writing, you MUST Run the code, Test whether it is running the way you wanted it to run, and Debug if it is not running properly. Throughout this lesson from hero and down, we will place " + dq + "** Run, Test, Debug!'  sign whenever you come to the point you can test run your incomplete project. Please watch out for that sign.")
+        bodyDiv:Add(steps3)
+
+        bodyDiv:AddHeading("Creating the Actions for " + dq + "Hiding and Showing' the Drawable Objects", 2)
+            Paragraph hideShow
+                hideShow:AddText("The first thing we need to learn for creating this Multi-Screen App is " + dq + "How to Hide and Show' the drawable objects. These drawable objects are already loaded with an image file, and already added to the program screen. In this first example, the template has done the loading-and-adding part of the job for all rectangular key objects.  We do not want the users to see these keys on the starting screen because the starting screen is dedicated to provide the user with the instruction of for your entire App. Therefore, you would like to " + dq + "Hide' these rectangular drawable objects at the beginning of your App. This process is strikingly simple. You call the " + dq + "Hide()' action on each key object as shown in the code below:")
+        bodyDiv:Add(hideShow)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "keyC:Hide()" + cr))
+
+            Paragraph hideShow1
+                hideShow1:AddText("With the level of programming knowledge we have learned so far, we unfortunately need to write this code for each single key objects. But… we do not want to do this in the middle of your code to unnecessarily clutter the file. We will create the action for this toward the bottom part of the file. Then we will " + dq + "call the action' in the appropriate place inside of the " + dq + "action CreateGame()' of Quorum Game Engine (QGE). At first, we will create this action that Hide all rectangular key objects. The template has the comment " + dq + "// Creating an action to hide all guitar keys' to show you where the appropriate place to write this code block. The code Example is shown below:")
+        bodyDiv:Add(hideShow1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Creating an action to hide all guitar keys" + cr
+                                                        +   "action HideGuitarKeys()" + cr
+                                                        +   "   keyC:Hide()" + cr
+                                                        +   "end"))
+
+            Paragraph hideShow2
+                hideShow2:AddText("In the next section of this lesson you will do this task. For now we will go on to learn how to " + dq + "Show' the hidden drawable object. This is also strikingly simple. You just call  the action 'Show()' from the drawable class on each hidden drawable objects that you want to show at the time. Once again, you need to do this for each objects. You will create the action for this code block toward the bottom part of the file as well. The code sample is shown below:")
+        bodyDiv:Add(hideShow2)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "//Creating an action to show all guitar keys" + cr
+                                                        +   "action ShowGuitarKeys()" + cr
+                                                        +   "   keyC:Show()" + cr
+                                                        +   "end"))
+
+        bodyDiv:AddHeading("Activity 1: Creating the separate actions for Hiding and Showing the drawable objects", 2)
+        bodyDiv:AddHeading("Coding Challenge 8: Creating action for Hiding all rectangular key objects", 4)
+            Paragraph act1
+                act1:AddText("Find the comments toward the bottom of the file in your template - " + dq + "// Creating an action to hide all guitar keys'. Write the action for hiding all rectangular key objects. *Note - You write the code for hiding all objects in one action.")
+        bodyDiv:Add(act1)
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE:GetIDETitle():AddText("Creating 'action HideGuitarKeys'")
+        addStatementIDE:GetIDESubtitle():AddText("Writing this action makes it easy for you to manage the flow of your code later on")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Coding Challenge 9: Creating action for Showing all rectangular key objects", 4)
+            Paragraph act1_1
+                act1_1:AddText("Find the comments toward the bottom of the file in your template - " + dq + "//Creating an action to show all guitar keys'. Write the action for hiding all rectangular key objects. *Note - You write the code for showing all objects in one action.")
+        bodyDiv:Add(act1_1)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE2:GetIDETitle():AddText("Creating 'action ShowGuitarKeys'")
+        addStatementIDE2:GetIDESubtitle():AddText("Writing this action makes it easy for you to manage the flow of your code later on")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("Calling the created action at the right place", 2)
+            Paragraph callAct
+                callAct:AddText("Now we have created two actions for the all rectangular-key objects. When the user run this  program, we do not want the keys to be showing. Therefore we need to hide all rectangular-key objects in the " + dq + "action CreateGame()' section of our code by default. Find the commented line " + dq + "// Calling the action for 'hiding' the guitar keys' in the template, and call your action. The sample code is shown below:")
+        bodyDiv:Add(callAct)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Calling the action for 'hinding' the guitar keys" + cr
+                                                        +   "HideGuitarKeys()"))
+
+            Paragraph callAct1
+                callAct1:AddText("Regarding the " + dq + "action ShowGuitarKeys()', we need to call this action when an appropriate key is pressed. We will work on that part later on.")
+        bodyDiv:Add(callAct1)
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD
+                runTD:AddText("When you run the program now, you should only see the empty screen with gray background.")
+        bodyDiv:Add(runTD)
+
+        bodyDiv:AddHeading("Creating the mechanism that sets Fonts to be used in the program", 2)
+        bodyDiv:AddHeading("Placing the " + dq + "use statement' whenever you use a new type of object", 4)
+            Paragraph fonts
+                fonts:AddText("A font object in Quorum language contains basic set of text attribute. The basic text attributes are " + dq + "font style', " + dq + "font size' and " + dq + "font color'. In order to set these attributes to one font, we need to first tell the computer we are using the font class from the Quorum standard libraries. You already know where to place the use statement. The use statement is shown below:")
+        bodyDiv:Add(fonts)
+            
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Font" + cr))
+
+            Paragraph fonts1
+                fonts1:AddText("Once the use statement is placed, you can go through the routine process of " + dq + "instantiating an object and running actions on the object' as usual. In the template, find the comment " + dq + "// Instantiating the Font objects'. Then instantiate two or three objects for from the Font class. Let's say your first font object's name is " + dq + "font1'. The following block of code shows how to set style, size and color for the " + dq + "font1'")
+        bodyDiv:Add(fonts1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "font1:LoadFont("+dq+"Arial"+dq+")" + cr
+                                                        +   "font:SetSize(48)" + cr
+                                                        +   "font:SetColor(red)" + cr))
+                
+            Paragraph fonts2
+                fonts2:AddText("But wait… We have instantiated two or three font objects haven't we? We do not want to repeat this block of code again and again for each font object. Let's use our " + dq + "Code Optimization' skill to make our code clean. You have learned this process already at the beginning of this lesson in the " + dq + "Review: … '. First, find the part that stays the same for each code block - usually the " + dq + "actions' you call from the " + dq + "font class'. Second, find the parts that could be the parameters (changeable values) in the code block and figure out what kind of value each parameter should be. For your convenience, we have the list that shows the type of each parameter for these actions.")
+        bodyDiv:Add(fonts2)
+            UnorderedList fontsList
+                AddListItemWithBoldAtFront(fontsList, "font1", " - This is an object we created from the Font class, and it's parameter type is " + dq + "Font'")
+                AddListItemWithBoldAtFront(fontsList, dq+"Arial"+dq, " - This is a style of font, and it is a 'text' variable")
+                AddListItemWithBoldAtFront(fontsList, "48", " - This is a size of font in point, and it is a " + dq + "integer' variable.")
+                AddListItemWithBoldAtFront(fontsList, "red", " - This is a color of the font, and it's parameter type is " + dq + "Color'")
+        bodyDiv:Add(fontsList)
+            
+        bodyDiv:AddHeading("Activity 2: Creating and Calling " + dq + "action SettingFonts(… with parameters …)'", 2)
+        bodyDiv:AddHeading("Coding Challenge 10: Creating " + dq + "action SettingFonts(… with parameters …)'", 4)
+            Paragraph act2
+                act2:AddText("Now you have all the information required for you to create a general action for setting a font with all primary attributes. You'd like to name your action according to the purpose of your action - like 'action SettingFonts(parameters…)'. Find the comments " + dq + "// Creating the action to set fonts' in the template and create your action for this purpose. If you have any question, please read the previous section in this  lesson - titled " + dq + "Review: Managing Complexity by Creating and Calling " + dq + "Actions'- " + dq + "Code Optimization''. You can find all information on the techniques and patterns you need to follow for doing this task and the next.")
+        bodyDiv:Add(act2)
+
+        SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE3:GetIDETitle():AddText("Creating 'action SettingFonts(with parameters)")
+        addStatementIDE3:GetIDESubtitle():AddText("Writing this action makes it easy for you to manage the flow of your code later on")
+        addStatementIDE3:SetGameEnvironment(true)
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+        bodyDiv:Add(addStatementIDE3:GetGameCanvas())
+
+        bodyDiv:AddHeading("Coding Challenge 11: Calling " + dq + "action SettingFonts(… with parameters …)'", 4)
+            Paragraph act2_1
+                act2_1:AddText("Now lets call this action in the main part of your code. Find the comment " + dq + "// Calling the actions for Setting the specific fonts to be used in the program'. Write your code under that line for the number of the fonts object you instantiated previously.** You would need the same number of lines as the number of fonts you instantiated in the first place.")
+        bodyDiv:Add(act2_1)
+
+        SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE4:GetIDETitle():AddText("Calling 'action SettingFonts(with parameters)")
+        addStatementIDE4:GetIDESubtitle():AddText("Now setting fornt for each fonts object is meade so easy.")
+        addStatementIDE4:SetGameEnvironment(true)
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+        bodyDiv:Add(addStatementIDE4:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD2
+                runTD2:AddText("When you run the program now, you will not see any change in the program behavior. However, your program should run without error.")
+        bodyDiv:Add(runTD2)        
+
+        bodyDiv:AddHeading("Creating the mechanism that sets Labels for each stage of the program", 2)
+            Paragraph labels
+                labels:AddText("The " + dq + "label' in Quorum Language is an area that we can place text (usually in English) elements of the screen display for the program. Although we can use the " + dq + "label' for many different purpose, we will use the label in this program to give the user a simple instruction for using each stage of the program. For this program, we need three labels - one for each stage of the program. We will be using the " + dq + "Code Optimization' technique again to minimize the clutter and managing the complexity of the code. ")
+        bodyDiv:Add(labels)
+            Paragraph labels1
+                labels1:AddText("Just like we did for a font object, we can set some basic  attribute to a label object. Which font are we using? How wide is the label area going to be? These are the two primary attribute we set for each label object. Unlike fonts, we actually " + dq + "Add' the labels to the program screen, therefore we need to set the location of the label, using the screen coordinate system we have learned. Finally but not least importantly, we need to place the " + dq + "text elements (instructional sentences)' in the label object. The code below shows how you can accomplish these tasks if you WERE to do each label setting for three labels without the use of action. Needless to say. before writing this code, 1.) you need to have placed the " + dq + "use statement for the label' in the proper area in the code, 2.) you need to have instantiated an object from the label class for each label for each stage of the program. The example below include such elements of the code as well.")
+        bodyDiv:Add(labels1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Font" + cr
+                                                        +   "" + cr
+                                                        +   "   // Instatiating the Label objects" + cr
+                                                        +   "   Label welcomeLabel" + cr
+                                                        +   "" + cr
+                                                        +   "   // Setting the attribute to the label object" + cr
+                                                        +   "   welcomeLabel:SetFont(font1)" + cr
+                                                        +   "   welcomeLable:SetWidth(700)" + cr
+                                                        +   "   welcomeLabel:SetText("+dq+"your instruction"+dq+")" + cr
+                                                        +   "   welcomeLabel:SetDescription("+dq+"your instruction"+dq+")" + cr
+                                                        +   "   welcomeLabel:SetPosition(50, 600)" + cr
+                                                        +   "   Add(welcomeLabel)" + cr))
+
+            Paragraph labels2
+                labels2:AddText("In this code block, you notice that there are two places where the phrase " + dq + "you instruction' is placed. The first placement of your instructional text is for the text elements for you computer screen. The second placement of the indexical instruction is for you to build the accessibility function for all users. Later on, we will use the [space key] to let the computer read aloud the text on the screen. The action " + dq + "SetDescription()' is used for this purpose. The following list shows the possible parameters for the general action you would create to do the same for all three label objects.")
+        bodyDiv:Add(labels2)
+            
+            UnorderedList labelsList1
+                AddListItemWithBoldAtFront(labelsList1, "welcomeLabel", " - This is a label object. It is a " + dq + "Label' for the parameter type.")
+                AddListItemWithBoldAtFront(labelsList1, "font1", " - This is the font we decided to use for this label. It is a " + dq + "Font' for the parameter type")
+                AddListItemWithBoldAtFront(labelsList1, "700", " -This width of the label area in pixel count. It is an " + dq + "integer' value")
+                AddListItemWithBoldAtFront(labelsList1, "" + dq +"your instruction" + dq + "", " - This is the instructional comment you write for each stage for the program. It is a " + dq + "text' value. **Note: You do not need to create two parameters for this value because the value we place in both occurrence of this text elements will be identical.")
+                AddListItemWithBoldAtFront(labelsList1, "50", " - This is the X-coordinate position of where the welcomeLabel is placed. It is a " + dq + "number' value.")
+                AddListItemWithBoldAtFront(labelsList1, "600", " - This is the Y-coordinate position of where the welcomeLabel is placed. It is a " + dq + "number' value.")
+        bodyDiv:Add(labelsList1)
+
+        bodyDiv:AddHeading("Activity 3: Creating " + dq + "action SetLabelsForEachScreen(with parameters)'", 2)
+        bodyDiv:AddHeading("Coding Challenge 12: Creating the action", 4)
+            Paragraph act3
+                act3:AddText("Follow the pattern of the process you have already learned several time for the code optimization. Find the comment " + dq + "// Creating the action to set labels' in the template and place your action in the lines below.")
+        bodyDiv:Add(act3)
+
+        SideBySideIDE addStatementIDE5
+        addStatementIDE5:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE5:GetIDETitle():AddText("Creating 'action SetLabelsForEachScreen(with parameters)")
+        addStatementIDE5:GetIDESubtitle():AddText("We will use this action ofr setting all three lable ofr each stage of the program.")
+        addStatementIDE5:SetGameEnvironment(true)
+        addStatementIDE5:Setup()
+        bodyDiv:Add(addStatementIDE5)
+        bodyDiv:Add(addStatementIDE5:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD3
+                runTD3:AddText("When you run the program now, you will not see any change in the program behavior. However, your program should run without error.")
+        bodyDiv:Add(runTD3)
+
+        bodyDiv:AddHeading("Calling " + dq + "action SetLabelsForEachScreen(with parameters)' ", 2)
+            Paragraph callingLabel
+                callingLabel:AddText("The beginning line of the action (the name of the action) you have created in the previous section should look similar to the following.")
+        bodyDiv:Add(callingLabel)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action SetLabelsForEachScreen(Label label, Font font, integer labelWidth, text comments, number positionX, number positionY)" + cr))
+
+            Paragraph callingLabel1
+                callingLabel1:AddText("When you call this action, there would be a major problem that makes you code so cluttered with sentences of instructional comments written on one long - line that is also the line you use to call this action. The computer could actually handle this complexity, but most likely you - the programer - cannot. Because you a limited by seeing certain length of the text on your screen - that is limited by the physical width of the screen. In order to avoid this problem, we will use the new concept called " + dq + "declaring the variable'. Since we look into this concept of the " + dq + "Variable' in depth in the later lessons in Unit5, we will just shoe you how ti is done in the code example below. And we will give you some cue to understand how ti is done.")
+        bodyDiv:Add(callingLabel1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "text welcomeComment = "+dq+"Welcome to the Concert Guitarist! - brah brah brah ..."+dq + cr
+                                                        +   "SetLabelsForEachScreen(welcomeLabel, font2, 700, welcomeComment, 30, 500)" + cr
+                                                        +   "welcomeLabel:Show()" + cr))
+
+            Paragraph callingLabel2
+                callingLabel2:AddText("In the code above, we have created (or declared) the text type variable called comment right before we call the " + dq + "action SetLabelsForEachScreen(with parameters)'. The variable is followed by " + dq + "=' sign and the text expression in double quotation marks. We use this variable " + dq + "welcomeComment' as one of the parameter when we call the action on the next line. In this way, we do not need to unnecessarily clutter the line we call the action. One more note here is that we called the action 'Show()' on the " + dq + "welcomeLabel' on the third line. This is because that the " + dq + "welcomeLabel' is the first instructional label for this program. When we call the " + dq + "action SetLabelsForEachScreen(with parameters)' for the other two labels, we need to call action 'Hide()' on both of them at the beginning. Later on this lesson, we will let them " + dq + "Show-up' on the screen when the user pressed a specific key on the keyboard.")
+        bodyDiv:Add(callingLabel2)
+
+        bodyDiv:AddHeading("Activity 4: Calling the " + dq + "action SetLabelsForEachScreen(with parameters)'", 2)
+        bodyDiv:AddHeading("Coding Challenge 13: Calling the action", 4)
+            Paragraph act4
+                act4:AddText("Find the comment " + dq + "// Calling the action for Setting the labels' in the ongoing template file. Use the same technique described above by creating/declaring text variable right before you call the " + dq + "SetLabelsForEachScreen(with parameters)' for all three label objects. do not forget to call " + dq + "Show()' action for the first label, and call " + dq + "Hide()' action for the second and third label.")
+        bodyDiv:Add(act4)
+
+        SideBySideIDE addStatementIDE6
+        addStatementIDE6:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE6:GetIDETitle():AddText("Calling 'action SetLabelsForEachScreen(with parameters)")
+        addStatementIDE6:GetIDESubtitle():AddText("We will call this action for all three label objects")
+        addStatementIDE6:SetGameEnvironment(true)
+        addStatementIDE6:Setup()
+        bodyDiv:Add(addStatementIDE6)
+        bodyDiv:Add(addStatementIDE6:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD4
+                runTD4:AddText("When you run the program now, you should see the label for the first screen on the gray background. This is the time you can compose the sentences for the instruction. Run the program again to adjust the label width, font size and th position of the label. Run, Test, Debug! Run, Test, Debug!")
+        bodyDiv:Add(runTD4)
+
+        bodyDiv:AddHeading("Adding the Background pictures to each stage of the program", 2)
+            Paragraph background
+                background:AddText("Adding the background picture to each screen is essential for the screen oriented programs. The change of the background picture instantaneously tells the user that a different stage of the program is reached, therefore he/she should expect different functionality from the program at that stage. ")
+        bodyDiv:Add(background)
+            Paragraph background1
+                background1:AddText("Coding for creating the background screen is very much straight forward process in Quorum Programming Language. The background picture is simply a large Drawable object. The background drawable is often resized to fit perfectly to the program screen's width and height. For this on-going project " + dq + "Concert Guitarist', we use three different background pictures. For the first screen, we will use the simple black background that is generated by the Quorum Game Engine (QGE). For the second and third screen, we will load the graphics file on to the corresponding Drawable objects.")
+        bodyDiv:Add(background1)
+            Paragraph background2
+                background2:AddText("You can start with the fist screen by going through the next process that you have already learned when you created the rectangular keys for each note in the lesson 2. ")
+        bodyDiv:Add(background2)
+            OrderedList bgList
+                bgList:AddListItem("Make sure you have use statement for the Drawable class - that you do in the template")
+                bgList:AddListItem("Instantiate an Drawable object for the first screen background")
+                bgList:AddListItem("Call LoadFilledRectangle(width, height, color) action on the object. Find the comment " + dq + "// Loading background screen for each stage' in the on-going project. Write the code in the line below. The screen size is 800 pixel width and 600 pixel height. The color should be " + dq + "black'.")
+                bgList:AddListItem("Add the object to the screen")
+        bodyDiv:Add(bgList)
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD4_1
+                runTD4_1:AddText("When you run the program now, you should see the message in the label on black background screen.")
+        bodyDiv:Add(runTD4_1)
+
+            Paragraph background3
+                background3:AddText("For the rest of the two screen background, you need to run " + dq + "Load(text filename)' action on the Drawable object that you created for each background, instead of calling the " + dq + "LoadFilledRectangle()' action. Also, you need to call 'Hide()' action after you added the object to the screen because you do not want the users to see the middle-of-program background and ending background at the beginning of the screen. The process of loading the graphics file onto the drawable object is exactly same as loading the audio file to the audio object. You need to specify the address and the name of the graphics file in the exact same way the file is located in you computer system.")
+        bodyDiv:Add(background3)
+
+        bodyDiv:AddHeading("The location of the graphics files", 5)
+
+        bodyDiv:AddImage("/files/code/Unit5/Location of graphics and audio files.png", "A picture showing the loationof the audio and the graphic files. The files are in the 'code' folder that is in the 'media' folder.")
+
+            Paragraph background4
+                background4:AddText("The picture above shows you the location and the name of the graphics we have prepared for this project. The location and name of the second screen background is " + dq + "/media/code/concert scene1.jpg', the third screen background is " + dq + "media/code/concertThankU.jpg' The example of the code for this part is shown below.")
+        bodyDiv:Add(background4)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "concertHall:Load("+dq+"/media/code/concert scene1.jpg"+dq+")" + cr
+                                                        +   "Add(concertHall)" + cr
+                                                        +   "concertHall:Hide()" + cr))
+
+        bodyDiv:AddHeading("Activity 5: Creating the action without parameter for managing the complexity in the code", 2)
+            Paragraph act5
+                act5:AddText("The picture above shows you the location and the name of the graphics we have prepared for this project. The location and name of the second screen background is " + dq + "/media/code/concert scene1.jpg', the third screen background is " + dq + "media/code/concertThankU.jpg' The example of the code for this part is shown below.")
+        bodyDiv:Add(act5)
+        bodyDiv:AddHeading("Coding Challenge 14: Creating " + dq + "action LoadConcertScreenForLaterUse'", 4)
+            Paragraph act5_1
+                act5_1:AddText("Find the comments " + dq + "// Creating the actions for loading the background screen for each phase of the program' in the on-going project. Create an action called " + dq + "LoadConcertScreenForLaterUse' in the lines below. You can almost copy and paste the code example above for this task. Once you get the idea, create you own action for the third screen background on the following lines. Once you are done with both tasks, find the comment " + dq + "// Calling the actions to get the other screen ready for later use' in the main coding area and call the actions in the lines below.")
+        bodyDiv:Add(act5_1)
+            
+        SideBySideIDE addStatementIDE7
+        addStatementIDE7:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE7:GetIDETitle():AddText("Creating and Calling actions that bundle the lines of code for the second screen background and the third screen background")
+        addStatementIDE7:GetIDESubtitle():AddText("")
+        addStatementIDE7:SetGameEnvironment(true)
+        addStatementIDE7:Setup()
+        bodyDiv:Add(addStatementIDE7)
+        bodyDiv:Add(addStatementIDE7:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD5
+                runTD5:AddText("hen you run the program now, you swill not see any change in the program behavior. Your program should run without error.")
+        bodyDiv:Add(runTD5)
+
+        bodyDiv:AddHeading("Adding the Background Audio to each stage of the program", 2)
+            Paragraph bgAudio
+                bgAudio:AddText("Adding audio to each stage of the program not only enhance the joy of the running the program but also provides the accessible audio cue for wide range of users. We have three stages/screens in this program, 1.) Welcome screen, 2.) Concert Hall screen, 3.) Thank you! screen. For each screen, we have prepared three background audio 1.) " + dq + "Intro-C.ogg', 2.) " + dq + "break.ogg' 3.) " + dq + "StadiumCheer.ogg'. All audio files are at the location of " + dq + "/media/code/'.")
+        bodyDiv:Add(bgAudio)
+
+        bodyDiv:AddHeading("Activity 6: Creating the System that plays specific background audio for each stage of the program in your code", 2)
+            Paragraph bgAudio1
+                bgAudio1:AddText("We have focused on learning how to do this part of coding in the lesson 2. The following is the step by step review of the process:")
+        bodyDiv:Add(bgAudio1)
+
+        bodyDiv:AddHeading("Coding Challenge 15", 4)
+            OrderedList act6List
+                act6List:AddListItem("Make it sure you have the use statement for the Audio class - that you do in this template.")
+                act6List:AddListItem("Instantiate the three audio object that represent the background sound for each stage of the program. Name them appropriately.")
+                act6List:AddListItem("Find the comment " + dq + "// Loading the Audio files to the Audio objects to be played later' in your on-going project. Load the audio files for all three audio objects.")
+                act6List:AddListItem("For the first audio object for the first screen, you would like to call " + dq + "EnableLooping()' action on the object.")
+                act6List:AddListItem("ind the comment " + dq + "// Letting the 'introAudio' to play at the start of the program'. Write the code to play the first audio at the beginning of the program.")
+        bodyDiv:Add(act6List)
+
+        SideBySideIDE addStatementIDE8
+        addStatementIDE8:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE8:GetIDETitle():AddText("Loading Audio files on Audio Objects for each stage of the program")
+        addStatementIDE8:GetIDESubtitle():AddText("")
+        addStatementIDE8:SetGameEnvironment(true)
+        addStatementIDE8:Setup()
+        bodyDiv:Add(addStatementIDE8)
+        bodyDiv:Add(addStatementIDE8:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD6
+                runTD6:AddText("When you run the program now, you should hear the introductory sound playing from the computer. It should be repeating the same tune.")
+        bodyDiv:Add(runTD6)
+
+        bodyDiv:AddHeading("Creating additional Keyboard Event that controls the flow of the program", 2)
+            Paragraph addKeys
+                addKeys:AddText("Now we have all the pieces ready to be used to make this program into Multi-Screen App. Only thing we need to do is to create the mechanism in our code that hides and shows the drawable objects as well as plays and stops audio objects, based on the user's choice of keyboard input. The flow of this program goes like this:")
+       bodyDiv:Add(addKeys)
+            OrderedList addKeyList
+                addKeyList:AddListItem("When our program starts, the user will hear the introductory background sound. At this point, the user can either read the instruction on the screen or press [space] key on the keyboard to let the computer read the instruction aloud. The instruction should include all information about how to use this program. It should also say " + dq + "Press [1 (on the number row)] to go into the Concert Hall' toward the end of the instruction.")
+                addKeyList:AddListItem("When the user press [1], the whole screen changes to the Concert Hall scene, and the background music for a rock concert will start playing. At the same time, all rectangular keys for the note will appear on the concert hall back ground. While the user is on this screen (or in this stage of the program), the user can play the guitar tunes with the press of the middle row and upper low keys. The user can press [space] key to have the computer read aloud the message on the screen that reads " + dq + "press [escape] to end the concert.'")
+                addKeyList:AddListItem("When the user press [escape] from the Concert Hall screen, the program will display the a scene of a crowd cheering with the sound to match the graphics. the user once again can press the [space] to have the computer read aloud the message on the screen that reads " + dq + "press [escape] to exit the program or press [1] to go back to the concert hall.'")
+        bodyDiv:Add(addKeyList)
+            Paragraph addKeys1
+                addKeys1:AddText("In order for you to create this mechanism in your code, you need to learn the concept of " + dq + "if - control structure'.  This concept is also called " + dq + "if-conditional'. It controls how your code works depending on the stage of the program the user is in,  and on the choices the user makes. We ware going to learn this concept in-depth in the following lessons. For now we have prepared the template to make this process easy for you. But at first, we need to find the right place to insert this template. Find the lengthy comment - shown below - in your on-going code.")
+       bodyDiv:Add(addKeys1)
+            
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   //Setting number '1' key for changing from introduction screen to Concert" + cr
+                                                        +   "   //Hall screen if the user is int the introduction screen. If the user is " + cr
+                                                        +   "   //n the Thank you screen, the same key changes the scne and the program" + cr
+                                                        +   "   //function back to the concert hall. If the user is in the concert hall" + cr
+                                                        +   "   //function back to the concert hall. If the user is in the concert hall" + cr
+                                                        +   "   //user is in the 'Thank you' screen, the same key will 'end/exit' the" + cr
+                                                        +   "   //program " + cr))
+
+            Paragraph addKeys2
+                addKeys2:AddText("This comment is placed right in the middle of the " + dq + "if - control structure' on purpose. The template below WILL NOT work unless you insert the entire template right under this comment.")
+        bodyDiv:Add(addKeys2)
+
+        bodyDiv:AddHeading("The template to set the Keyboard Event for changing the screen or the stage of the program", 2)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   elseif event:keyCode = event:NUM_1" + cr
+                                                        +   "       if welcomeScreen:IsShowing()" + cr
+                                                        +   "   " + cr
+                                                        +   "       elseif thanksScreen:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "       end" + cr
+                                                        +   "   elseif event:keyCode = event:ESCAPE" + cr
+                                                        +   "       if concertHall:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "       elseif thanksScreen:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "       end" + cr))
+
+            Paragraph temp
+                temp:AddText("Let's look at this template for brief explanation. This template contains the concept called " + dq + "Nested if conditional'. In a nutshell, the keys used in this template for the Keyboard Event is [1 (on the number row)] and [escape]. However, these two keys need to function differently depending on the " + dq + "condition' or the stage of the program. Therefore we have another " + dq + "if conditional' inside of the " + dq + "(parent) elseif' sections. The key [1] is used in the " + dq + "welcome screen/stage' to enable the user to change the screen to the " + dq + "concert hall screen/stage' So you would write your code to do such function of the program under the line " + dq + "if welcomeScreen:IsShowing()'. But wait… The key [1] is also used in the " + dq + "Thank you screen/stage' to give the user an option to go back into the " + dq + "concert hall screen/stage' as well. So you would write the code for such function of your program under the line " + dq + "elseif thanksScreen:IsShowing()'. The exact same explanation applies to the use of the [escape] key.")
+        bodyDiv:Add(temp)
+            Paragraph temp1
+                temp1:AddText("Insert (copy and paste) the template into the " + dq + "right place' in your on-going code. We will discuss the code to write int he section.")
+        bodyDiv:Add(temp1)
+
+        bodyDiv:AddHeading("The code block that controls the hiding and showing of the Drawable objects, as well as the playing and stopping of the Audio objects", 2)
+            Paragraph temp2
+                temp2:AddText("This code block is straight forward to write because the code follows your thinking process on what to hide and what to show next. We will go through this thinking process together for the change of the screen from the " + dq + "Welcome screen' to the " + dq + "Concert Hall screen'.")
+        bodyDiv:Add(temp2)
+            OrderedList tempList
+                tempList:AddListItem("To start with, the code block will be somewhat lengthy and it may create the clutter in your code if you write directly into the proper spot in the template. So we will create an action toward the bottom of the file. We call this action " + dq + "ChangeIntroToConcert'")
+                tempList:AddListItem("At the starting of the program the following objects are showing or playing: 1.) the Drawable object for the black background, 2.) the Label object for the instructional message for the welcome screen 3.) the Audio object for the introduction screen.")
+                tempList:AddListItem("You would like to call " + dq + "Hide()' or " + dq + "Stop()' action on these object (when user press the key [1]).")
+                tempList:AddListItem("Once you hide and stop the objects for welcome screen/stage, you would like to call action " + dq + "Show()' or " + dq + "Play()' on the object you would need for the next screen/stage - " + dq + "Concert Hall'. The objects are: 1.) the Drawable object for the concert hall background graphics, 2.) the Label objects for the concert hall instruction, 3.) the Audio object for the concert hall background music.")
+                tempList:AddListItem("One more thing - and most important: Do you remember we have created the action called " + dq + "ShowGuitarKeys()' at the beginning of this lesson for displaying all rectangular key objects on the screen? We " + dq + "call' the action right inside of this action. That should complete the whole stage setting for the next screen - concert hall")
+                tempList:AddListItem("Now we call this action in the proper place in the template - under the line " + dq + "if welcomeScreen:IsShowing()'.")
+        bodyDiv:Add(tempList)
+            Paragraph temp3
+                temp3:AddText("The code below showsan example for creating this action.")
+        bodyDiv:Add(temp3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action ChangeIntroToConcert" + cr
+                                                        +   "   introAudio:Stop()" + cr
+                                                        +   "   welcomeScreen:Hide()" + cr
+                                                        +   "   welcomeLabel:Hide()" + cr
+                                                        +   "   concertHall:Show()" + cr
+                                                        +   "   concertLabel:Show()" + cr
+                                                        +   "   ShowGuitarKeys()concertBGM:Play()" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   ""))
+
+        bodyDiv:AddHeading("Activity 7: Creating and Calling the action for other screen/stage changes", 2)
+        bodyDiv:AddHeading("Coding Challenge 16: Create and Call the following two actions in the " + dq + "right place' in your code", 4)
+            UnorderedList escList
+                escList:AddListItem("ChangeThanksToConcert()")
+                escList:AddListItem("ChangeConcertToThanks()")
+        bodyDiv:Add(escList)
+
+        SideBySideIDE addStatementIDE9
+        addStatementIDE9:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE9:GetIDETitle():AddText("Creating and Calling the actions for Screen Change")
+        addStatementIDE9:GetIDESubtitle():AddText("")
+        addStatementIDE9:SetGameEnvironment(true)
+        addStatementIDE9:Setup()
+        bodyDiv:Add(addStatementIDE9)
+        bodyDiv:Add(addStatementIDE9:GetGameCanvas())
+
+        bodyDiv:AddHeading("Adding the 'Exit' to the program", 4)
+            Paragraph addExit
+                addExit:AddText("")
+        bodyDiv:Add(addExit)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Exit()" + cr))
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD7
+                runTD7:AddText("When you run the program now, your program should be almost fully functional. press key [1] to change the program stage from the Welcome screen to the Connect Hall screen. Press [escape] key in the Concert Hall screen to see if it is functioning in the way you programed. Press and test all other keys for its proper functionality in each stage of the program. ")
+        bodyDiv:Add(runTD7)
+
+        bodyDiv:AddHeading("Adding Accessibility to the Program/App", 2)
+            Paragraph access
+                access:AddText("Modern day program requires the programmers to consider wide variety of users for the program. There could be children or elderly persons using the program we write. There could be persons with disabilities using our program. In this lesson, we have already sawn a seed in our code to make this program/app accessible. Do you remember that we included the action " + dq + "SetDescription()' when we were calling actions for our Label object? We will make the use of it now, and make the computer read the description in the screen aloud when the user press the [space] key. The following is the process to make this happen:")
+        bodyDiv:Add(access)
+            OrderedList accessList
+                accessList:AddListItem("Place the " + dq + "use statement' for Speech class.")
+                accessList:AddListItem("Instantiate an object from the Speech class.")
+                accessList:AddListItem("Call the action " + dq + "Say(object:GetDescription())' on the object")
+        bodyDiv:Add(accessList)
+            Paragraph access1
+                access1:AddText("It is needless to say that you need to do these tasks at the " + dq + "right place' in your code. I believe you already know where the right place is for the task 1 and 2. We will talk about the " + dq + "right place' for the task 3 in the following activity. For now, the code below shows the example code for each task:")
+        bodyDiv:Add(access1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Sound.Speech" + cr
+                                                        +   "   " + cr
+                                                        +   "   Speech speech" + cr
+                                                        +   "" + cr
+                                                        +   "   speech:Say(welcomeLabel:GetDescription())" + cr))
+            
+        bodyDiv:AddHeading("Activity 8: Adding the accessibility for the label on each screen/stage ", 2)
+        bodyDiv:AddHeading("Coding Challenge 17", 4)
+            Paragraph act8
+                act8:AddText("Find the comment " + dq + "//Setting the 'space' key for speaking the instruction on the screen' in your on-going code. It should be right under the section you worked on for the Activity 7. Insert (copy and paste) the following template right below the comment.")
+        bodyDiv:Add(act8)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "elseif event:keyCode = event:SPACE" + cr
+                                                        +   "   if welcomeScreen:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif concertHall:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif thanksScreen:IsShowing()" + cr
+                                                        +   "" + cr
+                                                        +   "   end" + cr))
+
+            Paragraph act8_1
+                act8_1:AddText("Assuming that you have already done the routine process of placing use statement and instantiating a speech object, we write the code in the blank space within the smaller " + dq + "if control structure (between if and end in the template)'. The code you write is almost identical to each other. The code below is an example. You need to replace the part " + dq + "labelObject' with the name of the Label object you used for each label for each screen.  **Note: You would use the same " + dq + "Speech object' for all three expression.")
+        bodyDiv:Add(act8_1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   speech:Say(labelObject:GetDescription())" + cr))
+
+        SideBySideIDE addStatementIDE10
+        addStatementIDE10:SetUniqueIdentifier("startGamesIDE")
+        addStatementIDE10:GetIDETitle():AddText("Unsing the Speech object to speak the on-screen message when the [space] key is pressed")
+        addStatementIDE10:GetIDESubtitle():AddText("")
+        addStatementIDE10:SetGameEnvironment(true)
+        addStatementIDE10:Setup()
+        bodyDiv:Add(addStatementIDE10)
+        bodyDiv:Add(addStatementIDE10:GetGameCanvas())
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD8
+                runTD8:AddText("Now the space key should be reading your instruction on the screen.")
+        bodyDiv:Add(runTD8)
+
+        bodyDiv:AddHeading("The finishing touch", 2)
+            Paragraph final
+                final:AddText("All the work we have done the section above could be useless if the user - who need the computer voice - does not know that he/she can press the [space] key on any screen to make the computer talk. What if we have a way to share this information to the users during our program is booting up. The answer is " + dq + "Yes'. Find the comment " + dq + "// Making your computer to speak simple instruction before starting the program'  in " + dq + "action Main' area. And paste the code below: ** Note: This function may or may not be available on some computer or on some web-browser.")
+        bodyDiv:Add(final)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "// Making your computer to spaek simple instruction before starting the program" + cr
+                                                        +   "say "+dq+"When the program starts, press 'space key to listen to the comments on each screen."+dq + cr))
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph runTD9
+                runTD9:AddText("When you run the program now, the program may take a little longer time to start. During that time, the computer should be speaking informing the user about the trick to use the [space] key.")
+        bodyDiv:Add(runTD9)
+
+        bodyDiv:AddHeading("wrap Up", 2)
+            Paragraph wrapup
+                wrapup:AddText("Creating a fully functional user-oriented program is a challenge even if the function of the App/Program itself is relatively simple. We - the programmers - always need to think of our program from the user's point of view, and try to make it as user friendly as possible. This task requires us to be as meticulous as possible. If you are successful following this lesson, you had a first experience of real programming. Great job!")
+        bodyDiv:Add(wrapup)
+        bodyDiv:AddHeading("Exemplar Solutions:", 4)
+            UnorderedList wrapupList
+                wrapupList:AddListItemLink("Unit5-KeyboardGuitor.zip", "/files/code/Unit5/Unit5-KeyboardGuitor.zip")
+                wrapupList:AddListItemLink("Unit5-Exemplar Solution.rtf", "/files/cpde/Unit5/Unit5-Exemplar Solution.rtf")
+        bodyDiv:Add(wrapupList)
+*/
+
+        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.1.1 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "1.2.1 (A, B, C, E)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.1 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.2 (A, B, C, D, E, F, J)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.3 (B, C, D)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.4.1 (E,F, G, L)")
+        bodyDiv:Add(list)
+
+/* Completed 4/29/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the skill of 'Creating Multi-screen App with Event Driven Programming'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 3 (Creating Multi Screen Apps with Event Driven Programming)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 3"
+    end
+    action GetShortDescription returns text
+        return "Learn about creatint Multi Screen Apps with Event Driven Programming"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson3A.html"
+    end
+
+end
+
+ 
+    

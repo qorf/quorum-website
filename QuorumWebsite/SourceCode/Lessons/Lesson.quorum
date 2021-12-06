@@ -1,0 +1,353 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.MetaData
+use Libraries.System.File
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.StrongText
+use Libraries.Web.Page.HeaderLink
+use Libraries.Web.Page.WebPageHeader
+use Libraries.Web.Page.MainContent
+use Libraries.Containers.Array
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Script
+
+
+class Lesson is WebPage
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+    Lesson nextLesson = undefined
+    text scriptsLocation = "/script/"
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Quorum Lessons - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Quorum Lessons", 1)
+        headDiv:AddText("These pages provide extra labs and assignments that can be freely used in the classroom.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        ComboButtonList comboButtons
+        comboButtons:AddComboButton("Join Mary in an Hour of Code", "/media/HourOfCodeDark.png", "hourofcode/part1.html")
+        comboButtons:AddComboButton("1: Tutorials on Quorum", "/media/quorumoffline.png", "reference.html")
+        comboButtons:AddComboButton("2: Variables and Types", "/media/basics/variables.png", "lessons/chapter2.html")
+        comboButtons:AddComboButton("3: Control Structures", "/media/control.png", "lessons/chapter3.html")
+        comboButtons:AddComboButton("4: Actions", "/media/basics/actions.png", "lessons/chapter4.html")
+        comboButtons:AddComboButton("5: Classes", "/media/basics/classes.png", "lessons/chapter5.html")
+        comboButtons:AddComboButton("6: Inheritance", "/media/basics/inheritance.png", "lessons/chapter6.html")
+
+        bodyDiv:Add(comboButtons)
+
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetTextFromSource(text path) returns text
+        File file
+        file:SetPath(path)
+        text value = file:Read()
+        return value
+    end
+
+    action GetNextLesson returns Lesson
+        return nextLesson
+    end
+
+    action SetNextLesson(Lesson next)
+        nextLesson = next
+    end
+
+    action GenerateList(Array<text> list) returns OrderedList
+        OrderedList ol
+        integer i = 0
+        repeat while i < list:GetSize()
+            ol:AddListItem(list:Get(i))
+            i = i + 1
+        end
+        
+        return ol
+    end
+
+    action GetName returns text
+        return ""
+    end
+
+    action GetShortDescription returns text
+        return ""
+    end
+
+    action AddDefaultHeaders
+        //add language headers
+        me:AddAttribute("xml:lang", "en")
+        me:SetLanguage("en")
+
+        //add the meta-data character set
+        MetaData charset
+        charset:SetCharacterSet("UTF-8")
+        AddMetaData(charset)
+
+        MetaData viewport
+        viewport:SetContent("width=device-width, initial-scale=1")
+        viewport:SetName("viewport")
+        AddMetaData(viewport)
+
+        text metaDescriptionContent = GetMetaDescription()
+        if metaDescriptionContent not= undefined
+            MetaData description
+            description:SetContent(metaDescriptionContent)
+            description:SetName("description")
+            AddMetaData(description)
+        end
+
+        AddKeywords()
+        AddScript("/script/jquery-1.8.3.min.js")
+        AddScript("/script/QuorumStandardLibrary.js")
+        AddScript("/script/script.js")
+        AddScript("/script/prism-quorum.js")
+        Script moduleLocateFile
+        moduleLocateFile:SetCode("        var Module = {
+            locateFile: function(path, prefix) {
+                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
+                return prefix + path;
+            }
+        };")
+        GetWebPageHeader():Add(moduleLocateFile)
+        AddScript("/script/load.js")
+       
+        
+        //add style sheet tags
+        AddStylesheet("/style/style.css")
+        AddStylesheet("/style/google.css")
+        AddIcon("/media/favicon.ico")
+
+        //Add Responsive Stylesheets
+        WebPageHeader webHeader = me:GetWebPageHeader()
+        webHeader:Add(GetMediaStyleSheet("/style/style-small.css", "(max-width: 500px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css", "(min-width: 501px) and (max-width: 1000px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-large.css", "(min-width: 1001px)"))
+
+        //Add the navigation bar
+        NavigationBar navigation
+        Add(navigation)
+    end
+
+    action AdjustMain(MainContent mainRegion)
+        mainRegion:AddAttribute("role","main")
+        mainRegion:SetIdentifier("main")
+        mainRegion:SetTabIndex("-1")
+    end
+
+    action GetMediaStyleSheet(text name, text media) returns HeaderLink
+        HeaderLink link
+        link:SetAddress(name)
+        link:SetType("text/css")
+        link:SetRelationship("stylesheet")
+        link:SetMedia(media)
+        return link
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, game programming, 
+        lego programming, computer courses, programming 3D, programming,
+        animation, graphics, multimedia, games, accessibility, computer science for all,
+        computer science, computer languages, Quorum programming language, robot programming,
+        online programming")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return undefined
+    end
+
+    // wrappers for html tags
+    action AddItalicFront(text italic, text nonitalic) returns text
+        return "<i>" + italic + "</i>" + nonitalic 
+    end
+
+    action AddTextBoldFront(text bold, text nonbold) returns text
+        return "<b>" + bold + "</b>" + nonbold
+    end
+
+    action AddStrongTag(text strong) returns text
+        return "<strong>" + strong + "</strong>"
+    end
+
+    action AddCodeTag(text code) returns text
+        return "<code>" + code + "</code>"
+    end
+
+    action AddListItemWithBoldAtFront(UnorderedList list, text bold, text value)
+        ListItem item
+        StrongText myBold
+        myBold:AddText(bold)
+        item:Add(myBold)
+
+        item:AddText(value)
+
+        list:Add(item)
+    end
+
+    action MakeNestedUnorderedList(Array<text> list) returns text
+
+        text unorderedList = "<ul>"
+        integer iterator = 0
+
+        repeat list:GetSize() times
+            unorderedList = unorderedList + "<li>" + list:Get(iterator) + "</li>"
+            iterator = iterator + 1
+        end
+    
+        return unorderedList + "</ul>"
+    end
+
+    action MakeNestedOrderedList(Array<text> list) returns text
+
+        text orderedList = "<ol>"
+        integer iterator = 0
+
+        repeat list:GetSize() times
+            orderedList = orderedList + "<li>" + list:Get(iterator) + "</li>"
+            iterator = iterator + 1
+        end
+    
+        return orderedList + "</ol>"
+    end
+
+    // HTML tags for general tables
+    // general format is add tags to text, then add text to array (for both rows and columns) 
+    // then the "rows" array 
+
+    action AddTableHeaderTag(Array<text> headerText) returns text
+        text columnTextWithTags = ""
+        integer iterator = 0
+
+        repeat headerText:GetSize() times
+            columnTextWithTags = columnTextWithTags + "<th>" + headerText:Get(iterator) + "</th>"
+            iterator = iterator + 1
+        end
+
+        return columnTextWithTags
+    end
+
+    action AddTableDataTag(Array<text> columnText) returns text
+        text columnTextWithTags = ""
+        integer iterator = 0
+
+        repeat columnText:GetSize() times
+            columnTextWithTags = columnTextWithTags + "<td>" + columnText:Get(iterator) + "</td>"
+            iterator = iterator + 1
+        end
+
+        return columnTextWithTags
+    end 
+
+    action AddTableRowTag(Array<text> rowEntries) returns text
+        text rowTextWithTags = ""
+            integer iterator = 0
+        repeat rowEntries:GetSize() times
+            rowTextWithTags = rowTextWithTags + "<tr>" + rowEntries:Get(iterator) + "</tr>"
+            iterator = iterator + 1
+        end
+        return rowTextWithTags
+    end
+
+    action AddTableTag(text tableRows) returns text 
+        return "<table>"  + tableRows + "</table>"
+    end
+
+    action GetSummaryName returns text
+        return ""
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetLocation returns text
+        return ""
+    end
+
+    /*
+        This is a helper action for creating an IDE on a page and potentially including source code in it.
+        If codePath is undefined, it is ignored. If it points to an invalid file, an error is thrown.
+
+        Attribute: Parameter div
+        Attribute: Parameter ideName this name must be unique
+        Attribute: Parameter the title of the IDE
+        Attribute: Parameter the subtitle of the IDE
+        Attribute: Parameter a path to a file with the code that lives in this IDE
+    */
+    action AddIDE(Division div, text ideName, text title, text subtitle, text codePath)
+        CodingOnline ide
+        ide:SetDevelopmentLabel(title)
+        ide:SetUniqueIdentifier(ideName)
+        ide:Setup()
+        ide:GetIDESubtitle():AddText(subtitle)
+        div:Add(ide)
+
+        if codePath not= undefined
+            File file
+            file:SetPath(codePath)
+            if file:Exists() and file:GetFileSize() > 0
+                ide:GetIDEInputArea():AddText(file:Read())
+            end
+        end
+    end
+
+    action AddIDE(Division div, text ideName, text title, text subtitle)
+        AddIDE(div, ideName, title, subtitle, undefined)
+    end
+
+    action AddSideBySideIDE(Division div, text ideName, text title, text subtitle)
+        CodingOnline ide
+        ide:SetDevelopmentLabel(title)
+        ide:SetUniqueIdentifier(ideName)
+        ide:Setup()
+        ide:GetIDESubtitle():AddText(subtitle)
+        div:Add(ide)
+    end
+
+    action AddGameIDE(Division div, text ideName, text title, text subtitle)
+        CodingOnline ide
+        ide:SetDevelopmentLabel(title)
+        ide:SetUniqueIdentifier(ideName)
+        ide:Setup()
+        ide:GetIDESubtitle():AddText(subtitle)
+        div:Add(ide)
+    end
+
+    action Write(text prepend)
+        text value = GetLocation()
+        File file
+        file:SetPath(prepend + value)
+        File parentFile = file:GetParentDirectory()
+        if parentFile not= undefined and not parentFile:Exists()
+            parentFile:CreateDirectories()
+        end
+        file:Write(Generate())
+    end
+
+    action WriteNextTutorial(Division div)
+        //Link to the next tutorial
+        Lesson lesson = GetNextLesson()
+        if lesson not= undefined
+            div:AddHeading("Next Tutorial", 2)
+            Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
+            next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            next:AddText(", which describes " + lesson:GetShortDescription() + ".")
+        end
+    end
+end

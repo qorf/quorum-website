@@ -1,0 +1,608 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+
+class Lab2_5 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Lab 2.5: Displaying an Image - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page-specific header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Lab 2.5: Displaying an Image ", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("In this lab, we will learn the following computer science concepts:")
+        
+        UnorderedList goalList
+        goalList:AddListItem("Accessing the Quorum Standard Library")
+        goalList:AddListItem("Creating Objects")
+        goalList:AddListItem("Calling Actions on Objects")
+        bodyDiv:Add(goalList)
+
+
+        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+
+        UnorderedList list
+        AddListItemWithBoldAtFront(list, "Big Idea: Creativity: ", "EU 1.2, LO 1.2.1, EK 1.2.1A, EK 1.2.1B, EK 1.2.1C, EU 1.3, LO 1.3.1, EK 1.3.1A, EK 1.3.1C")
+        AddListItemWithBoldAtFront(list, "Big Idea: Programming: ", "EU 5.1, LO 5.1.1, EK 5.1.1A")
+        bodyDiv:Add(list)
+
+         bodyDiv:AddHeading("Common Core Standards", 2)
+        UnorderedList ccList
+        AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
+        CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.6, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.9-10.1, CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.8, CCSS.ELA-Literacy.RST.9-10.9")
+        AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
+        CCSS.Math.Practice.MP8,")
+        bodyDiv:Add(ccList) 
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+        UnorderedList vocabularyList
+        vocabularyList:AddListItem("Library")
+        vocabularyList:AddListItem("Object")
+        vocabularyList:AddListItem("Instantiation")
+        vocabularyList:AddListItem("Action Call")
+        vocabularyList:AddListItem("Parameters")
+        vocabularyList:AddListItem("Parameter Passing")
+        vocabularyList:AddListItem("Pixels")
+        vocabularyList:AddListItem("PNG file extension")
+        vocabularyList:AddListItem("JPG file extension")
+        bodyDiv:Add(vocabularyList)
+        
+
+        bodyDiv:AddHeading("Overview", 2)
+
+
+        Paragraph p1 
+        p1:AddText("This lab demonstrates the use of the ")
+        CodeBlock gamesCode
+        gamesCode:AddText("Game")
+        p1:Add(gamesCode)
+        p1:AddText(" library in Quorum. The ")
+        p1:Add(gamesCode)
+        p1:AddText(" library can be used to display graphics to the screen, which is an important first step in making games. 
+                    The Quorum Game Engine supports image files with the ")
+        p1:AddLink( dq + ".png" + dq , "https://en.wikipedia.org/wiki/Portable_Network_Graphics")
+        p1:AddText(" or the ")
+        p1:AddLink( dq + ".jpg" + dq , "https://en.wikipedia.org/wiki/JPEG")
+        p1:AddText(" file extensions. You will write a program that displays an image to the screen. 
+                    This lab can be completed in Sodbeans or online. For Sodbeans, download this ")
+        p1:AddLink( dq + "zip file" + dq , "/files/lessons/chapter2/Lab2_5Template.zip")
+        p1:AddText(" for the template to help you get started. 
+                    To open the template, follow these steps:")
+        bodyDiv:Add(p1)
+
+        bodyDiv:AddParagraph("1. Download and extract the zip file")
+        bodyDiv:AddParagraph("2. Open NetBeans")
+        Paragraph overview3 
+        overview3:AddText("3. Under ")
+        Bold fileBold
+        fileBold:AddText("File")
+        overview3:Add(fileBold)
+        overview3:AddText(", click ")
+        Bold openProjectBold
+        openProjectBold:AddText("Open Project")
+        overview3:Add(openProjectBold)
+        bodyDiv:Add(overview3)        
+        bodyDiv:AddParagraph("4. Navigate to where you downloaded the zip file")
+        Paragraph overview5 
+        overview5:AddText("5. Select your project and click ")
+        overview5:Add(openProjectBold)
+        bodyDiv:Add(overview5)
+
+        bodyDiv:AddParagraph("You may also use this IDE to write and test your code.")
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("lab2_5IDE")
+        addStatementIDE:GetIDETitle():AddText("Displaying an Image")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+
+/*
+    This is a default class for creating a game in Quorum. Note that the Main 
+    action begins by calling StartGame(), which loads a window a game can 
+    be displayed in. The action CreateGame is where the game should load any 
+    assets, like images to be displayed, frames of animation, or sounds to be
+    played. 
+*/
+
+class Main is Game
+
+    /*
+        This action, Main, starts our computer program. In Quorum, programs always
+        begin from Main.
+    */
+
+    action Main
+        StartGame()
+    end
+
+    /*
+        This action sets up the default values for a game. For example, we might
+        use the Libraries.Game.Graphics.Drawable class to load up an image or 
+        a shape. Or, we might add a Libraries.Interface.Button for making something clickable
+        or a Libraries.Interface.TextBox for gathering user input in a game.
+    */
+
+    action CreateGame
+    end
+
+    /*
+        The update action is called on every " + dq + "frame" + dq + "of animation in a game. This
+        action should be used to do operations on items. So, for example, we 
+        might use this action to change frames of animation, to rotate items, 
+        or to make creatures jump.
+    */
+
+    action Update(number seconds)
+    end
+end")
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Goal 1: Accessing the Quorum Standard Library", 2)
+        Paragraph p2  
+        p2:AddText("Open the provided template and navigate to the ")
+        Bold mainBold
+        mainBold:AddText("main.quorum")
+        p2:Add(mainBold)
+        p2:AddText(" file.")
+        bodyDiv:Add(p2)
+ 
+        Paragraph p3
+        CodeBlock c3
+        c3:AddText("class Main is Game")
+        p3:AddText("This assignment makes use of the Quorum ")
+        p3:Add(gamesCode)
+        p3:AddText(" Library in the Quorum Standard Library. 
+                    You need to type the code to include these libraries at the very top of the ")
+        p3:Add(mainBold)
+        p3:AddText(" file, above the line that starts with ")
+        p3:Add(c3)
+        p3:AddText(" on line 11 of the file.")
+        bodyDiv:Add(p3)
+
+        Paragraph p31
+        CodeBlock drawableCode 
+        CodeBlock c31 
+        drawableCode:AddText("Drawable")
+        c31:AddText("Libraries.Game.Graphics.Drawable")
+        p31:AddText("Begin by typing the appropriate code to use the Quorum Game Engine Libraries in your project. The ")
+        p31:Add(drawableCode)
+        p31:AddText(" Library is called ")
+        p31:Add(c31)
+        p31:AddText(" and is used to draw objects on the screen.")
+        bodyDiv:Add(p31)
+
+        bodyDiv:Add(break)
+
+        bodyDiv:AddHeading("Example: Tell Quorum you want access to graphics.", 4)
+
+        CodeBlock example1Code
+        Span s1
+        s1:AddText(     "// this line tells Quorum we will be using the Graphics library to draw images to the screen" + cr)
+        s1:SetClassAttribute("comment")
+        example1Code:Add(s1)
+        example1Code:AddText(    "use Libraries.Game.Graphics.Drawable" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example1Code))
+
+
+        bodyDiv:AddParagraph("Any time you want to use a Quorum library, you need to include a statement like this at the top of your program code that lets Quorum know that you will be using that library.")
+
+
+        Paragraph p4
+        CodeBlock fileCode
+        fileCode:AddText("File")
+        CodeBlock cb4
+        cb4:AddText("Libraries.System.File")
+        CodeBlock useCode
+        useCode:AddText("use")
+        p4:AddText("In order to work with files, you also need to use the ")
+        p4:Add(fileCode)
+        p4:AddText(" library. The ")
+        p4:Add(fileCode)
+        p4:AddText(" library is called ")
+        p4:Add(cb4)
+        p4:AddText(". Add a statement to your project that allows you to use the Quorum ")
+        p4:Add(fileCode)
+        p4:AddText(" library, below the other ")
+        p4:Add(useCode)
+        p4:AddText("statements.")
+        bodyDiv:Add(p4)
+
+
+//        SideBySideIDE addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("addStatementIDE")
+//        addStatementIDE:GetIDETitle():AddText("Activity: Add Statement")
+//        Paragraph p5
+//        p5:AddText("Add the ")
+//        p5:Add(useCode)
+//        p5:AddText(" statement for the ")
+//        p5:Add(fileCode)
+//        p5:AddText(" library.")
+//        addStatementIDE:SetIDESubtitle(p5)
+//        addStatementIDE:SetGameEnvironment(true)
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        //bodyDiv:AddHeading("Activity: Add the use statement for the file library.", 4)
+
+
+//        Paragraph activity1Paragraph
+//        Bold activity1Bold
+//        activity1Bold:AddText("Activity: Add the  ")
+//        activity1Bold:Add(useCode)
+//        activity1Bold:AddText(" statement for the ")
+//        activity1Bold:Add(fileCode)
+//        activity1Bold:AddText(" library.")
+//        activity1Paragraph:Add(activity1Bold)
+//        bodyDiv:Add(activity1Paragraph)
+
+        bodyDiv:AddParagraph("You now are able to use these Quorum libraries in your program.")
+
+
+        bodyDiv:AddHeading("Goal 2: Creating Objects", 2)
+        bodyDiv:AddParagraph("Look for the lines that look like the following around lines 19-20 of the file:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action CreateGame" + cr 
+                                                        +   "end"))
+
+
+        Paragraph p6
+        CodeBlock actionCreateGameCode
+        CodeBlock endCode
+        actionCreateGameCode:AddText("action CreateGame")
+        endCode:AddText("")
+        p6:AddText("You write your code between the line that starts with ")
+        p6:Add(actionCreateGameCode)
+        p6:AddText(" and the line that starts with ")
+        p6:Add(endCode)
+        p6:AddText(".")
+        bodyDiv:Add(p6)
+
+        Paragraph p61
+        CodeBlock bunnyCode
+        bunnyCode:AddText("bunny")
+        endCode:AddText("end")
+        p61:AddText("To put the")
+        p61:Add(gamesCode)
+        p61:AddText(" and ")
+        p61:Add(fileCode)
+        p61:AddText(" libraries to use, instantiate a new ")
+        p61:Add(drawableCode)
+        p61:AddText(" object, calling it ")
+        p61:Add(bunnyCode)
+        p61:AddText(". Add this code between the ")
+        p61:Add(actionCreateGameCode)
+        p61:AddText(" line and the ")
+        p61:Add(endCode)
+        p61:AddText(" line.")
+        bodyDiv:Add(p61)
+
+        bodyDiv:Add(break)
+
+        Paragraph example2Paragraph
+        Bold example2Bold
+        example2Bold:AddText("Example: Instantiate an ")
+        example2Bold:Add(drawableCode)
+        example2Bold:AddText(" object.")
+        example2Paragraph:Add(example2Bold)
+        bodyDiv:Add(example2Paragraph)
+
+        CodeBlock example2Code
+        Span s2
+        example2Code:AddText(    "action CreateGame" + cr )
+        s2:AddText(     "   // this line of code creates the Drawable object called " + dq + "bunny" + dq + "" + cr)
+        s2:SetClassAttribute("comment")
+        example2Code:Add(s2)
+        example2Code:AddText(   "   Drawable bunny" + cr 
+                            +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example2Code))
+
+        Paragraph p7
+        CodeBlock fileMinCode
+        fileMinCode:AddText("file")
+        p7:AddText("Now, in order for the ")
+        p7:Add(drawableCode)
+        p7:AddText(" object to be able to display your image, it needs the file that contains the image. Create a new ")
+        p7:Add(fileCode)
+        p7:AddText(" object, naming it ")
+        p7:Add(fileMinCode)
+        p7:AddText(".")
+        bodyDiv:Add(p7)
+
+
+//        SideBySideIDE instantiateObjectIDE
+//        instantiateObjectIDE:SetUniqueIdentifier("instantiateObject")
+//        instantiateObjectIDE:GetIDETitle():AddText("Activity: Instantiate object")
+//        Paragraph p8
+//        p8:AddText("Instantiate a ")
+//        p8:Add(fileCode)
+//        p8:AddText(" object.")
+//        instantiateObjectIDE:SetIDESubtitle(p8)
+//        instantiateObjectIDE:SetGameEnvironment(true)
+//        instantiateObjectIDE:Setup()
+//        bodyDiv:Add(instantiateObjectIDE)
+//        bodyDiv:Add(instantiateObjectIDE:GetGameCanvas())
+
+        
+//        Paragraph activity2Paragraph
+//        Bold activity2Bold
+//        activity2Bold:AddText("Activity: Instantiate a ")
+//        activity2Bold:Add(fileCode)
+//        activity2Bold:AddText("object.")
+//        activity2Paragraph:Add(activity2Bold)
+//        bodyDiv:Add(activity2Paragraph)
+
+        
+        //bodyDiv:AddHeading("Activity: Instantiate a  file object.", 4)
+
+
+        Paragraph p9
+        p9:AddText("In order to use the ")
+        p9:Add(fileCode)
+        p9:AddText(" object, you need to tell the ")
+        p9:Add(fileCode)
+        p9:AddText(" object what file it is. 
+                    Since this file will represent the image file for your ")
+        p9:Add(drawableCode)
+        p9:AddText(" object, your file should be an image file. 
+                    Image files save data that represent all the pixels of an image. 
+                    The file formats that the Quorum Game Engine supports are ")
+        p9:AddLink( dq + ".png" + dq , "https://en.wikipedia.org/wiki/Portable_Network_Graphics")
+        p9:AddText(" or the ")
+        p9:AddLink( dq + ".jpg" + dq , "https://en.wikipedia.org/wiki/JPEG")
+        p9:AddText(" formats. ")
+        bodyDiv:Add(p9)
+
+        Paragraph p10
+        CodeBlock setPathCode
+        setPathCode:AddText("SetPath")
+        p10:AddText("To set the name of your file, you use the ")
+        p10:Add(setPathCode)
+        p10:AddText(" action. The ")
+        p10:Add(setPathCode)
+        p10:AddText(" action takes a text parameter that represents the name of the file.")
+        bodyDiv:Add(p10)
+
+        bodyDiv:Add(break)
+
+
+        Paragraph example3Paragraph
+        Bold example3Bold
+        example3Bold:AddText("Example: Tell the ")
+        example3Bold:Add(fileCode)
+        example3Bold:AddText(" object the name of the file it should represent.")
+        example3Paragraph:Add(example3Bold)
+        bodyDiv:Add(example3Paragraph)
+
+        CodeBlock example3Code
+        Span s3
+        s3:AddText(     "// this line of code tells the File object that the file it should" + cr 
+                    +   "// represent is the file called " + dq + "media/bunny.png" + dq + "" + cr)
+        s3:SetClassAttribute("comment")
+        example3Code:Add(s3)
+        example3Code:AddText(    "file:SetPath(" + dq + "media/bunny.png" + dq + ")" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example3Code))
+
+
+        Paragraph p11
+        CodeBlock loadCode
+        loadCode:AddText("Load")
+        p11:AddText("Now that you have your file set up, you can tell the ")
+        p11:Add(drawableCode)
+        p11:AddText(" object what to do. The ")
+        p11:Add(drawableCode)
+        p11:AddText(" object needs to load a file, the file you just set up! Use the ")
+        p11:Add(loadCode)
+        p11:AddText(" action to give the ")
+        p11:Add(drawableCode)
+        p11:AddText(" object the file you created in your program. ")
+        bodyDiv:Add(p11)
+
+        bodyDiv:Add(break)
+
+
+        Paragraph example4Paragraph
+        Bold example4Bold
+        example4Bold:AddText("Example: Tell the ")
+        example4Bold:Add(fileCode)
+        example4Bold:AddText(" object the name of the file.")
+        example4Paragraph:Add(example4Bold)
+        bodyDiv:Add(example4Paragraph)
+
+        CodeBlock example4Code
+        Span s4
+        s4:AddText(     "// this line of code passes the file you created and set the path to the bunny" + cr
+                    +   "// Drawable. The bunny now knows which image it should display." + cr )
+        s4:SetClassAttribute("comment")
+        example4Code:Add(s4)
+        example4Code:AddText( "bunny:Load(file)" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example4Code))
+
+        Paragraph p12
+        CodeBlock addCode
+        addCode:AddText("Add")
+        p12:AddText("You are now ready to display your image. You can do this by calling the ")
+        p12:Add(addCode)
+        p12:AddText(" action, passing your ")
+        p12:Add(drawableCode)
+        p12:AddText(" object as a parameter.")
+        bodyDiv:Add(p12)
+
+
+//        SideBySideIDE callingactionIDE
+//        callingactionIDE:SetUniqueIdentifier("callingaction")
+//        callingactionIDE:GetIDETitle():AddText("Activity: Calling the Add action")
+//        Paragraph p13
+//        p13:AddText("Add your bunny to the game by calling the ")
+//        p13:Add(addCode)
+//        p13:AddText(" action, passing it your bunny object.")
+//        callingactionIDE:SetIDESubtitle(p13)
+//        callingactionIDE:SetGameEnvironment(true)
+//        callingactionIDE:Setup()
+//        bodyDiv:Add(callingactionIDE)
+//        bodyDiv:Add(callingactionIDE:GetGameCanvas())
+
+        Paragraph activity3Paragraph
+        Bold activity3Bold
+        activity3Bold:AddText("Activity: Add your bunny to the game by calling the ")
+        activity3Bold:Add(addCode)
+        activity3Bold:AddText(" action, passing it your bunny object.")
+        activity3Paragraph:Add(activity3Bold)
+        bodyDiv:Add(activity3Paragraph)
+
+        bodyDiv:AddParagraph("You can now compile and run your program. 
+                            There should be no errors and your image should display on the screen in a separate window. 
+                            If your program does not compile, fix any errors and try again.")
+
+
+
+
+        bodyDiv:AddHeading("Goal 3: Calling Actions on Objects", 2)
+
+        Paragraph p14
+        CodeBlock setPositionCode
+        setPositionCode:AddText("SetPosition")
+        p14:AddText("When displaying your image, you may have noticed that it was placed in the lower left-hand corner of the screen. 
+                    You may want to change this position so that it can appear in another part of the screen. 
+                    You can do this in Quorum by calling the")
+        p14:Add(setPositionCode)
+        p14:AddText(" action on your ")
+        p14:Add(drawableCode)
+        p14:AddText(" object.")
+        bodyDiv:Add(p14)
+
+        Paragraph p15
+        CodeBlock numberCode
+        numberCode:AddText("number")
+        p15:AddText("The ")
+        p15:Add(setPositionCode)
+        p15:AddText(" action takes two parameters, both ")
+        p15:Add(numberCode)
+        p15:AddText(" variables. These ")
+        p15:Add(numberCode)
+        p15:AddText(" s represent coordinates that tell the ")
+        p15:Add(drawableCode)
+        p15:AddText(" object where to appear on the screen. 
+                    Coordinates of (0, 0) represent the lower left-hand corner of the screen. 
+                    To move the image to the right, increase the x-coordinate (the first parameter). 
+                    To move the image up, increase the y-coordinate (the second parameter).  ")
+        bodyDiv:Add(p15)
+
+
+        Paragraph p16
+        p16:AddText("The default values for the coordinates of the ")
+        p16:Add(drawableCode)
+        p16:AddText(" object are (0, 0). If you never call the ")
+        p16:Add(setPositionCode)
+        p16:AddText(" action, the ")      
+        p16:Add(drawableCode)
+        p16:AddText(" bject will automatically appear at the lower left corner of the screen. ")
+        bodyDiv:Add(p16)
+
+        bodyDiv:Add(break)
+
+        Paragraph example5Paragraph
+        Bold example5Bold
+        example5Bold:AddText("Example: Change the position of the bunny ")
+        example5Bold:Add(drawableCode)
+        example5Bold:AddText(" on the screen.")
+        example5Paragraph:Add(example5Bold)
+        bodyDiv:Add(example5Paragraph)
+
+        CodeBlock example5Code
+        Span s5
+        s5:AddText(     "// this line of code tells the bunny to appear at the location (500, 500) on the screen." + cr)
+        s5:SetClassAttribute("comment")
+        example5Code:Add(s5)
+        example5Code:AddText( "bunny:SetPosition(500, 500)" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example5Code))
+
+        Paragraph p17
+        p17:AddText("Play around with setting the position by changing the parameters of the ")
+        p17:Add(setPositionCode)
+        p17:AddText(" action. What happens when the coordinates go off of the screen?")
+        bodyDiv:Add(p17)
+
+//        SideBySideIDE changePositionIDE
+//        changePositionIDE:SetUniqueIdentifier("changeposition")
+//        changePositionIDE:GetIDETitle():AddText("Activity: Change the position")
+//        Paragraph p18
+//        p18:AddText("Change the position of the bunny ")
+//        p18:Add(drawableCode)
+//        p18:AddText(" to the upper right corner of the screen.")
+//        changePositionIDE:SetIDESubtitle(p18)
+//        changePositionIDE:SetGameEnvironment(true)
+//        changePositionIDE:Setup()
+//        bodyDiv:Add(changePositionIDE)
+//        bodyDiv:Add(changePositionIDE:GetGameCanvas())
+
+//        Paragraph activity4Paragraph
+//        Bold activity4Bold
+//        activity4Bold:AddText("Activity: Change the position of the bunny ")
+//        activity4Bold:Add(drawableCode)
+//        activity4Bold:AddText(" to the upper right corner of the screen.")
+//        activity4Paragraph:Add(activity4Bold)
+//        bodyDiv:Add(activity4Paragraph)
+
+        bodyDiv:AddParagraph("Compile and run your program again to see the change.")
+
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about creating objects and actions while coding an image manipulation application in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Lab Manual (Displaying an Image)"
+    end
+    action GetName returns text
+        return "Lab 2.5"
+    end
+    action GetShortDescription returns text
+        return "how work displaying an image in Quorum."
+    end
+    action GetLocation returns text
+        return "lessons/chapter2/lab2_5.html"
+    end
+end

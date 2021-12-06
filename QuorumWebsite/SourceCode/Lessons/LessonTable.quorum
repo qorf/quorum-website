@@ -1,0 +1,150 @@
+
+// Table Specific Imports
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.TableData
+
+// Content Imports
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.WebList
+
+class LessonTable is WebTable
+
+    // TableHeader header//?
+    TableBody body
+    TableRow currentRow
+    TableData currentLeftCol
+    TableData currentRightCol
+    
+    TableCaption currentCaption
+
+
+    action Setup // initialise the table
+        body:AddClassAttribute("LessonTable")        
+        
+
+        currentRow:Add(currentLeftCol)
+
+        currentRow:Add(currentRightCol)
+
+        body:Add(currentRow)
+        parent:WebTable:Add(body) // This has to happen last?   
+        
+    end
+
+    action Setup (text summary, text caption)
+        currentCaption:AddText(caption)
+        body:AddAttribute("summary", summary)
+        
+        Setup()
+    end
+
+    action Generate returns text
+        text toReturn = parent:WebTable:Generate()
+        
+        //output toReturn
+
+        return toReturn
+    end
+
+    // Update current working targets
+    action NextRow
+        // Create the next row of the table
+        TableRow newRow
+        TableData newLeft
+        TableData newRight      
+  
+        // Reassign our trackers
+        currentRow = newRow
+        currentLeftCol = newLeft
+        currentRightCol = newRight
+    
+        // Add the new row and columns to the table
+        currentRow:Add(currentLeftCol)
+        currentRow:Add(currentRightCol)
+        body:Add(currentRow)
+        
+        
+    end
+
+    // Doing these very explicitly for now
+    
+    //// Left
+    action AddLeft(Paragraph content)
+        currentLeftCol:Add(content)
+    end
+    
+    action AddLeft(UnorderedList content)
+        currentLeftCol:Add(content)
+    end
+
+    action AddLeft(OrderedList content)
+        currentLeftCol:Add(content)
+    end
+
+    action AddLeft(PreformattedText content)
+        currentLeftCol:Add(content)
+    end
+
+    action AddLeftParagraph(text content)
+        Paragraph p
+        p:AddText(content)
+        currentLeftCol:Add(p)
+    end
+
+    action AddLeftParagraphBoldFront(text left, text right) 
+        Paragraph p
+        p:AddText(Bolden(left) + right)
+        currentLeftCol:Add(p)
+    end
+
+
+
+    
+
+    //// Right
+    action AddRight(Paragraph content)
+        currentRightCol:Add(content)
+    end
+
+    action AddRight(UnorderedList content)
+        currentRightCol:Add(content)
+    end
+
+    action AddRight(OrderedList content)
+        currentRightCol:Add(content)
+    end
+
+    action AddRightParagraph(text content)
+        Paragraph p
+        p:AddText(content)
+        currentRightCol:Add(p) 
+    end    
+
+    action AddRightParagraphBoldFront(text left, text right) 
+        Paragraph p
+        p:AddText(Bolden(left) + right)
+        currentRightCol:Add(p)
+    end
+    
+    action AddRight(PreformattedText content)
+        currentRightCol:Add(content)
+    end
+
+    action Bolden(text toBold) returns text
+        return "<b>" + toBold + "</b>"
+    end
+    
+end

@@ -1,0 +1,211 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class ArraysTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Arrays - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Arrays", 1)
+        headDiv:AddText("Storing Information in memory")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Using Arrays in Quorum", 2)
+
+        bodyDiv:AddText("Like many programming languages, Quorum 
+            has a variety of support classes for storing information in memory. 
+            In Quorum, these are generally called containers and in this tutorial,
+            we will discuss how to use arrays.")
+
+        //the section on adding elements
+        bodyDiv:AddHeading("Adding to an Array", 2)
+        bodyDiv:AddParagraph(   "We can add to a array using code like the following:")
+
+        CodeBlock cb1
+        Span s1
+        Span s2
+        s1:AddText("//like with arrays, this code represents a template, a array that is filled only with integers" + cr )
+        s1:SetClassAttribute("comment")
+        s2:AddText("//put a value in the second slot in the array, which is named 1" + cr )
+        s2:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("use Libraries.Containers.Array" + cr)
+        cb1:AddText("Array&lt;integer&gt; array" + cr + cr)
+        cb1:Add(s2)
+        cb1:AddText("array:Add(5)" + cr)
+        cb1:AddText("output " + dq + "We added an item to the array." + dq + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddParagraph(   "Quorum does not allow us to add types to a templated value unless it matches exactly the type specified in the generic. "
+                            +   "So, for example, the following would be a compiler error:")
+
+        CodeBlock cb2
+        Span s3
+        s3:AddText("//since we have declared this array to use integers, we cannot put in a number type (with a decimal point)" + cr )
+        s3:SetClassAttribute("comment")
+        cb2:AddText("use Libraries.Containers.Array" + cr)
+        cb2:AddText("Array&lt;integer&gt; array" + cr + cr)
+        cb2:Add(s3)
+        cb2:AddText("array:Add(5.0)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        AddSideBySideIDE(bodyDiv, "addingElementsIDE", "Activity: Try adding elements to a array", 
+            "Try adding integers into a array")
+
+
+
+
+        //the section on getting elements
+        bodyDiv:AddHeading("Getting Items From a Array", 2)
+        bodyDiv:AddParagraph("Once we have added values to a array, we can obtain them individually using the Get action, like so:")
+
+        CodeBlock cb3
+        Span s4
+        Span s5
+        cb3:AddText("use Libraries.Containers.Array" + cr 
+                +   "Array&lt;integer&gt; myList" + cr + cr)
+        s4:AddText("//add two values to the array, 12 and 13" + cr )
+        s4:SetClassAttribute("comment")
+        cb3:Add(s4)
+        cb3:AddText("myList:Add(12)" + cr
+                +   "myList:Add(13)" + cr + cr)
+        s5:AddText("//this line returns the first integer, 12" + cr )
+        s5:SetClassAttribute("comment")
+        cb3:Add(s5)
+        cb3:AddText("integer value = myList:Get(0)"+ cr
+                +   "output value")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        AddSideBySideIDE(bodyDiv, "gettingElementsIDE", "Activity: Try getting elements from a array", 
+            "Try getting the integers back")
+
+        //the section on removing elements
+        bodyDiv:AddHeading("Removing Items From a Array", 2)
+        bodyDiv:AddParagraph(   "Similarly to getting, we can remove items from 
+            a array. If we want to remove just the first version of a value "
+            +   "(values are not guaranteed to be unique), then we can call 
+            Remove. If we want to remove all instances of an item, we can 
+            call RemoveAll. If an item is found, we are returned a boolean saying
+            that the removal was successful.")
+     
+        CodeBlock cb4
+        Span s6
+        cb4:AddText("use Libraries.Containers.Array" + cr 
+                +   "Array&lt;integer&gt; myList" + cr 
+                +   "myList:Add(43)" + cr
+                +   "myList:Add(13)" + cr
+                +   "myList:Add(43)" + cr + cr)
+        s6:AddText("//RemoveAll(43) would remove all 43s" + cr )
+        s6:SetClassAttribute("comment")
+        cb4:Add(s6)
+        cb4:AddText("boolean removed = myList:Remove(43)"+ cr
+                +   "output removed")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+        AddSideBySideIDE(bodyDiv, "removingElementsIDE", "Activity: Try removing elements from a array", 
+            "Try removing integers we have added")
+
+        //the section on iterating
+        bodyDiv:AddHeading("Iterating Over a Array", 2)
+        bodyDiv:AddParagraph(   "Finally, we often want to traverse over all elements in a array. "
+                            +   "To do this, we can use the Iterator class and ask it for each element, one at a time. The following example shows us how we might do this:")
+
+        CodeBlock cb5
+        Span s9
+        Span s10
+        Span s11
+        Span s12
+        Span s13
+        cb5:AddText("use Libraries.Containers.Array" + cr)
+        cb5:AddText("use Libraries.Containers.Iterator" + cr)
+        cb5:AddText("class Main" + cr
+                +   "   action Main" + cr)
+        cb5:AddText("       Array&lt;integer&gt; array" + cr)
+        s9:AddText("        //add 3 items: 5, 10, and 15" + cr )
+        s9:SetClassAttribute("comment")
+        cb5:Add(s9)
+        cb5:AddText("       array:Add(5)" + cr
+                +   "       array:Add(10)" + cr
+                +   "       array:Add(15)" + cr + cr)
+        s10:AddText("       //create an iterator to traverse our array" + cr )
+        s10:SetClassAttribute("comment")
+        cb5:Add(s10)
+        cb5:AddText("       Iterator&lt;integer&gt; it = array:GetIterator()" + cr)
+        s11:AddText("       //Keep iterating if more elements exist" + cr )
+        s11:SetClassAttribute("comment")
+        cb5:Add(s11)
+        cb5:AddText("       repeat while it:HasNext()" + cr)
+        s12:AddText("           //get the next item." + cr )
+        s12:SetClassAttribute("comment")
+        cb5:Add(s12)
+        cb5:AddText("           integer value = it:Next()" + cr)
+        cb5:AddText("           output value" + cr
+                +   "       end" + cr
+                +   "   end" + cr
+                +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+   
+        AddSideBySideIDE(bodyDiv, "iteratingIDE", "Activity: Try Iterating", 
+            "Try iterating over the data structure")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about using arrays for storing data in memory with the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Arrays"
+    end
+
+    action GetImageLocation returns text
+        return "/media/basics/Arrays.png"
+    end
+
+    action GetName returns text
+        return "arrays"
+    end
+
+    action GetShortDescription returns text
+        return "how to use arrays"
+    end
+
+    action GetLocation returns text
+        return "tutorials/language/arrays.html"
+    end
+end

@@ -1,0 +1,360 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Link
+
+class MobileAndroidVibrationTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+  
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Android Vibration Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Using Vibration on Android Devices", 1)
+        headDiv:AddText("Quorum can cause vibrations on Android devices.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Introducing Vibration in Quorum", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will learn how to use vibration in Android apps that we write in Quorum. Vibrations are useful 
+                                for providing an element of user feedback through the sense of touch, letting users know that they are doing something. For example, 
+                                in this app, we will make a simple game with rectangles at each corner of the screen, which will vibrate in different ways
+                                when the user touches one of them.") 
+
+        bodyDiv:AddHeading("Game Setup", 3)
+        bodyDiv:AddParagraph("Before we do anything with Vibrations, we need to set up our game. To start, create a new
+                                Quorum Game Application. Our main class will need to inherit both the Game and TouchListener classes. We will overload the
+                                Game's Main and CreateGame actions, as well as the TouchListener's ContinuedTouch class. Additionally, the class will
+                                need two integers as class variables for the screen's width and height, as well as a Vibration object. For now, just declare 
+                                these variables, and we'll go over their usage later. Finally, we will need the libraries 
+                                for TouchListener, TouchEvent, Array, Vibration, VibrationArray, Drawable, and Color, giving us the following template:")
+
+        CodeBlock cb1
+        cb1:AddText("use Libraries.Game.Game" + cr +
+                    "use Libraries.Interface.Events.TouchListener" + cr +
+                    "use Libraries.Interface.Events.TouchEvent" + cr +
+                    "use Libraries.Containers.Array" + cr +
+                    "use Libraries.Interface.Vibration.Vibration" + cr +
+                    "use Libraries.Interface.Vibration.VibrationArray" + cr +
+                    "use Libraries.Game.Graphics.Drawable" + cr +
+                    "use Libraries.Game.Graphics.Color" + cr + cr +
+                    "class Main is Game, TouchListener" + cr + cr +
+                    "    integer width = 0" + cr +
+                    "    integer height = 0" + cr + 
+                    "    Vibration vibrator" + cr + cr +
+                    "    action Main" + cr +
+                    "        StartGame()" + cr +
+                    "    end" + cr + cr +
+                    "    action CreateGame" + cr +
+                    "    end" + cr + cr +
+                    "    action Update(number seconds)" + cr +
+                    "    end" + cr + cr +
+                    "    action ContinuedTouch(TouchEvent event)" + cr +
+                    "    end" + cr + cr +
+                    "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddParagraph("Now, we'll add the rectangles to our game using Drawables. There will be four rectangles, one for each corner.
+                                Each rectangle will also be given the main as a TouchListener, allowing
+                                them to call our ContinuedTouch action when touched. You can alter their sizes and positions, but for the purposes of this tutorial,
+                                we recommend that you simply copy and paste the following CreateGame action:")
+
+        CodeBlock cb3
+        cb3:AddText("action CreateGame" + cr +
+                    "    AddTouchListener(me)" + cr + cr +
+                    "    width = GetScreenWidth()" + cr +
+                    "    height = GetScreenHeight()" + cr + cr +
+                    "    Color color" + cr + cr +
+                    "    Drawable box1" + cr +
+                    "    Drawable box2" + cr +
+                    "    Drawable box3" + cr +
+                    "    Drawable box4" + cr + cr +
+                    "    box1:LoadFilledRectangle(width/4, height/4, color:Black())" + cr +
+                    "    box2:LoadFilledRectangle(width/4, height/4, color:Black())" + cr +
+                    "    box3:LoadFilledRectangle(width/4, height/4, color:Black())" + cr +
+                    "    box4:LoadFilledRectangle(width/4, height/4, color:Black())" + cr + cr +
+                    "    box1:SetPosition(0, 0)" + cr +
+                    "    box2:SetPosition(4*(width/5), 0)" + cr +
+                    "    box3:SetPosition(0, 4*(height/5))" + cr +
+                    "    box4:SetPosition(4*(width/5), 4*(height/5))" + cr + cr +
+                    "    box1:AddTouchListener(me)" + cr +
+                    "    box2:AddTouchListener(me)" + cr +
+                    "    box3:AddTouchListener(me)" + cr +
+                    "    box4:AddTouchListener(me)" + cr + cr +
+                    "    Add(box1)" + cr +
+                    "    Add(box2)" + cr +
+                    "    Add(box3)" + cr +
+                    "    Add(box4)" + cr +
+                    "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        bodyDiv:AddHeading("Adding Vibrations", 3)
+        bodyDiv:AddParagraph("Now that we have our class set up, we need to add vibrations to the ContinuedTouch action. To do this, we 
+                                will start by creating a series of conditional statements for checking if the TouchEvent parameter was triggered
+                                inside of any of our rectangles. We will do this using the TouchEvent's " + dq + "GetX()" + dq + " and " + dq + "GetY()"
+                                + dq + " actions. Templated out, this gives us the following:")
+
+        CodeBlock cb5
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        Span ex
+        cb5:AddText("action ContinuedTouch(TouchEvent event)" + cr)
+        cb5:AddText("    if (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        s1:AddText("        // while touching within the area of box1" + cr + cr)
+        s1:SetClassAttribute("comment")
+        cb5:Add(s1)
+        cb5:AddText("    elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        s2:AddText("        // while touching within the area of box2" + cr + cr)
+        s2:SetClassAttribute("comment")
+        cb5:Add(s2)
+        cb5:AddText("    elseif (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        s3:AddText("        // while touching within the area of box3" + cr + cr)
+        s3:SetClassAttribute("comment")
+        cb5:Add(s3)
+        cb5:AddText("    elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        s4:AddText("        // while touching within the area of box4" + cr + cr)
+        s4:SetClassAttribute("comment")
+        cb5:Add(s4)
+        cb5:AddText("    else" + cr)
+        s6:AddText("        // while touching outside the area of any rectangle" + cr + cr)
+        s6:SetClassAttribute("comment")
+        cb5:Add(s6)
+        cb5:AddText("    end" + cr)
+        cb5:AddText("end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+
+        bodyDiv:AddHeading("Preset Vibrations", 4)
+        bodyDiv:AddParagraph("In Quorum, the simplest way to use vibration is to call one of the preset vibrations. These presets are Vibrate, QuickPulse,
+                                SlowPulse, and Rumble. Each of these actions requires you to provide the number of seconds to vibrate, or you can
+                                cause them to vibrate continuously by appending the word " + dq + "Forever" + dq + " to the action call, which removes the need for
+                                a specified duration. As an example, the following code adds a continuous vibration to the first drawable, which is in the bottom-left corner
+                                of our application:")
+
+        CodeBlock cb6
+        Span span1
+        cb6:AddText("if (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        span1:AddText("    // while touching within the area of box1" + cr + cr)
+        span1:SetClassAttribute("comment")
+        cb6:Add(span1)
+        cb6:AddText("    vibrator:VibrateForever()")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+
+        bodyDiv:AddParagraph("There is a fifth preset vibration, Knock, which is based on a pattern with varying wait durations and vibrate durations. As such,
+                                rather than repeating for a specified number of seconds, the Knock preset repeats for a specified number of
+                                repetitions. The Knock preset has two alternative actions, KnockOnce and KnockForever, neither of which
+                                have parameters. For the purposes of this tutorial, the Knock preset is close enough to the other presets that
+                                we won't add it to our game, but feel free to experiment with the other presets by replacing the VibrateForever call in the code
+                                we wrote above.")
+
+        bodyDiv:AddHeading("Frequency Vibrations", 4)
+        bodyDiv:AddParagraph("The Quorum Programming Language also allows you to create Vibrations at a given frequency, measured in Hertz (Hz), which represents the number of cycles
+                                to vibrate per second, each cycle consisting of a period of wait time and a period of vibration time. For example, at a frequency of 1 Hz, a cycle
+                                will vibrate for half a second, then wait for half a second.")
+        bodyDiv:AddParagraph("To provide a frequency for vibration, we will call the " + dq + "VibrateAtFrequency" + dq + " action, which accepts the number of seconds to vibrate
+                                and a second number for our frequency. To repeat the vibration until canceled, the VibrateAtFrequencyForever action is used, which only requires
+                                one number for the frequency.")
+
+        bodyDiv:AddParagraph("Returning to our project for this tutorial, the following code is an example of a frequency vibration, adding a 2.5 Hertz vibration to the 
+                                second drawable, in the bottom-right corner of the application:")
+
+        CodeBlock exCode
+        Span exSpan
+        exCode:AddText("elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        exSpan:AddText("    // while touching within the area of box2" + cr + cr)
+        exSpan:SetClassAttribute("comment")
+        exCode:Add(exSpan)
+        exCode:AddText("    vibrator:VibrateAtFrequencyForever(2.5)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(exCode))
+
+        bodyDiv:AddParagraph("Note that, depending on the motor in your device, the maximum frequency may change. In general, we recommend against using frequencies higher than 50 Hz, as
+                                some motors start skipping slightly, providing inconsistencies in the vibration. Additionally, it becomes increasingly difficult to distinguish
+                                between vibrations at higher frequencies, so many people will not feel a noticeable difference between, for instance, 50 Hz and 75 Hz. On the contrary,
+                                most people will be able to distinguish between 50 Hz and 25 Hz.")
+
+        bodyDiv:AddParagraph("As a final note on frequency vibrations, keep in mind that durations are approximate. This is because frequency vibrations create cycles of wait times
+                                and run times to work properly, so there may be some rounding involved while the action is determining how many total cycles will fit
+                                into the specified duration. In most cases, this approximation is negligible, but it may be noticeable at very low frequencies or very low
+                                durations. Generally, higher frequencies or durations will have a smaller margin of error.")
+
+        bodyDiv:AddHeading("Intensity Vibrations", 4)
+        bodyDiv:AddParagraph("In addition to frequency, Quorum also allows programmers to create Vibrations at a specified intensity, a number between 0.0 and 1.0, representing 
+                                a percentage of the maximum vibration intensity of a device. This is done by providing the Vibrate action with an additional number: the first is 
+                                still the duration in seconds, and the second is the intensity. For a continuous intensity vibration, provide an intensity for the
+                                VibrateForever action.")
+
+        bodyDiv:AddParagraph("Returning to our project for this tutorial, the following code is an example of an intensity vibration, adding a half-intensity vibration to
+                                the third drawable, which is in the top-left corner of the application:")
+
+        CodeBlock cb4
+        Span span
+        cb4:AddText("elseif (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        span:AddText("    // while touching within the area of box3" + cr + cr)
+        span:SetClassAttribute("comment")
+        cb4:Add(span)
+        cb4:AddText("    vibrator:VibrateForever(0.5)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+        // save point (for self-reference only)
+
+        bodyDiv:AddHeading("Using VibrationArrays", 4)
+
+        bodyDiv:AddParagraph("For the most direct control over vibrations, we use VibrationArrays. The VibrationArray is very similar to the normal Quorum Array,
+                                but it is specifically designed to store vibration patterns of varying durations and intensities. Each item in a VibrationArray
+                                holds a duration, measured in seconds, and an intensity between 0.0 and 1.0. To insert a new item, we use the Add action with either
+                                one or two numbers: the first is the number of seconds to vibrate, and the second, if provided, is the intensity. If an intensity is
+                                not provided, it will default to 1.0, or maximum intensity. Meanwhile, to retrieve a duration or intensity, we use the GetDuration and
+                                GetIntensity actions, respectively, which both require the index or location where the item is stored.")
+
+        bodyDiv:AddParagraph("Additionally, the VibrationArray also contains Remove, RemoveAll, and GetSize actions, which function identically to normal Arrays:
+                                the Remove action deletes an item at the specified index or location, the RemoveAll action clears the VibrationArray of all items,
+                                and the GetSize action returns the number of items stored in the VibrationArray.")
+
+        bodyDiv:AddParagraph("Once you have finished adding items to a VibrationArray, you can play it by using the VibrationArray as an argument.
+                                Like the Knock preset, there are three actions for vibrating with a VibrationArray: VibrateOnce, Vibrate, and VibrateForever. The
+                                VibrateOnce action only requires the VibrationArray, and will play through the pattern one time. The Vibrate action requires the
+                                VibrationArray and an integer for the amount of times you want the pattern to repeat. The VibrateForever action requires only the
+                                VibrationArray and will play it until canceled.")
+
+        bodyDiv:AddParagraph("Returning to our project for this tutorial, let's use a VibrationArray for box4, which is in the top-right corner of 
+                                the screen. Here is an example:")
+
+        CodeBlock cb17
+        Span span10
+        cb17:AddText("elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        span10:AddText("    // while touching within the area of box4" + cr + cr)
+        span10:SetClassAttribute("comment")
+        cb17:Add(span10)
+        cb17:AddText("    VibrationArray array" + cr + cr +
+                     "    array:Add(0.25)" + cr + 
+                     "    array:Add(0.5, 0)" + cr +
+                     "    array:Add(0.5, 0.5)" + cr +
+                     "    array:Add(1.5, 0)" + cr + cr +
+                     "    vibrator:VibrateForever(array)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb17))
+
+        bodyDiv:AddHeading("Canceling Vibrations", 4)
+
+        bodyDiv:AddParagraph("In the previous sections, all of our example vibrations repeat indefinitely. While they can be overwritten by triggering
+                                another vibration by touching another rectangle, we currently don't have a way to cancel an ongoing vibration. Fortunately,
+                                vibrations can easily be canceled in Quorum by calling the Vibration's " + dq + "Stop" + dq + " action. Let's use the final 
+                                else statement to cancel any existing vibration if the user touches an area with no rectangle, giving us the following code:")
+
+        CodeBlock cb13
+        Span span11
+        cb13:AddText("else" + cr)
+        span11:AddText("    // while touching outside the area of any rectangles" + cr + cr)
+        span11:SetClassAttribute("comment")
+        cb13:Add(span10)
+        cb13:AddText("    vibrator:Stop()" + cr +
+                    "end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb13))
+
+        bodyDiv:AddParagraph("With that, our ContinuedTouch action is complete. Using the examples we provided above, the resulting action should be like this:")
+
+        CodeBlock cb2
+        Span sp1
+        Span sp2
+        Span sp3
+        Span sp4
+        Span sp5
+        Span sp6
+        cb2:AddText("action ContinuedTouch(TouchEvent event)" + cr +
+                    "    if (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        sp1:AddText("        // while touching within the area of box1" + cr + cr)
+        sp1:SetClassAttribute("comment")
+        cb2:Add(sp1)
+        cb2:AddText("        logger:Log(" + dq + "Box1 Touched" + dq + ", " + dq + "Main Class" + dq + ")" + cr +
+                    "        vibrator:VibrateForever()" + cr +
+                    "    elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 0 and event:GetY() < height/4)" + cr)
+        sp2:AddText("        // while touching within the area of box2" + cr + cr)
+        sp2:SetClassAttribute("comment")
+        cb2:Add(sp2)
+        cb2:AddText("        vibrator:VibrateAtFrequencyForever(2.5)" + cr +
+                    "    elseif (event:GetX() > 0 and event:GetX() < width/4) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        sp3:AddText("        // while touching within the area of box3" + cr + cr)
+        sp3:SetClassAttribute("comment")
+        cb2:Add(sp3)
+        cb2:AddText("        vibrator:VibrateForever(0.5)" + cr +
+                    "    elseif (event:GetX() > 3*width/4 and event:GetX() < width) and (event:GetY() > 3*height/4 and event:GetY() < height)" + cr)
+        sp4:AddText("        // while touching within the area of box4" + cr + cr)
+        sp4:SetClassAttribute("comment")
+        cb2:Add(sp4)
+        cb2:AddText("        VibrationArray array" + cr + cr +
+                    "        array:Add(0.25)" + cr + 
+                    "        array:Add(0.5, 0)" + cr +
+                    "        array:Add(0.5, 0.5)" + cr +
+                    "        array:Add(1.5, 0)" + cr + cr +
+                    "        vibrator:VibrateForever(array)" + cr +
+                    "    else" + cr)
+        sp6:AddText("        // while touching outside the area of any rectangles" + cr + cr)
+        sp6:SetClassAttribute("comment")
+        cb2:Add(sp6)
+        cb2:AddText("        vibrator:Stop()" + cr +
+                    "    end" + cr +
+                    "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        Paragraph p1
+        p1:AddText("Now that our application is complete, we can test it by sending it to an Android Application, as demonstrated in the ")
+        p1:AddLink("Android Mobile Support", "/tutorials/mobile/android.html")
+        p1:AddText(" tutorial. Recall that the application will be named " + dq + "Default," + dq + " and it will overwrite applications by the same name.")
+        bodyDiv:Add(p1)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to use Vibrations in the Quorum programming language for Android devices."
+    end
+
+    action GetSummaryName returns text
+        return "Android Vibrations"
+    end
+
+    action GetName returns text
+        return "Android Vibrations"
+    end
+
+    action GetShortDescription returns text
+        return "how to use Vibrations on an Android device in Quorum."
+    end
+
+    action GetLocation returns text
+        return "tutorials/mobile/vibration.html"
+    end
+end

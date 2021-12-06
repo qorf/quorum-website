@@ -1,0 +1,186 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class AudioWhiteNoiseTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("White Noise Generator - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Generate White Noise", 1)
+        headDiv:AddText("Creating White Noise ")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("White Noise", 2)
+
+        bodyDiv:AddText("White noise is a combination of all the different sound frequencies audible to the human ear. 
+            This is similar to the static noise you hear from your television when it loses reception. 
+            To create white noise in Quorum, we begin by creating an Audio object as well as an AudioSamples object. 
+            Next we must set the channels within our noise and specify how long we want our noise to play for (in seconds). 
+            Then we assign values within our AudioSamples object to create the sounds. 
+            Finally we load our Audio object and play it until it finishes. ")
+        
+        bodyDiv:AddParagraph("Below is an example of a simple white noise generator producing mono sound:")
+
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        cb1:AddText("use Libraries.Compute.Random" + cr + 
+            "use Libraries.Sound.AudioSamples" + cr + 
+            "use Libraries.Sound.Audio" + cr + cr + 
+            "Random random" + cr + 
+            "AudioSamples samples" + cr + 
+            "Audio noise" + cr + cr)
+        s1:AddText("// We set the number of channels and how long we want our noise to play for. " + cr )
+        s1:SetClassAttribute("comment")
+        s2:AddText("// This will produce mono sound" + cr)
+        cb1:Add(s1)
+        cb1:AddText("samples:SetChannels(1) ")
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText("samples:SetSizeInSeconds(4) ") 
+        s3:AddText("// This will play the sound for 4 seconds" + cr + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        
+        s4:AddText("// To simulate white noise, we must first generate a series of random numbers within the range of -1 and 1." + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText("integer counter = 0" + cr + 
+            "repeat while counter < samples:GetSize()" + cr)
+        s5:AddText("    // We set the randomly generated number at index (counter) within the channel." + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText("    samples:Set(counter, random:RandomNumber() * 2 - 1, 0)" + cr + 
+            "    counter = counter + 1" + cr + 
+            "end" + cr + cr) 
+           
+        s6:AddText("// Finally, we load and play the noise we created until it finishes." + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText("noise:Load(samples)" + cr + 
+            "noise:PlayUntilDone()")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddHeading("AudioSamples", 2)
+        bodyDiv:AddParagraph("The AudioSamples object holds the discrete values of a signal. 
+            It can be used to create audio rather than just loading one. 
+            The object contains information for the number of channels it holds, the sample’s length in terms of seconds, and the number of samples per channel. 
+            A sample with a single channel will produce a mono sound while a dual channel sample produces stereo sound. 
+            Mono sound plays the same signal to all speakers. 
+            Stereo sounds assign each channel with a corresponding speaker so the signals in each speaker differ. 
+            You must first specify how many channels you want the object to hold by calling the SetChannels action. 
+            You can change the default sampling rate (44.1 kHz) by calling the SetSamplesPerSecond action. 
+            For most cases, leaving the sampling rate of 44.1 kHz will suffice. 
+            To change the amount in seconds of audio the AudioSamples object can hold, call the SetSizeInSeconds action.")
+        
+        bodyDiv:AddParagraph("In the example above, we go through the AudioSamples object by using a counter that increments until it reaches the amount of samples stored in each channel which is set by using the GetSize action. 
+            As we go through the object, we set the sample value to the randomly generated number through Random’s RandomNumber action. 
+            Each value in the AudioSamples must be between -1 and 1, so when using the RandomNumber action (which returns between 0 and 1), we multiply the random value by 2 then subtract 1 to fit it into the range -1 and 1.")
+        
+        bodyDiv:AddParagraph("Each channel requires its own values. 
+            If we had multiple channels, we would have to provide the samples for each one. 
+            In that case the code would look like this:")
+
+        CodeBlock cb2
+        cb2:AddText("integer counter = 0" + cr + 
+            "repeat while counter < samples:GetSize()" + cr + 
+            "   i = 0" + cr + 
+            "   repeat while i < samples:GetChannels()" + cr + 
+            "       samples:Set(counter, random:RandomNumber() * 2 - 1, i)" + cr + 
+            "       i = i + 1" + cr + 
+            "   end" + cr + 
+            "   counter = counter + 1" + cr + 
+            "end")   
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        
+        bodyDiv:AddHeading("Playing the Sound", 2)
+        bodyDiv:AddParagraph("To play the white noise we just created, we use Audio object. 
+            The Audio object is used to load our AudioSamples object using the Load action followed by playback of the sound using the PlayUntilDone action. 
+            We call these actions as follows:")
+            
+        CodeBlock cb3  
+        cb3:AddText("noise:Load(samples)" + cr + 
+            "noise:PlayUntilDone()")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        
+        bodyDiv:AddParagraph("For the duration of the playback, you should be hearing something similar to the sound of a radio on an unknown station. ")
+            
+        SideBySideIDE WhiteNoiseGeneratorIDE
+        WhiteNoiseGeneratorIDE:SetUniqueIdentifier("WhiteNoiseGenerator")
+        WhiteNoiseGeneratorIDE:Setup()
+        WhiteNoiseGeneratorIDE:GetIDETitle():AddText("Generate White Noise")
+        bodyDiv:Add(WhiteNoiseGeneratorIDE)
+
+        bodyDiv:AddParagraph(cr + "Congratulations! 
+            You were able to create a white noise generator and successfully played it back. 
+            There are also other noises you can create like pink and brown noise. 
+            Check them out and see if you can generate them yourself! 
+            You can run this program offline or online in a web browser.")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to create white noise in Quoroum."
+    end
+
+    action GetSummaryName returns text
+        return "White Noise Generator"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+        return "Creating White Noise sounds"
+    end
+
+    action GetShortDescription returns text
+        return "how to generate white noise."
+    end
+
+    action GetLocation returns text
+        return "tutorials/dsp/audiowhitenoise.html"
+    end
+end

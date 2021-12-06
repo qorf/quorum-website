@@ -1,0 +1,388 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class AudioWaveGeneratorTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Wave Generators - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Wave Generators", 1)
+        headDiv:AddText("Generate sounds with different wave forms")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Wave Generators", 2)
+
+        bodyDiv:AddParagraph("In this tutorial, we will cover the four main waveforms, how to generate them, and how to convert them to something we can actually hear. 
+            It is important that we know about these waveforms because they are fundamental to creating sounds (synthesizing). 
+            These four waves are: Sine waves, Square waves, Sawtooth waves, and Triangle waves.")
+        
+        bodyDiv:AddImage("/media/dsp/waveforms.png", "This is a picture of the four waveforms.")
+        
+        bodyDiv:AddParagraph("A waveform is a shape that repeats itself in a medium. 
+            These repeating shapes and values are determined by a wave’s attributes. 
+            These attributes include: wavelength, frequency, period, and amplitude. 
+            Together they allow us to hear different sounds with different pitches, harmonics, and timbres. 
+            Take note that the audible range of frequency for human ears is 20 Hz to 20,000 Hz. 
+            Typically, the higher the frequency, the higher the pitch sound you get. 
+            Harmonics are integer multiples of the frequency. ")
+
+        bodyDiv:AddParagraph("These are the equations we will be using to create our waveforms:")
+        
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        s1:AddText("// Sine wave" + cr)
+        s2:AddText("// Square wave" + cr)
+        s3:AddText("// Triangle wave" + cr)
+        s4:AddText("// Sawtooth wave" + cr)
+        s1:SetClassAttribute("comment")
+        s2:SetClassAttribute("comment")
+        s3:SetClassAttribute("comment")
+        s4:SetClassAttribute("comment")
+
+        cb1:Add(s1)
+        cb1:AddText("math:Sine(frequency * (twoPI * (counter/sampleSize)))" + cr + cr)
+        cb1:Add(s2)
+        cb1:AddText("math:Sine(frequency * (twoPI * (counter/sampleSize)))" + cr + 
+            "   if(s <= 0)" + cr + 
+            "       s = 0" + cr + 
+            "   else" + cr + 
+            "       s = 1" + cr + 
+            "   end" + cr + cr)
+        cb1:Add(s3)
+        cb1:AddText("2 / math:pi * math:InverseSine(math:Sine(frequency * twoPI * counter/sampleSize))" + cr + cr)
+        cb1:Add(s4)
+        cb1:AddText("-2 / math:pi * math:InverseTangent(1 / math:Tangent(frequency * math:pi* counter/sampleSize))")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddHeading("Example Program", 3)
+        bodyDiv:AddParagraph("Below is an example program implementing all four waveforms. 
+            Each waveform is played for a set amount of seconds (which we set to 4) one after another.")
+        
+        CodeBlock cb2
+        Span s5
+        Span s6
+        Span s7
+        Span s8
+        Span s9
+        Span s10
+        Span s11
+        Span s12
+        Span s13
+        Span s14
+        Span s15
+        Span s20
+        Span s21
+        Span s22
+        s5:AddText("// period" + cr)
+        s6:AddText("// seconds we want each wave to play for" + cr)
+        s7:AddText("// ~~~~~ Sine wave" + cr)
+        s8:AddText("// Equation for sine wave" + cr)
+        s9:AddText("// ~~~~~ Square wave" + cr)
+        s10:AddText("// Equation for square wave" + cr)
+        s11:AddText("// ~~~~~ Triangle wave" + cr)
+        s12:AddText("// Equation for tirangle wave" + cr)
+        s13:AddText("// ~~~~~ Sawtooth wave" + cr)
+        s14:AddText("// Equation for sawtooth wave" + cr)
+        s15:AddText("// ~~~~~ Play the waveforms" + cr)
+        s20:AddText("// audio1:PlayUntilDone()" + cr)
+        s21:AddText("// audio3:PlayUntilDone()" + cr)
+        s22:AddText("// audio4:PlayUntilDone()" + cr)
+        s5:SetClassAttribute("comment")
+        s6:SetClassAttribute("comment")
+        s7:SetClassAttribute("comment")
+        s8:SetClassAttribute("comment")
+        s9:SetClassAttribute("comment")
+        s10:SetClassAttribute("comment")
+        s11:SetClassAttribute("comment")
+        s12:SetClassAttribute("comment")
+        s13:SetClassAttribute("comment")
+        s14:SetClassAttribute("comment")
+        s15:SetClassAttribute("comment")
+        s20:SetClassAttribute("comment")
+        s21:SetClassAttribute("comment")
+        s22:SetClassAttribute("comment")
+
+        cb2:AddText("use Libraries.Compute.Math" + cr +    
+            "use Libraries.Sound.Audio" + cr + 
+            "use Libraries.Sound.AudioSamples" + cr + cr + 
+            "Math math" + cr + 
+            "number twoPI = math:pi * 2 ")
+        cb2:Add(s5)
+        cb2:AddText("number frequency = 440" + cr +
+            "integer seconds = 4 ")
+        cb2:Add(s6)
+        cb2:AddText(cr)
+        cb2:Add(s7)
+        cb2:AddText("AudioSamples sine" + cr +
+            "sine:SetChannels(1)" + cr +
+            "sine:SetSizeInSeconds(seconds)" + cr + cr +
+            "number sampleSize = sine:GetSamplesPerSecond()" + cr +
+            "integer counter = 0" + cr +
+            "repeat while counter < sine:GetSize()" + cr +
+            "   number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
+        cb2:Add(s8)
+        cb2:AddText("   sine:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr +
+            "end" + cr + cr)
+        cb2:Add(s9)
+        cb2:AddText("AudioSamples square" + cr + 
+            "square:SetChannels(1)" + cr +
+            "square:SetSizeInSeconds(seconds)" + cr + cr +
+
+            "sampleSize = square:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < square:GetSize()" + cr +
+            "   number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
+        cb2:Add(s10)
+        cb2:AddText("   if(s <= 0)" + cr +
+            "       s = -1" + cr +
+            "   else" + cr +
+            "       s = 1" + cr + 
+            "   end" + cr + 
+            "   square:Set(counter, s, 0)" + cr + 
+            "   counter = counter + 1" + cr +
+            "end" + cr + cr)
+        cb2:Add(s11)
+        cb2:AddText("AudioSamples triangle" + cr + 
+            "triangle:SetChannels(1)" + cr +
+            "triangle:SetSizeInSeconds(seconds)" + cr + cr +
+
+            "sampleSize = triangle:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < triangle:GetSize()" + cr +
+            "   number s = 2 / math:pi * math:InverseSine(math:Sine(frequency * twoPI * counter/sampleSize)) ")
+        cb2:Add(s12)
+        cb2:AddText("   triangle:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr + 
+            "end" + cr + cr)
+        cb2:Add(s13)
+        cb2:AddText("AudioSamples sawtooth" + cr + 
+            "sawtooth:SetChannels(1)" + cr +
+            "sawtooth:SetSizeInSeconds(seconds)" + cr + cr +
+
+            "sampleSize = sawtooth:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < sawtooth:GetSize()" + cr +
+            "   number s = -2 / math:pi * math:InverseTangent(1 / math:Tangent(frequency * math:pi* counter/sampleSize)) ")
+        cb2:Add(s14)
+        cb2:AddText("   sawtooth:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr + 
+            "end" + cr + cr)
+        cb2:Add(s15)
+        cb2:AddText("Audio audio1" + cr + 
+            "audio1:Load(sine)" + cr)
+        cb2:Add(s20)
+        cb2:AddText(cr + "Audio audio2" + cr +
+            "audio2:Load(square)" + cr +
+            "audio2:PlayUntilDone()" + cr + cr +
+            "Audio audio3" + cr +
+            "audio3:Load(triangle)" + cr)
+        cb2:Add(s21)
+        cb2:AddText(cr + "Audio audio4" + cr +
+            "audio4:Load(sawtooth)" + cr)
+        cb2:Add(s22)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        bodyDiv:AddHeading("Getting Started: Including the proper libraries", 2)
+        bodyDiv:AddParagraph("To begin, we will be using three libraries that must be included at the beginning of our project. 
+            Make sure to include the following at the top of your code: ")
+        CodeBlock cb3
+        cb3:AddText("use Libraries.Sound.Audio" + cr +
+            "use Libraries.Sound.AudioSamples" + cr +
+            "use Libraries.Compute.Math")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        
+        bodyDiv:AddHeading("Setting up the AudioSamples", 3)
+        bodyDiv:AddParagraph("We learned from a previous tutorial what the AudioSamples object was and how it is used to create sound. 
+            To implement the wave values, we must use the AudioSamples object. 
+            First, we create the object and then set how many channels we want and how long we would like the sound to play for. 
+            Let’s set it to one channel to produce a mono sound that will play for four seconds. 
+            Recall that with mono sound, each speaker will play the same sound from the single channel. 
+            We can do this by using the SetChannels() and SetSizeInSeconds() actions from the AudioSamples object.")
+        CodeBlock cb4
+        Span s16
+        s16:AddText("// or square, triangle, sawtooth" + cr)
+        s16:SetClassAttribute("comment")
+        cb4:AddText("AudioSamples sine ")
+        cb4:Add(s16)
+        cb4:AddText("sine:SetChannels(1)" + cr +
+            "sine:SetSizeInSeconds(4)")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+        
+        bodyDiv:AddHeading("Sine Waves", 2)
+        bodyDiv:AddParagraph("Sine waves are the most basic of the sound waves. 
+            It produces an isolated sound without additional harmonics. 
+            Let’s take a look into the sine wave code from the above example program.")
+        CodeBlock cb5
+        cb5:AddText("number sampleSize = sine:GetSamplesPerSecond()" + cr +
+            "integer counter = 0" + cr +
+            "repeat while counter < sine:GetSize()" + cr +
+            "   number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
+        cb5:Add(s8)
+        cb5:AddText("   sine:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr +
+            "end" + cr )
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        
+        bodyDiv:AddParagraph("Notice that the code is very similar to the white noise generator program we previously created. 
+            The only difference here is that instead of setting a sample with a random value, we set the sample to the value of our equation. 
+            In fact, the only thing that differs from each of our waveforms’ code is the equation. 
+            Sine waves look exactly like you would expect a “wave” to look like. 
+            It’s shape comes from the standard sine equation. " + cr +
+            "The line: number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
+        bodyDiv:AddText("is what gives this wave its shape.
+            We plot these values into our sine AudioSamples object to set them. 
+            As these samples are taken, you should hear an elongated beep sound. 
+            Compared to the other waveforms, the sine wave’s sound may seem dull and basic.")
+
+        bodyDiv:AddHeading("Square Waves, Triangle Waves, and Sawtooth Waves", 2)
+
+        bodyDiv:AddParagraph("Square waves, unlike sine waves, include odd [numbered] harmonics. 
+            The square wave should sound a bit louder and more rich because of these harmonics. 
+            There are only two possible values for square waves, a high level and a low level. 
+            Here is our code:")
+           
+        CodeBlock cb6
+        Span s17
+        Span s18
+        s17:AddText("// Low level" + cr)
+        s18:AddText("// High level" + cr)
+        s17:SetClassAttribute("comment")
+        s18:SetClassAttribute("comment")
+        
+        cb6:AddText("sampleSize = square:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < square:GetSize()" + cr +
+            "   number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
+        cb6:Add(s10)
+        cb6:AddText("   if(s <= 0)" + cr +
+            "       s = -1 ")
+        cb6:Add(s17)
+        cb6:AddText("   else" + cr +
+            "       s = 1 ")
+        cb6:Add(s18)
+        cb6:AddText("   end" + cr + 
+            "   square:Set(counter, s, 0)" + cr + 
+            "   counter = counter + 1" + cr +
+            "end")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+
+        bodyDiv:AddParagraph("Notice that we set our high value to 1 and our low value to 1. 
+            The high value is the wave’s amplitude. 
+            We also use the same equation as the sine wave but map these values to our high and low levels based on if they are positive or negative.")
+        
+        bodyDiv:AddParagraph("Triangle Waves are more like square waves in the sense that they also include odd harmonics. 
+            The difference is that the harmonics of a triangle wave jump much quicker than a square wave.")
+
+        CodeBlock cb7
+        cb7:AddText("sampleSize = triangle:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < triangle:GetSize()" + cr +
+            "   number s = 2 / math:pi * math:InverseSine(math:Sine(frequency * twoPI * counter/sampleSize)) ")
+        cb7:Add(s12)
+        cb7:AddText("   triangle:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr + 
+            "end" + cr + cr)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb7))
+        
+        bodyDiv:AddText("Again the code looks idential but with a different mathematical equation")
+        bodyDiv:AddParagraph("Lastly, sawtooth waves contain all harmonics (even and odd) which create a fuller sound. 
+            They are shaped the way they are because they rise steadily then drop to their lowest level.")
+
+        CodeBlock cb8
+        cb8:AddText("sampleSize = sawtooth:GetSamplesPerSecond()" + cr +
+            "counter = 0" + cr + 
+            "repeat while counter < sawtooth:GetSize()" + cr +
+            "   number s = -2 / math:pi * math:InverseTangent(1 / math:Tangent(frequency * math:pi* counter/sampleSize)) ")
+        cb8:Add(s14)
+        cb8:AddText("   sawtooth:Set(counter, s, 0)" + cr +
+            "   counter = counter + 1" + cr + 
+            "end")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        
+        bodyDiv:AddText("The sound of a single sawtooth wave should sound more like a buzz rather than a beep.")
+        bodyDiv:AddParagraph("If you listen closely to all these sound waves, you should be able to hear a sine wave as well. 
+            This is because each waveform can be described as an infinite set of sine waves.")
+
+        SideBySideIDE WaveGeneratorIDE
+        WaveGeneratorIDE:SetUniqueIdentifier("WaveGenerator")
+        WaveGeneratorIDE:Setup()
+        WaveGeneratorIDE:GetIDETitle():AddText("Generate Different Waveforms")
+        bodyDiv:Add(WaveGeneratorIDE)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+
+    action GetMetaDescription returns text
+        return "Learn how to create different wave forms in Quoroum."
+    end
+
+    action GetSummaryName returns text
+        return "Wave Generator"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+        return "Wave forms"
+    end
+
+    action GetShortDescription returns text
+        return "how to create different kinds of sounds."
+    end
+
+    action GetLocation returns text
+        return "tutorials/dsp/audiowavegenerator.html"
+    end
+end

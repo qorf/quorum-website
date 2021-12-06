@@ -1,0 +1,248 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class LegoMotorsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("LEGO Motors - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page-specific header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Using Motors with LEGO™ Robots", 1)
+        headDiv:AddText("This tutorial explains how to use motors on robots in Quorum.")
+        Add(headDiv)
+        
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Using motors with Robots in Quorum", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will become more familiar with how to use the motors of the robots. The topics discussed will include:")
+
+        UnorderedList list1
+        list1:AddListItem("How motors work in general.")
+        list1:AddListItem("The differnent ways that you can use motors in a program.")
+        bodyDiv:Add(list1)
+
+        bodyDiv:AddHeading("How Motors work", 2)
+        bodyDiv:AddParagraph("A motor is only able to perform a single specific task: rotation. A motor can either rotate backwards (with the RotateBackwards() action) or forward (with the RotateForward() action). All robot movement is controlled through motors.")
+        bodyDiv:AddParagraph("It is important to understand the orientation of the motor movement in order to give the robot instructions. The RotateForward() action rotates the motor forward away from the connection port. It may help to think of the "+dq+"front"+dq+" of the motor as the part that rotates and the "+dq+"back"+dq+" of the motor as the end that has the connection port. The image below illustrates the forward direction of a motor.")
+        bodyDiv:AddImage("/media/robots/motorMovement.png","This is an image of the motor movement")
+        bodyDiv:AddParagraph("The amount that a motor rotates is measured in degrees, where a rotation of 360 degrees means the motor has completed one full revolution. Rotation can also be specified as a negative number to indicate a reverse rotation. A rotation of -360 degrees will cause the motor to complete one revolution backwards.")
+        bodyDiv:AddParagraph("With Quorum, the speed at which a motor rotates is measured in degrees per second. So, with a speed of 360 degrees per second (the default setting) a motor will complete one revolution every second. Similarly, a motor speed of 720 will cause the motor to complete two full revolutions every second. The maximum speed for a motor varies since it will depend on battery voltage and the other things that the robot is doing. Generally, the range of speed is between 600-900 degrees per second.")
+        bodyDiv:AddParagraph("There are two types of motors, large and medium. The large motors are generally used to move a robot along a surface, while the medium motors usually control other parts of the robot. The large motors allow parts to be connected on either side, while the medium motors only allow a component to be connected to its front. An illustration of the medium motor is shown below. Despite their differences, however, any motor action can be used with either type of motor.")
+        bodyDiv:AddImage("/media/robots/mediumMotor.png","This is an image of the medium Motor")
+        bodyDiv:AddParagraph("When connecting motors to the robot, it is important to note which motor is plugged into which port. The motor ports on the brick are on top and labeled A, B, C, and D. We will give instructions to the motors using these letters in our code.")
+        bodyDiv:AddParagraph("Now that we have a better grasp on the basics of motors, we can explore different ways they can be utilized in a program.")
+
+        bodyDiv:AddHeading("Programming Motors", 2)
+        bodyDiv:AddText("The Quorum Robot Library provides actions for controlling motor movement, speed, and other information.")
+        bodyDiv:AddHeading("Motor Movement" , 3)
+        UnorderedList list2
+        list2:AddListItem("RotateForward")
+        list2:AddListItem("RotateBackward")
+        list2:AddListItem("RotateByDegrees")
+        list2:AddListItem("RotateToDegree")
+        list2:AddListItem("Stop")
+        list2:AddListItem("Wait")
+        bodyDiv:Add(list2)
+        bodyDiv:AddParagraph("With this set of actions, we can instruct the robot to move a certain amount or to move until we tell it to stop. If we want a motor to finish its rotation before the program moves on to the next line of code, we tell the program to wait for that motor to finish. The following program demonstrates these actions:")
+
+
+        CodeBlock cb0
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        cb0:AddText(    "use Libraries.Robots.Lego.Motor" + cr + cr
+                    +   "Motor motor" + cr + cr )
+        s1:AddText(     "//rotates one revolution" + cr)
+        s1:SetClassAttribute("comment")
+        cb0:Add(s1)
+        cb0:AddText(    "motor:RotateByDegrees("+dq+"C"+dq+", 360)" + cr
+                   +    "motor:Wait("+dq+"C"+dq+")" + cr + cr)
+        s2:AddText(     "//does nothing, motor is already at 360" + cr)
+        s2:SetClassAttribute("comment")
+        cb0:Add(s2)
+        cb0:AddText(    "motor:RotateToDegree("+dq+"C"+dq+", 360)" + cr
+                   +    "motor:Wait("+dq+"C"+dq+")" + cr + cr )
+        s3:AddText(     "//rotates one more revolution" + cr)
+        s3:SetClassAttribute("comment")
+        cb0:Add(s3)
+        cb0:AddText(    "motor:RotateByDegrees("+dq+"C"+dq+", 360)" + cr
+                   +    "motor:Wait("+dq+"C"+dq+")" + cr + cr )
+        s4:AddText(     "//rotates backwards two revolutions" + cr)
+        s4:SetClassAttribute("comment")
+        cb0:Add(s4)
+        cb0:AddText(    "motor:RotateToDegree("+dq+"C"+dq+", 0)" + cr
+                   +    "motor:Wait("+dq+"C"+dq+")" + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb0))
+
+    
+    bodyDiv:AddHeading("Motor Speed" , 3)   
+    UnorderedList list3
+    list3:AddListItem("SetSpeed")
+    bodyDiv:Add(list3)
+    bodyDiv:AddText("As mentioned above, the speed of a motor's rotation is measured in degrees per second. The following program shows a demonstration of how to use the SetSpeed() action.")
+
+
+        CodeBlock cb1
+        Span s5
+        Span s6
+        cb1:AddText(    "use Libraries.Robots.Lego.Motor" + cr + cr
+                    +   "Motor motor" + cr + cr )
+        s5:AddText(     "//motor B will rotate 2 revolutions per second" + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText(    "motor:SetSpeed("+dq+"B"+dq+", 720)" + cr + cr)
+        s6:AddText(     "//motor B should reach 1440 degrees in 2 seconds" + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText(    "motor:RotateByDegrees("+dq+"B"+dq+", 1440)" + cr
+                   +    "motor:Wait("+dq+"B"+dq+")" + cr + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+
+    bodyDiv:AddHeading("Motor Information" , 3)   
+    UnorderedList list4
+    list4:AddListItem("GetRotationTarget")
+    list4:AddListItem("ResetRotation")
+    list4:AddListItem("GetRotation")
+    list4:AddListItem("IsMoving")
+    list4:AddListItem("GetSpeed")
+    bodyDiv:Add(list4)
+    bodyDiv:AddParagraph("When a program is running, information is stored for each connected motor, including what degree a motor is moving to, how far it has already rotated, and the speed at which it is moving. We can also detect stalls by asking if the motor is currently moving. Lastly, we can reset the motor's rotation information back to 0.")
+    
+
+
+        CodeBlock cb2
+        Span s7
+        Span s8
+        Span s9
+        Span s10
+        Span s11
+        cb2:AddText(    "use Libraries.Robots.Lego.Motor" + cr 
+                    +   "use Libraries.Robots.Lego.Screen" + cr + cr 
+                    +   "Motor motor" + cr 
+                    +   "Screen screen" + cr + cr )
+        s7:AddText(     "//returns the default of 360, since we haven't set the speed" + cr)
+        s7:SetClassAttribute("comment")
+        cb2:Add(s7)
+        cb2:AddText(    "motor:GetSpeed("+dq+"A"+dq+")" + cr 
+                    +   "motor:RotateByDegrees("+dq+"A"+dq+", 1080)" + cr 
+                    +   "screen:Output("+dq+"Rotating to: "+dq+" + motor:GetRotationTarget("+dq+"A"+dq+"), 0)" + cr 
+                    +   "repeat while motor:IsMoving("+dq+"A"+dq+")" + cr )
+        s8:AddText(     "    //displays real-time speed on the screen" + cr)
+        s8:SetClassAttribute("comment")
+        cb2:Add(s8)
+        cb2:AddText(    "    screen:Output("+dq+"Speed: "+dq+" + motor:GetSpeed("+dq+"A"+dq+"), 1) " + cr
+                    +   "end" + cr + cr )
+        s9:AddText(     "//GetRotation will return 1080, since that's how far it has moved" + cr)
+        s9:SetClassAttribute("comment")
+        cb2:Add(s9)
+        cb2:AddText(    "screen:Output("+dq+"Rotation: "+dq+" + motor:GetRotation("+dq+"A"+dq+"), 2)" + cr
+                    +   "motor:ResetRotation("+dq+"A"+dq+")" + cr + cr)
+        s10:AddText(     "//now returns 0, since we reset the rotation information" + cr)
+        s10:SetClassAttribute("comment")
+        cb2:Add(s10)
+        cb2:AddText(    "screen:Output("+dq+"After reset: "+dq+" + motor:GetRotation("+dq+"A"+dq+"), 3)  " + cr + cr )
+        s11:AddText(     "//do one more rotation so we can look at the screen" + cr)
+        s11:SetClassAttribute("comment")
+        cb2:Add(s11)
+        cb2:AddText(    "motor:RotateByDegrees("+dq+"A"+dq+", 1080)" + cr
+                    +   "motor:Wait("+dq+"A"+dq+")" + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+
+        bodyDiv:AddHeading("Additional Information", 2)
+
+
+        UnorderedList infoList
+
+        ListItem li1
+        li1:AddText("The default rotation speed of a motor is 360 degrees per second."+cr)
+        infoList:Add(li1)
+
+        ListItem li2
+        Paragraph p1
+        CodeBlock cb3
+        CodeBlock cb4
+        CodeBlock cb5
+        li2:AddText("Class constants can be used to refer to motors when passing them to an action. For example, if we have a Motor object called ")
+
+        cb3:AddText(" motor ")
+        li2:Add(cb3)
+        li2:AddText(", then the code ")
+        cb4:AddText("motor:Stop("+dq+"A"+dq+")")
+        li2:Add(cb4)
+        li2:AddText("is the same thing as")
+        cb5:AddText("motor:Stop(motor:MOTOR_A)")
+        li2:Add(cb5)
+        li2:Add(p1)
+        infoList:Add(li2)
+
+        ListItem li3
+        Paragraph p2
+        p2:AddText("For documentation on the Motor class, see ")
+        p2:AddLink("here", "/Libraries/Robots/Lego/Motor.html")
+        p2:AddText(". ")
+        li3:Add(p2)
+        infoList:Add(li3)
+
+        bodyDiv:Add(infoList)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how code motors on a LEGO Mindstorms robot with the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Motors"
+    end
+
+    action GetImageLocation returns text
+        return "/media/robots/motors.png"
+    end
+
+    action GetName returns text
+        return "Motors"
+    end
+
+    action GetShortDescription returns text
+        return "how to use lego motors"
+    end
+
+    action GetLocation returns text
+        return "tutorials/robots/legoMotors.html"
+    end
+end

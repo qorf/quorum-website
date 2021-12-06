@@ -1,0 +1,546 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson7A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 7: If-statements unplugged")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 7: If-statements unplugged", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov
+                ov:AddText("We take a whole lesson to learn about <b>if-statements</b>, 
+                what they are, the terminology around them, and what they have to do with 
+                &quotselection&quot in programs. Students trace simple robot programs on 
+                paper to develop a sense of how to read and reason about code with 
+                <b>if-statements</b> in it. Students will also try writing code by 
+                hand to handle a robot situation.")
+        bodyDiv:Add(ov)
+            Paragraph ov1
+                ov1:AddText("Most of the programs that students have written so far include &quotevent handlers&quot 
+                that get triggered when certain events occur. In Lesson 5, they created a 
+                &quotCounter&quot program that either incremented or decremented the &quotcount&quot depending on which key was pressed.
+                 In this lesson students will gain an understanding of the 
+                &quotif-statement structures&quot that were provided in the template of the
+                &quotCounter&quot program. We will review the concept of &quotif-statements&quot 
+                much closer so that students can construct their own &quotif-statement structure&quot for use in their programs.")
+        bodyDiv:Add(ov1)  
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Conditionals: ", "Statements that only run under certain conditions.")
+                AddListItemWithBoldAtFront(voc, "If-Statement: ", "The common programming structure that implements &quotconditional statements.&quot")
+                AddListItemWithBoldAtFront(voc, "Selection: ", "A generic term for a type of programming statement (usually an if-statement) that uses a Boolean condition to determine, or select, whether or not to run a certain block of statements.")
+                //AddListItemWithBoldAtFront(voc, "Control Structure: ", "Structures in the code that control the order - which line of code the computer executes in which order. The common structures are: &quotif-structure&quot, &quotrepeat structure&quot, &quotaction structure&quot, &quotclass structure&quot")
+                AddListItemWithBoldAtFront(voc, "Pseudocode: ", "Expressions that are similar to a programming language, yet they do not follow the strict syntax rules of any programming language. Pseudocode is often used in the development process to easily examine the flow of the program.")
+        bodyDiv:Add(voc)          
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Reason about if-statements by tracing pseudocode programs by hand")
+                goalList:AddListItem("Write a short program in pseudocode that uses if-statements")
+                goalList:AddListItem("Explain the purpose of if-statements in programs")
+                goalList:AddListItem("Understand the computer's decision making process which leads to the concept of &quotAlgorithms&quot")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("The activities here get right to many common misconceptions 
+                about how if-statements work and how programs execute. Students may have a simple 
+                common-sense intuition about how if-statements work, but there are several ways 
+                you can get your wires crossed when considering how programs actually execute. 
+                There are two main issues: 1) How the flow of program execution works, and 
+                2) How complex logical statements are composed and evaluated. In this lesson 
+                we address program flow and tracing execution. We'll review more complex 
+                logical expressions later. Even though Boolean expressions show up in this lesson, 
+                we try to avoid using that term until the next lesson. For this lesson it's a 
+                condition that is simply <i>true</i> or <i>false</i>.")
+        bodyDiv:Add(purpose)
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList reso
+            reso:AddListItemLink("Will It Crash - Activity Guide, .pdf", "/files/code/Unit5/U5L07 - Activity Guide - Will it Crash.pdf")
+            reso:AddListItemLink("Will It Crash - Activity Guide (includes visual descriptions), .rtf", "/files/code/Unit5/Unit 5 Lesson 7 - Activity Guide - Will It Crash.rtf")
+            reso:AddListItemLink("Will It Crash - Activity Guide, .brf", "/files/code/Unit5/Unit 5 Lesson 7 - Activity Guide - Will It Crash.brf")
+            reso:AddListItemLink("Tactile Grid Template, .png", "/files/code/Unit5/Unit 5 Lesson7 - Tactile Grid Template.png")
+            reso:AddListItemLink("Annotated Pseudocode - If-Statements and Robot, .pdf", "/files/code/Unit5/U5L07 - Annotated Pseudocode - if-statements and Robot.pdf")
+            reso:AddListItemLink("Worked Example - If-Statements and Robot, .pdf", "/files/code/Unit5/U5L07 - Worked Example - If Statements and Robot.pdf")
+        bodyDiv:Add(reso)
+
+        /*
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "if", " - indicates the beginning of the &quotif structure&quot, and the condition that the &quotif-statement&quot evaluates.")
+                AddListItemWithBoldAtFront(code, "end", " - inidcates the stopping point")
+                AddListItemWithBoldAtFront(code, "else", "")
+        bodyDiv:Add(code)
+        */
+
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddHeading("When vs. If", 4)
+        UnorderedList getStart
+            getStart:AddListItem("Most of the programs you've written so far have event handlers that get triggered when certain events occur.")
+            getStart:AddListItem("In Lesson 5 we had an <b>if-statement</b> that started and ended something like this:")
+        bodyDiv:Add(getStart)
+        CodeBlock cb1
+            cb1:AddText("if event:keyCode = event:UP" + cr)
+            cb1:AddText("   counter = counter + 1" + cr)
+            //cb1:AddText("   upSound:Play()" + cr)
+            cb1:AddText("   ." + cr)
+            cb1:AddText("   ." + cr)
+            cb1:AddText("   ." + cr)
+            cb1:AddText("end" + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        UnorderedList getStart2
+            getStart2:AddListItem("The introduction of &quotif&quot introduces an English language issue for us moving forward.")
+        bodyDiv:Add(getStart2)
+        bodyDiv:AddParagraph("<b>Prompt: </b><i>I'm going to read two sentences out loud that describe a program. With a partner discuss what the difference
+        is between them, and decide which one is &quotright.&quot Here are the two sentences:</i>")
+        OrderedList getStart2a
+            getStart2a:AddListItem("<b>When</b> the button is clicked add one to the score.")
+            getStart2a:AddListItem("<b>If</b> the button is clicked add one to the score.")
+        bodyDiv:Add(getStart2a)
+        bodyDiv:Add(break)
+        bodyDiv:AddText("Give students a minute to discuss with their partner and then ask which one people think is &quotright.&quot Get a few opinions out, but don't stop here.")
+        bodyDiv:AddParagraph("<i>Let's try another one: </i>")
+        OrderedList getStart2b
+            getStart2b:AddListItem("<b>When</b> the score reaches 20, output &quotgame over.&quot")
+            getStart2b:AddListItem("<b>If</b> the score reaches 20, output &quotgame over.&quot")
+        bodyDiv:Add(getStart2b)
+        bodyDiv:AddParagraph("Give students some time to discuss with their partner before asking which one people think is &quotright.&quot")
+        bodyDiv:AddParagraph("<b>Discuss: </b> Points to raise - ")
+        UnorderedList points
+            points:AddListItem("There is no right answer. In <i>English</i> both pairs of sentences mean basically the same thing.")
+            points:AddListItem("However, in <i>programming</i>, using the words &quotif&quot and &quotwhen&quot map to some expectations about how the underlying code is written.")
+            //UnorderedList pointsA
+            ListItem pointsA
+            pointsA:AddText("Here is the difference: ")
+            UnorderedList pointsA1
+                pointsA1:AddListItem("<b>&quotWhen&quot</b> is used in reference to an <b>event</b> -- <i>When something happens respond in such and such a way.</i>")
+                pointsA1:AddListItem("<b>&quotIf&quot</b> is used in reference to a <b>decision</b> about whether or not to execute a certain piece of code -- <i>If something is true, then do this, otherwise do that.</i>")
+            pointsA:Add(pointsA1)
+            points:Add(pointsA)
+            ListItem pointsB
+            pointsB:AddText("When describing the behavior of a program, events and decisions might get mixed together. For example: ")
+            UnorderedList pointsB1
+                pointsB1:AddListItem("<i><b>&quotWhen</b> the button is clicked, <b>if</b> the score is 20 go to 'game over,' otherwise add one to the score.&quot</i>")
+            pointsB:Add(pointsB1)
+            points:Add(pointsB)
+            bodyDiv:Add(points)
+
+            bodyDiv:AddHeading("Activity", 2)
+            bodyDiv:AddParagraph("Today's activity focuses on <b>if-statements</b>. If the distinction between &quotwhen&quot and &quotif&quot is still a little fuzzy, that is okay.")
+            bodyDiv:AddParagraph("For now, the key idea is that if-statements are a new entity that let us do things we could not do with event handlers -- writing code to make decisions about whether or not to run some other piece of code.")
+
+        bodyDiv:AddHeading("Big Picture: If-statements:", 4)
+        UnorderedList student
+            student:AddListItem("<b>If-statements</b> exist so that your program can adapt, respond, or make choices about whether or not to execute certain portions of code based on some condition that you check while the program is executing.")
+            student:AddListItem("Because it involves checking conditions, these statements are sometimes called <b>conditional statements</b>, or sometimes just <b>conditionals</b>.")
+            student:AddListItem("A conditional statement (if-statement) requires a <b>conditional expression</b>, something that is either <i>true</i> or <i>false</i> and this conditional expression is what an if-statement uses to decide whether or not to execute a certain portion of code.")
+            student:AddListItem("A generic term used by the AP CSP Framework for this is <b>Selection</b>. As in: your program can <i>select</i> whether or not to run certain blocks of code.")
+        bodyDiv:Add(student)    
+        
+        bodyDiv:AddHeading("Key Idea: If-statements are how programs adapt and respond to conditions on the ground", 4)
+        Paragraph keyIdea
+            keyIdea:SetClassAttribute("cool-box")
+            keyIdea:AddText("The whole point is to be able to handle cases where you cannot know ahead of time whether or when certain conditions will exist in your program. So you have to write code to say something like: &quotOkay, at this point in the program, if <i>such and such</i> is true, then do <i>this</i>, otherwise do <i>that</i>.&quot")
+        bodyDiv:Add(keyIdea)
+
+        bodyDiv:AddParagraph("For the activity we're going to get our feet wet with if-statements using the <b>AP CS Principles pseudocode</b> language. To start we're going to use the IF/ELSE structures, but to keep things simple we'll only use the Robot conditional expression <b>CAN_MOVE (direction)</b> - which evaluates to true or false. Use the &quotAnnotated Pseudocode&quot worksheet and &quotWorked Example&quot worksheet for reference when writing your own pseudocode for your robot. The purpose of the Worked Example is to show that: ")
+        UnorderedList list4
+            list4:AddListItem("Code executes one line at a time from top to bottom.")
+            list4:AddListItem("Each if-statement condition is checked in the order of execution.")
+            list4:AddListItem("The conditions of later if-statements may be affected by what did, or didn't happen, in earlier lines of code.")
+        bodyDiv:Add(list4)
+
+        bodyDiv:AddHeading("Teaching Tip: ", 4)
+        Paragraph teach1
+            teach1:SetClassAttribute("cool-box")
+            teach1:AddText("You may want to review the worked example as a class, or you can have students read (individually or in pairs) and then follow up with a partner.")
+        bodyDiv:Add(teach1)
+
+bodyDiv:AddParagraph("<b>Distribute: </b> Will It Crash? - Activity Guide") 
+            UnorderedList list1 
+                list1:AddListItem("Put students in partners.") 
+                list1:AddListItem("Review the rules and do the first example together (if necessary).") 
+                list1:AddListItem("Partners should work together to trace and reason about the code.") 
+            bodyDiv:Add(list1)
+
+bodyDiv:AddHeading("Teacher’s Tip: Activity Template", 4)
+            Paragraph prep2
+                prep2:SetClassAttribute("cool-box")
+                prep2:AddText("We have included an enlarged template of the diagram below for those who may have difficulty using the template provided in the activity guide. If you have access to a Tactile Image Enhancer, the template could be copied onto the heat sensitive paper. This activity could alternatively be done on any platform that has 5 by 5 grid structure.")
+        bodyDiv:Add(prep2)
+        bodyDiv:AddImage("/files/code/Unit5/Unit 5 Lesson7 - Tactile Grid Template.png", "Tactile Grid Template with 5 rows and 5 columns")
+
+        bodyDiv:AddParagraph("<b>Compare results</b>")
+            UnorderedList list2
+                list2:AddListItem("Put groups together to review the ending state and position of the robot for each scenario.")
+                list2:AddListItem("If there are disagreements about the end state, have pairs work it out and re-trace the examples.")
+                list2:AddListItem("If there are common problems, save them, and review in the wrap-up.")
+            bodyDiv:Add(list2)
+
+        bodyDiv:AddParagraph("<b>Write code for the last problem and exchange</b>")
+        UnorderedList list3
+            list3:AddListItem("Partners can work on writing the code together.")
+            list3:AddListItem("When done, have groups exchange code and trace the other team's work to verify correctness or reveal problems.")
+        bodyDiv:Add(list3)
+
+        bodyDiv:AddHeading("Note: ", 4)
+        Paragraph note1
+        note1:SetClassAttribute("cool-box")
+            note1:AddText("Each &quotif structure&quot has its own &quotend&quot. Keeping each if-statement at the same indentation level as its end is important for acheiving readability within the code, especially when we begin using &quotnested if-statements&quot as shown below:")
+        bodyDiv:Add(note1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "if (Indentation Level 1)" + cr
+                                                        +   "   if (Indentation Level 2)" + cr
+                                                        +   "       doThis(Indentation Level 3)" + cr
+                                                        +   "   else (Indentation Level 2)" + cr
+                                                        +   "       doThat(Indentation Level 3)" + cr
+                                                        +   "   end (Indentation Level 2)" + cr
+                                                        +   "else (Indentation Level 1)" + cr
+                                                        +   "   doNothing(Indentation Level 2)" + cr
+                                                        +   "end (Indentation Level 1)" + cr))
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddParagraph("<b>What was trickiest?</b> If there were common problems that students had trouble with be sure to review those.")
+        bodyDiv:AddParagraph("<b>Prompt: </b>")
+        UnorderedList wrapUp
+            wrapUp:AddListItem("Were you tripped up by any of the problems? Which ones? Why?")
+            wrapUp:AddListItem("What's the difference between a seqeunce or series of if-statements versus an if-else statement?")
+        bodyDiv:Add(wrapUp)
+
+        bodyDiv:AddParagraph("<b>Discussion: </b>")
+        UnorderedList discuss
+            discuss:AddListItem("If-statements and conditional expressions are a huge part of programming and we're going to spend some time digging in with them.")
+            discuss:AddListItem("There are two main issues to concern yourself with when it comes to if-statements and today we've reviewed a lot at one of them, namely, <b>program flow and order of execution</b>.")
+            discuss:AddListItem("For example, one very common misconception, or place where people get tripped up is, in the <b>difference between a sequence of if-statements, and using an if-else statement</b>.")
+        bodyDiv:Add(discuss)
+
+        bodyDiv:AddHeading("Extended Learning", 2)
+        bodyDiv:AddHeading("<u>Algorithms - Solving Problems</u>", 4)
+        bodyDiv:AddParagraph("<b>What is an algorithm?</b> An algorithm is a precise sequence of instructions for a process that completes a task. Algorithms can be executed by a computer and are implemented using programming languages.")
+        bodyDiv:AddHeading("<u>Automating Physical Tasks</u>", 4)
+        UnorderedList auto
+            auto:AddListItem("<b>Physical Tasks in Daily Life: </b>Daily life is filled with tasks. Most mornings, for example, you'll need to get dressed, pack your things, and then travel from one place to another. Your day at work or school will be filled with tasks to complete. Even keeping up with friends, relaxing, or going to bed includes some tasks if you consider them closely.")
+            auto:AddListItem("<b>Automating Tasks: </b>We want to complete most tasks quickly, easily, and reliably. One important way we do this is by identifying step-by-step processes that we know work well. The steps to tie your shoes or the steps of a recipe are examples of processes we use to help us effectively take care of everyday tasks. 
+            </br> Processes to complete tasks are powerful because not only can humans use them, so can machines. Automation is the use of machines to complete some task with little to no human intervention, and from agriculture to manufacturing to transportation, it has transformed our society, economy, and daily lives.")
+            auto:AddListItem("<b>Automation Requires Algorithms: </b>At the heart of automation is a well-defined step-by-step process that the machine is completing. A machine to weave cloth, for example, is built to make stitches in a precise way in a precise number of rows using a precise number of threads. In other words, automating tasks means first identifying the process or <b>algorithm</b> your machine will complete. Often a human could use that same algorithm to complete a task, but the machine will typically do so more quickly, easily, and reliably.")
+        bodyDiv:Add(auto)
+
+        bodyDiv:AddHeading("<u>Algorithms and Information Tasks</u>", 4)
+        UnorderedList info
+            info:AddListItem("<b>Information Tasks and Tools: </b>Many tasks don't require physical work, but they do require thinking. For example, you might need to keep track of money, remember birthdays, or schedule activities. At their core these problems have to do with how we organize and make sense of information. Tools like calendars, clocks, and financial records help us complete these information tasks.")
+            info:AddListItem("<b>Automating Information Tasks: </b>Just like physical tasks, many information tasks can be completed using algorithms. For example when you learn the steps to add or multiply two numbers, you're really just using an algorithm for addition or multiplication. The recognition that information tasks could be described algorithmically led to the desire to automate these tasks as well, and eventually, to the creation of the computer.")
+        bodyDiv:Add(info)
+
+        bodyDiv:AddHeading("<u>Algorithms, Programming, and Computer Science</u>", 4)
+        UnorderedList prog
+            prog:AddListItem("<b>The Everything Machine: </b>Through history machines to automate information tasks usually did only one thing. A machine could track stars in the sky, or add numbers, but couldn't do both. By comparison, a single modern computer can add numbers, show video, communicate over the Internet, and play music. This is clearly a very different type of machine!")
+            prog:AddListItem("<b>Everything is Numbers: </b>Many important ideas led to the design of the modern computer. First was the realization that most information can be represented as numbers. In fact, you learned in Units 1 and 2 that text, images, sound and many other pieces of information you can dream up can be represented in some way as binary numbers. This means information problems can be represented in a standardized way.")
+            prog:AddListItem("<b>Simple Commands: </b>The next important realization is that information processes can be broken down into a common set of very simple commands. For example those steps might be adding or subtracting two numbers, moving information from one place to the next, or comparing two numbers. Even complex information processes like sorting a list of 1,000,000 names or determining if a picture has a cat in it can be represented on some level as a sequence of these simple commands.")
+            prog:AddListItem("<b>People Write Algorithms for Computers: </b>Together these two ideas allow information tasks to be standardized to a degree that a single machine (a computer) could be designed to complete many of them. In order for this to work a computer is first designed to do this small set of low level commands. Next, and most importantly, the computer is designed to let a human being write out their own sequence of commands to control the machine to complete the task at hand. Said another way, a computer is a machine that's designed for a human to write algorithms for it to run!")
+        bodyDiv:Add(prog)
+        
+        bodyDiv:AddHeading("<u>Algorithms and Creativity</u>", 4)
+        bodyDiv:AddParagraph("Any programming language only provides so many commands. Algorithms are created by combining these instructions in three ways. In fact, using these three methods you can describe ANY algorithm completed by a computer. Those three ways are:")
+        UnorderedList ssi
+            AddListItemWithBoldAtFront(ssi, "Sequence: ", "This is placing commands in an order. When you write a program that runs line by line you are defining the order in which a computer should run the fundamental commands that it understands.")
+            AddListItemWithBoldAtFront(ssi, "Selection: ", "This is when a computer chooses to run one of two or more sections of code. When you use an if-statement you are making use of selection.")
+            AddListItemWithBoldAtFront(ssi, "Iteration: ", "This is when a computer repeats a section of code. For example you can do this by using a repeat construct.")
+        bodyDiv:Add(ssi)
+        bodyDiv:AddParagraph("<b>Algorithms, Programming, and Creativity: </b>Even with the limited commands a computer understands and the limited ways you can combine them, there are actually many, conceivably infinite, ways to write a program to complete a task. Some may be more efficient or easier to understand than others, but there is typically no single &quotright&quot algorithm to complete a task. There also isn't an &quotalgorithm for writing algorithms.&quot You need to investigate and understand the problem you are trying to solve, and then get creative with how you'll combine the tools the programming language provides you. Computer science is a creative discipline because computers literally require human creativity to do anything at all!")
+        bodyDiv:AddHeading("<u>Algorithms, Unit 5, and the AP Exam</u>", 4)
+        bodyDiv:AddParagraph("<b>Algorithms and AP Computer Science Principles</b>")
+        OrderedList apExam
+            apExam:AddListItem("&quotAlgorithms&quot is one of the seven big ideas of AP Computer Science Principles.")
+            apExam:AddListItem("For the AP Create Performance Task you need to ... </br> <i>[identify] a code segment that contains an algorithm you developed...[and]...explain how the algorithm helps achieve the purpose of your program.</i>")
+        bodyDiv:Add(apExam)   
+
+        bodyDiv:AddParagraph("Programming is a creative activity. When you are planning a solution to a problem you are thinking about <i>algorithms</i>.")
+        UnorderedList prompt
+            prompt:AddListItem("How many different coding solutions were there for the last problem in the &quotWill It Crash&quot activity?")
+            prompt:AddListItem("Why are different solutions possible?")
+        bodyDiv:Add(prompt)
+        bodyDiv:AddParagraph("<b>Discussion: </b>")
+        UnorderedList discuss2
+            discuss2:AddListItem("There are multiple correct solutions")
+            discuss2:AddListItem("This is because there are multiple ways to think about the problem")
+            discuss2:AddListItem("There are also multiple algorithms for solving it")
+            discuss2:AddListItem("Even if you used the same algorithm, the code might be different.")
+            discuss2:AddListItem("All of this demonstrates that <b>programming is a creative activity</b>.")
+        bodyDiv:Add(discuss2)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.1(A, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.2(A, B, G)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.2.1(A, B, D)")
+        bodyDiv:Add(list)
+
+/*
+        bodyDiv:AddHeading("‘When vs. If’ when we - the programmers - talk about the programming", 2)
+            Paragraph whenIf
+                whenIf:AddText("The word ’if’ we use when talking about programming is a little different form the ‘if’ we use in daily conversation in English language’. Think about the following two expressions in English language. Then evaluate which one is the ‘right’ way to communicate the message.")
+        bodyDiv:Add(whenIf)
+            UnorderedList wiList
+                wiList:AddListItem("When the button is clicked add one to the score.")
+                wiList:AddListItem("If the button is clicked add one to the score.")
+        bodyDiv:Add(wiList)
+            Paragraph whenIf1
+                whenIf1:AddText("Let's try another one:")
+        bodyDiv:Add(whenIf1)
+            UnorderedList wiList1
+                wiList1:AddListItem("When the score reaches 20, set the screen to ‘game over.’")
+                wiList1:AddListItem("If the score reaches 20, set the screen to ‘game over.’")
+        bodyDiv:Add(wiList1)
+            Paragraph whenIf2
+                whenIf2:AddText("In everyday conversation, it is common to interchange the words ‘when’ and ‘if,’ as in ‘If the user presses the button, execute this function.’ There is no right or wrong in those two expressions.")
+        bodyDiv:Add(whenIf2)
+            Paragraph whenIf3
+                whenIf3:AddText("In the discussion of programming among the programmers however, ‘when’ should refer to an event and ‘if’ should refer to a program executing some conditional logic – deciding whether to run some code, based on a boolean condition. For example:")
+        bodyDiv:Add(whenIf3)
+        bodyDiv:AddHeading("When the user press [up allow] key, the program evaluates the ’if event:keyCode = event:UP’ is true or not, then decides whether or not to execute the code below.", 4)
+            Paragraph whenIf4
+                whenIf4:AddText("In English both pairs of sentences mean basically the same thing. However in discussing the programming, using the words ‘if’ and ‘when’ map to some expectations about how the underlying code is written. Here is the difference:")
+        bodyDiv:Add(whenIf4)
+            UnorderedList wiList2
+                wiList2:AddListItem("We - the programmers - use ‘when’ in reference to an event -- When something happens respond in such and such a way.")
+                wiList2:AddListItem("We use ‘if’ in reference to a decision about whether or not to execute a certain piece of code -- If something is true, then do this, otherwise do that.")
+        bodyDiv:Add(wiList2)        
+        
+        bodyDiv:AddHeading("Preparing for the unplugged activity", 2)
+            Paragraph prep
+                prep:AddText("In this lesson, we go through the series of brain tweezer activities that use 5 by 5 grid diagrams. The image below shows the diagram:")
+        bodyDiv:Add(prep)
+
+
+            Paragraph prep1
+                prep1:AddText("Each square in the 5 by 5 grid have its own coordinate name: Starting from lower left to right - A-1, A-2, A-3, A-4 and A-5. The row above the ‘A’ row has B-1, B-2, and so on. In the activity, there will be a square or squares that is going to be blocked. We place a robot (represented by an acute triangle) none of the square facing specific direction. That would be the starting point of the robot’s movement.")
+        bodyDiv:Add(prep1)
+
+
+
+        bodyDiv:AddLink("Unit 5 Lesson7 - Tactile Grid Template.png", "/files/code/Unit5/Unit 5 Lesson7 - Tactile Grid Template.png")
+
+        bodyDiv:AddHeading("Activity: ‘Will It Crash?’", 2)
+            UnorderedList actList
+                actList:AddListItemLink("U5L07 - Activity Guide - Will it Crash", "/files/code/Unit5/U5L07 - Activity Guide - Will it Crash.pdf")
+                actList:AddListItemLink("Unit 5 Lesson 7 - Activity Guide - Will It Crash.rtf", "/files/code/Unit5/Unit 5 Lesson 7 - Activity Guide - Will It Crash.rtf")
+                actList:AddListItemLink("Unit 5 Lesson 7 - Activity Guide - Will It Crash.brf", "/files/code/Unit5/Unit 5 Lesson 7 - Activity Guide - Will It Crash.brf")
+        bodyDiv:Add(actList)
+            Paragraph act
+                act:AddText("When you downloaded the one of the activity guides from the link above, you will find the pseudocode based on the Quorum Programming Language. In this activity we only use three new codes in Quorum Language:")
+        bodyDiv:Add(act)
+            UnorderedList actList1
+                AddListItemWithBoldAtFront(actList1, "if", " - This code indicates the beginning of the if structure, as well as the condition that the ‘if statement’ evaluates.")
+                AddListItemWithBoldAtFront(actList1, "end", " - This code indicates the stopping point of the code inside of the ’if statement’, when the computer determines the conditional in the ‘if statement’ is true, the computer will execute the code below the ‘if-statement’ down to this point. ")
+                AddListItemWithBoldAtFront(actList1, "else", " - This code indicates the opposite condition of the main ‘if-statement’. For example, the main if statement is ‘if (Can move forward)’, the ‘else’ inside of the ‘if structure’ (between the ‘if’ and its ‘end’) means ‘if (Cannot move forward)’.")
+        bodyDiv:Add(actList1)
+            Paragraph act1
+                act1:AddText("** Note: Every single ‘if-statement’ has it’s own ‘end’. A good programmer would place a ‘if-statement’ and its own ‘end’ on the same indentation level. This practice becomes very important when we have ‘nested if structure’ - the structure that has if statement inside of another ‘if statement’. In this structure, a good programmer would place the parent ‘if-structure’ and its ‘end’(that host the another ‘if structure’) on the indentation level 1, then place the child ‘if structure’ and its ‘end’(the ‘if structure’ inside) on the indentation level 2. The pseudocode below shows the example:")
+        bodyDiv:Add(act1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "if (Indentation Level 1)" + cr
+                                                        +   "   if (Indentation Level 2)" + cr
+                                                        +   "" + cr
+                                                        +   "   else (Indentation Level 2)" + cr
+                                                        +   "" + cr
+                                                        +   "   end (Indentation Level 2)" + cr
+                                                        +   "else (Indentation Level 1)" + cr
+                                                        +   "" + cr
+                                                        +   "end (Indentation Level 1)" + cr))
+
+        bodyDiv:AddHeading("A couple more things about ‘if’ - The flow of the code execution", 4)
+            Paragraph act2
+                act2:AddText("When the computer reads your code, it essentially follows the lines in the exact order of top to bottom. If you do not give your code any structural direction changer, the computer literally execute your code line by line. The control structures - such as ‘if’ and ‘repeat’ (and ‘action’) redirect the computer’s flow of reading your code by giving it (the computer itself) to evaluate the ‘condition’ in the code at the given time.")
+        bodyDiv:Add(act2)
+            Paragraph act3
+                act3:AddText("Also, one more thing to remember is that ‘the computer never stops working’ - especially when you write a good logical program. When computer encounters a ‘if-statement’, it will evaluate the ‘if condition’ is true or not, then decide whether or not to execute the code below. If the ‘if condition’ is not true, the computer WILL NOT stay idle there. It will look for the next line to execute!")
+        bodyDiv:Add(act3)
+            Paragraph act4
+                act4:AddText("OK, these are the only pre-knowledge you need to have to tackle the activity. As you go through the activity, you will learn how the ‘if statement (and its structure)’ works in the code. Good Luck!")
+        bodyDiv:Add(act4)
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddHeading("Solutions", 4)
+            UnorderedList wrapupList
+                wrapupList:AddListItemLink("KEY_ U5L07 - Activity Guide - Will it Crash.pdf", "/files/code/Unit5/KEY_ U5L07 - Activity Guide - Will it Crash.pdf")
+                wrapupList:AddListItemLink("Unit 5 Lesson 7 - Will It Crash - Answer Key.rtf", "/files/code/Unit5/Unit 5 Lesson 7 - Will It Crash - Answer Key.rtf")
+                wrapupList:AddListItemLink("Unit 5 Lesson 7 - Will It Crash - Answer Key.brf", "/files/code/Unit5/Unit 5 Lesson 7 - Will It Crash - Answer Key.brf")
+        bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Discussion on 'if-statement'", 4)
+            UnorderedList wrapupList1
+                wrapupList1:AddListItem("If-statments and conditional expressions are huge part of programming and we're going to spend some time digging in with them in the following lessons.")
+                wrapupList1:AddListItem("There are two main issues to concern yourself with when it comes to if-statements and today we've looked a lot at one of them, namely, program flow and order of execution.")
+                wrapupList1:AddListItem("For example, one very common misconception, or place where people get tripped up is, in the difference between a sequence of if-statements, and using an if-else statement.")
+                wrapupList1:AddListItem("When we start learning about ‘if-statement’, we can start to understand that we can actually make our code in the way that computer can make its own decision and execute the task without any instruction from the user. This concept leads to the topic of ‘Algorithms’")
+        bodyDiv:Add(wrapupList1)
+
+        bodyDiv:AddHeading("Algorithms - Solving Problems", 2)
+        bodyDiv:AddHeading("What is an algorithm?", 3)
+            Paragraph algo
+                algo:AddText("Definition: An algorithm is a precise sequence of instructions for a process that completes a task. Algorithms can be executed by a computer and are implemented using programming languages.")
+        bodyDiv:Add(algo)
+
+        bodyDiv:AddHeading("Automating Physical Tasks", 3)
+
+        bodyDiv:AddHeading("Physical Tasks in Daily Life", 4)
+            Paragraph algo1
+                algo1:AddText("Daily life is filled with tasks. Most mornings, for example, you'll need to get dressed, pack your things, and then travel from one place to another. Your day at work or school will be filled with tasks to complete. Even keeping up with friends, relaxing, or going to bed includes some tasks if you look closely.")
+        bodyDiv:Add(algo1)
+
+        bodyDiv:AddHeading("Automating Tasks", 4)
+            Paragraph algo2
+                algo2:AddText("We want to complete most tasks quickly, easily, and reliably. One important way we do this is by identifying step-by-step processes that we know work well. The steps to tie your shoes or the steps of a recipe are examples of processes we use to help us effectively take care of everyday tasks.")
+        bodyDiv:Add(algo2)
+            Paragraph algo3
+                algo3:AddText("Processes to complete tasks are powerful because not only can humans use them, so can machines. Automation is the use of machines to complete some task with little to no human intervention, and from agriculture to manufacturing to transportation, it has transformed our society, economy, and daily lives.")
+        bodyDiv:Add(algo3)
+
+        bodyDiv:AddHeading("Automation Requires Algorithms", 4)
+            Paragraph algo4
+                algo4:AddText("At the heart of automation is a well-defined step-by-step process that the machine is completing. A machine to weave cloth, for example, is built to make stitches in a precise way in a precise number of rows using a precise number of threads. In other words, automating a tasks means first identifying the process or algorithm your machine will complete. Often a human could use that same algorithm to complete a task, but the machine will typically do so more quickly, easily, and reliably.")
+        bodyDiv:Add(algo4)
+
+        bodyDiv:AddHeading("Algorithms and Information Tasks", 3)
+
+        bodyDiv:AddHeading("Information Tasks and Tools", 4)
+            Paragraph algo5
+                algo5:AddText("Many tasks don't require physical work, but they do require thinking. For example, you might need to keep track of money, remember birthdays, or schedule activities. At their core these problems have to do with how we organize and make sense of information. Tools like calendars, clocks, and financial records help us complete these information tasks.")
+        bodyDiv:Add(algo5)
+
+        bodyDiv:AddHeading("Automating Information Tasks", 4)
+            Paragraph algo6
+                algo6:AddText("Just like physical tasks, many information tasks can be completed using algorithms. For example when you learn the steps to add or multiply two numbers, you're really just using an algorithm for addition or multiplication. The recognition that information tasks could be described algorithmically led to the desire to automate these tasks as well, and eventually, to the creation of the computer.")
+        bodyDiv:Add(algo6)
+
+        bodyDiv:AddHeading("Algorithms, Programming, and Computer Science", 3)
+
+        bodyDiv:AddHeading("The Everything Machine", 4)
+            Paragraph algo7
+                algo7:AddText("Through history machines to automate information tasks usually did only one thing. A machine could track stars in the sky, or add numbers, but couldn't do both. By comparison, a single modern computer can add numbers, show video, communicate over the Internet, and play music. This is clearly a very different type of machine!")
+        bodyDiv:Add(algo7)
+
+        bodyDiv:AddHeading("Everything is Numbers", 4)
+            Paragraph algo8
+                algo8:AddText("Many important ideas led to the design of the modern computer. First was the realization that most information can be represented as numbers. In fact, you learned in Units 1 and 2 that text, images, sound and many other pieces of information you can dream up can be represented in some way as binary numbers. This means information problems can be represented in a standardized way.")
+        bodyDiv:Add(algo8)
+
+        bodyDiv:AddHeading("Simple Commands", 4)
+            Paragraph algo9
+                algo9:AddText("The next important realization is that information processes can be broken down into a common set of very simple commands. For example those steps might be adding or subtracting two numbers, moving information from one place to the next, or comparing two numbers. Even complex information processes like sorting a list of 1,000,000 names or determining if a picture has a cat in it can be represented on some level as a sequence of these simple commands.")
+        bodyDiv:Add(algo9)
+
+        bodyDiv:AddHeading("People Write Algorithms for Computers", 4)
+            Paragraph algo10
+                algo10:AddText("Together these two ideas allow information tasks to be standardized to a degree that a single machine (a computer) could be designed to complete many of them. In order for this to work a computer is first designed to do this small set of low level commands. Next, and most importantly, the computer is designed to let a human being write out their own sequence of commands to control the machine to complete the task at hand. Said another way, a computer is a machine that's designed for a human to write algorithms for it to run!")
+        bodyDiv:Add(algo10)
+
+        bodyDiv:AddHeading("Algorithms and Creativity", 3)
+
+        bodyDiv:AddHeading("Sequence, Selection, Iteration", 4)
+            Paragraph algo11
+                algo11:AddText("Any programming language only provides so many commands. Algorithms are created by combining these instructions in three ways. In fact, using these three you can describe ANY algorithm completed by a computer. Those three ways are:")
+        bodyDiv:Add(algo11)
+            UnorderedList wrapupList2
+                wrapupList2:AddListItem("Sequence: This is placing commands in an order. When you write a program that runs line by line you are defining the order in which a computer should run the fundamental commands that it understands.")
+                wrapupList2:AddListItem("Selection: This is when a computer chooses to run one of two or more sections of code. When you use an if-statement you are making use of selection.")
+                wrapupList2:AddListItem("Iteration: This is when a computer repeats a section of code. For example you can do this by using a loop.")
+        bodyDiv:Add(wrapupList2)
+
+        bodyDiv:AddHeading("Algorithms, Programming, and Creativity", 3)
+            Paragraph algo12
+                algo12:AddText("Even with the limited commands a computer understands and the limited ways you can combine them, there are actually many, conceivably infinite, ways to write a program to complete a task. Some may be more efficient or easier to understand than others, but there is typically no single ‘right’ algorithm to complete a task. There also isn't an ‘algorithm for writing algorithms’. You need to investigate and understand the problem you are trying to solve, and then get creative with how you'll combine the tools the programming language provides you. Computer science is a creative discipline because computers literally require human creativity to do anything at all!")
+        bodyDiv:Add(algo12)
+
+        bodyDiv:AddHeading("Algorithms, Unit 5, and the AP Exam", 2)
+
+        bodyDiv:AddHeading("Algorithms and AP Computer Science Principles", 4)
+            OrderedList exam
+                exam:AddListItem("Algorithms is one of the seven big ideas of AP Computer Science Principles.")
+                exam:AddListItem("For the AP Create Performance Task you need to...")
+        bodyDiv:Add(exam)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "[identify] a code segment that contains an algorithm you developed..." + cr
+                                                        +   "[and]...explain how the algorithm helps achieve the purpose of your program." + cr))
+
+        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Big Idea: Algorithms: ", "EU 4.1, LO 4.1.1, EK 4.1.1(AC)")
+                AddListItemWithBoldAtFront(list, "Big Idea: Algorithms: ", "EU 4.1, LO 4.1.2, EK 4.1.2(ABG)")
+                AddListItemWithBoldAtFront(list, "Big Idea: Programming: ", "EU 5.2, LO 5.2.1, EK 5.2.1(ABD)")
+        bodyDiv:Add(list)
+
+/* Completed 5/21/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the skill for building If-statements unplugged'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 7: (If-statements unplugged)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 7"
+    end
+    action GetShortDescription returns text
+        return "Learn about If-statements"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson7A.html"
+    end
+
+end
+
+ 
+    

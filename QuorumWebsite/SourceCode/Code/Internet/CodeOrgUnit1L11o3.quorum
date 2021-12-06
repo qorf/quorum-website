@@ -1,0 +1,383 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit1L11o3 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 1 Lesson 11 (Optional 3): How Routers Learn")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("The Internet - Lesson 11 (Optional 3): How Routers Learn", 1)
+        headDiv:AddText("Optional | (Mostly) Unplugged | Algorithms")
+        Add(headDiv)
+
+        Division bodyDiv   
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("This lesson is the last of the algorithm series. Building 
+                    off of the previous lesson about shortest path algorithms, the 
+                    activity in this lesson shows how routers learn about the rest 
+                    of the Internet in order to route traffic so it takes the shortest 
+                    path. In the previous lessons, we explored how packets are sent through 
+                    routers. The path 
+                    that the packet follows, and how the router knows where to send it, 
+                    however, has been largely untouched. This lesson simulates the 
+                    process of a router joining a network and generating a router table 
+                    that would allow them to send packets to anyone else in their 
+                    network as efficiently as possible.")
+
+//        bodyDiv:AddHeading("Vocabulary", 2)
+//        UnorderedList vocabularyList
+//            AddListItemWithBoldAtFront(vocabularyList, "Router Table: ", "a data 
+//                    table stored in a router that lists the routes to particular network destinations")
+//        bodyDiv:Add(vocabularyList)
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+
+        UnorderedList goalList
+        goalList:AddListItem("Describe how routers develop routing tables to determine how to send packets")
+        goalList:AddListItem("Develop a router table to efficiently transmit packets from one destination to another across the Internet")
+        goalList:AddListItem("Simulate the job of a router.")
+        bodyDiv:Add(goalList)
+
+//        bodyDiv:AddHeading("Background", 2)
+//            Paragraph background
+//            background:AddText("You have learned quite a bit about sending information 
+//                    over the Internet. As you know, when you send a message to your 
+//                    friend, it may pass through several routers to get there. If you 
+//                    live in Los Angeles, CA and your friend lives in Houston, TX, your 
+//                    router will check its " + dq + "routing table" + dq + " to send your 
+//                    message in the most direct route it knows (i.e. generally, a message 
+//                    won't go to Dubai between California and Texas). Let's say someone 
+//                    built a high-speed Internet line directly between your house and 
+//                    your friend's. How would your router learn about this new route? 
+//                    In the previous lesson, you learned about the Single Source Shortest 
+//                    Path (SSSP) problem. Today, you will be able to investigate a common 
+//                    application of SSSP - how routers learn.")
+//            bodyDiv:Add(background)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            bodyDiv:AddParagraph("Routers, like many systems on the Internet, are governed 
+                        by protocols. In order to determine where a packet should be 
+                        sent so that it can reach its desired destination, the router 
+                        uses a static or dynamic routing protocol such as Routing Information 
+                        Protocol (RIP) or Open Shortest Path First (OSPF), which both 
+                        create and maintain a routing table.")
+            bodyDiv:AddParagraph("Routers are only able to communicate with their directly 
+                        connected neighbors, so in order to generate an efficient table 
+                        for sending packets they communicate with their neighbors, 
+                        comparing who has the best way to reach a particular destination. 
+                        As routers learn about more paths, they are able to share this 
+                        information with their neighbors to help update and maintain 
+                        their routing tables.")
+
+        bodyDiv:AddHeading("Resources", 2)
+            UnorderedList resources
+            resources:AddListItemLink("Activity Guide in large print", "/files/code/Unit1/U1L1103 Activity Guide LP.docx")
+            resources:AddListItemLink("Activity Guide in braille, Duxbury file", "/files/code/Unit1/U1L11o3 Activity Guide Brl.dxb")
+            resources:AddListItemLink("Activity Guide in braille, .brf", "/files/code/Unit1/U1L11o3 Activity Guide Brl.brf")
+        bodyDiv:Add(resources)
+
+        bodyDiv:AddHeading("Getting Started", 2)
+
+            bodyDiv:AddParagraph("There is more significant work necessary to prepare the 
+                classroom for this lesson than most others. Students will need to be arranged 
+                in circles of eight, with each one being given a 2-page section of the 
+                Activity Guide (lettered A-H). Activity guides must be handed out in alphabetical 
+                order, as shown in the diagram below. It may make sense to have these waiting 
+                at seats when students arrive at class. The dotted lines in the diagram 
+                indicate who each person is allowed to exchange information with during the 
+                activity; they represent direct connections between routers. If you wish, you 
+                may indicate these connections with string, masking tape, etc.")
+
+            bodyDiv:AddImage("/files/code/Unit1/U1L11o3.png", "Image depicting arrangement of 8-student groups.")
+            bodyDiv:Add(break)
+            bodyDiv:Add(break)
+
+            UnorderedList protip1
+            AddListItemWithBoldAtFront(protip1, "Groups of Eight: ", "This activity is designed for groups of eight. Even if 
+                        the class is not divisible by eight, set up groups of eight. 
+                        The empty space(s) should be occupied by " + dq + "static" + dq + " (unchanging) 
+                        routers. Lay out the worksheets for the missing routers in the 
+                        empty spaces. Students can look at the sheets to get information 
+                        from the missing routers, but obviously the missing routers' tables 
+                        will never be updated. You can say that these routers are " + dq + 
+                        "static" + dq + " because they will never learn anything. However, their 
+                        information can still be learned and used by the other participants.")
+            AddListItemWithBoldAtFront(protip1, "Importance of Order: ", "If tables are immobile, it is sufficient 
+                        to create circles of chairs. This activity relies on each student 
+                        communicating with a specific set of individuals. The activity 
+                        guides are designed with the assumption that students will be 
+                        sitting in alphabetical order of the guides' letters, and the lesson will be much harder 
+                        to facilitate if this not the case.")
+            bodyDiv:Add(protip1)
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("A router is connected to a few other routers but the Internet is 
+                        much bigger. If a packet is supposed to get to destination 
+                        X, but the router is only connected to other routers A, B, and 
+                        C, how do you know which one you should forward the packet to 
+                        in order to reach X as fast as possible? There might be a lot 
+                        of Internet between you, your neighbors, and X. Even though the 
+                        cost or distance to your neighbor B might be the greatest of 
+                        your other neighbors, you can't know what lies beyond B. It 
+                        might be the best way to send traffic to X, but how can you know?")
+
+        bodyDiv:AddParagraph("Like the problems in the last lesson, a router wants to find the 
+                        shortest path through the network to any possible location on 
+                        the Internet. Unlike the algorithm from before, now we recognize 
+                        that a router cannot see how the entire network is connected ahead 
+                        of time. Not only is this not possible because the Internet is 
+                        too big, but also the network changes all the time, new routers 
+                        come online, cables get cut accidentally, etc. Instead, a router 
+                        can only observe traffic between it and its direct connections. 
+                        The question, then, is how can a router learn about the network in 
+                        order to optimally route packets?")
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+        UnorderedList protip2
+            protip2:AddListItem("Watch the Activity Demo Video to see how the activity should work.")
+        bodyDiv:Add(protip2)
+        bodyDiv:Add(break)
+
+        InlineFrame inlineFrame
+            inlineFrame:SetHeight("480")
+            inlineFrame:SetWidth("854")
+            inlineFrame:SetAddress("http://www.youtube.com/embed/jSyKiizvX_U")
+        bodyDiv:Add(inlineFrame)
+        UnorderedList vid
+            vid:AddListItemLink("Video: How Routers Learn Activity Demo", "https://www.youtube.com/watch?v=jSyKiizvX_U")
+        bodyDiv:Add(vid)
+
+        bodyDiv:AddHeading("Activity Examples", 4)
+        bodyDiv:AddParagraph("Use the diagram on the first page of the activity guide 
+            with these examples and update the table accordingly; make sure that you 
+            understand what to do after each example.")
+        UnorderedList act1Ex
+            AddListItemWithBoldAtFront(act1Ex, "Example 1", "")
+            act1Ex:AddListItem("Let's say you are router X, you are connected to routers 
+                Q, S and W, and you are now talking to router S.")
+            act1Ex:AddListItem("You would ask S, " + dq + "Do you have a path to Q?" + dq)
+            act1Ex:AddListItem("S responds " +dq + "Yes, I have a path to Q. The best 
+                one has a cost of 3." + dq)
+            act1Ex:AddListItem("Update your routing table diagram to reflect what S 
+                just told you.")
+        bodyDiv:Add(act1Ex)
+        bodyDiv:Add(break)
+
+        UnorderedList ex2
+            AddListItemWithBoldAtFront(ex2, "Example 2", "")
+            ex2:AddListItem("Then S asks you, " + dq + "Do you have a path to Q?" + dq +
+                " How should you respond?")
+            ex2:AddListItem("    Correct response: " + dq + "My best path to Q has a cost of 2" + dq)
+            ex2:AddListItem("        Explanation: If you read across the row for Q in your chart, 
+                it tells you about all the ways you know to get to Q and how much each one 
+                costs. Looking at your table right now, you know about two paths to Q. 
+                (One goes through S with a cost of 7, the other is your direct connection 
+                to Q with a cost of 2.) Of these two, the direct path is the best one 
+                available to you, so you report to S, " + dq + "I can get to Q, and 
+                my best path costs 2." + dq)
+        bodyDiv:Add(ex2)
+        bodyDiv:Add(break)
+
+        UnorderedList ex3
+            AddListItemWithBoldAtFront(ex3, "Example 3", "")
+            ex3:AddListItem("Later on, after exchanging information about all the 
+                other nodes, you end up looking at paths to W.")
+            ex3:AddListItem("S asks you, " + dq + "What's your best path to W?" + dq +
+                " How should you respond?")
+            ex3:AddListItem("    Correct response: " + dq + "My best path to W has 
+                a cost of 7." + dq)
+            ex3:AddListItem("Then S says, " + dq + "Well, I can get to W with a cost of 2." + dq)
+            ex3:AddListItem("Update your table to reflect this information.") 
+            ex3:AddListItem("Wait a second...now you have a new best path to W! 
+                You could tell S: " + dq + "Wait! My new best path has a cost of 6." +dq)
+            ex3:AddListItem("    Explanation: You might think it's weird that you're 
+                just reporting back to S effectively what she just told you. But it's OK, 
+                because you only need to worry about your own table and reporting the best 
+                path you currently have, and the best path you have to W now has a cost 
+                of 6.")
+        bodyDiv:Add(ex3)
+        bodyDiv:Add(break)
+
+        UnorderedList ex4
+            AddListItemWithBoldAtFront(ex4, "Example 4", "")
+            ex4:AddListItem("Later on, you might talk to S again, and start going 
+                through best paths.")
+            ex4:AddListItem("What if S says, " + dq + "My best path to Q is 1" + dq +
+                "? How should you update your diagram?")
+            bodyDiv:Add(ex4)
+
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+        bodyDiv:AddParagraph("Once the first round gets going, you might have to encourage or tell students to move onto the next partner, but different pairings will take different amounts of time to process all the information. It's OK if pairings happen organically after the first round. Just ensure that students (routers) only talk to the students (routers) they are directly connected to.")
+
+        bodyDiv:AddParagraph("Now that you have worked through the examples, complete three rounds
+            of the activity. The rules of these rounds are as follows.")
+        UnorderedList protip3
+            protip3:AddListItem("Round 1: Talk to a router next to you.")
+            protip3:AddListItem("Round 2: Talk to a router across from you.")
+            protip3:AddListItem("Round 3: Talk to a router on the other side of you.")
+        bodyDiv:Add(protip3)
+
+
+        bodyDiv:AddHeading("Mid-Simulation Reflection", 3)
+        bodyDiv:AddParagraph("After the students have completed three rotations, they will have met all of their neighbors and should have at least one path to all other routers within their network. Have a quick discussion using the following three prompts.")
+        UnorderedList act2
+            act2:AddListItem("1. Do you have a path to all other routers in your network? How do you know?")
+            act2:AddListItem("2. Is your path to each router the shortest or fastest route to that router? How can you be sure?")
+            act2:AddListItem("3. How many times will you have to meet with your neighbors in order to determine the shortest path to each router?")
+        bodyDiv:Add(act2)
+
+        bodyDiv:AddHeading("Possible Responses / Answers", 4)
+
+        UnorderedList poss
+            poss:AddListItem("1. For every possible destination (A-H), I should know at least one way to route traffic to it. (If I don't, it’s because I haven't met with one of my neighbors yet, or I forgot to record something in my table.)")
+            poss:AddListItem("2. It might be, but I don't know yet. If I keep talking to my neighbors, they might know paths that they didn't know the last time, or existing paths might have improved.")
+            poss:AddListItem("3. I also don't know this. All I can do is keep talking to my neighbors to see if information changes.")
+        bodyDiv:Add(poss)
+
+        bodyDiv:AddHeading("Finish Simulation", 3)
+            bodyDiv:AddParagraph("After 5 or 6 meetings with neighbors, each student should have 
+                found the shortest paths to all of the other routers. Once things seem 
+                to stop changing, you can stop and move on.")
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+            bodyDiv:AddParagraph("All groups may not have the shortest paths reflected 
+                in their routing tables because they didn't get through enough rounds 
+                of information exchange, or because the order in which they talked to 
+                people didn't allow the information to be disseminated as quickly. This is OK!")
+
+            bodyDiv:AddParagraph("As you finish up the simulation, have students reflect on this prompt:")
+            UnorderedList prompt
+            prompt:AddListItem("What is the shortest path from C to B? Look at the 
+                diagram and consult your routing tables. If a packet started at C and 
+                needed to get to B, which router would C pass it to? Once it got there, 
+                where would it go next? and so on. If you all followed your routing tables, 
+                would it take the shortest path to get to B?")
+            bodyDiv:Add(prompt)
+
+        bodyDiv:AddHeading("Pro Tip", 4)
+            bodyDiv:AddParagraph("Notice that as routers you never saw the whole network, but you 
+                were able to learn the best ways to get to other routers. You didn't even 
+                need to know who was connected to whom! You just needed to ask your 
+                neighbors if they had a path and how long it took. So routers don't 
+                actually need see a picture of the whole internet in order to know the 
+                best way to route packets. You can repeat this with other nodes if you want to continue to check.")
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+            bodyDiv:AddParagraph("Consider the relationship between our simulation 
+                    today and the shortest path problem you worked on in the last lesson.")
+            UnorderedList wrapup
+                wrapup:AddListItem("Why does a router keep track of the cost to a 
+                    destination through multiple routers, instead of only the fastest 
+                    one?")
+                wrapup:AddListItem("How is creating a router table similar to finding 
+                    the shortest path in a graph? How is it different?")
+                wrapup:AddListItem("Why do routers store information about neighbors and 
+                    costs, rather than the whole path from themselves to another router?")
+            bodyDiv:Add(wrapup)
+
+        bodyDiv:AddHeading("Assessment", 2)
+            UnorderedList assess
+                assess:AddListItem("1. In this activity, you filled in a routing table by 
+                    visiting other routers you were directly connected to find out what 
+                    paths they had. Why do routers need to use this method of talking to 
+                    their direct neighbors in order to fill in their routing tables?")
+                assess:AddListItem("2. Here is a new router network. You're router Z, and 
+                    you just joined this network, and router A is showing you its table, 
+                    which is shown below. Based on your current knowledge as router Z, 
+                    what is the cost of the most efficient way to send traffic to router C?")
+        bodyDiv:Add(assess)
+        bodyDiv:Add(break)
+        bodyDiv:AddImage("/files/code/Unit1/U1L11o3-routers-7.png", "Assessment Question 2 - Diagram")
+
+        bodyDiv:AddHeading("Teacher's Tip: Diagram Description", 4)
+            Paragraph tviTip3
+                tviTip3:AddText("The  network contains four nodes, " + dq + "A," + dq + " " + dq + "B," + dq + " "
+                    + dq + "C," + dq + " and " + dq + "D," + dq + " connected in a circular fashion, with no 
+            diagonals. A fifth node, " + dq + "Z" + dq + ", is only connected to A. The cost of A-Z is 3, A-B is  
+            2, B-C is 4, C-D is  5, and D-A is 3. 
+            A table is provided with cost information, titled Router A. The table has three columns labeled
+            " + dq + "Router," + dq + " " + dq + "Through Router B: Cost 2," + dq + " and " + dq + "Through Router D: Cost 3." + dq +
+            " The first row is " + dq + "A," + dq + " followed by two blanks (since there is no cost to get to router A from router A). 
+            Row 2 is " + dq + "B," + dq + " followed by " + dq + "2" + dq + " and " + dq + "3+." + dq + 
+            " Row 3 is " + dq + "C," + dq + " followed by " + dq + "2+4=6," + dq + " and " + dq + "3+5=8." + dq + 
+            " Lastly, Row 4 is " + dq + "D," + dq + " followed by " + dq + "2+" + dq + " and " + dq + "3.")
+        bodyDiv:Add(tviTip3)
+
+        bodyDiv:AddHeading("Extended Learning", 2)
+            UnorderedList ext
+                ext:AddListItemLink("Article: " + dq + "Understanding routing tables" +dq, "http://www.techrepublic.com/article/understanding-routing-tables/")
+                ext:AddListItem("Discover your own routing tables by typing in the command prompt: netstat -rn")
+            bodyDiv:Add(ext)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+        UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CD.L3A:8, CD.L3A:9, CD.L3B:4")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CT.L3B:3, CT.L3B:4, CT.L3B:6")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.2 (A, B, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.2.1 (A, B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.2.4 (A, B, C, D, G)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "6.2.1 (D)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "6.2.2 (A, B)")
+        bodyDiv:Add(list)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Through simulation, learn how routers learn, and how they determine the shortest path."
+    end
+
+    action GetSummaryName returns text
+        return "Lesson 11 (Optional 3: How Routers Learn)"
+    end
+    action GetName returns text
+        return "Lesson 11 (Optional 3)"
+    end
+    action GetShortDescription returns text
+        return "how routers learn"
+    end
+    action GetLocation returns text
+        return "lessons/code/internet/InternetLesson11o3.html"
+    end
+end

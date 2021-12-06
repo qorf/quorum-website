@@ -1,0 +1,193 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+
+class UserInterfacesDialog is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Dialog Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Dialog", 1)
+        headDiv:AddText("This tutorial tells you how to use Dialogs in Quorum")
+        Add(headDiv)
+        
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Introduction to Dialogs in Quorum", 2)
+        bodyDiv:AddParagraph("In Quorum, a Dialog is subwindow inside of the main window that is used to carry a temporary information apart from the information in the main application. Many Dialogs present an error message or warning to a user, but Dialogs can present any UI component. A common Dialog is one with a message and then an OK or Yes/No Button that will close the Dialog.")
+        bodyDiv:AddParagraph("Default Dialogs in Quorum have a top bar that is simply a bar of a set size with the name of the Dialog and then a Button to close the Dialog. Dialogs have an option to make this bar hidden, but for our example we will keep the top bar and we will make a panel with an Icon for the background and then a Button that with a Behavior that will close the Dialog.")
+        bodyDiv:AddParagraph("To start, make a new Game Application project.")
+        bodyDiv:AddHeading("Making a Dialog", 2)
+        Paragraph inherit
+        inherit:AddText("Quorum provides a Dialog in the Standard Library that you can use, but the default Dialog has two empty actions, OnShow and OnHide. These actions are called when the Dialog is opened or closed. What we will do is make our own Dialog that inherits from the default Dialog and we will override OnShow and OnHide. For more information on inheritance, see the tutorial on ")
+        inherit:AddLink("Inheritance.", "/tutorials/language/inheritance.html")
+        bodyDiv:Add(inherit)
+        bodyDiv:AddParagraph("To begin making our Dialog we will make a new Quorum class in our project and name it "+dq+"MyDialog.quorum." + dq)
+        bodyDiv:AddParagraph("In order to make a Dialog, we need to include the Dialog Library. For this Dialog we will also use Buttons, Color, Icon, and Speech Libraries. The class is named MyDialog and it will inherit from Dialog. There will be Button and Speech member variables, and three actions: Setup, OnShow, and OnHide. The template for our Dialog is shown in the code block below:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                            "use Libraries.Interface.Controls.Dialog" + cr
+                                            +"use Libraries.Interface.Controls.Button" + cr
+                                            +"use Libraries.Game.Graphics.Color" + cr
+                                            +"use Libraries.Interface.Controls.Icon" + cr
+                                            +"use Libraries.Sound.Speech" + cr  + cr
+
+                                            +"class MyDialog is Dialog" + cr
+                                            +"    Button close" + cr
+                                            +"    Speech speech" + cr + cr
+
+                                            +"    action Setup" + cr + cr
+
+                                            +"    end" + cr + cr
+
+                                            +"    action OnShow" + cr + cr
+
+                                            +"    end" + cr + cr
+
+                                            +"    action OnHide" + cr + cr
+
+                                            +"    end" + cr
+                                            +"end"))
+        bodyDiv:AddParagraph("In our Setup action we will Name our Dialog using SetName, and set its PixelWidth to 300. We will also set the Dialog to be modal. A modal Dialog prevents input from reaching other parts of the application while the Dialog is displayed. For example, clicking outside of the Dialog on a Button will not trigger the Button if the Dialog is modal. The code for this is shown below:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("SetName("+dq+"My Dialog"+dq+")" + cr
+                                            +"SetPixelWidth(300)" + cr
+                                            +"SetModal(true)" + cr))
+        Paragraph layout
+        layout:AddText("For the rest of the Setup action we will setup our Icon, Button, and panel. Our Button doesn’t currently have a behavior, but that can be added later. Setting up the panel is the same as making a container which was covered in the ")
+        layout:AddLink("Layout", "/tutorials/ui/layout.html")
+        layout:AddText(" tutorial. The code for how we made our panel is given in the following code block:")
+        bodyDiv:Add(layout)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                            "Color c" + cr
+                                            +"Icon diaIcon" + cr
+                                            +"diaIcon:LoadFilledRectangle(300, 300, c:LightGray())" + cr + cr
+
+                                            +"close:SetName("+dq+"Close"+dq+")" + cr
+                                            +"close:SetPosition(130, 140)" + cr + cr
+
+                                            +"Control panel" + cr
+                                            +"panel:SetPercentageWidth(1)" + cr
+                                            +"panel:SetPixelHeight(300)" + cr
+                                            +"panel:Add(diaIcon)" + cr
+                                            +"panel:Add(close)" + cr
+                                            +"Add(panel)"))
+        bodyDiv:AddParagraph("Now we will add to our OnShow and OnHide actions. These actions come from the Dialog parent and they are called upon opening or closing the Dialog. This Dialog will say and output that the Dialog was opened or closed, although OnShow will have one extra action call. In OnShow we will call Focus on our Button. This is so the Game now focuses on something inside of our Dialog window. This not only allows for the Button to be <b>accessible</b> by keyboard but also now we can use the Keyboard to close the Dialog. By default the escape key will close a Dialog. Both actions are shown in the following code block:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                            "action OnShow" + cr
+                                            +"    close:Focus()" + cr
+                                            +"    output GetName() + "+dq+" opened"+dq + cr
+                                            +"    speech:Say("+dq+"opened"+dq+")" + cr
+                                            +"end" + cr + cr
+
+                                            +"action OnHide" + cr
+                                            +"    output GetName() + "+dq+" closed"  + dq + cr
+                                            +"    speech:Say("+dq+"closed"+dq+")" + cr
+                                            +"end"))
+        bodyDiv:AddHeading("Opening a Dialog", 3)
+        bodyDiv:AddParagraph("Now we have a completed Dialog class, but there’s a problem, how do we open it? To open a Dialog you need to calls its Show action, but where do we call Show? A Dialog can open in a variety of ways but what we will do is in our main class, we will make a Button and we will give it a Behavior to open our Dialog. We will first make the behavior by making a new Quorum class named openDialog.quorum.")
+        bodyDiv:AddParagraph("In the following code block is the full openDialog class. All the class has is an action that will set what Dialog it will open and a Run action that opens the Dialog. ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                            "use Libraries.Interface.Behaviors.Behavior" + cr
+                                            +"use Libraries.Interface.Events.BehaviorEvent" + cr
+                                            +"use Libraries.Interface.Controls.Dialog" + cr + cr
+
+                                            +"class openDialog is Behavior" + cr
+                                            +"    Dialog dialog" + cr
+
+                                            +"    action SetDialog(Dialog newDialog)" + cr
+                                            +"        dialog = newDialog" + cr
+                                            +"    end" + cr + cr
+
+                                            +"    action Run(BehaviorEvent event)" + cr
+                                            +"        dialog:Show()" + cr
+                                            +"    end" + cr
+                                            +"end"))
+        bodyDiv:AddParagraph("You can also make a Behavior for our Dialog’s Button that will close the Dialog. It will be almost identical to this one but it will need a new name and it will call Hide instead of Show.")
+        bodyDiv:AddParagraph("Finally, in our main class we will make our Dialog and the Button that will Show the Dialog. Remember that we setup our Dialog in the Setup action so we have to call it after we declare our Dialog. Also note that we will set the Focus to our open Button so it is <b>accessible</b> with the keyboard. The full main class is shown in the following code block: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                            "use Libraries.Game.Game" + cr
+                                            +"use Libraries.Interface.Controls.Button" + cr + cr
+
+                                            +"class Main is Game" + cr + cr
+
+                                            +"    action Main" + cr
+                                            +"        StartGame()" + cr
+                                            +"    end" + cr + cr
+
+                                            +"    action CreateGame" + cr
+                                            +"        MyDialog dialog" + cr
+                                            +"        dialog:Setup()" + cr + cr
+
+                                            +"        Button open" + cr
+                                            +"        openDialog openBehavior" + cr
+                                            +"        openBehavior:SetDialog(dialog)" + cr + cr
+
+                                            +"        open:SetName("+dq+"Open Dialog"+dq+")" + cr
+                                            +"        open:SetBehavior(openBehavior)" + cr
+                                            +"        open:SetPosition(325, 400)" + cr + cr
+
+                                            +"        SetFocus(open)" + cr
+                                            +"        Add(open)" + cr
+                                            +"    end" + cr + cr
+
+                                            +"    action Update(number seconds)" + cr
+                                            +"    end" + cr
+                                            +"end"))
+        bodyDiv:AddParagraph("Now when we run the program their will a button that you can activate that opens our Dialog. When the Dialog is opened you can press the Escape key to close the Dialog, or if you added the closeDialog behavior you can close the Dialog by pressing Space to activate the Button. Note that you can also click the Buttons or the X on the Dialogs top bar.")
+        bodyDiv:AddImage("/media/userInterface/Dialog.png","This image shows the final expected game window with the Dialog open.")
+        bodyDiv:AddHeading("Run the Program", 2)
+        AddIDE(bodyDiv, "dialogTutorial","Activity: Dialog", "Try making a User Interface", "examples/UserInterface/Dialog/OptionDialogExample.quorum")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Dialogs in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Dialogs"
+    end
+
+    action GetName returns text
+        return "Dialogs"
+    end
+
+    action GetShortDescription returns text
+        return "how to use Dialogs"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/dialog.html"
+    end
+end

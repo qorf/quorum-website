@@ -1,0 +1,389 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson6A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 6: User Input and Text Type Values")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 6: User Input and Texts/Strings", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov
+                ov:AddText("In this lesson, students are introduced to the &quottext&quot 
+                data type (sometimes called a string in other programming languages) 
+                as a way of representing arbitrary sequences of ASCII characters. 
+                They will use the &quottext&quot data type to accept input from a user as they work on mastering 
+                two new User Input (UI) elements, the text input and the text output. Students combine these 
+                skills to develop a simple Mad Libs® app using the Online IDE.")
+        bodyDiv:Add(ov)
+            //Paragraph ov1
+                bodyDiv:AddHeading("*Mad Libs® is a trademark of the Penguin Group (USA) LLC., which does not sponsor, authorize or endorse this site.", 5)
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Text (String): ", "Any sequence of characters between double quotation marks, (examples: &quotHello,&quot &quot42,&quot &quotThis is a String!&quot)")
+                AddListItemWithBoldAtFront(voc, "Concatenate: ", "to link together or join. Typically used when joining two or more text type values and/or variables in programming, (example: &quotHello &quot + name)")
+        bodyDiv:Add(voc)
+        //bodyDiv:Add(ov1)
+           /* Paragraph ov2
+                ov2:AddText("<b>Note:</b> In Quorum Programming Language, we call text 
+                data type 'text'. The same data type is commonly called 'string' in many 
+                other languages. The developers of Quorum Language always researches what 
+                'word' we should use in coding when we introduce new 'coding syntax' in our 
+                language. What we strive for is which word would make most sense for all 
+                people (not only for the programmers but also for people who do not yet 
+                know programming). The evidence of the research shows that the word 'text' 
+                makes most sense to more people than the word 'string' when we talk about 
+                'text data type'. This is one of the reason Quorum Programming Language is 
+                called an 'Evidence Oriented Programming Language'. For further information 
+                please visit the following Quorum Web page.")
+        bodyDiv:Add(ov2)
+            
+        bodyDiv:AddLink("Programming Languages and Learning", "https://quorumlanguage.com/evidence.html")
+*/
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Identify text as a unique data type which contains a sequence of ASCII characters.")
+                goalList:AddListItem("Describe characteristics of the text data type.")
+                goalList:AddListItem("Accept text input in a program.")
+                goalList:AddListItem("Manipulate user-generated text input to generate dynamic output.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("Text data types (commonly called &quotstrings&quot in other programming languages) are a feature of essentially every 
+                programming language, and they allow for variable-length pieces of text to 
+                be represented, stored, and manipulated. While a single string can be 
+                stored in a variable, it is worth noting that a string will typically use 
+                much more memory than a number. Numbers are typically stored in fixed-width 
+                8-, 16-, 32-, or 64-bit chunks. ASCII characters require a single byte and 
+                so a text value of 100 characters, short by most standards, would require 800 
+                bits in order to be stored in memory. ")
+        bodyDiv:Add(purpose)
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList reso
+            reso:AddListItemLink("Mad Libs - Activity Guide, PDF", "/files/code/Unit5/U5L6 Activity Guide - Mad Libs.pdf")
+            reso:AddListItemLink("Mad Libs - Activity Guide, RTF", "/files/code/Unit5/U5L6 Activity Guide - Mad Libs.rtf")
+            reso:AddListItemLink("Mad Libs - Activity Guide, BRF", "/files/code/Unit5/Unit 5 Lesson 6 - Activity Guide - Mad Libs.brf")
+        bodyDiv:Add(reso)
+/*
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "say “text (string)�?", "")
+                AddListItemWithBoldAtFront(code, "text firstLetter = verb:GetCharacter(0)", "")
+                AddListItemWithBoldAtFront(code, "firstLetter = firstLetter:ToUpperCase()", "")
+                AddListItemWithBoldAtFront(code, "text remainingLetters = verb:GetSubtext(1)", "")
+        bodyDiv:Add(code)
+*/
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddParagraph("<b>Distribute: </b> the Mad Libs - Activity Guide from the Resources section. 
+        Students should use this opportunity to decide on what the theme of their Mad Libs app will be, 
+        what text they will accept into their app, and how it will be incorporated into its output. 
+        The primary guidelines of the project (also included in the Activity Guide) are:")
+        UnorderedList list1
+            list1:AddListItem("The app should be a &quothow-to&quot Mad Libs (e.g., &quotHow to take care of your pet ostrich&quot). Afterwards, you list steps with key components left open for user input. This is primarily to help students quickly conceive of ideas.")
+            list1:AddListItem("There should be at least 3 steps in their instructions.")
+            list1:AddListItem("Their app should accept at least 3 pieces of user input.")
+        bodyDiv:Add(list1)
+        bodyDiv:AddParagraph("Before moving on to begin coding their Mad Libs app, 
+        students should have a rough outline of their project. Once they have 
+        completed their outlines, students should begin coding their app.")
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("Remind students that &quotText&quot is a sequence of ASCII characters contained within double quotes. This sequence of characters can contain numbers, special characters, whitespace, and/or text. As a class discuss and go over a few examples of values that can be stored in a text type variable.")
+        UnorderedList list2
+            AddListItemWithBoldAtFront(list2, "&quotaText&quot: ", "Text type values may be similar to a variable name, but there are many differences.")
+            AddListItemWithBoldAtFront(list2, "&quotthis text has several spaces&quot: ", "Text can contain <b>spaces</b>.")
+            AddListItemWithBoldAtFront(list2, "&quot$2 bills are the coolest&quot: ", "Text can contain <b>special characters</b> (and can even start with them).")
+            AddListItemWithBoldAtFront(list2, "&quot11&quot: ", "Text might contain <b>only digits</b>. This example seems to be a number, but it is really 2 ASCII characters.")
+            AddListItemWithBoldAtFront(list2, "&quot&quot: ", "Text might contain <b>no characters</b>.")
+        bodyDiv:Add(list2)
+        
+
+/*
+bodyDiv:AddHeading("What is the 'Text Variable'?", 2)
+            Paragraph textVar
+                textVar:AddText("Unlike a number or integer type variable, the value for the text type variable can be confusing since it could be so many different expressions. The following list shows you some of the common values accepted as a text type variable.")
+        bodyDiv:Add(textVar)
+            UnorderedList textList
+                AddListItemWithBoldAtFront(textList, dq+"aText"+dq, "	 - Texts might look a lot like a variable name but there are many differences.")
+                AddListItemWithBoldAtFront(textList, dq+"look at all these spaces"+dq, " - Texts can contain spaces.")
+                AddListItemWithBoldAtFront(textList, dq+"$2 bills are the coolest"+dq, " - Texts can contain special characters (and even start with them).")
+                AddListItemWithBoldAtFront(textList, dq+"11"+dq, " - Texts might contain only digits. This looks like a number but it is really 2 ASCII characters.")
+                AddListItemWithBoldAtFront(textList, dq+""+dq, " - Texts might contain no characters.")
+        bodyDiv:Add(textList)*/
+        bodyDiv:AddHeading("Teacher's Tip", 4)
+        Paragraph tTip1
+            tTip1:SetClassAttribute("cool-box")
+            tTip1:AddText("The most important rule of the text variable is that the text value - assigned to the text variable - MUST always be within <b>&quotDouble Quotes&quot</b>")
+        bodyDiv:Add(tTip1)
+        
+        bodyDiv:AddParagraph("Here are a few more example outlines that you can have students refer to if they are having trouble coming up with an outline for their Mad Libs.")
+        bodyDiv:AddHeading("Pattern 1: A Letter from Camp", 4)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Dear [name of a person]," + cr
+                                                        +   "" + cr
+                                                        +   "Today is the first day of our camp at [name of a planet]. Things are going really well" + cr
+                                                        +   "so far with minor accidents here and there. We set up our tent on [a place in nature " + cr
+                                                        +   "that is usually dangerous]. When we were setting the tent poles, [name of a person] " + cr
+                                                        +   "accidentally hit [name of second person]'s [a part of the body]. Good thing we had [a " + cr
+                                                        +   "name of an animal] standing near by to take care of the small injury, otherwise [name" + cr
+                                                        +   "of second person again] would have lost an entire [a part of the body] by the time we come home." + cr
+                                                        +   "Oh, looks like I am needed again!" + cr
+                                                        +   "" + cr
+                                                        +   "Love you, [a name of an animal]" + cr))
+
+        bodyDiv:AddHeading("Pattern 2: How to train a dog to sit ", 4)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "It could be a challenge to train a dog to &quotsit.&quot" + cr
+                                                        +   "" + cr
+                                                        +   "1. First, you need to know what [dog name]'s favorite food is." + cr
+                                                        +   "2. Once you have found [same dog name]'s favorite food, hold [type of food]" + cr
+                                                        +   "   in front of his/her [a body part]." + cr
+                                                        +   "3. Since [name of your dog] is a [name of an animal], you need to be careful not to get " + cr
+                                                        +   "   [verb - past tense] by [name of your dog]." + cr
+                                                        +   "4. Tell [name of your dog] to &quotsit,&quot and at the same time, gently push down on their [a body " + cr
+                                                        +   "   part of a dog] with your open hand." + cr
+                                                        +   "5. Release your hand pressure to the [a body part of a dog], and keep telling [name of " + cr
+                                                        +   "   your dog] &quotsit.&quot" + cr
+                                                        +   "6. Once [name of your dog] knows how to keep [a body part of a dog] down with " + cr
+                                                        +   "   your command of &quotsit,&quot give him/her [name of a food] for the reward!" + cr))
+
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+            Paragraph build
+                build:AddText("Building this Mad Libs Program is relatively easy for you 
+                by now because we have done something like this in Lesson 4 already 
+                - Getting the user input for the calculator program. For this project, we will 
+                not have to &quotcast&quot the user input to an integer, instead we will save 
+                the user input as a text type variable to use when displaying the Mad Libs paragraph 
+                at the end of the program. Use your brainstorming ideas from the 
+                Activity Guide as a template for your MadLibs input and output.")
+        bodyDiv:Add(build)
+
+        bodyDiv:AddHeading("Program Flow", 4)
+            Paragraph build1
+                build1:AddText("Once completed, your program should: ")
+        bodyDiv:Add(build1)
+            OrderedList buildList
+                buildList:AddListItem("Prompt the user for text input of different types (e.g., noun, verb, adjective, etc.) - Request at least 3 separate words from the user. ")
+                buildList:AddListItem("Modify the user's &quotword&quot if necessary (e.g. capitalizing proper nouns).")
+                buildList:AddListItem("Place the user's input words within your Mad Libs outline using <b>concatenation</b>. - Using meaningful variable names for your user input will help to make this step easier.")
+                buildList:AddListItem("Output the Mad Libs to the screen. - Don't forget to add the &quotsay&quot command to make your Mad Libs app user friendly and accessible.")
+        bodyDiv:Add(buildList)
+/*
+        bodyDiv:AddHeading("Coding Flow", 4)
+            Paragraph build2
+                build2:AddText("In order for you to create this program, you should:")
+        bodyDiv:Add(build2)
+            OrderedList buildList1
+                buildList1:AddListItem("Write input syntax for each user input (a word) on separate lines. ***Note: Remember all user inputs are text variables!")
+                buildList1:AddListItem("Write a code block for modifying the user input for capitalization. Then store the modified data in an variable (you can reassign the value to the existing variable or caret new variable for it.)")
+                buildList1:AddListItem("Concatenate the user's text inputs into one series of instructional sentences in the output line. Or if you prefer,  Make five lines of separate statements as the output sentences can be naturally broken into five sections. Don't forget to add a line for 'say' command for each section as well to make the program user friendly and accessible.")
+                buildList1:AddListItem("For the fun of it, we can even let the computer speak the instruction to us by using 'say' command.")
+        bodyDiv:Add(buildList1) */
+            Paragraph build3
+                build3:AddText("The example below shows the review of input syntax, concatenation, and how to use the &quotsay&quot command.")
+        bodyDiv:Add(build3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "text userInput1 = input(&quotType in a noun.&quot)" + cr
+                                                        +   "text userInput2 = input(&quotType in a verb.&quot)" + cr
+                                                        +   "" + cr
+                                                        +   "output &quotMy output is &quot + userInput1 + &quot &quot + userInput2" + cr
+                                                        +   "say &quotMy output is &quot + userInput1 + &quot &quot + userInput2" + cr))
+
+        //bodyDiv:AddHeading("Coding Challenge 25", 4)
+            Paragraph build4
+                build4:AddText("You can write your program without &quotmodifying the user text input&quot for now. Try running your code after properly concatenating the user input words within your Mad Libs outline.")
+        bodyDiv:Add(build4)
+        //bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Writing MadLibs Program")
+        addStatementIDE:GetIDETitle():AddText("Writing MadLibs Program")
+        addStatementIDE:GetIDESubtitle():AddText("*** Run, Test, Debug!")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        bodyDiv:AddHeading("Modifying the user input", 4)
+            Paragraph modify
+                modify:AddText("You may need to modify some of the user input to fit your MadLibs outline, such as capitalizing the word at the beginning of a sentence. 
+                Remember text type values are just a sequence of ASCII characters. These ASCII characters can be accessed and modified individually to format your text variable to fit your MadLibs outline. The code block below shows an example of the process: ")
+                //modify:AddText("Your code so far should have the lines for asking the user to type in text input for the following: a plural noun, a noun1, a noun2, a name of a song, a verb. We are asking the user to input all of these in lower case. Because of that, we need to modify the user's text input for the 'verb', so that it will be capitalized when it is fit into the proper spot in the output sentences. In Quorum Programming Language, There are special way to accomplish the coding for this type of function by calling special actions directly on the variable itself - not on an object, but on a variable. The code block below shows the syntax:")
+        bodyDiv:Add(modify)   
+
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+            s1:AddText("//Creates a text type variable &quotfirstLetter&quot which will store the ASCII character" + cr)
+            s1:AddText("//in position 0 of our text type variable &quotverb&quot." + cr)
+            s1:SetClassAttribute("comment")
+            s2:AddText("//Converts the ASCII character stored in the &quotfirstLetter&quot variable to upper case" +cr)
+            s2:AddText("//(if the character is already upper case then it will remain upper case)." + cr)
+            s2:SetClassAttribute("comment")
+            s3:AddText("//Creates a text type variable &quotremainingLetters&quot which will store the remaining ASCII" + cr)
+            s3:AddText("//characters (from position 1 until the end of the text) of our text type variable &quotverb&quot." + cr)
+            s3:SetClassAttribute("comment")
+            s4:AddText("//Converts the remaining ASCII characters stored in &quotremainingLetters&quot to lower case" + cr)
+            s4:AddText("//(if the characters are already lower case then they will remain lower case)." + cr)
+            s4:SetClassAttribute("comment")
+            s5:AddText("//Saves our formatted ASCII characters to our text type variable &quotverb&quot which we can use to output to the screen" + cr)
+            s5:SetClassAttribute("comment")
+            cb1:Add(s1)
+            cb1:AddText("text firstLetter = verb:GetCharacter(0)" + cr)
+            cb1:Add(s2)
+            cb1:AddText("firstLetter = firstLetter:ToUpperCase()" + cr)
+            cb1:Add(s3)
+            cb1:AddText("text remainingLetters = verb:GetSubtext(1)" + cr)
+            cb1:Add(s4)
+            cb1:AddText("remainingLetters = remainingLetters:ToLowerCase()" + cr)
+            cb1:Add(s5)
+            cb1:AddText("verb = firstLetter + remainingLetters")
+            bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+
+            
+            
+/*
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "text firstLetter = verb:GetCharacter(0)" + cr
+                                                        +   "firstLetter = firstLetter:ToUpperCase()" + cr
+                                                        +   "text remainingLetters = verb:GetSubtext(1)" + cr
+                                                        +   "verb = firstLetter + remainingLetters" + cr))
+
+        bodyDiv:AddHeading("text firstLetter = verb:GetCharacter(0)", 5)
+            Paragraph modify1
+                modify1:AddText("In the first line of the code block above, we declare a new variable 'firstLetter' for the purpose to 'single out' the first letter in the 'text value' that the user input for the 'verb'. The 'verb' is the name of the variable we declared somewhere prior for the user input. We call action 'GetCharacter(Index indexNumber)' on the variable 'verb' - on the right side of the '=' sign. Index is an another way to express the position of letters in a word. For example, if the user input word 'run' for this variable, the position of the letter 'r' is index '0'. The position of the letter 'u' is index '1', and the 'n' is index '2'. Index number always starts with '0'.")
+        bodyDiv:Add(modify1) 
+        bodyDiv:AddHeading("firstLetter = firstLetter:ToUpperCase()", 5)
+            Paragraph modify2
+                modify2:AddText("In the second line, we 'reassign' a value to the variable 'firstLetter'. The new value is the result of calling the action 'ToUpperCase()' to the current value of the variable 'firstLetter' - this would would be the letter 'r' in the preious example.")
+        bodyDiv:Add(modify2) 
+        bodyDiv:AddHeading("text remainingLetters = verb:GetSubtext(1)", 5)
+            Paragraph modify3
+                modify3:AddText("In the third line, we create a new variable 'remainingLetters'. Then we assign the value that is the result of calling the action 'GetSubtext()' on the variable 'verb'. The 'action GetSubtext()' finds and copies any number of letters in a word from the specified index position and after. With the example of the word 'run', 'GetSubtext(1)' will copy the letter 'u' and 'n'.")
+        bodyDiv:Add(modify3) 
+        bodyDiv:AddHeading("verb = firstLetter + remainingLetters", 5)
+            Paragraph modify4
+                modify4:AddText("In the forth line, we 'reassign' the value to the variable 'verb'. The new value is the concatenated text string of 'firstLetter' and 'remainingLetters'. Now the user's text input is modified to have capitalization.")
+        bodyDiv:Add(modify4) 
+
+        bodyDiv:AddHeading("Coding Challenge 26", 4)*/
+            Paragraph modify5
+                modify5:AddText("Add your own code block to your program that will modify the user's input text for proper capitalization in your MadLibs outline.")
+        bodyDiv:Add(modify5) 
+        //bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Modifying User Input")
+        addStatementIDE1:GetIDETitle():AddText("Modifying User Input")
+        addStatementIDE1:GetIDESubtitle():AddText("*** Run, Test, Debug!")
+        addStatementIDE1:SetGameEnvironment(true)
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+        bodyDiv:Add(addStatementIDE1:GetGameCanvas())
+
+
+        bodyDiv:AddParagraph("<b>Make a Prediction:</b> Follow the lines of code below to determine what the output for this code segement would be: ")
+        CodeBlock cbA
+            cbA:AddText("text phrase = &quotI am so&quot" + cr)
+            cbA:AddText("text emotion = &quotexcited for&quot" + cr)
+            cbA:AddText("text place = &quotschool&quot" + cr)
+            cbA:AddText("text sentence = phrase + &quot &quot + emotion + &quot &quot + place + &quot today!&quot" + cr)
+            cbA:AddText("output sentence" + cr)
+            bodyDiv:Add(preformatter:GeneratePreformattedCode(cbA))
+            
+        bodyDiv:AddHeading("Wrap Up", 2)
+
+        //bodyDiv:AddLink("Exemplar Solution for Coding Challenge 25 and 26", "/files/code/Unit5/Unit 5 Lesson6 - Exemplar Solution.rtf")
+
+            Paragraph wrapup
+                wrapup:AddText("Once students have completed their applications they should share their work with their peers, trying one another's Mad Libs.")
+                //wrapup:AddText("Try creating a program with other MadLibs patterns. You can use your own sentences or you can use the following patterns:")
+        bodyDiv:Add(wrapup)
+        
+        
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CL.L2:4")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CPP.L2:5, CPP.L3A:3, CPP.L3A:4, CPP.L3A:5")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CT.L2:12, CT.L3A:1, CT.L3A:3")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.1.1 (B)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.3.1 (L)")
+
+        bodyDiv:Add(list)
+
+/* Completed 5/19/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the skill for Controlling Memory with Variables'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 6: (User Input and Text/Strings)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 6"
+    end
+    action GetShortDescription returns text
+        return "Learn about User Input and Text/Strings"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson6A.html"
+    end
+
+end
+
+ 
+    

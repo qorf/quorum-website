@@ -1,0 +1,126 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class Lab6_4 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Lab 6.4: Accessibility Keyboard Access")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Lab 6.4: ", 1)
+        headDiv:AddText("")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Objectives", 2)
+        bodyDiv:AddParagraph("The goal of this lab is to understand the following concepts:")
+        UnorderedList unorderedList0
+        bodyDiv:Add(unorderedList0)
+        ListItem listItem1
+        unorderedList0:Add(listItem1)
+        listItem1:AddText("Using a class hierarchy")
+        ListItem listItem2
+        unorderedList0:Add(listItem2)
+        listItem2:AddText("How to instantiate blueprint actions")
+        ListItem listItem3
+        unorderedList0:Add(listItem3)
+        listItem3:AddText("How to use the Libraries.Accessibility classes")
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("A screen reader is a computer program that runs in the background, reading what is displayed on the screen out loud for a blind or visually impaired user. For example, screen readers might tell us when a new window popped up on the screen, what keys are being pressed on a keyboard, or when an icon is selected on the desktop. In this lab, we will make a simple screen reader that reads the keyboard and tells us which keys are being pressed. In future labs, we will expand on these ideas by adding more screen reader features.")
+        bodyDiv:AddHeading("Task 1: Getting Started", 2)
+        bodyDiv:AddParagraph("We will begin the lab by starting Sodbeans 4.0 or later. Note that because the accessibility libraries were created for Quorum 2.0, they are not available in Sodbeans 3.5 or earlier. Once we have started Sodbeans, we will create a new " + dq + "Quorum Application" + dq + " project, and name it Lab6_4. In the Main.quorum file, it should contain a Main class and Main action.")
+        bodyDiv:AddParagraph("Next, we will create an additional class for the project. This class is going to handle speaking our keyboard events. To start, in the New File dialog, create a new file by selecting " + dq + "Quorum" + dq + " and " + dq + "Quorum Class" + dq + " in the Categories and File Types windows, respectively. Then, name the new file Observer in the New Quorum Class dialog. In computer science, an " + dq + "Observer" + dq + " is a nickname for a class that " + dq + "listens" + dq + " for events that happen on a computer. While we are making an observer that listens for keyboard events, there are other observers available that listen for changes in focus, the mouse, menus, changes in the computer's clock, or other events.")
+        bodyDiv:AddParagraph("For this lab we will be using a few new libraries to create our Observer. At the top of our Observer file, we need to include the 1) Speech class from the Sound library and 2) all of the Accessibility libraries. Our main file will also need to use the Accessibility libraries, so we will need to include that use statement in our main file as well.")
+        PreformattedText pre4
+        bodyDiv:Add(pre4)
+        pre4:AddAttribute("class", "code")
+        CodeBlock code5
+        code5:AddText(
+"use Libraries.Accessibility.all 
+use Libraries.Sound.Speech")
+        pre4:Add(code5)
+        bodyDiv:AddHeading("Task 2: Inheriting from the KeyboardObserver Class", 2)
+        bodyDiv:AddParagraph("Our Observer class will need to inherit the variables and actions of the KeyboardObserver class. To do this, tell Sodbeans that our Observer class " + dq + "is" + dq + " a KeyboardObserver.")
+        PreformattedText pre6
+        bodyDiv:Add(pre6)
+        pre6:AddAttribute("class", "code")
+        CodeBlock code7
+        code7:AddText(
+"//This is called " + dq + "inheritance" + dq + "
+class Observer is KeyboardObserver
+end")
+        pre6:Add(code7)
+        bodyDiv:AddParagraph("Since you we will be using our Observer class to say things very quickly, we will need to use an object of class Speech, which has more functionality than the say command for controlling speech. Using the Speech class instead of the say command will allow us to say events as soon as we get them instead of waiting until the previous event is done. To use the Speech class, we use the action Say and pass it the text we want it to say. As usual, when we use the Speech class, we need to add use Libraries.Sound.Speech to our file.")
+        bodyDiv:AddParagraph("As mentioned previously, there are many kinds of Observer. Specifically, Quorum defines a MouseObserver, KeyboardObserver, FocusObserver, WindowObserver, MenuObserver, PropertyObserver, and EverythingObserver. Each observer has a blueprint action, RecieveEvent, that we need to implement in order to use them. The implementation of the RecieveEvent is where we code our implementation. To do that, we will use the RecieveEvent's parameter of type KeyboardEvent, FocusEvent, or other types of events, depending on the kind of Observer. An KeyboardEvent contains information about the event (e.g. what key was pressed). The KeyboardEvent class also has a custom action called GetDescription(), which returns a sentence describing the event in English. We can use this sentence if we wish, or other values in the event, to write our screen reader.")
+        PreformattedText pre8
+        bodyDiv:Add(pre8)
+        pre8:AddAttribute("class", "code")
+        CodeBlock code9
+        code9:AddText(
+"action RecieveEvent(KeyboardEvent event)
+    speech:Say(event:GetDescription())
+end")
+        pre8:Add(code9)
+        bodyDiv:AddParagraph("In the example above, we used the Speech variable in the class to say the description of the event.")
+        bodyDiv:AddHeading("Task 3: Using the Observer class", 2)
+        bodyDiv:AddParagraph("Now that we have created a observer class, we can add that to an AccessibilityManager to begin listening for events.")
+        bodyDiv:AddParagraph("Go to our Main and instantiate an object of AccessibilityManager and one of your Observer class. The AccessibilityManager is what will run your screen reader. You can add as many instances of the observer classes as we want to the AccessibilityManager. When we start the AccessibilityManager it will begin receiving events from the system. More specifically, the RecieveEvent action will begin obtaining events from the system.")
+        bodyDiv:AddParagraph("We should have an instance of Observer and an instance of AccessibilityManager. We can use AccessibilityManager's Add action to add our observer to the instance of AccessibilityManager. Now, we need to call AccessibilityManager's Start action and run our program. Congratulations, we now the beginnings of a screen reader that talks to us!")
+        bodyDiv:AddHeading("Sample Output", 2)
+        bodyDiv:AddParagraph("When you run the program it should not do anything until we press a key on the keyboard. When we press a key, our screen reader should output which key was pressed.")
+        bodyDiv:AddParagraph("When we are done, first debug, fix any errors, and then show the code to the instructor.")
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetSummaryName returns text
+        return "Accessibility Keyboard Access"
+    end
+    action GetName returns text
+        return "Lab 6.4"
+    end
+    action GetShortDescription returns text
+        return "an introduction to obtaining keystrokes through the accessibility system."
+    end
+    action GetLocation returns text
+        return "lessons/chapter6/lab6_4.html"
+    end
+end

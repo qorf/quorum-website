@@ -1,0 +1,944 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson5A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 5: Building an App: Counter Game")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 5: Building an App: Counter Game", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("In this lesson students will add variables to a program to keep track of a score, or a count of some number of key presses. The major topic is <b>variable scope</b> and understanding the differences, benefits, and drawbacks, of using global versus local variables. This lesson focuses more on using global variables, since in event-driven apps that's what you need to keep track of data across multiple events.")
+        bodyDiv:AddParagraph("The very basics of a <b>simple if-statement</b> are also presented in this lesson. Finally, students are asked to apply what they've learned about variables, scope, and if-statements to make their own game modeled after one of the examples they saw during the lesson.")
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+        UnorderedList vocab
+            AddListItemWithBoldAtFront(vocab, "Global Variable: ", "A variable whose scope is &quotglobal&quot to the program, it can be used and updated by any part of the code. Its global scope is typically derived from the variable being declared (created) outside of any action in the class Main section.")
+            AddListItemWithBoldAtFront(vocab, "If-Statement: ", "The common programming structure that implements &quotconditional statements.&quot")
+            AddListItemWithBoldAtFront(vocab, "Local Variable: ", "A variable with local scope is one that can only be seen, used and updated by code within the same scope. Typically this means the variable was declared (created) inside an action.")
+            AddListItemWithBoldAtFront(vocab, "Variable Scope: ", "dictates what portions of the code can &quotsee&quot or use a variable, typically derived from where the variable was first created. (Refer to the Global v. Local section)")
+        bodyDiv:Add(vocab)
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+        UnorderedList goals
+            goals:AddListItem("Use global variables to track numeric data in a program or app.")
+            goals:AddListItem("Give a high-level explanation of what &quotvariable scope&quot means.")
+            goals:AddListItem("Debug problems related to variable scoping issues.")
+            goals:AddListItem("Modify existing programs to add and update variables to track information.")
+        bodyDiv:Add(goals)
+
+        bodyDiv:AddHeading("Purpose", 2)
+        bodyDiv:AddParagraph("This lesson is mostly a continuation and furthering of our 
+        understanding of variables and how they work. There are many pitfalls 
+        and misconceptions about variables and how to use them in programs for the 
+        early learner. Variables are often difficult to learn because they are 
+        abstract, and one must have a good mental model for what" + dq + "s happening in 
+        the computer and with program instructions, in order to reason about the code 
+        and develop one" + dq + "s own solutions to problems.")
+        bodyDiv:AddParagraph("The topic and concept of variable scope is a big one 
+        in any programming language. However, since many languages do it 
+        differently, the concept of variable scope isn" + dq + "t listed explicitly 
+        as a learning objective in the CSP framework. As a concept, though, 
+        variable scoping is a form of abstraction - a programming language 
+        lets you create variables with as narrow or broad a scope as you need 
+        to program a certain task. As a general practice, you usually want to 
+        create variables with the most narrow scope you can for the task at hand, 
+        since the other extreme - everything is global - can become unwieldy or 
+        hard to manage, and it doesn" + dq + "t promote code reuse.")
+
+        bodyDiv:AddHeading("Getting Started", 2)
+        bodyDiv:AddHeading("Recall basic mechanics and terminology of working with variables", 4)
+        bodyDiv:AddParagraph("<b>Recall:</b> In the previous lesson, students learned about the basic mechanics of working with variables in Quorum Programming Language. They developed a mental model for thinking about how values are stored and retreived from memory and that to avoid confusion they should read the &quot=&quot sign as &quotgets&quot when assigning values to a variable.")
+        bodyDiv:AddParagraph("<b>Moving Forward:</b> The whole purpose of learning about variables though is so that programs can make use of them while they are running.")  
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("There are a few things that students need to understand about where to create variables in their code and how to refer to them. In this lesson students will learn how to do this and how to debug a few problems related to common issues that newcomers may have with variables.")
+        bodyDiv:AddParagraph("Students will also use <i>if-statements</i> in this lesson to make certain changes once the score reaches a certain value.")
+
+        bodyDiv:AddHeading("Student Instructions: ", 3)
+        bodyDiv:AddParagraph("The example program below has a portion of the <i>Count Up/Down App</i> written. Right now, the program should output an increasing count when the &quotUP&quot key is pressed on the keyboard and output Down when the &quotDOWN&quot key is pressed on the keyboard.")
+
+         SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Count Up/Down App version 1")
+        addStatementIDE:GetIDETitle():AddText("Count Up/Down App version 1")
+        addStatementIDE:SetGameEnvironment(false)
+        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+    integer count = 0
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            count = count + 1
+            say count
+            output count
+        elseif event:keyCode = event:DOWN
+            say &quotDown&quot
+ 
+       end
+    end
+end
+
+")
+
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+
+        bodyDiv:AddParagraph("This small functionality demonstrates and important concept - how to create a variable in the app &quorcount&quot and update it when an event occurs. It may seem fairly straightforward but there are common misconceptions that we want to alert you to.")
+        bodyDiv:AddHeading("<u>Misconception Investigation</u>", 4)
+        bodyDiv:AddParagraph("You are going to do a small investigation of two apps that do almost the same thing, but <i>one works as expected</i> and <i>one with a bug</i> that demonstrates an important concept about using variables in programs and apps. Here is what you'll do: ")
+        OrderedList act1
+            act1:AddListItem("Run the first app (above), which works properly")
+            act1:AddListItem("Study the code until you think you understand what's happening")
+            act1:AddListItem("Pay attention to the code that handles the &quotUP&quot key being pressed")
+            act1:AddListItem("Run the second app (below), which has a bug")
+            act1:AddListItem("Can spot the difference in the code?")
+            act1:AddListItem("Report what you found! - It's not a quiz. You can go back and forth until you spot the problem, but you should find it and be able to write what it is.")
+        bodyDiv:Add(act1)
+
+        SideBySideIDE addStatementIDE1
+        addStatementIDE1:SetUniqueIdentifier("Count Up/Down App version 2")
+        addStatementIDE1:GetIDETitle():AddText("Count Up/Down App version 2")
+        addStatementIDE1:SetGameEnvironment(false)
+        addStatementIDE1:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            integer count = 0
+            count = count + 1
+            say count
+            output count
+        elseif event:keyCode = event:DOWN
+            say &quotDown&quot
+ 
+       end
+    end
+end
+
+")
+
+        addStatementIDE1:Setup()
+        bodyDiv:Add(addStatementIDE1)
+
+        bodyDiv:AddParagraph("Respond to the following questions about your investigation into the bug with the counting game. Feel free to go back and run or examine the code for the game again.")
+        UnorderedList act2
+            act2:AddListItem("From the user's perspective, what was the difference between the first version of the game and the second version of the game with the bug?")
+            act2:AddListItem("From examining the code, what specifically was the difference between the two, and why is that an issue?")
+            act2:AddListItem("How could you fix this bug?")
+        bodyDiv:Add(act2)
+
+        bodyDiv:AddHeading("<u>Variable Scope: Local vs. Global</u>", 4)
+        bodyDiv:AddParagraph("<b>Creating Variables in the Right Place:</b> The problem you encountered was caused by declaring the &quotcount&quot variable inside of the event handling action. In the second version, when you press the &quotUP&quot key: ")
+        OrderedList act3
+            act3:AddListItem("A new integer variable &quotcount&quot is declared with a value of 0")
+            act3:AddListItem("&quotcount&quot is incremented by 1")
+            act3:AddListItem("The current value of &quotcount&quot is output")
+        bodyDiv:Add(act3)
+        bodyDiv:AddParagraph("This code works as expected the first time the &quotUP&quot key is pressed, but then when the &quotUP&quot key is pressed again it goes through the entire sequence again recreating the &quotcount&quot variable with a value of 0, before incrementing the value and outputting the current value which will continue to be 1 over and over again every time the &quotUP&quot key is pressed.")
+        bodyDiv:AddParagraph("<b>Solution:</b> Instead of declaring (creating) a new variable inside of the event handler, declare (create) the &quotcount&quot variable and set the value to 0 in the Main part of the program and increment the value of the variable when the &quotUP&quot key is pressed.")
+        bodyDiv:AddParagraph("In Quorum Programming Language you have two choices:")
+        OrderedList act4
+            act4:AddListItem("Create a variable <b>outside</b> of any action")
+            act4:AddListItem("Create a variable <b>inside</b> an action")
+        bodyDiv:Add(act4)
+        bodyDiv:AddParagraph("The term for this is &quotvariable scope&quot. The scope of a variable defines which parts of your code can access and modify the variable. Quorum Programming Language has two scopes: <b>global</b> and <b>local</b>. Here's the difference...")
+        bodyDiv:AddHeading("Local Variables", 4)
+        Paragraph local
+            local:SetClassAttribute("cool-box")
+            local:AddText("Variables created <i>within an action</i> become <b>local</b> to the action. Local variables have <b>local scope:</b> they can <i>only</i> be accessed within the action. In the example below we say that <b>age</b> is &quotlocal to&quot <b>SomeAction()</b> which means that only code within <b>SomeAction()</b> can access and modify the value of <b>age</b>. Code that is outside of this action does not know that the variable exists and therefor cannot use the variable. In fact, local variables are <i>created</i> when an action starts, and <i>destroyed</i> when the action is completed. Local variables only exist for the life of one action call.")
+        bodyDiv:Add(local)
+        CodeBlock cb1
+        Span s1
+            s1:SetClassAttribute("comment")
+            s1:AddText("// code here CANNOT use the variable age" + cr + cr)
+            cb1:Add(s1)
+            cb1:AddText("action SomeAction()" + cr)   
+            cb1:AddText("   integer age = 17" + cr)
+            cb1:AddText("end" + cr + cr)
+            cb1:Add(s1)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        
+        bodyDiv:AddHeading("Global Variables", 4)
+        Paragraph global
+            global:SetClassAttribute("cool-box")
+            global:AddText("A variable declared outside of an action, becomes <b>global</b>. A global variable has <b>global scope</b> which means the variable is accessible and modifiable throughout your program by <i>any</i> code, and also in <i>any</i> action. In the example below we say that <b>lives</b> is a <b>global variable</b>.")
+        bodyDiv:Add(global)
+        
+        CodeBlock cb2
+        Span s2
+        Span s3
+            s2:SetClassAttribute("comment")
+            s3:SetClassAttribute("comment")
+            s2:AddText("// code here CAN use and modify the lives variable" + cr + cr)
+            s3:AddText("// code here CAN ALSO use and modify the lives variable" + cr + cr)
+            cb2:AddText("integer lives = 3" + cr + cr)
+            cb2:Add(s2)
+            cb2:AddText("action SomeAction()" + cr + cr)
+            cb2:Add(s3)
+            cb2:AddText("end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        bodyDiv:AddHeading("<u>Why Use Local Variables?</u>", 4)
+        bodyDiv:AddParagraph("Local variables are useful temporary placeholders for data that you need to perform a computation of some kind. Often a program will have several actions that perfom different but related tasks, and you'd like to reuse variable names. Since local variables are only recognized inside of their actions, variables with the same name can be reused in different actions.")
+        bodyDiv:AddParagraph("The best example of this is <b>action parameters</b>. Action parameters are a form of a local variable - they get created and initialized when an action is called, they get used while the action runs, and then they get destroyed when the action completes.")
+        bodyDiv:AddParagraph("Imagine if all we had were global variables. Then you <b>could not</b> write this code:")
+
+        CodeBlock cb3
+        Span s4
+            s4:SetClassAttribute("comment")
+            s4:AddText("    //some code" + cr )
+            cb3:AddText("action Add(integer a, integer b)" + cr )
+            cb3:AddText("   integer result = a + b" + cr)
+            cb3:AddText("end" + cr + cr)
+            cb3:AddText("action Subtract(integer a, integer b)" + cr )
+            cb3:AddText("   integer result = a - b" + cr)
+            cb3:AddText("end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        bodyDiv:AddParagraph("If all variables had to be global we'd have to invent different variable names for every action parameter in the entire program. But because the <b>a</b> and <b>b</b> variables are <b>local</b> to the action, we can re-use these handy parameter names.")
+        
+        bodyDiv:AddHeading("<u>Why Use Global Variables?</u>", 4)
+        bodyDiv:AddParagraph("Global variables are useful for keeping track of data over the lifetime of the program that's running. If you want to keep track of some data between events, or between action calls, you want a global variable.")
+        bodyDiv:AddParagraph("<b>Where to Create Global Variables:</b> By convention global variables are created and initialized in the very first lines of code in a program. This convention is helpful because it keeps all of the global variables in a group at the top where you can easily reference them.")
+        
+        bodyDiv:AddHeading("<u>Coding Challenge: Making Countdown Work</u>", 4)
+        bodyDiv:AddParagraph("You now know enough about using global variables to try it yourself. Let's start with an easy task. Right now pressing the &quotUP&quot key on the keyboard works as expected; pressing the &quotDOWN&quot key does not. So make the count go down by 1 every time the &quotDOWN&quot key is pressed on the keyboard.")
+        UnorderedList act5
+            act5:AddListItem("Study how the &quotUP&quot key press works and use it as an example for writing the code for the &quotDOWN&quot key press.")
+            act5:AddListItem("Add and modify the code so that when the &quotDOWN&quot key is pressed the count goes down")
+            act5:AddListItem("HINT: Don't forget to add the &quotsay&quot and &quotoutput&quot statements after decrementing the count value so that the user is aware of the current value of the &quotcount&quot variable.")
+        bodyDiv:Add(act5)
+
+       SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("Make Count Down Work")
+        addStatementIDE3:GetIDETitle():AddText("Make Count Down Work")
+        addStatementIDE3:SetGameEnvironment(false)
+        addStatementIDE3:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+    integer count = 0
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            count = count + 1
+            say count
+            output count
+        elseif event:keyCode = event:DOWN
+            say &quotDown&quot
+ 
+       end
+    end
+end
+
+")
+
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+
+        bodyDiv:AddHeading("<u>Debugging Practice</u>", 4)
+        bodyDiv:AddParagraph("The program below has a few different bugs. Do this: ")
+        UnorderedList act6
+            act6:AddListItem("Run the program")
+            ListItem act6a
+            act6a:AddText("To encounter the bug:")
+            UnorderedList act6a1
+                act6a1:AddListItem("Press the &quotUP&quot key on the keyboard twice")
+                act6a1:AddListItem("Press the &quotDOWN&quot key on the keyboard twice")
+            act6a:Add(act6a1)
+            act6:Add(act6a)
+            act6:AddListItem("Examine at the code and fix the problem")
+        bodyDiv:Add(act6)
+
+             SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("Debugging Practice")
+        addStatementIDE4:GetIDETitle():AddText("Debugging Practice")
+        addStatementIDE4:SetGameEnvironment(false)
+        addStatementIDE4:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+    integer count = 0
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            say count
+            count = count - 1
+        elseif event:keyCode = event:DOWN
+            say count
+            count = count + 1
+       end
+    end
+end
+
+")  
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+    
+    bodyDiv:AddHeading("<u>Simple Decisions with if-statements</u>", 4)
+    bodyDiv:AddParagraph("Now that you know how to use variables in your program to keep track of useful information, the next thing you probably want to do is make decisions based on the variable's values. For example: in the Count Up/Down program what we want to say is <b>&quotif the count reaches 10 then the player wins.&quot</b> We are going to learn all about &quotif-statements&quot in a later lesson. For now, we need to know just enough to make our program end.")
+    bodyDiv:AddParagraph("We want to add another &quotif-statement&quot into the event handler to check the value of &quotcount&quot <i>immediately after</i> we update its value. Here is an example of the full event handler: ")
+    
+    CodeBlock cb4
+        cb4:AddText("action PressedKey(KeyboardEvent event)" + cr)
+        cb4:AddText("   if event:keyCode = event:UP" + cr)
+        cb4:AddText("       count = count + 1" + cr)
+        cb4:AddText("       if count = 10" + cr)
+        cb4:AddText("           say &quotYou have reached 10, You Won!&quot" + cr)
+        cb4:AddText("       else" + cr)
+        cb4:AddText("           say count" + cr)
+        cb4:AddText("       end" + cr)
+        cb4:AddText("   elseif event:keyCode = event:DOWN" + cr)
+        cb4:AddText("       count = count - 1" + cr)
+        cb4:AddText("       say count" + cr)
+        cb4:AddText("   end" + cr)
+        cb4:AddText("end" + cr)
+    bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+    bodyDiv:AddParagraph("Most programming languages have a way to check if some condition is true, and if it is do something. It's called an &quotif-statement&quot. An if-statement does not constantly monitor your program checking the condition to determine if it's true or false. An if-statement is an instruction just like any other that gets executed line by line in order from top to bottom. This means that you need to insert an if-statement into your code <b>at the exact place where you need the condition checked</b>. Once the condition is checked, program execution picks up at the &quotend&quot of the if-statement and proceeds from there. This is why we need to <b>check the value of &quotcount&quot EVERY time the &quotUP&quot key is pressed</b>. So that means the if-statement must be written into the event handler for the &quotUP&quot key, and checked <i>after</i> we update the value of &quotcount&quot.")
+    bodyDiv:AddHeading("<u>Coding Challenge: Add Your Own If-Statement</u>", 4)
+    bodyDiv:AddParagraph("In most programs/apps you want to make decisions based on the state of the data you're keeing track of in the app. We have shown you how to add the if-statement structure to the &quotUP&quot key press. Now it is your turn to add some code for the &quotDOWN&quot key press that will say the player &quotlost&quot if their number reaches -5. ")
+    
+             SideBySideIDE addStatementIDE5
+        addStatementIDE5:SetUniqueIdentifier("Add Your Own If-Statement")
+        addStatementIDE5:GetIDETitle():AddText("Add Your Own If-Statement")
+        addStatementIDE5:SetGameEnvironment(false)
+        addStatementIDE5:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+    integer count = 0
+    text gameInstructions = &quotAdd one to your game counter by pressing the UP arrow key. Subtract one from your game counter by pressing the DOWN arrow key. If you reach 10, then you win. If you reach -5, then you lose&quot
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        say gameInstructions
+        output gameInstructions
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            count = count + 1
+            if count = 10
+                say &quotYou have reached &quot + count + &quot , You Won!&quot
+            else
+                say count
+                output count
+            end
+        elseif event:keyCode = event:DOWN
+            count = count - 1
+            say count
+            output count
+       end
+    end
+end
+
+")  
+
+        addStatementIDE5:Setup()
+        bodyDiv:Add(addStatementIDE5)
+        
+        bodyDiv:AddHeading("<u>Coding Challenge: Make Your Own &quotCounter&quot Game</u>", 4)
+        bodyDiv:AddParagraph("You will be creating your own game similar to the Count Up/Down app you have been working with in this lesson. The general object of the game is to use all 4 of the arrow keys to count up or down to reach the &quotGoal&quot number. For example you could set the:")
+        UnorderedList keys
+            keys:AddListItem("&quotUP&quot key to add 5 to your counter")
+            keys:AddListItem("&quotRIGHT&quot key to add 2 to your counter")
+            keys:AddListItem("&quotDOWN&quot key to subtract 3 from your counter")
+            keys:AddListItem("&quotLEFT&quot key to subtract 1 from your counter")
+        bodyDiv:Add(keys)
+        bodyDiv:AddParagraph("If the player's &quotcounter&quot equals the &quotgoal&quot number within a certain amount of key presses (or lives) then they win the game, otherwise they lose. Your main tasks are to: ")
+        UnorderedList tasks
+            tasks:AddListItem("Add the global variables to keep track of and/or update data during game play (e.g. counter, lives, goal)")
+            tasks:AddListItem("Add code to the event handlers to update the variables, output their current values, and/or indicate if the player has won or lost the game.")
+        bodyDiv:Add(tasks)
+        bodyDiv:AddParagraph("We have provided you with a template to get started. Refer to the pseudocode under the &quotUP&quot key press in the event handler to determine what you will need to include in the case of each key press and where to place those statements within each section. Remember that every &quotif-statement&quot structure needs to have an &quotend&quot as shown in the previous examples in this lesson.")
+
+             SideBySideIDE addStatementIDE6
+        addStatementIDE6:SetUniqueIdentifier("Make Your Own Counter Game")
+        addStatementIDE6:GetIDETitle():AddText("Make Your Own &quotCounter&quot Game")
+        addStatementIDE6:SetGameEnvironment(false)
+        addStatementIDE6:GetIDEInputArea():AddText("use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game, KeyboardListener
+
+    //Add your variables for tracking data here (e.g. lives, count)
+
+    //Add your goal number variable here
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        //say and output any instructions for the user here (e.g. what each key press does, indicate the goal number)
+        
+
+        AddKeyboardListener(me)
+
+    end
+
+    action Update(number seconds)
+        
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:UP
+            //decrement lives by 1
+            //increment counter by some amount
+            //if counter = the goalNumber 
+                //say the player wins
+            //elseif lives = 0 
+                //say the player loses
+            //else
+                //say and output the current counter value
+                //optional: say and output the current lives value
+            //end
+            
+     
+        elseif event:keyCode = event:DOWN
+            
+            
+
+        elseif event:keyCode = event:LEFT
+
+            
+
+        elseif event:keyCode = event:RIGHT
+            
+          
+
+        end
+    end
+end
+
+")  
+
+        addStatementIDE6:Setup()
+        bodyDiv:Add(addStatementIDE6)        
+        
+
+    bodyDiv:AddHeading("Wrap Up", 2)
+    bodyDiv:AddParagraph("Have students try out and evaluate their classmates' apps. It is up to you to determine who should evaluate which programs, how to pair students, and the degree of anonymity you wish to maintain. Peer review should be a useful activity for students in preparation for the Create Performance Task in which they need to give and receive feedback with a partner to improve their programs. ")
+    bodyDiv:AddParagraph("<b>Transition:</b> Now that we understand a bit about variables and how to use them in our programs, a whole new world will open to us. First, we will learn that variables can <b>hold other kinds of data besides numbers</b>. We'll also learn other ways to <b>get data from the user</b> using other UI elements like text input.")
+
+
+/*
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("In this lesson, students add variables to an exemplar app to keep track of a score, or a count of some number of button clicks. The major topic is variable scope - " + dq + "Lexical Scoping" + dq + " - and understanding the differences, benefits, and drawbacks, of using global versus local variables. This lesson focuses more on using global variables, since in event-driven apps that" + dq + "s what you need to keep track of data across multiple events. The very basics of a simple " + dq + "if statement" + dq + " is also presented in this lesson. This lesson is workable only with off-line IDE at this point.")
+        bodyDiv:Add(ov1)
+            
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("In this assignment we will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use global variables to track numeric data in an app.")
+                goalList:AddListItem("Give a high-level explanation of what " + dq + "Lexical Scoping of a Variable" + dq + " means.")
+                goalList:AddListItem("Debug problems related to variable scoping issues.")
+                goalList:AddListItem("Modify existing programs to add and update variables to track information.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("This lesson is mostly a continuation and furthering of our understanding of variables and how they work. There are many, many pitfalls and misconceptions about variables and how to use them in programs for the early learner. Variables are often difficult to learn because they are not visual, they are abstract, and one must have a good mental model for what" + dq + "s happening in the computer and with program instructions, in order to reason about the code and develop one" + dq + "s own solutions to problems.")
+        bodyDiv:Add(purpose)
+            Paragraph purpose1
+                purpose1:AddText("The topic and concept of variable scope is a big one in any programming language. However, since many languages do it differently, the concept of variable scope isn" + dq + "t listed explicitly as a learning objective in the CSP framework. As a concept, though, variable scoping is a form of abstraction - a programming language lets you create variables with as narrow or broad a scope as you need to program a certain task. As a general practice, you usually want to create variables with the most narrow scope you can for the task at hand, since the other extreme - everything is global - can become unwieldy or hard to manage, and it doesn" + dq + "t promote code reuse.")
+        bodyDiv:Add(purpose1)
+
+        bodyDiv:AddHeading("Vacabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Lexical Scoping", "- A concept:  " + dq + "A variable that is declared in one coding structure, is valid and effective only in the structure.")
+                AddListItemWithBoldAtFront(voc, "Local Variable", "- A variable that is declared in one of the smaller structure")
+                AddListItemWithBoldAtFront(voc, "Global Variable", "- A variable that is declared in the " + dq + "class Main" + dq + " (the parents structure), outside any other smaller structures")
+                AddListItemWithBoldAtFront(voc, "Update Instruction", "- The code block we place in the " + dq + "action Update" + dq + "")
+        bodyDiv:Add(voc)
+
+        bodyDiv:AddHeading("Incroduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "integer castedCounter = cast(text, counter)", "")
+                AddListItemWithBoldAtFront(code, "redTriangle:LoadFilledTriangle(300, 400, 500, 400, 400, 600, red)", "")
+        bodyDiv:Add(code)
+
+        bodyDiv:AddHeading("Project: " + dq + "Clicker Counter" + dq + "", 2)
+            Paragraph project
+                project:AddText("In this lesson we will incorporate the use of variables and the use of Event Driven Programming into one simple program. The program we create is called " + dq + "Clicker Counter" + dq + ". The program would help the users to keep track of the numbers (such as points earned in the game), or it could be used for simple calculation task in our daily life. The picture below shows how our program would look like at the end of the lesson.")
+        bodyDiv:Add(project)
+
+        bodyDiv:AddImage("/files/code/Unit5/ClickerCounter.png", "The picture shows a red triangle in the upper region of the screen and a blue inverted triangle in the lower region of the screen. In-between these two triangles, the number " + dq + "0" + dq + " is shown in black 72 point font size. The screen background is gray.")
+
+            Paragraph project1
+                project1:AddText("When this program is running, the user can press [Up Arrow] key to count up the number one at a time, or counter down the number by one by pressing the [Down Arrow]. The current number will be always shown in the center of the program screen. The program will be fully user friendly and accessible with clicking sound, and " + dq + "read out loud" + dq + " function by the use of the [space] key. The program will have the proper way to terminate itself by the use of the [escape] key.")
+        bodyDiv:Add(project1)
+
+        bodyDiv:AddHeading("Creating the basic programming environment for an Event Driven Program - Part 1", 2)
+            Paragraph programP1
+                programP1:AddText("So far we have created at least two Event Driven Programs in lesson 2 and lesson3 in this Unit. In those lessons however, we have used the templates to guide us through the building the programs. In this lesson, we will build the entire code from the scratch on the blank Quorum Game Engine (QGE). We will still start with a template. We provide this template however, only for the purpose of providing you with proper audio files. Let" + dq + "s download the template first. ")
+        bodyDiv:Add(programP1)
+
+        bodyDiv:AddLink("Unit5-ClickerCounter - Template.zip", "/files/code/Unit5/Unit5-ClickerCounter - Template.zip")
+
+            Paragraph programP1_1
+                programP1_1:AddText("In order for you to build an App from the scratch however, you would need to understand the structure of QGE as well as the structure of a normal pattern of computer program in Quorum. We have talked about the structure of QGE n lesson 1 already. We will recapture our knowledge on the QGE and discuss the normal program structure in Quorum Programming Language. Knowing the structure of programming is very important because there are two essential factors in programming. 1.) What and how you write a line of code is important. 2.) Where you place the line of code is even more important! We will take a look at the QGE below:")
+        bodyDiv:Add(programP1_1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Game" + cr
+                                                        +   "   " + cr
+                                                        +   "   class Main is Game" + cr
+                                                        +   "" + cr
+                                                        +   "       action Main" + cr
+                                                        +   "           StartGame()" + cr
+                                                        +   "       end" + cr
+                                                        +   "" + cr
+                                                        +   "       action CreateGame" + cr
+                                                        +   "" + cr
+                                                        +   "       end" + cr
+                                                        +   "" + cr
+                                                        +   "       action Update(number seconds)" + cr
+                                                        +   "" + cr
+                                                        +   "       end" + cr
+                                                        +   "   end" + cr))
+
+            Paragraph programP1_2
+                programP1_2:AddText("For the purpose of this discussion, we have deleted all the comments that come with the QGE when/if you are to create new project on the off-line IDE. So what you see in the code above is the bare-born QGE that has all the normal coding structure of the Quorum Programming Language within itself.")
+        bodyDiv:Add(programP1_2)
+
+        bodyDiv:AddHeading("The " + dq + "use statement" + dq + "", 4)
+            Paragraph programP1_3
+                programP1_3:AddText("In all Quorum programming, the " + dq + "use statements" + dq + " has to be at the beginning part of the file.")
+        bodyDiv:Add(programP1_3)
+
+        bodyDiv:AddHeading("The " + dq + "class Main is Game" + dq + "", 4)
+
+            Paragraph programP1_4
+                programP1_4:AddText("This is the main frame of the QGE. All code you write (except " + dq + "the use statements" + dq + ") need to be written between this line and the very last " + dq + "end" + dq + " expression at the bottom of the file. If you think of your entire code as a bunch of cool toys, the " + dq + "class Main" + dq + " is the big toybox you put all your toys. In normal programming, you would have only " + dq + "class Main" + dq + " on this line. Because this is the QGE we have " + dq + "is Game" + dq + " attached to the expression. (This is an advanced concept called " + dq + "Inheritance" + dq + ")")
+        bodyDiv:Add(programP1_4)
+
+        bodyDiv:AddHeading("The " + dq + "action Main" + dq + "", 4)
+            Paragraph programP1_5
+                programP1_5:AddText("Inside of the class main, you would always need to have " + dq + "one" + dq + " (ONLY ONE) " + dq + "action Main" + dq + ". The " + dq + "action Main" + dq + " also has its own " + dq + "end" + dq + " expression. The first " + dq + "end" + dq + " you would find after the " + dq + "action Main" + dq + " in the QGE is the " + dq + "end" + dq + " for the " + dq + "action Main" + dq + " part of your code. You would normally place the " + dq + "action Main" + dq + " code block somewhere close to the beginning area of code inside of the " + dq + "class Main" + dq + ".")
+        bodyDiv:Add(programP1_5)
+            Paragraph programP1_6
+                programP1_6:AddText("The " + dq + "action Main" + dq + " is the most important part of your code. Your entire code would not work without this part. The " + dq + "action Main" + dq + " contains the primary instruction for the computer to run your code. By reading the instruction inside of the action Main, the computer would understand which part of the code it needs to run next , and next , and next, … ")
+        bodyDiv:Add(programP1_6)
+            Paragraph programP1_7
+                programP1_7:AddText("In some of the console programming you would learn in the following lessons, you would write a lot of code inside of the " + dq + "action Main" + dq + ". In the QGE however, the " + dq + "action Main" + dq + " part is strikingly simple. We usually do not write single line of code inside of this area. This is because all the work of building the instruction is done by the QGE behind the scene. All code you write is still essential for the QGE but, the QGE does all work for connecting your code together in right order, and put it into single action " + dq + "StartGame()" + dq + " - all behind the scene.")
+        bodyDiv:Add(programP1_7)
+            Paragraph programP1_8
+                programP1_8:AddText("**Note: In Quorum Language, the need for the " + dq + "class Main" + dq + " and " + dq + "action Main" + dq + " is " + dq + "allowed to be omitted" + dq + " for the simple program that does not use " + dq + "actions" + dq + ". In fact, the previous lesson - Lesson 4 - was written in the way to take advantage of this special function of the Quorum Programming Language.")
+        bodyDiv:Add(programP1_8)
+
+        bodyDiv:AddHeading("The " + dq + "action CreateGame" + dq + "", 4)
+            Paragraph programP1_9
+                programP1_9:AddText("This is a special action created by the QGE. You would place all code for the initial setting of your screen oriented App inside of this area. In a way, for the computer, this action is not different from any action you would create in the latter section this file. The QGE knows this is a special action, and it will place it in the right place in the " + dq + "StartGame()" + dq + " action behind the scene.")
+        bodyDiv:Add(programP1_9)
+
+        bodyDiv:AddHeading("The " + dq + "action Update(number seconds)" + dq + "", 4)
+            Paragraph programP1_0
+                programP1_0:AddText("This is another special action created by the QGE. You would place the code for making changes in your program in this area. The changes could be different things: moving the images, making the image larger and smaller, making the image disappear and reappear, changing the status of the main character" + dq + "s life point, etc.")
+        bodyDiv:Add(programP1_0)
+
+        bodyDiv:AddHeading("Creating the basic programming environment for an Event Driven Program - Part 2", 2)
+            Paragraph programP2
+                programP2:AddText("Now you have deeper understanding of the QGE, this part will be review for you in how to set up the Event Driven Programming environment on top of the QGE. We have done this with several code examples in the previous lessons. We will just describe the steps below:")
+        bodyDiv:Add(programP2)
+            OrderedList pP2List
+                pP2List:AddListItem("Place " + dq + "use Libraries.Interface.Events.KeyboardEvent" + dq + " and " + dq + "use Libraries.Interface.Events.KeyboardListener" + dq + "")
+                pP2List:AddListItem("Change " + dq + "class Main is Game" + dq + " to " + dq + "class Main is Game, KeyboardListener" + dq + "")
+                pP2List:AddListItem("Add the expression " + dq + "AddKeyboardListener(me)" + dq + " in the " + dq + "action CreateGame" + dq + " part, - We usually place this expression toward the ending part of the " + dq + "action CreateGame" + dq + " when all other codes are filled.")
+        bodyDiv:Add(pP2List)
+
+        bodyDiv:AddHeading("Creating Initial Visual and Audio Setting for the Screen", 2)
+            Paragraph visual
+                visual:AddText("Each one of the following steps will require you to go through he routine process of using object on your code - 1.) use statement, 2.) Instantiating an object(s) 3.) Calling action(s) on the objects.")
+        bodyDiv:Add(visual)
+            OrderedList visualList
+                visualList:AddListItem("The process one needs to be done in the use statement area.")
+                visualList:AddListItem("The process two needs to be done in the " + dq + "class Main" + dq + ", yet not in any action area. We usually do the instantiation of objects toward beginning area of " + dq + "class Main" + dq + ".")
+                visualList:AddListItem("The process three has to be done in the " + dq + "action CreateGame" + dq + ".")
+        bodyDiv:Add(visualList)
+
+        bodyDiv:AddHeading("Start with color setting", 4)
+            Paragraph visual1
+                visual1:AddText("It would be helpful if you set up all colors you can use for this program in the early stage of the coding process. Refer to the section on " + dq + "Color object" + dq + " in the previous lessons. Or even better, look at the code you completed for the previous lessons. The truth is, that is what most of the professional programmers would do when they cannot remember how they did it before. ")
+        bodyDiv:Add(visual1)
+
+        bodyDiv:AddHeading("Work on the triangles", 4)
+            Paragraph visual2
+                visual2:AddText("For this program, we need to draw four images on the screen.  Two of them will be the right-side-up triangles that have exactly same dimension. They are placed at the exactly at the same spot on the screen as well. In the real world, one triangle would be on top of the other, totally covering the one below. Well… we are doing this in the virtual world. So we will give color of " + dq + "red" + dq + " on the triangle on the top and " + dq + "black" + dq + " to the triangle at the bottom. We will add those on the program screen. Then we will call action " + dq + "Hide()" + dq + " on the object for the black triangle. ")
+        bodyDiv:Add(visual2)
+            Paragraph visual3
+                visual3:AddText("If you have been getting familiar with the use of the off-line IDE, you may have noticed that every time you type valid object name followed by " + dq + ": (colon)" + dq + ", the list of the actions available to the object will come up in a small box screen. That is a function of the IDE called " + dq + "Code Completion" + dq + ". It is a very handy tool for a programmer. Find the acton called LoadFilledTriangle(integer x1, integer y1, integer x2, integer y2, integer x3, integer y3, Color color) from the list by either using the mouse or the [arrow keys], then press enter. You still needs to add the parenthesis and the parameters on your own. the following is an example for the " + dq + "red triangle" + dq + ":")
+        bodyDiv:Add(visual3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "redTriangle:LoadFilledTriangle(300, 400, 500, 400, 400, 600, red)" + cr
+                                                        +   "Add(redTriangle)" + cr))
+
+            Paragraph visual4
+                visual4:AddText("You still need to create two inverted triangles with colors - one with the color of your choice, the other with black. These two inverted triangles need to be drawn in the ares that is not overlapping the right-side-up triangles. You would stuck the inverted triangles on top of each other, then hide the bottom black triangle - just like you did for the other set of triangles.")
+        bodyDiv:Add(visual4)
+            Paragraph visual5
+                visual5:AddText("Before you work on these task though, you would have realized that you are doing exactly same type of coding four times. It would be great if you can use your code optimization skill in this process.")
+        bodyDiv:Add(visual5)
+
+        bodyDiv:AddHeading("Loading Audio Files to the audio objects", 4)
+            Paragraph visual6
+                visual6:AddText("In this program, we will create visual and audio cues for the users to know when a specific key is pressed. We will assign two keys - [up arrow] and [down arrow] - for this purpose. You would create an audio object for each key and name them properly. ")
+        bodyDiv:Add(visual6)
+            Paragraph visual7
+                visual7:AddText("The template comes with two audio files in the " + dq + "media" + dq + " folder. Go to the project pane and find the files - " + dq + "bing.ogg" + dq + " and " + dq + "boing.ogg" + dq + ". Load those files to corresponding audio object you created. ")
+        bodyDiv:Add(visual7)
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph visual8
+                visual8:AddText("Now, run your program to see if the triangle with desired colors are properly shown on your screen.")
+        bodyDiv:Add(visual8)
+
+       bodyDiv:AddHeading("Font and Label", 2)
+            Paragraph fAndL
+                fAndL:AddText("We have learned the syntax of setting the font and displaying the label (which uses the font) in the lesson 3 - when we are creating the App " + dq + "Concert Guitarist" + dq + ". Refer to the section in lesson 3 where we learned how to set the font and label. Or check your code that you created for the App in lesson 3. Since we are building one screen App with one label display in this lesson, we do not need to use our " + dq + "Code Optimization" + dq + " skill for this App. But wait… There is a couple of things we would like you to do differently in this coding. ")
+        bodyDiv:Add(fAndL)
+            Paragraph fAndL1
+                fAndL1:AddText("We will display a numeric information in the center of the screen in the area between two triangles.  In the " + dq + "Concert Guitarist" + dq + "App, we needed to fit rather lengthy instruction in the label. That was the reason we needed to call action " + dq + "SetWidth(integer width)" + dq + " in the code block for setting label. This time, the numeric display we place would be short. You probably would not need to use that particular action. ")
+        bodyDiv:Add(fAndL1)
+            Paragraph fAndL2
+                fAndL2:AddText("We will still call the action " + dq + "SetText(text info)" + dq + " and action " + dq + "SetDescription(text info)" + dq + " on the label object. The problem is that these actions only take text variables as a parameter. So, for now, place “0�? (" + dq + "0" + dq + " in double quotes) for the parameters for both actions. We will explain how this works in the following sections.")
+        bodyDiv:Add(fAndL2)
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph fAndL3
+                fAndL3:AddText("Now, run your program to see if " + dq + "0" + dq + " appears in the center of the screen.")
+        bodyDiv:Add(fAndL3)
+
+        bodyDiv:AddHeading("Establishing the mechanism for Keyboard Event in your program", 2)
+        bodyDiv:AddHeading("Mechanism for the visual and audio effect for the triangles", 4)
+            Paragraph keyEvent
+                keyEvent:AddText("We are creating a very similar mechanism that we created for the App " + dq + "Concert Guitarist" + dq + " in the lesson 3. Instead of using a specific key to change the background graphics and stage of the program, we will use a key to create a visual effect of the key press on the screen. We use [up arrow] key and [down arrow] key. When the user press the [up arrow] key, the red right-side-up triangle will disappear at the same time, black right-side-up triangle will take over the spot. When user release the same key, the black triangle disappears and the red triangle reappears. Since the computer does this change of the triangles so fast, it looks like the red triangle is briefly depressed when the change happens on the screen. We will establish the same visual effect for the green inverted triangle as well.")
+        bodyDiv:Add(keyEvent)
+            Paragraph keyEvent1
+                keyEvent1:AddText("In order for us to set up this mechanism, we need to use a set of preset actions from the keyboardEvent class. You have used these actions before in the lesson 1, 2 and 3. The actions are " + dq + "action PressedKey(KeyboardEvent event)" + dq + " and " + dq + "action ReleasedKey(KeyboardEvent event)" + dq + ". These actions are special actions designed to work with KeyboardListener class in Quorum standard libraries. You still needs to create these actions as though you are creating these actions in your code. However, you really do not have the liberty of changing the name of these actions. They need to be written exactly as they are. Since they are actions, we treat them like any other action we create. We place them toward the end of the " + dq + "class Main" + dq + " - out side of any other actions. Because this action involves " + dq + "if statement" + dq + " - which we have not learned in depth yet, we provide the template below for both actions. You can place the template code below in the proper area in your code:")
+        bodyDiv:Add(keyEvent1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action PressedKey(KeyboardEvent event)" + cr
+                                                        +   "   if event:keyCode = event:UP" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif event:keyCode = event:DOWN" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif event:keyCode = event:SPACE" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif event:keyCode = event:ESCAPE" + cr
+                                                        +   "" + cr
+                                                        +   "   end" + cr
+                                                        +   "end" + cr
+                                                        +   "" + cr
+                                                        +   "action ReleasedKey(KeyboardEvent event)" + cr
+                                                        +   "   if event:keyCode = event:UP" + cr
+                                                        +   "" + cr
+                                                        +   "   elseif event:keyCode = event:DOWN" + cr
+                                                        +   "" + cr
+                                                        +   "   end" + cr
+                                                        +   "end" + cr))
+
+            Paragraph keyEvent2
+                keyEvent2:AddText("Once you have the template in our code, create the code block that does hiding and showing of an appropriate object under the proper " + dq + "if" + dq + " or " + dq + "else if" + dq + " statement in the template. You would do this task in the " + dq + "action PressedKey(KeyboardEvent event)" + dq + " first then in the " + dq + "action ReleasedKey(KeyboardEvent event)" + dq + ". While you are working in the first action, have the appropriate audio object to play in the same area you do the " + dq + "Hide()" + dq + " and " + dq + "Show()" + dq + ". The audio file " + dq + "bing.ogg" + dq + " plays clear high pitch sound. The audio file " + dq + "boing.ogg" + dq + " plays low pitch sound.")
+        bodyDiv:Add(keyEvent2)
+
+        bodyDiv:AddHeading("*** Run. Test, Debug", 4)
+            Paragraph rtd
+                rtd:AddText("Run your code now. Your program should give you the visual and audio effect when you press the [up arrow] key or [down arrow] key.")
+        bodyDiv:Add(rtd)
+
+        bodyDiv:AddHeading("Mechanism for having the computer read the label out loud", 4)
+            Paragraph keyEvent3
+                keyEvent3:AddText("We continue to work on the template. Under the line " + dq + "elseif event:keyCode = event:SPACE" + dq + ", you need to insert the code very similar to the example below:")
+        bodyDiv:Add(keyEvent3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   speech:Say(label1:GetDescription())" + cr))
+
+            Paragraph keyEvent4
+                keyEvent4:AddText("You need to replace the " + dq + "speech" + dq + " with the name of your Speech object you instantiate. You also need to replace " + dq + "label1" + dq + " with the name of the Label object you have already instantiated.")
+        bodyDiv:Add(keyEvent4)
+
+        bodyDiv:AddHeading("Mechanism for having your program terminate properly", 4)
+            Paragraph keyEvent5
+                keyEvent5:AddText("Under the line " + dq + "elseif event:keyCode = event:ESCAPE" + dq + ", write the code " + dq + "Exit()" + dq + ". This code comes from the Game class itself. Since the class Main is also the class Game, you do not need to use any object to use this action.")
+        bodyDiv:Add(keyEvent5)
+
+        bodyDiv:AddHeading("*** Run. Test, Debug", 4)
+            Paragraph rtd1
+                rtd1:AddText("Run your code now. When you press the [space] key, your program should say " + dq + "zero" + dq + ". When you press the [escape] key, your program should properly terminate itself.")
+        bodyDiv:Add(rtd1)
+
+        bodyDiv:AddHeading("A Variable and its Scope - Lexical Scoping", 2)
+            Paragraph lex
+                lex:AddText("Once you start structuring your program in the way most good programmers do, where you place a variable(s) becomes really important. Misplaced variable(s) could clash your program or at least make the program to work incorrectly. Each variable you create has its own " + dq + "scope" + dq + " of effectiveness. The place where you first declare the variable determines the " + dq + "scope" + dq + " of the variable. This concept is called " + dq + "Lexical Scoping" + dq + ". In the general summarization, the concept is described as " + dq + "A variable that is declared in one coding structure,  is valid and effective only in the structure." + dq + " The structure means many things in coding; a " + dq + "class" + dq + " is a structure, an " + dq + "action" + dq + " is a structure. There also are " + dq + "if" + dq + " structure and " + dq + "repeat" + dq + " structure - that we will be learning in the following lessons.")
+        bodyDiv:Add(lex)
+        bodyDiv:AddHeading("Review of Variables and Type Casting", 4)
+            Paragraph lex1
+                lex1:AddText("Before we learn about where to place the code according to the " + dq + "Lexical Scoping" + dq + ", we need to make it sure we understand what code we write for this program. We learned how to call text variable for " + dq + "user input (console input)" + dq + ", then how to cast it into " + dq + "integer variable" + dq + ". We do the opposite in this program. First, we declare the integer variable called " + dq + "counter" + dq + ", then we cast the variable into text variable. finally we use this text variable inlace of “0�? we used in the label. Remember the actions we call for the label object - " + dq + "SetText(text textValue)" + dq + " and " + dq + "SetDescription(text textValue)" + dq + " only accept text variable/value as a parapeters. The code below is the example:")
+        bodyDiv:Add(lex1)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   integer counter = 0" + cr
+                                                        +   "   " + cr
+                                                        +   "   integer castedCounter = cast(text, counter)" + cr))
+
+        bodyDiv:AddHeading("More on Type Casting", 4)
+            Paragraph lex2
+                lex2:AddText("Type Casting is a powerful tool for programmers to achieve variety of functionality in our programs. It also comes with deeper complexity that the programmers need to understand. For example, there are " + dq + "Explicit Type Casting" + dq + " and " + dq + "Implicit Type Casting" + dq + ". You can even cast one type of object into another type of object. There are situations that you can type certain variable/object into another, while there are situations you cannot. Not all types of variables and objects are compatible to each other, therefore type casting is irrelevant in such cases.  Quorum Language web-site has a variety of pages on this topic. We would recommend you to visit the links below for your further learning on " + dq + "Type Casting" + dq + ".")
+        bodyDiv:Add(lex2)                                
+            UnorderedList lexList
+                lexList:AddListItemLink("Tutorial: Types and Variables", "https://quorumlanguage.com/tutorials/language/types.html")
+                lexList:AddListItemLink("Tutorial: Type Casting", "https://quorumlanguage.com/tutorials/language/casting.html")
+        bodyDiv:Add(lexList)
+
+        bodyDiv:AddHeading("A " + dq + "Local Variable" + dq + " and its Scope", 2)
+            Paragraph localVar
+                localVar:AddText("In this section, we will be making a coding mistake on purpose. It is easier for us to understand how " + dq + "Lexical Scoping" + dq + " works in coding when you experience and analyze this type of coding mistake.")
+        bodyDiv:Add(localVar) 
+            Paragraph localVar1
+                localVar1:AddText("Let" + dq + "s type in both lines of the code example above in the " + dq + "action CreateGame" + dq + " section of your code. Since we use the text variable " + dq + "castedCounter" + dq + " in the label, you need to place them somewhere above the code block for the label. You just created the " + dq + "Local Variable" + dq + ". This variable is called " + dq + "Local" + dq + " because it is declared in one of the smaller structure " + dq + "action CreateGame" + dq + " and it is used for the " + dq + "action CreateGame" + dq + ". Once you do this, you replace the “0�? in the two label actions  - " + dq + "SetText(“0�?) and SetDescription(“0�?)" + dq + " - with the " + dq + "castedCounter" + dq + ". (You delete " + dq + "0" + dq + " and double quote around it.) so far so good. ")
+        bodyDiv:Add(localVar1) 
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph localVar2
+                localVar2:AddText("Run your code now. You should still see " + dq + "0" + dq + " in the center of the screen.")
+        bodyDiv:Add(localVar2) 
+
+        bodyDiv:AddHeading("Making a error on purpose and analyzing the error", 4)
+            Paragraph localVar3
+                localVar3:AddText("Our hope is this integer variable " + dq + "counter" + dq + " keeps track of how many times the [up arrow] and the [down arrow] keys are pressed. So, we will add such function in the Keyboard Event section of our code. Add " + dq + "counter = counter + 1" + dq + " in the section below the line " + dq + "if event:keyCode = event:UP" + dq + ". Then add another code " + dq + "counter = counter - 1" + dq + " below the line " + dq + "elseif event:keyCode = event:DOWN" + dq + ". ")
+        bodyDiv:Add(localVar3) 
+            Paragraph localVar4
+                localVar4:AddText("Now, wait a minute! As soon as you do this, your IDE gives you the error indicator (red wavy line with audio cue) under the code you just wrote. If you build/compile this program now, it will give you an error like " + dq + "I could not find the variable called counter …" + dq + "")
+        bodyDiv:Add(localVar4) 
+            Paragraph localVar5
+                localVar5:AddText("This error is caused by the programmer" + dq + "s mistake in " + dq + "Lexical Scoping" + dq + ". An ordinary logic may say “I created the variable " + dq + "counter" + dq + " in the " + dq + "action CreateGame" + dq + ", and it shows the counter on the screen when I test-run the program. So this aspect/function of my program should be all set to go�?. Unfortunately that is not the case for the computer" + dq + "s logic. When the computer starts reading your code to execute/run your code, the variable " + dq + "counter" + dq + " is still a local counter inside of the structure called " + dq + "action CreateGame" + dq + ".  According to the rule of Lexical Scoping " + dq + "" + dq + "A variable that is declared in one coding structure, is valid and effective only in the structure" + dq + ", this variable" + dq + "s scope is only effective in the " + dq + "action CreateGame" + dq + ". Therefore this variable does not even exist outside of the " + dq + "action CreateGame" + dq + ". ")
+        bodyDiv:Add(localVar5) 
+            Paragraph localVar6
+                localVar6:AddText("With this understanding in mind, we will delete the two example lines from the " + dq + "action CreateGame" + dq + ". You do not need to change anything else we did in this section - even the errors in the KeyBoard Event. You would create even more error-lines in the code by doing this. It is OK. Let" + dq + "s leave them as errors for now. We will learn how to handle the scope of this variable properly in the following section.")
+        bodyDiv:Add(localVar6) 
+
+        bodyDiv:AddHeading("A " + dq + "Global Variable" + dq + " and its Scope", 2)
+            Paragraph globalVar
+                globalVar:AddText("Type the first line in the code example " + dq + "integer counter = 0" + dq + " in the area below where you instantiated all objects at the beginning of " + dq + "class Main" + dq + ". It should be outside of any action in the code. Then observe the all error lines (related to this variable) magically become valid lines! You just declared a " + dq + "Global Variable" + dq + "! A " + dq + "Global Variable" + dq + " is a variable that can be used throughout the code. it needs to be declared toward the beginning part of the code, inside of " + dq + "class Main" + dq + ", outside of all actions.")
+        bodyDiv:Add(globalVar) 
+            Paragraph globalVar1
+                globalVar1:AddText("Well… We should still have a couple of lines of code with error. They should be in the " + dq + "action CreateGame" + dq + ". They are the ones related to the text variable " + dq + "castedCounter" + dq + ". For this variable, we will shy away from using the code example. The text variable " + dq + "castedCounter" + dq + " needs to be used in two separate actions in our code. This fact hopefully gives you the instant idea that we need to declare this variable as a " + dq + "Global Variable" + dq + ". So we will declare this variable in the area right below the line we declared the integer variable " + dq + "counter" + dq + ". Then we will give a " + dq + "temporary" + dq + " value to the variable by writing two double quote operators consecutively after the " + dq + "=" + dq + " sign operator.  When the computer reads this line of code, it still create the variable named " + dq + "castedCounter" + dq + " in its memory, and leave the content as " + dq + "blank" + dq + ". When you do this properly, you should see the remaining error disappearing.")
+        bodyDiv:Add(globalVar1) 
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph globalVar2
+                globalVar2:AddText("Run the code now. You should see nothing in the area where you previously had " + dq + "0" + dq + " in the center of the screen. Or we should say that we see " + dq + "blank" + dq + " in the center of the screen. ")
+        bodyDiv:Add(globalVar2)
+
+        bodyDiv:AddHeading("Reassigning a new value to the " + dq + "Global Variable", 4)
+            Paragraph globalVar3
+                globalVar3:AddText("In order for us to make the numeric expression (as a text variable) reappear on the screen, we need to reassign a new variable to the " + dq + "castedCounter" + dq + ". As we learned in the Lesson 4, we no longer place the type of variable - such as " + dq + "integer" + dq + " or " + dq + "text" + dq + " - in front of the variable when we do the reassignment. In this case, we will reassign the casted value of the " + dq + "counter" + dq + " variable to the text variable " + dq + "castedCounter" + dq + ". We do this in the " + dq + "action CreateGame" + dq + " area right before we use this variable for the label. The code below is the example:")
+        bodyDiv:Add(globalVar3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   castedCounter = cast(text, counter)" + cr))
+
+            Paragraph globalVar4
+                globalVar4:AddText("The reason why we do this in this particular spot in the code is that it is the place where the reassignment of the code is most needed. This is just a common logic. When we display the label on the screen, we would want to display the most updated value at any given time in our program, wouldn" + dq + "t we? This common logic becomes useful when we work on the final step of building this program. **Note: Reassigning the variable in the " + dq + "class Main" + dq + " area does not do any good in most program unless you have a specific reason to do so there.")
+        bodyDiv:Add(globalVar4)
+
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph globalVar5
+                globalVar5:AddText("Run your code now. You should see the " + dq + "0" + dq + " back in the center of the screen. One last problem is however, when you press the [up arrow] key or [down arrow] key, the " + dq + "0" + dq + " is not adding 1 or subtracting one from itself at all. It just stays as " + dq + "zero" + dq + ". This program does not have so much meaning for the user unless it does such function. We will finish up this program in the next section by adding " + dq + "update" + dq + " instruction in our code.")
+        bodyDiv:Add(globalVar5)      
+
+        bodyDiv:AddHeading("Checking our code" + dq + "s functionality by adding console output temporarily", 2)
+            Paragraph checkCode
+                checkCode:AddText("Believe or not, the integer variable in your code is actually counting the key press properly at this stage of code development. It just not showing - to anyone including you the programmer. We will place a " + dq + "console output" + dq + " line temporarily in your code to reveal what the program is doing behind the display screen. Place the code " + dq + "output counter" + dq + " right below the both lines you placed the " + dq + "counter = counter + 1" + dq + " and " + dq + "counter = counter - 1" + dq + " in the " + dq + "action KeyPressed" + dq + ".")
+        bodyDiv:Add(checkCode) 
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph checkCode1
+                checkCode1:AddText("Now run your code and press one of the key. Observe that the proper integer is displayed in the output area of the off-line IDE. This method of adding console output is a great debugging technique.")
+        bodyDiv:Add(checkCode1) 
+
+        bodyDiv:AddHeading("Adding " + dq + "Update" + dq + " instruction for the screen display", 2)
+            Paragraph updateInst
+                updateInst:AddText("If you remember from the App we created in Lesson 2 and 3, we had a instruction to make the rectangular object to spin in " + dq + "action Update(number seconds)" + dq + ". We will write the code for reassigning the value to " + dq + "castedCounter" + dq + " (text variable) in this action as well. The following is the steps to achieve this final step of the program development:")
+        bodyDiv:Add(updateInst) 
+            OrderedList updateList
+                updateList:AddListItem("Cast the integer variable " + dq + "counter" + dq + " to the text variable " + dq + "castedCounter" + dq + " just like you did in the " + dq + "action CreateGame" + dq + ".")
+                updateList:AddListItem("Call action " + dq + "SetText()" + dq + " on the Label object and use the " + dq + "castedCounter" + dq + " as the parameter.")
+                updateList:AddListItem("Call action " + dq + "SetDescription()" + dq + " on the Label object and use " + dq + "castedCounter" + dq + " as the parameter.")
+                updateList:AddListItem("Add the Label object.")
+        bodyDiv:Add(updateList)
+            Paragraph updateInst1
+                updateInst1:AddText("The idea for doing all this is that even the static screen like " + dq + "display of an integer" + dq + " is not really static. It drawn again and again by the computer monitor every 60th of a second or so. Our eyes just cannot keep up with this redrawing process - it is too fast! Therefore we perceive the screen as static. So, by doing the process above, we created the mechanism for the computer screen to draw newly updated value in the " + dq + "counter" + dq + " variable by converting it into text variable, then displaying on to the screen every 60th of a second.")
+        bodyDiv:Add(updateInst1)
+        bodyDiv:AddHeading("*** Run, Test, Debug!", 4)
+            Paragraph updateInst2
+                updateInst2:AddText("Now run your code and press one of the keys. It should be adding one to the current number when you press the [up arrow] key, and subtracting one when you press the [down arrow] key. also when you press the space bar, it should be reading gate current counter value out loud. Press the [escape key] to check the termination of the program.")
+        bodyDiv:Add(updateInst2)
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+
+        bodyDiv:AddHeading("Exemplar Solution", 4)
+        bodyDiv:AddLink("Unit5-ClickerCounter.zip", "/files/code/Unit5/Unit5-ClickerCounter.zip")
+        
+        */
+        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CL.L2:4")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CPP.L2:5, CPP.L3A:3, CPP.L3A:4, CPP.L3A:5")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards: ", "CT.L2:12, CT.L3A:1, CT.L3A:3")
+        bodyDiv:Add(list)
+
+/* Completed 5/12/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the skill of using vairables in an Event Driven Program: 'Clicker'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 5: (Building an App: Clicker)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 5"
+    end
+    action GetShortDescription returns text
+        return "Learn about using vairables in an Event Driven Program: 'Clicker'"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson5A.html"
+    end
+
+end
+
+ 
+    

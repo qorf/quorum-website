@@ -1,0 +1,762 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson8A is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+   
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 8: Boolean Expressions and &quotIf&quot-Statements")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 8: Boolean Expressions and &quotIf&quot-Statements", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("In this lesson, students write their own <b>if</b> and <b>if-else</b> 
+                statements in the Quorum Programming Language for the first time. The concepts 
+                of conditional execution should carry over from the previous lesson, leaving 
+                this lesson to get into the nitty gritty details of writing working code. 
+                Students will write code using the online IDE for a series of problems
+                that require them to do everything from debugging common problems, writing simple 
+                programs that output to the console, and implementing the conditional logic into 
+                an existing app or game, like &quotPassword Checker&quot or a simple Dice Game.")
+        bodyDiv:Add(ov1)
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+            UnorderedList voc
+                AddListItemWithBoldAtFront(voc, "Boolean:", " A single value of either TRUE or FALSE")
+                AddListItemWithBoldAtFront(voc, "Boolean Expression: ", " in programming, an expression that evaluates to TRUE or FALSE.")
+//                AddListItemWithBoldAtFront(voc, "Conditionals: ", "Statements that only run under certain conditions.")
+//                AddListItemWithBoldAtFront(voc, "If-Statement: ", "The common programming structure that implements &quotconditional statements&quot.")
+//                AddListItemWithBoldAtFront(voc, "Selection: ", "A generic term for a type of programming statement (usually an if-statement) that uses a Boolean condition to determine, or select, whether or not to run a certain block of statements.")
+                //AddListItemWithBoldAtFront(voc, "Boolean 'returns'", " - The boolean expression returns a value of 'true' or 'false' to the computer behind the scene. The programmer nor the user ever see this happening in the code or in the program")
+        bodyDiv:Add(voc)
+            
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Write and test conditional expressions using comparison operations")
+                goalList:AddListItem("Given an English description, write code (if-statements) to create desired program logic")
+                goalList:AddListItem("Use the comparison operators (<, >, <=, >=, =, not=) to implement decision logic in a program.")
+                goalList:AddListItem("Use if, if-else, or nested if-statements to express desired program logic")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("The main purpose here is <i>Practice, Practice, Practice</i>. 
+                The lesson asks us to write if-statements in a variety of contexts and across 
+                a variety of program types and problem solving scenarios.")
+        bodyDiv:Add(purpose)
+
+        bodyDiv:AddHeading("Resources", 2)
+        UnorderedList reso
+            reso:AddListItemLink("(Optional) Flowcharts - Activity Guide, .pdf", "/files/code/Unit5/U5L8 Activity Guide - Flowcharts.pdf")
+        bodyDiv:Add(reso)
+
+
+        /*
+        bodyDiv:AddHeading("Introduced Code", 2)
+            UnorderedList code
+                AddListItemWithBoldAtFront(code, "if a < b", "")
+                AddListItemWithBoldAtFront(code, "elseif c > d", "")
+                AddListItemWithBoldAtFront(code, "else", "")
+                AddListItemWithBoldAtFront(code, "end", "")
+                AddListItemWithBoldAtFront(code, "box:SetPosition(150, 150)", "")
+                AddListItemWithBoldAtFront(code, "box:Initialize(200, 50)", "")
+                AddListItemWithBoldAtFront(code, "AddKeyboardListener(box)", "")
+        bodyDiv:Add(code)
+        */
+
+        bodyDiv:AddHeading("Getting Started", 2)
+            Paragraph getStart
+                getStart:AddText("In everyday conversation, it is common to interchange 
+                the words &quotwhen&quot and &quotif&quotâ€? as in &quotIf the user presses 
+                the button, execute this function.&quot The English language is tricky. We 
+                often say &quotif&quot the button is clicked when really we mean &quotwhen&quot a button 
+                is clicked. This can cause confusion because &quotif&quot has a well-defined meaning 
+                in programming.")
+        bodyDiv:Add(getStart)
+        bodyDiv:AddHeading("How are conditionals (if-statements) different from events?", 4)
+        UnorderedList getStart1
+                getStart1:AddListItem("Events are setup by a programmer, but triggered by the computer at any moment in time. ")
+                getStart1:AddListItem("If-statements are a way a programmer can have their code make a decision during the normal flow of execution to do one thing or another.")
+        bodyDiv:Add(getStart1)
+        bodyDiv:AddParagraph("As we have already learned in prior lessons, an <b>if-statement</b> is evaluated when the code reaches a particular line and uses a true/false condition (like a comparison between values e.g., score = 5), to decide whether to execute a block of code.")
+
+        bodyDiv:AddHeading("Optional: Flow Charts", 4)
+        Paragraph optional
+            optional:SetClassAttribute("cool-box")
+            optional:AddText("Some people find flow-charting a useful exercise for thinking about if-statements. You can work through the &quot(Optional) Flowcharts&quot activity guide with your students to warm up on paper.
+            Alternatively, you might revisit this activity <i>after</i> students have had some experience writing if-statements to solidify their understanding.")
+        bodyDiv:Add(optional)
+
+        bodyDiv:AddHeading("Activity", 2)
+        bodyDiv:AddParagraph("Students will be introduced to conditionals by solving different types of small puzzles and writing small programs in different contexts with different kinds of output. 
+        Read the student instructions for more info.")
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+        bodyDiv:AddParagraph("In this lesson we move from pseudocode to real code as you write if-statements. You'll learn more about the Quorum Programming Language syntax for if-statements and boolean expressions as you get practice with several small programs.")
+        bodyDiv:AddParagraph("Points to pay attention to: ")
+        UnorderedList vidq1
+            vidq1:AddListItem("What's a <i>Boolean Expression</i>?")
+            vidq1:AddListItem("Why is it called a &quotBoolean&quot?")
+            ListItem vidq1a
+            CodeBlock cb1
+                cb1:AddText("10 > 25")
+                vidq1a:AddText("Is ")
+                vidq1a:Add(cb1)
+                vidq1a:AddText(" a legal expression?")
+            vidq1:Add(vidq1a)
+        bodyDiv:Add(vidq1)
+
+        InlineFrame inlineFrame
+        inlineFrame:SetAddress("https://www.youtube.com/embed/y3rCKJNOwpA")
+        inlineFrame:SetHeight("480")
+        inlineFrame:SetWidth("854")
+        bodyDiv:Add(inlineFrame)
+        UnorderedList video1
+        video1:AddListItemLink("Video: CS Principles: Conditionals - Part 1 Boolean Expressions", 
+        "https://www.youtube.com/watch?v=y3rCKJNOwpA")
+        bodyDiv:Add(video1) 
+
+        /*
+        bodyDiv:AddHeading("Video: Introduction to Conditionals - Part 1", 2)
+        bodyDiv:AddHeading("Before you watch:", 4)
+            UnorderedList video1
+                video1:AddListItem("What's a Boolean Expression?")
+                video1:AddListItem("Why is it called a " + dq + "Boolean" + dq + "?")
+                video1:AddListItem("Is this a legal expression? - " + dq + "10 > 25" + dq + " ???")
+        bodyDiv:Add(video1)
+
+        InlineFrame inlineFrame
+        inlineFrame:SetAddress("https://www.youtube.com/embed/y3rCKJNOwpA")
+        bodyDiv:Add(inlineFrame)
+
+        UnorderedList vid
+            vid:AddListItemLink("Video: Introduction to Conditionals - Part 1", "https://www.youtube.com/watch?v=y3rCKJNOwpA")
+        bodyDiv:Add(vid)
+        */
+        //bodyDiv:AddHeading("Confusing terms???", 4)
+            Paragraph compOp
+                compOp:AddText("As you saw in the video there are a bunch of terms that are all generally talking about the same thing.")
+        bodyDiv:Add(compOp)
+        bodyDiv:AddHeading("Boolean, Boolean values, Boolean expressions:", 4)
+            UnorderedList compOpList
+                compOpList:AddListItem("A <b>Boolean value</b> is simply a computer science term that means a <b>true/false value</b>.")
+                compOpList:AddListItem("A <b>Boolean expression</b> is a statement that <i>evaluates</i> to a Boolean value (a single true/false).")
+        bodyDiv:Add(compOpList)
+        bodyDiv:AddHeading("Condition, Conditionals, Conditional Statements:", 4)
+            UnorderedList compOpList1
+                compOpList1:AddListItem("&quotConditional&quot is simply a generic term for code that alters program flow based on true/false values (like an if-statement)")
+        bodyDiv:Add(compOpList1)
+
+        bodyDiv:AddHeading("Comparison Operators", 3)
+        Paragraph compOp1
+            compOp1:AddText("A common type of condition to check is a comparison of two values. Here are 6 common <b>comparison operators</b>. Each compares a value on the left with a value on the right and returns a Boolean value - <b>true</b> or <b>false</b>. Most of these do what you would expect.")
+        bodyDiv:Add(compOp1)
+            //Paragraph compOp2
+                //compOp2:AddText("In Java script, the programmers use " + dq + "==" + dq + " (double equal sign) for representing the comparison operator. This is because the " + dq + "=" + dq + " (single equal sign) represent the assignment operator. In Quorum programming language however, we use the " + dq + "=" + dq + " (single equal sign) for both cases. In Quorum language, the language system itself has function to differentiate the meaning of the " + dq + "=" + dq + " sign based on where it appears in the context of our coding.")
+        //bodyDiv:Add(compOp2)
+            //Paragraph compOp3
+                //compOp3:AddText("We use not=, <=, and >= because they only require ASCII symbols. Historically the mathematical symbols " + dq + "â‰ " + dq + ", " + dq + "â‰¤" + dq + " and " + dq + "â‰¥" + dq + " were hard or impossible to produce on some systems. In Java script, the programmers use " + dq + "!" + dq + " (exclamation point) for representing " + dq + "not" + dq + ". The ! is universally read as " + dq + "not" + dq + " in man languages. Below are a bunch of examples of how you might see comparisons in code. Review them if you like or continue on and come back if you need reference.")
+        //bodyDiv:Add(compOp3)
+        Paragraph compareOp
+            compareOp:SetClassAttribute("cool-box")
+        compareOp:AddText("<b>&quot=&quot  (is equal to)</b>: Compares two values - numbers, strings, or other booleans - and returns <i>true</i> if they are equal, otherwise returns <i>false</i>.</br>")
+            CodeBlock equal1a
+                equal1a:AddText("  &quotHello&quot = &quothello&quot")
+                compareOp:Add(equal1a)
+                compareOp:AddText(" returns <i>false</i> -- because the strings are slightly different (uppercase H and lowercase h).</br>")
+            CodeBlock equal2a
+                equal2a:AddText("  &quot3&quot = 3")
+                compareOp:Add(equal2a)
+                compareOp:AddText(" returns <i>false</i> -- because one is a text value and the other is an integer value.</br>")
+            CodeBlock equal3a
+                equal3a:AddText("  (2 + 1) = 3")
+                compareOp:Add(equal3a)
+                compareOp:AddText(" returns <i>true</i> -- because the arithmetic expression evaluates to 3.</br>")
+            CodeBlock equal4a
+                equal4a:AddText("   x = 7")
+                compareOp:Add(equal4a)
+                compareOp:AddText(" returns <i>true</i> -- when the variable x has the value 7.</br></br>")
+        
+        compareOp:AddText("<b>&quotnot=&quot  (is not equal to)</b>: Compares two values - numbers, strings, or other booleans - and returns <i>true</i> if they are <b>not equal</b>, otherwise returns <i>false</i>.</br>")
+            CodeBlock notEqual1a
+                notEqual1a:AddText("  &quotHello&quot not= &quothello&quot")
+                compareOp:Add(notEqual1a)
+                compareOp:AddText(" returns <i>true</i> -- because the strings are slightly different (uppercase H and lowercase h).</br>")
+            CodeBlock notEqual2a
+                notEqual2a:AddText("  &quot3&quot not= 3")
+                compareOp:Add(notEqual2a)
+                compareOp:AddText(" returns <i>true</i> -- because one is a text value and the other is an integer value.</br>")
+            CodeBlock notEqual3a
+                notEqual3a:AddText("  (2 + 1) not= 3")
+                compareOp:Add(notEqual3a)
+                compareOp:AddText(" returns <i>false</i> -- because the arithmetic expression evaluates to 3.</br>")
+            CodeBlock notEqual4a
+                notEqual4a:AddText("  x not= 7")
+                compareOp:Add(notEqual4a)
+                compareOp:AddText(" returns <i>true</i> -- when the variable x <i>is any value other than</i> 7.</br></br>")
+
+        compareOp:AddText("<b> &quot>&quot  (is greater than)</b>: Compares two values to determine if the number on the left is <i>greater than</i> the number on the right.</br>")
+            CodeBlock greater1a
+                greater1a:AddText("  4 > 3")
+                compareOp:Add(greater1a)
+                compareOp:AddText(" returns <i>true</i></br>")
+            CodeBlock greater2a
+                greater2a:AddText("  3 > 7")
+                compareOp:Add(greater2a)
+                compareOp:AddText(" returns <i>false</i></br>")
+            CodeBlock greater3a
+                greater3a:AddText("  age > 17")
+                compareOp:Add(greater3a)
+                compareOp:AddText(" returns <i>true</i> -- when the value of the variable &quotage&quot is strictly greater than 17, otherwise <i>false</i></br></br>")
+        compareOp:AddText("<b> &quot<&quot  (is less than)</b>: Compares two values to determine if the number on the left is <i>less than</i> the number on the right.</br>")
+            CodeBlock less1a
+                less1a:AddText("  4 < 3")
+                compareOp:Add(less1a)
+                compareOp:AddText(" returns <i>false</i></br>")
+            CodeBlock less2a
+                less2a:AddText("  3 < 7")
+                compareOp:Add(less2a)
+                compareOp:AddText(" returns <i>true</i></br>")
+            CodeBlock less3a
+                less3a:AddText("  age < 17")
+                compareOp:Add(less3a)
+                compareOp:AddText(" returns <i>true</i> -- when the value of the variable &quotage&quot is strictly less than 17, otherwise <i>false</i></br></br>")
+
+
+        compareOp:AddText("<b> &quot<=&quot  (is less than or equal to)</b>: Compares two values to determine if the number on the left is <i>less than or equal to</i> the number on the right.</br>")
+            CodeBlock lessEq1a
+                lessEq1a:AddText("  4 <= 3")
+                compareOp:Add(lessEq1a)
+                compareOp:AddText(" returns <i>false</i></br>")
+            CodeBlock lessEq2a
+                lessEq2a:AddText("  3 <= 7")
+                compareOp:Add(lessEq2a)
+                compareOp:AddText(" returns <i>true</i></br>")
+            CodeBlock lessEq3a
+                lessEq3a:AddText("  age <= 18")
+                compareOp:Add(lessEq3a)
+                compareOp:AddText(" returns <i>true</i> -- when the value of the variable &quotage&quot is 18 or less</br></br>")
+
+        compareOp:AddText("<b> &quot>=&quot  (is greater than or equal to)</b>: Compares two values to determine if the number on the left is <i>greater than or equal to</i> the number on the right.</br>")
+            CodeBlock greaterEq1a
+                greaterEq1a:AddText("  4 >= 3")
+                compareOp:Add(greaterEq1a)
+                compareOp:AddText(" returns <i>true</i></br>")
+            CodeBlock greaterEq2a
+                greaterEq2a:AddText("  3 >= 7")
+                compareOp:Add(greaterEq2a)
+                compareOp:AddText(" returns <i>false</i></br>")
+            CodeBlock greaterEq3a
+                greaterEq3a:AddText("  age >= 18")
+                compareOp:Add(greaterEq3a)
+                compareOp:AddText(" returns <i>true</i> -- when the value of the variable &quotage&quot is 18 or greater</br>")
+        bodyDiv:Add(compareOp)
+
+/*
+        bodyDiv:AddHeading("" + dq + "=" + dq + " (equal sign) - Compares two values - numbers, strings, or other booleans - and returns true if they are equal, otherwise false. (4)", 4)
+            UnorderedList equal
+                AddListItemWithBoldAtFront(equal, "â€œHelloâ€? = â€œhelloâ€? returns false", " - because the texts are slightly different (uppercase lower case).")
+                AddListItemWithBoldAtFront(equal, "â€œ3â€? = 3 returns false", " - because the â€œ3â€? is a text value and 3 is a integer value.")
+                AddListItemWithBoldAtFront(equal, "(2+1) = 3 returns true", " - because the arithmetic expression evaluates to 3.")
+                AddListItemWithBoldAtFront(equal, "x = 7 returns true", " - when the variable x has the value 7.")
+        bodyDiv:Add(equal)
+
+        bodyDiv:AddHeading("" + dq + "not=" + dq + " - Compares two values - numbers, strings, or other booleans - and returns true if they are not equal, otherwise false.", 4)
+            UnorderedList equal1
+                AddListItemWithBoldAtFront(equal1, "â€œHelloâ€? not= â€œhelloâ€? returns true", " - because the texts are slightly different.")
+                AddListItemWithBoldAtFront(equal1, "â€œ3â€? not= 3 returns true", " - because these values are different in type.")
+                AddListItemWithBoldAtFront(equal1, "(2+1) not= 3 returns false", " - because the arithmetic expression evaluates to 3.")
+                AddListItemWithBoldAtFront(equal1, "x not= 7 returns true", " - when the variable x is any value other than 7.")
+        bodyDiv:Add(equal1)
+
+        bodyDiv:AddHeading("" + dq + ">" + dq + " (greater than sign) - Compares two values to see if the number on the left is greater than the number on the right. (4)", 4)
+            UnorderedList equal2
+                AddListItemWithBoldAtFront(equal2, "4 > 3 returns true", "")
+                AddListItemWithBoldAtFront(equal2, "3 > 7 returns false", "")
+                AddListItemWithBoldAtFront(equal2, "age > 17 returns true", " - when the value of the variable " + dq + "age" + dq + " is strictly greater than 17, otherwise false.")
+        bodyDiv:Add(equal2)
+
+        bodyDiv:AddHeading("" + dq + "<" + dq + " (less than sign) - Compares two values to see if the number on the left is less than the number on the right.", 4)
+            UnorderedList equal3
+                AddListItemWithBoldAtFront(equal3, "4 < 3 returns false", "")
+                AddListItemWithBoldAtFront(equal3, "3 < 7 returns true", "")
+                AddListItemWithBoldAtFront(equal3, "age < 17 returns true", " - when the value of the variable " + dq + "age" + dq + " is strictly less than 17, otherwise false.")
+        bodyDiv:Add(equal3)
+
+        bodyDiv:AddHeading("" + dq + "<=" + dq + " (less than equal sign) - Compares two values to see if the number on the left is less than or equal to the number on the right.", 4)
+            UnorderedList equal4
+                AddListItemWithBoldAtFront(equal4, "3 <= 4 returns true", "")
+                AddListItemWithBoldAtFront(equal4, "4 <= 3 returns false", "")
+                AddListItemWithBoldAtFront(equal4, "age <= 18 returns true", " - when the value of the variable " + dq + "age" + dq + " is 18 or less.")
+        bodyDiv:Add(equal4)
+
+        bodyDiv:AddHeading("" + dq + ">=" + dq + " (greater than equal sign) - Compares two values to see if the number on the left is greater than or equal to the number on the right.", 4)
+            UnorderedList equal5
+                AddListItemWithBoldAtFront(equal5, "3 >= 4 returns false", "")
+                AddListItemWithBoldAtFront(equal5, "4 >= 3 returns true", "")
+                AddListItemWithBoldAtFront(equal5, "age >= 18 returns true", " - when the value of the variable " + dq + "age" + dq + " is 18 or greater.")
+        bodyDiv:Add(equal5)
+*/
+        bodyDiv:AddHeading("How If-Statements Work", 3)
+        InlineFrame inlineFrame2
+        inlineFrame2:SetAddress("https://www.youtube.com/embed/0oG3Wck2fRU")
+        inlineFrame2:SetHeight("480")
+        inlineFrame2:SetWidth("854")
+        bodyDiv:Add(inlineFrame2)
+        UnorderedList video2
+        video2:AddListItemLink("Video: CS Principles: Conditionals - Part 2A if-Statements", 
+        "https://www.youtube.com/watch?v=0oG3Wck2fRU")
+        bodyDiv:Add(video2) 
+
+        bodyDiv:AddHeading("Explore Comparison Operators with &quotoutput&quot", 3)
+        //bodyDiv:AddHeading("Coding Challenge 27", 4)
+            Paragraph chlg27
+                chlg27:AddText("Write simple &quotboolean expressions&quot with a single if- 
+                structure. Have the computer output something if the &quotboolean 
+                expression&quot is true. Change the value of the variables or change 
+                the comparison operator to test the boolean expression. You can try with 
+                different data types as well. The code below is an example:")
+        bodyDiv:Add(chlg27)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer age = 15" + cr
+                                                        +   "if age >= 13" + cr
+                                                        +   "   output "+dq+"You can go to a PG 13 movie alone."+dq+"" + cr
+                                                        +   "end" + cr))
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Testing the Boolean Expression")
+        addStatementIDE:GetIDETitle():AddText("Testing the Boolean Expression")
+        addStatementIDE:GetIDESubtitle():AddText("")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+       
+
+        /*
+        bodyDiv:AddHeading("Video: Introduction to Conditionals - Part 2", 2)
+        InlineFrame inlineFrame1
+        inlineFrame1:SetAddress("https://www.youtube.com/embed/UDi7xgIIW8E")
+        bodyDiv:Add(inlineFrame1)
+
+        UnorderedList vid1
+            vid1:AddListItemLink("Video: Introduction to Conditionals - Part 2", "https://www.youtube.com/watch?v=UDi7xgIIW8E")
+        bodyDiv:Add(vid1)
+        */
+
+        bodyDiv:AddHeading("How If-Else Statements Work ", 3)
+        InlineFrame inlineFrame3
+        inlineFrame3:SetAddress("https://www.youtube.com/embed/ZIL_3YRD14s")
+        inlineFrame3:SetHeight("480")
+        inlineFrame3:SetWidth("854")
+        bodyDiv:Add(inlineFrame3)
+        UnorderedList video3
+        video3:AddListItemLink("Video: CS Principles: Conditionals - Part 2B if/else Statements", 
+        "https://www.youtube.com/watch?v=ZIL_3YRD14s")
+        bodyDiv:Add(video3) 
+
+            Paragraph elseIf
+                elseIf:AddText("With an <i>if - else</i> structure you are giving an 
+                <b>either-or</b> command. <b>Either</b> the line of code after the <i>if</i> 
+                will execute <b>or</b> the lines after the <i>else</i> will execute. Those 
+                are the options. This statement is useful when the choice the user needs 
+                to make is only one or the other. In the code section below we modified the code from the prior example
+                to <b>either</b> output one message if the boolean expression evaluates to true <b>or</b> output a different
+                message if the boolean expression evaluates to false.")
+                //elseIf:AddText("We have already experienced how the &quotelse&quot statement works in conjunction with an existing &quotif-statement&quot during the &quotWill It Crash?&quot activity. The " + dq + "else" + dq + " practically means â€œanything elseâ€?. This statement is useful is the choice the user needs to make is only one or the other. However in reality in our life or in coding, this is such a limiting decision making process. Therefore we have " + dq + "elseif" + dq + " statement.")
+        bodyDiv:Add(elseIf)
+            /*Paragraph elseIf1
+                elseIf1:AddText("The &quotelseif&quot statement enables us to choose from multiple options when making decisions. When you write the code with &quotelseif&quot, you always place it within an &quotif-structure&quot, after the main &quotif-statement&quot line. If you use the &quotelse&quot statement in the same &quotif-statement&quot, the &quotelse&quot always comes last in the &quotif-structure&quot. The code below shows an example:")
+        bodyDiv:Add(elseIf1)
+        */
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer age = 9" + cr
+                                                        +   "if age >= 13" + cr
+                                                        +   "   output "+dq+"You can go to a PG 13 movie alone."+dq+"" + cr
+                                                        +   "else" + cr
+                                                        +   "   output "+dq+"You are not old enough to go to a PG 13 movie alone."+dq+"" + cr
+                                                        +   "end" + cr))
+        bodyDiv:AddParagraph("")
+        /*
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "if age < 7" + cr
+                                                        +   "   output &quotYour admission is Free!&quot" + cr
+                                                        +   "elseif age > 65 " + cr
+                                                        +   "   output &quotYour admission is $5.00&quot" + cr
+                                                        +   "elseif student = true" + cr
+                                                        +   "   output &quotYour admission is $8.00&quot" + cr
+                                                        +   "else" + cr
+                                                        +   "   output &quotYour admission is $10.00&quot" + cr
+                                                        +   "end" + cr
+                                                        +   ""))
+
+            Paragraph elseIf2
+                elseIf2:AddText("The order of the conditions matters!")
+                UnorderedList elseIf2a
+                    elseIf2a:AddListItem("An <i>elseif</i> will execute the code associated with the <b>first</b> condition that evaluates to true -- all other conditions will be ignored.")
+                    elseIf2a:AddListItem("An <i>elseif</i> statement is like saying &quotFIRST check this condition, THEN check this one, THEN check this one and so on")
+        bodyDiv:Add(elseIf2)
+        bodyDiv:Add(elseIf2a)
+
+        bodyDiv:AddHeading("Using an &quotif/else&quot Statement", 2)
+        bodyDiv:AddHeading("Coding Challenge: Movie rating examiner", 4)
+            Paragraph act2
+                act2:AddText("Build a Movie Rating Examiner program (like the one described in the video). You can refer to the flow chart examples to plan the various paths of execution that your program might take. Your program should: ")
+        bodyDiv:Add(act2)
+            UnorderedList act2List
+                act2List:AddListItem("Ask the user for their age (you will have to &quotcast&quot the user input text value to an integer value for your comparison).")
+                act2List:AddListItem("Evaluate whether(or not) the user is allowed to view a PG 13 movie by themselves")
+                act2List:AddListItem("Output the results of the evaluation (e.g. &quotYou can see a PG 13 movie by yourself")
+        bodyDiv:Add(act2List)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("Coding Challenge 28")
+        addStatementIDE2:GetIDETitle():AddText("Using 'elseif' and 'else' in a correct order")
+        addStatementIDE2:GetIDESubtitle():AddText("")
+        addStatementIDE2:SetGameEnvironment(true)
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+        bodyDiv:Add(addStatementIDE2:GetGameCanvas())
+
+        bodyDiv:AddHeading("Run, Test, Debug! - Testing the coding order in a  " + dq + "if-statement" + dq + "", 4)
+            Paragraph act2_1
+                act2_1:AddText("Make it sure the your code runs in the way you planned.")
+        bodyDiv:Add(act2_1)
+*/
+        bodyDiv:AddHeading("Using If-Statements with Event-Driven Programming", 3)
+            Paragraph consoleEvent
+                consoleEvent:AddText("So far, we have learned the concept of an if-statement in the context of console programming. Now we will learn how to apply the same concept to Event-Driven Programming by first writing a very simple console program, then writing the same program in the Event-Driven Programming. The fact is that Event-Driven Programming is not that different from the Console Programming. Rather, they are the same type of programming with different way of accepting the input data and displaying the output result.")
+        bodyDiv:Add(consoleEvent)
+
+        bodyDiv:AddHeading("Coding Challenge - Password Checker", 4)
+            Paragraph act3
+                act3:AddText("Write a program that does the following:")
+        bodyDiv:Add(act3)
+            OrderedList act3List
+                act3List:AddListItem("Asks the user to " + dq + "Enter their password." + dq)
+                act3List:AddListItem("Evaluates whether the password is <b>either</b> correct, <b>or</b> incorrect.")
+                act3List:AddListItem("Outputs <b>either</b> &quotAccess Granted!&quot, <b>or</b> &quotAccess Denied.&quot")
+        bodyDiv:Add(act3List)
+        bodyDiv:AddParagraph("A few things to remember:")
+        UnorderedList remember
+            remember:AddListItem("To compare two values they must be the same type. For instance, if your &quotpassword&quot is an integer type, then you will have to cast the user input to an integer type as well. &quot735&quot is not the same thing as 735.")
+            remember:AddListItem("If your password is a text value type, then the case must match as well. &quotPassword&quot is not the same as &quotpassword.&quot")
+        bodyDiv:Add(remember)
+        SideBySideIDE addStatementIDE3
+        addStatementIDE3:SetUniqueIdentifier("Password Checker")
+        addStatementIDE3:GetIDETitle():AddText("Password Checker")
+        addStatementIDE3:GetIDESubtitle():AddText("")
+        addStatementIDE3:SetGameEnvironment(true)
+        addStatementIDE3:Setup()
+        bodyDiv:Add(addStatementIDE3)
+        bodyDiv:Add(addStatementIDE3:GetGameCanvas())
+
+/*
+        bodyDiv:AddHeading("Password Checker - Event Driven App", 4)
+            Paragraph act4
+                act4:AddText("You need to use off-line IDE for this challenge. Download the template code from the link below, then open the project.")
+        bodyDiv:Add(act4)
+
+        bodyDiv:AddLink("Unit5Lesson8-PasswordChecker-Template.zip", "/files/code/Unit5/Unit5Lesson8-PasswordChecker-Template.zip")
+
+            Paragraph act4_0
+                act4_0:AddText("The picture below shows how this simple program would look like. Let" + dq + "s run the mental scenario on how this program works: ")
+        bodyDiv:Add(act4_0)
+
+        bodyDiv:AddImage("/files/code/Unit5/U5L8-PasswordPic.png", "The image show the Lable with 'enter Passwrod'. The Text box is shown below it.")
+
+            OrderedList act4List
+                act4List:AddListItem("This program displays the message asking the user to input the password in the Label area.")
+                act4List:AddListItem("This program takes the input from the user and place the visual display of the input in a editable box - called " + dq + "TextBox" + dq + "")
+                act4List:AddListItem("The program will evaluate if the text user input is exactly same to the preset text (password). This " + dq + "boolean expression" + dq + " will return " + dq + "true" + dq + " or " + dq + "false" + dq + " to the program.")
+                act4List:AddListItem("If the program receives " + dq + "true" + dq + ", it will output the message informing the user that the password is correct in the Label area.")
+                act4List:AddListItem("If the program receives " + dq + "false" + dq + ", it will output the message informing the password is incorrect in the Label area.")
+        bodyDiv:Add(act4List)
+
+        bodyDiv:AddHeading("Coding Challenge 30: setting up TextBox for the user input", 4)
+            Paragraph act4_1
+                act4_1:AddText("For this Event Driven Programming, we use a new element called " + dq + "TextBox" + dq + ". TextBox is a feature that accept text input from the user. Just like the " + dq + "Label" + dq + " we have been using, it has its own class and preset actions. On par with the basics of Object Oriented Programming, you need to place " + dq + "use statement" + dq + " for the " + dq + "TextBox" + dq + " class, then instantiate an object for it. In the template, we have taken care of the use statement for this class. You need to take care of the object instantiation at the proper place in the template. ** Note: You will find the comments that start with " + dq + "***" + dq + " in the template. The proper place for each tasks in this section is indicated in the template in such way.")
+        bodyDiv:Add(act4_1)
+            Paragraph act4_2
+                act4_2:AddText("Once you instantiate the " + dq + "TextBox object" + dq + ", like you did for the " + dq + "Label" + dq + " object, you need to set up the initial setting for the placement and the dimension of the text box in the " + dq + "action CreateGame()" + dq + ". Find the proper place in the template, and call " + dq + "SetPosition(integer x, integer y)" + dq + " and " + dq + "Initialize(integer x, integer y)" + dq + " actions on the TextBox object. Then Add the object to the program. The action Initialize(x, y) sets the size dimension of the text box. ")
+        bodyDiv:Add(act4_2)
+            Paragraph act4_3
+                act4_3:AddText("Unlike " + dq + "Label" + dq + " class object, the " + dq + "TextBox" + dq + " object requires one more special line of code to function properly. The code is " + dq + "AddKeyboardListener(box)" + dq + ". With this code, your program will listen to what the user types on the keyboard. The code below shows the example for this section:")
+        bodyDiv:Add(act4_3)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "   box:SetPosition(150, 150)" + cr
+                                                        +   "   box:Initialize(200, 50)" + cr
+                                                        +   "   Add(box)" + cr
+                                                        +   "" + cr
+                                                        +   "   AddKeyboardListener(box)" + cr))
+
+        bodyDiv:AddHeading("Run, Test, Debug!", 4)
+            Paragraph act4_4
+                act4_4:AddText("You should see the empty TextBox on your app screen.")
+        bodyDiv:Add(act4_4)
+
+        bodyDiv:AddHeading("Coding Challenge 31: Declaring Necessary Variables", 4)
+            Paragraph act4_5
+                act4_5:AddText("When we run the mental scenario of this program, you would have noticed that we need to declare some text variables that play different role in this program. We need: 1.) the text variable that to be fit into the Label object. 2.) the text variable that stores the user input. 3.) the text variable that stores the correct password.")
+        bodyDiv:Add(act4_5)
+            Paragraph act4_6
+                act4_6:AddText("Since we need to use all three variables throughout the program with update loop, we need to make them global-variables. Find the proper place for declaring these variables, declare them then initialize them with text values. Hint: The text variable for the Label is especially useful because it cane be used to give the user the initial instruction as well as the response message to the user input.")
+        bodyDiv:Add(act4_6)
+
+        bodyDiv:AddHeading("Coding Challenge 32: Using the text variable for the Label as a parameter ", 4)
+            Paragraph act4_7
+                act4_7:AddText("The label object in " + dq + "action CreateGame()" + dq + " and " + dq + "action Update()" + dq + " needs to use the variable you declared for the purpose. Find both places and fill replace the text parameter with the appropriate variable.")
+        bodyDiv:Add(act4_7)
+
+        bodyDiv:AddHeading("Run Text, Debug!", 4)
+            Paragraph act4_8
+                act4_8:AddText("Is the Label showing what it supposed to say? You can press [down arrow] key to have the computer read the label as well.")
+        bodyDiv:Add(act4_8)
+
+        bodyDiv:AddHeading("Coding Challenge 33:", 4)
+            Paragraph act4_9
+                act4_9:AddText("Now, the part for the " + dq + "if-statement" + dq + ". At the bottom part of the code, there is an action called " + dq + "action PressedKey(KeyboardEvent event)" + dq + ". You should be fairly familiar with the structure and the mechanism of this part. You will write you code in the area that is reserved for the case when the user pressed [enter] key. The following is the logical coding process:")
+        bodyDiv:Add(act4_9)
+            OrderedList chlg33
+                chlg33:AddListItem("Reassign a new value to the text variable for the TextBox by calling the action " + dq + "GetInput()" + dq + " on the textBox object. Here is an example: " + dq + "boxInput = box:GetInput()" + dq + "")
+                chlg33:AddListItem("Construct the " + dq + "if-statement" + dq + " structure starting with a " + dq + "boolean expression" + dq + " that evaluate the value in the text variable for the password and the value in the boxInput are the same. (Place " + dq + "end" + dq + " a few lines below.)")
+                chlg33:AddListItem("In the case the boolean returns true, reassign the appropriate value (text) to the text variable for the label. on in the line right below the main if-satement.")
+                chlg33:AddListItem("To make the App user friendly and accessible, you program will sound the appropriate audio when the password is correct. The template already has the two audio objects that are loaded with audio files. Find an appropriate object and call action " + dq + "Play()" + dq + " on it. ")
+                chlg33:AddListItem("In the case the boolean returns false, create " + dq + "else" + dq + " structure in the " + dq + "if-statement" + dq + ". Then do the similar code writing as you did for the case of boolean true.")
+                chlg33:AddListItem("Male it sure you have the " + dq + "end" + dq + "!")
+        bodyDiv:Add(chlg33)
+
+        bodyDiv:AddHeading("Run, Test, Debug!", 4)
+            Paragraph act4_10
+                act4_10:AddText("Now the coding is complete. When the user enters the exactly same text string as it is stored in the text variable for the password, your program should respond to the user appropriately - and vise versa for the other case.")
+        bodyDiv:Add(act4_10)
+
+        bodyDiv:AddHeading("Code mapping and Writing the code", 2)
+            Paragraph codeMap
+                codeMap:AddText("Up to this point, we have provided the guiding procedure for you to mentally prepare for how to write a program (for the simple console -programming). Now we would like you to try truly form the scratch in writing the console code for this program. When a programmer write a code for an App, he/she usually start with forming a mental map for he entire flow of the coding. He/she may use a scratch pair with the lines of  pseudocode to help the mapping. The programmer ask questions to him/herself:")
+        bodyDiv:Add(codeMap)
+            UnorderedList codeMapList
+                codeMapList:AddListItem("How does the program handles the decision making process?")
+                codeMapList:AddListItem("What kind of control structure do I need to construct in my code? ")
+                codeMapList:AddListItem("What kind of variables do I need to create? and how to use them?")
+                codeMapList:AddListItem("Does the variables need to be local or global?")
+                codeMapList:AddListItem("In what order do I need to write the code?")
+        bodyDiv:Add(codeMapList)
+            Paragraph codeMap1
+                codeMap1:AddText("All these questions are essential in writing a code. Without the answer to these questions, your program will not run. If a programmer is working with a group of programmers who are working on the same project, knowing the answer to all those detail questions makes him/her a variable member in collaboration. Once the programmer thinks the code is " + dq + "run-able" + dq + " (executable without syntax errors), a good programmer always Run the program for Testing, then Debug the code to improve the behavior of the program execution. When in this process, the programmer would ask him/herself questions:")
+        bodyDiv:Add(codeMap1)
+            UnorderedList codeMapList1
+                codeMapList1:AddListItem("Is the program running in the expected way?")
+                codeMapList1:AddListItem("Is this program makes sense to the user who may not know anything about this program?")
+                codeMapList1:AddListItem("Is this program user friendly enough? ")
+                codeMapList1:AddListItem("Do we have accessibility potions for this program?")
+        bodyDiv:Add(codeMapList1)
+            Paragraph codeMap2
+                codeMap2:AddText("Answering and modifying the already " + dq + "run-able" + dq + " code based on the answer to this question, might become an huge task for the programmer(s). This part of the programming effort is totally up to the programmer(s). The program that answers all these question may or may not become a " + dq + "great program" + dq + " butâ€¦ all great programs tend to have built-in answers to all these questions.")
+        bodyDiv:Add(codeMap2)
+*/
+        bodyDiv:AddHeading("Coding Challenge - Dice Game", 4)
+            Paragraph act5
+                act5:AddText("Write a program that does the following: ")
+        bodyDiv:Add(act5)
+            OrderedList act5List
+                act5List:AddListItem("Has the computer roll the die (Randomly generating an integer between 1 and 6 and storing the value in a variable for the computer's roll).")
+                act5List:AddListItem("Asks the user to " + dq + "Press 1" + dq + " to roll their die.")
+                act5List:AddListItem("If the user pressed 1, Randomly generate another integer between 1 and 6 and store it in a variable for the user's roll.")
+                act5List:AddListItem("Compares the user roll value to the computer roll value.")
+                act5List:AddListItem("If the user roll is equal to the computer roll, say the value of both the computer roll and the user roll and " + dq + "Tie Game." + dq)
+                act5List:AddListItem("elseif the user roll is greater than the computer roll, say the value of both the computer roll and the user roll and " + dq + "You Won." + dq)
+                act5List:AddListItem("else, say the value of both the computer roll and the user roll and " + dq + "You Lost." + dq)
+                act5List:AddListItem("Use the say command when displaying the instructions and game results to make this game accesible.")
+                //act5List:AddListItem("Has the user &quotRoll the Dice&quot (using the RandomIntegerBetween(1, 6) action and storing the value in a variable)")
+                //act5List:AddListItem("The app starts with the computer rolling the dice, yet not showing the user what number it rolled. You could start the App displaying and/or saying (by using " + dq + "say" + dq + " command) like â€œThe computer just rolled the dice.â€?.")
+                //act5List:AddListItem("Then the App asks the user to enter the choice " + dq + "1" + dq + " (only choice) in the pop-up dialogue box to roll his/her dice.")
+                //act5List:AddListItem("The user types " + dq + "1" + dq + " in a dialogue box, then press [enter].")
+                //act5List:AddListItem("All behind the scene: The user" + dq + "s action prompt the app to generate the random number between 1 and 6.")
+                //act5List:AddListItem("All behind the scene: The App compares the computer" + dq + "s dice number and the user" + dq + "s dice number. ")
+                //act5List:AddListItem("Depending of the comparison result, the App would respond the user by displaying and/or saying one of the statements 1.) â€œThe computer rolled " + dq + "â€¦" + dq + ", you rolled " + dq + "â€¦" + dq + ". You win!â€?. 2.) â€œThe computer rolled " + dq + "â€¦" + dq + ", you rolled " + dq + "â€¦" + dq + ". The computer wins.â€? 3.) â€œThe computer rolled " + dq + "â€¦" + dq + ", you rolled " + dq + "â€¦" + dq + ". It" + dq + "s a tie.â€?")
+        bodyDiv:Add(act5List)
+
+        //bodyDiv:AddHeading("Coding Challenge 34: Programming Console App " + dq + "Dice Game" + dq + "", 4)
+            Paragraph chlg34
+                chlg34:AddText("First, think about the flow for this program (refer to the &quotFlowchart&quot worksheet), then write the code. The following hints may help you with the coding process:")
+        bodyDiv:Add(chlg34)
+            UnorderedList chlg34List
+                chlg34List:AddListItem("You will need to declare variables to store the random integer and use the RandomIntegerBetween() action to generate the values to store in those variables.")
+                chlg34List:AddListItem("You may need to use the casting technique to cast the user input into a " + dq + "calculable" + dq + " or " + dq + "comparable" + dq + " variable type depending on how what type you will use when declaring the userInput variable.")
+                chlg34List:AddListItem("You will need to use the if, elseif, else statement structure that we have provided to determine which message will be displayed to the screen. (Is the Game Tied, Did the User Win, or Did the Computer Win?)")
+                chlg34List:AddListItem("Refer to past lessons if you need help with declaring variables, &quotcasting&quot user input, or calling the RandomIntegerBetween() action.")
+        bodyDiv:Add(chlg34List)
+
+        SideBySideIDE addStatementIDE4
+        addStatementIDE4:SetUniqueIdentifier("Dice Game")
+        addStatementIDE4:GetIDETitle():AddText("Dice Game")
+        //addStatementIDE4:GetIDESubtitle():AddText("")
+        addStatementIDE4:SetGameEnvironment(true)
+        addStatementIDE4:GetIDEInputArea():AddText("use Libraries.Compute.Random
+Random random
+//say instructions(i.e. The computer just Rolled the Die, press 1 to try and beat the Computer)
+
+if userInput = " + dq + "1" + dq + "
+    //roll user die
+   
+    if //the first condition goes here
+        //the output in case of the first condition
+
+    elseif //the second condition goes here
+        //the output in case of the second condition
+    
+    else //(there is only one other condition so nothing will need to go here)
+        //the output in case of the only other option (the third condition)
+
+    end
+end")
+        addStatementIDE4:Setup()
+        bodyDiv:Add(addStatementIDE4)
+        bodyDiv:Add(addStatementIDE4:GetGameCanvas())
+
+        /*bodyDiv:AddHeading("Activity 6: Project 4 " + dq + "Dice Game" + dq + " - Event Driven App", 2)
+            Paragraph act6
+                act6:AddText("You need to use off-line IDE for this challenge. Download the template code from the link below, then open the project.")
+        bodyDiv:Add(act6)
+
+        bodyDiv:AddLink("Unit5-DiceGame-Template.zip", "/files/code/Unit5/Unit5-DiceGame-Template.zip")
+
+            Paragraph act6_1
+                act6_1:AddText("The picture below shows how this simple program would look like. Let" + dq + "s run the mental scenario on how this program works:")
+        bodyDiv:Add(act6_1)
+
+        bodyDiv:AddHeading("Introcution screen", 5)
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-DiceGame-IntroPic.png", "The picture shows the gray screen with introcutory comment for the progam.")
+        bodyDiv:AddHeading("Result screen", 5)
+        bodyDiv:AddImage("/files/code/Unit5/Unit5-DiceGame-resultPic.png", "The picture shows the gray screen with the comment for the result of the game.")
+
+            OrderedList act6List
+                act6List:AddListItem("The program starts with the sound effect of the dice roll, then display the message on the screen for instruction for this program.")
+                act6List:AddListItem("The user can press the [space] key at this point to have the computer read the instruction on the screen.")
+                act6List:AddListItem("When the user press [enter] key, the program will play another sound effect of dice roll as well as clear bell sound or slap sound that indicate the result of your dice roll.")
+                act6List:AddListItem("The computer displays the comment on the result of the dice battle.")
+                act6List:AddListItem("The user can press the [space] key at this point to have the computer read the comment on the screen.")
+                act6List:AddListItem("The user can press [escape] key to end the program.")
+        bodyDiv:Add(act6List)
+    
+        bodyDiv:AddHeading("Coding Challenge 35: Building " + dq + "Dice Game" + dq + " - Event Driven Programming", 4)
+            Paragraph chlg35
+                chlg35:AddText("Converting the console program - you have created in Coding Challenge 34 - follows the same patterns we did in the Coding Challenge 30-33 (When we converted the console program of " + dq + "The Password Checker" + dq + " into Event Driven Programming). The following function of the App is already taken care of in the template code:")
+        bodyDiv:Add(chlg35)
+            UnorderedList chlg35List
+                chlg35List:AddListItem("The " + dq + "use statement" + dq + " for the Random class and all other necessary classes are already written.")
+                chlg35List:AddListItem("The template has three audio object named appropriately and loaded with appropriate audio files.")
+                chlg35List:AddListItem("The template has keyboard event structure for the keys: 1.) [enter] key for executing your code for displaying the result of the game, as well as making the appropriate audio to play based on the result. 2.) [space] key for the user to have the computer talk. 3.) [escape] key for the user to Exit the game.")
+                chlg35List:AddListItem("The template has the basic font setting and label setting for the visual display.")
+        bodyDiv:Add(chlg35List)
+
+            Paragraph chlg35_1
+                chlg35_1:AddText("For this programming, we will only provide the list of the tasks you need to do (not necessarily in the order) in coding. The tasks correspond to the lines that are witten in the same way in the template:")
+        bodyDiv:Add(chlg35_1)
+            UnorderedList chlg35List1
+                chlg35List1:AddListItem("Instantiate a Random object")
+                chlg35List1:AddListItem("Declare integer variables for the computer's (random) die roll and the user's (random) die roll")
+                chlg35List1:AddListItem("Declare a text variable that will store the user input (e.g. if the user Presses 1 to Play the Game)")
+                chlg35List1:AddListItem("Have the computer (randomly) generate the integer for its die roll, and store that value in the associated variable")
+                chlg35List1:AddListItem("If the user pressed 1 to play, Have the computer (randomly) generate an integer for the user's die roll, and store that value in the associated variable.")
+                chlg35List1:AddListItem("Display who won the game or if the game is a tie game.")
+                chlg35List1:AddListItem("")
+        bodyDiv:Add(chlg35List1)
+      */ 
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+        bodyDiv:AddHeading("Compare and Contrast - easy/hard", 4)
+        bodyDiv:AddParagraph("You've now had experience reasoning about if-statements on paper with the &quotWill it Crash?&quot activity, and now actually writing if-statements in working code. Compare and Contrast these experiences.")
+        UnorderedList wrapUp
+            wrapUp:AddListItem("For &quotWill it Crash&quot - what was easy, what was hard?")
+            wrapUp:AddListItem("For this lesson, writing if-statements - what was easy, what was hard?")
+            wrapUp:AddListItem("If there was one thing you wish you understood better at this point, what would it be?")
+        bodyDiv:Add(wrapUp)
+
+        bodyDiv:AddHeading("Nested if-statements", 4)
+        bodyDiv:AddParagraph("What if we need to check more than one condition for an if-statement at the same time? For instance it is the weekend if it is Saturday <b>or</b> Sunday. One solution is to <b>nest</b> if-statements. <b>Nesting if-statements</b> is one way to check more than one condition at a time. There are other ways to check more than one condition at a time that we will learn about in the next lesson.")
+            //UnorderedList wrapupList
+                //wrapupList:AddListItemLink("Unit 5 Lesson 8 - Exemplar Solution.rtf", "/files/code/Unit5/Unit 5 Lesson 8 - Exemplar Solution.rtf")
+                //wrapupList:AddListItemLink("Unit5Lesson8-PasswordChecker.zip", "/files/code/Unit5/Unit5Lesson8-PasswordChecker.zip")
+                //wrapupList:AddListItemLink("Unit5-DiceGame.zip", "/files/code/Unit5/Unit5-DiceGame.zip")
+        //bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2011): ", "CL.L2:3")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2011): ", "CPP.L2:5")
+                AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2011): ", "CT.L2:1, CT.L2:14, CT.L2:3, CT.L2:6, CT.L2:8")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "4.1.1(A, B, C)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ", "5.5.1(E, G)")
+        bodyDiv:Add(list)
+
+/* Completed 5/26/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the concept of the Boolean Expressions and " + dq + "if" + dq + " Statements'"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 8: (Boolean Expressions and " + dq + "if" + dq + " Statements)"
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 8"
+    end
+    action GetShortDescription returns text
+        return "Learn the concept of the Boolean Expressions and " + dq + "if" + dq + " Statements"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson8A.html"
+    end
+
+end
+
+ 
+    

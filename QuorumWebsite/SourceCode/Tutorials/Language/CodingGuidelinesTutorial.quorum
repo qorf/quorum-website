@@ -1,0 +1,216 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class CodingGuidelinesTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Coding Coding Conventions - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Quorum Coding Conventions", 1)
+        headDiv:AddText("While not required, this page provides standard conventions for writing Quorum code.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Conventions for naming classes, actions, and parameters", 2)
+        bodyDiv:AddParagraph(   "We recommend the following conventions for naming classes, actions, and parameters in Quorum:" + cr + cr
+                            +   "Do's:" + cr)
+        UnorderedList doList
+        doList:AddListItem("Do use short and meaningful names")
+        doList:AddListItem("Do use names that are common in English")
+        doList:AddListItem("Do use names that best represent what it is your class, action, or parameter does or is")
+        doList:AddListItem("Do use the most obvious name you can think of for your libraries (a thesaurus is helpful).")
+        bodyDiv:Add(doList)
+        bodyDiv:AddParagraph(   "Do not's:" + cr)
+        bodyDiv:Add(break)
+        UnorderedList doNotList
+        doNotList:AddListItem("Do not use acronyms (e.g., awk, sed, ascii, io)")
+        doNotList:AddListItem("Do not use shortened names (e.g. use AbsoluteValue instead of Abs, or CharacterToInteger instead of atoi)")
+        doNotList:AddListItem("Do not use single letters for parameter names (e.g., use index instead of i)")
+        doNotList:AddListItem("Do not use computer science or technical jargon (e.g., virtual void abs() = 0;, BTree, or LinkedList)")
+        doNotList:AddListItem("Do not make names excessively verbose (e.g., ThisActionIsReallyAwesomeButHardToType())")
+        doNotList:AddListItem("Do not give your libraries arbitrary names (e.g., call your library MailServer instead of BobsGem)")
+        bodyDiv:Add(doNotList)
+
+        //the section on naming and layout conventions
+        bodyDiv:AddHeading("Naming and Layout Conventions", 2)
+        bodyDiv:AddParagraph(   "In Quorum, there are a few conventions for class, action and variable naming that we recommend following in your code.")
+
+        //the section on class names
+        bodyDiv:AddHeading("Class Names", 3)
+        bodyDiv:AddParagraph(   "Class names in Quorum should be in the pascal case format, e.g., PascalCase, with the P and C capitalized.")
+
+        //the section on actions names
+        bodyDiv:AddHeading("Action Names", 3)
+        bodyDiv:AddParagraph(   "Action names in Quorum should also be in the pascal case format, e.g., PascalCase, with the P and C capitalized. "
+                            +   "In addition, actions that do not have any parameters do not require parentheses. By convention, leave out any syntax that is not required.")
+
+        //the section on variables names
+        bodyDiv:AddHeading("Variable Names", 3)
+        bodyDiv:AddParagraph(   "Variable names in Quorum should follow the camel case format, e.g., camelCase, with the first c lowercase and the second C capitalized.")
+
+        //the section on indentation
+        bodyDiv:AddHeading("Indentation", 3)
+        bodyDiv:AddParagraph(   "The Quorum compiler does not pay attention to whitespace in code. However, we ask that you use consistent indentation." + cr + cr
+                            +   "Consistent indentation:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "class Main" + cr
+                                                        +   "    action Main" + cr
+                                                        +   "        output " + dq + "hello world." + dq + cr
+                                                        +   "    end" + cr
+                                                        +   "end"))
+        bodyDiv:AddParagraph(   "Inconsistent indentation:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "class Main" + cr
+                                                        +   "action Main" + cr
+                                                        +   "output " + dq + "hello world." + dq + cr
+                                                        +   "    end" + cr
+                                                        +   "end"))
+
+ 
+        CodingOnline indentationIDE
+        indentationIDE:SetUniqueIdentifier("indentationIDE")
+        indentationIDE:Setup()
+        indentationIDE:GetIDETitle():AddText("Activity: Try indentation")
+        indentationIDE:GetIDESubtitle():AddText("Try the above code blocks.")
+        bodyDiv:Add(indentationIDE)
+
+        //the section on comments and documentation
+        bodyDiv:AddHeading("Comments and Documentation", 2)
+        bodyDiv:AddParagraph(   "In Quorum, there are two types of comments: single line and multi-line comments. "
+                            +   "For single line comments, we recommend a space after the beginning two forward slashes, like so:" + cr + cr
+                            +   "Good single-line comment:")
+
+        CodeBlock cb1
+        Span s1
+        s1:AddText(     "// Output a message to the user." + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText(    "output " + dq + "hello world." + dq )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddParagraph(   "Multi-line comments should be formatted such that the beginning forward star and ending star forward are on their own lines, like so:")
+
+        CodeBlock cb2
+        Span s2
+        s2:AddText(     "/*" + cr
+                    +   "the main entry point to the program" + cr
+                    +   "*/" + cr)
+        s2:SetClassAttribute("comment")
+        cb2:Add(s2)
+        cb2:AddText(    "action Main" + cr
+                    +   "end" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+
+        bodyDiv:AddParagraph(   "However, if on only one line, as a single line comment is sufficient:")
+
+        CodeBlock cb3
+        Span s3
+        s3:AddText(     "/* May as well use a single line comment */" + cr)
+        s3:SetClassAttribute("comment")
+        cb3:Add(s3)
+        cb3:AddText(    "action Main" + cr
+                    +   "end" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+
+
+ 
+        CodingOnline commentsAndDocumentationIDE
+        commentsAndDocumentationIDE:SetUniqueIdentifier("commentsAndDocumentationIDE")
+        commentsAndDocumentationIDE:Setup()
+        commentsAndDocumentationIDE:GetIDETitle():AddText("Activity: Try comments and documentation")
+        commentsAndDocumentationIDE:GetIDESubtitle():AddText("Try the above code blocks.")
+        bodyDiv:Add(commentsAndDocumentationIDE)
+
+        //the section on documentation
+        bodyDiv:AddHeading("Documentation", 3)
+        bodyDiv:AddParagraph(   "Please fully document each action and class in Quorum standard library files. " 
+                            +   "In each case, please be sure to include at least one example, in all case, of code to execute that action or use that class. "
+                            +   "Here is an example comment from the array class:")
+
+        CodeBlock cb4
+        Span s4
+        s4:AddText(     "/*" + cr
+                    +   "The Array class is a data structure that stores items in contiguous memory. An" + cr
+                    +   "item is typically stored and accessed through an index or location. This location" + cr
+                    +   "always starts at 0, this means the first item in the array is at location 0, the" + cr
+                    +   "second is at location 1, etc. The default maximum size is set to 10, but can be" + cr
+                    +   "changed by using the SetSize(value) method or the array will automatically" + cr
+                    +   "make itself large when the space is needed (note: it is possible to turn the " + cr
+                    +   "resizing off with the SetAutoResize(false) method)." + cr + cr
+                    +   "Attribute: Example" + cr + cr
+                    +   "use Libraries.Containers.Array" + cr
+                    +   "class Main" + cr
+                    +   "   action Main" + cr
+                    +   "      //make the array" + cr
+                    +   "      Array<integer> myArray" + cr
+                    +   "      //add a value" + cr
+                    +   "      myArray:Add(12)" + cr
+                    +   "      //get it back" + cr
+                    +   "      integer value = myArray:Get(0)" + cr
+                    +   "   end" + cr
+                    +   "end" + cr
+                    +   "*/" )
+        s4:SetClassAttribute("comment")
+        cb4:Add(s4)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about common conventions for writing code in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Coding Guidelines"
+    end
+
+    action GetImageLocation returns text
+        return "/media/CodingGuidelines.png"
+    end
+
+    action GetName returns text
+        return "Coding Guidelines"
+    end
+
+    action GetShortDescription returns text
+        return "some basic conventions that we can follow while coding."
+    end
+
+    action GetLocation returns text
+        return "tutorials/language/codingGuidelines.html"
+    end
+end

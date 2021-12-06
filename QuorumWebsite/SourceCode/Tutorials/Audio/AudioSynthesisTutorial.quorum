@@ -1,0 +1,249 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class AudioSynthesisTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("AM & FM Synthesis - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Modulation Synthesis", 1)
+        headDiv:AddText("Amplitude and Frequency Modulation (AM & FM)")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Modulation Synthesis", 2)
+        bodyDiv:AddParagraph("Have you ever wondered what AM and FM meant when scrolling through radio stations? 
+            AM stands for amplitude modulation and uses changes in amplitude to encode a radio wave. 
+            FM stands for frequency modulation which unlike AM, uses changes in frequencies to encode. 
+            The different techniques make a huge difference in terms of sound quality. ")
+
+        bodyDiv:AddParagraph("There are many different techniques we can use to digitally synthesize (create) sounds. 
+            Modulating a wave refers to changing its properties such as frequency, amplitude, and phase to create a new sound. 
+            For AM and FM synthesis, we will have two waves: a carrier wave and a modulator wave. 
+            The carrier wave is the original wave that we will be altering. 
+            The modulator wave refers to the wave that we will be using to alter the carrier wave. 
+            It’s more like the factor that changes the carrier wave. 
+            For this tutorial, we will be learning how to implement these techniques through very basic modulation. ")
+
+        bodyDiv:AddHeading("Amplitude modulation (AM) Synthesis", 2)
+        bodyDiv:AddText("Amplitude Modulation involves having a carrier wave’s amplitude being driven by the modulator wave. 
+            It is often understood as the sum and differences between the signals.")
+
+        bodyDiv:AddHeading("Example Program", 4)
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        Span s7
+        Span s8
+        Span s9
+        Span s10
+        s1:AddText("// AM Synthesis" + cr)
+        s2:AddText("// Frequency of Carrier wave" + cr)
+        s3:AddText("// Frequency of Modulator wave" + cr)
+        s4:AddText("// Amplitude of Carrier wave" + cr)
+        s5:AddText("// Amplitude of Modulator wave" + cr)
+        s6:AddText("// Mono sound" + cr)
+        s7:AddText("// 4 Seconds of playback" + cr)
+        s8:AddText("// Carrier Wave" + cr)
+        s9:AddText("// Modulator Wave" + cr)
+        s10:AddText("// AM modulated wave" + cr)
+        s1:SetClassAttribute("comment")
+        s2:SetClassAttribute("comment")
+        s3:SetClassAttribute("comment")
+        s4:SetClassAttribute("comment")
+        s5:SetClassAttribute("comment")
+        s6:SetClassAttribute("comment")
+        s7:SetClassAttribute("comment")
+        s8:SetClassAttribute("comment")
+        s9:SetClassAttribute("comment")
+        s10:SetClassAttribute("comment")
+        cb1:AddText("use Libraries.Compute.Math" + cr +
+            "use Libraries.Sound.Audio" + cr +
+            "use Libraries.Sound.AudioSamples" + cr)
+        cb1:Add(s1)
+        cb1:AddText(cr + "Math math" + cr + 
+            "number twoPi = math:pi * 2" + cr + 
+            "number carrierFrequency = 440 ")
+        cb1:Add(s2)
+        cb1:AddText("number modulatorFrequency = 10 ")
+        cb1:Add(s3)
+        cb1:AddText("number carrierAmplitude = 1 ")
+        cb1:Add(s4)
+        cb1:AddText("number modulatorAmplitude = 1 ")
+        cb1:Add(s5)
+        cb1:AddText(cr + "AudioSamples amWave" + cr +
+            "amWave:SetChannels(1) ")
+        cb1:Add(s6)
+        cb1:AddText("amWave:SetSizeInSeconds(4) ")
+        cb1:Add(s7)
+        cb1:AddText(cr + "number sampleSize = amWave:GetSamplesPerSecond()" + cr +
+            "integer counter = 0" + cr +
+            "repeat while counter < amWave:GetSize()" + cr +
+            "   number carrierWave = math:Cosine(carrierFrequency * twoPi * counter/sampleSize) ")
+        cb1:Add(s8)
+        cb1:AddText("   number modulatorWave = modulatorAmplitude * math:Cosine(modulatorFrequency * twoPi * counter/sampleSize) + carrierAmplitude ")
+        cb1:Add(s9)
+        cb1:AddText("   number a = carrierWave * modulatorWave ")
+        cb1:Add(s10)
+        cb1:AddText("   amWave:Set(counter, a, 0)" + cr +
+            "   counter = counter + 1" + cr +
+            "end" + cr + cr +
+            "Audio audio" + cr +
+            "audio:Load(amWave)" + cr +
+            "audio:PlayUntilDone()")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        
+        bodyDiv:AddParagraph("This may seem a little confusing using multiple waves and trigonometry, but the structure is very similar to the structure we’ve been using with our previous wave generators. 
+            What we have is two waves, the carrier and modulator wave mentioned earlier, that are combined (multiplied).")
+
+        CodeBlock cb2
+        cb2:AddText("number carrierWave = math:Cosine(carrierFrequency * twoPi * counter/sampleSize) ")
+        cb2:Add(s8)
+        cb2:AddText("number modulatorWave = modulatorAmplitude * math:Cosine(modulatorFrequency * twoPi * counter/sampleSize) + carrierAmplitude ")
+        cb2:Add(s9)
+        cb2:AddText("number a = carrierWave * modulatorWave ")
+        cb2:Add(s10)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        
+        bodyDiv:AddParagraph("Combining these two waves creates a single wave that has the same frequency as the carrier, but with different amplitudes throughout each cycle. 
+            This is the basic formula for AM synthesis. 
+            The image below shows the resulting wave which should resemble something beating.")
+        bodyDiv:AddImage("/media/dsp/amWave.png", "This is a picture of an AM Wave")
+
+        bodyDiv:AddHeading("Frequency Modulation (FM) Synthesis", 3)
+        bodyDiv:AddParagraph("Frequency modulation is more widely used in real-life technologies than amplitude modulation because of its ability to “block�? noises. This provides a cleaner, crisper sound that is ultimately less staticky. As the name implies, we are changing the frequency of the carrier wave here while we leave the amplitude and phase the same. To visualize FM waves, imagine a slinky. If you were to compress the slinky, the frequency increases but stretching it out would decrease its frequency. What we are doing is compressing the wave at certain points to produce a new sound.")
+        
+        bodyDiv:AddHeading("Example Program", 4)
+        bodyDiv:AddText("To understand FM synthesis in Quorum, let’s take a look at the following example program.")
+        
+        CodeBlock cb3
+        Span s11
+        Span s12
+        s11:AddText("// FM Synthesis" + cr)
+        s12:AddText("// FM Modulated wave" + cr)
+        s11:SetClassAttribute("comment")
+        s12:SetClassAttribute("comment")
+
+        cb3:AddText("use Libraries.Compute.Math" + cr +
+            "use Libraries.Sound.Audio" + cr +
+            "use Libraries.Sound.AudioSamples" + cr)
+        cb3:Add(s11)
+        cb3:AddText(cr + "Math math" + cr + 
+            "number twoPi = math:pi * 2" + cr + 
+            "number carrierFrequency = 440 ")
+        cb3:Add(s2)
+        cb3:AddText("number modulatorFrequency = 10 ")
+        cb3:Add(s3)
+        cb3:AddText("number carrierAmplitude = 1 ")
+        cb3:Add(s4)
+        cb3:AddText("number modulatorAmplitude = 10 ")
+        cb3:Add(s5)
+        cb3:AddText(cr + "AudioSamples fmWave" + cr +
+            "fmWave:SetChannels(1) ")
+        cb3:Add(s6)
+        cb3:AddText("fmWave:SetSizeInSeconds(4) ")
+        cb3:Add(s7)
+        cb3:AddText(cr + "number sampleSize = fmWave:GetSamplesPerSecond()" + cr +
+            "integer counter = 0" + cr +
+            "repeat while counter < fmWave:GetSize()" + cr +
+            "   number modulatorWave = modulatorAmplitude * math:Sine(modulatorFrequency * twoPi * counter/sampleSize) ")
+        cb3:Add(s9)
+        cb3:AddText("   number f = carrierAmplitude * math:Sine(carrierFrequency * twoPi * counter/sampleSize + modulatorWave) ")
+        cb3:Add(s12)
+        cb3:AddText("   fmWave:Set(counter, f, 0)" + cr +
+            "   counter = counter + 1" + cr +
+            "end" + cr + cr +
+            "Audio audio" + cr +
+            "audio:Load(fmWave)" + cr +
+            "audio:PlayUntilDone()")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        
+        bodyDiv:AddParagraph("Again we alter the carrier wave with the modulator wave. 
+            The equations are different from the equations used for AM synthesis. 
+            What we have is a carrier wave that includes another wave (modulator wave) into itself to change its sound.")
+            
+        CodeBlock cb4
+        cb4:AddText("number modulatorWave = modulatorAmplitude * math:Sine(modulatorFrequency * twoPi * counter/sampleSize) ")
+        cb4:Add(s9)
+        cb4:AddText("number f = carrierAmplitude * math:Sine(carrierFrequency * twoPi * counter/sampleSize + modulatorWave) ")
+        cb4:Add(s12)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        
+        bodyDiv:AddParagraph("The image below shows the waves being combined to alter the carrier wave’s frequencies. 
+            This is the most basic form of FM synthesis. 
+            The sound produced should sound similar to quickly placing and removing your hand from a speaker’s output. ")
+
+        bodyDiv:AddImage("/media/dsp/fmWave.png", "This is a picture of an FM wave")
+
+        SideBySideIDE SynthesizeIDE
+        SynthesizeIDE:SetUniqueIdentifier("Synthesizer")
+        SynthesizeIDE:Setup()
+        SynthesizeIDE:GetIDETitle():AddText("Synthesize Sounds")
+        bodyDiv:Add(SynthesizeIDE)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn AM & FM Synthesis in Quoroum."
+    end
+
+    action GetSummaryName returns text
+        return "Modulation Synthesis"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+        return "AM & FM Synthesis"
+    end
+
+    action GetShortDescription returns text
+        return "how to synthesize your own sounds."
+    end
+
+    action GetLocation returns text
+        return "tutorials/dsp/audiosynthesis.html"
+    end
+end

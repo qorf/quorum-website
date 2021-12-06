@@ -1,0 +1,364 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class UserInterfacesFocus is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Focus Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Focus", 1)
+        headDiv:AddText("This tutorial tells you how to use Focus in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to Focuses in Quorum", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will learn how the Focus works in the Quorum Game Engine. The Focus "
+                            + "is an element within the Item class that is used to indicate which Item is currently "
+                            + "selected by the user. If an Item does not have the current Focus, it cannot be activated. "
+                            + "Typically, the Focus cycles through several Focusable Items. In Quorum, this is done by "
+                            + "manually setting the next and previous Focuses for each Item in the cycle. Having a cycle
+                               of focusable Items also allows the user to go through all these items with the keyboard. ")
+
+        bodyDiv:AddParagraph("For this tutorial, we will create several Drawables and allow the user to cycle the Focus "
+                            + "through them. When one of the Items receives the Focus, it will change color to green and "
+                            + "say which shape it is, and when the Item loses the Focus, it will change color to red and "
+                            + "output which shape lost the Focus and which shape gained the Focus. To start, create a new "
+                            + "Game Application project.")
+
+        bodyDiv:AddHeading("Creating a Focusable Drawable", 2)
+
+        bodyDiv:AddParagraph("Before we can add much to the main, we need to create a new class. We will name this new class "
+                        + dq + "FocusDrawable.quorum." + dq + " We will need the libraries for Drawable, FocusEvent, "
+                        + "Color, and Speech.")
+
+        bodyDiv:AddParagraph("The FocusDrawable class will inherit the Drawable class, and we will override the "
+                            + "GainedFocus and LostFocus actions to execute some instructions when the Drawable gains the "
+                            + "Focus. We will also need a text class variable for the shape’s description and actions to "
+                            + "set and get that description. This gives us the following template:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Interface.Events.FocusEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class FocusDrawable is Drawable" + cr
+                                                        + "    action GainedFocus(FocusEvent event)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action LostFocus(FocusEvent event)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("For the GainedFocus action, recall that this class inherits the Drawable class. Thus, the "
+                            + "FocusDrawable item itself will be the shape we want to change the color of. Thus, we need "
+                            + "to use " + dq + "me:SetColor(color:Green())." + dq + " Additionally, the Speech class will "
+                            + "be used to have the program say the Description of the Drawable aloud. This gives us the "
+                            + "following action:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action GainedFocus(FocusEvent event)" + cr
+                                                        + "    Color color" + cr
+                                                        + "    me:SetColor(color:Green())" + cr + cr
+                                                        + "    Speech speech" + cr
+                                                        + "    speech:Say(GetDescription())" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Now we can move on to LostFocus, the final action. This action will need to set itself to "
+                            + "the color Red, and output the internal Description of the Item that just lost the Focus. This gives us "
+                            + "the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action LostFocus(FocusEvent event)" + cr
+                                                        + "    Color color" + cr
+                                                        + "    me:SetColor(color:Red())" + cr + cr
+                                                        + "    output " + dq + "The " + dq + " + GetDescription() + " + dq + " has lost the Focus." + dq + cr
+                                                        + "end"))
+
+/*        bodyDiv:AddParagraph("The completed FocusDrawable class is as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Interface.Events.FocusEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class FocusDrawable is Drawable" + cr + cr
+                                                        + "    text shapeDescription = undefined" + cr + cr
+                                                        + "    action SetShapeDescription(text newShape)" + cr
+                                                        + "        shapeDescription = newShape" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action GetShapeDescription returns text" + cr
+                                                        + "        return shapeDescription" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action GainedFocus(FocusEvent event)" + cr
+                                                        + "        Color color" + cr
+                                                        + "        me:SetColor(color:Green())" + cr + cr
+                                                        + "        if shapeDescription not= undefined" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say(shapeDescription)" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action LostFocus(FocusEvent event)" + cr
+                                                        + "        Color color" + cr
+                                                        + "        me:SetColor(color:Red())" + cr + cr
+                                                        + "        output " + dq + "The " + dq + " + shapeDescription + " + dq + " has lost the Focus." + dq + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+*/
+        bodyDiv:AddHeading("Cycles Using Focus", 2)
+
+        bodyDiv:AddParagraph("We now have an Item that does something when it gains or loses the Focus, but that alone does not fully
+                              utilize the focus. To make use of having focus we can create a cycle that the focus goes through by 
+                              setting each each Item’s NextFocus and PreviousFocus Item.")
+
+        bodyDiv:AddParagraph("Now that we’ve created the FocusDrawable class, we can return to the main class. This class "
+                            + "will need the Color library, so we must add the appropriate use statement. Since we want the
+                               cycle of shapes to be usable as soon as the game begins, we will write "
+                            + "our new code into the CreateGame class. To start, we will create a Color variable and six "
+                            + "FocusDrawable objects. These objects will be two rectangles, two circles, and two "
+                            + "triangles. The following are our declarations:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Color color" + cr
+                                                        + "FocusDrawable rectangle1" + cr
+                                                        + "FocusDrawable circle1" + cr
+                                                        + "FocusDrawable triangle1" + cr
+                                                        + "FocusDrawable rectangle2" + cr
+                                                        + "FocusDrawable circle2" + cr
+                                                        + "FocusDrawable triangle2"))
+
+        bodyDiv:AddParagraph("Now we will load each shape. Since the FocusDrawable class inherits the Drawable class, we "
+                            + "can use the Drawable class’s LoadFilledRectangle, LoadFilledCircle, and LoadFilledTriangle "
+                            + "actions. This adds the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:LoadFilledRectangle(50, 50, color:Red())" + cr
+                                                        + "circle1:LoadFilledCircle(25, color:Red())" + cr
+                                                        + "triangle1:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())" + cr
+                                                        + "rectangle2:LoadFilledRectangle(50, 50, color:Red())" + cr
+                                                        + "circle2:LoadFilledCircle(25, color:Red())" + cr
+                                                        + "triangle2:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())"))
+
+        bodyDiv:AddParagraph("To make the shapes match the cycle we will make later, we will arrange them in a circle on "
+                            + "the game window. This gives the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:SetPosition(375, 500)" + cr
+                                                        + "circle1:SetPosition(600, 375)" + cr
+                                                        + "triangle1:SetPosition(600, 175)" + cr
+                                                        + "rectangle2:SetPosition(375, 50)" + cr
+                                                        + "circle2:SetPosition(150, 175)" + cr
+                                                        + "triangle2:SetPosition(150, 375)"))
+
+        bodyDiv:AddParagraph("Next, we need to call SetDescription for each FocusDrawable to give it an appropriate "
+                            + "description. Our calls are as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:SetShapeDescription(" + dq + "First Rectangle" + dq + ")" + cr
+                                                        + "circle1:SetShapeDescription(" + dq + "First Circle" + dq + ")" + cr
+                                                        + "triangle1:SetShapeDescription(" + dq + "First Triangle" + dq + ")" + cr
+                                                        + "rectangle2:SetShapeDescription(" + dq + "Second Rectangle" + dq + ")" + cr
+                                                        + "circle2:SetShapeDescription(" + dq + "Second Circle" + dq + ")" + cr
+                                                        + "triangle2:SetShapeDescription(" + dq + "Second Triangle" + dq + ")"))
+
+        bodyDiv:AddParagraph("Before we add each Item to the Focus cycle, we need to make them Focusable objects. Some "
+                            + "Items are Focusable by default, such as TextBoxes and Trees, but Drawables are not, so we "
+                            + "must set them manually. This is done by calling the SetFocusable action with a boolean "
+                            + "parameter of true. This adds the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:SetFocusable(true)" + cr
+                                                        + "circle1:SetFocusable(true)" + cr
+                                                        + "triangle1:SetFocusable(true)" + cr
+                                                        + "rectangle2:SetFocusable(true)" + cr
+                                                        + "circle2:SetFocusable(true)" + cr
+                                                        + "triangle2:SetFocusable(true)"))
+
+        bodyDiv:AddParagraph("Now that each Item is Focusable, we need to manually set the next and previous Focus for "
+                            + "each Item. We will set the next Focus from rectangle1 to circle1, from circle1 to "
+                            + "triangle1, then to rectangle2, circle2, triangle2, and finally have triangle2 go to "
+                            + "rectangle1, forming a cycle, while the previous Focuses will go in reverse order. This "
+                            + "gives us the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:SetNextFocus(circle1)" + cr
+                                                        + "rectangle1:SetPreviousFocus(triangle2)" + cr
+                                                        + "circle1:SetNextFocus(triangle1)" + cr
+                                                        + "circle1:SetPreviousFocus(rectangle1)" + cr
+                                                        + "triangle1:SetNextFocus(rectangle2)" + cr
+                                                        + "triangle1:SetPreviousFocus(circle1)" + cr
+                                                        + "rectangle2:SetNextFocus(circle2)" + cr
+                                                        + "rectangle2:SetPreviousFocus(triangle1)" + cr
+                                                        + "circle2:SetNextFocus(triangle2)" + cr
+                                                        + "circle2:SetPreviousFocus(rectangle2)" + cr
+                                                        + "triangle2:SetNextFocus(rectangle1)" + cr
+                                                        + "triangle2:SetPreviousFocus(circle2)"))
+
+        bodyDiv:AddParagraph("With the next and previous Focus set for each Item, now we need to add them to the game. "
+                            + "This is done with the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Add(rectangle1)" + cr
+                                                        + "Add(circle1)" + cr
+                                                        + "Add(triangle1)" + cr
+                                                        + "Add(rectangle2)" + cr
+                                                        + "Add(circle2)" + cr
+                                                        + "Add(triangle2)"))
+
+        bodyDiv:AddParagraph("Finally, we must start the Focus on one of our Items, otherwise we cannot begin the cycle. "
+                            + "We will begin with rectangle1. This is done simply by calling the Focus action, giving us "
+                            + "the following line:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle1:Focus()"))
+
+/*        bodyDiv:AddParagraph("The completed main class is as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr + cr
+                                                        + "class Main is Game" + cr + cr
+                                                        + "    action Main" + cr
+                                                        + "        StartGame()" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action CreateGame" + cr
+                                                        + "        Color color" + cr
+                                                        + "        FocusDrawable rectangle1" + cr
+                                                        + "        FocusDrawable circle1" + cr
+                                                        + "        FocusDrawable triangle1" + cr
+                                                        + "        FocusDrawable rectangle2" + cr
+                                                        + "        FocusDrawable circle2" + cr
+                                                        + "        FocusDrawable triangle2" + cr + cr
+                                                        + "        rectangle1:LoadFilledRectangle(50, 50, color:Red())" + cr
+                                                        + "        circle1:LoadFilledCircle(25, color:Red())" + cr
+                                                        + "        triangle1:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())" + cr
+                                                        + "        rectangle2:LoadFilledRectangle(50, 50, color:Red())" + cr
+                                                        + "        circle2:LoadFilledCircle(25, color:Red())" + cr
+                                                        + "        triangle2:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())" + cr + cr
+                                                        + "        rectangle1:SetPosition(375, 500)" + cr
+                                                        + "        circle1:SetPosition(600, 375)" + cr
+                                                        + "        triangle1:SetPosition(600, 175)" + cr
+                                                        + "        rectangle2:SetPosition(375, 50)" + cr
+                                                        + "        circle2:SetPosition(150, 175)" + cr
+                                                        + "        triangle2:SetPosition(150, 375)" + cr + cr
+                                                        + "        rectangle1:SetShapeDescription(" + dq + "First Rectangle" + dq + ")" + cr
+                                                        + "        circle1:SetShapeDescription(" + dq + "First Circle" + dq + ")" + cr
+                                                        + "        triangle1:SetShapeDescription(" + dq + "First Triangle" + dq + ")" + cr
+                                                        + "        rectangle2:SetShapeDescription(" + dq + "Second Rectangle" + dq + ")" + cr
+                                                        + "        circle2:SetShapeDescription(" + dq + "Second Circle" + dq + ")" + cr
+                                                        + "        triangle2:SetShapeDescription(" + dq + "Second Triangle" + dq + ")" + cr + cr
+                                                        + "        rectangle1:SetFocusable(true)" + cr
+                                                        + "        circle1:SetFocusable(true)" + cr
+                                                        + "        triangle1:SetFocusable(true)" + cr
+                                                        + "        rectangle2:SetFocusable(true)" + cr
+                                                        + "        circle2:SetFocusable(true)" + cr
+                                                        + "        triangle2:SetFocusable(true)" + cr + cr
+                                                        + "        rectangle1:SetNextFocus(circle1)" + cr
+                                                        + "        rectangle1:SetPreviousFocus(triangle2)" + cr
+                                                        + "        circle1:SetNextFocus(triangle1)" + cr
+                                                        + "        circle1:SetPreviousFocus(rectangle1)" + cr
+                                                        + "        triangle1:SetNextFocus(rectangle2)" + cr
+                                                        + "        triangle1:SetPreviousFocus(circle1)" + cr
+                                                        + "        rectangle2:SetNextFocus(circle2)" + cr
+                                                        + "        rectangle2:SetPreviousFocus(triangle1)" + cr
+                                                        + "        circle2:SetNextFocus(triangle2)" + cr
+                                                        + "        circle2:SetPreviousFocus(rectangle2)" + cr
+                                                        + "        triangle2:SetNextFocus(rectangle1)" + cr
+                                                        + "        triangle2:SetPreviousFocus(circle2)" + cr + cr
+                                                        + "        Add(rectangle1)" + cr
+                                                        + "        Add(circle1)" + cr
+                                                        + "        Add(triangle1)" + cr
+                                                        + "        Add(rectangle2)" + cr
+                                                        + "        Add(circle2)" + cr
+                                                        + "        Add(triangle2)" + cr + cr
+                                                        + "        rectangle1:Focus()" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+*/
+        bodyDiv:AddParagraph("Now when we run the program, the shapes are arranged in a circular pattern and can be cycled "
+                            + "through, saying aloud the current Focus and turning it Green, and outputting when an Item "
+                            + "loses the Focus and turning it back to Red. To move forwards to the next Focus, press Tab, "
+                            + "and to move backwards to the previous Focus, press Shift + Tab. Alternatively, the shapes "
+                            + "can be clicked on with the mouse to change the Focus.")
+
+        bodyDiv:AddImage("/media/userInterface/Focus.png", "This image shows the arrangement of Drawables with the First Circle in Focus.")
+
+        bodyDiv:AddHeading("GetNextFocus and GetPreviousFocus", 2)
+
+        bodyDiv:AddParagraph("There are two additional actions relating to the Focus that are included in the Item class. "
+                            + "These are GetNextFocus and GetPreviousFocus, both of which return an Item. To demonstrate "
+                            + "these, we will modify the GainedFocus action in the FocusDrawable class from the program "
+                            + "we created in the previous section.")
+
+        bodyDiv:AddParagraph("To start, delete the line of " + dq + "speech:Say(GetDescription())." + dq + " Rather than "
+                            + "have the program say which shape we are on, we will alter it to prompt the user to move to "
+                            + "the next or previous shape.")
+
+        bodyDiv:AddParagraph("First, we need to create a new FocusDrawable object, nextDrawable, and assign it to the "
+                            + "value returned from calling the current Item’s GetNextFocus action. However, this action "
+                            + "returns an Item, which is fine since the actions we are using are part of the Item class. Then we can use the "
+                            + "GetDescription action of the obtained Item to get its Description. This "
+                            + "gives us the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Item nextDrawable = me:GetNextFocus()" + cr
+                                                        + "text nextDescription = nextDrawable:GetDescription()"))
+
+        bodyDiv:AddParagraph("Next, we will do the same to get the description of the previous FocusDrawable, only "
+                            + "changing the variable names and calling GetPreviousFocus instead of GetNextFocus. This is "
+                            + "done with the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Item previousDrawable = me:GetPreviousFocus()" + cr
+                                                        + "text previousDescription = previousDrawable:GetDescription()"))
+
+        bodyDiv:AddParagraph("Finally, we will use the Speech class to prompt the user aloud and we will also output the statement. We accomplish this by "
+                            + "adding the following line:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("speech:Say(" + dq + "Tab to reach the " + dq + " + nextDescription + " + dq + ", Shift Tab to reach the " + dq + " + previousDescription)" + cr +
+                                                          "output " + dq + "Tab to reach the " + dq + " + nextDescription + " + dq + ", Shift Tab to reach the " + dq + " + previousDescription"))
+
+        bodyDiv:AddParagraph("Now, when we run the program, it will verbally tell the user and output the description of both the "
+                            + "next and previous Focuses when a new Focus is acquired.")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about the Focus in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "the Focus"
+    end
+
+    action GetName returns text
+        return "the Focus"
+    end
+
+    action GetShortDescription returns text
+        return "how to use the Focus"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/focus.html"
+    end
+end

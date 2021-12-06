@@ -1,0 +1,152 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.InlineFrame
+use Libraries.Web.Page.StrongText
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Link
+
+class Developers is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Building from Source - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building from Source", 1)
+        headDiv:AddText("This page discusses how to build the Quorum programming language from source code, including the bootstrapping process into NetBeans.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        bodyDiv:AddHeading("Building Quorum from Source", 2)
+        Paragraph sourceParagraph = bodyDiv:AddParagraph("In this section, we discuss building Quorum from source. 
+        These instructions only apply to Quorum 6.0 and up. Older versions of Quorum are 
+        possible to build, but are not supported. Source is downloaded using ")
+        sourceParagraph:AddLink( " Git. " , "/git-scm.com/" )
+        sourceParagraph:AddText("For those unfamiliar with Git, for all practical purposes, this tool downloads the source code and manages versions of it. 
+        The source can be downloaded either from the console or from within NetBeans. 
+        For more information, please visit the Quorum ")
+        sourceParagraph:AddLink( "git tutorial." , "quorumlanguage.com/documents/tutorials/git.php" )
+
+        OrderedList buildingSourceList
+        buildingSourceList:AddListItem("Download and install Quorum from the download page")
+        ListItem value = buildingSourceList:AddListItem("Clone the source code for Quorum from our ")
+        Link repoLink
+        repoLink:SetAddress("/bitbucket.org/stefika/quorum-language")
+        repoLink:AddText("Quorum Bitbucket Repository")
+        value:Add(repoLink)
+        buildingSourceList:AddListItem("Open NetBeans and then open the project under under quorum-language/Quorum3. 
+This is a normal NetBeans project that, if you have Quorum installed, will open like any other project in NetBeans.")
+        buildingSourceList:AddListItem("Build, run, or debug the project normally in NetBeans. Since Quorum itself is written in Quorum, it works like any other project.")
+
+        bodyDiv:Add(buildingSourceList)
+
+        bodyDiv:AddHeading("Bootstrapping NetBeans", 2)
+        bodyDiv:AddParagraph("These steps are for bootstrapping the Quorum 6 
+            compiler from scratch and using it in a new version of NetBeans 8.2. These steps are primarily done from beginning 
+            to end in a linear fashion, but under certain circumstances (which 
+            are stated here) it might be necessary to change the order as described.")
+
+        bodyDiv:AddParagraph("(Not that you should only do the first step if you are replacing the 
+            plugins. Otherwise, skip it. Build the Java projects for the plugins, located 
+            in the Quorum3Plugins folders. This only needs to be done the first time 
+            that you’re bootstrapping, or if you change the contents of one of these 
+            projects. During this process, the projects may fail to build due to missing 
+            Quorum dependencies. If this happens, skip this step for now. 
+            The particular projects you’ll want to build are:")
+
+        OrderedList bootstrappingPluginsList
+        bootstrappingPluginsList:AddListItem("FilePlugin: The plugin that handles file IO on Desktop")
+        bootstrappingPluginsList:AddListItem("JavaGame, inside the GamePlugin folder
+            When building JavaGame for the first time, you will encounter an 
+            issue where your Netbeans environment is missing the LWJGL 3.1.2 library. 
+            See “LWJGL3 Install Instructions.rtf” inside JavaGame/libs for 
+            instructions on adding the library to Netbeans.
+            ")
+
+        bodyDiv:AddParagraph("One the plugins are optionally setup, we can 
+            now move to the core bootstrapping process. Note that bootstrapping is a 
+            bit confusing, but the core idea is that you are compiling Quorum in 
+            Quorum, then sending the compiler to NetBeans. Thus, when you then run 
+            NetBeans, it is including the new version.")
+            
+        OrderedList bootstrappingList
+        bootstrappingList:AddListItem("Open the Quorum3 project’s source code, right click on “Library.quorum” and set it to be the main file. Then run the program.")
+        bootstrappingList:AddListItem("If you were not able to build the plugin projects due to missing Quorum dependencies, those should now be resolved. In this case, start over the process, beginning with plugins and then moving to step 1.")
+        bootstrappingList:AddListItem("After the program has finished running, right click on “main.quorum” and set it to be the main file. Then build the program.")
+        ListItem runScriptListItem = bootstrappingList:AddListItem("Once the project is built, you will run 
+            one of the two bootstrap scripts located in the Quorum3 project, depending on 
+            what platform you are using. These can be run either from the command line or 
+            inside Netbeans. If you are using a Mac, use “bootstrap.sh”. If you are on a 
+            Windows machine, use “bootstrap.bat” instead.")
+
+        UnorderedList runScriptSublist
+        runScriptSublist:AddListItem("To run the script directly in Netbeans, you will need the C/C++ module installed. If it’s already installed, the script’s icon should be a page with a gear on it - otherwise, it will appear as a boxed question mark. If it is installed, you can run the script by right-clicking it and selecting Run.")
+        runScriptSublist:AddListItem("If the module isn’t installed, on some platforms you can quickly install it by double-clicking the script in the project view. Otherwise, you can install the module by going to the top menu and selecting “Tools -- Plugins”, going to the “Available Plugins” tab, and searching for the C/C++ module.")
+        runScriptListItem:Add(runScriptSublist)
+        bootstrappingList:AddListItem("Once the bootstrap script is completed, run the Sodbeans project, located in the IDE folder. This will open the bootstrapped IDE.")
+        bodyDiv:Add(bootstrappingList)
+
+        bodyDiv:AddHeading("Quorum Branches", 2)
+
+        bodyDiv:AddText("If you are interested in contributing source code to the project, first check out the current source branches: ")
+        bodyDiv:AddLink( "Quorum source code" , "https://bitbucket.org/stefika/quorum-language" )
+        bodyDiv:AddText(". Quorum’s compiler is placed into a series of branches, where we do development for various releases. To get one in Git, you can use NetBeans or issue the command ‘git checkout branchName’ from the terminal. For example, we might use ‘git checkout development’ to get the latest development branch. While we sometimes make branches temporarily other than these, the most common branches are:")
+        bodyDiv:Add(break)    
+        
+        UnorderedList list
+        AddListItemWithBoldAtFront(list, "master", ": The primary branch. This branch always corresponds to our live server. It currently points to Quorum 4.0.")
+        AddListItemWithBoldAtFront(list, "Quorum6", ": The branch Quorum 6 was placed on. Previous versions did not have their own branch.")
+        AddListItemWithBoldAtFront(list, "development", ": An experimental branch. This is our primary development branch where we push fixes, new development, or new features. It is experimental, but usually rather stable. It is relatively normal for our team to push development to beta regularly.")
+        bodyDiv:Add(list)
+
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "quorum programming language, source code, 
+        NetBeans, bootstrapping, compile from source, developers, development, 
+        software developer, building from source")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about building from source code or contributing to the Quorum programming language."
+    end
+
+    action GetLocation returns text
+        return "developers.html"
+    end
+end

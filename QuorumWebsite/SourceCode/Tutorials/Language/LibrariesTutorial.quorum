@@ -1,0 +1,126 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class LibrariesTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Use Statements - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Use Statements", 1)
+        headDiv:AddText("How to load and interact with library classes.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Format and Finding Libraries", 2)
+        bodyDiv:AddParagraph(   "Whenever we need to include a library or class we have already written into a project we are currently working on, "
+                            +   "we will need to add a use statement. A use statement will includes the classes we wish to use. "
+                            +   "For example, suppose we were writing a program that generates a random number and outputs it to the user. "
+                            +   "We don't need to write the code to generate a random number because the Quorum standard library already includes a class "
+                            +   "that does so." + cr + cr
+                            +   "The use statement consists of the " + dq + "use" + dq + " keyword followed by the full name of the class or library to include. "
+                            +   "So, to use the random class we would used the following statement:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Random"))
+
+        bodyDiv:AddText(         "One important thing to remember about the use statement is that it must be placed at the top of file. "
+                            +   "A class definition and action must always come after the list of use statements. "
+                            +   "In order to find a library in the Quorum standard library we can use code completion if we are offline "
+                            +   "If we are using Windows or OSX the shortcut is CTRL + SPACE, to find any available library classes. "
+                            +   "In addition to code completion there is a ")
+        bodyDiv:AddLink("Quorum Standard Library Reference", "/libraries.html")
+        bodyDiv:AddText(        " available.")
+
+
+        //the section on random number example
+        bodyDiv:AddHeading("Random Number Example", 2)
+        bodyDiv:AddParagraph(   "A complete solution to the above problem is as follows:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr
+            +   "class Main" + cr
+            +   "     action Main" + cr
+            +   "          Random random" + cr
+            +   "          output random:RandomIntegerBetween(1, 100)" + cr
+            +   "     end" + cr
+            +   "end"))
+ 
+        AddSideBySideIDE(bodyDiv, "randomNumberExampleIDE", "Activity: Try the random number example", 
+            "Try making a random number")
+
+        //the section on the .all command
+        bodyDiv:AddHeading("The .all Command", 2)
+        bodyDiv:AddParagraph(   "Sometimes we may want to use all of the classes under a given file. For example, "
+                            +   "suppose we wanted to include all of the classes in " + dq + "Libraries.Compute" + dq + ", this includes the Random class and other Math related class. "
+                            +   "We can add all to the end of the use statement to include all of the classes within a file:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.all" + cr
+            +   "class Main" + cr
+            +   "     action Main" + cr
+            +   "          Random random" + cr
+            +   "          Math math" + cr
+            +   "          output random:RandomIntegerBetween(1, 100)" + cr
+            +   "          output math:SquareRoot(6)" + cr
+            +   "     end" + cr
+            +   "end"))
+     
+        AddSideBySideIDE(bodyDiv, "theAllCommandIDE", "Activity: Try the .all command", 
+            "Try using all libraries in a package")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Practice with 'use' statements for loading new libraries in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Using Libraries"
+    end
+
+    action GetImageLocation returns text
+        return "/media/UsingLibraries.png"
+    end
+
+    action GetName returns text
+        return "Using Libraries"
+    end
+
+    action GetShortDescription returns text
+        return "how to use classes built into Quorum."
+    end
+
+    action GetLocation returns text
+        return "tutorials/language/usingLibraries.html"
+    end
+end

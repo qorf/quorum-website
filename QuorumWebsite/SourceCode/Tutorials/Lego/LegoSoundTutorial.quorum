@@ -1,0 +1,215 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class LegoSoundTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("LEGO Sound - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page-specific header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Using Sounds with LEGO™ Robots", 1)
+        headDiv:AddText("This tutorial helps explain the use of sounds with LEGO™ Robots.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Using Sounds with LEGO™ Robots in Quorum", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will talk about the 
+            different ways a robot can produce sound. In particular, we will discuss:")
+
+        UnorderedList list
+        list:AddListItem("Gerenal information about sounds")
+        list:AddListItem("Playing Tones")
+        list:AddListItem("Playing Pre-defined Beeps")     
+        list:AddListItem("Playing Audio Clips")
+        bodyDiv:Add(list)
+                
+        //the secticn on general information
+        bodyDiv:AddHeading("General Information About Sounds", 2)
+        bodyDiv:AddParagraph(   "The brick has a single speaker on its side, which all sounds are played out of. "
+                            +   "Quorum has two actions that are used for controlling the volume of the sounds: ")
+
+        CodeBlock cb1
+        cb1:AddText("GetVolume")
+        bodyDiv:Add(cb1)
+        bodyDiv:AddText(" and ")
+        CodeBlock cb2
+        cb2:AddText("SetVolume")
+        bodyDiv:Add(cb2)
+        bodyDiv:AddText(". Volume levels are represented as percentages of the maximum volume, and thus the range that volume actions work with is between 0 and 100." )  
+        bodyDiv:Add(break)
+        bodyDiv:Add(break)
+        bodyDiv:AddParagraph(   "With the Sound class, we are able to play tones, pre-defined beeps, and even audio clips. "
+                            +   "These sounds can be used to indicate that a robot is doing something, has reached a certain part in the program, "
+                            +   "or to simply get the attention of others.")
+
+
+
+        //the section on playing tones
+        bodyDiv:AddHeading("Playing Tones", 2)
+        bodyDiv:AddParagraph(   "Tones are sounds played at a certain frequency, measured in hertz (Hz). "
+                            +   "For humans, the audible range for these tones is from around 20 Hz to 20,000 Hz where lower frequencies generate lower pitch sounds "
+                            +   "and higher frequencies generate higher pitch sounds. An example of how to play a tone in a program is as follows:")
+
+        CodeBlock tonecode1
+        Span comment1
+        tonecode1:AddText(    "use Libraries.Robots.Lego.Sound" + cr + cr 
+                            +    "Sound sound" + cr
+                            +    "sound:PlayTone(440, 200)"  )
+        comment1:AddText(     "     //plays a tone corresponding to 440 Hz for 200 milliseconds" + cr)
+        comment1:SetClassAttribute("comment")
+        tonecode1:Add(comment1)      
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(tonecode1))
+
+
+        bodyDiv:AddText(   "From the comment in the example, we can see that the ")
+        CodeBlock cb3
+        cb3:AddText("PlayTone")
+        bodyDiv:Add(cb3)
+        bodyDiv:AddText(" action takes two parameters: the frequency of the tone 
+            we want to play and the amount of time, in milliseconds, 
+            that we want it to play for.")
+
+
+        
+        //the section on playing beeps
+        bodyDiv:AddHeading("Playing Pre-Defined Beeps", 2)   
+        bodyDiv:AddParagraph(   "Quorum has a set of actions to play different types of beeps. The different actions are as follows:")                                              
+        UnorderedList list2
+        list2:AddListItem("Beep")
+        list2:AddListItem("BeepTwice")
+        list2:AddListItem("BeepSequenceUp")     
+        list2:AddListItem("BeepSequenceDown")
+        list2:AddListItem("Buzz")
+        bodyDiv:Add(list2)
+        bodyDiv:AddText(            "The ")
+        CodeBlock cb4
+        cb4:AddText("Beep")
+        bodyDiv:Add(cb4)
+        bodyDiv:AddText(" and ")
+        CodeBlock cb5
+        cb5:AddText("BeepTwice")
+        bodyDiv:Add(cb5)
+        bodyDiv:AddText(" actions do what you might think: beep and beep twice, respectively. The ")
+        CodeBlock cb6
+        cb6:AddText("BeepSequenceUp")
+        bodyDiv:Add(cb6)
+        bodyDiv:AddText(" plays four tones in quick succession, with each tone being a higher frequency than the last. On the other hand, ")
+        CodeBlock cb7
+        cb7:AddText("BeepSequenceDown")
+        bodyDiv:Add(cb7)
+        bodyDiv:AddText(" plays the same tones in reverse. The ")
+        CodeBlock cb8
+        cb8:AddText("buzz")
+        bodyDiv:Add(cb8)
+        bodyDiv:AddText(" action plays a lower frequency tone than any of the others for a short amount of time.")
+                                      
+
+                
+        //the section on audio clips
+        bodyDiv:AddHeading("Playing Audio Clips", 2)
+
+        Paragraph p1
+        p1:AddText("Custom audio clips can be played through the Sound class's ")
+        CodeBlock cb9
+        cb9:AddText("PlayAudio")
+        p1:Add(cb9)
+        p1:AddText(" action. The types of sound files that can be played are 
+            limited to .wav files and must be in mono format (as opposed to stereo). 
+            The easiest way to put a sound on the robot is to physically pull the 
+            SD-card out of the robot and place it into a card reader in the computer. 
+            If your computer does not have an SD card reader, you may need to purchase one. ")
+
+        bodyDiv:Add(p1)
+        bodyDiv:AddParagraph("On the SD card, there are two partitions, 
+            or structures for storing files, one being named FAT32 and the other 
+            named EXT4. In our case, the EXT4 partition is where Quorum programs 
+            live. We want to transfer our files into the same folder as the 
+            Quorum files, which is in the folder /home/lejos/programs. In order to read EXT4, you need to either use 
+            Linux or a program to allow you to read that partition format. 
+            More information on that can be found at the links below for 
+            Mac or PC:")
+
+        
+        UnorderedList list3
+            list3:AddListItemLink("Managing EXT4 from Windows", "https://www.howtogeek.com/112888/3-ways-to-access-your-linux-partitions-from-windows/")
+            list3:AddListItemLink("Managing EXT4 from Mac", "http://osxdaily.com/2014/03/20/mount-ext-linux-file-system-mac/")
+        bodyDiv:Add(list3)
+
+        bodyDiv:AddParagraph("Once you have the file on the robot, the following code will allow the robot to play it:")
+
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+            "use Libraries.Robots.Lego.Sound" + cr
+            +   "use Libraries.System.File" + cr + cr
+            +   "File audioFile" + cr
+            +   "Sound sound" + cr + cr
+            +   "audioFile:SetPath(" + dq + "sound.wav" + dq + ")" + cr
+            +   "sound:PlayAudio(audioFile)"))
+
+        //the section on additional information
+        bodyDiv:AddHeading("Additional Information", 2)
+
+        bodyDiv:AddText("For more information on the Sound class, see the ")
+        bodyDiv:AddLink("Sound class documentation","/Libraries/Robots/Lego/Sound.html")
+        bodyDiv:AddText(".")
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how code MIDI sounds on a LEGO Mindstorms robot with the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Sound"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/microphone.gif"
+    end
+
+    action GetName returns text
+        return "Sound"
+    end
+
+    action GetShortDescription returns text
+        return "how to use sounds with lego robots"
+    end
+
+    action GetLocation returns text
+        return "tutorials/robots/legoSound.html"
+    end
+end

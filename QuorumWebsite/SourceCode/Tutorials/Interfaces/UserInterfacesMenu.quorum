@@ -1,0 +1,630 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class UserInterfacesMenu is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Menu Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Menu", 1)
+        headDiv:AddText("This tutorial tells you how to use Menus in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to Menus in Quorum", 2)
+        bodyDiv:AddParagraph("In this tutorial, we will learn how to use Menus in the Quorum Game Engine. Menus are GUI tools very similar to Trees in that the 
+                            items have a similar hierarchical structure, but the MenuItems are arranged on a MenuBar differently than TreeItems on a Tree. You will 
+                            typically see MenuBars run horizontally while trees run vertically. Another key difference is that only one submenu can be open at a time, 
+                            whereas multiple subtrees can be expanded at a time. Typically, MenuBars are located at the top of an application and common headers found 
+                            on those MenuBars are File, Edit, View, and so on.")
+
+        bodyDiv:AddImage("/media/userInterface/menuExample.png", "This image shows an example of a Menu in NetBeans. "
+                + "The File menu is chosen, with Import Project chosen under it and expanded. From Zip is the final choice highlighted.")
+
+        bodyDiv:AddParagraph("For this tutorial, we will create a simple Menu with several operations for editing a "
+                            + "Drawable. Specifically, our Menu will allow us to scale, rotate, color, and "
+                            + "reset a triangle. To start, create a new Game Application project.")
+
+        bodyDiv:AddHeading("Creating a Menu", 2)
+        bodyDiv:AddHeading("Setup", 3)
+
+        bodyDiv:AddParagraph("For our main class, we will need the libraries for MenuBar, MenuItem, FlowLayout, Array, Dawable, and "
+                            + "Color, adding the following use statements:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Interface.Controls.MenuBar" + cr
+                                                        + "use Libraries.Interface.Controls.MenuItem" + cr
+                                                        + "use Libraries.Interface.Layouts.FlowLayout" + cr
+                                                        + "use Libraries.Containers.Array" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Game.Graphics.Color"))
+
+        bodyDiv:AddParagraph("We need the FlowLayout library because the container of the menu needs to have a FlowLayout set for the menu to render properly. 
+                            For this tutorial, we will not be making a container for the menu, since giving the game window a FlowLayout will work for our 
+                            example. We will write the remaining code for the main class in the CreateGame action. To start, we will set a FlowLayout, declare 
+                            our MenuBar and Array that will hold the highest-level headers, and create our triangle Drawable with the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("FlowLayout flow" + cr
+                                                        + "SetLayout(flow)" + cr + cr
+                                                        + "Array&lt;MenuItem&gt; headers" + cr
+                                                        +"MenuBar menu" + cr + cr
+                                                        +  "Drawable triangle" + cr
+                                                        + "triangle:LoadFilledTriangle(0, 0, 150, 80, 200, 25)" + cr
+                                                        + "triangle:SetPosition(100, 100)" + cr
+                                                        + "Add(triangle)"))
+        Paragraph flowContainer
+        flowContainer:AddText("In this example, setting the game to have a FlowLayout will work properly, but if you need the game to have a ManualLayout in your own applications, look at the ")
+        flowContainer:AddLink("Layout", "/tutorials/ui/layout.html")
+        flowContainer:AddText(" tutorial where we go over how to make a container hold items in a FlowLayout.")
+        bodyDiv:Add(flowContainer)
+        bodyDiv:AddHeading("Creating Headers with Arrays", 3)
+
+        bodyDiv:AddParagraph("To start, we need to create our MenuItems for our first header. But there are two ways of adding the headers to the MenuBar 
+                            and submenus: we can either call the Add action for each one individually, or we can add them to an Array and then add the Array 
+                            of MenuItems to the MenuBar. Both methods will achieve the same results, the only thing to be careful of is that the Array 
+                            must already be populated before you try to add it to a MenuItem or MenuBar. For this tutorial, only the first header's submenus 
+                            will and the highest-level headers will be in an Array.")
+        
+        bodyDiv:AddParagraph("We will declare the MenuItems for header1 and create three Arrays of MenuItems, which will be used to 
+                            create our submenus. Our declarations are as follows:")
+
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        Span s7
+        Span s8
+        Span s9
+        cb1:AddText("MenuItem header1        ")
+        s1:AddText("//size" + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("MenuItem header1_1          ")
+        s2:AddText("//increase size" + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText("MenuItem header1_1_1            ")
+        s3:AddText("//horizontal" + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText("MenuItem header1_1_2            ")
+        s4:AddText("//vertical" + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText("MenuItem header1_1_3            ")
+        s5:AddText("//both" + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText("MenuItem header1_2          ")
+        s6:AddText("//decrease size" + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText("MenuItem header1_2_1            ")
+        s7:AddText("//horizontal" + cr)
+        s7:SetClassAttribute("comment")
+        cb1:Add(s7)
+        cb1:AddText("MenuItem header1_2_2            ")
+        s8:AddText("//vertical" + cr)
+        s8:SetClassAttribute("comment")
+        cb1:Add(s8)
+        cb1:AddText("MenuItem header1_2_3            ")
+        s9:AddText("//both" + cr + cr)
+        s9:SetClassAttribute("comment")
+        cb1:Add(s9)
+        cb1:AddText("Array &lt;MenuItem&gt; head1" + cr
+                    + "Array &lt;MenuItem&gt; head1_1" + cr
+                    + "Array &lt;MenuItem&gt; head1_2")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        bodyDiv:AddParagraph("Note that the comments indicate the organization of our Menu, where submenus have an extra "
+                            + "indentation level than their parent menu. For example, this means that header1_1_3 is one "
+                            + "of the three submenus under header1_1, and header1_1 itself is a submenu under header1.")
+
+        bodyDiv:AddParagraph("Before we can Add our MenuItems, we need to set up our Arrays. The Arrays will contain the headers that will form a submenu
+                             in our MenuBar. The following code block shows which header goes to which array. Also note the order you add MenuItems because 
+                             that will affect the order that they will be seen in the MenuBar.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("head1:Add(header1_1)" + cr
+                                                        + "head1:Add(header1_2)" + cr
+                                                        + "head1_1:Add(header1_1_1)" + cr
+                                                        + "head1_1:Add(header1_1_2)" + cr
+                                                        + "head1_1:Add(header1_1_3)" + cr
+                                                        + "head1_2:Add(header1_2_1)" + cr
+                                                        + "head1_2:Add(header1_2_2)" + cr
+                                                        + "head1_2:Add(header1_2_3)"))
+
+        bodyDiv:AddParagraph("With our Arrays created, we can Add them to the higher level MenuItems. The MenuItems header1, header1_1, and header1_2
+                             will have Array of MenuItems Added to them. And header1 will be added to the headers Array since it is a top level MenuItem.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("header1:Add(head1)" + cr
+                                                        + "header1_1:Add(head1_1)" + cr
+                                                        + "header1_2:Add(head1_2)" + cr
+                                                        + "headers:Add(header1)"))
+
+        bodyDiv:AddParagraph("Now that the MenuItems are added to the MenuBar we can use the SetName action to give a name to each 
+                             Menu Item which will be the Text that is displayed when viewing the MenuBar. This is done with the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("header1:SetName(" + dq + "Size" + dq + ")" + cr
+                                                        + "header1_1:SetName(" + dq + "Increase Size" + dq + ")" + cr
+                                                        + "header1_1_1:SetName(" + dq + "Horizontal Scale" + dq + ")" + cr
+                                                        + "header1_1_2:SetName("+ dq + "Vertical Scale" + dq + ")" + cr
+                                                        + "header1_1_3:SetName(" + dq + "Full Scale" + dq + ")" + cr
+                                                        + "header1_2:SetName(" + dq + "Decrease Size" + dq + ")" + cr
+                                                        + "header1_2_1:SetName(" + dq + "Horizontal Shrink" + dq + ")" + cr
+                                                        + "header1_2_2:SetName(" + dq + "Vertical Shrink" + dq + ")" + cr
+                                                        + "header1_2_3:SetName(" + dq + "Full Shrink" + dq + ")"))
+
+        bodyDiv:AddHeading("Creating Headers with Add", 3)
+        bodyDiv:AddParagraph("In addition to the Arrays method from the last section, we can also use the Add action to create 
+                             submenus. This allows us to avoid having to set up an Array for different groups of MenuItems. We
+                             will be creating our second header and its submenus using this method. Below are our declarations
+                             of the MenuItems:")
+
+        CodeBlock cb2
+        Span s10
+        Span s11
+        Span s12
+        Span s13
+        Span s15
+        Span s16
+        Span s17
+        cb2:AddText("MenuItem header2        ")
+        s10:AddText("//rotation" + cr)
+        s10:SetClassAttribute("comment")
+        cb2:Add(s10)
+        cb2:AddText("MenuItem header2_1          ")
+        s11:AddText("//clockwise rotation" + cr)
+        s11:SetClassAttribute("comment")
+        cb2:Add(s11)
+        cb2:AddText("MenuItem header2_1_1            ")
+        s12:AddText("//30 degrees" + cr)
+        s12:SetClassAttribute("comment")
+        cb2:Add(s12)
+        cb2:AddText("MenuItem header2_1_2            ")
+        s13:AddText("//45 degrees" + cr)
+        s13:SetClassAttribute("comment")
+        cb2:Add(s13)
+        cb2:AddText("MenuItem header2_2          ")
+        s15:AddText("//counter-clockwise rotation" + cr)
+        s15:SetClassAttribute("comment")
+        cb2:Add(s15)
+        cb2:AddText("MenuItem header2_2_1            ")
+        s16:AddText("//30 degrees" + cr)
+        s16:SetClassAttribute("comment")
+        cb2:Add(s16)
+        cb2:AddText("MenuItem header2_2_2            ")
+        s17:AddText("//45 degrees" + cr)
+        s17:SetClassAttribute("comment")
+        cb2:Add(s17)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+
+
+
+        bodyDiv:AddParagraph("Next, to add the MenuItems to one another, we will use the Add action as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("headers:Add(header2)" + cr
+                                                        + "header2:Add(header2_1)" + cr
+                                                        + "header2:Add(header2_2)" + cr
+                                                        + "header2_1:Add(header2_1_1)" + cr
+                                                        + "header2_1:Add(header2_1_2)" + cr
+                                                        + "header2_2:Add(header2_2_1)" + cr
+                                                        + "header2_2:Add(header2_2_2)"))
+
+        bodyDiv:AddParagraph("Now we set the names for each header with the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("header2:SetName(" + dq + "Rotation" + dq + ")" + cr
+                                                        + "header2_1:SetName(" + dq + "Clockwise" + dq + ")" + cr
+                                                        + "header2_1_1:SetName(" + dq + "30 Degrees" + dq + ")" + cr
+                                                        + "header2_1_2:SetName(" + dq + "45 Degrees" + dq + ")" + cr
+                                                        + "header2_2:SetName(" + dq + "Counter-Clockwise" + dq + ")" + cr
+                                                        + "header2_2_1:SetName(" + dq + "30 Degrees" + dq + ")" + cr
+                                                        + "header2_2_2:SetName(" + dq + "45 Degrees" + dq + ")"))
+
+        bodyDiv:AddParagraph("Next, let's add the last two headers, one for changing the Color and one to reset the triangle.")
+
+        bodyDiv:AddParagraph("We will create MenuItems for the third header, name them, and add them to the menu bar in the same manner as before, giving the following code:")
+
+        CodeBlock cb4
+        Span s22
+        Span s23
+        Span s26
+        Span s27
+        cb4:AddText("MenuItem header3        ")
+        s22:AddText("//color" + cr)
+        s22:SetClassAttribute("comment")
+        cb4:Add(s22)
+        cb4:AddText("MenuItem header3_1          ")
+        s23:AddText("//red" + cr)
+        s23:SetClassAttribute("comment")
+        cb4:Add(s23)
+        cb4:AddText("MenuItem header3_2          ")
+        s26:AddText("//green" +cr)
+        s26:SetClassAttribute("comment")
+        cb4:Add(s26)
+        cb4:AddText("MenuItem header3_3          ")
+        s27:AddText("//blue" + cr + cr)
+        s27:SetClassAttribute("comment")
+        cb4:Add(s27)
+        cb4:AddText("header3:SetName(" + dq + "Color" + dq + ")" + cr
+                    + "header3_1:SetName(" + dq + "Red" + dq + ")" + cr
+                    + "header3_1:SetName("+ dq + "Green" + dq + ")" + cr
+                    + "header3_2:SetName(" + dq + "Blue" + dq + ")" + cr + cr
+                    + "header3:Add(header3_1)" + cr
+                    + "header3:Add(header3_2)" + cr
+                    + "header3:Add(header3_3)" + cr
+                    + "headers:Add(header3)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+        bodyDiv:AddParagraph("Now we'll add the final header. We will create MenuItems, name them, then add the header to the MenuBar and, giving us the following lines of code:")
+
+        CodeBlock cb5
+        Span s29
+        Span s30
+        cb5:AddText("MenuItem header4        ")
+        s29:AddText("//reset" + cr)
+        s29:SetClassAttribute("comment")
+        cb5:Add(s29)
+        cb5:AddText("MenuItem header4_1          ")
+        s30:AddText("//reset all" + cr + cr)
+        s30:SetClassAttribute("comment")
+        cb5:Add(s30)
+        cb5:AddText("header4:SetName(" + dq + "Reset" + dq + ")" + cr
+                    + "header4_1:SetName(" + dq + "Reset All" + dq + ")" + cr + cr
+                    + "header4:Add(header4_1)" + cr
+                    + "headers:Add(header4)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+
+        bodyDiv:AddParagraph("Now we have all of the submenus created and our top-level headers in an Array so all we need to now is add the 
+                             headers array to the MenuBar and add the MenuBar to the game which can be done with these lines of code:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("menu:Add(headers)" + cr
+                                                        + "Add(menu)"))
+                                                        
+        bodyDiv:AddHeading("Accessibility", 3)
+        bodyDiv:AddParagraph("We will now make our Menu accessible and when working with menus it is important to understand how a Menu interacts 
+                            with Focus. What we will do make a hidden Button that will start with Focus and then you can Tab or Shift + Tab to 
+                            Focus on the Menu. We will do it this way because when a Menu is closed or a MenuItem is activated, the Menu will 
+                            return the Focus to whatever the last Item in Focus was. In our case it will be our Button. To do this for our 
+                            example we will add the following lines of code:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+                                        "Button focuser" + cr
+                                        +"focuser:SetName("+dq+" "+dq+")" + cr
+                                        +"focuser:Hide()" + cr
+                                        +"focuser:SetNextFocus(menu)" + cr
+                                        +"focuser:SetPreviousFocus(menu)" + cr
+                                        +"SetFocus(focuser)" + cr
+                                        +"Add(focuser)"))
+        bodyDiv:AddParagraph("Now when we run the program, the menu bar will be at the top of the screen and only the highest-level headers will
+                             be visible. You can hover over the headers with your mouse or with the menu in Focus you can navigate the menu with 
+                             the keyboard. Hovering over or navigating to a MenuItem will its submenu if it has one. However, you might notice 
+                             that trying to activate a MenuItem will only close the submenus and do nothing else. This is because we have not set
+                             any behaviors for the MenuItems to use which we will do in the next section. ")
+
+        bodyDiv:AddHeading("Setting Behaviors", 2)
+        bodyDiv:AddParagraph("Now we simply need to add Behaviors to our lowest-level MenuItems. Although any MenuItem can have a set behavior, 
+                            typically, if a MenuItem has any submenus under it, it will not have a Behavior, as its purpose is only to open and 
+                            show the related submenus. For this tutorial we only set behaviors for the lowest-level MenuItems. ")
+        bodyDiv:AddParagraph("We will be using 4 behaviors for our MenuItems and they will be defined in their own files. The next 4 code blocks
+                             show the behaviors we will be using along with the name and brief description for each Quorum class.")
+
+        bodyDiv:AddParagraph("SizeBehavior will take a Drawable and scale it by a set factor on the X and Y axis. SizeBehavior.quorum:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class SizeBehavior is Behavior" + cr + cr
+                                                        + "    Drawable triangle = undefined" + cr
+                                                        + "    number scaleX = 1.0" + cr
+                                                        + "    number scaleY = 1.0" + cr + cr
+                                                        + "    action Run(BehaviorEvent behavior)" + cr
+                                                        + "        if triangle not= undefined" + cr
+                                                        + "            triangle:SetScale(scaleX, scaleY)" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say(" + dq + "Scaled by a factor of " + dq + " + scaleX + " + dq + " horizontally, and a factor of " + dq + " + scaleY + " + dq + "vertically." + dq + ")" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDrawable(Drawable newTriangle)" + cr
+                                                        + "        triangle = newTriangle" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetScale(number newScaleX, number newScaleY)" + cr
+                                                        + "        scaleX = newScaleX" + cr
+                                                        + "        scaleY = newScaleY" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("RotationBehavior will take a Drawable and rotate it by a specified number of degrees. RotationBehavior.quorum:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class RotationBehavior is Behavior" + cr + cr
+                                                        + "    Drawable triangle = undefined" + cr
+                                                        + "    number degrees = 0.0" + cr + cr
+                                                        + "    action Run(BehaviorEvent behavior)" + cr
+                                                        + "        if triangle not= undefined" + cr
+                                                        + "            triangle:Rotate(degrees)" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say("+dq+"Rotated "+dq+ " + degrees + " +dq+" degrees."+dq+")" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDrawable(Drawable newTriangle)" + cr
+                                                        + "        triangle = newTriangle" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDegrees(number newDegrees)" + cr
+                                                        + "        degrees = newDegrees" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("ColorBehavior takes a Drawable and changes its color. ColorBehavior.quorum:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class ColorBehavior is Behavior" + cr + cr
+                                                        + "    Drawable triangle = undefined" + cr
+                                                        + "    Color color = undefined" + cr
+                                                        + "    text colorName = undefined" + cr + cr
+                                                        + "    action Run(BehaviorEvent behavior)" + cr
+                                                        + "        if triangle not= undefined" + cr
+                                                        + "            triangle:SetColor(color)" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say("+dq+"Color changed to "+dq+" + colorName + "+dq+"."+dq+")" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDrawable(Drawable newTriangle)" + cr
+                                                        + "        triangle = newTriangle" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetColor(Color newColor, text newName)" + cr
+                                                        + "        color = newColor" + cr
+                                                        + "        colorName = newName" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+
+        bodyDiv:AddParagraph("ResetBehavior will reset the triangle Drawable to its defaults. ResetBehavior.quorum:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class ResetBehavior is Behavior" + cr + cr
+                                                        + "    Drawable triangle = undefined" + cr + cr
+                                                        + "    action Run(BehaviorEvent behavior)" + cr
+                                                        + "        if triangle not= undefined" + cr
+                                                        + "            triangle:SetRotation(0)" + cr
+                                                        + "            triangle:SetScale(1)" + cr
+                                                        + "            triangle:LoadFilledTriangle(0, 0, 150, 80, 200, 25)" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say("+dq+"Reset"+dq+")" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDrawable(Drawable newTriangle)" + cr
+                                                        + "        triangle = newTriangle" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+        bodyDiv:AddParagraph("Now we go back to our main class and make our Behavior objects and call their Set actions so can edit
+                             the triangle properly. With the behaviors made we then simply call SetBehavior for each MenuItem that 
+                            we will use to alter the triangle. This is done whit the following lines of code:")
+        CodeBlock mainBehaviors
+        Span header1
+        Span header2
+        Span header3
+        Span header4
+        header1:SetClassAttribute("comment")
+        header2:SetClassAttribute("comment")
+        header3:SetClassAttribute("comment")
+        header4:SetClassAttribute("comment")
+        header1:AddText("//header1 behaviors" + cr)
+        header2:AddText("//header2 behaviors" + cr)
+        header3:AddText("//header3 behaviors" + cr)
+        header4:AddText("//header4 behaviors" + cr)
+        mainBehaviors:Add(header1)
+        mainBehaviors:AddText("SizeBehavior horizontalScale" + cr
+            +"SizeBehavior verticalScale" + cr
+            +"SizeBehavior fullScale" + cr
+            +"SizeBehavior horizontalShrink" + cr
+            +"SizeBehavior verticalShrink" + cr
+            +"SizeBehavior fullShrink" + cr + cr
+            +"horizontalScale:SetDrawable(triangle)" + cr
+            +"verticalScale:SetDrawable(triangle)" + cr
+            +"fullScale:SetDrawable(triangle)" + cr
+            +"horizontalShrink:SetDrawable(triangle)" + cr
+            +"verticalShrink:SetDrawable(triangle)" + cr
+            +"fullShrink:SetDrawable(triangle)" + cr + cr
+            +"horizontalScale:SetScale(1.25, 1.00)" + cr
+            +"verticalScale:SetScale(1.00, 1.25)" + cr
+            +"fullScale:SetScale(1.25, 1.25)" + cr
+            +"horizontalShrink:SetScale(0.75, 1.00)" + cr
+            +"verticalShrink:SetScale(1.00, 0.75)" + cr
+            +"fullShrink:SetScale(0.75, 0.75)" + cr + cr
+            +"header1_1_1:SetBehavior(horizontalScale)" + cr
+            +"header1_1_2:SetBehavior(verticalScale)" + cr
+            +"header1_1_3:SetBehavior(fullScale)" + cr
+            +"header1_2_1:SetBehavior(horizontalShrink)" + cr
+            +"header1_2_2:SetBehavior(verticalShrink)" + cr
+            +"header1_2_3:SetBehavior(fullShrink)" + cr + cr)
+        mainBehaviors:Add(header2)
+        mainBehaviors:AddText("RotationBehavior clockwise30" + cr
+            +"RotationBehavior clockwise45" + cr
+            +"RotationBehavior counter30" + cr
+            +"RotationBehavior counter45" + cr + cr
+            +"clockwise30:SetDrawable(triangle)" + cr
+            +"clockwise45:SetDrawable(triangle)" + cr
+            +"counter30:SetDrawable(triangle)" + cr
+            +"counter45:SetDrawable(triangle)" + cr + cr
+            +"clockwise30:SetDegrees(30)" + cr
+            +"clockwise45:SetDegrees(45)" + cr
+            +"counter30:SetDegrees(-30)" + cr
+            +"counter45:SetDegrees(-45)" + cr + cr
+            +"header2_1_1:SetBehavior(clockwise30)" + cr
+            +"header2_1_2:SetBehavior(clockwise45)" + cr
+            +"header2_2_1:SetBehavior(counter30)" + cr
+            +"header2_2_2:SetBehavior(counter45)" + cr + cr) 
+        mainBehaviors:Add(header3)
+        mainBehaviors:AddText("Color color" + cr
+            +"ColorBehavior redBehavior" + cr
+            +"ColorBehavior greenBehavior" + cr
+            +"ColorBehavior blueBehavior" + cr + cr
+            +"redBehavior:SetDrawable(triangle)" + cr
+            +"greenBehavior:SetDrawable(triangle)" + cr
+            +"blueBehavior:SetDrawable(triangle)" + cr + cr
+            +"redBehavior:SetColor(color:Red(), "+dq+"Red"+dq+")" + cr
+            +"greenBehavior:SetColor(color:Green(), "+dq+"Green"+dq+")" + cr
+            +"blueBehavior:SetColor(color:Blue(), "+dq+"Blue"+dq+")" + cr + cr
+            +"header3_1:SetBehavior(redBehavior)" + cr
+            +"header3_2:SetBehavior(greenBehavior)" + cr
+            +"header3_3:SetBehavior(blueBehavior)" + cr + cr)
+        mainBehaviors:Add(header4)
+        mainBehaviors:AddText("ResetBehavior resetBehavior" + cr
+            +"resetBehavior:SetDrawable(triangle)" + cr
+            +"header4_1:SetBehavior(resetBehavior)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(mainBehaviors))
+        bodyDiv:AddParagraph("Now when we run our program, you can still navigate the menu, but when you activate a one 
+                            of the lowest-level MenuItems the triangle Drawable will change depending on the behavior you activated.")
+        bodyDiv:AddImage("/media/userInterface/MenuFinal.png", "This image shows the final expected Game window with the Decrease Size submenu open")
+        bodyDiv:AddHeading("MenuSelection and MenuPath", 2)
+
+        bodyDiv:AddParagraph("In Quorum, Menus use their own selection class, MenuSelection, to keep track of information regarding the currently 
+                            selected MenuItem. In particular, the MenuSelection keeps track of the unique and specific path to the current selection, 
+                            causing another similarity between Trees and Menus. This path is stored in the form of an Array of MenuItems and Menus 
+                            allow for us to easily get this Array with the GetMenuPath action. To demonstrate this, we will add a small amount of code 
+                            to each of our Behavior classes we created in the tutorial thus far.")
+
+        bodyDiv:AddParagraph("To start, we will need the libraries for MenuItem and Array, "
+                            + "adding the following use statements:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.MenuItem" + cr
+                                                        + "use Libraries.Containers.Array"))
+
+        bodyDiv:AddParagraph("Next, we will add to the end of the Run action, outside of the conditional if statement. "
+                            + "First, we need to obtain the currently selected MenuItem. This can be done with "
+                            + "BehaviorEvent's GetItem action, but this returns an Item, not a MenuItem, so we will need "
+                            + "to cast it. This is done with the following line:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("MenuItem tempItem = cast(MenuItem, behavior:GetItem())"))
+
+        bodyDiv:AddParagraph("Now that we have the MenuItem that called the behavior we can use its GetMenuPath action to get the Array of MenuItems. This gives the following line:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Array&lt;MenuItem&gt; items = tempItem:GetMenuPath()"))
+
+        bodyDiv:AddParagraph("Now that we have the path to the currently selected MenuItem, we can traverse the Array "
+                            + "from the beginning to the end to obtain the full path. We will simply output this as text, "
+                            + "so we will use each MenuItem's GetName action as we go through the Array in a repeat while "
+                            + "loop. This is gives the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("integer counter = 0" + cr
+                                                        + "integer size = items:GetSize()" + cr
+                                                        + "text path = " + dq + dq + cr
+                                                        + "repeat while counter < size" + cr
+                                                        + "    path = path + items:Get(counter):GetName() + " + dq + "\" + dq + cr
+                                                        + "    counter = counter + 1" + cr
+                                                        + "end" + cr + cr
+                                                        + "output path"))
+
+        bodyDiv:AddParagraph("As an example, the updated SizeBehavior class is as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Interface.Controls.MenuItem" + cr
+                                                        + "use Libraries.Containers.Array"
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class SizeBehavior is Behavior" + cr + cr
+                                                        + "    Drawable triangle = undefined" + cr
+                                                        + "    number scaleX = 1.0" + cr
+                                                        + "    number scaleY = 1.0" + cr + cr
+                                                        + "    action Run(BehaviorEvent behavior)" + cr
+                                                        + "        if triangle not= undefined" + cr
+                                                        + "            triangle:SetScale(scaleX, scaleY)" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say(" + dq + "Scaled by a factor of " + dq + " + scaleX + " + dq + " horizontally, and a factor of " + dq + " + scaleY + " + dq + "vertically." + dq + ")" + cr
+                                                        + "        end" + cr + cr
+                                                        + "        MenuItem tempItem = cast(MenuItem, behavior:GetItem())" + cr
+                                                        + "        Array&lt;MenuItem&gt; items = tempItem:GetMenuPath()" + cr + cr
+                                                        + "        integer counter = 0" + cr
+                                                        + "        integer size = items:GetSize()" + cr
+                                                        + "        text path = " + dq + dq + cr
+                                                        + "        repeat while counter < size" + cr
+                                                        + "            path = path + items:Get(counter):GetName() + " + dq + "\" + dq + cr
+                                                        + "            counter = counter + 1" + cr
+                                                        + "        end" + cr
+                                                        + "        output path" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetDrawable(Drawable newTriangle)" + cr
+                                                        + "        triangle = newTriangle" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action SetScale(number newScaleX, number newScaleY)" + cr
+                                                        + "        scaleX = newScaleX" + cr
+                                                        + "        scaleY = newScaleY" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Now, when the SizeBehavior is run, it will output the path to the currently selected "
+                            + "MenuItem. This change is done the same way for all five Behavior classes we made, so the "
+                            + "use statements and addition to the Run action can simply be copied into the other classes.")
+
+        bodyDiv:AddHeading("Run the Program", 2)
+        AddIDE(bodyDiv, "menuTutorial","Activity: Menu", "Try making a User Interface", "examples/UserInterface/Menu/Main.quorum")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Menus in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Menus"
+    end
+
+    action GetName returns text
+        return "Menus"
+    end
+
+    action GetShortDescription returns text
+        return "how to use Menus"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/menu.html"
+    end
+end

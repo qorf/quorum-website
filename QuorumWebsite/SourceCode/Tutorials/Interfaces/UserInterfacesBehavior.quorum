@@ -1,0 +1,387 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+
+class UserInterfacesBehavior is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Behavior Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Behavior", 1)
+        headDiv:AddText("This tutorial tells you how to use Behaviors in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("What is a Behavior?", 2)
+        bodyDiv:AddParagraph("A Behavior is a critical GUI component that allows items in the user interface "
+                           + "to conduct actions or even respond to user interaction. Most of the classes that use Behaviors "
+                           + "are user interface controls, such as Buttons and TextBoxes, which will be covered in "
+                           + "the following tutorials. Together, these classes provide a way to efficiently route user input "
+                           + "throughout the system.")
+
+        bodyDiv:AddParagraph("This is what the Behavior class in Quorum looks like: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("package Libraries.Interface.Behaviors" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr + cr
+                                                        + "class Behavior" + cr 
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Dispose" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action IsFinished returns boolean" + cr
+                                                        + "        return false" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("On the surface, you will see that the Behavior class does not do anything itself. This "
+                       +"is because it is heavily subclassed for specific actions. ")
+        bodyDiv:AddText("For more information on inheritance and overriding actions, see the tutorial on ")
+        bodyDiv:AddLink("Inheritance", "/tutorials/language/inheritance.html")
+        bodyDiv:AddText(".")
+        bodyDiv:AddParagraph("Lets run through the four actions in a Behavior:")
+
+        OrderedList actionsList
+
+        actionsList:AddListItem("Run - Run is called when an action is taken with the Behavior. For example, if a Button is clicked in the user interface, then Run would be called. ")
+        actionsList:AddListItem("Update - A Behavior can also be set to Update on every frame of a running program. However, not all Behaviors do this. For example, when a Behavior is set to a Button via SetBehavior, Update is never called, while the Run action is called when the Button is pressed. In contrast, if the AddBehavior action is called on an item, Update will be called every frame. We will go over the specifics of each GUI element in their respective tutorials, so don't worry about this difference for now.")
+        actionsList:AddListItem("Dispose - This action does nothing by default, but it can be overridden for cleanup actions when the Behavior is finished. Note that, like the Update action, Dispose is only called if the Behavior is added through AddBehavior, not if it is set as a default Behavior using SetBehavior.")
+        actionsList:AddListItem("IsFinished - This action returns a boolean, which states if the Behavior has completed its work.")
+        bodyDiv:Add(actionsList)
+
+//        bodyDiv:Add(break)
+//        bodyDiv:AddText("    1) Run, which is called when an action is taken with the Behavior.")
+//        bodyDiv:Add(break)
+//        bodyDiv:AddText("    2) Update, which is called on each frame of the program while the Behavior is active.")
+//        bodyDiv:Add(break)
+//        bodyDiv:AddText("    3) Dispose, which is used for cleanup actions when the Behavior is finished.")
+//        bodyDiv:Add(break)
+//        bodyDiv:AddText("    4) IsFinished, which states if a Behavior is finished.")
+
+        bodyDiv:AddParagraph("For this tutorial, we will first create a simple Behavior that outputs and says text."
+                            + " To start, create a new Game Application project. ")
+        bodyDiv:AddText("Note: We will use the Drawable and Speech classes in this tutorial. For more information on using Drawables, check out the tutorial on ")
+        bodyDiv:AddLink("Drawing in 2D", "/tutorials/games/drawing2D.html")
+        bodyDiv:AddText(", and for more information on Speech, see the documentation on the ")
+        bodyDiv:AddLink("Speech", "https://quorumlanguage.com/Libraries/Sound/Speech.html")
+        bodyDiv:AddText(" class.")
+
+        //section on creating simple output behavior
+        bodyDiv:AddHeading("Outputting with a Behavior", 2)
+
+        bodyDiv:AddParagraph("To create our own Behavior, we will create a new Quorum Class, which we will name " + dq + "OutputBehavior.quorum." + dq
+                            + " This class will use the libraries for Behavior, BehaviorEvent, and Speech. "
+                            + "The class itself will override the Behavior's Run action to "
+                            + "output and say the desired text. This gives the following OutputBehavior class:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class OutputBehavior is Behavior" + cr
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "        Speech speech" + cr
+                                                        + "        speech:Say("+ dq + "Hello world!" + dq + ", false)" + cr
+                                                        + "        output " + dq + "Hello world!" + dq + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+        
+        bodyDiv:AddParagraph("We now have our completed OutputBehavior class, but nothing will happen yet because it has to be added to an object "
+                            + "for the Behavior to run. To do so, we will make a Drawable and use it so our Behavior can run."
+                            + " Return to the main class and in the CreateGame action we will make a Drawable and add our Behavior "
+                            + "to it.")
+
+        bodyDiv:AddParagraph("The complete main class will be as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr + cr
+                                                        + "class Main is Game" + cr
+                                                        + "    action Main" + cr
+                                                        + "        StartGame()" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action CreateGame" + cr
+                                                        + "        Drawable box" + cr
+                                                        + "        OutputBehavior behavior" + cr
+                                                        + "        box:AddBehavior(behavior)" + cr
+                                                        + "    end" + cr
+                                                        + "end" + cr))
+
+        bodyDiv:AddParagraph("If we run the program now, nothing will be in the game window, but "+ dq + "Hello World!" + dq
+                            + " will output to the console and you will hear the program say " + dq + "Hello World." + dq)
+        bodyDiv:AddParagraph(" This was a simple "
+                            + "Behavior that only needed to override the Run action, but most Behaviors will perform more "
+                            + "complex actions and may need to override all 4 of a Behavior's actions. For a deeper look into "
+                            + "Behaviors, in the next section of this tutorial we will rotate a drawable for 5 seconds and change its color using Behaviors.")
+
+
+        //the section on rotating a Drawable
+        bodyDiv:AddHeading("Rotation with a Behavior", 2)
+        
+
+        /*bodyDiv:AddParagraph("This gives us the following Main class:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr + cr
+                                                        + "class Main is Game" + cr
+                                                        + "    action Main" + cr
+                                                        + "        StartGame()" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action CreateGame" + cr
+                                                        + "        Drawable box" + cr
+                                                        + "        Color color" + cr
+                                                        + "        box:LoadFilledRectangle(300, 200, color:Red())" + cr
+                                                        + "        box:SetPosition(250, 250)" + cr
+                                                        + "        Add(box)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))*/
+        bodyDiv:AddHeading("Creating a New Behavior", 3)
+        bodyDiv:AddParagraph("To begin, we will create a new Quorum class, which we"
+                            + " will name " + dq + "RotationBehavior.quorum." + dq + " "
+                            + "In addition to the Behavior and BehaviorEvent libraries needed to make a Behavior, we will be using the Color, Drawable, and"
+                            + " Speech libraries.")
+
+        bodyDiv:AddParagraph("The RotationBehavior class will inherit the Behavior class, and we will override the"
+                            + " actions for Run, Update, Dispose, and IsFinished. Additionally, we need to create a Drawable"
+                            + " class variable to store our rectangle for use in all actions, and we must also create a timer"
+                            + " so that we can make our Behavior last for five seconds, giving the following template:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class RotationBehavior is Behavior" + cr
+                                                        + "    Drawable rectangle = undefined" + cr
+                                                        + "    number timer = 0" + cr + cr
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Dispose" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action IsFinished returns boolean" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+
+        bodyDiv:AddParagraph("In the Run action, we must first obtain the Drawable we want to rotate. Since the "
+                            + "RotationBehavior will later be added to the Drawable itself in the main class, we "
+                            + "can use the BehaviorEvent's GetItem action to get the object associated with the Behavior."
+                            + " However, this action returns an Item, not a Drawable, so we must cast it. This gives us the"
+                            + " following line:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("rectangle = cast(Drawable, event:GetItem())"))
+
+        bodyDiv:AddParagraph("Next, for the program to say " + dq + "Rotate," + dq + " we will need to use the Speech class's"
+                            + " Say action, giving us the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Speech speech" + cr
+                                                        + "speech:Say(" + dq + "Rotate" + dq + ")"))
+
+        
+
+        bodyDiv:AddParagraph("This gives the following complete Run action:")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action Run(BehaviorEvent event)" + cr
+                                                        + "    rectangle = cast(Drawable, event:GetItem())" + cr
+                                                        + "    Speech speech" + cr
+                                                        + "    speech:Say(" + dq + "Rotate" + dq + ")" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Moving on to the Update action, we want our rectangle to rotate, and we want to keep track "
+                            + "of the time elapsed. Therefore, we need to increment the timer and call the Drawable's Rotate "
+                            + "action. Since the Update action will be used for five seconds, a rotation of 72 degrees per "
+                            + "second will result in a full 360 degrees rotation, giving us the following Update action:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action Update(number seconds)" + cr
+                                                        + "    timer = timer + seconds" + cr
+                                                        + "    if rectangle not= undefined" + cr
+                                                        + "        rectangle:Rotate(72 * seconds)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Note that the conditional if-statement checks if the " + dq + "rectangle" + dq + " variable is defined. If we did not "
+                            + "include this, then the program could potentially crash by attempting to rotate an object that "
+                            + "does not exist.")
+
+        bodyDiv:AddParagraph("In the Dispose action, we want our rectangle to change color to indicate that the Behavior is "
+                            + "finished. As such, we need to create a Color variable and call the Drawable's SetColor action."
+                            + " Lastly, for the program to say " + dq + "Rotation complete," + dq + " we will once again need to use the Speech"
+                            + " class's Say action. This gives the following Dispose action:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action Dispose" + cr
+                                                        + "    if rectangle not= undefined" + cr
+                                                        + "        Color color" + cr
+                                                        + "        rectangle:SetColor(color:Green())" + cr
+                                                        + "        Speech speech" + cr
+                                                        + "        speech:Say(" + dq + "Rotation complete" + dq + ")" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("With this, once the Behavior is finished, the rectangle will change from Red to Green, and "
+                            + "the program will say " + dq + "Rotation complete." + dq)
+
+        bodyDiv:AddParagraph("In the IsFinished action, we need to set the action to return true once five seconds have "
+                            + "passed. Thus, we simply add the line " + dq + "return timer >= 5" + dq + " to get the "
+                            + "following action:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action IsFinished returns boolean" + cr
+                                                        + "    return timer >= 5" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Altogether, the resulting RotationBehavior class looks like this:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class RotationBehavior is Behavior" + cr + cr
+                                                        + "    Drawable rectangle" + cr
+                                                        + "    number timer = 0" + cr + cr
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "        rectangle = cast(Drawable, event:GetItem())" + cr
+                                                        + "        Speech speech" + cr
+                                                        + "        speech:Say(" + dq + "Rotate" + dq + ", false)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "        timer = timer + seconds" + cr + cr
+                                                        + "        if rectangle not= undefined" + cr
+                                                        + "            rectangle:Rotate(72 * seconds)" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Dispose" + cr
+                                                        + "        if rectangle not= undefined" + cr
+                                                        + "            Color color" + cr
+                                                        + "            rectangle:SetColor(color:Green())" + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say(" + dq + "Rotation complete" + dq + ", false)" + cr
+                                                        + "        end" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action IsFinished returns boolean" + cr
+                                                        + "        return timer >= 5" + cr
+                                                        + "    end" + cr
+                                                        + "end" + cr))
+
+        bodyDiv:AddHeading("Setting up Main", 3)
+        
+        bodyDiv:AddParagraph("In the main, we will be using a Drawable and and will be altering its Color, so we must include the Drawable and Color"
+                        + " libraries.")
+
+        //bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Graphics.Drawable" + cr
+        //                                                 + "use Libraries.Game.Graphics.Color"))
+
+        bodyDiv:AddParagraph("First, we will create a Drawable object and a Color object. For the purposes of this"
+                            + " tutorial, we want the Drawable to use its Behavior as soon as the game begins, so we'll"
+                            + " add it to the game in the CreateGame action.")
+
+        //bodyDiv:Add(preformatter:GeneratePreformattedCode("Drawable box" + cr
+        //                                                 + "Color color"))        
+
+        bodyDiv:AddParagraph("Next, let's load a rectangle shape using the Drawable's LoadFilledRectangle action. We are going to "
+                            + "make it red for this tutorial. Then,"
+                            + " we'll give it a position with the SetPosition action. Finally, we'll add it to the game"
+                            + " using " + dq + "Add(box)." + dq)
+
+        //bodyDiv:Add(preformatter:GeneratePreformattedCode("box:LoadFilledRectangle(300, 200, color:Red())" + cr
+        //                                                 + "box:SetPosition(250, 250)" + cr + "Add(box)"))
+        bodyDiv:AddParagraph("Lastly, we must return to the main class and give a RotationBehavior to our Drawable. At the "
+                            + "end of the CreateGame action, this can be done creating a RotationBehavior variable and "
+                            + "calling the Drawable's AddBehavior action, giving us the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("RotationBehavior rotate" + cr
+                                                        + "box:AddBehavior(rotate)"))
+
+        bodyDiv:AddParagraph("The resulting final version of the Main class is as follows:")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Game.Graphics.Drawable" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr + cr
+                                                        + "class Main is Game" + cr + cr
+                                                        + "    action Main" + cr
+                                                        + "        StartGame()" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action CreateGame" + cr
+                                                        + "        Drawable box" + cr
+                                                        + "        Color color" + cr
+                                                        + "        box:LoadFilledRectangle(300, 200, color:Red())" + cr
+                                                        + "        box:SetPosition(250, 250)" + cr
+                                                        + "        Add(box)" + cr + cr
+                                                        + "        RotationBehavior rotate" + cr
+                                                        + "        box:AddBehavior(rotate)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr
+                                                        + "end" + cr))
+
+        bodyDiv:AddParagraph("Now, when the program is run, the rectangle will start as red, the program will say "
+                            + dq + "Rotate," + dq + " the rectangle will make one full rotation over five seconds, "
+                            + "and then turn green while the program says " + dq + "Rotation complete." + dq
+                            + " The following images show a sample of the beginning, middle, and end of the Behavior's"
+                            + " execution.")
+
+        bodyDiv:AddImage("/media/userInterface/BehaviorBegin.png", "This is an image of initial position of the Drawable.")
+        bodyDiv:AddImage("/media/userInterface/BehaviorMiddle.png", "This is an image of a position of the Drawable mid-Behavior.")
+        bodyDiv:AddImage("/media/userInterface/BehaviorEnd.png", "This is an image of end position of the Drawable.")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Behaviors in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Behaviors"
+    end
+
+//    action GetImageLocation returns text
+//        return "/media/games/Drawing2D.png"
+//    end
+
+    action GetName returns text
+        return "Behaviors"
+    end
+
+    action GetShortDescription returns text
+        return "how to use Behaviors for GUIs"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/behavior.html"
+    end
+end

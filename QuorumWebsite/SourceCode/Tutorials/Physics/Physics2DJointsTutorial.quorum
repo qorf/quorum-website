@@ -1,0 +1,690 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class Physics2DJointsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Physics Joints In 2D - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Physics Joints In 2D", 1)
+        headDiv:AddText("Understanding joints in a 2D physics enabled Quorum game")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //the section on general information
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "In this tutorial, we will cover how to create joints: a way to link items in a game so that they act more like objects in the real-world. "
+                            +   "Specifically, we will cover distance joints, which can also be used as springs, weld joints, and rope joints. "
+                            +   "To see these concepts in action, we will create two games. "
+                            +   "The first game will have a ")
+        bodyDiv:AddLink(    "slinky", "https://en.wikipedia.org/wiki/Slinky")
+        bodyDiv:AddText(    " that can go down some stairs. "
+                            +   "The second game will have two boxes connected by a rope, where one box can be moved by the player. "
+                            +   "")
+
+        //the section on linear damping
+        bodyDiv:AddHeading("Linear Damping", 2)
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(   "Linear damping, in the physics engine, causes moving items to slow down over time regardless of any other factor. "
+                            +   "Note that linear damping has a different meaning in real life. "
+                            +   "Here, it is similar to friction, but it does not require contact with another item or surface. "
+                            +   "We might want to review friction in the ")
+        bodyDiv:AddLink(    "Mass, Friction, and More Tutorial In 2D", "/tutorials/physics/massandfriction2D.html")
+        bodyDiv:AddText(   ". While the effect will look similar to using friction, linear damping usually cannot be used to replace friction, because it will affect movement at times when friction would not. "
+                            +   "Instead, linear damping could be used to simulate air or wind resistance. "
+                            +   "It can be set like so: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number linearDamping = 0.3" + cr
+                                                            + "item:SetLinearDamping(linearDamping)"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "linearDamping is a positive number. "
+                            +   "Zero means no linear damping. "
+                            +   "The effect increases with larger numbers. ") 
+        
+        //the section on angular damping
+        bodyDiv:AddHeading("Angular Damping", 2)
+
+        bodyDiv:AddParagraph( "")
+        bodyDiv:AddText(    "The difference between linear damping and angular damping is similar to the difference between linear and angular velocity, which was discussed in the ")
+        bodyDiv:AddLink(    "Force and Velocity Tutorial In 2D", "/tutorials/physics/forceandvelocity2D.html")
+        bodyDiv:AddText(    ". Angular damping will cause angular movement to slow down over time. "
+                            +   "This effect occurs regardless of whether or not an item is in contact with other collidable objects in a game. "
+                            +   "Angular damping can be set like this: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number angularDamping = 0.3" + cr
+                                                            + "item:SetAngularDamping(angularDamping)"))
+        bodyDiv:AddParagraph(   "angularDamping is a positive number. "
+                            +   "Zero means no angular damping. "
+                            +   "The effect increases with larger numbers. ")
+        
+        //the section on Joints
+        bodyDiv:AddHeading("Joints", 2)
+
+        bodyDiv:AddParagraph("Joints are used to create a connection between two items, with different kinds of joints causing different effects. "
+                            +   "We can use multiple joints to connect many items as well. "
+                            +   "There are three different types of joints available at this time: the distance joint, weld joint, and rope joint. "
+                            +   "First we will discover the distance joint. ")
+
+        //the section on the Distance Joint
+        bodyDiv:AddHeading("Distance Joint", 2)
+        bodyDiv:AddParagraph("The distance joint forces the two items it connects to maintain a set distance between them. "
+                            +   "The items will not be able to get closer to or farther from each other. "
+                            +   "Imagine that they are connected by an invisible rod that allows them to spin about the connection points. "
+                            +   "Since the items are allowed to spin around their connection points, torque can be introduced. "
+                            +   "To create a distance joint, the first step is to add this use statement to the top: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Physics.Joints.DistanceJoint2D"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Then we need to create the two Item2D objects to be joined and give them positions. "
+                            +   "Note that Drawable objects are Item2D objects. "
+                            +   "We also need to create two Vector2 objects and set them to the point on each item that we want the joint to connect to. "
+                            +   "It may be helpful to review the ")
+        bodyDiv:AddLink(    "Force and Velocity Tutorial In 2D", "/tutorials/physics/forceandvelocity2D.html")
+        bodyDiv:AddText(    "’s section on vectors. ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Drawable itemA" + cr
+                            +   "Drawable itemB" + cr
+                            +   "itemA:LoadFilledRectangle(10, 10)" + cr
+                            +   "itemB:LoadFilledRectangle(10, 10)" + cr 
+                            +   "itemA:SetPosition(100, 0)" + cr
+                            +   "itemB:SetPosition(150, 0)" + cr + cr
+                            +   "Vector2 connectionPointA" + cr
+                            +   "Vector2 connectionPointB" + cr
+                            +   "connectionPointA:Set(110, 0)" + cr
+                            +   "connectionPointB:Set(150, 0)"))
+        bodyDiv:AddParagraph(    "A distance joint can then be created using this code: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "DistanceJoint2D joint" + cr
+                            +   "joint:Initialize(itemA, itemB, connectionPointA, connectionPointB)" + cr
+                            +   "GetCurrentLayer2D():AddJoint(joint)"))
+        bodyDiv:AddParagraph("A distance joint object is made in the first line. "
+                            +   "We will need one for each joint we want to make. "
+                            +   "The next line is the initialization of the joint. "
+                            +   "This line is where the joint is set-up. "
+                            +   "The parameters are the two items followed by the vectors containing the points that they will connect at. "
+                            +   "The parameters should match up so that the first item corresponds to the first vector. "
+                            +   "In the example above, itemA connects at connectionPointA. "
+                            +   "The final line of code above adds the joint to the current layer. ")
+        bodyDiv:AddParagraph("Note that if we forget to set the connection points before initializing the joint, the connection points and distance will not be what we want. "
+                            +   "The same thing will happen if we forget to set the positions of the Item2D objects before initializing the joint. "
+                            +   "If one or more of the points is set so that it is not on the item it corresponds to, the distance between the two items will not be maintained in the way we expect. "
+                            +   "If the joint is initialized after the joint is added to the layer, it will not connect the items.")
+        bodyDiv:AddParagraph("When we initialize the distance joint, it automatically sets the distance that the items must maintain to be the distance between the two connection points. "
+                            +   "We can change this at anytime using:")   
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number distance = 50" + cr
+                                                            + "joint:SetDistance(distance)"))
+        bodyDiv:AddParagraph("distance is a number that is more than the distance between the items when they are colliding. "
+                            +   "If we accidentally set the distance to be too small, the items may go flying off in opposite directions."
+                            +   "The distance should not be less than the distance when the items are colliding. ")
+
+        //the section on the Spring Joint
+        bodyDiv:AddHeading("Springing into Action", 2)
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("The distance joint can be modified to work like a spring. "
+                            +   "There are two properties that need to be set to achieve this: ")
+        bodyDiv:AddLink(    "frequency", "https://en.wikipedia.org/wiki/Frequency") 
+        bodyDiv:AddText(" and ")
+        bodyDiv:AddLink(    "damping ratio", "https://en.wikipedia.org/wiki/Damping_ratio")
+        bodyDiv:AddText(". Frequency means the number of events that occur in a set amount of time, usually a second. "
+                            +   "This joint uses frequency to calculate the stiffness of the spring, or how easily it allows movement away from the set distance. "
+                            +   "When a spring is pulled apart or pushed in, it then snaps back to its original form, oscillating from a little too stretched to a little too contracted. "
+                            +   "The frequency is related to how much the spring oscillates and how far the oscillations stretch or shrink. "
+                            +   "The damping ratio is similar to linear and angular damping, but it only causes the oscillations to slow down. "
+                            +   "It causes the oscillations of the spring to decrease and eventually stop. "
+                            +   "These properties can be set anytime after the joint object has been created like so: ")
+        bodyDiv:AddParagraph("")                    
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number frequency = 0.1" + cr
+                                                            + "number dampingRatio = 0.3" + cr 
+                                                            + "joint:SetFrequency(X)" + cr
+                                                            + "joint:SetDampingRatio(Y)"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Both frequency and dampingRatio are positive numbers with 0 as the default value for both. "
+                            +   "Zero for both means no frequency or damping, meaning we just get a distance joint. "
+                            +   "While frequency can be any positive number, it works well to pick one between zero and half of the frame rate. "
+                            +   "For more information on frames, see the ")
+        bodyDiv:AddLink(    "Getting Started With Games Tutorial", "/tutorials/games/gamesStarted.html")
+        bodyDiv:AddText(    ". Usually this means that frequency should be less than or equal to 30. "
+                            +   "If we pick a frequency greater than half of the frame rate, we may find that it is similar to a picking a value less than half the frequency. "
+                            +   "Note that smaller values for frequency produce a less stiff spring for the joint. "
+                            +   "For damping ratio, values between 0 and 1 work well, though the damping ratio can be any positive number. "
+                            +   "The difference in effect between different values above 1 may not be as easily observable as the difference in effect between values between 0 and 1. "
+                            +   "In other words, if we slightly increase or decrease a damping ratio value between 0 and 1, there will be more of an observable difference than if we tried doing the same with a value above 1. ")                    
+    
+        //the section on the Weld Joint
+        bodyDiv:AddHeading("Weld Joint", 2)
+        bodyDiv:AddParagraph("The weld joint connects two items at one point. "
+                            +   "It can be used to glue them together at the point, or can be adjusted to allow the items some movement around the connection point. "
+                            +   "The initial setup is similar to the other joints. "
+                            +   "First a use statement needs to be added to the top of the program.")                
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Physics.Joints.WeldJoint2D"))
+        bodyDiv:AddParagraph("Then the joint must be created and initialized with the items and the connection point. ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Drawable itemA" + cr
+                            +   "Drawable itemB" + cr
+                            +   "itemA:LoadFilledRectangle(10, 10)" + cr
+                            +   "itemB:LoadFilledRectangle(10, 10)" + cr
+                            +   "itemA:SetPosition(100, 0)" + cr
+                            +   "itemB:SetPosition(110, 0)" + cr + cr
+                            +   "Vector2 connectionPoint" + cr
+                            +   "connectionPoint:Set(110, 0)" + cr + cr
+                            +   "WeldJoint2D joint" + cr
+                            +   "joint:Initialize(itemA, itemB, connectionPoint)" + cr
+                            +   "GetCurrentLayer2D():AddJoint(joint)" + cr))
+        bodyDiv:AddParagraph("")                    
+        bodyDiv:AddText(    "Note that we are using a Vector2 object to store the connection point. "
+                            +   "If you want to review vectors, see the ")
+        bodyDiv:AddLink(    "Force and Velocity In 2D Tutorial", "/tutorials/physics/forceandvelocity2D.html")                    
+        bodyDiv:AddText(    ". With this setup, the connection between the two items will be like glue. "
+                            +   "They should not be able to move much around their connection. "
+                            +   "If we want to allow them some more movement around their connection point, we can do that using frequency and damping ratio, like the spring joint.")
+        bodyDiv:AddParagraph("")                    
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number frequency = 0.1" + cr
+                                                            + "number dampingRatio = 0.3" + cr
+                                                            + "joint:SetFrequency(frequency)" + cr
+                                                            + "joint:SetDampingRatio(dampingRatio)"))
+        bodyDiv:AddParagraph("")                    
+        bodyDiv:AddText(    "frequency and dampingRatio are positive numbers with 0 as the default value for both. "
+                            +   "Similar to the spring version of the distance joint, as frequency gets smaller, more movement is allowed around the weld point, but a frequency of 0 allows almost no movement. "
+                            +   "Damping ratio here is similar to the distance joint as well. "
+                            +   "Values between 0 and 1 have a noticeable effect on slowing down movement around the joint while values over 1 will cause the damping effect to be very pronounced.")                          
+     
+        //the section containing the slinky game code
+        bodyDiv:AddHeading("Slinky Game Code", 2)
+
+        bodyDiv:AddParagraph("This game is a demo of a slinky on top of some stairs. "
+                            +   "The arrow keys can be used to push the slinky in the regular four directions. "
+                            +   "Depending on how the slinky is pushed, it may walk down the steps.")
+        bodyDiv:AddText(    "Here is a ")
+        bodyDiv:AddLink(    "zip file" , "/files/games/SlinkyTutorial.zip" )
+        bodyDiv:AddText(    " with the sounds used in this game. "
+                            +   "Read through, then use the following code to discover distance and weld joints. ")
+        bodyDiv:AddParagraph("")
+
+        CodeBlock cb1
+        Span s1 
+        Span s2 
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        Span s7
+        Span s8
+        cb1:AddText("use Libraries.Game.Game" + cr 
+                    +   "use Libraries.Game.Graphics.Drawable"+ cr 
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr 
+                    +   "use Libraries.Compute.Vector2" + cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Physics.Joints.DistanceJoint2D" + cr
+                    +   "use Libraries.Game.Physics.Joints.WeldJoint2D" + cr 
+                    +   "use Libraries.Sound.Audio" + cr    
+                    +   "use Libraries.Interface.Events.CollisionEvent2D" + cr
+                    +   "use Libraries.Interface.Events.CollisionListener2D" + cr + cr
+                    +   "class Main is Game, KeyboardListener, CollisionListener2D" + cr
+                    +   "   Drawable slinkyBottom" + cr   
+                    +   "   Drawable slinkyTop" + cr
+                    +   "   integer groundHeight = 550" + cr
+                    +   "   integer startLocation = 20" + cr
+                    +   "   integer slinkyHeight = 5" + cr
+                    +   "   integer slinkyLength = 90" + cr 
+                    +   "   integer numberOfSteps = 6" + cr 
+                    +   "   Audio slinkySound" + cr 
+                    +   "   number collisionCount = 0" + cr + cr
+                    +   "   action Main" + cr 
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr
+                    +   "       EnablePhysics2D(true)" + cr
+                    +   "       AddKeyboardListener(me)" + cr
+                    +   "       AddCollisionListener(me)" + cr
+                    +   "       Color color" + cr + cr)
+        s1:AddText("  /*" + cr
+                    +   "       The ground will be a staircase, so we need steps that decrease in height." + cr
+                    +   "       This code creates the steps from left to right and by decreasing height." + cr
+                    +   "  */" + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("       integer i = 1" + cr
+                    +   "       repeat while i <= numberOfSteps" + cr
+                    +   "            Drawable ground" + cr
+                    +   "            ground:LoadFilledRectangle(GetScreenWidth() / numberOfSteps, groundHeight/numberOfSteps * (numberOfSteps-i))" + cr
+                    +   "            ground:SetPosition((i - 1) * (GetScreenWidth() / numberOfSteps), 0)" + cr
+                    +   "            if (i mod 2) = 1" + cr
+                    +   "                ground:SetColor(color:Red())" + cr
+                    +   "            else" + cr
+                    +   "                ground:SetColor(color:Yellow())" + cr
+                    +   "            end" + cr 
+                    +   "            ground:EnablePhysics(true)" + cr
+                    +   "            ground:SetUnmovable()" + cr
+                    +   "            ground:SetFriction(0.8)" + cr
+                    +   "            Add(ground)" + cr
+                    +   "            i = i + 1" + cr
+                    +   "        end" + cr + cr)
+        s2:AddText("        //  We save the slinky top and bottom so that we can move them with key presses." + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText("        slinkyTop = CreateSlinky(18, slinkyBottom)" + cr
+                    +   "        Vector2 gravity" + cr
+                    +   "        gravity:Set(0, -170)" + cr
+                    +   "        SetGravity2D(gravity)" + cr
+                    +   "        slinkySound:Load(" + dq + "Sound/Clang.ogg" + dq + ")" + cr
+                    +   "        slinkySound:SetVolume(0.4)" + cr
+                    +   "    end" + cr + cr)
+        s3:AddText("  /*" + cr
+                    +   "    This action creates a slinky by creating boxes that connect one to another" + cr
+                    +   "    with a weld joint and a spring (distance) joint. The boxes are stacked and" + cr
+                    +   "    each connects to the box above and below it. The joints are setup so that " + cr
+                    +   "    there is a weld joint on one edge and a spring joint on the other. Which side" + cr
+                    +   "    each kind of joint is alternates so that the slinky is alternatingly pushed up "  + cr
+                    +   "    on one side by the spring joint, and held together on the other by the weld" + cr
+                    +   "    joint." + cr
+                    +   "  */" + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText("    action CreateSlinky(integer sizeOfSlinky, Drawable bottom) returns Drawable" + cr
+                    +   "        Drawable previousLink = bottom" + cr
+                    +   "        Color color" + cr + cr
+                    +   "        integer i = 0" + cr
+                    +   "        repeat while i < sizeOfSlinky" + cr
+                    +   "            Drawable link" + cr
+                    +   "            WeldJoint2D weldJoint" + cr
+                    +   "            DistanceJoint2D springJoint" + cr
+                    +   "            Vector2 anchor" + cr + cr)
+        s4:AddText("            //  First another box is added to the slinky stack." + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText("            if i = 0" + cr
+                    +   "                link = bottom" + cr
+                    +   "            end" + cr
+                    +   "            link:LoadFilledRectangle(slinkyLength, slinkyHeight)" + cr
+                    +   "            link:SetPosition(startLocation, groundHeight + i * slinkyHeight - groundHeight/numberOfSteps)" + cr
+                    +   "            if (i mod 2 ) = 0" + cr
+                    +   "                link:SetColor(color:Blue())" + cr
+                    +   "            else" + cr
+                    +   "                link:SetColor(color:Purple())" + cr
+                    +   "            end" + cr
+                    +   "            link:EnablePhysics(true)" + cr
+                    +   "            link:SetResponsive()" + cr
+                    +   "            link:SetMass(5)" + cr
+                    +   "            link:SetFriction(0.8)" + cr
+                    +   "            Add(link)" + cr
+                    +   "            if i > 0" + cr)
+        s5:AddText("                // Then the weld and spring joints are added to opposite touching edges." + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText("                anchor:Set(startLocation + slinkyLength * ((i + 1) mod 2)," + cr
+                    +   "                groundHeight + i * slinkyHeight - groundHeight/numberOfSteps)" + cr
+                    +   "                weldJoint:Initialize(previousLink, link, anchor)" + cr
+                    +   "                weldJoint:SetFrequency(0.1)" + cr
+                    +   "                weldJoint:SetDampingRatio(0.2)" + cr
+                    +   "                anchor:SetX(startLocation + slinkyLength * (i  mod 2))" + cr
+                    +   "                springJoint:Initialize(previousLink, link, anchor, anchor)" + cr
+                    +   "                springJoint:SetDistance(slinkyHeight)" + cr 
+                    +   "                springJoint:SetFrequency(1)" + cr)
+        s6:AddText("                //  We make sure to add the joints to the layer so they can work." + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText("                GetCurrentLayer2D():AddJoint(springJoint)" + cr
+                    +   "                GetCurrentLayer2D():AddJoint(weldJoint)" + cr 
+                    +   "            end" + cr
+                    +   "            previousLink = link" + cr
+                    +   "            i = i + 1" + cr
+                    +   "        end" + cr
+                    +   "        return previousLink" + cr
+                    +   "    end" + cr + cr)
+        s7:AddText("    //  A sound plays when slinky collides with the steps or itself half of the time. " + cr)
+        s7:SetClassAttribute("comment")
+        cb1:Add(s7)
+        cb1:AddText("    action BeginCollision(CollisionEvent2D event)" + cr
+                    +   "        collisionCount = collisionCount + 1" + cr
+                    +   "        if (collisionCount > 2)" + cr
+                    +   "            slinkySound:SetX(event:GetItemB():GetX())" + cr
+                    +   "            slinkySound:SetBalance(event:GetItemB():GetX())" + cr
+                    +   "            slinkySound:SetY(event:GetItemB():GetY())" + cr
+                    +   "            slinkySound:SetPitch(event:GetItemB():GetY()/120)" + cr
+                    +   "            slinkySound:Play() " + cr
+                    +   "            collisionCount = 0" + cr
+                    +   "        end" + cr
+                    +   "   end" + cr + cr)
+        s8:AddText("  /*" + cr
+                    +   "    We set the linear velocity of both the top and bottom pieces of the slinky," + cr
+                    +   "    so no matter which side is up, the top side is moved." + cr
+                    +   "  */" + cr)
+        s8:SetClassAttribute("comment")
+        cb1:Add(s8)        
+        cb1:AddText("    action PressedKey(KeyboardEvent event)" + cr
+                    +   "        Vector2 velocity" + cr
+                    +   "        if event:keyCode = event:LEFT" + cr
+                    +   "            velocity:Set(-220, 0)" + cr
+                    +   "            slinkyTop:SetLinearVelocity(velocity)"   + cr
+                    +   "            slinkyBottom:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:RIGHT" + cr
+                    +   "            velocity:Set(220, 0)" + cr
+                    +   "            slinkyTop:SetLinearVelocity(velocity)" + cr
+                    +   "            slinkyBottom:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:UP" + cr        
+                    +   "            velocity:Set(0, 220)" + cr
+                    +   "            slinkyTop:SetLinearVelocity(velocity)" + cr
+                    +   "            slinkyBottom:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:DOWN" + cr
+                    +   "            velocity:Set(0, -220)" + cr
+                    +   "            slinkyTop:SetLinearVelocity(velocity)" + cr
+                    +   "            slinkyBottom:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr
+                    +   "    end" + cr
+                    +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        // running the slinky game
+        bodyDiv:AddHeading("Run the Program", 2)
+        bodyDiv:AddParagraph(   "If we run this game, we should have a slinky on the top of a set of steps. Use the arrow keys to push the slinky.")
+        AddIDE(bodyDiv, "slinkyGame", "Activity: Learning Joints with a Slinky", "Try the above code block", "examples/Physics/Joints/Slinky.quorum")
+        //the section on the Rope Joint
+        bodyDiv:AddHeading("Rope Joint", 2)
+        bodyDiv:AddParagraph("The rope joint is similar to the distance joint. "
+                            +   "It maintains a maximum distance between two items, but the rope joint allows the items to be closer to each other than that distance. "
+                            +   "It acts as if an imaginary rope is keeping the items from getting farther apart than the length of the rope. "
+                            +   "The setup for the rope joint is very similar to the distance joint. "
+                            +   "First we need to add this use statement to the top: ")                
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Physics.Joints.RopeJoint2D"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Then we need to create the joint, initialize it, and add it to the layer we want it to live in. "
+                            +   "Reviewing the ")
+        bodyDiv:AddLink(    "Layers Tutorial", "/tutorials/games/layers.html")
+        bodyDiv:AddText(    " may help here.")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Drawable itemA" + cr
+                            +   "Drawable itemB" + cr
+                            +   "itemA:LoadFilledRectangle(10, 10)" + cr
+                            +   "itemB:LoadFilledRectangle(10, 10)" + cr
+                            +   "itemA:SetPosition(100, 0)" + cr
+                            +   "itemB:SetPosition(150, 0)" + cr + cr
+                            +   "Vector2 connectionPointA" + cr
+                            +   "Vector2 connectionPointB" + cr
+                            +   "connectionPointA:Set(110, 0)" + cr 
+                            +   "connectionPointB:Set(150, 0)" + cr + cr
+                            +   "RopeJoint2D joint" + cr
+                            +   "joint:Initialize(itemA, itemB, connectionPointA, connectionPointB, 50)" + cr
+                            +   "GetCurrentLayer2D():AddJoint(joint)" + cr))
+        bodyDiv:AddParagraph("The joint is created in the third to last line and then the joint is then initialized. "
+                            +   "The parameters are: the two items that the joint will connect, the two points they will be connected at, and the maximum length of the rope. "
+                            +   "The connection points are ordered in the parameter list so that itemA connects at connectionPointA. ")
+        bodyDiv:AddParagraph("Just like with the distance joint, it is important the length of the rope not be less than the distance between the connection points when the two items are colliding. "
+                            +   "This will cause unpredictable behavior. "
+                            +   "If one or more of the connection points is not actually on the item it is connecting, unexpected behavior around that point and item will result. "
+                            +   "With the distance joint, it is possible to change the distance while the game is running, but changing the length of the rope while the game is running with the rope joint can cause unexpected behavior. ")                    
+
+        //the section containing the rope game code
+        bodyDiv:AddHeading("Rope Game Code", 2)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "This game is a demo of a rope connecting two boxes. "
+                            +   "One box is in the center of the screen and is unmovable. "
+                            +   "It is connected to a responsive box that can be pushed in the regular four directions using the arrow keys. "
+                            +   "For a review on the difference between unmovable and responsive objects, check out the ")
+        bodyDiv:AddLink(    "Gravity In 2D Tutorial" , "/tutorials/physics/gravity2D.html" )                    
+        bodyDiv:AddText(    ". The rope will keep the boxes from getting too far apart, and influence the movement of the responsive box. ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Here is a ")
+        bodyDiv:AddLink(    "zip file" , "/files/games/Joints2D.zip" )
+        bodyDiv:AddText(    " containing a Quorum project using the code below. "
+                            +   "Read through, then use the following code to discover distance and weld joints. ")
+        bodyDiv:AddParagraph("")
+
+        CodeBlock cb2
+        Span s10
+        Span s11
+        Span s12
+        Span s13
+        Span s14
+        Span s15
+        Span s16
+        Span s17
+        Span s18
+        Span s19
+        Span s20
+        cb2:AddText("use Libraries.Game.Game" + cr 
+                    +   "use Libraries.Game.Graphics.Drawable"+ cr 
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr 
+                    +   "use Libraries.Compute.Vector2" + cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Physics.Joints.WeldJoint2D" + cr
+                    +   "use Libraries.Game.Physics.Joints.RopeJoint2D" + cr 
+                    +   "use Libraries.Sound.Audio" + cr + cr
+                    +   "class Main is Game, KeyboardListener" + cr + cr
+                    +   "   Drawable unmovableBox" + cr   
+                    +   "   Drawable movingBox" + cr
+                    +   "   Vector2 from" + cr
+                    +   "   Vector2 to" + cr 
+                    +   "   RopeJoint2D ropeJoint" + cr 
+                    +   "   Audio bingSound" + cr
+                    +   "   number timePassed = 0" + cr + cr)
+        s10:AddText("   //  We want to create two boxes, one that is fixed and one that can move, and connect them with a rope." + cr)
+        s10:SetClassAttribute("comment")
+        cb2:Add(s10)
+        cb2:AddText("   action Main" + cr 
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr
+                    +   "       EnablePhysics2D(true)" + cr
+                    +   "       AddKeyboardListener(me)" + cr
+                    +   "       Color color" + cr + cr)
+        s11:AddText("       //  First we setup the box that is responsive." + cr)
+        s11:SetClassAttribute("comment")
+        cb2:Add(s11)
+        cb2:AddText("       movingBox:LoadFilledRectangle(40,40)" + cr
+                    +   "       movingBox:SetPosition(150, 300)" + cr
+                    +   "       movingBox:SetColor(color:Purple())" + cr
+                    +   "       movingBox:EnablePhysics(true)" + cr
+                    +   "       movingBox:SetResponsive()" + cr
+                    +   "       movingBox:SetMass(1)" + cr
+                    +   "       movingBox:SetFriction(0.2)" + cr
+                    +   "       movingBox:SetLinearDamping(0.9)" + cr
+                    +   "       Add(movingBox)" + cr + cr)
+        s12:AddText("       //  Then we need to setup the non-responsive box." + cr)
+        s12:SetClassAttribute("comment")
+        cb2:Add(s12)
+        cb2:AddText("       unmovableBox:LoadFilledRectangle(40,40)" + cr 
+                    +   "       unmovableBox:SetPosition(370,300)" + cr
+                    +   "       unmovableBox:SetColor(color:Blue())" + cr
+                    +   "       unmovableBox:EnablePhysics(true)" + cr
+                    +   "       unmovableBox:SetMass(1)" + cr
+                    +   "       Add(unmovableBox)" + cr + cr)
+        s13:AddText("  /*" + cr
+                    +   "       We will use this CreateRope action to connect the two boxes with a rope." + cr
+                    +   "       The code for this is below CreateGame. The parameters are the two items" + cr
+                    +   "       to be connected and the two points that they connect at. " + cr
+                    +   "  */" + cr)
+        s13:SetClassAttribute("comment")
+        cb2:Add(s13)
+        cb2:AddText("       from:Set(movingBox:GetX() + 40, movingBox:GetY())" + cr
+                    +   "       to:Set(unmovableBox:GetX(), unmovableBox:GetY())" + cr
+                    +   "       CreateRope(movingBox, unmovableBox, from, to)" + cr)
+        s14:AddText("  /*" + cr
+                    +   "       The rope joint helps stabilize the rope. Setting the maximum length of" + cr
+                    +   "       the rope joint to be less than the length of the rope makes means that" + cr
+                    +   "       even with some stretch, the rope should not extend to the breaking point" + cr
+                    +   "       without a very large force." + cr
+                    +   "  */" + cr)
+        s14:SetClassAttribute("comment")
+        cb2:Add(s14)
+        cb2:AddText("       ropeJoint:Initialize(movingBox, unmovableBox, from, to, 180)" + cr
+                    +   "       GetCurrentLayer2D():AddJoint(ropeJoint)" + cr + cr
+                    +   "       Vector2 gravity" + cr
+                    +   "       gravity:Set(0, -130)" + cr
+                    +   "       SetGravity2D(gravity)" + cr
+                    +   "       bingSound:Load(" + dq + "media/Bing.ogg" + dq + ")" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr
+                    +   "        timePassed = timePassed + seconds" + cr
+                    +   "        if timePassed > 0.5" + cr
+                    +   "            bingSound:SetPitch(movingBox:GetY()/100)" + cr
+                    +   "            bingSound:SetBalance(movingBox:GetX())" + cr
+                    +   "            bingSound:Play()" + cr
+                    +   "            timePassed = 0" + cr
+                    +   "        end" + cr
+                    +   "    end" + cr + cr)
+        s15:AddText("  /*" + cr
+                    +   "    This CreateRope action makes a " + dq + "rope" + dq +" between two items by making many small" + cr
+                    +   "    boxes and connecting them with weld joints. The weld joints have frequency so" + cr
+                    +   "    that movement is allowed around the connection point. The boxes and weld joints" + cr
+                    +   "    together make a sort of chain which acts like a rope on screen." + cr
+                    +   "  */" + cr)
+        s15:SetClassAttribute("comment")
+        cb2:Add(s15)
+        cb2:AddText("    action CreateRope(Drawable itemA, Drawable itemB, Vector2 anchorA, Vector2 anchorB)" + cr
+                    +   "       Drawable previousLink = itemA" + cr
+                    +   "       Color color" + cr
+                    +   "       Vector2 anchor = anchorA" + cr)
+        s16:AddText("  /*" + cr
+                    +   "       The distance is rounded up when it is cast as an integer so that the" + cr
+                    +   "       rope does not end up too short." + cr
+                    +   "  */" + cr)
+        s16:SetClassAttribute("comment")
+        cb2:Add(s16)
+        cb2:AddText("       integer length = cast(integer, anchorA:Distance(anchorB)+1)" + cr + cr
+                    +   "       integer i = 0" + cr
+                    +   "       repeat while i <= length/5" + cr)
+        s17:AddText("           //  Here we setup one of the individual boxes making up the rope." + cr)
+        s17:SetClassAttribute("comment")
+        cb2:Add(s17)
+        cb2:AddText("            Drawable link" + cr
+                    +   "            WeldJoint2D weldJoint" + cr + cr
+                    +   "            if i not= length/5" + cr
+                    +   "                link:LoadFilledRectangle(5, 2)" + cr
+                    +   "                link:SetPosition(anchor:GetX(), anchor:GetY())" + cr
+                    +   "                if (i mod 2 ) = 0" + cr
+                    +   "                    link:SetColor(color:Blue())" + cr
+                    +   "                else" + cr
+                    +   "                    link:SetColor(color:Purple())" + cr
+                    +   "                end" + cr
+                    +   "                link:EnablePhysics(true)" + cr
+                    +   "                link:SetResponsive()" + cr
+                    +   "                link:SetMass(0.1)" + cr
+                    +   "                link:SetFriction(0.2)" + cr)
+        s18:AddText("                //  Linear Damping is set to model a little air resistance." + cr)
+        s18:SetClassAttribute("comment")
+        cb2:Add(s18)
+        cb2:AddText("                link:SetLinearDamping(0.9)" + cr
+                    +   "                Add(link)" + cr
+                    +   "            else" + cr
+                    +   "                link = itemB" + cr
+                    +   "            end" + cr + cr)
+        s19:AddText("            //  A weld joint is created between two of the items." + cr)
+        s19:SetClassAttribute("comment")
+        cb2:Add(s19)
+        cb2:AddText("            weldJoint:Initialize(previousLink, link, anchor)" + cr
+                    +   "            weldJoint:SetFrequency(0.1)" + cr
+                    +   "            weldJoint:SetDampingRatio(0.2)" + cr
+                    +   "            GetCurrentLayer2D():AddJoint(weldJoint)" + cr + cr)
+        s20:AddText("  /*" + cr
+                    +   "            The anchor is moved to the next position. The rope is being created" + cr
+                    +   "            horizontally here, so only the x coordinate is updated." + cr
+                    +   "  */" + cr)
+        s20:SetClassAttribute("comment")
+        cb2:Add(s20)
+        cb2:AddText("            anchor:SetX(anchor:GetX() + 5)" + cr
+                    +   "            previousLink = link" + cr 
+                    +   "            i = i + 1" + cr 
+                    +   "        end" + cr
+                    +   "    end" + cr + cr
+                    +   "    action PressedKey(KeyboardEvent event)" + cr
+                    +   "        Vector2 velocity" + cr
+                    +   "        if event:keyCode = event:LEFT" + cr
+                    +   "            velocity:Set(-220, 0)" + cr
+                    +   "            movingBox:SetLinearVelocity(velocity)"   + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:RIGHT" + cr
+                    +   "            velocity:Set(220, 0)" + cr
+                    +   "            movingBox:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:UP" + cr        
+                    +   "            velocity:Set(0, 220)" + cr
+                    +   "            movingBox:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr + cr
+                    +   "        if event:keyCode = event:DOWN" + cr
+                    +   "            velocity:Set(0, -220)" + cr
+                    +   "            movingBox:SetLinearVelocity(velocity)" + cr
+                    +   "        end" + cr
+                    +   "    end" + cr
+                    +   "end")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))                    
+
+        // running the rope game
+        bodyDiv:AddHeading("Run the Program", 2)
+        bodyDiv:AddParagraph(   "If we run this game, we should have a rope connecting two boxes. 
+        One box is in the center of the screen and is unmovable. It is connected to a responsive box that
+        can be pushed in the regular four directions using the arrow keys.  The rope will keep the boxes 
+        from getting too far apart, and influence the movement of the responsive box.")
+        AddIDE(bodyDiv, "ropeGame", "Activity: Learning Rope Joints", "Try the above code block", "examples/Physics/Joints/Rope.quorum")
+//        SideBySideIDE addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("physics2DJoints")
+//        addStatementIDE:GetIDETitle():AddText("Joints In 2D")
+//        addStatementIDE:SetGameEnvironment(true)
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to add physics effects like joints, combining multiple objects together, in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Joints In 2D"
+    end
+
+    action GetImageLocation returns text
+        return "media/games/gamesStarted.png"
+    end
+
+    action GetName returns text
+        return "Joints In 2D"
+    end
+
+    action GetShortDescription returns text
+        return "how to use joints in a 2D game"
+    end
+
+    action GetLocation returns text
+        return "tutorials/physics/joints2D.html"
+    end
+end

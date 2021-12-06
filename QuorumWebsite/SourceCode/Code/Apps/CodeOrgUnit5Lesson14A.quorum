@@ -1,0 +1,659 @@
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.InlineFrame
+
+class CodeOrgUnit5Lesson14A is Lesson
+    text iText = ""
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 5 Lesson 14:  Building an App " + dq + "Image Scroller" + dq)
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Building Apps - Lesson 14:  Building an App " + dq + "Image Scroller" + dq, 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //Division box
+
+        bodyDiv:AddHeading("Overview", 2)
+            Paragraph ov1
+                ov1:AddText("Students will extend the concepts and the coding syntax learned with the " + dq + "My Favorite Things" + dq + " app from the previous lesson to create a similar program that manages and displays a collection of images and responds to keyboard events. Additionally, they are introduced to the practice of refactoring code in order to keep programs consistent and remove redundancies when adding new functionality.  This lesson also serves as further practice with using Arrays in programs.")
+        bodyDiv:Add(ov1)
+            
+        bodyDiv:AddHeading("Vocabulary", 2)
+        UnorderedList vocab
+            AddListItemWithBoldAtFront(vocab, "Keyboard Event: ", "in Quorum, an event triggered by pressing or releasing a key on the keyboard.")
+        bodyDiv:Add(vocab)
+
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("Students will be able to:")
+            UnorderedList goalList
+                goalList:AddListItem("Use an Array to maintain a collection of data in a program.")
+                goalList:AddListItem("Create apps that allow user interaction through Keyboard Events.")
+                goalList:AddListItem("Refactor code in order to appropriately incorporate new functionality while maintaining readability and consistency.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddHeading("Purpose", 2)
+            Paragraph purpose
+                purpose:AddText("Most applications you use are not based on static pieces of code. Instead the software will be continuously updated both to correct errors and introduce new pieces of functionality. If later improvements are anticipated it is generally possible to develop programs in a way that easily incorporates new functionality. At other times it is necessary to make larger changes to the way a program operates in order to incorporate new features while maintaining existing functionality. Refactoring code in this way can be a tedious and challenging endeavor, but it helps ensure that the final product is consistent and easy to maintain. If software is not kept in a logical, consistent, and succinct form, then it will only get harder to keep introducing new features, increasing the likelihood of errors.")
+        bodyDiv:Add(purpose)
+
+        bodyDiv:AddHeading("Getting Started", 2)
+            Paragraph getStart
+                getStart:AddText("When we want to add new functionality to our programs, we'll of course have to write new code. Sometimes, when we add new code to an existing program, we'll also have to make changes to the original components of our program. Why might this be the case?")
+        bodyDiv:Add(getStart)
+            UnorderedList getStartList
+                getStartList:AddListItem("The old code and the new code contradict one another.")
+                getStartList:AddListItem("The old code and the new code may have redundant components.")
+                getStartList:AddListItem("Incorporating the new code may help us find better ways to write the old code.")
+        bodyDiv:Add(getStartList)
+            Paragraph getStart1
+                getStart1:AddText("Writing software is an iterative process. We continuously update and improve our ideas as we learn new techniques, debug our software, or identify new features we'd like to add to our code. While our code will constantly be changing, we'd like it to remain organized, consistent, and readable. The use of " + dq + "refactoring" + dq + " helps in this process. Refactoring is similar to the concept of " + dq + "encapsulating." + dq + " It helps the programmer to reduce redundancy in the code and to manage the complexity in coding. Further, the " + dq + "refactoring" + dq + " gives the programmer clarity in reading the logical working of the code. In return the " + dq + "refactoring" + dq + " eases the process of modifying the entire program's function if necessary later on.")
+        bodyDiv:Add(getStart1)
+//            Paragraph getStart2
+//                getStart2:AddText("Today we're visiting the project development team Michael and Alexis once again. Through their brain storming and problem solving process, we are going to be further extending the knowledge and skill we have already learned in the previous lessons, and seeing how this process plays out in practice.")
+//        bodyDiv:Add(getStart2)
+
+        bodyDiv:AddHeading("Activity", 2)
+
+        bodyDiv:AddParagraph("In this activity, students will put together everything they've learned in previous lessons to create an application. This application will be similar to the " + dq + "My Favorite Things" + dq + " app from the previous lesson, in that the major component is an Array that the program moves through. Instead of an Array of text, this lesson uses an Array of Drawables, which display images. For the most part, students are walked-through how to put together a basic version of the program, but then shift focus to refactoring, the process of restructing code to be more readable and/or less complex.")
+
+        bodyDiv:AddHeading("Student Instructions", 3)
+
+        Paragraph activity1 
+            activity1:AddText("For today's lesson, we'll be creating an " + dq + "Image Scroller" + dq + " app, which is similar to the " + dq + "My Favorite Things" + dq + " app we created in the previous lesson. However, rather than store various text variables in an Array, this program will store pictures via the Drawable class. For this lesson, we'll show you exactly what you need to do with the Drawable class, but if you would like to know more you can refer to the documentation for the Drawable class ")
+            activity1:AddLink("here", "https://quorumlanguage.com/Libraries/Game/Graphics/Drawable.html")
+            activity1:AddText(".")
+        bodyDiv:Add(activity1)
+
+        bodyDiv:AddParagraph("Before we begin, we need a good idea of what we want our program to accomplish. The app should have an Array of images, one of which is displayed on the screen at any given time. The user can then use the Up Arrow and Down Arrow keys to cycle through which image is currently displayed. Lastly, we will add a description to each image, which the program will read aloud when the Spacebar key is pressed. Below is streamlined list.")
+
+        bodyDiv:AddHeading("How the " + dq + "Image Scroller" + dq + " app should run:", 4)
+            UnorderedList proList
+                proList:AddListItem("The app starts with displaying the first image on the screen.")
+                proList:AddListItem("When a user presses the Up Arrow key, the app displays the next image in the Array.")
+                proList:AddListItem("When a user presses the Down Arrow key, the app displays the previous image in the Array")
+                proList:AddListItem("Each image has a description that is read aloud when a user presses the Spacebar key.")
+        bodyDiv:Add(proList)
+
+        bodyDiv:AddParagraph("Now that we have a good idea of what we want our program to do, we need to come up with a plan for acheiving it. Below is a basic outline of the program's design.")
+
+        bodyDiv:AddHeading("How the " + dq + "Image Scroller" + dq + " app should be designed:", 4)
+            OrderedList proList1
+                proList1:AddListItem("Create the Array")
+                proList1:AddListItem("Add pictures to the array")
+                proList1:AddListItem("Set descriptions for the pictures")
+                proList1:AddListItem("Set up the Keyboard Event handler mechanism")
+                proList1:AddListItem("Build a mechanism that changes the picture or reads the current description using the Keyboard Event handler")
+                proList1:AddListItem("Refactor code to make it easier to read")
+        bodyDiv:Add(proList1)
+
+        bodyDiv:AddHeading("Template for the " + dq + "Image Scroller" + dq + " App", 4)
+        bodyDiv:AddParagraph("Below is a template for the program. It contains all the necessary use statements, though we will end up adding a few extra actions to it. An online IDE is provided at the end of this section for you to test your code. To avoid repeatedly scrolling between the instructions and the IDE, we recommend that you write your code in a text editor, and then copy and paste it into the online IDE at the end of the section.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+            + "use Libraries.Game.Graphics.Drawable" + cr
+            + "use Libraries.Containers.Array" + cr
+            + "use Libraries.Interface.Events.KeyboardEvent" + cr
+            + "use Libraries.Interface.Events.KeyboardListener" + cr
+            + "use Libraries.Sound.Audio" + cr + cr
+            + "class Main is Game" + cr + cr
+            + "    action Main" + cr
+            + "        StartGame()" + cr
+            + "    end" + cr + cr
+            + "    action CreateGame" + cr + cr
+            + "    end" + cr + cr
+            + "    action Update(number seconds)" + cr
+            + "    end" + cr + cr
+            + "    action PressedKey(KeyboardEvent event)" + cr + cr
+            + "    end" + cr + cr
+            + "end"))
+
+        bodyDiv:AddHeading("Creating the Array", 4)
+        bodyDiv:AddParagraph("Before we do anything else, we need to create our Array and our objects. Remember that this Array will contain Drawable objects, rather than integers like we did in the previous lesson. We will also need to declare four Drawables, an integer to keep track of the current picture, and two Audio variables to play sounds. These variables are used in multiple actions, so they need to be declared as class variables; that is, they need to be declared within the class, but outside any actions. As such, your declarations should be similar to the following code example.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Array&lt;Drawable&gt; arrayOfPictures" + cr
+            + "Drawable picture0" + cr
+            + "Drawable picture1" + cr
+            + "Drawable picture2" + cr
+            + "Drawable picture3" + cr
+            + "integer currentPic = 0" + cr
+            + "Audio newPicSound" + cr
+            + "Audio lastPicSound"))
+
+        bodyDiv:AddHeading("Adding Pictures to the Array", 4)
+        bodyDiv:AddParagraph("Now that we have our Array declared, we can simply use the " + dq + "Add" + dq + " action with our Drawables. The first is done for you below. These additions should be made in the " + dq + "CreateGame" + dq + " action. You don't need to know the ins and outs of how the Quorum Game Engine is used for this lesson, but it is important to know that the " + dq + "CreateGame" + dq + " action is called just once, when the application first starts. Until otherwise stated, the following sections will also be adding code to the " + dq + "CreateGame" + dq + " action.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("arrayOfPictures:Add(picture0)"))
+
+        bodyDiv:AddParagraph("At this point, we have an Array of Drawables, but we haven't loaded any images to those Drawables yet. This is simply done by writing four lines of code to load each of our images. The following lines load each image, and the filepath must be typed exactly as shown.")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("picture0:Load(" + dq + "/media/code/picture 0.png" + dq + ")" + cr
+            + "picture1:Load(" + dq + "/media/code/picture 1.png" + dq + ")" + cr
+            + "picture2:Load(" + dq + "/media/code/picture 2.png" + dq + ")" + cr
+            + "picture3:Load(" + dq + "/media/code/picture 3.png" + dq + ")"))
+
+        bodyDiv:AddParagraph("While we are loading our Drawables, we should also go ahead and load our Audio objects. These will be used later to indicate for us when we have cycled through the Array of pictures, but for now you only need to add the following lines of code. Like the Drawables, these filepaths must be typed exactly as shown.")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("newPicSound:Load(" + dq + "/media/code/Bing.ogg" + dq + ")" + cr
+            + "lastPicSound:Load(" + dq + "/media/code/Boing.ogg" + dq + ")"))
+
+        bodyDiv:AddHeading("Setting Descriptions for the Pictures", 4)
+        bodyDiv:AddParagraph("As previously stated, our program should have a description of each picture that will be read aloud when the Spacebar key is pressed. These descriptions need to be set manually by the " + dq + "SetDescription" + dq + " action. You may either make your own descriptions, or simply use the ones below.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("arrayOfPictures:Get(0):SetDescription(" + dq + "Fall: Scarlet leaves on an autumn blaze maple tree" + dq + ")" + cr
+            + "arrayOfPictures:Get(1):SetDescription(" + dq + "Winter: Snow on the ground and an evergreen tree" + dq + ")" + cr
+            + "arrayOfPictures:Get(2):SetDescription(" + dq + "Spring: Two butterflies drinking nectar from flowers" + dq + ")" + cr
+            + "arrayOfPictures:Get(3):SetDescription(" + dq + "Summer: Fireworks shooting up into the night sky" + dq + ")"))
+
+        bodyDiv:AddHeading("Setting Up the Keyboard Event Handler", 4)
+        bodyDiv:AddParagraph("Now that we have our pictures and descriptions set, we can finally add input to our application. To start, we need to add a Keyboard Listener to the application. This is done by adding the following line of code.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("AddKeyboardListener(me)"))
+
+        bodyDiv:Add(break)
+
+            Paragraph retValue11
+                retValue11:SetClassAttribute("cool-box")
+                retValue11:AddText("Note: You don't need to understand exactly what this line of code does for this application or the Computer Science Principles course. What is important for our purposes is the effect: the application will pay attention to the keyboard while it is active, and will automatically call the " + dq + "PressedKey" + dq + " action when any key is pressed.")
+        bodyDiv:Add(retValue11)
+
+        bodyDiv:AddParagraph("For the next bit of code, we'll move down to the " + dq + "PressedKey" + dq + " action. This action is called when any key is pressed, and the specific key pressed is saved as the " + dq + "keyCode" + dq + " value held within the " + dq + "event" + dq + " parameter. This " + dq + "keyCode" + dq + " is actually just an integer, so we simply need to compare it to the right values using conditional if-statements. Fortunately, you don't need to have these values memorized; instead, we can access the correct values by the " + dq + "event" + dq + " parameter's UP, DOWN, and SPACE values. The format of the first if-statement is shown below.")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("if event:keyCode = event:DOWN" + cr + cr
+            + "end"))
+
+        bodyDiv:AddParagraph("Within the conditional if-statement for the Down arrow key, use nested if-statements to go to the previous picture in the Array. You'll need to hide the current picture, decrement the " + dq + "currentPic" + dq + " variable, and show the new current picture. Below are the commands for showing and hiding a picture.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("drawable:Hide()" + cr
+            + "drawable:Show()"))
+
+        bodyDiv:Add(break)
+                    Paragraph retValue12
+                retValue12:SetClassAttribute("cool-box")
+                retValue12:AddText("Hint: Remember to check for the value of " + dq + "currentPic" + dq + " before you change it! Since we want the program to cycle through the pictures, it should reset " + dq + "currentPic" + dq + " to the last index of the Array instead of decreasing below the first index. To signify for the user when this happens, you should also play the " + dq + "lastPicSound" + dq + " variable using the line " + dq + "lastPicSound:Play()." + dq)
+        bodyDiv:Add(retValue12)
+
+        bodyDiv:AddParagraph("Once you've finished the conditional for the Down arrow key, do the opposite for the Up arrow key. Similar to the Down arrow key you just finished, make sure to reset the " + dq + "currentPic" + dq + " variable to the first index of the Array instead of increasing past the last index. To differentiate this for the user, play the " + dq + "newPicSound" + dq + " variable using the line " + dq + "newPicSound:Play()." + dq)
+
+        bodyDiv:AddParagraph("Lastly, we need to add code for when the Spacebar key is pressed. This is the simplest, as we simply need to use the " + dq + "say" + dq + " command on the current picture's description, giving us the following line in our if-statement.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("say(arrayOfPictures:Get(currentPic):GetDescription())"))
+
+        bodyDiv:AddParagraph("With this, we are just about done with the application! In fact, all we have left to do is add the Drawables to the screen and hide all but the first picture the program starts with. This is done by simply adding the following lines of code to the end of the " + dq + "CreateGame" + dq + " action.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Add(arrayOfPictures:Get(0))" + cr
+            + "Add(arrayOfPictures:Get(1))" + cr
+            + "Add(arrayOfPictures:Get(2))" + cr
+            + "Add(arrayOfPictures:Get(3))" + cr + cr
+            + "arrayOfPictures:Get(1):Hide()" + cr
+            + "arrayOfPictures:Get(2):Hide()" + cr
+            + "arrayOfPictures:Get(3):Hide()"))
+
+        bodyDiv:AddHeading("Refactoring", 4)
+
+        bodyDiv:AddParagraph("While creating the application, you may have noticed that a few lines of code in our program are very similar, sometimes only changing the variable. Hopefully warning bells went off in your head! Any time you encounter redundancies like this, especially if you happen to be copying portions of code from one area of your program to another, it's a good indication that you should write a function to capture that behavior in one place.")
+        
+            Paragraph para
+            para:AddText("When you add new features to your code you will often create redundancies. To keep your code readable and consistent, you may need to rewrite old pieces of code. This process of restructuring existing code without changing its external behavior is called ")
+            Bold bold
+            bold:AddText("refactoring")
+            para:Add(bold)
+            para:AddText(". It is an important process when developing software that improves code readability and reduces complexity. As a result, code is much easier to maintain.")
+        bodyDiv:Add(para)
+
+        bodyDiv:AddParagraph("To demonstrate refactoring, we're going to alter this application to make adding further functionality to the code easier. Specifically, we'll:")
+        
+        UnorderedList list1
+            list1:AddListItem("Create a function for setting a picture's description")
+            list1:AddListItem("Create functions for loading the pictures")
+            list1:AddListItem("Create functions for cycling up and down the Array")
+        bodyDiv:Add(list1)
+
+        bodyDiv:AddHeading("Description Function", 4)
+        bodyDiv:AddParagraph("The first change we'll make is creating a function for setting the description of the passed Drawable's description. This is an example of refactoring done primarily to make code easier to read; our original line of " + dq + "arrayOfPictures:Get(0):SetDescription(" + dq + "Fall: Scarlet leaves on an autumn blaze maple tree" + dq + ")" + dq + " can be a little difficult to read for those other than the code's writer, particularly if the reader is a less experienced programmer. Instead, we will create an action for this line of code, which we can call in the " + dq + "CreateGame" + dq + " action.")
+        bodyDiv:AddParagraph("Create a new action, named something like " + dq + "SetDescriptionToPicture," + dq + " and have it accept an integer parameter (the Array index), and a text parameter (the image description). This would simplify the action calls in " + dq + "CreateGame" + dq + " to the following, which are easier to read.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("SetDescriptionToPicture(0, " + dq + "Fall: Scarlet leaves on an autumn blaze maple tree" + dq + ")" + cr
+            + "SetDescriptionToPicture(1, " + dq + "Winter: Snow on the ground and an evergreen tree" + dq + ")" + cr
+            + "SetDescriptionToPicture(2, " + dq + "Spring: Two butterflies drinking nectar from flowers" + dq + ")" + cr
+            + "SetDescriptionToPicture(3, " + dq + "Summer: Fireworks shooting up into the night sky" + dq + ")"))
+
+        bodyDiv:AddHeading("Loading Functions", 4)
+        bodyDiv:AddParagraph("Next we'll do some refactoring with a bit more practical use; first, we'll set up a function to load one picture, and then a second function to load all the pictures in our Array. Not only does this make the code easier to read, but it will also reduce the amount of changes we would have to make if we added more Drawables to the Array.")
+        
+        bodyDiv:AddParagraph("To start, create a new action, with a name like " + dq + "LoadOnePicture." + dq + " This action should accept a Drawable parameter and a text parameter. Since the " + dq + "Load" + dq + " action is case-sensitive and the image files are stored on the website, we've provided this action for you below.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action LoadOnePicture(Drawable object, text filename)" + cr
+            + "    object:Load(" + dq + "/media/code/" + dq + " + filename)"+ cr
+            + "end"))
+
+        bodyDiv:AddParagraph("Now we'll create the second action, named " + dq + "LoadAllPictures." + dq + " This action has no parameters, and should cycle through the elements of our Array using a " + dq + "repeat while" + dq + " loop, calling the " + dq + "LoadOnePicture" + dq + " action we made in the last step for each iteration of the loop. Additionally, you should add the picture to the screen and hide it for each iteration of the loop. This lets you remove the section at the end of the " + dq + "CreateGame" + dq + " action where we added and hid the pictures.")
+
+                bodyDiv:Add(break)
+                    Paragraph retValue13
+                retValue13:SetClassAttribute("cool-box")
+                retValue13:AddText("Hint: due to the way in which our image files are named, you can use your loop's counter for the text parameter of the " + dq + "LoadOnePicture" + dq + " action: try using ")
+                Bold bold1
+                bold1:AddText(dq + "picture " + dq + " + counter + " + dq + ".png" + dq)
+                retValue13:Add(bold1)
+                retValue13:AddText(" in the action call.")
+        bodyDiv:Add(retValue13)
+
+        bodyDiv:AddHeading("Cycling Functions", 4)
+        bodyDiv:AddParagraph("Lastly, let's consider that you wanted to add the ability to use the Left and Right arrow keys to cycle through the pictures, while also allowing users to still use the Down and Up arrow keys. Altering the " + dq + "PressedKey" + dq + " action is simple; we simply need two more conditional if-statements, comparing " + dq + "event:keyCode" + dq + " to " + dq + "event:LEFT" + dq + " and " + dq + "event:RIGHT." + dq + " However, our code would start getting long and cluttered if we copied the code within the conditionals for the Down and Up arrow keys.")
+
+        bodyDiv:AddParagraph("Instead, we should create two actions, " + dq + "LastPicture" + dq + " and " + dq + "NextPicture," + dq + " where we can simply pass it the " + dq + "KeyEvent event" + dq + " variable as a parameter and then copy the code for the Down arrow key and Up arrow key conditionals, respectively. Then we can simply call the " + dq + "LastPicture" + dq + " action when either the Down or Left arrow key is pressed, and call the " + dq + "NextPicture" + dq + " action when either the Up or Right arrow key is pressed.")
+
+        SideBySideIDE addStatementIDE
+        addStatementIDE:SetUniqueIdentifier("Image Scroller")
+        addStatementIDE:GetIDETitle():AddText("Image Scroller")
+        addStatementIDE:GetIDESubtitle():AddText("")
+        addStatementIDE:SetGameEnvironment(true)
+        addStatementIDE:Setup()
+        bodyDiv:Add(addStatementIDE)
+        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+//            Paragraph project
+//                project:AddText("Michael - " + dq + "Well... It seems that our next project is creating the program that scrolls the image on the screen from one to another by a press of a key. We need to use the concept of Array in this program writing." + dq)
+//        bodyDiv:Add(project)
+//            Paragraph project1
+//                project1:AddText("Michael - " + dq + "I do understand that the graphics are huge part of today's programming but... It certainly gives me a challenge as a blind person." + dq)
+//        bodyDiv:Add(project1)
+//            Paragraph project2
+//                project2:AddText("Alexis  - " + dq + "I hear you. But... Check this out. I was reading the Quorum Standard Libraries as you recommended me to do. Then I found that we can attach the description to almost all kind of visual object we create in Quorum Programming Language. Do you think we can attach the description to the graphics - that we use in this programming - so the program becomes meaningful to the blind users?" + dq)
+//        bodyDiv:Add(project2)
+//            Paragraph project3
+//                project3:AddText("Michael - " + dq + "Is that right!? That's a great idea! I always hated when my screen reader says 'Graphics' whenever it comes across the pictures in a blind unfriendly web pages.  Maybe I can find out how to help the web programmers to make their pages more accessible by building this App." + dq)
+//        bodyDiv:Add(project3)
+//            Paragraph project4
+//                project4:AddText("Alexis - " + dq + "OK then, How about you come up with some ideas for building this App." + dq)
+//        bodyDiv:Add(project4)
+//            Paragraph project5
+//                project5:AddText("Michael - " + dq + "I thought you would say something like that. That's OK. I already have some idea. This app is actually simpler than the one we have build toggery before. Because we really don't need to come up with the ideas for 'game ending condition' and 'setting next game board' and stuff like that in this App. The only thing this app needs to do is the following:" + dq)
+//        bodyDiv:Add(project5)
+//
+//        bodyDiv:AddHeading("How the 'Image Scroller' App should run:", 4)
+//            OrderedList proList
+//                proList:AddListItem("App start with displaying the first picture on the screen.")
+//                proList:AddListItem("When a user press a button, the App changes the picture to the next one in the list/array.")
+//                proList:AddListItem("We can make the app to go back one picture with a press of another key.")
+//                proList:AddListItem("We attach a description to each picture so that the description can explain the picture - like a caption for the picture.")
+//                proList:AddListItem("Don't forget to create a way for the user to exit the app.")
+//        bodyDiv:Add(proList)
+//
+//        bodyDiv:AddHeading("Alex: What components to build in coding", 4)
+//            Paragraph project6
+//                project6:AddText("Alexis - " + dq + "Hah, that's simple! Let me come up with the things we need to do for coding this program then." + dq)
+//        bodyDiv:Add(project6)
+//
+//            UnorderedList proList1
+//                proList1:AddListItem("Creating Array")
+//                proList1:AddListItem("Adding pictures to the array")
+//                proList1:AddListItem("Set descriptions for the pictures")
+//                proList1:AddListItem("Setting up the Keyboard Event handler mechanism")
+//                proList1:AddListItem("Building a mechanism for changing the picture inside of the keyboard event handler.")
+//                proList1:AddListItem("Building a mechanism for having the computer read the description of the pictures")
+//                proList1:AddListItem("Building a mechanism for a user to exit the App.")
+//        bodyDiv:Add(proList1)
+//
+//        bodyDiv:AddHeading("The 'Image Scroller' template", 4)
+//            Paragraph project7
+//                project7:AddText("Once again, we are providing the template only because this App uses some graphics and audio files. The source code it self is an empty Quorum Game Engine (QGE)")
+//        bodyDiv:Add(project7)
+//
+//        bodyDiv:AddLink("Unit5Lesson14-ImageScroller - Template.zip", "/files/code/Unit5/Unit5Lesson14-ImageScroller - Template.zip")
+//
+//        bodyDiv:AddHeading("Mike and Alex: Building an Array of Pictures by using arrays creatively", 2)
+//            Paragraph buildArray
+//                buildArray:AddText("Michael - " + dq + "Easy enough. Let's get started. In Quorum Language, we learned that we need to specify the 'type' of values that goes into to an array, right? So in this case, we will create an array that specifically stores the Drawable objects. The code should look like this:" + dq)
+//        bodyDiv:Add(buildArray)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Containers.Array" + cr
+//                                                        +   "" + cr
+//                                                        +   "Array<Drawable>  arrayOfPictures" + cr))
+//
+//            Paragraph buildArray1
+//                buildArray1:AddText("Michael - " + dq + "For this App, I have prepared four scenery pictures  - each represent a season in a year. So I guess we need to instantiate 4 Drawable objects and store in the array:" + dq)
+//        bodyDiv:Add(buildArray1)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Drawable" + cr
+//                                                        +   "" + cr
+//                                                        +   "Drawable picture0" + cr
+//                                                        +   "Drawable picture1" + cr
+//                                                        +   "Drawable picture2" + cr
+//                                                        +   "Drawable picture3" + cr
+//                                                        +   "" + cr
+//                                                        +   "   action CreateGame //(inside of this frame in QGE)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture0)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture1)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture2)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture3)" + cr
+//                                                        +   "   end" + cr))
+//
+//            Paragraph buildArray2
+//                buildArray2:AddText("Alexis - " + dq + "That's make sense so far but... Why did you name the Drawable object from 'picture0' instead of picture1." + dq)
+//        bodyDiv:Add(buildArray2)
+//            Paragraph buildArray3
+//                buildArray3:AddText("Michael - " + dq + "Well... I wanted to correspond the number in the object to the index position of the array. In that way I can avoid confusing myself later on in my coding." + dq)
+//        bodyDiv:Add(buildArray3)
+//
+//        bodyDiv:AddHeading("Alex: Loading one picture to a Drawable object in the corresponding array position.", 4)
+//            Paragraph buildArray4
+//                buildArray4:AddText("Alexis - " + dq + "OK, now it's my turn. I came up with a really clever idea to load all pictures in all corresponding objects. So, watch me." + dq)
+//        bodyDiv:Add(buildArray4)
+//            Paragraph buildArray5
+//                buildArray5:AddText("Alexis - " + dq + "At first, I was writing the code block that is loading and adding the graphics files to the corresponding Drawable one by one. Then I started to get annoyed by writing the same code again and again. So I first created an action that load one picture to one Drawable object:" + dq)
+//        bodyDiv:Add(buildArray5)
+//            Paragraph buildArray6
+//                buildArray6:AddText("")
+//        bodyDiv:Add(buildArray6)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action LoadOnePicture(Drawable object, text filename)" + cr
+//                                                        +   "   object:Load("+dq+"/Graphics/"+dq+ " + filename)" + cr
+//                                                        +   "end" + cr))
+//
+//            Paragraph buildArray7
+//                buildArray7:AddText("Alexis - " + dq + "In this way, if I want to load a picture to an object I can call this action in the 'action CreateGame' like this:" + dq)
+//        bodyDiv:Add(buildArray7)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "LoadOnePicture(picture1, " + dq + "winter.png" + dq + ")" + cr))
+//
+//            Paragraph buildArray8
+//                buildArray8:AddText("Alexis - " + dq + "But,  this is not a good part of my code. As I was doing this repetitious task, I remembered What you said about your naming convention for the Drawable objects. And start thinking about 'what if I change the name of the graphics file in the same way you did.'" + dq)
+//        bodyDiv:Add(buildArray8)
+//            Paragraph buildArray9
+//                buildArray9:AddText("Alexis - " + dq + "So I did - starting with the picture of fall: 'fall.png' to 'picture 0.png', 'winter.png' to 'picture 1.png', and so on." + dq)
+//        bodyDiv:Add(buildArray9)
+//            Paragraph buildArray10
+//                buildArray10:AddText("Alexis - " + dq + "When I did that, the idea I was contemplating in my mind became clearer. What if I create an integer variable 'loadCounter' and initialize it to '0' Then set up the mechanism - using the 'repeat while' structure - that retrieve the Drawable object from the position that is equal to the value in 'loadCounter'. Then load the picture - that has the same number at the end of its name  - to the retrieved object. After loading the picture to the object, adding the object to the screen, and hiding it for the initial setting, I will let the 'loadCounter' to increase one for the next iteration. In this way, the object 'picture0' will get loaded with 'picture 0.png', the 'picture1' will get loaded with 'picture 1.png', and so forth." + dq)
+//        bodyDiv:Add(buildArray10)
+//            Paragraph buildArray11
+//                buildArray11:AddText("Michael - " + dq + "How did you control to stop the repeat?" + dq)
+//        bodyDiv:Add(buildArray11)
+//            Paragraph buildArray12
+//                buildArray12:AddText("Alexis - " + dq + "Oh, I just used the concept we learned in the previous lesson 'repeat while loadCounter < arrayOfPictures:GetSize()'. I put all the code block in an action:" + dq)
+//        bodyDiv:Add(buildArray12)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "action LoadAllPictures" + cr
+//                                                        +   "" + cr
+//                                                        +   "   integer loadCounter = 0" + cr
+//                                                        +   "" + cr
+//                                                        +   "   repeat while loadCounter < arrayOfPictures:GetSize()" + cr
+//                                                        +   "       LoadOnePicture(arrayOfPictures:Get(loadCounter), "+dq+"picture "+dq+" + loadCounter + "+dq+".png"+dq+")" + cr
+//                                                        +   "       Add(arrayOfPictures:Get(loadCounter))" + cr
+//                                                        +   "       arrayOfPictures:Get(loadCounter):Hide()" + cr
+//                                                        +   "       loadCounter = loadCounter + 1" + cr
+//                                                        +   "   end" + cr
+//                                                        +   "end" + cr))
+//
+//            Paragraph buildArray13
+//                buildArray13:AddText("Alexis - " + dq + "Only thing I needed to do after creating this action is to call this action in 'action CreateGame'. The entire code compiled without any problem. I hope it is working." + dq)
+//        bodyDiv:Add(buildArray13)
+//            Paragraph buildArray14
+//                buildArray14:AddText("Michael - " + dq + "Wow, this is really smart code. This code can handle the situation when we decided to add 100 more Drawable objects with pictures later on. Other than instantiating the object for each picture and naming the file name properly, we do not need to change any other part of the code to accommodate additional pictures in the program. This code block takes care of all the loading, adding and hiding for the initial setting for all additional pictures." + dq)
+//        bodyDiv:Add(buildArray14)
+//            Paragraph buildArray15
+//                buildArray15:AddText("Alexis - " + dq + "Yeah, the teacher said the ''refactoring' is a great strategy in coding. Now I can see why." + dq)
+//        bodyDiv:Add(buildArray15)
+//
+//        bodyDiv:AddHeading("Mike: First Trial Run", 2)
+//            Paragraph firstTry
+//                firstTry:AddText("Michael - " + dq + "Now. let's see if we can try out this code. First thing we need to do for this trial, is to write a code that 'Shows' the 'picture 0' in object 'picture0' in the 'action CreateGame'." + dq)
+//        bodyDiv:Add(firstTry)
+//            Paragraph firstTry1
+//                firstTry1:AddText("Alexis - " + dq + "OK, would 'arrayOfPictures:Get(loadCounter):Show()' work?" + dq)
+//        bodyDiv:Add(firstTry1)
+//            Paragraph firstTry2
+//                firstTry2:AddText("Michael - " + dq + "Unfortunately not. Do you remember the lexical scoping? The variable 'loadCounter' is a local variable only exist inside the 'action LoadAllPictures'. It cannot be used in another structure like 'action CreateGame'. We just need to declare a global variable outside of any structure (beginning part in the class Main). Let's call it 'currentPic' and initialize it to 0. Then , inside of the 'CreateGame', we willed the object in at that index position to 'Show()'. That part of the code should look like this:" + dq)
+//        bodyDiv:Add(firstTry2)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer currentPic = 0" + cr
+//                                                        +   "" + cr
+//                                                        +   "// (We still have all other parts of QGE intact)" + cr
+//                                                        +   "" + cr
+//                                                        +   "   action CreateGame" + cr
+//                                                        +   "       arrayOfPictures:Add(picture0)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture1)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture2)" + cr
+//                                                        +   "       arrayOfPictures:Add(picture3)" + cr
+//                                                        +   "" + cr
+//                                                        +   "        LoadAllPictures()" + cr
+//                                                        +   "" + cr
+//                                                        +   "       arrayOfPictures:Get(currentPic):Show()" + cr
+//                                                        +   "   end" + cr))
+//
+//        bodyDiv:AddHeading("Run, Test, Debug!", 4)
+//            Paragraph firstTry3
+//                firstTry3:AddText("Your program should now show the first picture")
+//        bodyDiv:Add(firstTry3)
+//
+//        bodyDiv:AddHeading("Mike and Alex: Creating Keyboard Event Handler that controls the changing of the pictures", 2)
+//            Paragraph changePic
+//                changePic:AddText("Michael - " + dq + "I would say that we use [down arrow] key to advance the picture and [up arrow] key to back track them." + dq)
+//        bodyDiv:Add(changePic)
+//            Paragraph changePic1
+//                changePic1:AddText("Alexis - " + dq + "It is kind of strange you say it that way, down for increasing and up for decreasing. But... I guess that is really the intuitive way the user would understand because they are accustomed to doing such in other image scrolling programs such as office presentation programs." + dq)
+//        bodyDiv:Add(changePic1)
+//            Paragraph changePic2
+//                changePic2:AddText("Michael - " + dq + "Then the base structure for the keyboard handler should be like this - including the [space] key for speech and [escape] key for exiting:" + dq)
+//        bodyDiv:Add(changePic2)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Interface.Events.KeyboardEvent" + cr
+//                                                        +   "use Libraries.Interface.Events.KeyboardListener" + cr
+//                                                        +   "" + cr
+//                                                        +   "class Main is Game, KeyboardListener" + cr
+//                                                        +   "// (All other QGE and previous code blocks are intact" + cr
+//                                                        +   "" + cr
+//                                                        +   "   action CreateGame" + cr
+//                                                        +   "   // (Previous code are are still here)" + cr
+//                                                        +   "" + cr
+//                                                        +   "       AddKeyboardListener(me)" + cr
+//                                                        +   "   end" + cr
+//                                                        +   "" + cr
+//                                                        +   "   action PressedKey(KeyboardEvent event)" + cr
+//                                                        +   "       if event:keyCode = event:DOWN" + cr
+//                                                        +   "" + cr
+//                                                        +   "       elseif event:keyCode = event:UP" + cr
+//                                                        +   "" + cr
+//                                                        +   "       elseif event:keyCode = event:SPACE" + cr
+//                                                        +   "" + cr
+//                                                        +   "       elseif event:keyCode = event:ESCAPE" + cr
+//                                                        +   "           Exit()" + cr
+//                                                        +   "       end" + cr
+//                                                        +   "   end" + cr))
+//
+//        bodyDiv:AddHeading("Alex: Controlling the array boundary when the user keeps pressing [down arrow]", 4)
+//            Paragraph changePic3
+//                changePic3:AddText("Alexis - " + dq + "OK, let me try writing the code for the [DOWN] key. The basic idea for this key is that 1.) the variable 'currentPic' will increase by one when the user press the key, 2.) at the same time the Array object 'arrayOfPictures' will retrieve the picture from the new index position. But wait... What if the user presses the [DOWN] key too many times to the point to exceed the size limit of the array?" + dq)
+//        bodyDiv:Add(changePic3)
+//            Paragraph changePic4
+//                changePic4:AddText("Michael - " + dq + "That would cause the program to crash." + dq)
+//        bodyDiv:Add(changePic4)
+//            Paragraph changePic5
+//                changePic5:AddText("Alexis - " + dq + "Wonderful. Hmmm... I will not let it. I will write 'if-else statement' that limit the integer value of the 'currentPic' variable. Then I will place it inside of the existing 'if-elseif structure' for the event handling. How about this:" + dq)
+//        bodyDiv:Add(changePic5)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "if currentPic < arrayOfPictures:GetSize()-1" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Hide()" + cr
+//                                                        +   "   currentPic = currentPic + 1" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Show()" + cr
+//                                                        +   "   newPicSound:Play()" + cr
+//                                                        +   "else" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Hide()" + cr
+//                                                        +   "   currentPic = 0" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Show()" + cr
+//                                                        +   "   newPicSound:Play()" + cr
+//                                                        +   "end" + cr))
+//
+//            Paragraph changePic6
+//                changePic6:AddText("Michael - Well done! I really like the way you used only 'else'.")
+//        bodyDiv:Add(changePic6)
+//            Paragraph changePic7
+//                changePic7:AddText("Alexis - Did you notice that? Because the [DOWN] key only increases the integer value of the 'currentPic', there will be no other usability than the value getting passed the last index number. Therefore, as far as I limit the value for the 'currentPic' to the highest possible index position in the array, 'else' will take care of all and only other case - that is the index position that is beyond the last highest index position.")
+//        bodyDiv:Add(changePic7)
+//            Paragraph changePic8
+//                changePic8:AddText("Michael - " + dq + "Yes. And your code reset the value back to '0' which is the beginning picture. The user does not even know what's happening. he/she would just cycle through when continuously pressing the [DOWN] key." + dq)
+//        bodyDiv:Add(changePic8)
+//
+//        bodyDiv:AddHeading("Mike: Controlling the array boundary when the user keeps pressing [up arrow]", 4)
+//            Paragraph changePic9
+//                changePic9:AddText("Alexis - " + dq + "It would be the same way for the [UP] key, isn't it? - just opposite way?" + dq)
+//        bodyDiv:Add(changePic9)
+//            Paragraph changePic10
+//                changePic10:AddText("Michael - " + dq + "Well, I first thought so and start writing the code like your way - only with the logic for opposite direction with the number line." + dq)
+//        bodyDiv:Add(changePic10)
+//            Paragraph changePic11
+//                changePic11:AddText("Michael - " + dq + "But, then I realized that we have not given our code or our user to reassign any number higher than the last index position in the array in this code. You can check the code so far. There is no possible way for the current number to go beyond the highest index number - thanks to your code. Also there is no way for the number to go below '0'. [UP] key is the only option for the user to decrease the integer value in the 'currentPic' below '0'." + dq)
+//        bodyDiv:Add(changePic11)
+//            Paragraph changePic12
+//                changePic12:AddText("Michael - " + dq + "When I realized this fact in our code, I came up with much easier way to write the code for the [UP] arrow key = like this:" + dq)
+//        bodyDiv:Add(changePic12)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "if currentPic <= 0" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Hide()" + cr
+//                                                        +   "   currentPic = 3" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Show()" + cr
+//                                                        +   "   lastPicSound:Play()" + cr
+//                                                        +   "else" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Hide()" + cr
+//                                                        +   "   currentPic = currentPic -1" + cr
+//                                                        +   "   arrayOfPictures:Get(currentPic):Show()" + cr
+//                                                        +   "   lastPicSound:Play()" + cr
+//                                                        +   "end" + cr))
+//
+//        bodyDiv:AddHeading("Run, Test, Debug!", 4)
+//            Paragraph changePic14
+//                changePic14:AddText("Write the code based on the Mike and Alex's idea in the proper place in your on-going code. Now you App's visual part is complete. It should respond to the [UP] and [DOWN] arrow keys appropriately, while scrolling the image for the four seasons back and forth.")
+//        bodyDiv:Add(changePic14)
+//
+//        bodyDiv:AddHeading("Mike & Alex: Make the App Accessible and User Friendly", 2)
+//            Paragraph access
+//                access:AddText("Michael - " + dq + "You talked about setting the description on each pictures at the beginning of this development session. So, I just tried that, and it worked!" + dq)
+//        bodyDiv:Add(access)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "picture1:SetDescription(" + dq + "Fall: Scarlet leaves on an autumn blaze maple tree" + dq + ")" + cr))
+//
+//            Paragraph access1
+//                access1:AddText("Michael - 'But then, I realized that I need to do this at least four times for each picture stored in a contiguous index position in the array. So I refactored this code into an action while using the array, and called the actions in the 'action CreateGame' section:'")
+//        bodyDiv:Add(access1)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "//(In 'action CreateGame')" + cr
+//                                                        +   "" + cr
+//                                                        +   "   SetDescriptionToPicture(0, "+dq+"Fall: Scarlet leaves on an autumn blaze maple tree"+dq+")" + cr
+//                                                        +   "   SetDescriptionToPicture(1, "+dq+"Winter: Snow on the ground and an evergreen tree"+dq+")" + cr
+//                                                        +   "   //(and so forth for index position 2 and 3)" + cr
+//                                                        +   "" + cr
+//                                                        +   "   // Refactored action with the use of the array" + cr
+//                                                        +   "   action SetDescriptionToPicture(integer arrayIndex, text description)" + cr
+//                                                        +   "       arrayOfPictures:Get(arrayIndex):SetDescription(description)" + cr
+//                                                        +   "   end" + cr))
+//
+//            Paragraph access2
+//                access2:AddText("Michael - " + dq + "While I am at this task, I also wrote a simple make sense code for the [space] key (for the speech function)." + dq)
+//        bodyDiv:Add(access2)
+//
+//        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Michael - " + dq + "While I am at this task, I also wrote a simple make sense code for the [space] key (for the speech function)." + dq + cr))
+//
+//            Paragraph access3
+//                access3:AddText("Alexis - " + dq + "Wow, Did you notice something Michale? We have used the concept and the syntax of an Array in almost all code blocks we have written for this App. And the array did make it much easier for us to write an App like this." + dq)
+//        bodyDiv:Add(access3)
+//            Paragraph access4
+//                access4:AddText("Michael - " + dq + "Yes. On top of that, since we used the concept of refactoring in our code with the array structure within, our code is now expandable or scaleable. If the user decide to use this App with the pictures him/herself photographed in the future, he/she can simply add the pictures to the array - and add description. Then this program still works regardless how many pictures he/she put in. The user does not even need to change any other part of the code." + dq)
+//        bodyDiv:Add(access4)
+//            Paragraph access5
+//                access5:AddText("Alexis - " + dq + "Yap, Really like our code. But the way, I set up the small mechanism so that a different sound effect would play when the user press the [down] or [up] arrow key. It would make it easier for any user to notice when the visual is changed on the screen." + dq)
+//        bodyDiv:Add(access5)
+//            Paragraph access6
+//                access6:AddText("Michael - " + dq + "Very nice!" + dq)
+//        bodyDiv:Add(access6)
+//
+//        bodyDiv:AddHeading("Run. Test, Debug!", 4)
+//            Paragraph access7
+//                access7:AddText("Create the mechanism for the sound effect Alexis talked about to complete the App. Then Run, Test, Debug!")
+//        bodyDiv:Add(access7)
+
+
+        bodyDiv:AddHeading("Wrap Up", 2)
+
+        bodyDiv:AddParagraph("After students are finished with the lesson, hold a class discussion about refactoring. Consider prompting the students with the paragraph below. Under it are points you should consider making if they do not come out naturally during the discussion.")
+
+            Paragraph wrapup
+                wrapup:AddText("In today's activity, we needed to make some changes to our original code in order to incorporate new functionality. Sometimes this meant we needed to make changes to our old code as well. Why might you want to change or refactor old code? Is it necessarily a bad thing to refactor code? What steps can we take to avoid refactoring code too frequently?")
+        bodyDiv:Add(wrapup)
+            UnorderedList wrapupList
+                wrapupList:AddListItem("Refactoring is the process of changing the way we wrote old code in order to keep programs consistent and readable while incorporating new functionality.")
+                wrapupList:AddListItem("It is possible that refactoring code will not change the user's experience but will make the program easier to read and maintain.")
+                wrapupList:AddListItem("Refactoring is a useful process, but it can be time consuming and challenging. We'd ideally not refactor code very often but it is sometimes necessary.")
+                wrapupList:AddListItem("Good planning and design can help avoid refactoring. Good use of functions and an organized program means that at the very least we limit areas that need to be changed.")
+        bodyDiv:Add(wrapupList)
+
+        bodyDiv:AddHeading("Standards Alignment", 2)
+            UnorderedList list
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.1.1 (A)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.2.1 (E, F, I, J, K)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.3.1 (A, B, C, D, G, K, L)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.4.1 (B, C, G, M)")
+                AddListItemWithBoldAtFront(list, "Computer Science Principles: ","5.5.1 (H, I, J)")
+            bodyDiv:Add(list)
+
+/* Completed 6/20/18 by Ko */
+
+        WriteNextTutorial(bodyDiv)
+        Add(bodyDiv)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn the concept of the thisnking process to build an Event Driven App with Arrays/List"
+    end
+
+    action GetSummaryName returns text
+        return "Code.Org Unit 5 Lesson 14:  Building an App " + dq + "Image Scroller" + dq
+    end
+    action GetName returns text
+        return "Code.Org Unit 5 Lesson 14:  Building an App " + dq + "Image Scroller" + dq
+    end
+    action GetShortDescription returns text
+        return "Learn the thinking process to build an Event Driven App with Arrays/List"
+    end
+    action GetLocation returns text
+        return "lessons/code/BuildingApps/Lesson14A.html"
+    end
+end   

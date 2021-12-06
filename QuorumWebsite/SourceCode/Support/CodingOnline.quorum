@@ -1,0 +1,478 @@
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Label
+use Libraries.Web.Page.TextArea
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Select
+use Libraries.Web.Page.Option
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Canvas
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.Form
+use Libraries.Web.Page.Input
+use Libraries.Web.Page.Section
+
+class CodingOnline is Division
+    text uniqueIdentifier = ""
+    Heading title
+    Paragraph subtitle
+    UnorderedList subtitleList
+    TextArea inputArea
+    Button button
+    PreformattedText outputArea
+    boolean shouldHaveDropDownMenu = false
+    boolean shouldUseListSubtitle = false
+    Select selectMenu
+    text ideLabel = ""
+    text ideStyleTag = "ideTotal"
+
+    action SetStylesheetTag(text value)
+        ideStyleTag = value
+    end
+
+    action GetStyleSheetTag returns text
+        return ideStyleTag
+    end
+
+    action GetDevelopmentLabel returns text
+        return ideLabel
+    end
+
+    action SetDevelopmentLabel(text label)
+        ideLabel = label
+    end
+
+    
+    action Setup
+        me:AddClassAttribute(GetStyleSheetTag())
+        me:SetIdentifier(uniqueIdentifier + "Ide")
+        
+        Label labelForIDE
+        labelForIDE:AddAttribute("for", uniqueIdentifier + "IdeInput")
+        labelForIDE:AddText(ideLabel)
+        title:Add(labelForIDE)
+        title:SetScale(2)
+        title:SetClassAttribute("allInOneIdeTitle")
+        Add(title)
+
+        if shouldHaveDropDownMenu
+            selectMenu:SetIdentifier(uniqueIdentifier + "IdeDropDownMenu")
+            selectMenu:SetClassAttribute("allInOneIdeDropDownMenu")
+            selectMenu:SetTitle(uniqueIdentifier + "IdeDropDownMenu")
+            Add(selectMenu)
+        end
+        if shouldUseListSubtitle = false
+            subtitle:SetClassAttribute("allInOneIdeSubtitle")
+            Add(subtitle)
+        else
+            subtitleList:SetClassAttribute("allInOneIdeSubtitle")
+            Add(subtitleList)
+        end
+        
+        
+        //accessibility label
+        Heading inputLabel
+        inputLabel:SetScale(2)
+        inputLabel:SetClassAttribute("hidden")
+        inputLabel:AddText("Code Area")
+        Add(inputLabel)
+
+        Section codingSection
+        codingSection:AddAttribute("aria-labeledby", uniqueIdentifier + "CodeArea")
+                
+
+        Division flexContainerInputOutput
+        flexContainerInputOutput:SetClassAttribute("flex-container")
+
+//        inputArea:SetName("code")
+//        inputArea:SetClassAttribute("ideTextboxInput")
+//        inputArea:SetIdentifier(uniqueIdentifier + "IdeInput")
+//        inputArea:SetSpellcheck(false)
+//        inputArea:AddAttribute("onkeydown",
+//            "keyboardInputShortcuts(event, '"+uniqueIdentifier + "IdeInput"+
+//            "', '"+uniqueIdentifier +"IdeOutput'" + 
+//            ", '"+uniqueIdentifier +"QuorumGraphicsCanvas')")
+//        inputArea:AddAttribute("role", "textbox")              //aria attribute
+//        inputArea:AddAttribute("aria-multiline", "true")        //aria attribute
+        //flexContainerInputOutput:Add(inputArea)
+        flexContainerInputOutput:Add(AddCodeEditArea())
+
+        Canvas canvas
+        canvas:SetClassAttribute("ideVisualOutput")
+        canvas:SetIdentifier(uniqueIdentifier + "QuorumGraphicsCanvas")
+        canvas:AddAttribute("role", "application")
+        canvas:AddAttribute("tabindex", "0")
+        canvas:AddAttribute("onkeydown", "canvasInputKeys(event, '"+uniqueIdentifier+"QuorumGraphicsCanvas')")
+        canvas:AddAttribute("onfocusout", "canvasFocusOut('"+uniqueIdentifier+"QuorumGraphicsCanvas')")
+        canvas:AddAttribute("onclick", "canvasClicked('"+uniqueIdentifier+"QuorumGraphicsCanvas')")
+        canvas:AddAttribute("data-in-focus", "false")
+        flexContainerInputOutput:Add(canvas)
+
+        codingSection:Add(flexContainerInputOutput)
+//        Input ideName
+//        ideName:SetName("ideName")
+//        ideName:SetType("text")
+//        ideName:SetClassAttribute("hidden")
+//        ideName:SetDefaultValue(uniqueIdentifier)
+//        form:Add(ideName)
+
+        Division flexContainerRunButtons
+        flexContainerRunButtons:SetClassAttribute("flex-container")
+
+        Button buildButton
+        buildButton:SetType("button")
+        buildButton:SetIdentifier(uniqueIdentifier + "BuildButton")
+        buildButton:SetClassAttribute("FlexBuildButton")
+        buildButton:SetOnClick("newRunCode('" + uniqueIdentifier + "IdeInput" 
+            + "', '" + uniqueIdentifier + "IdeOutput" 
+            + "', '" + uniqueIdentifier + "QuorumGraphicsCanvas" + "', false)")
+        buildButton:AddText("Build (CTRL+B)")
+        flexContainerRunButtons:Add(buildButton)
+
+        Button runButton
+        runButton:SetType("button")
+        runButton:SetIdentifier(uniqueIdentifier + "RunButton")
+        runButton:SetClassAttribute("FlexBuildButton")
+        runButton:SetOnClick("newRunCode('" + uniqueIdentifier + "IdeInput" 
+            + "', '" + uniqueIdentifier + "IdeOutput" 
+            + "', '" + uniqueIdentifier + "QuorumGraphicsCanvas" + "', true)")
+        runButton:AddText("Run (CTRL+R)")
+        flexContainerRunButtons:Add(runButton)
+
+        Button stopButton
+        stopButton:SetType("button")
+        stopButton:SetIdentifier(uniqueIdentifier + "StopButton")
+        stopButton:SetClassAttribute("FlexBuildButton")
+        stopButton:SetOnClick("stopProgram()")
+        stopButton:AddText("Stop Program")
+        flexContainerRunButtons:Add(stopButton)
+
+        codingSection:Add(flexContainerRunButtons)
+        Add(codingSection)
+
+
+        Division fileBar
+        fileBar:SetClassAttribute("flex-container")
+
+        Button saveProjectButton
+        saveProjectButton:SetType("button")
+        saveProjectButton:SetIdentifier(uniqueIdentifier +"saveProjectButton")
+        saveProjectButton:SetClassAttribute("FlexBuildButton")
+        saveProjectButton:SetOnClick("showSaveModal('" + uniqueIdentifier + "')")
+        saveProjectButton:AddText("Save")
+        fileBar:Add(saveProjectButton)
+
+        Button loadProjectButton
+        loadProjectButton:SetType("button")
+        loadProjectButton:SetIdentifier(uniqueIdentifier +"loadProjectButton")
+        loadProjectButton:SetClassAttribute("FlexBuildButton")
+        loadProjectButton:SetOnClick("showLoadModal('" + uniqueIdentifier + "')")
+        loadProjectButton:AddText("Load")
+        fileBar:Add(loadProjectButton)
+
+        AddSaveDialog()
+        AddLoadDialog()
+
+        Button embedButton
+        embedButton:SetType("button")
+        embedButton:SetIdentifier(uniqueIdentifier +"embedCodeButton")
+        embedButton:SetClassAttribute("FlexBuildButton")
+        embedButton:SetOnClick("embedCode('" + uniqueIdentifier + "ideTextboxInput" + "', '" 
+            + uniqueIdentifier + "IdeOutput" + "', '" + uniqueIdentifier + "CopyArea" + "')")
+        embedButton:AddText("Embed")
+        fileBar:Add(embedButton)
+        
+        Add(fileBar)
+        
+        //accessibility label
+        Heading outputLabel
+        outputLabel:SetScale(2)
+        outputLabel:SetClassAttribute("hidden")
+        outputLabel:AddText("Output Area")
+        Add(outputLabel)
+
+        outputArea:SetClassAttribute("allInOneIdeOutput")
+        outputArea:SetIdentifier(uniqueIdentifier + "IdeOutput")
+        outputArea:AddAttribute("role", "region")
+        outputArea:AddAttribute("aria-atomic", "true")
+        outputArea:AddAttribute("aria-label", "output of Development Environment")
+        outputArea:AddAttribute("aria-live", "assertive")
+        Add(outputArea)
+
+        Input embedValue
+        embedValue:SetType("hidden")
+        embedValue:SetIdentifier(uniqueIdentifier + "CopyArea")
+        embedValue:AddAttribute("readonly", "readonly")
+        Add(embedValue)
+    end
+
+    private action AddCodeEditArea returns Division
+        Division editContainer
+        TextArea lineNumbers
+        PreformattedText pre
+        CodeBlock highlightedContent
+        
+
+        editContainer:SetClassAttribute("ideTextboxInput")
+        editContainer:SetIdentifier(uniqueIdentifier + "IdeInput")
+        editContainer:SetTabIndex("-1")
+
+        lineNumbers:SetClassAttribute("ideLineNumbers")
+        lineNumbers:SetSpellcheck(false)
+        lineNumbers:SetReadOnly(true)
+        lineNumbers:AddText("1")
+        lineNumbers:SetTabIndex("-1")
+        lineNumbers:AddAttribute("aria-hidden", "true")
+
+        inputArea:SetName("code")
+        inputArea:SetIdentifier(uniqueIdentifier+"ideTextboxInput")
+        inputArea:AddAttribute("onkeydown",
+            "keyboardInputShortcuts(event, '"+uniqueIdentifier + "IdeInput"+
+            "', '"+uniqueIdentifier +"IdeOutput'" + 
+            ", '"+uniqueIdentifier +"QuorumGraphicsCanvas')")
+        inputArea:SetClassAttribute("ideEditing")
+        inputArea:SetSpellcheck(false)
+        inputArea:AddAttribute("oninput", "editAreaUpdate(this); editAreaSyncScroll(this);")
+        inputArea:AddAttribute("onscroll", "editAreaSyncScroll(this);")
+        inputArea:AddAttribute("aria-multiline", "true")
+        inputArea:SetTabIndex("0")
+
+        pre:SetClassAttribute("syntaxHighlighting")
+        highlightedContent:SetClassAttribute("language-quorum highlighting-content")
+        pre:AddAttribute("aria-hidden", "true")
+        highlightedContent:SetTabIndex("-1")
+        pre:Add(highlightedContent)
+        pre:SetTabIndex("-1")
+
+        editContainer:Add(lineNumbers)
+        editContainer:Add(inputArea)
+        editContainer:Add(pre)
+
+        // text that's in the the text area on load wont be highlighted immeditately
+        // so run update at least once before the user interacts with the ide
+        Script highlight
+        highlight:SetCode("window.addEventListener('pageshow', () => {var element = document.getElementById('" +uniqueIdentifier + "IdeInput').querySelector('.ideEditing');editAreaUpdate(element)});")
+
+        editContainer:Add(highlight)
+
+        return editContainer
+    end
+
+    private action AddSaveDialog
+        Division saveDiv
+
+        text id = GetUniqueIdentifier()
+
+        saveDiv:SetClassAttribute("modal")
+        saveDiv:SetIdentifier(id + "SaveModal")
+        saveDiv:AddAttribute("role", "dialog")
+        saveDiv:AddAttribute("aria-labelledby", id + "SaveTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division saveTitleDiv
+        saveTitleDiv:SetClassAttribute("savetitle")
+        saveTitleDiv:SetIdentifier(id + "SaveTitleDiv")
+        saveTitleDiv:AddText("Save this Project")
+        modalDialog:Add(saveTitleDiv)
+
+        Form saveForm
+
+        saveForm:SetClassAttribute("saveform")
+        saveForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        fieldContainerDiv:SetClassAttribute("saveFieldContainer")
+        
+        Division projectNameDiv
+        projectNameDiv:SetClassAttribute("projectnamediv formfielddiv")
+
+        Label projectNameLabel
+        projectNameLabel:AddText("Project Name: ")
+        projectNameDiv:Add(projectNameLabel)
+        
+        Input projectNameInput
+        projectNameInput:SetType("text")
+        projectNameInput:SetClassAttribute("SaveField")
+        projectNameInput:SetName("projectname")
+        projectNameInput:SetIdentifier(id + "projectNameInput")
+        projectNameInput:AddAttribute("data-prefix", id)
+        projectNameInput:SetRequired(true)
+        
+        projectNameDiv:Add(projectNameInput)
+
+        fieldContainerDiv:Add(projectNameDiv)
+
+        Division footbar
+        footbar:SetClassAttribute("footbar")
+
+        
+        Button submitButton
+        submitButton:SetClassAttribute("savebtn")
+        submitButton:SetType("button")
+        submitButton:AddText("Save Project")
+        submitButton:SetTabIndex("0")
+        submitButton:SetOnClick("saveProject('" + id + "', '" + id + "ideTextboxInput', '" + id + "IdeOutput', '" + id + "projectNameInput', 'false')")
+
+        saveForm:Add(fieldContainerDiv)
+
+        Division buttonContainerDiv
+        buttonContainerDiv:SetClassAttribute("saveContainer")
+
+        Button cancelButton
+        cancelButton:SetType("button")
+        cancelButton:SetOnClick("hideSaveModal('" + id + "')")
+        cancelButton:SetClassAttribute("savebtn savecancelbtn")
+        cancelButton:AddAttribute("data-prefix", id)
+        cancelButton:SetIdentifier(id + "SaveProjectCancel")
+        cancelButton:AddText("Cancel")
+        cancelButton:SetTabIndex("0")
+
+        buttonContainerDiv:Add(submitButton)
+        buttonContainerDiv:Add(cancelButton)
+
+        footbar:Add(buttonContainerDiv)
+
+        saveForm:Add(footbar)
+
+        modalDialog:Add(saveForm)
+        saveDiv:Add(modalDialog)
+
+        Add(saveDiv)
+    end
+
+    private action AddLoadDialog
+        Division loadDiv
+
+        text id = GetUniqueIdentifier()
+
+        loadDiv:SetClassAttribute("modal")
+        loadDiv:SetIdentifier(id + "LoadModal")
+        loadDiv:AddAttribute("role", "dialog")
+        loadDiv:AddAttribute("aria-labelledby", id + "LoadTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division loadTitleDiv
+        loadTitleDiv:SetClassAttribute("loadtitle")
+        loadTitleDiv:SetIdentifier(id + "LoadTitleDiv")
+        loadTitleDiv:AddText("Load a Project")
+        modalDialog:Add(loadTitleDiv)
+
+        Form loadForm
+
+        loadForm:SetClassAttribute("loadform")
+        loadForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        fieldContainerDiv:SetClassAttribute("loadFieldContainer")
+        fieldContainerDiv:SetIdentifier(id + "LoadFieldContainer")
+        
+        Division projectLoadDiv
+        projectLoadDiv:SetClassAttribute("projectloaddiv formfielddiv")
+
+        Select projectSelect
+        projectSelect:SetClassAttribute("loadProjectSelect")
+        projectSelect:SetIdentifier(id + "LoadProjectSelect")
+        projectSelect:AddAttribute("data-prefix", id)
+        projectSelect:AddAttribute("size", "5")
+        projectLoadDiv:Add(projectSelect)
+
+        fieldContainerDiv:Add(projectLoadDiv)
+
+        Division footbar
+        footbar:SetClassAttribute("footbar")
+
+        
+        Button submitButton
+        submitButton:SetClassAttribute("loadbtn")
+        submitButton:SetType("button")
+        submitButton:AddText("Load Project")
+        submitButton:SetTabIndex("0")
+        submitButton:SetOnClick("loadProject('" + id + "', '" + id + "LoadProjectSelect', '" + id + "ideTextboxInput', '" + id + "IdeOutput')")
+
+        loadForm:Add(fieldContainerDiv)
+
+        Division buttonContainerDiv
+        buttonContainerDiv:SetClassAttribute("loadContainer")
+
+        Button cancelButton
+        cancelButton:SetType("button")
+        cancelButton:SetOnClick("hideLoadModal('" + id + "')")
+        cancelButton:SetClassAttribute("loadbtn loadcancelbtn")
+        cancelButton:AddAttribute("data-prefix", id)
+        cancelButton:SetIdentifier(id + "LoadProjectCancel")
+        cancelButton:AddText("Cancel")
+        cancelButton:SetTabIndex("0")
+
+        buttonContainerDiv:Add(submitButton)
+        buttonContainerDiv:Add(cancelButton)
+
+        footbar:Add(buttonContainerDiv)
+
+        loadForm:Add(footbar)
+
+        modalDialog:Add(loadForm)
+        loadDiv:Add(modalDialog)
+
+        Add(loadDiv)
+    end
+
+    action GetUniqueIdentifier() returns text
+        return uniqueIdentifier
+    end
+
+    action SetUniqueIdentifier(text id)
+        uniqueIdentifier = id
+    end
+
+    action SetShouldHaveDropDownMenu(boolean b)
+        shouldHaveDropDownMenu = b
+    end
+
+    action SetShouldUseListSubtitle(boolean b)
+        shouldUseListSubtitle = b
+    end
+
+    action GetSelectMenu() returns Select
+        return selectMenu
+    end
+
+    action GetIDETitle() returns Heading
+        return title
+    end
+
+    action GetIDESubtitle() returns WebTag
+        if shouldUseListSubtitle = false
+            return subtitle
+        else
+            return subtitleList
+        end
+    end
+
+    action SetIDESubtitle(Paragraph p)
+        subtitle = p
+    end
+
+    action SetIDESubtitle(UnorderedList ul)
+        subtitleList = ul
+    end
+
+    action GetIDEInputArea() returns TextArea
+        return inputArea
+    end
+
+    action GetIDEButton() returns Button
+        return button
+    end
+
+    action GetIDEOutputArea returns PreformattedText
+        return outputArea
+    end
+end

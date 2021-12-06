@@ -1,0 +1,398 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class Physics3DForceAndVelocityTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Physics Force and Velocity In 3D - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Physics Force and Velocity In 3D", 1)
+        headDiv:AddText("Understanding force and velocity in a 3D physics enabled Quorum game")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        //the section on general information
+        bodyDiv:AddHeading("Overview", 2)
+        bodyDiv:AddParagraph( "")
+        bodyDiv:AddText     ("In this tutorial, we will discover new physics concepts by making a platformer game. "
+                            +   "Our goal is to propel a character represented by a ball forward through a series of platforms. "
+                            +   "We will do this using the concept of ")
+        bodyDiv:AddLink(    "force", "https://en.wikipedia.org/wiki/Force")
+        bodyDiv:AddText(    " which we can control in various ways. "
+                            +   "We will also need linear ")
+        bodyDiv:AddLink(    "velocity", "https://en.wikipedia.org/wiki/Velocity")
+        bodyDiv:AddText(    ". "
+                            +   "Linear velocity propels our character forward and forces can be used for jumping. "
+                            +   "To make platforms, we will use a concept that we call NonResponsiveness, which was mentioned in the ")
+        bodyDiv:AddLink(    "Gravity in 3D", "/tutorials/physics/gravity3D.html")
+        bodyDiv:AddText(    " tutorial. To use these ideas, we need a special concept from math: ")
+        bodyDiv:AddLink("vectors", "https://en.wikipedia.org/wiki/Euclidean_vector")
+        bodyDiv:AddText(". ")
+
+        //the section on Vectors
+        bodyDiv:AddHeading("Vectors", 2)
+        bodyDiv:AddParagraph("In math, a vector is like a line starting at a point and continuing out in one direction. "
+                            +   "It has a magnitude (length) and a direction. "
+                            +   "When we are using these for forces, we can look at the direction as being the direction we want the force to push towards and the magnitude as how strong the force is. "
+                            +   "When we are using these for linear velocity, we can look at the direction as being the direction the object will move in and the magnitude as how fast it will move. "
+                            +   "In Quorum for 3-dimensional games, we handle all of the details of vectors for you using a special class called Vector3. "
+                            +   "First we need to add a use statement to the top of the program: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Vector3"))                    
+        bodyDiv:AddParagraph(   "We can then set a Vector3 object like this: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
+                                                            + "number Y = -10" + cr
+                                                            + "number Z = 0" + cr
+                                                            + "myVector:Set(X , Y, Z)"))
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText( "The X value represents the direction and amount of force applied horizontally per second. "
+                            +   "The Y is the same for vertical force and Z is the same for force applied towards or away from the screen. "
+                            +   "It might be helpful for us to review the ")
+        bodyDiv:AddLink("Drawing In 3D tutorial","/tutorials/games/drawing3D.html")                    
+        bodyDiv:AddText(   " to remember how the three axes translate to the screen. "
+                            +   "This might look familiar to how we set gravity. "
+                            +   "In fact, gravity is represented in the system using a Vector3. "
+                            +   "Gravity pushes objects down, so we set the Y value to be a negative number. "
+                            +   "It does not push objects along the x or z axes, so the X  and Z were set to 0. "
+                            +   "Gravity can be set using a Vector3 object as well: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector3 gravity" + cr + "gravity:Set(0 , -10, 0)" + cr + "SetGravity3D(gravity)"))
+        
+        //the section on linear velocity
+        bodyDiv:AddHeading("Linear Velocity", 2)
+
+        bodyDiv:AddParagraph("To give the character a continuous push forward, we need to set their linear velocity, and to do this, we need to create and set a Vector3 object. "
+                            +   "In the example code here, we want the character to move horizontally across the screen from left to right, so the X is set to a positive number. "
+                            +   "We don’t want them to have vertical movement, unless it’s from the force of a jump or gravity, and we do not want movement towards or away from the screen at all. "
+                            +   "The Y and Z are set to 0. "
+                            +   "Once we have the Vector3 setup, we can set the linear velocity of the character: ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "linearVelocity:Set(5, 0, 0)" + cr
+                                                            +   "character:SetLinearVelocity(linearVelocity)" + cr))
+        bodyDiv:AddParagraph(   "Now the linear velocity will be applied to the character. "
+                            +   "We can think of this as how much the character will move each second. "
+                            +   "Note that the linear velocity is affected by forces, friction, gravity, and other physics properties. ")
+        
+        //the section on angular velocity
+        bodyDiv:AddHeading("Angular Velocity", 2)
+
+        bodyDiv:AddParagraph( "")
+        bodyDiv:AddText(    "If we want an item to rotate, we can do this with ")
+        bodyDiv:AddLink(    "angular velocity", "https://en.wikipedia.org/wiki/Angular_velocity")
+        bodyDiv:AddText(    ". We can set it using:")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector3 angularVelocity" + cr
+                                                            + "angularVelocity:Set(0, 0, 100)" + cr
+                                                            + "character:SetAngularVelocity(angularVelocity)"))
+        bodyDiv:AddParagraph(   "Note that angular velocity is set differently in 3D than in 2D. "
+                            +   "In 2D angular velocity was simply a number, and rotations could be clockwise or counterclockwise depending on the sign of the number. "
+                            +   "In 3D we can choose which axis we want an item to rotate about as well. "
+                            +   "Angular velocity is represented using a Vector3, where the x value represents the amount of rotation per second about the x axis. "
+                            +   "Likewise the y and z values of the Vector3 correspond to rotation about the y and z axes, respectively. "
+                            +   "Like linear velocity, it is applied to the character continuously, but can be affected by torque, friction, and other physics properties. "
+                            +   "A negative number for any of the three numbers in the Vector3 means clockwise rotation about that axis while a positive number means counterclockwise rotation. ")
+
+        //the section on Force
+        bodyDiv:AddHeading("Force", 2)
+
+        bodyDiv:AddParagraph( "We used force previously when we added gravity, but forces can be used for much more than gravity. "
+                            +   "Forces can be made to push responsive objects in any direction with varying degrees of strength by setting the Vector3 appropriately. "
+                            +   "After we have a Vector3 object created and set, we can apply force in two ways. "
+                            +   "The first way to apply a force to an object is using the ApplyForceToCenter action. "
+                            +   "This action applies all of the force to the center of the object. ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector3 force" + cr
+                                                            + "force:Set(50, 300, 0)" + cr
+                                                            + "itemName:ApplyForceToCenter(force)"))
+        bodyDiv:AddParagraph(   "The second way is to use the ApplyForce action which takes two Vector3 objects instead of one. "
+                            +   "The first is the force vector, and the second is the point the force will be applied to (represented by a Vector3 object.) "
+                            +   "The point should be in the form of a displacement from the center of the object the force is being applied to. "
+                            +   "For example, if we want the force be applied at a spot one to the right and one up from the center of the object, the point’s x and y variables would both be set to one and the point’s z variable would be zero. "
+                            +   "If we wanted to apply force to the center with this action, we would set the point’s x, y, and z variables to zero. "
+                            +   "Note that this is different in 2D where the point does not represent how far from the center, but where on the screen the force should be applied from.")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector3 point" + cr
+                                                            + "point:Set(0, 0, 0)" + cr
+                                                            + "itemName:ApplyForce(force, point)"))
+        bodyDiv:AddParagraph("This action is useful when the force needs to hit the object at a particular spot. "
+                            +   "Additionally, if a force is not applied to the center of the object, a torque will be introduced, causing the object to rotate. ")
+        
+         //the section on Force
+        bodyDiv:AddHeading("Torque", 2)
+
+        bodyDiv:AddParagraph( "") 
+        bodyDiv:AddLink(    "Torque", "https://en.wikipedia.org/wiki/Torque")
+        bodyDiv:AddText(    " is the angular component of a force, which means applying it will make the item spin. "
+                            +   "We can apply torque manually using: ")
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector3 torque" + cr
+                                                            + "torque:Set(0, 0, 100)" + cr
+                                                            + "itemName:ApplyTorque(torque)"))
+        bodyDiv:AddParagraph(   "Torque is set in a similar way to angular velocity. "
+                            +   "The x, y, and z components of the Vector3 correspond to rotation about the x, y, and z axes. "
+                            +   "The difference between torque and angular velocity is the same as the difference between force and linear velocity. "
+                            +   "Force is a one time push, while linear velocity is the current speed. "
+                            +   "Applying torque is like giving the item a one time push to start it spinning, while angular velocity is the current amount of rotations per second applied continuously. "
+                            +   "A negative number for any of the three numbers in the Vector3 means clockwise rotation about that axis while a positive number means counterclockwise rotation. ")
+ 
+        //the section on other method of movement
+        bodyDiv:AddHeading("Movement Outside of Physics", 2)
+
+        bodyDiv:AddParagraph( "")
+        bodyDiv:AddText("If we want to move an item without using physics, and without affecting the physics system, we can use SetPosition(), SetX(), SetY(), SetZ() or Rotate(). "
+                            +   "These actions are described in more detail in the ") 
+        bodyDiv:AddLink(    "Animation in 3D tutorial", "/tutorials/games/animation3D.html")
+        bodyDiv:AddText(    " tutorial. "
+                            +   "Using these will leave velocities and forces intact upon arrival at the designated spot, but will also bypass the collision detection system and forces like gravity on the way.")
+        bodyDiv:AddParagraph("")
+                                     
+        //the section containing the platformer game code
+        bodyDiv:AddHeading("Code", 2)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText(    "Here is a ")
+        bodyDiv:AddLink(    "zip file" , "/files/games/Force3D.zip" )
+        bodyDiv:AddText(    " containing a Quorum project that uses the code below. "
+                            +   "Read through, then use the following code to discover forces and linear velocity. ")
+        bodyDiv:AddParagraph("")
+
+        CodeBlock cb1
+        Span s1 
+        Span s2 
+        Span s3 
+        Span s4 
+        Span s5 
+        Span s6 
+        Span s7
+        Span s8
+        Span s9
+        Span s10
+        Span s11
+        cb1:AddText("use Libraries.Game.Game" + cr 
+                    +   "use Libraries.Game.Graphics.Model"+ cr 
+                    +   "use Libraries.Compute.Vector3" + cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr 
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr
+                    +   "use Libraries.Interface.Events.CollisionListener3D" + cr
+                    +   "use Libraries.Interface.Events.CollisionEvent3D" + cr
+                    +   "use Libraries.Sound.Audio" + cr 
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr + cr)
+        cb1:AddText("class Main is Game, KeyboardListener, CollisionListener3D" + cr + cr
+                    +   "   boolean platformMovesUp = false" + cr
+                    +   "   number totalSeconds = 0.0" + cr + cr
+                    +   "   Model platformRight" + cr
+                    +   "   Model platformLeft" + cr
+                    +   "   Model character" + cr
+                    +   "   Vector3 gravity" + cr 
+                    +   "   Vector3 linearVelocity" + cr 
+                    +   "   Vector3 jump" + cr
+                    +   "   Color color" + cr + cr 
+                    +   "   Audio jumpSound" + cr
+                    +   "   Audio impactSound"  + cr
+                    +   "   Audio platformSound" + cr + cr
+                    +   "   action Main" + cr 
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr
+                    +   "       DirectionalLight light" + cr
+                    +   "       light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "       light:SetDirection(GetCamera3D():GetDirection())" + cr
+                    +   "       Add(light)" + cr + cr
+                    +   "       AmbientLight ambient" + cr
+                    +   "       ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "       SetAmbientLight(ambient)" + cr + cr
+                    +   "       AddCollisionListener(me)" + cr
+                    +   "       AddKeyboardListener(me)" + cr
+                    +   "       EnablePhysics3D(true)" + cr + cr
+                    +   "       platformLeft:SetName(" + dq + "platformLeft" + dq +")" + cr
+                    +   "       platformLeft:LoadBox(7, 1, 3, color:Green())" + cr
+                    +   "       platformLeft:SetPosition(-5, -2, 0)" + cr
+                    +   "       Add(platformLeft)" + cr
+                    +   "       platformLeft:EnablePhysics(true)" + cr
+                    +   "       platformLeft:SetNonResponsive()" + cr + cr
+                    +   "       platformRight:SetName(" + dq + "platformRight" + dq + ")" + cr
+                    +   "       platformRight:LoadBox(7, 1, 3, color:Green())" + cr
+                    +   "       platformRight:SetPosition(5, -4, 0)" + cr
+                    +   "       Add(platformRight)" + cr
+                    +   "       platformRight:EnablePhysics(true)" + cr
+                    +   "       platformRight:SetNonResponsive()" + cr + cr
+                    +   "       character:SetName(" + dq + "character" + dq + ")" + cr
+                    +   "       character:LoadSphere(1, 1, 1, " + dq + "media/HourOfCodeDark.jpg" + dq + ")" + cr
+                    +   "       character:SetPosition(-5, -1, 0)" + cr
+                    +   "       Add(character)" + cr
+                    +   "       character:EnablePhysics(true)" + cr
+                    +   "       character:SetResponsive()" + cr + cr
+                    +   "       linearVelocity:Set(1, 0, 0)" + cr
+                    +   "       character:SetLinearVelocity(linearVelocity)" + cr + cr
+                    +   "       jump:Set(70, 350, 0)" + cr
+                    +   "       gravity:Set(0, -9, 0)" + cr
+                    +   "       SetGravity3D(gravity)" + cr + cr
+                    +   "       jumpSound:Load(" + dq + "media/Fwip.ogg" + dq + ")" + cr
+                    +   "       impactSound:Load(" + dq + "media/Boing.ogg" + dq + ")" + cr
+                    +   "       platformSound:Load(" + dq + "media/Bing.ogg" + dq + ")" + cr + cr
+                    +   "       jumpSound:SetVolume(0.5)" + cr
+                    +   "       impactSound:SetVolume(0.4)" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr
+                    +   "       totalSeconds = totalSeconds + seconds" + cr)
+        s1:AddText( "   // These if statements make a threshold of how far up and down the platform can travel" + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("       if platformRight:GetY() > 1" + cr
+                    +   "           platformMovesUp = false" + cr
+                    +   "       end" + cr
+                    +   "       if platformRight:GetY() <= -4" + cr
+                    +   "           platformMovesUp = true" + cr
+                    +   "       end" + cr )
+        s2:AddText( "   // The platform moves either up or down" + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText("       if totalSeconds  >= 0.01" + cr
+                    +   "           if platformMovesUp" + cr
+                    +   "               platformRight:MoveY(0.05)" + cr
+                    +   "           else" + cr
+                    +   "               platformRight:MoveY(-0.05)" + cr
+                    +   "           end" + cr
+                    +   "           totalSeconds = 0" + cr
+                    +   "       end" + cr)
+        s3:AddText("   /*" + cr
+                    +   "       To make the game endless, we move our character back to the left side " + cr
+                    +   "       of the screen after he goes off the right side. " + cr
+                    +   "   */" + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText("       if (character:GetX() >= 5)" + cr
+                    +   "           character:SetPosition(-5, platformRight:GetY() + 1, character:GetZ())" + cr
+                    +   "           character:SetLinearVelocity(linearVelocity)" + cr)
+        s4:AddText("   /*" + cr
+                    +   "       We set the height of the left platform to be the right platform's height so that it " + cr
+                    +   "       seems like our character is continuing on the same platform as the one they were on" + cr
+                    +   "       when they went off the right side. " + cr
+                    +   "   */" + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText("           platformLeft:SetY(platformRight:GetY())" + cr)
+        s5:AddText("    //  This math causes the height of the right platform to cycle through some different options." + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText("           platformRight:SetY(((totalSeconds * 100) mod 6) - 4)" + cr
+                    +   "           if totalSeconds > 10" + cr
+                    +   "               totalSeconds = 0" + cr
+                    +   "           end" + cr)
+        s6:AddText("    // The platform switches directions when we go to a new screen. " + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText("           platformMovesUp = true not= platformMovesUp" + cr 
+                    +   "       end" + cr)
+        s9:AddText("    // The platform sound changes depending on how close the two platforms are to each other. " + cr)
+        s9:SetClassAttribute("comment")
+        cb1:Add(s9)
+        cb1:AddText("       platformSound:SetY(platformRight:GetY() - platformLeft:GetY())" + cr
+                    +   "       platformSound:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action PressedKey(KeyboardEvent event)" + cr
+                    +   "       Vector3 axis" + cr)
+        s7:AddText("        // When space is pressed, the circle jumps!" + cr)
+        s7:AddClassAttribute("comment")
+        cb1:Add(s7)
+        cb1:AddText("       if event:keyCode = event:SPACE" + cr
+                    +   "           character:ApplyForceToCenter(jump)" + cr
+                    +   "           jumpSound:Play()" + cr
+                    +   "       end" + cr)
+        s10:AddText("       // The ball will spin counterclockwise when the left arrow key is pressed." + cr)
+        s10:AddClassAttribute("comment")
+        cb1:Add(s10)
+        cb1:AddText("       if event:keyCode = event:LEFT" + cr
+                    +   "           axis:Set(0, 0, 100)" + cr
+                    +   "           character:ApplyTorque(axis)" + cr
+                    +   "       end" + cr)
+        s11:AddText("   /*" + cr
+                    +   "       The ball will spin clockwise when the right arrow key is pressed. If the ball was already " + cr
+                    +   "       spinning counterclockwise, then pressing the right arrow key will cause it to slow its spinning." + cr
+                    +   "   */" + cr)
+        s11:AddClassAttribute("comment")
+        cb1:Add(s11)
+        cb1:AddText("       if event:keyCode = event:RIGHT" + cr
+                    +   "            axis:Set(0, 0, -100)" + cr
+                    +   "           character:ApplyTorque(axis)" + cr
+                    +   "       end" + cr
+                    +   "   end" + cr + cr 
+                    +   "   action BeginCollision(CollisionEvent3D event)" + cr
+                    +   "       impactSound:Play()" + cr
+                    +   "   end" + cr
+                    +   "end" + cr + cr)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        //the section on running the program
+//        bodyDiv:AddHeading("Run the Program", 2)
+//        bodyDiv:AddParagraph(   "If we run this game, we should have a ball on a platform on the left side of the screen with a moving platform on the right. "
+//                                +   "The ball will be moving towards the right side of the screen at a constant pace. "
+//                                +   "The space bar can be used to jump to make sure the ball makes it to the right platform. ")
+//        
+//        SideBySideIDE addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("physics3DForce")
+//        addStatementIDE:GetIDETitle():AddText("Force and Velocity In 3D")
+//        addStatementIDE:SetGameEnvironment(true)
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to add physics effects like 3D force and velocity to games written in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Forces and Velocity In 3D"
+    end
+
+    action GetImageLocation returns text
+        return "media/physics/Man_Jumping_Cliff.png"
+    end
+
+    action GetName returns text
+        return "Force and Velocity In 3D"
+    end
+
+    action GetShortDescription returns text
+        return "how to add forces and velocity to a 3D game"
+    end
+
+    action GetLocation returns text
+        return "tutorials/physics/forceandvelocity3D.html"
+    end
+end

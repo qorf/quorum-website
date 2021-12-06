@@ -1,0 +1,382 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class UserInterfacesTree is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Tree Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Tree", 1)
+        headDiv:AddText("This tutorial tells you how to use Trees in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to Trees in Quorum", 2)
+        bodyDiv:AddHeading("What is a Tree?", 3)
+        bodyDiv:AddParagraph("In this tutorial, we will learn how to use Trees in the Quorum Game Engine. Trees are an "
+                            + "interface tool that represents related items in a hierarchy. For example, a Quorum "
+                            + "Project's file directory is a Tree, which may look something like ProjectName, under "
+                            + "ProjectName the Source Code, and under Source Code a few classes, say Class1.quorum, "
+                            + "Class2.quorum, and main.quorum.")
+
+        bodyDiv:AddImage("/media/userInterface/TreeExample.png", "This image is an example of a Tree.")
+        
+        bodyDiv:AddHeading("What is a TreeItem?", 3)
+        bodyDiv:AddParagraph("In Quorum, a Tree contains some number of TreeItem objects. A TreeItem is a node inside of our tree. In the above example, ProjectName, "
+                            + "Source Code, Class1.quorum, Class2.quorum, and main.quorum are all TreeItems. Notice how Source Code is a TreeItem but it also has its "
+                            + "own children: Class1.quorum, Class2.quorum, and main.quorum. Similarly, TreeItems can be added to other TreeItems to create subtrees.")
+
+        bodyDiv:AddParagraph("For this tutorial, we will set the focus on the Tree as soon as the program starts, allowing "
+                            + "the arrow keys to be used to navigate through the TreeItems. The Up and Down Arrow "
+                            + "Keys move the selection up or down one and the Left and Right Arrow "
+                            + "Keys close or open a subtree. The Enter key will activate the Behavior of the "
+                            + "currently selected TreeItem.")
+
+        bodyDiv:AddParagraph("The Tree we create will be able to output and say the name of which "
+                            + "TreeItem is selected. To start, create a new Game "
+                            + "Application project.")
+
+        //the section on creating a tree
+        bodyDiv:AddHeading("Tree of Color", 2)
+        bodyDiv:AddHeading("Making the Tree", 3)
+        bodyDiv:AddParagraph("In order to use a Tree, we must include the Tree and TreeItem libraries. We will also need the "
+                        + "Icon and Color libraries, giving us the following use statements:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Tree" + cr
+                                                        + "use Libraries.Interface.Controls.TreeItem" + cr
+                                                        + "use Libraries.Interface.Controls.Icon" + cr
+                                                        + "use Libraries.Game.Graphics.Color" + cr))
+
+        bodyDiv:AddParagraph("Since we want the Tree to be usable as soon as the game begins, everything we add to the "
+                            + "main class will be in the CreateGame action. To begin, we must create an Icon to go "
+                            + "along with each TreeItem. An Icon is similar to a Drawable, with the primary distinction "
+                            + "being that an Icon is a Drawable and a Control"
+                            + ". For our example, we will use a small circle or rectangle icon next to each "
+                            + "TreeItem to represent which color that item represents with the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Color color" + cr + cr
+                                                        + "Icon iconA" + cr
+                                                        + "Icon iconA_1" + cr
+                                                        + "Icon iconB" + cr
+                                                        + "Icon iconB_1" + cr
+                                                        + "Icon iconB_2" + cr
+                                                        + "Icon iconB_2_1" + cr
+                                                        + "Icon iconB_2_2" + cr
+                                                        + "Icon iconC" + cr + cr
+                                                        + "iconA:LoadFilledRectangle(10, 10, color:Red())" + cr
+                                                        + "iconA_1:LoadFilledCircle(10, color:CustomColor(1, 0.75, 0.75, 1))" + cr
+                                                        + "iconB:LoadFilledRectangle(10, 10, color:Blue())" + cr
+                                                        + "iconB_1:LoadFilledCircle(10, color:CustomColor(0, 0, 0.5, 1))" + cr
+                                                        + "iconB_2:LoadFilledCircle(10, color:CustomColor(0, 1, 1, 1))" + cr
+                                                        + "iconB_2_1:LoadFilledCircle(10, color:CustomColor(0.25, 0, 0.25, 1))" + cr
+                                                        + "iconB_2_2:LoadFilledCircle(10, color:CustomColor(0.75, 0, 0.75, 1))" + cr
+                                                        + "iconC:LoadFilledRectangle(10, 10, color:Green())" + cr))       
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("For the purposes of this tutorial, we suggest you simply use the values above for the CustomColor "
+                        + "action. However, if you would like to learn more, see the documentation on the ")
+        bodyDiv:AddLink("Color", "/Libraries/Game/Graphics/Color.html")
+        bodyDiv:AddText(" class.")
+
+        bodyDiv:AddParagraph("Now we will create our Tree, as well as our TreeItem objects, using the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Tree tree" + cr + cr
+                                                        + "TreeItem itemA" + cr
+                                                        + "TreeItem itemA_1" + cr
+                                                        + "TreeItem itemB" + cr
+                                                        + "TreeItem itemB_1" + cr
+                                                        + "TreeItem itemB_2" + cr
+                                                        + "TreeItem itemB_2_1" + cr
+                                                        + "TreeItem itemB_2_2" + cr
+                                                        + "TreeItem itemC" + cr))
+
+        bodyDiv:AddParagraph("With our TreeItem objects created, we now need to individually set their names and their icons. "
+                            + "This is done by calling each TreeItem's SetName and SetIcon action. Here are the lines for just ItemA:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("itemA:SetName("+ dq + "Red" +dq +")" + cr
+                                                         + "itemA:SetIcon(iconA)"))
+
+        bodyDiv:AddParagraph("Now it is time to add our TreeItem objects to the Tree. We start by adding itemA, itemB, and itemC to our Tree. "
+                            +"To make our subtrees, we add itemA_1 to itemA, add itemB_1 and itemB_2 to itemB, and add itemB_2_1 and itemB_2_2 "
+                            +"to itemB_2. These tasks are accomplished with the following lines of code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("tree:Add(itemA)" + cr
+                                                        + "tree:Add(itemB)" + cr
+                                                        + "tree:Add(itemC)" + cr + cr
+                                                        + "itemA:Add(itemA_1)" + cr
+                                                        + "itemB:Add(itemB_1)" + cr
+                                                        + "itemB:Add(itemB_2)" + cr
+                                                        + "itemB_2:Add(itemB_2_1)" + cr
+                                                        + "itemB_2:Add(itemB_2_2)" + cr))
+
+        bodyDiv:AddParagraph("Next, we will add the Tree to the game window. First we set its position, followed by a Resize "
+                            + "action call, and finally Add. The Resize action has the Tree organize and resize its layout so the TreeItem objects "
+                            + "can be seen; without this, the TreeItem objects would overlap on top of one "
+                            + "another. Lastly, we will set the focus on the Tree, making our Tree <b>accessible</b> and allowing us to navigate it with the keyboard. This gives the "
+                            + "following code in the main class, so far:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        +"use Libraries.Interface.Controls.Tree"  + cr
+                                                        +"use Libraries.Interface.Controls.TreeItem" + cr
+                                                        +"use Libraries.Interface.Controls.Icon" + cr
+                                                        +"use Libraries.Game.Graphics.Color" + cr
+
+                                                        +"class Main is Game" + cr
+                                                        + "    action Main" + cr
+                                                        + "        StartGame()" + cr
+                                                        + "    end" + cr
+                                                        + "    action CreateGame" + cr
+                                                        + "        Color color" + cr
+                                                        + "        Icon iconA" + cr
+                                                        + "        Icon iconA_1" + cr
+                                                        + "        Icon iconB" + cr
+                                                        + "        Icon iconB_1" + cr
+                                                        + "        Icon iconB_2" + cr
+                                                        + "        Icon iconB_2_1" + cr
+                                                        + "        Icon iconB_2_2" + cr
+                                                        + "        Icon iconC" + cr  + cr
+                                                        + "        iconA:LoadFilledRectangle(10, 10, color:Red())" + cr
+                                                        + "        iconA_1:LoadFilledCircle(10, color:CustomColor(1, 0.75, 0.75, 1))" + cr
+                                                        + "        iconB:LoadFilledRectangle(10, 10, color:Blue())" + cr
+                                                        + "        iconB_1:LoadFilledCircle(10, color:CustomColor(0, 1, 1, 1))" + cr
+                                                        + "        iconB_2:LoadFilledCircle(10, color:CustomColor(0.5, 0, 0.5, 1))" + cr
+                                                        + "        iconB_2_1:LoadFilledCircle(10, color:CustomColor(0.25, 0, 0.25, 1))" + cr
+                                                        + "        iconB_2_2:LoadFilledCircle(10, color:CustomColor(0.75, 0, 0.75, 1))" + cr
+                                                        + "        iconC:LoadFilledRectangle(10, 10, color:Green())" + cr + cr
+                                                        + "        Tree tree" + cr + cr
+
+                                                        + "        TreeItem itemA" + cr
+                                                        + "        TreeItem itemA_1" + cr
+
+                                                        + "        TreeItem itemB" + cr
+                                                        + "        TreeItem itemB_1" + cr
+                                                        + "        TreeItem itemB_2" + cr
+                                                        + "        TreeItem itemB_2_1" + cr
+                                                        + "        TreeItem itemB_2_2" + cr
+
+                                                        + "        TreeItem itemC" + cr + cr
+                                                        + "        itemA:SetName(" + dq +"Red"+ dq +")" + cr
+                                                        + "        itemA_1:SetName("+ dq +"Pink"+ dq +")" + cr
+
+                                                        + "        itemB:SetName("+ dq +"Blue"+ dq +")" + cr
+                                                        + "        itemB_1:SetName("+ dq +"Cyan"+ dq +")" + cr
+                                                        + "        itemB_2:SetName("+ dq +"Purple"+ dq +")" + cr
+                                                        + "        itemB_2_1:SetName("+ dq +"Dark Purple"+ dq +")" + cr
+                                                        + "        itemB_2_2:SetName("+ dq +"Light Purple"+ dq +")" + cr 
+
+                                                        + "        itemC:SetName("+ dq +"Green"+ dq +")" + cr + cr
+
+
+                                                        + "        itemA:SetIcon(iconA)" + cr
+                                                        + "        itemA_1:SetIcon(iconA_1)" + cr
+
+                                                        + "        itemB:SetIcon(iconB)" + cr
+
+                                                        + "        itemB_1:SetIcon(iconB_1)" + cr
+                                                        + "        itemB_2:SetIcon(iconB_2)" + cr
+                                                        + "        itemB_2_1:SetIcon(iconB_2_1)" + cr
+                                                        + "        itemB_2_2:SetIcon(iconB_2_2)" + cr
+
+                                                        + "        itemC:SetIcon(iconC)" + cr + cr
+
+                                                        + "        tree:Add(itemA)" + cr
+                                                        + "        tree:Add(itemB)" + cr
+                                                        + "        tree:Add(itemC)" + cr + cr
+
+                                                        + "        itemA:Add(itemA_1)" + cr
+                                                        + "        itemB:Add(itemB_1)" + cr
+                                                        + "        itemB:Add(itemB_2)" + cr
+                                                        + "        itemB_2:Add(itemB_2_1)" + cr
+                                                        + "        itemB_2:Add(itemB_2_2)" + cr + cr
+
+                                                        + "        tree:SetPosition(150, 450)" + cr
+                                                        + "        tree:Resize()" + cr
+                                                        + "        Add(tree)" + cr
+                                                        + "        SetFocus(tree)" + cr
+                                                        + "    end" + cr + cr
+                                                        + "    action Update(number seconds)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Now, when the project is run, the Tree appears, but it does nothing aside from let us view and navigate it.")
+
+        bodyDiv:AddImage("/media/userInterface/Tree.png", "This is an image of the Tree with all subtrees opened.")
+
+        bodyDiv:AddHeading("Setting a Behavior", 3)
+        bodyDiv:AddParagraph("Before we continue, we need to design the Behavior we want the activation of our TreeItem "
+                            + "objects to take. For this tutorial we will have each TreeItem output and say their name. To do so, first create a new Quorum class, which we will name " + dq
+                            + "OutBehavior.quorum." + dq)
+        bodyDiv:AddParagraph(" This class will require the Behavior, BehaviorEvent, "
+                            + "and Speech libraries. "
+                            + "The OutBehavior class itself will inherit the Behavior class, and we will only override the Run action,"
+                            + " giving us the following template:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class OutBehavior is Behavior" + cr + cr
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("For the Run action, we need to get the TreeItem's name in order to output it. To do that, we can"
+                            +" use the BehaviorEvent's GetItem action to get the object associated with the Behavior. However, the GetItem "
+                            +"action returns an Item, so we need to cast it to a TreeItem. Once it has been cast, we have access to the TreeItem's GetName "
+                            +"action which we will use to get the text we wish to output. Altogether, the OutBehavior class is as follows:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
+                                                        + "use Libraries.Sound.Speech" + cr + cr
+                                                        + "class OutBehavior is Behavior" + cr + cr
+                                                        + "    action Run(BehaviorEvent event)" + cr
+                                                        + "            TreeItem treeItem = cast(TreeItem, event:GetItem())" + cr + cr
+                                                        + "            text colorName = treeItem:GetName()" + cr + cr
+                                                        + "            Speech speech" + cr
+                                                        + "            speech:Say(colorName, false)" + cr
+                                                        + "            output colorName" + cr
+                                                        + "    end" + cr
+                                                        + "end"))
+
+        bodyDiv:AddParagraph("Returning to the main class, we will create an OutBehavior object for the TreeItems. Since every TreeItem "
+                            +"will have the same behavior, we only need to make one. Finally, we simply have to assign the OutBehavior object "
+                            +"to each TreeItem. This is done with the SetBehavior action call, using the following lines of code:")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("OutBehavior behavior" +cr +cr
+                                                        + "itemA:SetBehavior(behavior)" + cr
+                                                        + "itemA_1:SetBehavior(behavior)" + cr + cr
+                                                        + "itemB:SetBehavior(behavior)" + cr
+                                                        + "itemB_1:SetBehavior(behavior)" + cr
+                                                        + "itemB_2:SetBehavior(behavior)" + cr
+                                                        + "itemB_2_1:SetBehavior(behavior)" + cr
+                                                        + "itemB_2_2:SetBehavior(behavior)" + cr + cr
+                                                        + "itemC:SetBehavior(behavior)" + cr))
+
+        bodyDiv:AddParagraph("This code will be appended to the CreateGame action in our main class.")
+
+        bodyDiv:AddParagraph("When the project is run, activating a TreeItem now causes the program to output and say the "
+                            +"TreeItem object's name. Note that each TreeItem can be activated either by double-clicking "
+                            +"with the mouse, or by pressing Enter on a highlighted TreeItem.")
+
+        //bodyDiv:AddImage("/media/userInterface/TreeEnd.png", "This image shows the expected complete Tree.")
+
+        //the section on using TreeSelections
+        bodyDiv:AddHeading("The TreeSelection Class", 2)
+
+        bodyDiv:AddParagraph("In Quorum, Trees have a special tool that is used to manage which TreeItem is selected. "
+                            + "This tool is the TreeSelection class. This class keeps track of the current selection by "
+                            + "storing the specific and unique path to the current TreeItem, storing them in an Array of "
+                            + "TreeItems from high level to low level. For example, the path to the " + dq + "Purple" + dq
+                            + " TreeItem in the above example is an Array of two TreeItems, starting with " + dq + "Blue," + dq
+                            + " then " + dq + "Purple." + dq + " To demonstrate how selections work with Trees, we will add to the "
+                            + "OutBehavior class and have it output the selected TreeItem's path when activated.")
+
+        bodyDiv:AddParagraph("First, we will need to include a few more use statements in the OutBehavior class. These are:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Selections.TreeSelection" + cr
+                                                        + "use Libraries.Interface.Controls.Tree" + cr
+                                                        + "use Libraries.Interface.Controls.TreeItem" + cr
+                                                        + "use Libraries.Containers.Array"))
+
+        bodyDiv:AddParagraph("Now, we can add to the Run action. After the cast statement we already have, we "
+                            + "need to get the current TreeSelection, which can be obtained from the current Tree. Since "
+                            + "we are triggering the Behavior from a TreeItem variable in the main class, we can obtain "
+                            + "the Tree from the TreeItem associated with the BehaviorEvent parameter. Then, we get the selection "
+                            + "from the Tree. This is done with the following lines:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("TreeItem treeItem = cast(TreeItem, event:GetItem())" + cr
+                                                        + "Tree tree = treeItem:GetTree()" + cr
+                                                        + "TreeSelection selection = tree:GetSelection()"))
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("Now that we have our TreeSelection, we can call the TreeSelection's GetPath action to obtain "
+                        + "the Array of TreeItems. For more information, see the tutorial on ")
+        bodyDiv:AddLink("Arrays", "/tutorials/language/arrays.html")
+        bodyDiv:AddText(". Once we have the Array, we can obtain how many TreeItems there are "
+                        + "with the Array's GetSize action. This gives the following two lines:")
+        bodyDiv:AddParagraph("")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Array&lt;TreeItem&gt; treeItems = selection:GetPath()" + cr
+                                                        + "integer size = treeItems:GetSize()"))
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:AddText("Since we do not know ahead of time how large the path is, we need to make use of repeating, "
+                        + "specifically repeat while. In this repeat, we will traverse the Array in order and continually "
+                        + "add each TreeItem's name to a text variable. For more information, see the tutorial on ")
+        bodyDiv:AddLink("Repeats", "/tutorials/language/repeat.html")
+        bodyDiv:AddText(". Finally, we will output the text variable once the repeat is completed. This gives the "
+                        + "following lines of code:")
+        bodyDiv:AddParagraph("")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("integer counter = 0" + cr
+                                                        + "text name = " + dq + dq + cr + cr
+                                                        + "repeat while counter < size" + cr
+                                                        + "    TreeItem temp = treeItems:Get(counter)" + cr
+                                                        + "    name = name + temp:GetName() + " + dq + "\" + dq + cr
+                                                        + "    counter = counter + 1" + cr
+                                                        + "end" + cr + cr
+                                                        + "output name"))
+
+        bodyDiv:AddParagraph("Now, when we run the program, activating a TreeItem will also output the path to that TreeItem.")
+
+
+        bodyDiv:AddHeading("Run the Program", 2)
+        AddIDE(bodyDiv, "treeTutorial","Activity: Tree", "Try making a User Interface", "examples/UserInterface/Tree/Main.quorum")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Trees in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Trees"
+    end
+
+    action GetName returns text
+        return "Trees"
+    end
+
+    action GetShortDescription returns text
+        return "how to use Trees"
+    end
+
+    action GetLocation returns text
+        return "tutorials/ui/tree.html"
+    end
+end

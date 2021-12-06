@@ -1,0 +1,229 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Link
+
+use Libraries.Web.Page.AttributeAccepter 
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Attribute 
+
+class KeyboardEventsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Keyboard Events - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Keyboard Events in Quorum", 1)
+        headDiv:AddText("This tutorial shows how to use keyboard events in our games.")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading(     "Introduction to Keyboard Events in Quorum", 2)
+
+        bodyDiv:AddParagraph(   "In this tutorial, we will learn about using player input and the game engine's event system. "
+                            +   "With these tools, our games will be able to react to keyboard input.")
+
+
+
+        bodyDiv:AddHeading(     "Handling Input with Events", 3)
+
+        bodyDiv:AddText(    "The second method for getting player input is known as ")
+        Bold handlingTitle
+        handlingTitle:AddText("event handling")
+        bodyDiv:Add(handlingTitle)
+        bodyDiv:AddText(    ". Event handling is a technique in which we designate code blocks that run whenever a specific event occurs, such as the mouse being clicked or a key being pressed. "
+                        +   "When we use event handling, we rely on the game engine to notify us when an event occurs by automatically calling certain predefined actions.")
+
+
+        bodyDiv:AddHeading(     "The Difference Between Polling and Event Handling", 4)
+
+        bodyDiv:AddParagraph(   "Most games, especially large games, use event handling instead of polling to detect input. "
+                            +   "To understand why, it’s helpful to think of an analogy for how the two approaches work.")
+
+        bodyDiv:AddParagraph(   "Consider the situation where you want to get a book from the library, but it is currently checked out. "
+                            +   "One approach (polling) is to call the library once every hour and ask the librarian if the book has been returned yet. "
+                            +   "The other approach (event handling) is to register your request with the librarian and respond when you are notified that the book is available.")
+
+        bodyDiv:AddParagraph(   "From this example, you can see that event handling is much more efficient than input polling, because it doesn’t waste time repeatedly checking. "
+                            +   "There are cases where it isn't noticeable which approach you use and others where it is necessary to poll, but the event handling approach should generally be preferred.")
+
+
+
+
+        bodyDiv:AddHeading(     "Using KeyboardEvents", 3)
+
+        bodyDiv:AddParagraph(   "To see how events can be used for keyboard input, we will use another sample program. "
+                            +   "This program will play a sound when the space bar is pressed, and a different sound when it is released. "
+                            +   "We will use the same audio files in the previous sample, or you can use your own.")
+
+        bodyDiv:AddParagraph(   "Our code for this sample uses two classes, which are each in a separate file. "
+                            +   "Let's start by looking at the Soundboard class.")
+
+        CodeBlock cb8
+        Span s3
+        Span s31
+        Span s32
+        cb8:AddText(    "use Libraries.Interface.Events.KeyboardListener" + cr 
+                   +    "use Libraries.Interface.Events.KeyboardEvent" + cr 
+                   +    "use Libraries.Sound.Audio" + cr + cr
+                   +    "class Soundboard is KeyboardListener" + cr   
+                   +    "   Audio pressedSound" + cr 
+                   +    "   Audio releasedSound" + cr + cr
+                   +    "   on create" + cr )
+        s3:AddText(     "       // We load our sounds when this object is created." + cr)
+        s3:SetClassAttribute("comment")
+        cb8:Add(s3)
+        cb8:AddText(    "       pressedSound:Load(" + dq + "AudioFiles/lightSound.wav" + dq + ")" + cr 
+                    +   "       releasedSound:Load(" + dq + "AudioFiles/heavySound.wav" + dq + ")" + cr 
+                    +   "   end" + cr + cr )
+        s31:AddText(     "   // This action will be called when any keyboard key is pressed." + cr)
+        s31:SetClassAttribute("comment")
+        cb8:Add(s31)
+        cb8:AddText(    "   action PressedKey(KeyboardEvent event)" + cr
+                   +    "   if event:keyCode = event:SPACE" + cr
+                   +    "       pressedSound:Play()" + cr 
+                   +    "   end" + cr 
+                   +    "end" + cr )
+        s32:AddText(     "   // This action will be called when any keyboard key is released." + cr)
+        s32:SetClassAttribute("comment")
+        cb8:Add(s32)
+        cb8:AddText(    "   action ReleasedKey(KeyboardEvent event)" + cr
+                   +    "       if event:keyCode = event:SPACE" + cr
+                   +    "           releasedSound:Play()" + cr 
+                   +    "       end" + cr 
+                   +    "   end" + cr + cr
+                   +    "end" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+
+
+        Paragraph p6
+        CodeBlock cb9
+        cb9:AddText(" class Soundboard is KeyboardListener ")
+        p6:AddText("An important thing to note about this code is in the first line (the class definition) where we specify that the class is a KeyboardListener (")
+        p6:Add(cb9)
+        p6:AddText( "). By inheriting from the KeyboardListener class, our class gets special actions that can " + dq + "listen" + dq + " for KeyboardEvents. "
+                +   "This gives us certain action definitions that the engine will automatically call when a keyboard event occurs. "
+                +   "If we choose to listen and respond to an event we simply put our actions inside these actions.")
+        bodyDiv:Add(p6)
+
+        Paragraph p7
+        CodeBlock cb10
+        cb10:AddText(" keyCode ")
+        p7:AddText( "In any class that inherits from KeyboardListener, the PressedKey action will be called automatically by the engine when the user presses a key on the keyboard. "
+                +   "The PressedKey action must take a KeyboardEvent as a parameter which is passed by the engine. "
+                +   "This KeyboardEvent contains a field ")
+        p7:Add(cb10)
+        p7:AddText( "that represents what key was pressed. A KeyboardEvent also contains values representing all possible supported keys on a keyboard, which we use in our example to make sure that the key that was pressed is the space bar. "
+                +   "We can choose to listen to whichever events we want to and respond to whichever keys we specify. "
+                +   "If a key is pressed that we don't respond to, the event is ignored by our code.")
+        bodyDiv:Add(p7)
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action PressedKey(KeyboardEvent event)" + cr
+                                                        + "   if event:keyCode = event:SPACE" + cr 
+                                                        + "      pressedSound:Play()" + cr 
+                                                        + "   end" + cr 
+                                                        + "end"))
+
+        bodyDiv:AddParagraph(   "In any class that inherits from KeyboardListener, the ReleasedKey action will be called automatically by the engine when the user releases a key on the keyboard. "
+                            +   "Let’s start by looking at the Soundboard class."
+                            +   "Like the PressedKey action, this action must take a KeyboardEvent as a parameter which will provide the information on which key was released.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("action ReleasedKey(KeyboardEvent event)" + cr
+                                                        + "   if event:keyCode = event:SPACE" + cr 
+                                                        + "      releasedSound:Play()" + cr 
+                                                        + "   end" + cr 
+                                                        + "end"))
+        bodyDiv:AddParagraph(   "With this class ready to receive KeyboardEvents, we can set up our Main class as follows:")
+
+        CodeBlock cb11
+        Span s4
+        Span s41
+        cb11:AddText(   "use Libraries.Game.Game" + cr + cr
+                   +    "class Main is Game" + cr )
+        s4:AddText(     "   // We create a object using our Soundboard listener class." + cr)
+        s4:SetClassAttribute("comment")
+        cb11:Add(s4)
+        cb11:AddText(   "   Soundboard board" + cr + cr 
+                    +   "   action Main" + cr 
+                    +   "       StartGame()" + cr
+                    +   "   end" + cr + cr 
+                    +   "   action CreateGame" + cr)
+        s41:AddText(    "       // We add the listener to our game.  This has the effect of letting the engine know " + cr
+                    +   "       //that the Soundboard object should be notified of keyboard events." + cr)
+        s41:SetClassAttribute("comment")
+        cb11:Add(s41)
+        cb11:AddText(   "       AddKeyboardListener(board)" + cr
+                   +    "   end" + cr + cr
+                   +    "   action Update(number seconds)" + cr 
+                   +    "   end" + cr 
+                   +    "end" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb11))
+
+        Paragraph p8
+        CodeBlock cb12
+        cb12:AddText(" AddKeyboardListener(board) ")
+        p8:AddText( "The most important addition to the Main class is ")
+        p8:Add(cb12)
+        p8:AddText( ". This action tells the game engine that our Soundboard object is ready to start receiving KeyboardEvents. "
+                +   "Now our program will " + dq + "get"  + dq + "events from the keyboard (meaning that the engine will call the actions we specified in the Soundboard class when events occur).")
+        bodyDiv:Add(p8)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to capture keyboard events using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Keyboard Events"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Events.png"
+    end
+
+    action GetName returns text
+        return "Keyboard Events in Quorum"
+    end
+
+    action GetShortDescription returns text
+        return "How to use keyboard events in our games."
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/keyboardEvents.html"
+    end
+end

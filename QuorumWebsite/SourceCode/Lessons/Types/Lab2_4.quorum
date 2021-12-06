@@ -1,0 +1,549 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.MainContent
+
+class Lab2_4 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Lab 2.4: Playing Audio - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page-specific header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Lab 2.4: Playing Audio ", 1)
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("Goals", 2)
+        bodyDiv:AddParagraph("In this lab, we will learn the following computer science concepts:")
+        
+        UnorderedList goalList
+        goalList:AddListItem("Accessing the Quorum Standard Library")
+        goalList:AddListItem("Creating Objects")
+        goalList:AddListItem("Calling Actions on Objects")
+        bodyDiv:Add(goalList)
+
+
+        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+
+        UnorderedList list
+        AddListItemWithBoldAtFront(list, "Big Idea: Creativity: ", "EU 1.2, LO 1.2.1, EK 1.2.1A, EK 1.2.1B, EK 1.2.1C, EU 1.3, LO 1.3.1, EK 1.3.1A, EK 1.3.1B")
+        AddListItemWithBoldAtFront(list, "Big Idea: Programming: ", "EU 5.1, LO 5.1.1, EK 5.1.1A")
+        bodyDiv:Add(list)
+
+        bodyDiv:AddHeading("Common Core Standards", 2)
+        UnorderedList ccList
+        AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
+        CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.10, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.11-12.4, CCSS.ELA-Literacy.RST.11-12.5")
+        AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP4, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
+        CCSS.Math.Practice.MP8")
+        bodyDiv:Add(ccList)
+
+
+        bodyDiv:AddHeading("Vocabulary", 2)
+        UnorderedList vocabularyList
+        vocabularyList:AddListItem("Library")
+        vocabularyList:AddListItem("Instantiation")
+        vocabularyList:AddListItem("Action Call")
+        vocabularyList:AddListItem("Parameters")
+        vocabularyList:AddListItem("Parameter Passing")
+        vocabularyList:AddListItem("Samples")
+        vocabularyList:AddListItem("OGG file extension")
+        vocabularyList:AddListItem("WAV file extension")
+        bodyDiv:Add(vocabularyList)
+        
+
+        bodyDiv:AddHeading("Overview", 2)
+
+
+        Paragraph p1 
+        p1:AddText("This lab demonstrates the use of the ")
+        CodeBlock audioCode
+        audioCode:AddText("Audio")
+        p1:Add(audioCode)
+        p1:AddText(" library in Quorum. The ")
+        p1:Add(audioCode)
+        p1:AddText(" library can be used to play music files in the ")
+        p1:AddLink( dq + ".ogg" + dq , "https://en.wikipedia.org/wiki/Ogg")
+        p1:AddText(" or the ")
+        p1:AddLink( dq + ".wav" + dq , "https://en.wikipedia.org/wiki/WAV")
+        p1:AddText(" formats. 
+                    You will write a program that plays a music file that can be shared with classmates. 
+                    Download this ")
+        p1:AddLink( dq + "zip file" + dq , "/files/lessons/chapter2/Lab2_4Template.zip")
+        p1:AddText(" for a template to help you get started. To open the template, follow these steps:")
+        bodyDiv:Add(p1)
+
+        bodyDiv:AddParagraph("1. Download and extract the zip file")
+        bodyDiv:AddParagraph("2. Open NetBeans")
+        Paragraph overview3 
+        overview3:AddText("3. Under ")
+        Bold fileBold
+        fileBold:AddText("File")
+        overview3:Add(fileBold)
+        overview3:AddText(", click ")
+        Bold openProjectBold
+        openProjectBold:AddText("Open Project")
+        overview3:Add(openProjectBold)
+        bodyDiv:Add(overview3)
+        bodyDiv:AddParagraph("2. Open NetBeans")
+        bodyDiv:AddParagraph("4. Navigate to where you downloaded the zip file")
+        Paragraph overview5 
+        overview5:AddText("5. Select your project and click ")
+        overview5:Add(openProjectBold)
+        bodyDiv:Add(overview5)
+
+        bodyDiv:AddParagraph("You may also use the online versions of the development environment to test your code. For this, we have stored the song file at media/song.ogg.")
+
+        bodyDiv:AddHeading("Goal 1: Accessing the Quorum Standard Library", 2)
+        Paragraph p2  
+        p2:AddText("Open the provided template and navigate to the ")
+        Bold mainBold
+        mainBold:AddText("main.quorum")
+        p2:Add(mainBold)
+        p2:AddText(" file.")
+        bodyDiv:Add(p2)
+ 
+        Paragraph p3
+        CodeBlock c31   
+        p3:AddText("This assignment makes use of the Quorum ")
+        c31:AddText("Libraries.Sound.Audio")
+        p3:Add(audioCode)
+        p3:AddText(" Library in the Quorum Standard Library. 
+                    You need to type code at the very top of the ")
+        p3:Add(mainBold)
+        p3:AddText(" file that lets Quorum know you want to use this library. 
+                    Begin by typing the appropriate code to use the Quorum ")
+        p3:Add(audioCode)
+        p3:AddText(" Library in your project. The ")
+        p3:Add(audioCode)
+        p3:AddText(" Library is called ")
+        p3:Add(c31)
+        p3:AddText(".")
+        bodyDiv:Add(p3)
+
+        bodyDiv:Add(break)
+
+        Paragraph example1Paragraph
+        Bold example1Bold
+        example1Bold:AddText("Example: Tell Quorum we want access to ")
+        example1Bold:Add(audioCode)
+        example1Bold:AddText(".")
+        example1Paragraph:Add(example1Bold)
+        bodyDiv:Add(example1Paragraph)
+
+        CodeBlock example1Code
+        Span s1
+        s1:AddText(     "// this line tells Quorum we will use the Audio library" + cr)
+        s1:SetClassAttribute("comment")
+        example1Code:Add(s1)
+        example1Code:AddText(    "use Libraries.Sound.Audio" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example1Code))
+
+
+        bodyDiv:AddParagraph("Any time you want to use a Quorum library, you need to include a statement like this at the top of your program code that lets Quorum know that you will be using that library.")
+
+
+        Paragraph p4
+        CodeBlock fileCode
+        fileCode:AddText("File")
+        CodeBlock cb4
+        cb4:AddText("Libraries.System.File")
+        CodeBlock useCode
+        useCode:AddText("use")
+        p4:AddText("In order to work with files, you also need to use the ")
+        p4:Add(fileCode)
+        p4:AddText(" library. The ")
+        p4:Add(fileCode)
+        p4:AddText(" library is called ")
+        p4:Add(cb4)
+        p4:AddText(". Add a statement to your project that allows you to use the Quorum ")
+        p4:Add(fileCode)
+        p4:AddText(" library, below the other ")
+        p4:Add(useCode)
+        p4:AddText("statement.")
+        bodyDiv:Add(p4)
+
+        bodyDiv:Add(break)
+
+
+//
+//        Paragraph activity1Paragraph
+//        Bold activity1Bold
+//        activity1Bold:AddText("Activity: Add the ")
+//        activity1Bold:Add(useCode)
+//        activity1Bold:AddText(" statement for the ")
+//        activity1Bold:Add(fileCode)
+//        activity1Bold:AddText(" library.")
+//        activity1Paragraph:Add(activity1Bold)
+//        bodyDiv:Add(activity1Paragraph)
+
+        bodyDiv:Add(break)
+
+        SideBySideIDE addStatementIDE2
+        addStatementIDE2:SetUniqueIdentifier("addStatementIDE2")
+        addStatementIDE2:GetIDETitle():AddText("Activity: Add Statement")
+        addStatementIDE2:Setup()
+        bodyDiv:Add(addStatementIDE2)
+
+
+        bodyDiv:AddParagraph("You now are able to use these Quorum libraries in your program.")
+
+
+
+        bodyDiv:AddHeading("Goal 2: Creating Objects", 2)
+
+        Paragraph p6
+        CodeBlock audioMinCode
+        audioMinCode:AddText("audio")
+        p6:AddText("To put the ")
+        p6:Add(audioCode)
+        p6:AddText(" and ")
+        p6:Add(fileCode)
+        p6:AddText(" libraries to use, instantiate a new ")
+        p6:Add(audioCode)
+        p6:AddText(" object, calling it ")
+        p6:Add(audioMinCode)
+        p6:AddText(".")
+        bodyDiv:Add(p6)
+
+        bodyDiv:Add(break)
+
+        Paragraph example2Paragraph
+        Bold example2Bold
+        example2Bold:AddText("Example: Instantiate an ")
+        example2Bold:Add(audioCode)
+        example2Bold:AddText(" object.")
+        example2Paragraph:Add(example2Bold)
+        bodyDiv:Add(example2Paragraph)
+
+        CodeBlock example2Code
+        Span s2
+        s2:AddText(     "// this creates an Audio object and calls it " + dq + "audio" + dq + "" + cr)
+        s2:SetClassAttribute("comment")
+        example2Code:Add(s2)
+        example2Code:AddText(    "Audio audio" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example2Code))
+
+        Paragraph p7
+        CodeBlock fileMinCode
+        fileMinCode:AddText("file")
+        p7:AddText("Now, in order for the ")
+        p7:Add(audioCode)
+        p7:AddText(" object to be able to play your song, it needs the file that contains the song. 
+                    Create a new ")
+        p7:Add(fileCode)
+        p7:AddText(" object, naming it ")
+        p7:Add(fileMinCode)
+        p7:AddText(".")
+        bodyDiv:Add(p7)
+
+        bodyDiv:Add(break)
+
+        
+
+//        SideBySideIDE instantiateObjectIDE
+//        instantiateObjectIDE:SetUniqueIdentifier("instantiateObject")
+//        instantiateObjectIDE:GetIDETitle():AddText("Activity: Instantiate object")
+//        Paragraph p8
+//        p8:AddText("Instantiate a ")
+//        p8:Add(fileCode)
+//        p8:AddText(" object.")
+//        instantiateObjectIDE:SetIDESubtitle(p8)
+//        instantiateObjectIDE:Setup()
+//        bodyDiv:Add(instantiateObjectIDE)
+
+//        Paragraph activity2Paragraph
+//        Bold activity2Bold
+//        activity2Bold:AddText("Activity: Instatiate the ")
+//        activity2Bold:Add(fileCode)
+//        activity2Bold:AddText(" object.")
+//        activity2Paragraph:Add(activity2Bold)
+//        bodyDiv:Add(activity2Paragraph)
+
+        bodyDiv:Add(break)
+
+        SideBySideIDE instantiateObjectIDE
+        instantiateObjectIDE:SetUniqueIdentifier("instantiateObjectIDE")
+        instantiateObjectIDE:GetIDETitle():AddText("Activity: Instantiate a File object")
+        instantiateObjectIDE:Setup()
+        bodyDiv:Add(instantiateObjectIDE)
+
+        Paragraph p9
+        p9:AddText("In order to use the ")
+        p9:Add(fileCode)
+        p9:AddText(" object, you need to tell the ")
+        p9:Add(fileCode)
+        p9:AddText(" object what file it is. 
+                    Since this file will represent the sound file for your ")
+        p9:Add(audioCode)
+        p9:AddText(" object, your file should be an audio file. 
+                    Audio files save data that represents all the samples of a sound. 
+                    The file formats that the Quorum ")
+        p9:Add(audioCode)
+        p9:AddText(" Library supports are ")
+        p9:AddLink( dq + ".ogg" + dq , "https://en.wikipedia.org/wiki/Ogg")
+        p9:AddText(" or the ")
+        p9:AddLink( dq + ".wav" + dq , "https://en.wikipedia.org/wiki/WAV")
+        p9:AddText(" formats. ")
+        bodyDiv:Add(p9)
+
+        Paragraph p10
+        CodeBlock setPathCode
+        setPathCode:AddText("SetPath")
+        p10:AddText("To set the name of your file, you use the ")
+        p10:Add(setPathCode)
+        p10:AddText(" action. The ")
+        p10:Add(setPathCode)
+        p10:AddText(" action takes a text parameter that represents the name of the file.")
+        bodyDiv:Add(p10)
+
+        bodyDiv:Add(break)
+
+
+        Paragraph example3Paragraph
+        Bold example3Bold
+        example3Bold:AddText("Example: Tell the ")
+        example3Bold:Add(fileCode)
+        example3Bold:AddText(" object the file path.")
+        example3Paragraph:Add(example3Bold)
+        bodyDiv:Add(example3Paragraph)
+
+        CodeBlock example3Code
+        Span s3
+        s3:AddText(     "//This line of code sets the path in the file to media/song.ogg" + cr)
+        s3:SetClassAttribute("comment")
+        example3Code:Add(s3)
+        example3Code:AddText(    "file:SetPath(" + dq + "media/song.ogg" + dq + ")" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example3Code))
+
+
+        Paragraph p11
+        CodeBlock loadCode
+        loadCode:AddText("Load")
+        p11:AddText("Now that you have your file set up, you can now tell the ")
+        p11:Add(audioCode)
+        p11:AddText(" object what to do. The ")
+        p11:Add(audioCode)
+        p11:AddText(" object needs to load a file, the file you just set up! Use the ")
+        p11:Add(loadCode)
+        p11:AddText(" action to give the ")
+        p11:Add(audioCode)
+        p11:AddText(" object the file you created in your program. ")
+        bodyDiv:Add(p11)
+
+        bodyDiv:Add(break)
+
+
+        Paragraph example4Paragraph
+        Bold example4Bold
+        example4Bold:AddText("Example: Load the file to the ")
+        example4Bold:Add(audioCode)
+        example4Bold:AddText(" object.")
+        example4Paragraph:Add(example4Bold)
+        bodyDiv:Add(example4Paragraph)
+
+        CodeBlock example4Code
+        Span s4
+        s4:AddText(     "//This line loads a file into the audio object" + cr)
+        s4:SetClassAttribute("comment")
+        example4Code:Add(s4)
+        example4Code:AddText( "audio:Load(file)" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example4Code))
+
+        Paragraph p12
+        CodeBlock playUntilDoneCode
+        playUntilDoneCode:AddText("PlayUntilDone")
+        p12:AddText("You are now ready to play your audio file. You can do this by calling the ")
+        p12:Add(playUntilDoneCode)
+        p12:AddText(" action for your ")
+        p12:Add(audioCode)
+        p12:AddText(" object. The ")
+        p12:Add(playUntilDoneCode)
+        p12:AddText(" plays your ")
+        p12:Add(audioCode)
+        p12:AddText(" object until it is done, ensuring that your program does not end until the audio file is done playing. ")
+        bodyDiv:Add(p12)
+
+        bodyDiv:Add(break)
+
+
+//        Paragraph activity3Paragraph
+//        Bold activity3Bold
+//        activity3Bold:AddText("Activity: Play your audio file by calling the ")
+//        activity3Bold:Add(playUntilDoneCode)
+//        activity3Bold:AddText(" action on your ")
+//        activity3Bold:Add(audioCode)
+//        activity3Bold:AddText(" object.")
+//        activity3Paragraph:Add(activity3Bold)
+//        bodyDiv:Add(activity3Paragraph)
+
+        bodyDiv:Add(break)
+
+        SideBySideIDE callingactionIDE
+        callingactionIDE:SetUniqueIdentifier("callingactionIDE")
+        callingactionIDE:GetIDETitle():AddText("Activity: Call the PlayUntilDone Action")
+        callingactionIDE:Setup()
+        bodyDiv:Add(callingactionIDE)
+
+        bodyDiv:AddParagraph("You can now run your program. 
+                            There should be no errors, and your audio file should play. 
+                            If your program does not compile, fix any errors and try again.")
+
+
+        bodyDiv:AddHeading("Goal 3: Calling Actions on Objects", 2)
+
+        Paragraph p14
+        CodeBlock setBalanceCode
+        setBalanceCode:AddText("SetBalance")
+        p14:AddText("When playing audio files, you may want the audio to play in only the right ear or the left ear. 
+                    You can do this in Quorum by calling the ")
+        p14:Add(setBalanceCode)
+        p14:AddText(" action on your ")
+        p14:Add(audioCode)
+        p14:AddText(" object.")
+        bodyDiv:Add(p14)
+
+        Paragraph p15
+        CodeBlock numberCode
+        numberCode:AddText("number")
+        p15:AddText("The ")
+        p15:Add(setBalanceCode)
+        p15:AddText(" action takes one parameter, a ")
+        p15:Add(numberCode)
+        p15:AddText(" . The values for this ")
+        p15:Add(numberCode)
+        p15:AddText(" can be between -1 and 1. Each has the following behavior: ")
+        bodyDiv:Add(p15)
+
+        UnorderedList numberList
+        numberList:AddListItem("A value of -1 sets the audio to play in only the left ear")
+        numberList:AddListItem("A value between -1 and 0 sets the audio to play from the left, moving increasingly to the left as the number gets closer to -1")
+        numberList:AddListItem("A value of 0 sets the audio to play in both ears")
+        numberList:AddListItem("A value between 0 and 1 sets the audio to play from the right, moving increasingly to the right as the number gets closer to 1")
+        numberList:AddListItem("A value of 1 sets the audio to play in only the right ear")
+        bodyDiv:Add(numberList)
+
+        Paragraph p16
+        p16:AddText("0 is the default value for the balance of ")
+        p16:Add(audioCode)
+        p16:AddText(" objects. If you never call the ")
+        p16:Add(setBalanceCode)
+        p16:AddText(" action, the audio will automatically play in both ears. ")
+        bodyDiv:Add(p16)
+
+        bodyDiv:Add(break)
+
+        Paragraph example5Paragraph
+        Bold example5Bold
+        example5Bold:AddText("Example: Change the balance of your ")
+        example5Bold:Add(audioCode)
+        example5Bold:AddText(" object to the left ear.")
+        example5Paragraph:Add(example5Bold)
+        bodyDiv:Add(example5Paragraph)
+
+        CodeBlock example5Code
+        Span s5
+        s5:AddText(     "// this line of code tells your audio object that its balance should be the " + cr
+                    +   "// number you are passing to it." + cr)
+        s5:SetClassAttribute("comment")
+        example5Code:Add(s5)
+        example5Code:AddText( "audio:SetBalance(-1)" )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(example5Code))
+
+        Paragraph p17
+        p17:AddText("Play around with the balance options by changing the parameter of the ")
+        p17:Add(setBalanceCode)
+        p17:AddText(" action.")
+        bodyDiv:Add(p17)
+
+        
+
+//        SideBySideIDE changeBalanceIDE
+//        changeBalanceIDE:SetUniqueIdentifier("changebalance")
+//        changeBalanceIDE:GetIDETitle():AddText("Activity: Change the Balance")
+//        Paragraph p18
+//        p18:AddText("Change the balance of the ")
+//        p18:Add(audioCode)
+//        p18:AddText(" object to the right ear.")
+//        changeBalanceIDE:SetIDESubtitle(p18)
+//        changeBalanceIDE:Setup()
+//        bodyDiv:Add(changeBalanceIDE)
+
+        bodyDiv:Add(break)
+//
+//        Paragraph activity4Paragraph
+//        Bold activity4Bold
+//        activity4Bold:AddText("Activity: Change the balance of your ")
+//        activity4Bold:Add(audioCode)
+//        activity4Bold:AddText(" object to the right ear.")
+//        activity4Paragraph:Add(activity4Bold)
+//        bodyDiv:Add(activity4Paragraph)
+
+        SideBySideIDE changeBalanceIDE
+        changeBalanceIDE:SetUniqueIdentifier("changeBalanceIDE")
+        changeBalanceIDE:GetIDETitle():AddText("Activity: Change the Balance of your code to the right ear only")
+        changeBalanceIDE:Setup()
+        bodyDiv:Add(changeBalanceIDE)
+
+
+        bodyDiv:AddParagraph("You can compile and run your program to hear the differences.")
+
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+
+        bodyDiv:AddHeading("Resources", 3)
+        bodyDiv:AddParagraph("The music used for this lab is Beachfront Celebration by Kevin MacLeod (incompetech.com). " 
+        + "Licensed under Creative Commons: By Attribution 3.0 License.")
+
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about creating objects and actions while coding an audio application in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Lab Manual (Playing Audio)"
+    end
+    action GetName returns text
+        return "Lab 2.4"
+    end
+    action GetShortDescription returns text
+        return "how work playing audio in Quorum."
+    end
+    action GetLocation returns text
+        return "lessons/chapter2/lab2_4.html"
+    end
+end

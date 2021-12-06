@@ -1,0 +1,732 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+
+class GamesSoundTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Sound - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Sound", 1)
+        headDiv:AddText("This tutorial tells you how to play audio files Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("An Introduction to Playing Sounds in Quorum", 2)
+
+        Paragraph introParagraph
+        introParagraph:AddText("This tutorial will explain how to add and manipulate sounds by using the Quorum Audio library. "
+                            +   "In order to access the Audio library, we must include the ")
+        CodeBlock cb1
+        cb1:AddText(" use Libraries.Sound.Audio ")
+        introParagraph:Add(cb1)
+
+        introParagraph:AddText(" statement at the beginning of our class definition. "
+                            +  "The Quorum Audio library supports files with either ")
+        introParagraph:AddLink( ".wav" , "https://en.wikipedia.org/wiki/WAV" )
+        introParagraph:AddText(" or ")
+        introParagraph:AddLink( ".ogg" , "https://en.wikipedia.org/wiki/Ogg")
+        introParagraph:AddText(" extensions."
+                            +  "In order to use sounds, we first need to place a copy of the sound file into our project. "
+                            +  "It does not matter where in our project we place it, but for this example, we make a new folder in the main project folder called " + dq + "Sounds." + dq + " It is placed next to the folder labeled " + dq + "Source Code." + dq + "This looks like so:")
+        bodyDiv:Add(introParagraph)
+
+        bodyDiv:AddImage("/media/games/AudioProjectWindow.png", "This is an image of the Audio Project Window")
+
+
+        bodyDiv:AddText(  "To make things easier to get started in this tutorial, a project containing many different sounds has been provided in this ")
+        bodyDiv:AddLink( "zip file" , "/files/games/AudioProject.zip" ) 
+        bodyDiv:AddText(".")
+
+
+        //the section on Getting Started: Playing Sounds
+        bodyDiv:AddHeading("Getting Started: Playing Sounds", 2)
+
+
+        Paragraph p1
+        CodeBlock cb2
+        CodeBlock cb3
+        cb2:AddText(" audio1 ")
+        cb3:AddText(" audio2 ")
+        p1:AddText( "In order to play a sound in our program, we need to instantiate an Audio object and then load an audio file into it in the same way we loaded an image into a Drawable previously. "
+                +   "Once we have created an Audio object, we set the audio file for the object by calling the Load action. "
+                +   "There are two ways we can set the file for an Audio object. "
+                +   "The easiest way is just to call Load with a file path in quotes (shown below for the object ")
+        p1:Add(cb2)
+        p1:AddText( "). "
+                +   "The other common way is to create a Quorum File object, set the path of that object to the audio file, and then pass the File object to the Audio object to the Load action (shown below for the object ")
+        p1:Add(cb3)
+        p1:AddText( "). "
+                +   "Both of these methods are correct.")
+        bodyDiv:Add(p1)
+
+
+        CodeBlock cb4
+        Span s1
+        Span s2
+        Span s3
+        s1:AddText("// these statements tell Quorum we will be using the Audio and File libraries" + cr)
+        s1:SetClassAttribute("comment")
+        cb4:Add(s1)
+        cb4:AddText("use Libraries.Sound.Audio" + cr + "use Libraries.System.File")
+
+        s2:AddText("// these statements demonstrate how to load a file into an Audio object by" + cr + "// passing the path of the audio file as text to the Load action" + cr )
+        s2:SetClassAttribute("comment")
+        cb4:Add(s2)
+        cb4:AddText("Audio audio1" + cr + "audio1:Load("  + dq + "Sounds/Bing.ogg" + dq + ")")
+
+        s3:AddText("// these statements demonstrate how to set the file of an Audio object by" + cr + "// creating a File object, setting the path of that File object, and passing the" + cr + "// File object to the Audio object's Load action." + cr )
+        s3:SetClassAttribute("comment")
+        cb4:Add(s3)
+        cb4:AddText("Audio audio2" + cr + "File file" + cr + "file:SetPath(" + dq + "Sounds/Boom.ogg" + dq + ")" + cr + "audio2:Load(file)")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+
+
+        bodyDiv:AddParagraph("Once we have our Audio object created and loaded, we can play our Audio object by calling the Play action. It is important that the Audio object we want to play has a file loaded to it; otherwise our program will not work.")
+
+        CodeBlock cb7
+        Span s4
+        s4:AddText("// this statement demonstrates how to play an Audio object." + cr )
+        s4:SetClassAttribute("comment")
+        cb7:Add(s4)
+        cb7:AddText("audio1:Play()")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb7))
+
+        bodyDiv:AddParagraph(   "You may have noticed that when we have a sound that lasts longer than a few seconds, our program ended before the sound finished playing. "
+                            +   "If we haven't prevented the program from finishing before our sound is done playing, our program will end before the sound is done and it will cut off. "
+                            +   "A simple remedy for this is to use the PlayUntilDone action to play our Audio object instead of using the regular Play action. "
+                            +   "Be aware that any statements after the call to PlayUntilDone will not execute until our sound is done playing. "
+                            +   "An example using the PlayUntilDone action is below. ")
+
+        CodeBlock cb8
+        Span s5
+        s5:AddText("// this statement demonstrates how to play an Audio object until it is done" + cr )
+        s5:SetClassAttribute("comment")
+        cb8:Add(s5)
+        cb8:AddText("audio2:PlayUntilDone()")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        Paragraph p3
+        CodeBlock cb9
+        cb9:AddText(" song ")
+        p3:AddText( "We may also want to control playback of our sound during our program. "
+                +   "Audio objects have actions that allow us to Pause, Resume, and Stop our sound. "
+                +   "We can also enable or disable looping of the Audio object. "
+                +   "If looping is allowed, the Audio object will begin to play again after it is finished. "
+                +   "We can enable looping by calling the EnableLooping action, and we can disable looping by calling the DisableLooping action. "
+                +   "The following example uses the Quorum Game Engine to implement a simple audio player using these actions.")
+
+        p3:AddText( "For this example, we will skip ahead a little bit and demonstrate an example that uses keyboard input, by making the game a ")
+        p3:AddLink( "KeyboardListener", "/libraries/Interface/Events/KeyboardListener.html")
+        p3:AddText( " .")
+
+        p3:AddText( "We will go over the details of this in the next tutorial, ")
+        p3:AddLink( "Events Tutorial", "/tutorials/games/events.html")
+        p3:AddText( ", but for now, mainly pay attention to the action calls on the Audio object ")
+        p3:Add(cb9)
+        p3:AddText( ".")
+        bodyDiv:Add(p3)
+
+        
+
+        CodeBlock cb10
+        Span s6
+        Span s61
+        Span s62
+        Span s63
+        Span s64
+        Span s65
+        Span s66
+        Span s67
+        Span s68
+        cb10:AddText(   "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Sound.Audio" + cr
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr + cr
+                    +   "class Main is Game, KeyboardListener" + cr
+                    +   "     Audio song" + cr + cr
+                    +   "     action Main" + cr
+                    +   "          StartGame()" + cr
+                    +   "     end" + cr + cr
+                    +   "     action CreateGame" + cr
+                    +   "          AddKeyboardListener(me)" + cr
+                    +   "          song:Load(" + dq + "Sounds/song.ogg" + dq + ")" + cr
+                    +   "          song:Play()" + cr
+                    +   "     end" + cr + cr
+                    +   "     action Update(number seconds)" + cr 
+                    +   "     end" + cr + cr)
+
+        s6:AddText(     "   // this action sets our game to react to keyboard events from the game engine" + cr)
+        s6:SetClassAttribute("comment")
+        cb10:Add(s6)
+        cb10:AddText(   "   action PressedKey(KeyboardEvent event)" + cr)
+        
+        s61:AddText(    "       // these statements determine which key is pressed - more in the next tutorial" + cr)
+        s61:SetClassAttribute("comment")
+        cb10:Add(s61)
+        cb10:AddText(   "       if event:keyCode = event:P" + cr)
+
+        s62:AddText(    "          // if the P key was pressed, pause or play the audio" + cr)
+        s62:SetClassAttribute("comment")
+        cb10:Add(s62)
+        cb10:AddText(   "           if song:IsPlaying()" + cr)
+
+        s63:AddText(    "               // if audio is playing, pause it" + cr)
+        s63:SetClassAttribute("comment")
+        cb10:Add(s63)
+        cb10:AddText(   "               song:Pause()" + cr
+                    +   "           else" + cr )
+
+        s64:AddText(    "               // otherwise play it" + cr)
+        s64:SetClassAttribute("comment")
+        cb10:Add(s64)
+        cb10:AddText(   "               song:Play()" + cr
+                    +   "           end" + cr 
+                    +   "       elseif event:keyCode = event:S" + cr )
+
+        s65:AddText(    "           // if the S key was pressed, stop the audio" + cr)
+        s65:SetClassAttribute("comment")
+        cb10:Add(s65)
+        cb10:AddText(   "           song:Stop()" + cr
+                    +   "       elseif event:keyCode = event:R" + cr )
+                   
+        s66:AddText(    "           // if the R key was pressed, resume the audio" + cr)
+        s66:SetClassAttribute("comment")
+        cb10:Add(s66)
+        cb10:AddText(   "           song:Resume()" + cr
+                    +   "       elseif event:keyCode = event:E" + cr )
+
+        s67:AddText(    "           // if the E key was pressed, enable looping" + cr)
+        s67:SetClassAttribute("comment")
+        cb10:Add(s67)
+        cb10:AddText(   "           song:EnableLooping()" + cr
+                    +   "       elseif event:keyCode = event:D" + cr )
+
+        s68:AddText(    "           // if the D key was pressed, enable looping" + cr)
+        s68:SetClassAttribute("comment")
+        cb10:Add(s68)
+        cb10:AddText(   "           song:DisableLooping()" + cr
+                    +   "       elseif event:keyCode = event:D" + cr 
+                    +   "       end" + cr 
+                    +   "   end" + cr 
+                    +   "end" + cr + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb10))
+
+
+//        SideBySideIDE playingSoundsIDE
+//        playingSoundsIDE:SetUniqueIdentifier("playingSounds")
+//        playingSoundsIDE:Setup()
+//        playingSoundsIDE:GetIDETitle():AddText("Activity: Playing Sounds")
+//        playingSoundsIDE:GetIDESubtitle():AddText("Use the Quorum Game Engine to implement a simple audio player using these actions.")
+//        bodyDiv:Add(playingSoundsIDE)
+        
+
+
+        bodyDiv:AddHeading("Playing Longer Audio: Streaming", 2)
+
+
+        bodyDiv:AddParagraph(   "If we have a longer audio file, like one that contains a full-length song, we may want to load our file via the LoadToStream action. "
+                            +   "The LoadToStream action allows our audio file to be loaded in " + dq + "chunks," + dq + "as they are needed instead of all at once. "
+                            +   "This is more efficient and allows the file to start playing more quickly than if it must wait for the entire audio file to be loaded, especially for longer sounds, like songs. In order to stream our Audio object, we will need a loop that keeps the Audio object streaming as long as it is playing. "
+                            +   "An example of this follows: ")
+
+
+        CodeBlock cb11
+        Span s7
+        Span s71
+        Span s72
+        Span s73
+        Span s74
+        cb11:AddText(   "use Libraries.Sound.Audio" + cr + cr)
+        s7:AddText(     "// this line creates our Audio object we will be using to stream" + cr)
+        s7:SetClassAttribute("comment")
+        cb11:Add(s7)
+        cb11:AddText(   "Audio streamingAudio" + cr + cr)
+
+        s71:AddText(    "// this line loads a " + dq + "chunk" + dq + "of the data from the file " + dq + "LongSong.ogg" + dq + "to our Audio object" + cr)
+        s71:SetClassAttribute("comment")
+        cb11:Add(s71)
+        cb11:AddText(   "streamingAudio:LoadToStream(" + dq + "Sounds/longSong.ogg" + dq + ")" + cr + cr)
+
+        s72:AddText(    "// this line plays the first " + dq + "chunk" + dq + "of the data that was loaded from the file" + cr)
+        s72:SetClassAttribute("comment")
+        cb11:Add(s72)
+        cb11:AddText(   "streamingAudio:Play()" + cr + cr)
+
+        s73:AddText(    "// this loop will continuously check if the whole song has been played" + cr)
+        s73:SetClassAttribute("comment")
+        cb11:Add(s73)
+        cb11:AddText(   "repeat while streamingAudio:IsPlaying()" + cr)
+
+        s74:AddText(    "   // this gets the next " + dq + "chunk" + dq + "of data to play" + cr)
+        s74:SetClassAttribute("comment")
+        cb11:Add(s74)
+        cb11:AddText(   "   streamingAudio:Stream()" + cr
+                    +   "end"  + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb11))
+
+
+
+
+        bodyDiv:AddParagraph(   "A Quorum File object can also be used instead of a text file path when calling the LoadToStream action. " + cr )
+        bodyDiv:AddParagraph(   "If we are playing sound as part of a game using the Quorum Game Engine, the proper place to put the Stream() call is inside the Update action, which is called every frame in the Main Game Loop. "
+                            +   "This will ensure that the next " + dq + "chunk" + dq + "of sound will be loaded at every opportunity. An example of streaming in the game engine follows: ")
+
+        CodeBlock cb12
+        Span s8
+        cb12:AddText(   "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Sound.Audio" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "   Audio audio1" + cr 
+                    +   "   Audio song" + cr + cr
+                    +   "   action Main" + cr 
+                    +   "       StartGame()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr
+                    +   "       audio1:Load(" + dq + "Sounds/Fwip.ogg" + dq + ")" + cr
+                    +   "       audio1:Play()" + cr
+                    +   "       song:LoadToStream(" + dq + "Sounds/song.ogg" + dq + ")" + cr
+                    +   "       song:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr )
+                    
+
+        s8:AddText(     "       //since this action is in the main game loop and called every frame it should not be inside another loop." + cr)
+        s8:SetClassAttribute("comment")
+        cb12:Add(s8)
+        cb12:AddText(   "       song:Stream()" + cr
+                    +   "   end" + cr
+                    +   "end" + cr )
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb12))
+
+
+//        SideBySideIDE playingLongerAudioIDE
+//        playingLongerAudioIDE:SetUniqueIdentifier("playingLongerAudio")
+//        playingLongerAudioIDE:Setup()
+//        playingLongerAudioIDE:GetIDETitle():AddText("Activity: Playing Longer Audio")
+//        playingLongerAudioIDE:GetIDESubtitle():AddText("The same thing but with a longer audio file")
+//        bodyDiv:Add(playingLongerAudioIDE)
+
+
+
+        bodyDiv:AddHeading("Changing the Audio: Controlling Volume and Pitch", 2)
+
+
+        bodyDiv:AddParagraph(   "We are able to set the volume and pitch of our Audio objects as they are playing by calling the SetVolume and SetPitch actions. "
+                            +   "These actions both take number parameters that represent the percent change in the pitch. "
+                            +   "For example, a number of 0.5 passed to SetVolume will set the new volume at 50% of the maximum volume. "
+                            +   "A number of 1.2 passed to SetPitch will raise the pitch 20% above the normal pitch. "
+                            +   "Examples of these actions follow: ")
+
+
+        CodeBlock cb13
+        Span s9
+        Span s91
+        cb13:AddText(   "use Libraries.Sound.Audio" + cr
+                    +   "Audio audio" + cr 
+                    +   "audio:Load(" + dq + "Sounds/Clang.ogg" + dq + ")" + cr + cr )
+        s9:AddText(     "// this line sets the volume of our Audio object at 50% its maximum volume." + cr)
+        s9:SetClassAttribute("comment")
+        cb13:Add(s9)
+        cb13:AddText(   "audio:SetVolume(0.5)" + cr + cr )
+
+        s91:AddText(     "// this line sets the pitch of our Audio object at 120% the normal pitch" + cr)
+        s91:SetClassAttribute("comment")
+        cb13:Add(s91)
+        cb13:AddText(   "audio:SetPitch(1.2)" + cr + cr 
+                    +   "audio:PlayUntilDone()" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb13))
+
+        bodyDiv:AddParagraph(   "If we want to know what the current settings of the volume and pitch of our Audio objects are, we can use the GetVolume and GetPitch actions, respectively. "
+                            +   "These actions return a number that represents the value of the volume or pitch and can be used with their corresponding Set actions to change the values of the volume and/or pitch over time. "
+                            +   "An example of this follows: ")
+
+        CodeBlock cb14
+        Span s10
+        Span s101
+        Span s102
+        Span s103
+        cb14:AddText(   "use Libraries.Sound.Audio" + cr
+                    +   "Audio audio" + cr 
+                    +   "audio:Load(" + dq + "Sounds/song.ogg" + dq + ")" + cr 
+                    +   "audio:Play()" + cr + cr )
+        s10:AddText(    "// this loop keeps our sound playing until it is done" + cr)
+        s10:SetClassAttribute("comment")
+        cb14:Add(s10)
+        cb14:AddText(   "repeat while audio:IsPlaying()" + cr )
+
+        s101:AddText(   "   // this conditional checks if the current volume is greater than 0. If it is, it decreases the volume" + cr)
+        s101:SetClassAttribute("comment")
+        cb14:Add(s101)
+        cb14:AddText(   "   if audio:GetVolume() > 0.0" + cr )
+
+        s102:AddText(   "   // this line calculates the new volume by getting the current volume and subtracting 0.00001% (one hundred-thousandth of a percent)" + cr)
+        s102:SetClassAttribute("comment")
+        cb14:Add(s102)
+        cb14:AddText(   "   number newVolume = audio:GetVolume() - 0.0000001" + cr + cr )
+
+        s103:AddText(   "   // this line sets the volumen to newVolume, which will have the effect of fading the sound out quickly." + cr)
+        s103:SetClassAttribute("comment")
+        cb14:Add(s103)
+        cb14:AddText(   "   audio:SetVolume(newVolume)" + cr 
+                    +   "   end" + cr  
+                    +   "end" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb14))
+
+
+//        SideBySideIDE changingTheAudioIDE
+//        changingTheAudioIDE:SetUniqueIdentifier("changingTheAudio")
+//        changingTheAudioIDE:Setup()
+//        changingTheAudioIDE:GetIDETitle():AddText("Activity: Changing the Audio")
+//        changingTheAudioIDE:GetIDESubtitle():AddText("Call the SetVolume and SetPitch actions to set the volume and pitch of our Audio objects. ")
+//        bodyDiv:Add(changingTheAudioIDE)
+
+        bodyDiv:AddHeading("Changing where the sound is played:", 2)
+        bodyDiv:AddHeading("Balance, Fade and Rotation", 3)
+
+        bodyDiv:AddParagraph("When using these actions, we should be aware of a few things.")
+        
+        UnorderedList goalList
+        goalList:AddListItem("First, the default volume of an Audio object is its maximum volume. This means that the volume can never be set higher than that default volume. Passing a number parameter that is greater than 1 to the SetVolume action will have no effect.")
+        goalList:AddListItem("Second, changing the pitch of the Audio object also affects the speed of playback. Making the pitch lower causes the sound to play slower; likewise, making the pitch higher causes the sound to play faster.")
+        bodyDiv:Add(goalList)
+
+        bodyDiv:AddParagraph("With mono sounds, i.e., sounds that have only one audio channel, we can change the way the sound is played from our speakers through the use of the SetBalance, SetFade, and Rotation actions. "
+                            + "The SetBalance action is used to change which speaker (the right speaker or left speaker) the sound will play out of. "
+                            + "The SetFade action sets the sound to play from the forward or backward audio channels. "
+                            + "The Rotate action allows the sound to be set at a rotation between 0 and 360 degrees around the user.")
+        
+        bodyDiv:AddParagraph( "The SetBalance action is used to change how the audio plays out of the left and right speakers. "
+                            + "SetBalance has one parameter, a number between -1 and 1 that represents which speaker to play out of. "
+                            + "A number between -1 and 0 causes the audio to play from the left speaker, with a value of -1 causing it to play completely from the left speaker. "
+                            + "A value of 0 causes the audio to play from both speakers equally. "
+                            + "A value between 0 and 1 causes the audio to play from the right speaker, with a value of 1 causing it to play completely from the right speaker. "
+                            + "The default balance of Audio objects is 0. Example uses of the SetBalance action are below.")
+                            
+        CodeBlock cb15
+        Span s11
+        cb15:AddText(   "use Libraries.Sound.Audio" + cr + cr
+                    +   "Audio left" + cr 
+                    +   "Audio right" + cr 
+                    +   "Audio center" + cr + cr 
+                    +   "left:Load(" + dq + "Sounds/Firework.ogg" + dq + ")" + cr
+                    +   "right:Load(" + dq + "Sounds/Robot.ogg" + dq + ")" + cr
+                    +   "center:Load(" + dq + "Sounds/Modem.ogg" + dq + ")" + cr + cr )
+
+        s11:AddText(    "// set the balances of the objects (there is no need to set the balance of the center object because its default balance is 0)" + cr)
+        s11:SetClassAttribute("comment")
+        cb15:Add(s11)
+        cb15:AddText(   "left:SetBalance(-1)" + cr 
+                    +   "right:SetBalance(1)" + cr + cr 
+                    +   "left:PlayUntilDone()" + cr 
+                    +   "right:PlayUntilDone()" + cr
+                    +   "center:PlayUntilDone()" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb15))
+
+        bodyDiv:AddParagraph( "The SetFade action is used to change how the audio plays out of the forward and back channels. "
+                            + "SetFade has one parameter, a number, which represents which channel, forward or back, the audio should play out of. "
+                            + "This number behaves in much the same way that the parameter of the SetBalance action works. "
+                            + "A number between -1 and 0 causes the audio to play out of the backwards channel. "
+                            + "A number between 0 and 1 causes the audio to play out of the forwards channel. "
+                            + "Examples of the SetFade actions follow:")
+  
+        CodeBlock cb16
+        Span s12
+        cb16:AddText(   "use Libraries.Sound.Audio" + cr + cr
+                    +   "Audio front" + cr 
+                    +   "Audio back" + cr 
+                    +   "Audio center" + cr + cr 
+                    +"front:Load(" + dq + "Sounds/Firework.ogg" + dq + ")" + cr
+                    +"back:Load(" + dq + "Sounds/Robot.ogg" + dq + ")" + cr
+                    +"center:Load(" + dq + "Sounds/Modem.ogg" + dq + ")" + cr + cr )
+
+        s12:AddText(    "// set the balances of the objects (there is no need to set the fade of the center object because its default fade is 0)" + cr)
+        s12:SetClassAttribute("comment")
+        cb16:Add(s12)
+        cb16:AddText(   "front:SetFade(1)" + cr 
+                    +   "back:SetFade(-1)" + cr + cr 
+                    +   "front:PlayUntilDone()" + cr 
+                    +   "back:PlayUntilDone()" + cr
+                    +   "center:PlayUntilDone()" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb16))
+
+
+        bodyDiv:AddParagraph( "The Rotate action is used to rotate the sound about the listener. "
+                            + "Rotate takes one parameter, a number that represents the amount of degrees to rotate the sound around the listener. "
+                            + "0 degrees represents a rotation in front of the listener. "
+                            + "180 degrees represents a rotation behind the listener. "
+                            + "Examples of the Rotate action follow:")
+  
+        CodeBlock cb17
+        Span s13
+        cb17:AddText(   "use Libraries.Sound.Audio" + cr + cr
+                    +   "Audio audio" + cr + cr 
+                    +"audio:Load(" + dq + "Sounds/Fwip.ogg" + dq + ")" + cr + cr )
+
+        s13:AddText(    "// set the audio to be rotated 90 degrees with respect to the listener" + cr)
+        s13:SetClassAttribute("comment")
+        cb17:Add(s13)
+        cb17:AddText(   "audio:Rotate(90)" + cr + cr
+                    +   "audio:PlayUntilDone()" + cr )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb17))
+
+        bodyDiv:AddParagraph( "SetBalance, SetFade, and Rotate have corresponding GetBalance, GetFade, and GetRotation actions that return the current value of each setting." )
+        bodyDiv:AddParagraph( "It is important to note that SetBalance, SetFade, and Rotate cannot be used at the same time. "
+                            + "For example, if the balance is set on an Audio object, and then a call is made to set the fade of that same Audio object, the balance will be reset to the default value. "
+                            + "We will not be able to use these functions to create the illusion of 3D sound. To do that, use the positional audio functions described in the next section.")
+ 
+//        SideBySideIDE BalanceFadeRotationIDE
+//        BalanceFadeRotationIDE:SetUniqueIdentifier("BalanceFadeRotation")
+//        BalanceFadeRotationIDE:Setup()
+//        BalanceFadeRotationIDE:GetIDETitle():AddText("Activity: Changing where the sound is played: Balance, Fade and Rotation")
+//        BalanceFadeRotationIDE:GetIDESubtitle():AddText("Use the SetBalance, SetFade and Rotate action")
+//        bodyDiv:Add(BalanceFadeRotationIDE)
+
+
+        bodyDiv:AddHeading("3D Sound: Positional Audio", 2)
+
+        bodyDiv:AddParagraph( "Quorum audio objects have the ability to be set in a position in a virtual 3D space. "
+                            + "3D space is often represented in math and other applications with 3D (x, y, z) coordinate system. "
+                            + "An example of a 3D coordinate system is below.")
+ 
+        bodyDiv:AddImage("/media/games/coordinate_system.png", " ")
+
+        bodyDiv:AddParagraph( "Quorum uses a virtual 3D coordinate system very much like this one to set sounds in 3D space. "
+                            + "Audio objects have x, y, and z-coordinates that can be set through the SetX, SetY, and SetZ actions. "
+                            + "These three actions each take a single number parameter that represents the value of that coordinate. "
+                            + "Audio objects also have corresponding GetX, GetY, and GetZ actions that return the requested coordinate.")
+ 
+       bodyDiv:AddParagraph(  "Using positional audio can allow us to do some cool things in our programs. "
+                            + "For example, we can use an audio object in a game, set its initial position, and then update its position in the game update loop. "
+                            + "An example is below.")
+
+        CodeBlock cb18
+        Span s14
+        Span s141
+        Span s142
+        cb18:AddText(   "use Libraries.Game.Game" +cr 
+                    +   "use Libraries.Sound.Audio" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "   Audio audio" + cr + cr
+                    +   "   action Main" + cr
+                    +   "       StartGame()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr 
+                    +   "       audio:Load(" + dq + "Sounds/Firework.ogg" + dq + ")" + cr + cr )
+
+        s14:AddText(    "       // give the audio some initial coordinates" + cr)
+        s14:SetClassAttribute("comment")
+        cb18:Add(s14)
+        cb18:AddText(   "       audio:SetX(-1)" + cr 
+                    +   "       audio:SetY(-1)" + cr 
+                    +   "       audio:SetZ(-1)" + cr + cr 
+                    +   "       audio:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr )
+
+        s141:AddText(   "       // calculate the new x, y, and z coordinates based off the current coordinates." + cr
+                    +   "      //In this example, the x, y, and z coordinates are increased by 0.25 every second." + cr)
+        s141:SetClassAttribute("comment")
+        cb18:Add(s141)
+        cb18:AddText(   "       number newX = audio:GetX() + 0.30 * seconds" + cr 
+                    +   "       number newY = audio:GetY() + 0.30 * seconds" + cr 
+                    +   "       number newZ = audio:GetZ() + 0.30 * seconds" + cr + cr )
+
+        s142:AddText(   "       // using the newly calculated coordinates, update the position of the object" + cr)
+        s142:SetClassAttribute("comment")
+        cb18:Add(s142)
+        cb18:AddText(   "       audio:SetX(newX)" + cr 
+                    +   "       audio:SetY(newY)" + cr 
+                    +   "       audio:SetZ(newZ)" + cr 
+                    +   "   end" + cr 
+                    +   "end" + cr )
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb18))
+
+
+//        SideBySideIDE positionalAudioIDE
+//        positionalAudioIDE:SetUniqueIdentifier("positionalAudio")
+//        positionalAudioIDE:Setup()
+//        positionalAudioIDE:GetIDETitle():AddText("Activity: 3D Sound: Positional Audio")
+//        positionalAudioIDE:GetIDESubtitle():AddText("Using positional audio can allow us to do some cool things in our programs")
+//        bodyDiv:Add(positionalAudioIDE)
+
+
+        bodyDiv:AddHeading("Audio3D", 2)
+
+        bodyDiv:AddText( "The Quorum game engine also supports Audio3D objects, which inherit from the Item3D class and the Audio class. "
+                            + "An Audio3D object can be moved, positioned, and rotated just like a Model in 3-space, and it can use all of the Audio actions. "
+                            + "We can add Audio3D objects directly to our models so that the positional audio will be calculated for us. "
+                            + "Our Audio3D objects share the same coordinate system as all other Item3D objects and can exist on the same ")
+ 
+        bodyDiv:AddLink( "Layer", "/tutorials/games/layers.html")
+        bodyDiv:AddText( " .")
+
+
+        bodyDiv:AddHeading("Doppler Shift", 3)
+
+        bodyDiv:AddText( "Audio3D objects have their Doppler shift (the change in pitch based on listener position, for more information, see ")
+
+        bodyDiv:AddLink( "here", "https://en.wikipedia.org/wiki/Doppler_effect")
+        bodyDiv:AddText( ") calculated and enabled by default. At any time we can disable Doppler by calling the Audio3D DisableDoppler() action. " 
+                +   "Once it has been disabled, the Audio3D action EnableDoppler() will turn it back on. "
+                +   "We should remember that these actions can only be called on an instantiated Audio3D object. For example:")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("audio:DisableDoppler()" + cr + "audio:EnableDoppler()"))
+
+
+        bodyDiv:AddHeading("Listener Position and Direction", 3)
+
+
+        bodyDiv:AddText( "Recall this from our ")
+        bodyDiv:AddLink( "Camera ", "/tutorials/games/cameras.html")
+
+        bodyDiv:AddText( "tutorial: A camera object has both a position and a direction that it uses to display a scene. "
+                +   "Our Audio3D objects have a similar feature called a listener. That listener has a position and a direction that it uses to represent a scene. "
+                +   "The default listener position is at (0, 0, 0), with the direction (0, 0, 1). Both of these can be changed to track the movement of a player in the game. "
+                +   "The actions that we use to change the position are Audio3D actions that should be called on our audio object. Below is an example of how we can call these actions on our Audio3D object:")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("audio:SetListenerPosition(0, 1, -1)" + cr + "audio:SetListenerDirection(0, -1, 1)"))
+
+        bodyDiv:AddParagraph(   "We can also represent our position and direction as a Vector3.")
+        bodyDiv:AddParagraph(   "Below is an example of a program that adds a sound to a moving box. "
+                            +   "The default settings for Doppler (on) and Listener are used, but we can try any of the code fragments from the two previous sections to understand how Doppler and Listener position/direction affect our game.")
+
+        CodeBlock cb19
+        Span s15
+        Span s151
+        cb19:AddText(   "use Libraries.Game.Game" +cr 
+                    +   "use Libraries.Game.Graphics.Model" +cr 
+                    +   "use Libraries.Game.Graphics.Color" + cr 
+                    +   "use Libraries.Game.Audio3D" + cr + cr
+                    +   "class Main is Game" + cr 
+                    +   "   Audio3D audio" + cr
+                    +   "   Model model" + cr + cr
+                    +   "   action Main" + cr
+                    +   "       StartGame()" + cr 
+                    +   "   end" + cr + cr
+                    +   "   action CreateGame" + cr 
+                    +   "       Color color" + cr 
+                    +   "       model:LoadBox(0.5, 0.5, 0.5, color:Green())" + cr 
+                    +   "       Add(model)" + cr 
+                    +   "       audio:Load(" + dq + "Sounds/Robot.ogg" + dq + ")" + cr 
+                    +   "       audio:EnableLooping()" + cr )
+
+        s15:AddText(    "       //adds the audio to the model so position is automatically calculated" + cr)
+        s15:SetClassAttribute("comment")
+        cb19:Add(s15)
+        cb19:AddText(   "       model:Add(audio)" + cr + cr  
+                    +   "       model:SetX(-5)" + cr + cr
+                    +   "       audio:Play()" + cr
+                    +   "   end" + cr + cr
+                    +   "   action Update(number seconds)" + cr )
+
+        s151:AddText(   "       //Moves the model a small amount in each frame" + cr)
+        s151:SetClassAttribute("comment")
+        cb19:Add(s151)
+        cb19:AddText(   "       model:Move(0.025, 0, 0)" + cr + cr 
+                    +   "   end" + cr 
+                    +   "end" + cr  )
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb19))
+
+//        SideBySideIDE audio3DIDE
+//        audio3DIDE:SetUniqueIdentifier("audio3D")
+//        audio3DIDE:Setup()
+//        audio3DIDE:GetIDETitle():AddText("Activity: Audio3D")
+//        audio3DIDE:GetIDESubtitle():AddText("Using the Doppler Shift and also Listener Position and Direction")
+//        bodyDiv:Add(audio3DIDE)
+
+
+        bodyDiv:AddHeading("Common Problems", 2)
+
+        bodyDiv:AddHeading("When I run my program, I get an error telling me that the file extension is unsupported.", 4)
+
+        bodyDiv:AddParagraph(   "Quorum can only play audio files in the " + dq + ".wav" + dq + " or " + dq + ".ogg" + dq + " formats. "
+                            +   "Ensure that the audio file is one of these formats. "
+                            +   "If it is not, there are many free programs available that will convert the file to one of these formats. ")
+ 
+        bodyDiv:AddHeading("When I run my program, I get an error telling me that I can't play audio before it is loaded.", 4)
+
+        bodyDiv:AddParagraph(   "In order to play an audio object, a file must be loaded to it. "
+                            +   "Ensure that a file is loaded to the audio object before calling its Play action. ")
+
+        bodyDiv:AddHeading("I have called SetBalance/SetPitch/Rotate on my audio object, but it did not have any effect.", 4)
+
+        bodyDiv:AddParagraph(   "The SetBalance, SetPitch, and Rotate actions only work on mono sounds. Ensure that the sound is not stereo. "
+                            +   "If it is, there are many free programs available that will convert sound files from stereo to mono.")
+
+        bodyDiv:AddHeading("I have called SetX/SetY/SetZ on my audio object, but it did not have any effect.", 4)
+
+        bodyDiv:AddParagraph(   "The SetX, SetY, and SetZ actions only work on mono sounds. Ensure that the sound is not stereo. "
+                            +   "If it is, there are many free programs available that will convert sound files from stereo to mono.")
+
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about the 2D and 3D audio system, and how we code it, using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Games Sound"
+    end
+
+    action GetImageLocation returns text
+        return "/media/Sound.gif"
+    end
+
+    action GetName returns text
+        return "Playing Audio Files"
+    end
+
+    action GetShortDescription returns text
+        return "how to play audio files Quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/sound.html"
+    end
+end
