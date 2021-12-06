@@ -1,0 +1,221 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Skybox
+use Libraries.Game.Graphics.Camera
+use Libraries.Game.InputMonitor
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Sound.Audio
+use Libraries.Compute.Math
+use Libraries.Game.Graphics.Drawable
+ 
+class Main is Game, KeyboardListener
+    Audio clickSound
+    Audio clickSound2
+    Audio fireworks
+    Skybox skybox
+    Camera camera = undefined
+    InputMonitor monitor
+    KeyboardEvent keys
+    Math math
+    Drawable zoomImage
+    number pitch = 0
+    number roll = 0
+    number yaw = 0
+    number lastYaw = 0
+    number lastPitch = 0
+    boolean pressed = false
+    text imageLink = ""
+    text imageDesc = ""
+    integer imageYaw = 0
+    integer imagePitch = 0
+    boolean messageSent = false
+    boolean zoomed = false
+ 
+    action Main
+        StartGame()
+    end
+ 
+    action CreateGame
+        //MODIFY THIS CODE FOR THE NIGHT SKY IMAGES
+        skybox:Load("media/astro/right.jpg", "media/astro/left.jpg", "media/astro/top.jpg", "media/astro/bottom.jpg", "media/astro/front.jpg", "media/astro/back.jpg")
+        SetSkybox(skybox)
+        camera = GetCamera3D()
+        camera:SetPosition(0, 0, 0)
+        camera:LookAt(0, 0, 1)
+        clickSound:Load("media/astro/click.wav")
+        clickSound2:Load("media/astro/click2.wav")
+        fireworks:Load("media/astro/fireworks.wav")
+        AddKeyboardListener(me)
+        zoomImage:Hide()
+        Add(zoomImage)
+    end
+ 
+    action Update(number seconds)
+        if not zoomed
+            if monitor:IsKeyPressed(keys:LEFT)
+                yaw = yaw - 30 * seconds
+                if yaw < 0
+                    yaw = 360 - yaw
+                    lastYaw = 360
+                    clickSound:Play()
+                end
+                camera:SetYawPitchRoll(yaw, pitch, roll)
+                if yaw < (lastYaw - 10)
+                    clickSound:Play()
+                    lastYaw = math:Round(yaw,-1)
+                    output lastYaw
+                end
+            elseif monitor:IsKeyPressed(keys:RIGHT)
+                yaw = yaw + 30 * seconds
+                if yaw > 360
+                    yaw = yaw - 360
+                    lastYaw = 0
+                    clickSound:Play()
+                end
+                camera:SetYawPitchRoll(yaw, pitch, roll)
+                if yaw > (lastYaw + 10)
+                    clickSound:Play()
+                    lastYaw = math:Round(yaw,-1)
+                    output lastYaw
+                end
+            elseif monitor:IsKeyPressed(keys:UP)
+                pitch = pitch + 30 * seconds
+                if pitch > 90
+                    pitch = 90
+                    clickSound2:Play()
+                end
+                camera:SetYawPitchRoll(yaw, pitch, roll)
+                if pitch > (lastPitch + 10)
+                    clickSound2:Play()
+                    lastPitch = math:Round(pitch,-1)
+                    output lastPitch
+                end
+            elseif monitor:IsKeyPressed(keys:DOWN)
+                pitch = pitch - 30 * seconds
+                if pitch < 0
+                    pitch = 0
+                    clickSound2:Play()
+                end
+                camera:SetYawPitchRoll(yaw, pitch, roll)
+                if pitch < (lastPitch - 10)
+                    clickSound2:Play()
+                    lastPitch = math:Round(pitch,-1)
+                    output lastPitch
+                end
+            end
+            if monitor:IsKeyPressed(keys:SPACE)
+                if pressed = false
+                     output "Right Ascension: " + math:Round(yaw mod 360, 1)
+                     output "Declination: " + math:Round(pitch, 1)
+                    pressed = true
+                end
+            else         
+                pressed = false
+            end
+            imageInView(yaw, pitch)
+            if imageLink not= ""
+                if messageSent = false
+                    output "You found something at (" + imageYaw + ", " + imagePitch + "). Press the Z key to zoom in."
+                    messageSent = true
+                end
+            else
+                messageSent = false
+            end
+        end
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if event:keyCode = event:Z
+            if zoomed
+                zoomImage:Hide()
+                zoomed = false
+            else
+                if imageLink not= ""
+                    fireworks:Play()
+                    output "You found the " + imageDesc
+                    zoomImage:Load(imageLink)
+                    zoomImage:Show()
+                    output "Press the Z key to zoom out again."
+                    zoomed = true
+                else
+                    output "Nothing to zoom in on"
+                end 
+            end
+        end
+    end
+
+    action imageInView (number yaw, number pitch)
+        number margin = 2
+        imageLink = ""
+        imageDesc = ""
+        imageYaw = 0
+        imagePitch = 0
+        imageYaw1 = 100
+        imagePitch1 = 45
+        imageLink1 = "media/astro/crab.png"
+        imageDesc1 = "Crab Nebula"
+        imageYaw2 = 264
+        imagePitch2 = 15
+        imageLink2 = "media/astro/jupiter.png"
+        imageDesc2 = "planet Jupiter"
+        imageYaw3 = 322
+        imagePitch3 = 82
+        imageLink3 = "media/astro/supernova1987a.png"
+        imageDesc3 = "Supernova 1987a"
+        imageYaw4 = 201
+        imagePitch4 = 58
+        imageLink4 = "media/astro/neptune.png"
+        imageDesc4 = "planet Neptune"
+        imageYaw5 = 25
+        imagePitch5 = 33
+        imageLink5 = "media/astro/mars.png"
+        imageDesc5 = "planet Mars"
+        imageYaw6 = 148
+        imagePitch6 = 70
+        imageLink6 = "media/astro/pillars.png"
+        imageDesc6 = "Pillars of Creation"
+        if yaw > imageYaw1 - margin and yaw < imageYaw1 + margin
+            if pitch > imagePitch1 - margin and pitch < imagePitch1 + margin
+                imageLink = imageLink1
+                imageDesc = imageDesc1
+                imageYaw = imageYaw1
+                imagePitch = imagePitch1
+            end
+        elseif yaw > imageYaw2 - margin and yaw < imageYaw2 + margin
+            if pitch > imagePitch2 - margin and pitch < imagePitch2 + margin
+                imageLink = imageLink2
+                imageDesc = imageDesc2
+                imageYaw = imageYaw2
+                imagePitch = imagePitch2
+            end
+        elseif yaw > imageYaw3 - margin and yaw < imageYaw3 + margin
+            if pitch > imagePitch3 - margin and pitch < imagePitch3 + margin
+                imageLink = imageLink3
+                imageDesc = imageDesc3
+                imageYaw = imageYaw3
+                imagePitch = imagePitch3
+            end
+        elseif yaw > imageYaw4 - margin and yaw < imageYaw4 + margin
+            if pitch > imagePitch4 - margin and pitch < imagePitch4 + margin
+                imageLink = imageLink4
+                imageDesc = imageDesc4
+                imageYaw = imageYaw4
+                imagePitch = imagePitch4
+            end
+        elseif yaw > imageYaw5 - margin and yaw < imageYaw5 + margin
+            if pitch > imagePitch5 - margin and pitch < imagePitch5 + margin
+                imageLink = imageLink5
+                imageDesc = imageDesc5
+                imageYaw = imageYaw5
+                imagePitch = imagePitch5
+            end
+        elseif yaw > imageYaw6 - margin and yaw < imageYaw6 + margin
+            if pitch > imagePitch6 - margin and pitch < imagePitch6 + margin
+                imageLink = imageLink6
+                imageDesc = imageDesc6
+                imageYaw = imageYaw6
+                imagePitch = imagePitch6
+            end
+        end
+    end
+end

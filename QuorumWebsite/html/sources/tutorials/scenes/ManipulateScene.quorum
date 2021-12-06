@@ -1,0 +1,74 @@
+use Libraries.Game.Game
+use Libraries.Game.Scenes.Scene
+use Libraries.System.File
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Item2D
+
+
+/*
+    This is a default class for creating a game in Quorum. Note that the Main 
+    action begins by calling StartGame(), which loads a window a game can 
+    be displayed in. The action CreateGame is where the game should load any 
+    assets, like images to be displayed, frames of animation, or sounds to be
+    played. 
+*/
+class Main is Game, KeyboardListener, CollisionListener2D
+    
+    Speech speech
+    Item2D player = undefined
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        // This code is provided by the Scene template. It automatically loads your scene into the game.
+        File file
+        file:SetPath("Scenes/Scene.qs")
+        LoadScene(file)
+        // End of templated CreateGame code.
+
+        player = FindItem2DByName("1: Boy")
+
+        if player not= undefined
+            player:CanRotate(false)
+    
+            AddKeyboardListener(me)
+            AddCollisionListener(me)
+            EnablePhysics2D(true)
+        end
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if player = undefined
+            return now
+        end
+
+        //these variables get the object's x and y coordinares
+        number x = player:GetX()
+        number y = player:GetY()
+
+        //this will be used to move the object 20 pixels
+        number amount = 20
+
+        if event:keyCode = event:LEFT
+            player:SetY(y-amount)
+        elseif event:keyCode = event:RIGHT
+            player:SetY(y+amount)
+        elseif event:keyCode = event:UP
+            player:SetX(x+amount)
+        elseif event:keyCode = event:DOWN
+            player:SetX(x-amount)
+        end
+    end
+
+    action ReleasedKey(KeyboardEvent event)
+        if player = undefined
+            return now
+        end
+    end
+end

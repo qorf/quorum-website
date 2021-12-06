@@ -1,0 +1,81 @@
+use Libraries.Game.Game
+use Libraries.Game.Scenes.Scene
+use Libraries.System.File
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Item3D
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Sound.Speech
+
+
+/*
+    This is a default class for creating a game in Quorum. Note that the Main 
+    action begins by calling StartGame(), which loads a window a game can 
+    be displayed in. The action CreateGame is where the game should load any 
+    assets, like images to be displayed, frames of animation, or sounds to be
+    played. 
+*/
+class Main is Game, KeyboardListener, CollisionListener3D
+    
+    Speech speech
+    Item3D player = undefined
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        // This code is provided by the Scene template. It automatically loads your scene into the game.
+        File file
+        file:SetPath("Scenes/Scene.qs")
+        LoadScene(file)
+        // End of templated CreateGame code.
+
+        player = FindItem3DByName("1: Girl")
+
+        if player not= undefined
+            player:CanRotate(false)
+    
+            AddKeyboardListener(me)
+            AddCollisionListener(me)
+            EnablePhysics3D(true)
+        end
+    end
+
+    action Update(number seconds)
+    end
+
+    action PressedKey(KeyboardEvent event)
+        if player = undefined
+            return now
+        end
+
+        //these variables get the object's x and y coordinares
+        number x = player:GetX()
+        number y = player:GetY()
+        number z = player:GetZ()
+
+        //this will be used to move the object 20 pixels
+        number amount = 20
+
+        if event:keyCode = event:LEFT
+            player:SetX(x-amount)
+        elseif event:keyCode = event:RIGHT
+            player:SetX(x+amount)
+        elseif event:keyCode = event:UP
+            player:SetZ(z+amount)
+        elseif event:keyCode = event:DOWN
+            player:SetZ(z-amount)
+        elseif event:keyCode = event:CONTROL_LEFT
+            player:SetY(y-amount)
+        elseif event:keyCode = event:CONTROL_RIGHT
+            player:SetY(y-amount)
+        end
+    end
+
+    action ReleasedKey(KeyboardEvent event)
+        if player = undefined
+            return now
+        end
+    end
+end
