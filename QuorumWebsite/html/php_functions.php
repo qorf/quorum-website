@@ -357,6 +357,7 @@ function isValidResetKey($key)
     $conn = null;
 
     $rows = $stmt->rowCount();
+	$current_time = date("Y-m-d H:i:s");
 
     // For any rows we found, check if they're invalid (already expired or already used).
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
