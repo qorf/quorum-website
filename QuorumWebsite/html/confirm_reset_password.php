@@ -15,7 +15,7 @@
 
     $key = $_POST['pagekey'];
 
-    if ($key === null || key === "")
+    if ($key === null || $key === "")
     {
         echo "Invalid page key - if you need to reset your password, use the 'forgot password' option in the login pane.";
         return;
