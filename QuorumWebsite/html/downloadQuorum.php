@@ -1,9 +1,17 @@
 <?php
 
     require_once("php_functions.php");
-    
-    $session = $_COOKIE['sessionID'];
-    $user_name = getUserName($session);
+
+    if (isset($_COOKIE['sessionID']))
+    {
+        $session = $_COOKIE['sessionID'];
+        $user_name = getUserName($session);
+    }
+    else
+    {
+        $session = 0;
+        $user_name = "";
+    }
 
     if ($user_name === "") {
         echo '<!DOCTYPE html>
@@ -103,7 +111,7 @@
     if ($requestedFile === "QuorumStudioWindows" . $studioVersionName . ".exe")
     {
         $file_name = 'Quorum Studio ' . $studioVersionName . '.exe';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $studioVersionMajor;
         $minor = $studioVersionMinor;
         $download_name = "Quorum Studio Windows";
@@ -111,7 +119,7 @@
     elseif ($requestedFile === "QuorumStudioMac" . $studioVersionName . ".pkg")
     {
         $file_name = 'Quorum Studio ' . $studioVersionName . '.pkg';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $studioVersionMajor;
         $minor = $studioVersionMinor;
         $download_name = "Quorum Studio Mac";
@@ -119,7 +127,7 @@
     elseif ($requestedFile === "QuorumStudioWindowsDaily.exe")
     {
         $file_name = 'QuorumStudioWindowsDaily.exe';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $quorumStudioDailyMajor;
         $minor = $quorumStudioDailyMinor;
         $download_name = "Quorum Studio Daily Windows";
@@ -127,7 +135,7 @@
     elseif ($requestedFile === "QuorumStudioMacDaily.pkg")
     {
         $file_name = 'QuorumStudioMacDaily.pkg';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $quorumStudioDailyMajor;
         $minor = $quorumStudioDailyMinor;
         $download_name = "Quorum Studio Daily Mac";
@@ -135,7 +143,7 @@
     elseif ($requestedFile === "QuorumWindows" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip")
     {
         $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . '.zip';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $quorumVersionMajor;
         $minor = $quorumVersionMinor;
         $download_name = "Quorum Console Windows";
@@ -143,7 +151,7 @@
     elseif ($requestedFile === "QuorumMac" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip")
     {
         $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . '.zip';
-        $file = '/var/www/Downloads/' . $file_name;
+        $file = '/var/www/downloads/' . $file_name;
         $major = $quorumVersionMajor;
         $minor = $quorumVersionMinor;
         $download_name = "Quorum Console Mac";
