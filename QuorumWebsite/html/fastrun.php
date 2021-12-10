@@ -33,7 +33,7 @@
         curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($_POST));
         
         // set variables for database submission
-        $version = '10';     // hard code for each quorum release
+        $version = '9.5';     // hard code for each quorum release
         $code = $_POST['code'];
         $output = '';       // filled below after compile
         $button = '0';      // 0 for build | 1 for run
