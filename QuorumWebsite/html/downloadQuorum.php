@@ -104,6 +104,7 @@
     
     $quorumVersionMajor = 9;
     $quorumVersionMinor = 0;
+    $quorumVersionRevision = 0;
     
     $quorumStudioDailyMajor = 3;
     $quorumStudioDailyMinor = 0;
@@ -140,17 +141,17 @@
         $minor = $quorumStudioDailyMinor;
         $download_name = "Quorum Studio Daily Mac";
     }
-    elseif ($requestedFile === "QuorumWindows" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip")
+    elseif ($requestedFile === "QuorumWindows" . $quorumVersionMajor . "." . $quorumVersionMinor . "." . $quorumVersionRevision . ".zip")
     {
-        $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . '.zip';
+        $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . "." . $quorumVersionRevision . '.zip';
         $file = '/var/www/downloads/' . $file_name;
         $major = $quorumVersionMajor;
         $minor = $quorumVersionMinor;
         $download_name = "Quorum Console Windows";
     }
-    elseif ($requestedFile === "QuorumMac" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip")
+    elseif ($requestedFile === "QuorumMac" . $quorumVersionMajor . "." . $quorumVersionMinor . "." . $quorumVersionRevision . ".zip")
     {
-        $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . '.zip';
+        $file_name = 'Quorum ' . $quorumVersionMajor . '.' . $quorumVersionMinor . "." . $quorumVersionRevision . '.zip';
         $file = '/var/www/downloads/' . $file_name;
         $major = $quorumVersionMajor;
         $minor = $quorumVersionMinor;
