@@ -316,8 +316,10 @@ var submitCode = function () {
         e.preventDefault();
         var target = e.target.id.slice(0, -9); //takes off "IdeButton" from the id
         $('#' + target + 'IdeOutput').text("");
-        var pageURL = "";
+        var pageURL = window.location.href;
         var tempCode = $('#' + target + 'IdeInput').val();
+        let outputRegion = document.getElementById(target+"IdeOutput")
+        currentIDEOutput_$Global_ =  target + 'IdeOutput';
         if (tempCode == "") {
             showModal($('#noCodeModalContainer')); //the root element of the modal
         } else {
@@ -327,15 +329,29 @@ var submitCode = function () {
                 url: "/proxy.php",
                 data: codeData,
                 success: function (result) {
-                    try {
-                        $('#' + target + 'IdeOutput').html(eval(result));
-                    } catch (e) {
-                        if (e instanceof SyntaxError) {
-                            $('#' + target + 'IdeOutput').html(result);
-                            hadCompilerError = true;
-        }
+                    outputRegion.innerHTML = "";
+                    OuTpUt_$tRiNg_ = "";
+                    let head= document.getElementsByTagName('head')[0];
+                    let run = document.getElementById("Runnable");
+                    if(run != null) {
+                        Stop();
+                        head.removeChild(run);
                     }
-                        completedcheck = checkOutputGeneral($('#' + target + 'IdeOutput').html());
+                    total_console_length239847239482734 = 0;
+                    length = 0;
+
+                    if(result.startsWith( "<div class=")) {
+                        outputRegion.innerHTML = result;
+                    } else if(result.startsWith("Failed to connect")) {
+                        outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com"
+                    } else {
+                        var script= document.createElement('script');
+                        script.id = "Runnable";
+                        script.innerHTML= result;
+                        head.appendChild(script);
+                        Start();
+                    }
+                    completedcheck = checkOutputGeneral(OuTpUt_$tRiNg_);
                     var reportData = {code: tempCode, uuid: 0/*id*/, pagenumber: 0/*pageNumber*/, slidenumber: 0/*slideNr*/, resultCode: result, completed: 0/*completedcheck*/, pageurl: pageURL, gacookie: 0/*ga_cookie*/};
                     $.ajax({
                         type: "POST",
@@ -347,8 +363,7 @@ var submitCode = function () {
                         error: function (xhr, ajaxOptions, thrownError) {
                             console.log(xhr, ajaxOptions, thrownError);
                         }
-
-    });
+                    });
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     $('#' + target + 'IdeOutput').html("Error: Could not connect to server: " + thrownError.toString());
@@ -999,26 +1014,26 @@ var checkOutputGeneral = function (output) {
     console.log(path);
     
     var outputArray = [];
-    outputArray[0] = 'GATTACA<br>Welcome to GATTACA<br>';
+    outputArray[0] = 'GATTACA\nWelcome to GATTACA\n';
     outputArray[1] = 'The area is 28.';
-    outputArray[2] = 'Hello!<br>';
-    outputArray[3] = '2.0<br>4.0<br>6.0<br>8.0<br>10.0<br>';
-    outputArray[4] = '0.0 is even<br>1.0 is odd<br>2.0 is even<br>3.0 is odd<br>4.0 is even<br>5.0 is odd<br>6.0 is even<br>7.0 is odd<br>8.0 is even<br>9.0 is odd<br>';
-    outputArray[5] = 'Programming in Quorum is fun!<br>';
+    outputArray[2] = 'Hello!\n';
+    outputArray[3] = '2.0\n4.0\n6.0\n8.0\n10.0\n';
+    outputArray[4] = '0.0 is even\n1.0 is odd\n2.0 is even\n3.0 is odd\n4.0 is even\n5.0 is odd\n6.0 is even\n7.0 is odd\n8.0 is even\n9.0 is odd\n';
+    outputArray[5] = 'Programming in Quorum is fun!\n';
 
     expected = null;
     if(path === "/hourofcode/part1.html") {
-        expected = 'GATTACA<br>Welcome to GATTACA<br>'.toLowerCase();
+        expected = 'GATTACA\nWelcome to GATTACA\n'.toLowerCase();
     } else if(path === "/hourofcode/part2.html") {
-        expected = 'The area is 28.<br>'.toLowerCase();
+        expected = 'The area is 28.\n'.toLowerCase();
     } else if(path === "/hourofcode/part3.html") {
-        expected = 'Hello!<br>'.toLowerCase();
+        expected = 'Hello!\n'.toLowerCase();
     } else if(path === "/hourofcode/part4.html") {
-        expected = '2.0<br>4.0<br>6.0<br>8.0<br>10.0<br>'.toLowerCase();
+        expected = '2.0\n4.0\n6.0\n8.0\n10.0\n'.toLowerCase();
     } else if(path === "/hourofcode/part5.html") {
-        expected = '0.0 is even<br>1.0 is odd<br>2.0 is even<br>3.0 is odd<br>4.0 is even<br>5.0 is odd<br>6.0 is even<br>7.0 is odd<br>8.0 is even<br>9.0 is odd<br>'.toLowerCase();
+        expected = '0.0 is even\n1.0 is odd\n2.0 is even\n3.0 is odd\n4.0 is even\n5.0 is odd\n6.0 is even\n7.0 is odd\n8.0 is even\n9.0 is odd\n'.toLowerCase();
     } else if(path === "/hourofcode/part6.html") {
-        expected = 'Programming in Quorum is fun!<br>'.toLowerCase();
+        expected = 'Programming in Quorum is fun!\n'.toLowerCase();
     }
     
     console.log(expected);

@@ -21,7 +21,7 @@ ob_start();
  * http://www.run.quorumlanguage.com
  * http://jedi.cs.unlv.edu:8080/Quorum/
  *  */
-$base = "localhost:8080/Quorum/";  //set this to the url you want to scrape
+$base = "quorum_server:1269";  //set this to the url you want to scrape
 $ckfile = '/var/apache/tmp/simpleproxy-cookie-' . session_id();
 //$ckfile = '/home/stefik/tmp/simpleproxy-cookie-' . session_id();  //this can be set to anywhere you fancy!  just make sure it is secure.
 
@@ -95,7 +95,7 @@ if (curl_error($curlSession)){
         $body = $ar[1];
         
         //handle headers - simply re-outputing them
-        $header_ar = split(chr(10),$header);
+        $header_ar = explode(chr(10),$header);
         foreach($header_ar as $k=>$v){
                 if(!preg_match("/^Transfer-Encoding/",$v)){
                         $v = str_replace($base,$mydomain,$v); //header rewrite if needed
