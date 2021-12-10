@@ -204,6 +204,10 @@
     $date = date("Y-m-d H:i:s");
 
     try {
+        $servername = $_ENV["MYSQL_NAME"] . ":" . $_ENV["MYSQL_PORT"];
+        $dbname = $_ENV["MYSQL_DATABASE"];
+        $username = $_ENV["MYSQL_USER"];
+        $password = $_ENV["MYSQL_PASSWORD"];
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $conn->prepare("INSERT INTO quorum_studio_downloads (operating_system, address, time, version_major, version_minor, username, download) VALUES (:os, :ip, :date, :major, :minor, :user_name, :download)");
