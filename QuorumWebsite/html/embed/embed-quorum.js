@@ -11,9 +11,9 @@ function LoadScript(url) {
     document.head.appendChild(script);
 }
 
-LoadScript("https://localhost/script/QuorumStandardLibrary.js");
-LoadScript("https://localhost/script/prism-quorum.js");
-LoadScript("https://localhost/script/load.js");
+LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js");
+LoadScript("https://quorumlanguage.com/script/prism-quorum.js");
+LoadScript("https://quorumlanguage.com/script/load.js");
 
 function update_console() {
     if (typeof OuTpUt_$tRiNg_ !== 'undefined' && typeof currentIDEOutput_$Global_ !== 'undefined') {
@@ -195,7 +195,7 @@ var newRunCode = function (input, output, canvas, execute) {
         }
     };
 
-    xmlhttp.open("POST", "/fastrun.php", true);
+    xmlhttp.open("POST", "https://quorumlanguage.com/fastrun.php", true);
     xmlhttp.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
     xmlhttp.send("code=" + codeInput + "&" + "pageURL=" + pageURL + "&" + "ideName=" + ideName);
 };
