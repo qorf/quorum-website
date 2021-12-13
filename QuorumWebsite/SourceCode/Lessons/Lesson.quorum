@@ -277,8 +277,39 @@ class Lesson is WebPage
         return ""
     end
 
+   /*
+        This is a helper action for creating an IDE on a page and potentially including source code in it.
+        If codePath is undefined, it is ignored. If it points to an invalid file, an error is thrown.
+
+        Attribute: Parameter div
+        Attribute: Parameter ideName this name must be unique
+        Attribute: Parameter the title of the IDE
+        Attribute: Parameter the subtitle of the IDE
+        Attribute: Parameter a path to a file with the code that lives in this IDE
+    */
+    action AddIDE(Division div, text ideName, text title, text subtitle, text codePath)
+        CodingOnline ide
+        ide:SetDevelopmentLabel(title)
+        ide:SetUniqueIdentifier(ideName)
+        ide:Setup()
+        ide:GetIDESubtitle():AddText(subtitle)
+        div:Add(ide)
+
+        if codePath not= undefined
+            File file
+            file:SetPath(codePath)
+            if file:Exists() and file:GetFileSize() > 0
+                ide:GetIDEInputArea():AddText(file:Read())
+            end
+        end
+    end
+
+    action AddIDE(Division div, text ideName, text title, text subtitle)
+        AddIDE(div, ideName, title, subtitle, undefined)
+    end
+
     action AddSideBySideIDE(Division div, text ideName, text title, text subtitle)
-        SideBySideIDE ide
+        CodingOnline ide
         ide:SetDevelopmentLabel(title)
         ide:SetUniqueIdentifier(ideName)
         ide:Setup()
@@ -287,8 +318,7 @@ class Lesson is WebPage
     end
 
     action AddGameIDE(Division div, text ideName, text title, text subtitle)
-        SideBySideIDE ide
-        ide:SetGameEnvironment(true)
+        CodingOnline ide
         ide:SetDevelopmentLabel(title)
         ide:SetUniqueIdentifier(ideName)
         ide:Setup()
