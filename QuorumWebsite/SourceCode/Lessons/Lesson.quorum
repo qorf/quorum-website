@@ -11,6 +11,7 @@ use Libraries.Web.Page.WebPageHeader
 use Libraries.Web.Page.MainContent
 use Libraries.Containers.Array
 use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Script
 
 
 class Lesson is WebPage
@@ -20,6 +21,7 @@ class Lesson is WebPage
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
     Lesson nextLesson = undefined
+    text scriptsLocation = "/script/"
 
 
     action Setup
@@ -109,20 +111,36 @@ class Lesson is WebPage
             AddMetaData(description)
         end
 
+        // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
         AddKeywords()
         AddScript("/script/jquery-1.8.3.min.js")
-        AddScript("/script/script.js")
-        
+        AddScript("/script/QuorumStandardLibrary.js" + versions:GetLanguageVersionQuery())
+        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+        AddScript("/script/prism-quorum.js" + versions:GetScriptVersionQuery())
+        Script moduleLocateFile
+        moduleLocateFile:SetCode("        var Module = {
+            locateFile: function(path, prefix) {
+                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
+                return prefix + path;
+            }
+        };")
+        GetWebPageHeader():Add(moduleLocateFile)
+        AddScript("/script/load.js" + versions:GetLoadVersionQuery())
+
         //add style sheet tags
+        AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
         AddStylesheet("/style/style.css")
         AddStylesheet("/style/google.css")
         AddIcon("/media/favicon.ico")
 
         //Add Responsive Stylesheets
         WebPageHeader webHeader = me:GetWebPageHeader()
-        webHeader:Add(GetMediaStyleSheet("/style/style-small.css", "(max-width: 500px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css", "(min-width: 501px) and (max-width: 1000px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-large.css", "(min-width: 1001px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-small.css" + versions:GetCSSVersionQuery(), "(max-width: 500px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css" + versions:GetCSSVersionQuery(), "(min-width: 501px) and (max-width: 1000px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-large.css" + versions:GetCSSVersionQuery(), "(min-width: 1001px)"))
 
         //Add the navigation bar
         NavigationBar navigation
