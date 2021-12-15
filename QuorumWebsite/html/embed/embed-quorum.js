@@ -11,9 +11,31 @@ function LoadScript(url) {
     document.head.appendChild(script);
 }
 
-LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js");
-LoadScript("https://quorumlanguage.com/script/prism-quorum.js");
+var prismScript = undefined;
+function LoadPrism()
+{
+    url = "https://quorumlanguage.com/script/prism-quorum.js"
+    callback = hightlightCode
+    // Adding the script tag to the head as suggested before
+    var script = document.createElement("script");
+    script.type = 'text/javascript';
+    script.src = url;
+    // Then bind the event to the callback function.
+    script.addEventListener("load", callback);
+    prismScript = script;
+    // Fire the loading
+    document.head.appendChild(script);
+}
+
+var hightlightCode = function() {
+    Prism.highlightAll();
+};
+
+LoadPrism();
 LoadScript("https://quorumlanguage.com/script/load.js");
+LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js");
+
+
 
 function update_console() {
     if (typeof OuTpUt_$tRiNg_ !== 'undefined' && typeof currentIDEOutput_$Global_ !== 'undefined') {
@@ -225,14 +247,18 @@ var InjectQuorumEnvironment = function(element, name, code) {
     div.id = name + "OuterQuorumEnvironment";
     div.innerHTML = result;
     div.setAttribute("class", "quorum-embed");
-    
+
     element.appendChild(div);
-    
+
     var outer = document.getElementById(name + 'ideTextboxInput');
     outer.value = code;
     var editor = document.getElementById(name + 'IdeInput');
     editor.value = code;
-    editAreaUpdate(editor);
+    if(typeof Prism !== 'undefined') {
+        editAreaUpdate(editor);
+    } else {
+        prismScript.addEventListener("load", () => {editAreaUpdate(editor);});
+    }
 }
 var GenerateQuorumEnvironment = function(name) {
     var environment = 
