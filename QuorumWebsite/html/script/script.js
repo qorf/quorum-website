@@ -951,61 +951,9 @@ var embedCode = function(input, output, copyArea) {
     var inputRegion = document.getElementById(input);
     var outputRegion = document.getElementById(output);
 
-    var inputValue = inputRegion.value;
-    inputValue = inputValue.replace(/"/g, '&quot;');
-    inputValue = inputValue.replace(/\n/g, '\\n');
+    window.open("tutorials/language/embedTutorial.html", "_blank")
+    outputRegion.innerHTML = outputRegion.innerHTML + "<br></br>A tab was opened which contains a tutorial on how to embed Quorum online.";
 
-    var html = "<div style=\"position: relative; width: 100%; height: 580px;\">" +
-            "<script>" +
-                "var loadEmbeddedIDE = function()" +
-                "{" +
-                    "document.embedForm.submit();" +
-                    "loadEmbeddedIDE = function(){};" +
-                "};" +
-            "</script>" +
-            "<form name=\"embedForm\" target=\"embeddedQuorum\" action=\"http://www.quorumlanguage.com/embedded_ide.php\" method=\"get\">" +
-                "<input id= \"hiddenCode\" type=\"hidden\" name=\"embedcode\" value=\"" + inputValue + "\" />" +
-            "</form>" +
-            "<iframe onload=\"loadEmbeddedIDE()\" name=\"embeddedQuorum\" frameborder=\"0\" scrolling=\"no\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%;\"></iframe>" +
-        "</div>";
-
-    html = html.replace(/&/g, '&amp');
-    html = html.replace(/</g, '&lt');
-    html = html.replace(/>/g, '&gt');
-    
-    outputRegion.innerHTML = html;
-    
-    try
-    {
-        var copyArea = document.getElementById(copyArea);
-        copyArea.value = html;
-        copyArea.type = "text";
-        if (copyArea.select)
-        {
-            copyArea.select();
-        }
-        else
-        {
-            copyArea.focus();
-            copyArea.setSelectionRange(0, html.length);
-        }
-        var success = document.execCommand('copy');
-        copyArea.type = "hidden";
-        if (!success)
-        {
-            console.log("Could not copy to the clipboard.");
-            outputRegion.innerHTML = outputRegion.innerHTML + "<br></br>You can copy the above code into your own site to embed the editor.";
-        }
-        else
-        {
-            outputRegion.innerHTML = outputRegion.innerHTML + "<br></br>The code to embed this editor has been copied to your clipboard, or you can copy it above.";
-        }
-    }
-    catch (error)
-    {
-        console.log("Copying to the clipboard was unsuccessful: " + error.message);
-        outputRegion.innerHTML = outputRegion.innerHTML + "<br></br>You can copy the above code into your own site to embed the editor.";
-    }
 };
 
 var checkOutputGeneral = function (output) {
