@@ -574,6 +574,9 @@ var updateLineNumbers = function(element, numLines) {
 
 //IDE submit button action
 var newRunCode = function (input, output, canvas, execute) {
+	// Attempt to stop previously running programs on this page first.
+	stopProgram();
+	
     var codeInput = document.getElementById(input).querySelector(".ideEditing").value;
     var outputRegion = document.getElementById(output);
     
