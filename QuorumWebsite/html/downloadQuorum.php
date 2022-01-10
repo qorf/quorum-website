@@ -264,8 +264,11 @@
         $buffer = ''; 
         while (!feof($handle)) { 
           $buffer = fread($handle, 4096); 
-          echo $buffer; 
-          ob_flush(); 
+          echo $buffer;
+          if (ob_get_level() > 0)
+          {
+            ob_flush();
+          }
           flush(); 
         } 
         fclose($handle); 
