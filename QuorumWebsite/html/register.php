@@ -82,15 +82,21 @@
     $hashed_password = password_hash($user_pass, PASSWORD_DEFAULT);
     
     try {
+        $current_time = date("Y-m-d H:i:s");
+        $current_tries = 0;
+        $birthday_formatted = $birthday_date->format("Y-m-d");
+
         $conn = connect();
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("INSERT INTO sodbeans_users (username, password, first_name, last_name, email, birthday) VALUES (:username, :password, :first_name, :last_name, :email, :birthday)");
+        $stmt = $conn->prepare("INSERT INTO sodbeans_users (username, password, first_name, last_name, email, birthday, reset_password_expire, tries) VALUES (:username, :password, :first_name, :last_name, :email, :birthday, :reset_password_expire, :tries)");
         $stmt->bindParam(':username', $user_name);
         $stmt->bindParam(':password', $hashed_password);
         $stmt->bindParam(':first_name', $first_name);
         $stmt->bindParam(':last_name', $last_name);
         $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':birthday', $birthday);
+        $stmt->bindParam(':birthday', $birthday_formatted);
+        $stmt->bindParam(':reset_password_expire', $current_time);
+        $stmt->bindParam(':tries', $current_tries);
         $stmt->execute();
         echo "success";
     } catch (PDOException $e) {
