@@ -13,6 +13,7 @@
         $user_name = "";
     }
 
+/*
     if ($user_name === "") {
         echo '<!DOCTYPE html>
     <html xml:lang= "en" lang= "en" >
@@ -93,6 +94,7 @@
             </small></footer></body></html>';
         return;
     }
+*/
 
     $requestedFile = $_GET['file'];
 
