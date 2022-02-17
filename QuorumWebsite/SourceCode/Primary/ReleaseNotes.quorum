@@ -14,6 +14,7 @@ use Libraries.Web.Page.InlineFrame
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
 
 class ReleaseNotes is Lesson
     text dq = ""
@@ -21,6 +22,133 @@ class ReleaseNotes is Lesson
     text cr = ""
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
+
+    action QuorumStudio3_5Notes(Division bodyDiv)
+        bodyDiv:AddHeading("Quorum Studio 3.5 February 4, 2022", 1)
+        bodyDiv:AddParagraph("The overall technical architecture for Quorum Studio 4.0 and Quorum 10.0 is significantly different than in previous software releases on the project. In order to get adequate testing before the official release in the summer of 2022, we are putting up a middle of the road version of the technologies to make it easier for our team, and the community, to test everything. As this version of Quorum and Quorum Studio is about half-way between the next version, we are calling these versions Quorum Studio 3.5 and Quorum 9.5.")
+
+        // Shaders
+        bodyDiv:AddHeading("Graphics Shaders and Updates",2)
+        bodyDiv:AddParagraph("For some time, Quorum has used OpenGL for rendering its content. Historically, because Quorum Studio was used across many school systems, we kept the OpenGL version rather old, as some schools use older hardware. Notably, we were using OpenGL 2.1, from 2006. While this system worked well enough to invent much of the accessible graphics pipeline in the language, OpenGL 2.1 used a particular kind of graphics pipeline that is now outdated. Further, OpenGL is having challenges today. Apple has deprecated this system, limits it to OpenGL 4.1 (about 2011 or so), and is quite slow compared to Windows in our testing. Further, OpenGL itself is sometimes being replaced by third parties (e.g., Apple's metal, Vulkan), while others still are maintaining it (e.g., WebGL, Android). The future of OpenGL is thus uncertain and we are preparing for the potential reality where its creators abandon it.")
+        bodyDiv:AddParagraph("To try and fix this issue, we have redesigned Quorum's backend for Quorum 9.5. This includes the following changes:")
+        OrderedList list1
+        list1:AddListItem("Upgrading to OpenGL 4.1 (desktop), OpenGLES 3.0 (mobile), or WebGL 2.0 (web). Despite the varying version numbers, these are all approximately the same OpenGL version for different platforms.")
+        list1:AddListItem("Completed a near rewrite of the graphics system, exposing the raw shader system from within Quorum code.")
+        list1:AddListItem("Added a set of raw graphics calls, which gives considerably more control of the graphics pipeline from within Quorum. These calls do largely map to OpenGL, but we have done our best to make them neutral across graphics pipelines. This will change in the future and we hope will become even more neutral over time.")
+        list1:AddListItem("Added support for mapping calls into the graphics system, changing, and creating shaders. The idea is that you can set shaders on individual items or control them in a number of other ways. ")
+        list1:AddListItem("Added support for geometry and tesselation shaders from within Quorum.")
+        list1:AddListItem("Currently, the shader code itself is written in GLSL. We strongly suspect this will change over time, because different platforms have different requirements. Further, even with these changes, writing shaders is difficult, and highly mathematical, so we suspect the team will be thinking of plans related to ease of use in the future as well. Point being, while users can use shaders now, we urge the community not to go nuts in creating GLSL specific dependencies. ")
+        list1:AddListItem("Adjusted and improved the graphics primitives that can be used on the system, including in the creation of a new polygon function from Drawable, which allows more sophisticated shapes to be drawn and also allows those shapes to be drawn with less pixelation.")
+        bodyDiv:Add(list1)
+
+
+        // Database
+        bodyDiv:AddHeading("Database Support (Beta)",2)
+        Paragraph dbParagraph
+        dbParagraph:AddText("Based on the work of ")
+        dbParagraph:AddLink("Drews et al.", "https://dl.acm.org/doi/10.1145/3368089.3409701?cid=81314486348")
+        dbParagraph:AddText(", we have implemented a new database system for Quorum. In this version, we consider this system to be in beta. The core approach behind this is described in the paper (the hybrid system, which happened to do best in the experiment) and allows users to write code to connect to, get data from, and send data to, a database system. In the first version, we support ")
+        dbParagraph:AddLink("MySQL", "https://www.mysql.com/")
+        dbParagraph:AddText(". For those needing different architectures (e.g., postgres), there is an architecture in place where it can be added, but such systems are not yet supported. Here are some of the core features of the system.")
+        bodyDiv:Add(dbParagraph)
+        OrderedList list2
+        list2:AddListItem("Support for creating, adjusting, and dropping tables")
+        list2:AddListItem("Support for logging into databases and closing them")
+        list2:AddListItem("Support for many kinds of queries, written through typical Quorum syntax. ")
+        list2:AddListItem("Integration of database support into the data science systems, like charts, statistics, and DataFrames. This allows users to query databases and then run calculations on any results without needing custom programming languages or syntax.")
+        bodyDiv:Add(list2)
+
+        // Charts
+        bodyDiv:AddHeading("Charts",2)
+        bodyDiv:AddParagraph("As our work continues on Data Science for Quorum, we have made significant improvements to charts. There is a lot more work to do and how to tackle it is a balance. For example, charts need to look correct visually and, as those looks change, each piece needs to be made available in the accessibility system. Further, the charts need to be accessible online and offline and this means we need different modes for different purposes. Each of these features requires careful thinking and time. We expect many releases over the next few years on these features. Recent changes follow:")
+        OrderedList list3
+        list3:AddListItem("Added a series of color templates that can be used. Many of the choices made by the team come from evidence in the academic literature [1,2,3], although so far as we can tell, there really is no perfect choice for the defaults. Thus, we have also given the user the ability to change between them, or set their own, as color needs are both partially subjective and vary, at least to a degree, by personal preference.")
+        list3:AddListItem("Added the ability to split charts into facets, meaning separate them by factors from a DataFrame. Another way to say this might be to say that we can now automatically separate charts out by variables of interest.")
+        list3:AddListItem("Adjusted a host of minor graphical changes to the charts to make them look visually nicer")
+        list3:AddListItem("Added customization options for axes, legend position, font size, gridlines, group brackets, and point/line density.")
+        list3:AddListItem("Added accessible navigation to charts exported as SVGs (bar chart, histogram, scatterplot, pie chart, violin plot). This work is complicated and a work in progress. ")
+        list3:AddListItem("Added support for additional Chart customization features in the SVG export process (visual update, gridlines, vertical/horizontal orientation, stacked/unstacked bars)")
+        list3:AddListItem("Added pie charts and donut charts.")
+        list3:AddListItem("Added a first step way to embed these charts into other systems accessibly.")
+        bodyDiv:Add(list3)
+
+        // Backend
+        bodyDiv:AddHeading("Quorum Backend Changes",2)
+        bodyDiv:AddParagraph("Quorum 9.5 introduces a rewritten backend for managing Quorum Plugins, through the integration of Gradle. For most users, this will not matter, but the key change is that when a user clicks build in Quorum Studio, what the language generates has changed a great deal. Thus, Quorum programs written in version 9.5 are source compatible with previous versions, and technically also generate the same bytecode from the compiler, but they interact with plugins differently. This change greatly simplifies how we connect into third party systems, including the iPhone, Android, and other features. Features include:")
+        OrderedList list4
+        list4:AddListItem("Quorum now uses Gradle 7.1 from within the primary build system. Users overriding the standard library (rare for users to do), will now see different messages from the system.")
+        list4:AddListItem("Changed QuorumStudio to use JDK 11 by default. The reason for this is, especially, because dependence on JDK 8 on Mac was preventing us from conducting experiments with accessibility on this operating system. Changing this was thus necessary to even begin work on Mac accessibility")
+        list4:AddListItem("All plugin and Quorum code remains set to JDK 8 bytecode, not JDK 11, because otherwise it would break compatibility with LEGO mindstorms")
+        list4:AddListItem("From Quorum, all plugins are now generated using projects in IntelliJ or the console. This allows users with accessibility needs to write the code in any accessible format they wish, then run the full build from within Quorum Studio or from the console, removing an additional accessibility barrier. This also removes our previous reliance on NetBeans.")
+        list4:AddListItem("Fixed a number of small bugs in the compiler, especially related to the new parser architecture introduced in Quorum 9")
+        list4:AddListItem("Fixed an extremely annoying bug in the compiler where parameters would not properly propagate their location information, which caused use hints to break and compiler errors to give the wrong location for essentially any error related to parameters")
+        list4:AddListItem("Adjusted the standard library scripts to adjust how dependencies are managed, including how JavaScript is generated")
+        list4:AddListItem("Quorum's test suite now uses NodeJS to execute")
+        bodyDiv:Add(list4)
+
+        // code completion 
+        bodyDiv:AddHeading("Code Completion",2)
+        bodyDiv:AddParagraph("One major improvement in Quorum Studio 3.5 is code completion. While Quorum has had code completion for a while, it has generally been pretty buggy. With the advent of Quorum 9's hand parsing architecture, however, it became much easier for us to control what information can be sent to the code completion system, which in turn made it easier to rewrite it and clean it up. For this reason, code completion in this version is now much more reliable across the board. Some general changes include:")
+        OrderedList list5
+        list5:AddListItem("Fixed a bug in code completion causing the return type to not show up properly")
+        list5:AddListItem("Fixed a bug in code completion causing many kinds of expressions to not parse correctly and thus give you no information")
+        list5:AddListItem("Added chaining to code completion. Not all permutations are yet supported, but the feature covers a significant number of common cases")
+        list5:AddListItem("Significantly improved Quorum's ability to understand what would be useful to a user based upon context in the source")
+        list5:AddListItem("Improved suggestions, including being able to provide hints for basic primitives, in addition to classes in the standard library, and action calls")
+        bodyDiv:Add(list5)
+
+        // iphone 
+        bodyDiv:AddHeading("iPhone Changes",2)
+        bodyDiv:AddParagraph("Quorum has several changes to the iPhone architecture, including:")
+        OrderedList list6
+        list6:AddListItem("The addition of Core Haptics to the supported APIs. The implementation is in beta and has not been well tested, but we are including it specifically so we can run experiments on it and improve it. The tricky part here is that we want calls on android for haptics to largely feel similar to those on iPhone, but we need to evaluate this using funky devices called laser doppler vibrometers. Also, laser doppler vibrometer is a fun thing to say. Go ahead. Say it 10 times fast. It's fun.")
+        list6:AddListItem("Updated iPhone to the latest MobiVM release through Gradle")
+        list6:AddListItem("Updated the Gradle support on iPhone to version 6.9. This is different than standard Quorum, but MobiVM does not yet support 7.1 and this version is sufficient for our needs")
+        list6:AddListItem("Our iPhone support has historically had an extremely slow build process, due to the way we are building the native files and converting using MobiVM. This is still true, but we have introduced some primitive caching, which makes repeated builds faster. More work is needed on this system to speed up iPhone support in various contexts, but it is an improvement.")
+        list6:AddListItem("Updated the graphics system to use the new shader architecture. We should note that due to inconsistencies in Apple's GLSL implementation on such devices, there are some continued challenges in graphics on such devices")
+        bodyDiv:Add(list6)
+
+        // other
+        bodyDiv:AddHeading("Other Features",2)
+        OrderedList list7
+        list7:AddListItem("Added a Serial class to Quorum for Serial port connections or bluetooth. Special thanks to Alex Chavez for the Pull Request for this feature")
+        list7:AddListItem("Added a SerialPort class to allow communication on individual, but separate, ports.")
+        list7:AddListItem("Added a way to query for available serial ports")
+        list7:AddListItem("Made a host of improvements to the DateTime class, which badly needed the attention.")
+        list7:AddListItem("Added support for dates into the DataFrame class")
+        bodyDiv:Add(list7)
+
+        // website
+        bodyDiv:AddHeading("Quorum Website Upgrade",2)
+        bodyDiv:AddParagraph("We have completed our long-planned upgrade to the Quorum website. This included a rewrite of a whole host of systems and an upgrade from Quorum 6 online to Quorum 9.5. Quorum can now be embedded into third party websites and run from anywhere. Finally, we have begun our experiments with making accessible graphics work in a web browser. This feature will take quite some time to get right, but we have been updating and tweaking the pieces since the initial update in December.")
+        OrderedList list8
+        list8:AddListItem("Significantly changed the way you program on the website. This adds syntax highlighting, more hotkeys, and buttons.")
+        list8:AddListItem("Added code regions that are still accessible, but visually look better")
+        list8:AddListItem("Added code regions automatically in the generated documentation")
+        list8:AddListItem("Changed to a new server infrastructure that should be much faster for most users")
+        list8:AddListItem("Made the compiler an order of magnitude faster online")
+        list8:AddListItem("Placed many of the compilation dependencies behind cloudflare, which should speed things up especially for international users")
+        list8:AddListItem("Upgraded the online compiler to Quorum 9.5 ")
+        list8:AddListItem("Made it so when you compile a program, you get immediate feedback, instead of jumping to a new page")
+        list8:AddListItem("Integrated a graphics region in the online development environments so you can conduct graphics on the same page")
+        list8:AddListItem("Upgraded the graphics system online to WebGL 2.0")
+        list8:AddListItem("Fixed a host of small bugs in the online version of Quorum")
+        bodyDiv:Add(list8)
+
+        bodyDiv:AddHeading("Known Issues",2)
+        bodyDiv:AddParagraph("We have completed our long-planned upgrade to the Quorum website. This included a rewrite of a whole host of systems and an upgrade from Quorum 6 online to Quorum 9.5. Quorum can now be embedded into third party websites and run from anywhere. Finally, we have begun our experiments with making accessible graphics work in a web browser. This feature will take quite some time to get right, but we have been updating and tweaking the pieces since the initial update in December.")
+        OrderedList list10
+        list10:AddListItem("Xcode 13 removed xtrace from the xcrun utility, which means our ability to detect iOS devices is currently broken in that version. This is true for older and newer versions of Quorum Studio")
+        list10:AddListItem("Certain graphics applications seem to be throwing an error on M1 mac processors. The error does not appear to impact runtime behavior")
+        bodyDiv:Add(list10)
+
+        bodyDiv:AddHeading("References",2)
+        OrderedList list9
+        list9:AddListItem("Gramazio, C. C., Laidlaw, D. H., & Schloss, K. B. (2017). Colorgorical: Creating discriminable and preferable color palettes for information visualization. IEEE Transactions on Visualization and Computer Graphics, 23(1), 521-530. https://doi.org/10.1109/TVCG.2016.2598918")
+        list9:AddListItem("Lyn Bartram, Abhisekh Patra, and Maureen Stone. 2017. Affective Color in Visualization. In Proceedings of the 2017 CHI Conference on Human Factors in Computing Systems (CHI '17). Association for Computing Machinery, New York, NY, USA, 1364-1374. DOI:https://doi.org/10.1145/3025453.3026041")
+        list9:AddListItem("Luz Rello and Jeffrey P. Bigham. 2017. Good Background Colors for Readers: A Study of People with and without Dyslexia. In Proceedings of the 19th International ACM SIGACCESS Conference on Computers and Accessibility (ASSETS '17). Association for Computing Machinery, New York, NY, USA, 72-80. DOI:https://doi.org/10.1145/3132525.3132546")
+        bodyDiv:Add(list9)
+    end
 
     action QuorumStudio3_0_1Notes(Division bodyDiv)
         bodyDiv:AddHeading("Quorum Studio 3.0.1 September 10th, 2021", 1)
@@ -528,6 +656,7 @@ class ReleaseNotes is Lesson
         Division bodyDiv
         bodyDiv:SetClassAttribute("bodyContainer")
 
+        QuorumStudio3_5Notes(bodyDiv)
         QuorumStudio3_0_1Notes(bodyDiv)
         QuorumStudio3_0Notes(bodyDiv)
         QuorumStudio2_3Notes(bodyDiv)
