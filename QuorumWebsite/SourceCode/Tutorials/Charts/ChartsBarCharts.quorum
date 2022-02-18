@@ -1,0 +1,178 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+
+class ChartsBarCharts is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Charts Tutorial - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Charts", 1)
+        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Making a Bar Chart", 2)
+
+        bodyDiv:AddParagraph("The first chart type we will be using a new type of dataset to make a Bar Chart. Bar charts are useful for data scientists to compare the quantities of different types of groups.  This dataset being used showcases the costs of night out activities around different parts of the country. We will be using it to compare how much total these activities cost per country.")
+
+        bodyDiv:AddParagraph("First step to this process is that we will need to load in the dataset and format it. To follow along, download the Night Out Dataset below. Feel free to save the dataset anywhere on your computer, but for this tutorial, we will have it inside of a Data folder contained in another internal folder called "+dq+"Miscellaneous."+dq+"
+")
+
+        bodyDiv:AddParagraph("To follow along, we can download the WorldNightOut.csv dataset ")
+        bodyDiv:AddLink("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Culture%20and%20Entertainment/WorldNightOut.csv")
+
+
+        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+
+        bodyDiv:AddHeading("Loading and Formatting", 2)
+
+        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, we will need a DataFrame. Using the frame, we use the Load function and type in the file path of the Night Outs CSV. A comma separated file (CSV) file is a plain text file that separates data with commas.")
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.BarChart
+
+// create dataframe to read in data
+DataFrame frame
+frame:Load("+dq+"../Data/Culture and Entertainment/WorldNightOut.csv"+dq+")
+"))
+        
+        bodyDiv:AddParagraph("For this next part, we will want to select two columns of the dataset that we are comparing: Country and Cost. For Country, we will categorize this data because there are multiple activities listed for one country. This helps format the totals in which we will use Cost to add how much these activities cost per country. To select the Country column in our dataset, we would want to use the function, AddSelectedFactors(text textHeader). This will put countries listed on the x-axis. Adding an additional factor will separate our bar chart even further into smaller bars that can categorize items based on a broader factor, such as countries. We will also be extracting "+dq+"Items"+dq+" from the dataset and this will separate each activity from the country and display on the legend.")
+
+        bodyDiv:AddParagraph("Similarly, to get the Cost column from the dataset, we use the action AddSelectedColumns("+dq+"Cost"+dq+"). This will add up the totals of these columns based on the categorized country and display them on the y axis.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedFactors("+dq+"Country"+dq+")
+frame:AddSelectedColumns("+dq+"Cost"+dq+")
+frame:AddSelectedFactors("+dq+"Items"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Now we create a bar chart object:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.BarChart
+
+// create dataframe to read in data
+DataFrame frame
+frame:Load("+dq+"../Data/Culture and Entertainment/WorldNightOut.csv"+dq+")
+frame:AddSelectedFactors("+dq+"Country"+dq+")
+frame:AddSelectedFactors("+dq+"Item"+dq+")
+frame:AddSelectedColumns("+dq+"Cost"+dq+")
+
+BarChart chart = frame:BarChart()
+chart:Display()
+"))
+        
+    bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+
+    bodyDiv:AddHeading("Labeling The Bar Chart", 2)
+
+    bodyDiv:AddParagraph("We have successfully created your BarChart object! Now it is time to add features and tidy it up so you are able to present your data to viewers and have them understand what they are looking at. We will now be setting the title, the x axis title, and the y axis title. We will also be setting the font size so our data visualization can be read easily.")
+
+    bodyDiv:AddParagraph("To label the titles, we must call the following functions now using our "+dq+"chart"+dq+" component: SetTitle(), SetXAxisTitle(), and SetYAxisTitle(). SetTitle() takes in a string as the parameter so we can come up with a title that briefly describes our comparisons; in this case our title can be "+dq+"How Expensive are Night Outs Per Country."+dq+" The next part is about labeling the x axis and y axis. 
+")
+    bodyDiv:AddParagraph("For the x axis, we again will call our SetXAxisTitle(text title) function from our chart component which takes in a string; we should label this "+dq+"Countries"+dq+" and put it inside the parameter. The same process follows for SetYAxisTitle(text title) in which it should be labeled as "+dq+"Cost (in USD $)"+dq+" because our data calculates the cost in US dollars.")
+
+    bodyDiv:AddParagraph("We should also add a subtitle in our chart so we give clarity for our viewers of what the chart is about. This can be any small description or any useful / additional information. In this case, we would call SetSubtitle(text title) and insert a string inside the parameters. We will make our string "+dq+"Various nightly activities cost in different countries."+dq+"")
+
+    bodyDiv:AddParagraph("We should have the following code:")
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("// create title to describe graph
+chart:SetTitle("+dq+"How Expensive are Night Outs Per Country"+dq+")
+
+// label the x and y axis
+chart:SetXAxisTitle("+dq+"Countries"+dq+")
+chart:SetYAxisTitle("+dq+"Cost (in USD $)"+dq+")
+chart:SetSubtitle("+dq+"Various nightly activities cost in different countries"+dq+"
+"))
+
+    bodyDiv:AddParagraph("Next, we will change the font size of our graph so it has readability for viewers. As mentioned previously, what many scientific papers fail to do when constructing graphs is having them readable to the audience. In order to change the font size, we must call the function SetFontSize(integer num) which takes in an integer as the parameter. Let’s put 30 inside the parameter and the font size should now be set to 30 pts.")
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:SetFontSize(30)"))
+
+    bodyDiv:AddHeading("Customizing The Data Visualization")
+
+    bodyDiv:AddParagraph("
+With your bar chart, you are also able to change the color palette, the legend title, and the legend location. Before we display our chart, let us take a look at how to further customize this bar chart.
+
+For this tutorial, we will be selecting the Colorgorical palette.
+")
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:SetColorPaletteToColorgorical()"))
+
+    bodyDiv:AddParagraph("Lastly, we will play around with the legend. Labeling your legend is important so that it provides clarity for the data, especially giving meaning to our categories created in the bar chart.
+To label the legend, we must call the SetLegendTitle() function which takes in a string value, which we will label as "+dq+"Countries."+dq+" Next we can change the position of the legend; by default, it is displayed on the right side, but it can be positioned at top, bottom, and left as well. Let us call the function, SetLegendLocation() that takes in a string location and we will put "+dq+"bottom"+dq+" as the parameter.
+")
+
+    bodyDiv:AddParagraph("We should have the following code:")
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:SetLegendLocation("+dq+"bottom"+dq+")
+chart:SetLegendTitle("+dq+"Countries"+dq+")
+"))
+
+    bodyDiv:AddHeading("Displaying The Chart",2)
+    bodyDiv:AddParagraph("Congratulations, your bar chart is constructed! Now you can display your chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to your screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display to show the bar chart.")
+       
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+
+    
+    bodyDiv:AddParagraph("Now, feel free to clean, build, and run your program and you shortly should see a Game window pop-up. This is our Bar Chart! To view the entire code, click") 
+    bodyDiv:AddLink("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/BarChartExample.quorum")
+    bodyDiv:AddText("to view the file.")
+
+    bodyDiv:AddHeading("Further Useful Bar Chart Functions",2)
+         WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Bar Charts in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Bar Charts in Quorum"
+    end
+
+    action GetName returns text
+        return "Bar Charts in Quorum"
+    end
+
+    action GetShortDescription returns text
+        return "how to make a simple bar chart in Quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/charts/barchart.html"
+    end
+end
