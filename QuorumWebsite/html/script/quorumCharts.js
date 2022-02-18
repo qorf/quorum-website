@@ -15,12 +15,19 @@
  */
 
 window.addEventListener('load', function () {
+	
 
-  var trees = document.querySelectorAll('[role="tree"]');
+  var trees = document.querySelectorAll('ul.quorum-chart-tree');
 
   for (var i = 0; i < trees.length; i++) {
     var t = new TreeLinks(trees[i]);
     t.init();
+  }
+  
+  var innerElements = document.querySelectorAll(".quorum-chart-rect, quorum-chart-element");
+  for( var innerElement of innerElements ) {
+    innerElement.addEventListener( 'mouseover', function() { onMouseOverInnerElement(event) });
+    innerElement.addEventListener( 'mouseout', function() { onMouseOutInnerElement(event) });
   }
 
 });
@@ -338,7 +345,6 @@ var TreeitemLink = function (node, treeObj, group) {
 };
 
 TreeitemLink.prototype.init = function () {
-  console.log("Initializing: " + this.domNode.id);
   this.domNode.tabIndex = -1;
 
   if (!this.domNode.getAttribute('role')) {
@@ -376,7 +382,6 @@ TreeitemLink.prototype.isExpanded = function () {
 /* EVENT HANDLERS */
 
 TreeitemLink.prototype.handleKeydown = function (event) {
-  console.log("keydown");
   var tgt = event.currentTarget,
     flag = false,
     char = event.key,
@@ -546,4 +551,16 @@ TreeitemLink.prototype.handleMouseOut = function (event) {
   event.currentTarget.classList.remove('hover');
 };
 
+function onMouseOverInnerElement(event){
+	var navId = event.target.id + "-nav";
+	var nav = document.getElementById(navId);
+	var mouseoverEvent = new Event('focus');
+	nav.dispatchEvent(mouseoverEvent);
+};
 
+function onMouseOutInnerElement(event){
+	var navId = event.target.id + "-nav";
+	var nav = document.getElementById(navId);
+	var mouseoutEvent = new Event('blur');
+	nav.dispatchEvent(mouseoutEvent);
+};
