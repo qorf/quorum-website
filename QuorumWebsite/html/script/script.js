@@ -1,6 +1,6 @@
 var currentIDEInput_$Global_ = '';
 var currentIDEOutput_$Global_ = 'frontPageIdeOutput';
-var currentIDECanvas_$Global_ = 'QuorumGraphicsCanvas';
+var currentUIContainer_$Global_ = 'QuorumUIContainer';
 var total_console_length239847239482734 = 0;
 setInterval(update_console, 500);
 
@@ -463,19 +463,19 @@ var buildCode = function (input, output) {
     });
 };
 
-var keyboardInputShortcuts = function(event, input, output, canvas) {
+var keyboardInputShortcuts = function(event, input, output, uiContainer) {
     var key = event.keyCode;
     var active = event.getModifierState("Control");
     //CTRL + R, run a program
     if(key === 82 && active) {
-        newRunCode(input, output, canvas, true);
+        newRunCode(input, output, uiContainer, true);
     } else if (key === 66 && active) {
-        newRunCode(input, output, canvas, false);
+        newRunCode(input, output, uiContainer, false);
     }
 };
 
 //IDE stop program button action
-var stopProgram = function(canvas) {
+var stopProgram = function(uiContainer) {
     //prevent errors if nothing has been built yet
     if (typeof Stop === "function") { 
         Stop();
@@ -526,7 +526,7 @@ var updateLineNumbers = function(element, numLines) {
 };
 
 //IDE submit button action
-var newRunCode = function (input, output, canvas, execute) {
+var newRunCode = function (input, output, uiContainer, execute) {
 	// Attempt to stop previously running programs on this page first.
 	stopProgram();
 	
@@ -537,7 +537,7 @@ var newRunCode = function (input, output, canvas, execute) {
     var ideName = input.replace("IdeInput","");
     currentIDEInput_$Global_ = input;
     currentIDEOutput_$Global_ = output;
-    currentIDECanvas_$Global_ = canvas;
+    currentUIContainer_$Global_ = uiContainer;
     var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName};
     $.ajax({
         type: "POST",
