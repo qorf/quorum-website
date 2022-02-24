@@ -474,53 +474,6 @@ var keyboardInputShortcuts = function(event, input, output, canvas) {
     }
 };
 
-var canvasInputKeys = function(event, canvasID) {
-    //whether or not the user is focused is kept in a data attribute
-    let canvas = document.getElementById(canvasID);
-    isCanvasFocused = canvas.dataset.inFocus;
-    switch (event.key) {
-        case "Tab":
-            if(isCanvasFocused == "true") {
-                event.preventDefault();
-            } else {
-                event.stopPropagation();
-            }
-            break;
-        case "Enter":
-            //if a user presses enter then enter the canvas
-            // but dont propagate that first key press
-            if(isCanvasFocused == "false"){
-                isCanvasFocused = "true";
-                event.stopPropagation();
-            }
-            break;
-        case "Esc": // IE/Edge specific value
-        case "Escape":
-            isCanvasFocused = "false";
-            break;
-        default:
-            //on default if not focused then dont propagate the key
-            if(isCanvasFocused == "false") {
-                event.stopPropagation();
-            }
-            return; // Quit when this doesn't handle the key event.
-      }
-      canvas.dataset.inFocus = isCanvasFocused;
-}
-
-//update the data attribute when leaving the canvas
-var canvasFocusOut = function(canvasID) {
-    let canvas = document.getElementById(canvasID);
-    canvas.dataset.inFocus = "false";
-}
-
-//this will allow for keys to be passed through to canvas if clicked
-var canvasClicked = function(canvasID) {
-    let canvas = document.getElementById(canvasID);
-    if(canvas.dataset.inFocus)
-    canvas.dataset.inFocus = "true";
-}
-
 //IDE stop program button action
 var stopProgram = function(canvas) {
     //prevent errors if nothing has been built yet
