@@ -161,7 +161,7 @@
                            });
                         </script>
                      </div>
-                     <canvas id= "writeCodeQuorumGraphicsCanvas" onfocusout= "canvasFocusOut('writeCodeQuorumGraphicsCanvas')" data-in-focus= "false" tabindex= "0" class= "ideVisualOutput" role= "application" onclick= "canvasClicked('writeCodeQuorumGraphicsCanvas')" onkeydown= "canvasInputKeys(event, 'writeCodeQuorumGraphicsCanvas')" >
+                     <canvas id= "writeCodeQuorumGraphicsCanvas" tabindex= "0" class= "ideVisualOutput" role= "application" >
                      </canvas>
                   </div>
                   <div class= "flex-container" >
