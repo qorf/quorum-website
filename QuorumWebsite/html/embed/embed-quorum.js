@@ -1,6 +1,6 @@
 var currentIDEInput_$Global_ = '';
 var currentIDEOutput_$Global_ = 'DefaultQuorumEnvironmentIdeOutput';
-var currentIDECanvas_$Global_ = 'QuorumGraphicsCanvas';
+var currentUIContainer_$Global_ = 'QuorumUIContainer';
 var total_console_length239847239482734 = 0;
 setInterval(update_console, 500);
 
@@ -57,19 +57,19 @@ var Module = {
     }
  };
 
-var keyboardInputShortcuts = function(event, input, output, canvas) {
+var keyboardInputShortcuts = function(event, input, output, uiContainer) {
     var key = event.keyCode;
     var active = event.getModifierState("Control");
     //CTRL + R, run a program
     if(key === 82 && active) {
-        newRunCode(input, output, canvas, true);
+        newRunCode(input, output, uiContainer, true);
     } else if (key === 66 && active) {
-        newRunCode(input, output, canvas, false);
+        newRunCode(input, output, uiContainer, false);
     }
 };
 
 //IDE stop program button action
-var stopProgram = function(canvas) {
+var stopProgram = function(uiContainer) {
     //prevent errors if nothing has been built yet
     if (typeof Stop === "function") { 
         Stop();
@@ -120,7 +120,7 @@ var updateLineNumbers = function(element, numLines) {
 };
 
 //IDE submit button action
-var newRunCode = function (input, output, canvas, execute) {
+var newRunCode = function (input, output, uiContainer, execute) {
     var codeInput = document.getElementById(input).querySelector(".ideEditing").value;
     var outputRegion = document.getElementById(output);
     
@@ -128,7 +128,7 @@ var newRunCode = function (input, output, canvas, execute) {
     var ideName = input.replace("IdeInput","");
     currentIDEInput_$Global_ = input;
     currentIDEOutput_$Global_ = output;
-    currentIDECanvas_$Global_ = canvas;
+    currentUIContainer_$Global_ = uiContainer;
     var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName};
 
     var xmlhttp = new XMLHttpRequest();
@@ -223,15 +223,15 @@ var GenerateQuorumEnvironment = function(name) {
                "<div class= \"flex-container\" >" +
                   "<div id= \""+name+"IdeInput\" tabindex= \"-1\" class= \"ideTextboxInput\" >" +
                      "<textarea tabindex= \"-1\" aria-hidden= \"true\" class= \"ideLineNumbers\" spellcheck= \"false\" readonly= \"readonly\" >1</textarea>" +
-                     "<textarea id= \""+name+"ideTextboxInput\" spellcheck= \"false\" name= \"code\" onscroll= \"editAreaSyncScroll(this);\" tabindex= \"0\" class= \"ideEditing\" onkeydown= \"keyboardInputShortcuts(event, '"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumGraphicsCanvas')\" aria-multiline= \"true\" oninput= \"editAreaUpdate(this); editAreaSyncScroll(this);\" ></textarea>" +
+                     "<textarea id= \""+name+"ideTextboxInput\" spellcheck= \"false\" name= \"code\" onscroll= \"editAreaSyncScroll(this);\" tabindex= \"0\" class= \"ideEditing\" onkeydown= \"keyboardInputShortcuts(event, '"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumUIContainer')\" aria-multiline= \"true\" oninput= \"editAreaUpdate(this); editAreaSyncScroll(this);\" ></textarea>" +
                      "<pre aria-hidden= \"true\" tabindex= \"-1\" class= \"syntaxHighlighting\" ><code tabindex= \"-1\" class= \"language-quorum highlighting-content\" ></code></pre>" +
                      "<script  type=\"text/javascript\">window.addEventListener('pageshow', () => {var element = document.getElementById('"+name+"IdeInput').querySelector('.ideEditing');editAreaUpdate(element)});</script>" +
                   "</div>" +
-                  "<canvas id= \""+name+"QuorumGraphicsCanvas\" tabindex= \"0\" class= \"ideVisualOutput\" role= \"application\" ></canvas>" +
+                  "<div id= \""+name+"QuorumUIContainer\" style=\"position: relative;\" class= \"ideVisualOutput\" ></div>" +
                "</div>" +
                "<div class= \"flex-container\" >" +
-                  "<button id= \""+name+"BuildButton\" class= \"FlexBuildButton\" onclick= \"newRunCode('"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumGraphicsCanvas', false)\" type= \"button\" >Build (CTRL+B)</button>" +
-                  "<button id= \""+name+"RunButton\" class= \"FlexBuildButton\" onclick= \"newRunCode('"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumGraphicsCanvas', true)\" type= \"button\" >Run (CTRL+R)</button>" +
+                  "<button id= \""+name+"BuildButton\" class= \"FlexBuildButton\" onclick= \"newRunCode('"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumUIContainer', false)\" type= \"button\" >Build (CTRL+B)</button>" +
+                  "<button id= \""+name+"RunButton\" class= \"FlexBuildButton\" onclick= \"newRunCode('"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumUIContainer', true)\" type= \"button\" >Run (CTRL+R)</button>" +
                   "<button id= \""+name+"StopButton\" class= \"FlexBuildButton\" onclick= \"stopProgram()\" type= \"button\" >Stop Program</button>" +
                "</div>" +
             "</section>" +

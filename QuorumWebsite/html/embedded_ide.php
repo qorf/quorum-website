@@ -35,7 +35,7 @@
                   <div class= "flex-container" >
                      <div id= "embeddedIdeInput" tabindex= "-1" class= "ideTextboxInput" >
                         <textarea tabindex= "-1" aria-hidden= "true" class= "ideLineNumbers" spellcheck= "false" readonly= "readonly" >1</textarea>
-                        <textarea id= "embeddedideTextboxInput" spellcheck= "false" name= "code" onscroll= "editAreaSyncScroll(this);" tabindex= "0" class= "ideEditing" onkeydown= "keyboardInputShortcuts(event, 'embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumGraphicsCanvas')" aria-multiline= "true" oninput= "editAreaUpdate(this); editAreaSyncScroll(this);" ><?php print $_GET['embedcode'] ?></textarea>
+                        <textarea id= "embeddedideTextboxInput" spellcheck= "false" name= "code" onscroll= "editAreaSyncScroll(this);" tabindex= "0" class= "ideEditing" onkeydown= "keyboardInputShortcuts(event, 'embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumUIContainer')" aria-multiline= "true" oninput= "editAreaUpdate(this); editAreaSyncScroll(this);" ><?php print $_GET['embedcode'] ?></textarea>
                         <pre aria-hidden= "true" tabindex= "-1" class= "syntaxHighlighting" ><code tabindex= "-1" class= "language-quorum highlighting-content" ></code></pre>
                         <script  type="text/javascript">window.addEventListener('pageshow', () => {
                            var element = document.getElementById('embeddedIdeInput').querySelector('.ideEditing');
@@ -43,12 +43,11 @@
                            });
                         </script>
                      </div>
-                     <canvas id= "embeddedQuorumGraphicsCanvas" tabindex= "0" class= "ideVisualOutput" role= "application" >
-                     </canvas>
+                     <div id= "embeddedQuorumUIContainer" style= "position: relative;" class= "ideVisualOutput" ></div>
                   </div>
                   <div class= "flex-container" >
-                     <button id= "embeddedBuildButton" class= "FlexBuildButton" onclick= "newRunCode('embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumGraphicsCanvas', false)" type= "button" >Build (CTRL+B)</button>
-                     <button id= "embeddedRunButton" class= "FlexBuildButton" onclick= "newRunCode('embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumGraphicsCanvas', true)" type= "button" >Run (CTRL+R)</button>
+                     <button id= "embeddedBuildButton" class= "FlexBuildButton" onclick= "newRunCode('embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumUIContainer', false)" type= "button" >Build (CTRL+B)</button>
+                     <button id= "embeddedRunButton" class= "FlexBuildButton" onclick= "newRunCode('embeddedIdeInput', 'embeddedIdeOutput', 'embeddedQuorumUIContainer', true)" type= "button" >Run (CTRL+R)</button>
                      <button id= "embeddedStopButton" class= "FlexBuildButton" onclick= "stopProgram()" type= "button" >Stop Program</button>
                   </div>
                </section>

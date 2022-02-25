@@ -153,7 +153,7 @@
                   <div class= "flex-container" >
                      <div id= "writeCodeIdeInput" tabindex= "-1" class= "ideTextboxInput" >
                         <textarea tabindex= "-1" aria-hidden= "true" class= "ideLineNumbers" spellcheck= "false" readonly= "readonly" >1</textarea>
-                        <textarea id= "writeCodeideTextboxInput" spellcheck= "false" name= "code" onscroll= "editAreaSyncScroll(this);" tabindex= "0" class= "ideEditing" onkeydown= "keyboardInputShortcuts(event, 'writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumGraphicsCanvas')" aria-multiline= "true" oninput= "editAreaUpdate(this); editAreaSyncScroll(this);" ><?php print $code; ?></textarea>
+                        <textarea id= "writeCodeideTextboxInput" spellcheck= "false" name= "code" onscroll= "editAreaSyncScroll(this);" tabindex= "0" class= "ideEditing" onkeydown= "keyboardInputShortcuts(event, 'writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumUIContainer')" aria-multiline= "true" oninput= "editAreaUpdate(this); editAreaSyncScroll(this);" ><?php print $code; ?></textarea>
                         <pre aria-hidden= "true" tabindex= "-1" class= "syntaxHighlighting" ><code tabindex= "-1" class= "language-quorum highlighting-content" ></code></pre>
                         <script  type="text/javascript">window.addEventListener('pageshow', () => {
                            var element = document.getElementById('writeCodeIdeInput').querySelector('.ideEditing');
@@ -161,12 +161,11 @@
                            });
                         </script>
                      </div>
-                     <canvas id= "writeCodeQuorumGraphicsCanvas" tabindex= "0" class= "ideVisualOutput" role= "application" >
-                     </canvas>
+                     <div id= "writeCodeQuorumUIContainer" style= "position: relative;" class= "ideVisualOutput" ></div>
                   </div>
                   <div class= "flex-container" >
-                     <button id= "writeCodeBuildButton" class= "FlexBuildButton" onclick= "newRunCode('writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumGraphicsCanvas', false)" type= "button" >Build (CTRL+B)</button>
-                     <button id= "writeCodeRunButton" class= "FlexBuildButton" onclick= "newRunCode('writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumGraphicsCanvas', true)" type= "button" >Run (CTRL+R)</button>
+                     <button id= "writeCodeBuildButton" class= "FlexBuildButton" onclick= "newRunCode('writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumUIContainer', false)" type= "button" >Build (CTRL+B)</button>
+                     <button id= "writeCodeRunButton" class= "FlexBuildButton" onclick= "newRunCode('writeCodeIdeInput', 'writeCodeIdeOutput', 'writeCodeQuorumUIContainer', true)" type= "button" >Run (CTRL+R)</button>
                      <button id= "writeCodeStopButton" class= "FlexBuildButton" onclick= "stopProgram()" type= "button" >Stop Program</button>
                   </div>
                </section>
