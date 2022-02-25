@@ -1,0 +1,338 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+
+class ChartsScatterPlots is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Scatter Plots - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Charts", 1)
+        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Making a Scatter Plot", 2)
+
+        bodyDiv:AddParagraph("The next chart we will be learning to create would be a scatter plot. Scatter plots are used to observe relationships between two variables. An example of this would be comparing the heights and diameters of trees, where the position of each dot correlates to that specified height and diameter. The data as a whole can represent a relationship: strong positive/negative linear, moderate positive/negative linear, or no relationship. As a data scientist, one of the most important patterns is seeing how points cluster from other points, if there are any gaps within the dataset, and identifying outliers for within the set. We focus on these aspects to make predictions on future datasets and understand trends.")
+
+        bodyDiv:AddParagraph("This next dataset we are using to create a scatter plot is about insurance costs on various customers. It will compare the cost of insurance based on their BMI (body mass index). Each dot also represents the ages of these customers. ")
+
+        bodyDiv:AddText("To follow along, we can download the NYC Airbnb dataset ")
+        bodyDiv:AddLink("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Science/insurance.csv")
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+
+        Array<text> rubricText1
+        rubricText1:Add("19")
+        rubricText1:Add("female") 
+        rubricText1:Add("27.9")
+        rubricText1:Add("16884.924")
+        
+        
+        Array<text> rubricText2
+        rubricText2:Add("19")
+        rubricText2:Add("male") 
+        rubricText2:Add("33.77")
+        rubricText2:Add("1725.5523")
+
+
+        Array<text> rubricText3
+        rubricText3:Add("28")
+        rubricText3:Add("male") 
+        rubricText3:Add("33")
+        rubricText3:Add("4449.462")
+
+        
+        Array<text> rubricText4
+        rubricText4:Add("33")
+        rubricText4:Add("male") 
+        rubricText4:Add("22.705")
+        rubricText4:Add("21984.47061")
+
+        
+        Array<text> rubricText5
+        rubricText5:Add("32")
+        rubricText5:Add("male") 
+        rubricText5:Add("28.88")
+        rubricText5:Add("3866.8552")
+
+        
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Age", " "))
+        rubricHeader:Add(AddTextBoldFront("Sex", " "))
+        rubricHeader:Add(AddTextBoldFront("BMI", " "))
+        rubricHeader:Add(AddTextBoldFront("Charges", " "))
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+        rubricRows:Add(AddTableDataTag(rubricText2))
+        rubricRows:Add(AddTableDataTag(rubricText3))
+        rubricRows:Add(AddTableDataTag(rubricText4))
+        rubricRows:Add(AddTableDataTag(rubricText5))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Insurance CSV"))
+
+        bodyDiv:AddHeading("Loading and Formatting", 2)
+
+        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, you will need to create a DataFrame component named frame. Using the frame, you must use the Load function and type in the file path of the insurance CSV. Recall that a CSV is a comma separated text file that holds in data.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.ScatterPlot
+
+/*
+    This is an example of a simple scatter plot in quorum.
+    The data collected is about medical insurance costs in relation to BMI (body mass index).
+*/
+
+// create dataframe to read in data
+DataFrame frame
+frame:Load("+dq+"../Data/Science/insurance.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Note that, we stored this dataset in a Data folder and contained in that folder is an inner folder named Science.")
+
+        bodyDiv:AddParagraph("Once the data has been loaded in, we will now extract this data to use in the data visualization. We will be using two functions from our frame component, AddSelectedColumns(text heading) and AddSelectedFactors(text heading). In this instance, because scatter plots need two data variables for comparisons, we will be extracting the BMI and charges using our AddSelectedColumns() function. We will also be extracting ages with our AddSelectedFactors() function to discriminate the two variables through the dots. The usage of these two functions are shown below:")
+
+        Array<text> rubricText6
+        rubricText6:Add("frame:AddSelectedColumns(text heading)")
+        rubricText6:Add("AddSelectedColumns() takes in a string that matches a column heading from our dataset. This function is used to format our axises. For this tutorial, we will be calling this function twice and extract "+dq+"bmi"+dq+" and "+dq+"charges."+dq+"") 
+        rubricText6:Add("frame:AddSelectedColumns("+dq+"heading"+dq+")")     
+
+        Array<text> rubricText7
+        rubricText7:Add("frame:AddSelectedFactors(text heading)")
+        rubricText7:Add("AddSelectedFactors() takes in a string that matches a column heading from our dataset. This function is used to label our dots and form the legend based off of the two variables we are comparing. For this tutorial, we will be extracting "+dq+"age."+dq+"")
+        rubricText7:Add("frame:AddSelectedFactors("+dq+"heading"+dq+")")    
+        
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Function", " "))
+        rubricHeader1:Add(AddTextBoldFront("Description", " "))
+        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText6))
+        rubricRows1:Add(AddTableDataTag(rubricText7))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Adding CSV columns onto Charts"))
+
+        bodyDiv:AddParagraph("We should have the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// pull out selected data, for this we will be categorizing by bmi, charges, and age
+frame:AddSelectedColumns("+dq+"bmi"+dq+")
+frame:AddSelectedColumns("+dq+"charges"+dq+")
+frame:AddSelectedFactors("+dq+"age"+dq+")
+"))
+
+        bodyDiv:AddParagraph("
+Now it is time to create the Scatter Plot which can be done with the following code. This creates a chart object from our DataFrame component, frame. The rest of this lesson, we will be using the chart object we have created to change and format the rest of our scatter plot.
+")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// using the data frame, format data by creating a scatter plot chart component
+ScatterPlot chart = frame:ScatterPlot()
+chart:Display()
+"))
+
+        bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+        
+        bodyDiv:AddHeading("Labeling the Scatter Plot",2)
+
+        bodyDiv:AddParagraph("In order for viewers to understand our data, labels give a clear comprehension of what is being presented. This means that we will be labeling the x axis, y axis, legend, and giving our chart a title that describes the dataset. To do so, we will call the following functions with our ‘chart’ object: SetTitle(text name), SetXAxisTitle(text name), SetYAxisTitle(text name), SetLegendTitle(text name), and SetSubtitle(text name). Here is a brief description on what each function does and what it takes in.")
+       
+        Array<text> rubricText8
+        rubricText8:Add("SetTitle(text name)")
+        rubricText8:Add("SetTitle() takes in a string as a parameter, which would be the title of the chart. For this example, we will name the chart "+dq+"Charges of Insurance Based Off of BMI and Age"+dq+"")
+        rubricText8:Add("chart:SetTitle("+dq+"Charges of Insurance Based Off of BMI and Age"+dq+")")        
+
+        Array<text> rubricText9
+        rubricText9:Add("SetXAxisTitle(text name)")
+        rubricText9:Add("SetXAxisTitle() takes in a string as a parameter, which would be the label of the x axis. For this example, we will label this section "+dq+"Body Mass Index (BMI)"+dq+"")
+        rubricText9:Add("chart:SetXAxisTitle("+dq+"Body Mass Index (BMI)"+dq+"")
+        
+        Array<text> rubricText10
+        rubricText10:Add("SetYAxisTitle(text name)")
+        rubricText10:Add("SetYAxisTitle() takes in a string as a parameter, which would be the label of the y axis. For this example, we will label this section "+dq+"Insurance Cost (in $)."+dq+" This is also a good section to label the unit we are comparing, such as dollars.
+")
+        rubricText10:Add("chart:SetYAxisTitle("+dq+"Insurance Cost (in $)"+dq+")")
+
+        Array<text> rubricText11
+        rubricText11:Add("SetLegendTitle(text name)")
+        rubricText11:Add("SetLegendTitle() takes in a string as a parameter, which would label the legend of the chart. The legend identifies the separate ages for the dots. For this example, we will label the legend "+dq+"Age Group"+dq+"
+")
+        rubricText11:Add("chart:SetLegendTitle("+dq+"Age Group"+dq+")")
+
+        Array<text> rubricText12
+        rubricText12:Add("SetSubtitle(text title)")
+        rubricText12:Add("SetSubtitle() takes in a string as a parameter which would set a subtitle under the title. This can be any short description or any other necessary information for our chart. For this example, we will label the subtitle "+dq+"Does body weight and age affect cost of insurance?"+dq+"")
+        rubricText12:Add("chart:SetSubtitle("+dq+"Does body weight and age affect cost of insurance?"+dq+")")
+
+        Array<text> rubricHeader2
+        rubricHeader2:Add(AddTextBoldFront("Function", " "))
+        rubricHeader2:Add(AddTextBoldFront("Description", " "))
+        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows2
+        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+      
+        rubricRows2:Add(AddTableDataTag(rubricText8))
+        rubricRows2:Add(AddTableDataTag(rubricText9))
+        rubricRows2:Add(AddTableDataTag(rubricText10))
+        rubricRows2:Add(AddTableDataTag(rubricText11))
+        rubricRows2:Add(AddTableDataTag(rubricText12))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Labeling Charts"))        
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// label your scatter plot
+chart:SetXAxisTitle"+dq+"Body Mass Index (BMI)"+dq+")
+chart:SetYAxisTitle("+dq+"Insurance Cost (in $)"+dq+")
+chart:SetLegendTitle("+dq+"Age Group"+dq+")
+chart:SetSubtitle("+dq+"Does body weight and age affect cost of insurance?"+dq+")
+chart:SetTitle("+dq+"Charges of Insurance Based Off of BMI and Age"+dq+")
+"))
+        bodyDiv:AddParagraph("Note, if we would like to see the data chart so far, we can type "+dq+"chart:Display()"+dq+" to view it with the labels we created.
+")
+        
+        bodyDiv:AddHeading("Customizing the Data Visualization", 2)
+        
+        bodyDiv:AddParagraph("Now that we have our data labeled, we can customize our data to our liking, such as adjusting the intervals, changing starting values, and changing the color. We will be playing around with all these features and to do so, we will be again, using our chart object to call these functions. The functions we will be using for this would be: SetLegendLocation(text location), SetColorPaletteToDisurbing(), SetFontSize(integer size), FlipOrientation(), and ShowLinearRegression(bool). Here are brief descriptions on what each function does and how to use it.")
+
+        Array<text> rubricText13
+        rubricText13:Add("SetLegendLocation(text location)")
+        rubricText13:Add("SetLegendLocation() takes in a string as a parameter, which would be the directions, left, right, top or bottom. These directions would place the legend in the specified place. For this example, we will place the legend on the "+dq+"bottom"+dq+"")
+        rubricText13:Add("chart:SetLegendLocation("+dq+"Legend Location"+dq+")")
+
+        Array<text> rubricText14
+        rubricText14:Add("SetFontSize(integer size)")
+        rubricText14:Add("SetFontSize() takes in an integer as a parameter and will set the font size on all text based on the desired input. For this tutorial, we will insert 30 as the font size.")
+        rubricText14:Add("chart:SetFontSize(30)")
+
+        Array<text> rubricText15
+        rubricText15:Add("SetColorPaletteToDisurbing()") 
+        rubricText15:Add("SetColorPaletteToDisurbing() takes in no parameters, but will adjust the color palette based off of yellows, browns, oranges, and greens")
+        rubricText15:Add("chart:SetColorPaletteToDisturbing()")  
+
+        Array<text> rubricText16
+        rubricText16:Add("ShowLinearRegression(boolean)")
+        rubricText16:Add("takes in a true or false value (boolean), and wll show the regression lines and equations for the chart")
+        rubricText16:Add("chart:ShowLinearRegression(true)")
+
+        Array<text> rubricText17
+        rubricText17:Add("FlipOrientation()")
+        rubricText17:Add("FlipOrientation() takes in no parameters, and this function will swap the places of the x and y axis.")
+        rubricText17:Add("chart:FlipOrientation()")    
+
+        Array<text> rubricHeader3
+        rubricHeader3:Add(AddTextBoldFront("Function", " "))
+        rubricHeader3:Add(AddTextBoldFront("Description", " "))
+        rubricHeader3:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows3
+        rubricRows3:Add(AddTableHeaderTag(rubricHeader3))
+      
+        rubricRows3:Add(AddTableDataTag(rubricText13))
+        rubricRows3:Add(AddTableDataTag(rubricText14))
+        rubricRows3:Add(AddTableDataTag(rubricText15))
+        rubricRows3:Add(AddTableDataTag(rubricText16))
+        rubricRows3:Add(AddTableDataTag(rubricText17))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows3), "Customizing Charts")) 
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// set the legend location, choices are left, right, top and bottom
+chart:SetLegendLocation("+dq+"bottom"+dq+")
+
+// color palette contains yellows, oranges, browns, and greens
+chart:SetColorPaletteToDisturbing()
+
+// adjust font size by preference, here we set it to 30 pt
+chart:SetFontSize(30)
+
+// if we would like to switch the x and y axis
+chart:FlipOrientation()
+"))
+
+        bodyDiv:AddParagraph("Congratulations, our Scatter Plot is constructed! Now we can display the chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to your screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the specified display.")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display(1000, 750)"))      
+
+         bodyDiv:AddParagraph(" ")
+    bodyDiv:AddText("Now, feel free to clean, build, and run your program and you shortly should see a Game window pop-up. This is our Histogram! To view the entire code, click ") 
+    bodyDiv:AddLink("here ", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/ScatterPlotExample.quorum")
+    bodyDiv:AddText("to view the file.")
+
+        bodyDiv:AddHeading("Further Useful Scatter Plot Functions",2)
+        Array<text> rubricText18
+        rubricText18:Add("SetPointDestiny(integer num)")
+        rubricText18:Add("This function takes in an integer that will adjust the size of the dots of the scatter plot")
+        rubricText18:Add("chart:SetPointDensity(5)")
+  
+        Array<text> rubricHeader4
+        rubricHeader4:Add(AddTextBoldFront("Function", " "))
+        rubricHeader4:Add(AddTextBoldFront("Description", " "))
+        rubricHeader4:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows4
+        rubricRows4:Add(AddTableHeaderTag(rubricHeader4))
+      
+        rubricRows4:Add(AddTableDataTag(rubricText18))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows4), "Extra Functions")) 
+        
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about creating scatter plots in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "making a scatter plot"
+    end
+
+    action GetName returns text
+        return "scatter plot"
+    end
+
+    action GetShortDescription returns text
+        return "how to use the scatter plot chart in quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/charts/scatterplot.html"
+    end
+end
