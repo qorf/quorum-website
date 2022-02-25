@@ -68,53 +68,6 @@ var keyboardInputShortcuts = function(event, input, output, canvas) {
     }
 };
 
-var canvasInputKeys = function(event, canvasID) {
-    //whether or not the user is focused is kept in a data attribute
-    let canvas = document.getElementById(canvasID);
-    isCanvasFocused = canvas.dataset.inFocus;
-    switch (event.key) {
-        case "Tab":
-            if(isCanvasFocused == "true") {
-                event.preventDefault();
-            } else {
-                event.stopPropagation();
-            }
-            break;
-        case "Enter":
-            //if a user presses enter then enter the canvas
-            // but dont propagate that first key press
-            if(isCanvasFocused == "false"){
-                isCanvasFocused = "true";
-                event.stopPropagation();
-            }
-            break;
-        case "Esc": // IE/Edge specific value
-        case "Escape":
-            isCanvasFocused = "false";
-            break;
-        default:
-            //on default if not focused then dont propagate the key
-            if(isCanvasFocused == "false") {
-                event.stopPropagation();
-            }
-            return; // Quit when this doesn't handle the key event.
-      }
-      canvas.dataset.inFocus = isCanvasFocused;
-}
-
-//update the data attribute when leaving the canvas
-var canvasFocusOut = function(canvasID) {
-    let canvas = document.getElementById(canvasID);
-    canvas.dataset.inFocus = "false";
-}
-
-//this will allow for keys to be passed through to canvas if clicked
-var canvasClicked = function(canvasID) {
-    let canvas = document.getElementById(canvasID);
-    if(canvas.dataset.inFocus)
-    canvas.dataset.inFocus = "true";
-}
-
 //IDE stop program button action
 var stopProgram = function(canvas) {
     //prevent errors if nothing has been built yet
@@ -274,7 +227,7 @@ var GenerateQuorumEnvironment = function(name) {
                      "<pre aria-hidden= \"true\" tabindex= \"-1\" class= \"syntaxHighlighting\" ><code tabindex= \"-1\" class= \"language-quorum highlighting-content\" ></code></pre>" +
                      "<script  type=\"text/javascript\">window.addEventListener('pageshow', () => {var element = document.getElementById('"+name+"IdeInput').querySelector('.ideEditing');editAreaUpdate(element)});</script>" +
                   "</div>" +
-                  "<canvas id= \""+name+"QuorumGraphicsCanvas\" onfocusout= \"canvasFocusOut('"+name+"QuorumGraphicsCanvas')\" data-in-focus= \"false\" tabindex= \"0\" class= \"ideVisualOutput\" role= \"application\" onclick= \"canvasClicked('"+name+"QuorumGraphicsCanvas')\" onkeydown= \"canvasInputKeys(event, '"+name+"QuorumGraphicsCanvas')\" ></canvas>" +
+                  "<canvas id= \""+name+"QuorumGraphicsCanvas\" tabindex= \"0\" class= \"ideVisualOutput\" role= \"application\" ></canvas>" +
                "</div>" +
                "<div class= \"flex-container\" >" +
                   "<button id= \""+name+"BuildButton\" class= \"FlexBuildButton\" onclick= \"newRunCode('"+name+"IdeInput', '"+name+"IdeOutput', '"+name+"QuorumGraphicsCanvas', false)\" type= \"button\" >Build (CTRL+B)</button>" +

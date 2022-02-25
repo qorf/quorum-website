@@ -43,7 +43,7 @@
                            });
                         </script>
                      </div>
-                     <canvas id= "embeddedQuorumGraphicsCanvas" onfocusout= "canvasFocusOut('embeddedQuorumGraphicsCanvas')" data-in-focus= "false" tabindex= "0" class= "ideVisualOutput" role= "application" onclick= "canvasClicked('embeddedQuorumGraphicsCanvas')" onkeydown= "canvasInputKeys(event, 'embeddedQuorumGraphicsCanvas')" >
+                     <canvas id= "embeddedQuorumGraphicsCanvas" tabindex= "0" class= "ideVisualOutput" role= "application" >
                      </canvas>
                   </div>
                   <div class= "flex-container" >
