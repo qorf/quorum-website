@@ -1,0 +1,308 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+
+class ChartsLineCharts is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Line Charts - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Charts", 1)
+        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Making a Line Chart", 2)
+
+        bodyDiv:AddParagraph("The next chart type to learn how to create is a line chart. Line charts are a great visualization tool to use when presenting trends over time. Scientists typically use line charts to emphasize patterns of change in one or more variables of data. The dataset that we will be using for this lesson describes how much people in the US and the UK spend on Christmas on average over the years. With this graph, we can see how expensive (or inexpensive) shopping has been from 1999 to present day, and can draw conclusions about overall spending habits and price adjustments.")
+        bodyDiv:AddParagraph("First step to this process is that we will need to properly load in the dataset and format it. To follow along, download the Christmas Spending Dataset below. Feel free to save the dataset anywhere on your computer, but for this tutorial, we will have it inside of a Data folder contained in another internal folder called" +dq+"Miscellaneous." +dq+"")
+        bodyDiv:AddText("To follow along, we can download the Christmas spending dataset ")
+        bodyDiv:AddLink("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/Christmas%20spending.csv")
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+
+        Array<text> rubricText1
+        rubricText1:Add("1999")
+        rubricText1:Add("857") 
+        rubricText1:Add("945")
+        
+        
+        Array<text> rubricText2
+        rubricText2:Add("2000")
+        rubricText2:Add("817") 
+        rubricText2:Add("926")
+
+
+        Array<text> rubricText3
+        rubricText3:Add("2001")
+        rubricText3:Add("794") 
+        rubricText3:Add("845")
+
+        
+        Array<text> rubricText4
+        rubricText4:Add("2002")
+        rubricText4:Add("690") 
+        rubricText4:Add("760")
+
+        
+        Array<text> rubricText5
+        rubricText5:Add("2003")
+        rubricText5:Add("734") 
+        rubricText5:Add("832")
+        
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Year", " "))
+        rubricHeader:Add(AddTextBoldFront("Christmas spend in US", " "))
+        rubricHeader:Add(AddTextBoldFront("Christmas spend in UK", " "))
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+        rubricRows:Add(AddTableDataTag(rubricText2))
+        rubricRows:Add(AddTableDataTag(rubricText3))
+        rubricRows:Add(AddTableDataTag(rubricText4))
+        rubricRows:Add(AddTableDataTag(rubricText5))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Christmas spending CSV"))
+
+        bodyDiv:AddHeading("Loading and Formatting", 2)
+
+        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, you will need to create a DataFrame component named 'frame'. Using the frame, you must use the Load function and type in the file path of the Christmas Spending CSV. Recall that a CSV is a comma separated text file that holds in data.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.LineChart
+
+/*
+    This is an example of a simple line chart in quorum.
+    The data collected is about medical insurance costs in relation to BMI (body mass index).
+*/
+
+// create dataframe to read in data
+DataFrame frame
+frame:Load("+dq+"../Data/Miscellaneous/Christmas spending.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Note that, we stored this dataset in a Data folder and contained in that folder is an inner folder named Science.")
+
+        bodyDiv:AddParagraph("Once the data has been loaded in, we will now extract this data to use in the data visualization. We will be using two functions from our frame component, AddSelectedColumn and AddSelectedFactor where the columns will be used to label our x axis, signifying the groups we are observing and the factor will be used to label our y axis, signifying the change over time. AddSelectedColum and AddSelectedFactor take in a parameter of either the column number or the column label in the CSV file. We will be using the column number to demonstrate.")
+        bodyDiv:AddParagraph("In our dataset, we have a total of three columns: the year (0), spending in the US (1), and spending in the UK (2). The numbers correspond to the columns which we will extract using AddSelectedColumns and AddSelectedFactor. For this, we would call AddSelectedFactor() and type in 0 inside the parameter, which grabs the year. Similarly, we would call AddSelectedColumn() and inside the parameters type 1 and 2. Note that AddSelectedColumn() must be called twice to separate column 1 and column 2 from each other. The usage of these functions is shown below:")
+        Array<text> rubricText6
+        rubricText6:Add("frame:AddSelectedColumns(text heading)")
+        rubricText6:Add("AddSelectedColumns() takes in a string that matches a column heading from our dataset. This function is used to format our axises. For this tutorial, we will be calling this function twice and extract "+dq+"bmi"+dq+" and "+dq+"charges."+dq+"") 
+        rubricText6:Add("frame:AddSelectedColumns("+dq+"heading"+dq+")")     
+
+        Array<text> rubricText7
+        rubricText7:Add("frame:AddSelectedFactors(text heading)")
+        rubricText7:Add("AddSelectedFactors() takes in a string that matches a column heading from our dataset. This function is used to label our dots and form the legend based off of the two variables we are comparing. For this tutorial, we will be extracting "+dq+"age."+dq+"")
+        rubricText7:Add("frame:AddSelectedFactors("+dq+"heading"+dq+")")    
+        
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Function", " "))
+        rubricHeader1:Add(AddTextBoldFront("Description", " "))
+        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText6))
+        rubricRows1:Add(AddTableDataTag(rubricText7))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Adding CSV columns onto Charts"))
+
+        bodyDiv:AddParagraph("We should have the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// grabs the average spending values and place as x axis
+frame:AddSelectedColumn(1)
+frame:AddSelectedColumn(2)
+
+// grabs the year values and place as y axis
+frame:AddSelectedFactor(0)
+"))
+
+        bodyDiv:AddParagraph("
+Now it is time to create the Line chart which can be done with the following code. This creates a chart object from our DataFrame component, frame. Because we want both the UK and the US data to be on the same chart, we will be calling the function SeparateByFactor() and put in 'false' as the parameter to get us started. By default, the line chart will separate each line with its own graph, so to adjust that setting, we will just want to simply call the function. The rest of this lesson, we will be using the chart object we have created to change and format the rest of our line chart. 
+")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// create chart component inherited from the line chart library
+LineChart chart = frame:LineChart()
+// creates only 1 chart but both lines are on same chart
+chart:SeparateByFactor(false)
+chart:Display()
+"))
+
+        bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+        
+        bodyDiv:AddHeading("Labeling the Line Chart",2)
+
+        bodyDiv:AddParagraph("In order for viewers to understand our data, labels give a clear comprehension of what is being presented. This means that we will be labeling the x axis, y axis, legend, and giving our chart a title that describes the dataset. To do so, we will call the following functions with our 'chart' object: SetTitle(text name), SetXAxisTitle(text name), SetYAxisTitle(text name), SetLegendTitle(text name), and SetSubtitle(text name). Here is a brief description on what each function does and what it takes in.")
+       
+        Array<text> rubricText8
+        rubricText8:Add("SetTitle(text name)")
+        rubricText8:Add("SetTitle() takes in a string as a parameter, which would be the title of the chart. For this example, we will name the chart "+dq+"How Much the US and UK Spend During Christmas"+dq+"")
+        rubricText8:Add("chart:SetTitle("+dq+"How Much the US and UK Spend During Christmas"+dq+")")        
+
+        Array<text> rubricText9
+        rubricText9:Add("SetXAxisTitle(text name)")
+        rubricText9:Add("SetXAxisTitle(text name): SetXAxisTitle takes in a string as a parameter, which would be the label of the x axis. For this example, we will label this section " +dq+"Year" +dq+ " because this is the time frame we are observing.")
+        rubricText9:Add("chart:SetXAxisTitle("+dq+"Year"+dq+"")
+        
+        Array<text> rubricText10
+        rubricText10:Add("SetYAxisTitle(text name)")
+        rubricText10:Add("SetYAxisTitle() takes in a string as a parameter, which would be the label of the y axis. For this example, we will label this section "+dq+"Money Spent (in $)"+dq+" because this is the factor used for comparison between the different countries. This is also a good section to label the unit we are comparing, such as dollars.
+")
+        rubricText10:Add("chart:SetYAxisTitle("+dq+"Money Spent (in $)"+dq+")")
+
+        Array<text> rubricText11
+        rubricText11:Add("SetLegendTitle(text name)")
+        rubricText11:Add("SetLegendTitle takes in a string as a parameter, which would label the legend of the chart. The legend identifies the separate countries into different lines. For this example, we will label the legend "+dq+"Christmas Shopping Spending."+dq+"")
+        rubricText11:Add("chart:SetLegendTitle("+dq+"Christmas Shopping Spending"+dq+")")
+
+        Array<text> rubricText12
+        rubricText12:Add("SetSubtitle(text title)")
+        rubricText12:Add("SetSubtitle takes in a string as a parameter which would set a subtitle under the title. This can be any short description or any other necessary information for our chart. For this example, we will label the subtitle "+dq+"Overtime, shopping costs have increased over the years in XMAS shopping"+dq+"")
+        rubricText12:Add("chart:SetSubtitle("+dq+"Overtime, shopping costs have increased over the years in XMAS shopping"+dq+")")
+
+        Array<text> rubricHeader2
+        rubricHeader2:Add(AddTextBoldFront("Function", " "))
+        rubricHeader2:Add(AddTextBoldFront("Description", " "))
+        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows2
+        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+      
+        rubricRows2:Add(AddTableDataTag(rubricText8))
+        rubricRows2:Add(AddTableDataTag(rubricText9))
+        rubricRows2:Add(AddTableDataTag(rubricText10))
+        rubricRows2:Add(AddTableDataTag(rubricText11))
+        rubricRows2:Add(AddTableDataTag(rubricText12))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Labeling Charts"))        
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// label your line chart
+chart:SetXAxisTitle"+dq+"Year"+dq+")
+chart:SetYAxisTitle("+dq+"Money Spent (in $)"+dq+")
+chart:SetLegendTitle("+dq+"Christmas Shopping Spending"+dq+")
+chart:SetLegendLocation("+dq+"top"+dq+")
+chart:SetTitle("+dq+"How Much the US and UK Spend During Christmas"+dq+")
+"))
+        bodyDiv:AddParagraph("Note, if we would like to see the data chart so far, we can type "+dq+"chart:Display()"+dq+" to view it with the labels we created.")
+        
+        bodyDiv:AddHeading("Customizing the Data Visualization", 2)
+        
+        bodyDiv:AddParagraph("Now that we have our data labeled, we can customize our data to our liking, such as adjusting the intervals, changing starting values, and changing the color. We will be playing around with all these features and to do so, we will be again, using our chart object to call these functions. The functions we will be using for this would be: SetLegendLocation(text location), SetColorPaletteToDisurbing(), SetFontSize(integer size), FlipOrientation(), and ShowLinearRegression(bool). Here are brief descriptions on what each function does and how to use it.")
+
+        Array<text> rubricText13
+        rubricText13:Add("SetXTickCount(integer count)")
+        rubricText13:Add("SetXTickCount(number setX) takes in an integer as a parameter and will create n number of intervals from the x axis of the data given. For this tutorial, we will insert 9 as the tick count.")
+        rubricText13:Add("chart:SetXTickCount(9)")
+
+        Array<text> rubricText14
+        rubricText14:Add("SetFontSize(integer size)")
+        rubricText14:Add("SetFontSize() takes in an integer as a parameter and will set the font size on all text based on the desired input. For this tutorial, we will insert 20 as the font size.")
+        rubricText14:Add("chart:SetFontSize(20)")
+
+        Array<text> rubricText15
+        rubricText15:Add("SetLineDesnity(number size)") 
+        rubricText15:Add("SetLineDesnity(number size) takes in an integer as a parameter and will adjust the thickness of the lines within the chart. For this tutorial, we will insert 4 for the density.")
+        rubricText15:Add("chart:SetColorPaletteToDisturbing()")  
+
+        Array<text> rubricText16
+        rubricText16:Add("SetColorPaletteToCalm()")
+        rubricText16:Add("SetColorPaletteToCalm() changes the color palette to calmer colors such as lighter blues and grays. To view more options for color palettes click here.")
+        rubricText16:Add("chart:SetColorPaletteToCalm()")
+
+        Array<text> rubricHeader3
+        rubricHeader3:Add(AddTextBoldFront("Function", " "))
+        rubricHeader3:Add(AddTextBoldFront("Description", " "))
+        rubricHeader3:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows3
+        rubricRows3:Add(AddTableHeaderTag(rubricHeader3))
+      
+        rubricRows3:Add(AddTableDataTag(rubricText13))
+        rubricRows3:Add(AddTableDataTag(rubricText14))
+        rubricRows3:Add(AddTableDataTag(rubricText15))
+        rubricRows3:Add(AddTableDataTag(rubricText16))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows3), "Customizing Charts")) 
+
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("/* this will put 9 sections of years within the graph and will format the graph based on 
+the number of specified ticks, meaning, only points labeled on x axis, but graph will label
+all years from 1999 to 2021
+*/
+chart:SetXTickCount(9)
+
+// makes font size bigger
+chart:SetFontSize(20)
+// creates a thicker line for graph
+chart:SetLineDensity(4)
+// changes the color palette
+chart:SetColorPaletteToCalm()
+"))
+
+        bodyDiv:AddParagraph("Congratulations, our line chart is constructed! Now you can display your chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to your screen size. By doing chart:Display(number width, number height), it will display the chart in a respected constraint window size. We will be using the specified chart display for this. In this case, inside the Display parameters, we will put 1500 as the first parameter and 750 as the second parameter which will construct a display based on those dimensions.")
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display(1500, 750)"))      
+
+         bodyDiv:AddParagraph(" ")
+    bodyDiv:AddText("Now, feel free to clean, build, and run your program and you shortly should see a Game window pop-up. This is your Line Chart! To view the entire code, click ") 
+    bodyDiv:AddLink("here ", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/LineChartExample.quorum")
+    bodyDiv:AddText("to view the file.")
+        
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about creating line charts in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "making a line chart"
+    end
+
+    action GetName returns text
+        return "line chart"
+    end
+
+    action GetShortDescription returns text
+        return "how to use the line chart in quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/charts/linechart.html"
+    end
+end
