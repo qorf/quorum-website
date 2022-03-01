@@ -76,8 +76,7 @@
                     <h2 class= "ideSubHeading" >Console Output</h2>
                     <pre id= "IdeOutput" class= "allInOneIdeOutput" role= "region" aria-atomic= "true" aria-label= "output of Development Environment" aria-live= "assertive" aria-relevant="additions"></pre>
                     <h2 class= "ideSubHeading" >Visual Output</h2>
-                    <canvas tabindex= "0" id= "QuorumGraphicsCanvas" class= "ideCanvas" role="application"></canvas>
-                    <script  type="text/javascript">var canvas = document.getElementById("QuorumGraphicsCanvas"); canvas.width = 800; canvas.height = 600;</script>
+                    <div style= "position: relative; width: 800px; height: 600px;" id= "QuorumUIContainer" class= "ideCanvas"></div>
                 </div>
                 <h2>Tips for using the Run Page</h2>
                 <p>This page allows us to run programs written in the Quorum 
