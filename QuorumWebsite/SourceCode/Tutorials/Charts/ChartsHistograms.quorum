@@ -1,0 +1,294 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+
+class ChartsHistograms is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Histograms - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Charts", 1)
+        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Making a Histogram", 2)
+
+        bodyDiv:AddParagraph("A very common chart for visualizing numeric data is through a histogram. Histograms are typically used to represent the distribution of numerical data. The variable we observe is divided into different intervals where as a whole, we can examine the shape of the graph whether it is skewed, normal, uniform, bimodal [two distinct curves], etc. and draw conclusions about the data. Typical datasets to look out for when wanting to construct a histogram would be datasets featuring costs, ages, GPAs, and test scores. Note that datasets with non-numeric data are not recommended for histograms.")
+        bodyDiv:AddParagraph("For this lesson, we will examine the costs of various AirBnB per night in NYC in 2019. We can examine how expensive it is to rent an AirBnB and can make a conclusion if using the app is worth it or not.")
+        bodyDiv:AddParagraph("First step to this process is that we will need to properly load in the dataset and format it. Feel free to save the dataset anywhere on your computer, but for this tutorial, we will have it inside of a Data folder contained in another internal folder called "+dq+"Other."+dq+"")
+
+         bodyDiv:AddText("To follow along, we can download the NYC Airbnb dataset ")
+        bodyDiv:AddLink("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Other/AB_NYC_2019.csv")
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+
+        Array<text> rubricText1
+        rubricText1:Add("Brooklyn")
+        rubricText1:Add("Kensington") 
+        rubricText1:Add("Private room")
+        rubricText1:Add("149")
+        
+        
+        Array<text> rubricText2
+        rubricText2:Add("Manhattan")
+        rubricText2:Add("Midtown") 
+        rubricText2:Add("Entire home/apt")
+        rubricText2:Add("225")
+
+        
+        Array<text> rubricText3
+        rubricText3:Add("Manhattan")
+        rubricText3:Add("Harlem") 
+        rubricText3:Add("Private room")
+        rubricText3:Add("150")
+
+        
+        Array<text> rubricText4
+        rubricText4:Add("Brooklyn")
+        rubricText4:Add("Clinton Hill") 
+        rubricText4:Add("Entire home/apt")
+        rubricText4:Add("89")
+
+        
+        Array<text> rubricText5
+        rubricText5:Add("Manhattan")
+        rubricText5:Add("East Harlem") 
+        rubricText5:Add("Entire home/apt")
+        rubricText5:Add("80")
+
+        
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Neighborhood Group", " "))
+        rubricHeader:Add(AddTextBoldFront("Neighborhood", " "))
+        rubricHeader:Add(AddTextBoldFront("Room Type", " "))
+        rubricHeader:Add(AddTextBoldFront("Price", " "))
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+        rubricRows:Add(AddTableDataTag(rubricText2))
+        rubricRows:Add(AddTableDataTag(rubricText3))
+        rubricRows:Add(AddTableDataTag(rubricText4))
+        rubricRows:Add(AddTableDataTag(rubricText5))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Airbnb Prices in NYC CSV"))
+
+        bodyDiv:AddHeading("Loading and Formatting", 2)
+
+        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, you will need to create a DataFrame component named "+dq+"frame"+dq+". Using the frame, you must use the Load function and type in the file path of the Airbnb CSV.")        
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.Histogram
+
+// create frame component
+DataFrame frame
+// read in data from dog csv
+frame:Load("+dq+"../Data/Other/AB_NYC_2019.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Once the data has been loaded in, we will now extract this data to use in the data visualization. We will be using two functions from our frame component, AddSelectedColumns and AddSelectedFactors where the columns will be used to label our x axis, signifying the groups we are observing and the factor will be used to label our y axis, signifying the change over time. AddSelectedColum and AddSelectedFactor take in a parameter of either the column number or the column label in the CSV file. We will be using the column number to demonstrate. ")
+        bodyDiv:AddParagraph("Notice in our data that we do have a lot of columns, but feel free to ignore them, the only column we will be pulling are the prices. Please note that for a Histogram, we will only be using the AddSelectedColumns() because we would like to count the totals of each cost range for AirBnBs. This goes for other datasets as well, in which we will not be modifying the y axis. AddSelectedColumns() will take a string as the parameter which represents the text header in the data file.")
+        bodyDiv:AddParagraph("We should have the following code:")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// pull out specific columns from csv that we are comparing
+// note: histograms do not support factors
+frame:AddSelectedColumns("+dq+"price"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Now it is time to create the Histogram which can be done with the following code. This creates a chart object from our DataFrame component, frame. The rest of this lesson, we will be using the chart object we have created to change and format the rest of our line chart. ")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// create chart component inherited from the line chart library
+Histogram chart = frame:Histogram()
+chart:Display()
+"))
+
+        bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+
+        bodyDiv:AddHeading("Labeling The Histogram", 2)
+        
+        bodyDiv:AddParagraph("In order for viewers to understand our data, labels give a clear comprehension of what is being presented. This means that we will be labeling the x axis, y axis, legend, and giving our chart a title that describes the dataset. To do so, we will call the following functions with our "+dq+"chart"+dq+" object: SetTitle(), SetXAxisTitle(), SetYAxisTitle(), SetLegendTitle(), and SetSubtitle(). Here is a brief description on what each function does and what it takes in.")
+
+        Array<text> rubricText6
+        rubricText6:Add("SetTitle(text name)*")
+        rubricText6:Add("SetTitle() takes in a string as a parameter, which would be the title of the chart. For this example, we will name the chart "+dq+"Average Price a Night for an AirBnB in 2019 (NYC)"+dq+"
+") 
+        rubricText6:Add("chart:SetTitle("+dq+"Average Price a Night for an AirBnB in 2019 (NYC)"+dq+")")
+
+        Array<text> rubricText7
+        rubricText7:Add("SetXAxisTitle(text name)")
+        rubricText7:Add("SetXAxisTitle() takes in a string as a parameter, which would be the label of the x axis. For this example, we will label this section "+dq+"Price"+dq+" because this is the time frame we are observing") 
+        rubricText7:Add("chart:SetXAxisTitle("+dq+"Price"+dq+")")
+
+        Array<text> rubricText8
+        rubricText8:Add("SetYAxisTitle(text name)")
+        rubricText8:Add("SetYAxisTitle() takes in a string as a parameter, which would be the label of the y axis. For this example, we will label this section "+dq+"Total"+dq+" because this is the factor used for comparison between the different countries. This is also a good section to label the unit we are comparing, such as dollars") 
+        rubricText8:Add("chart:SetYAxisTitle("+dq+"Total"+dq+")")
+
+        Array<text> rubricText9
+        rubricText9:Add("SetLegendTitle(text name)")
+        rubricText9:Add("SetLegendTitle() takes in a string as a parameter, which would label the legend of the chart. The legend identifies the separate countries into different lines. For this example, we will label the legend "+dq+"Cost a night"+dq+"") 
+        rubricText9:Add("chart:SetLegendTitle("+dq+"Cost a Night"+dq+")")
+
+        Array<text> rubricText10
+        rubricText10:Add("SetSubtitle(text title)")
+        rubricText10:Add("SetSubtitle() takes in a string as a parameter which would set a subtitle under the title. This can be any short description or any other necessary information for our chart. For this example, we will label the subtitle "+dq+"How expensive does staying in NYC cost"+dq+"")
+        rubricText10:Add("chart:SetSubtitle("+dq+"How expensive does staying in NYC cost"+dq+")")
+
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Function", " "))
+        rubricHeader1:Add(AddTextBoldFront("Description", " "))
+        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText6))
+        rubricRows1:Add(AddTableDataTag(rubricText7))
+        rubricRows1:Add(AddTableDataTag(rubricText8))
+        rubricRows1:Add(AddTableDataTag(rubricText9))
+        rubricRows1:Add(AddTableDataTag(rubricText10))
+ 
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Histrogram Labeling Functions"))
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// create a title to describe the chart 
+chart:SetTitle("+dq+"Average Price a Night for an AirBnB in 2019 (NYC)"+dq+")
+// let's adjust the font size so it appears nicely on the screen
+chart:SetTitleFontSize(20)
+
+// label the x axis, y axis, and the legend title
+chart:SetXAxisTitle("+dq+"Price"+dq+")
+chart:SetYAxisTitle("+dq+"Count"+dq+")
+chart:SetSubtitle("+dq+"How expensive does staying in NYC cost"+dq+")
+chart:SetLegendTitle("+dq+"Cost a Night"+dq+")
+"))
+
+        bodyDiv:AddParagraph("*Note: We will also be adjusting the font size for the title as well so it fits nicely with our histogram. For this, we will be calling the function SetTitleFontSize() with our chart object. This takes in an integer (size) as the parameter, so for this case, we will insert 20 as our parameter.")
+
+        bodyDiv:AddHeading("Customizing The Data Visualization", 2)
+
+        bodyDiv:AddParagraph("Now that we have our data labeled, we can customize our data to our liking, such as adjusting the intervals, changing starting values, and changing the color. We will be playing around with all these features and to do so, we will be again, using our chart object to call these functions. The functions we will be using for this would be: SetXTickInterval(), SetXAxisMinimum(), and SetColorPaletteToWarmScale(). ")
+
+        Array<text> rubricText11
+        rubricText11:Add("SetXTickInterval(number setX)")
+        rubricText11:Add("SetXTickInterval() takes in an integer as a parameter and sets the interval in multiples of the setX value given. For this tutorial, we will insert 50 as the tick count") 
+        rubricText11:Add("chart:SetXTickInterval(50)")
+
+        Array<text> rubricText12
+        rubricText12:Add("SetXAxisMinimum(number min)")
+        rubricText12:Add("SetXAxisMinimum()  takes in an integer as a parameter and adjusts the starting point for the x axis. For this tutorial, we will insert 0 as our minimum so we can see the price ranges from 0-50, 50-100, etc.") 
+        rubricText12:Add("chart:SetXAxisMinimum(0)")
+        
+         Array<text> rubricText13
+        rubricText13:Add("SetColorPaletteToWarmScale()")
+        rubricText13:Add("SetColorPaletteToWarmScale() changes the color palette to warmer colors such as yellows, reds, and oranges.") 
+        rubricText13:Add("chart:SetColorPaletteToWarmScale()")
+
+         Array<text> rubricHeader2
+        rubricHeader2:Add(AddTextBoldFront("Function", " "))
+        rubricHeader2:Add(AddTextBoldFront("Description", " "))
+        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows2
+        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+      
+        rubricRows2:Add(AddTableDataTag(rubricText11))
+        rubricRows2:Add(AddTableDataTag(rubricText12))
+        rubricRows2:Add(AddTableDataTag(rubricText13))
+ 
+       bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Other Useful Bar Chart Functions"))
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("// customization features
+// sets this to warm tones
+chart:SetColorPaletteToWarmScale()
+// define a clear interval, we separate each interval by 50
+chart:SetXTickInterval(50)
+// let's start our chart at 0 to examine a curve as a whole
+chart:SetXAxisMinimum(0)
+"))
+
+        bodyDiv:AddHeading("Displaying The Chart",2)
+
+        bodyDiv:AddParagraph("Congratulations, our Histogram is constructed! Now you can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display to show the histogram.
+")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+
+         bodyDiv:AddParagraph(" ")
+    bodyDiv:AddText("Now, feel free to clean, build, and run your program and you shortly should see a Game window pop-up. This is our Histogram! To view the entire code, click ") 
+    bodyDiv:AddLink("here ", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/HistogramExample.quorum")
+    bodyDiv:AddText("to view the file.")
+
+        bodyDiv:AddParagraph(" ")
+    bodyDiv:AddHeading("Final Chart",2)
+        bodyDiv:AddImage("/media/tutorials/charts/histogram2.svg","Histogram")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Histograms in the Quorum programming language."
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "charts, acessibility, charts for accessibility, accessible charts,
+        histogram, how to make a histogram, accessible histogram, histogram for visually impaired, histogram text to speech, 
+        accessible data, normal distribution, bell curve, uniform distribution, skew, data skew, histogram skewed data, median,
+        average, discrete random variable, continuous random variable, pretty histogram, easy histogram, plots, plotting, data statistics,
+        statistics, histogram for students, beginner histogram, histogram tutorial")
+        AddMetaData(keywords)
+    end
+
+    action GetSummaryName returns text
+        return "creating a histogram "
+    end
+
+    action GetName returns text
+        return "creating a histogram"
+    end
+
+    action GetShortDescription returns text
+        return "how to use the histogram chart in quorum"
+    end
+
+    action GetLocation returns text
+        return "tutorials/charts/histogram.html"
+    end
+end
