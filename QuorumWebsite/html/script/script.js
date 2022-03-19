@@ -397,72 +397,6 @@ function createSession(session, username) {
     });
 }
 
-function saveIDE(input, output) {
-    var codeInput = document.getElementById(input).value;
-    var outputRegion = document.getElementById(output);
-    var session = getSession();
-    var filename = "";
-    var pageURL = window.location.href;
-    var ideName = input.replace("IdeInput","");
-
-    var postData = {session:session, filename:filename, pageURL:pageURL, ideName:ideName, code:code};
-    $.ajax({
-        type: "POST",
-        url: "/ide_save.php",
-        data: postData,
-        success: function (result) {
-            outputRegion.innerHTML = result;
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com.";
-        }
-    });
-}
-
-function loadIDE(input, output) {
-    var codeInputRegion = document.getElementById(input);
-    var outputRegion = document.getElementById(output);
-    var session = getSession();
-    var filename = "";
-    var pageURL = window.location.href;
-    var ideName = input.replace("IdeInput","");
-
-    var postData = {session:session, pageURL:pageURL, ideName:ideName};
-    $.ajax({
-        type: "POST",
-        url: "/ide_load.php",
-        data: postData,
-        success: function (result) {
-            codeInputRegion.innerHTML = result;
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com.";
-        }
-    });
-}
-
-//IDE submit button action
-var buildCode = function (input, output) {
-    var codeInput = document.getElementById(input).value;
-    var outputRegion = document.getElementById(output);
-    
-    var pageURL = window.location.href;
-    var ideName = input.replace("IdeInput","");
-
-    var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName};
-    $.ajax({
-        type: "POST",
-        url: "/build.php",
-        data: codeData,
-        success: function (result) {
-            outputRegion.innerHTML = result;
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
-        }
-    });
-};
-
 var keyboardInputShortcuts = function(event, input, output, uiContainer) {
     var key = event.keyCode;
     var active = event.getModifierState("Control");
@@ -530,15 +464,19 @@ var newRunCode = function (input, output, uiContainer, execute) {
 	// Attempt to stop previously running programs on this page first.
 	stopProgram();
 	
+    // UPDATE WHEN IDE HAS MULTIPLE FILES
     var codeInput = document.getElementById(input).querySelector(".ideEditing").value;
+    // ------
     var outputRegion = document.getElementById(output);
     
     var pageURL = window.location.href;
     var ideName = input.replace("IdeInput","");
+    let button = execute ?  0 : 1;
+    let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     currentIDEInput_$Global_ = input;
     currentIDEOutput_$Global_ = output;
     currentUIContainer_$Global_ = uiContainer;
-    var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName};
+    var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName, build_only: button, timezone: tz};
     $.ajax({
         type: "POST",
         url: "/fastrun.php",
@@ -733,38 +671,6 @@ var logout = function() {
     });
 };
 
-var saveCode = function(input, output) {
-    var outputRegion = document.getElementById(output);
-    $.ajax({
-        type: "GET",
-        url: "/session_valid.php",
-        success: function (result) {
-            if (result === "success") {
-                var codeInput = document.getElementById(input).value;
-                var pageURL = window.location.href;
-                var ideName = input.replace("IdeInput","");
-                var fileName = "";
-                var codeData = {code: codeInput, pageURL: pageURL, ide_name:ideName, file_name: fileName};
-                $.ajax({
-                    type: "POST",
-                    url: "/ide_save.php",
-                    data: codeData,
-                    success: function (result) {
-                        outputRegion.innerHTML = result;
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
-                    }
-                });
-            } else {
-                outputRegion.innerHTML = "User is not logged in";
-            }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
-        }
-    });
-};
 
 var saveProject = function(id, input, output, namefield, overwrite) {
     $.ajax({
@@ -772,10 +678,12 @@ var saveProject = function(id, input, output, namefield, overwrite) {
         url: "/session_valid.php",
         success: function (result) {
             if (result === "success") {
+                // UPDATE LATER FOR MULTIPLE FILES
                 var codeInput = document.getElementById(input).value;
-                var filename = document.getElementById(namefield).value;
+                // -----
+                var projectName = document.getElementById(namefield).value;
                 var pageURL = window.location.href;
-                var codeData = {code: codeInput, file_name: filename, overwrite: overwrite, ide: id, url: pageURL};
+                var codeData = {code: codeInput, project_name: projectName, overwrite: overwrite, ide: id, url: pageURL};
                 $.ajax({
                     type: "POST",
                     url: "/project_save.php",
@@ -811,43 +719,6 @@ var saveProject = function(id, input, output, namefield, overwrite) {
     });
 };
 
-var loadCode = function(input, output) {
-    var outputRegion = document.getElementById(output);
-    $.ajax({
-        type: "GET",
-        url: "/session_valid.php",
-        success: function (result) {
-            if (result === "success") {
-                var inputRegion = document.getElementById(input);
-                var pageURL = window.location.href;
-                var ideName = input.replace("IdeInput","");
-                var codeData = {pageURL: pageURL, ide_name:ideName};
-                $.ajax({
-                    type: "POST",
-                    url: "/ide_load.php",
-                    data: codeData,
-                    success: function (result) {
-                        if (result !== "") {
-                            inputRegion.value = result;
-                            outputRegion.innerHTML = "Code loaded successfully";
-                        } else {
-                            outputRegion.innerHTML = "No saved code found";
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
-                    }
-                });
-            } else {
-                outputRegion.innerHTML = "User is not logged in";
-            }
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
-        }
-    });
-};
-
 var loadProject = function(id, select, input, output)
 {
     var outputRegion = document.getElementById(output);
@@ -857,22 +728,22 @@ var loadProject = function(id, select, input, output)
         success: function (result) {
             if (result === "success") {
                 var inputRegion = document.getElementById(input);
-                var file, sharedBy;
+                var project, sharedBy;
                 var filename = document.getElementById(select).value;
                 var index = filename.lastIndexOf("#");
                 
                 if (index === -1)
                 {
-                    file = filename;
+                    project = filename;
                     sharedBy = "";
                 }
                 else
                 {
-                    file = filename.substring(0, index);
+                    project = filename.substring(0, index);
                     sharedBy = filename.substring(index + 1);
                 }
                 
-                var codeData = {filename: file, shared: sharedBy};
+                var codeData = {project_name: project, shared: sharedBy};
                 $.ajax({
                     type: "POST",
                     url: "/load_project_file.php",
@@ -880,6 +751,7 @@ var loadProject = function(id, select, input, output)
                     success: function (result) {
                         if (result !== "") {
                             inputRegion.value = result;
+                            editAreaUpdate(inputRegion);
                             outputRegion.innerHTML = 'Loaded "' + filename + '".';
                             hideLoadModal(id);
                         } else {
@@ -2070,7 +1942,7 @@ function deleteRow(button)
         $.ajax({
             type: "POST",
             url: "/delete_project.php",
-            data: {file: button.value},
+            data: {project: button.value},
             success: function (result) 
             {
                 if (result === "success")

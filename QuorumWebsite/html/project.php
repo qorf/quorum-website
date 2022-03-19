@@ -3,7 +3,10 @@
 
     require_once("php_functions.php");
 
-    $user_name = getUserName($_COOKIE["sessionID"]);
+    $user_name = "";
+    if (isset($_COOKIE['sessionID'])) {
+      $user_name = getUserName($_COOKIE["sessionID"]);
+    }
     $run_text = "Program";
     $code = "";
     $header = "Run Quorum Online";
@@ -22,15 +25,16 @@
         $value_zero = 0;
 
         $conn = connect();
-        $stmt = $conn->prepare("SELECT public, code FROM project_files WHERE username = :username AND filename = :filename AND deleted = :zero");
+        // find out if the project is public and grab the project id
+        $stmt = $conn->prepare("SELECT public, id FROM projects WHERE username = :username AND project_name = :project AND deleted = :zero");
         $stmt->bindParam(":username", $project_user);
-        $stmt->bindParam(":filename", $project_name);
+        $stmt->bindParam(":project", $project_name);
         $stmt->bindParam(":zero", $value_zero);
         $stmt->execute();
         
         $test_condition = 0;
 
-        // There can be at most 1 row with the given criteria.
+        // There can be at most 1 row with the given criteria. (for now)
         if ($stmt->rowCount() === 1)
         {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -39,9 +43,19 @@
             
             if ($row['public'] == 1 || ($user_name == $project_user))
             {
-                $code = $row['code'];
-                $run_text = $project_name;
-                $subheader = $row['public'] == 1 ? "This is a public project. Anyone can view it." : "This is a private project. Only you can view it.";
+               // grab code using the ID from project_files and files table
+
+               $project_stmt = $conn->prepare("SELECT code FROM files WHERE hash = (SELECT hash FROM project_files WHERE id = :id AND deleted = :zero )");
+               $project_stmt->bindParam(":id", $row['id']);
+               $project_stmt->bindParam(":zero", $value_zero);
+               $project_stmt->execute();
+               if ($project_stmt->rowCount() === 1)
+               {
+                  $code_row = $project_stmt->fetch(PDO::FETCH_ASSOC);
+                  $code = $code_row['code'];
+               }
+               $run_text = $project_name;
+               $subheader = $row['public'] == 1 ? "This is a public project. Anyone can view it." : "This is a private project. Only you can view it.";
             }
             else
             {
@@ -99,13 +113,13 @@
       <nav class= "headerNavBar outermostContainer" >
          <div class= "skiptocontent" ><a href= "#main" >skip to main content</a></div>
          <ul >
-            <li ><a id= "homePageLink" href= "https://quorumlanguage.com/" ><img src= "/media/QuorumLogoWhite.png" alt= "Home" >Quorum</a></li>
+            <li ><a id= "homePageLink" href= "/index.html" ><img src= "/media/QuorumLogoWhite.png" alt= "Home" >Quorum</a></li>
             <li ><a href= "/learn.html" >Learn</a></li>
             <li ><a href= "/selection.html" >Hour of Code</a></li>
             <li ><a href= "/reference.html" >Reference</a></li>
             <li ><a href= "/libraries.html" >Libraries</a></li>
             <li ><a href= "/download.html" >Download</a></li>
-            <li ><a href= "https://quorum.atlassian.net" >Bugs</a></li>
+            <li ><a href= "/bugs.html" >Bugs</a></li>
             <li ><a id= "profileButton" href= "profile.php" >My Projects</a></li>
             <li ><a id= "loginButton" onclick= "loginButtonPressed()" href= "#" >Login</a></li>
          </ul>
