@@ -15,6 +15,8 @@ use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Web.Page.WebList
 use Libraries.Containers.Array
+use Libraries.System.FileReader
+use Libraries.System.File
 
 class ChartsBarCharts is Lesson
     text dq = ""
@@ -27,6 +29,16 @@ class ChartsBarCharts is Lesson
         //html header stuff
         SetWebPageTitle("Bar Charts - Quorum Programming Language")
         AddDefaultHeaders()
+
+        // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
         MainContent mainRegion
@@ -147,7 +159,7 @@ BarChart chart = frame:BarChart()
 chart:Display()
 "))
 
-    AddIDE(bodyDiv,"BC1","Bar Charts: Reading in Data and Displaying","Example of loading our data and creating bar chart object","examples/charts/BC1.quorum")
+    AddIDE(bodyDiv,"BC1","Bar Charts: Reading in Data and Displaying","Example of loading our data and creating bar chart object","examples/Charts/BC1.quorum")
         
     bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
 
@@ -176,7 +188,7 @@ chart:SetSubtitle("+dq+"Various nightly activities cost in different countries"+
 
     bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:SetFontSize(30)"))
     
-    AddIDE(bodyDiv,"BC2","Bar Charts: Labeling","Example of labeling our bar chart","examples/charts/BC2.quorum")
+    AddIDE(bodyDiv,"BC2","Bar Charts: Labeling","Example of labeling our bar chart","examples/Charts/BC2.quorum")
 
     bodyDiv:AddHeading("Customizing The Data Chart", 2)
 
@@ -198,7 +210,7 @@ To label the legend, we must call the SetLegendTitle(text title) function which 
 chart:SetLegendTitle("+dq+"Countries"+dq+")
 "))
 
-    AddIDE(bodyDiv,"BC3","Bar Charts: Customization","Example of customizing our bar chart","examples/charts/BC3.quorum")
+    AddIDE(bodyDiv,"BC3","Bar Charts: Customization","Example of customizing our bar chart","examples/Charts/BC3.quorum")
 
 
     bodyDiv:AddHeading("Displaying The Chart",2)
@@ -212,11 +224,23 @@ chart:SetLegendTitle("+dq+"Countries"+dq+")
     bodyDiv:AddText("to view the file.")
 
     bodyDiv:AddHeading("Run the program",2)
-    AddIDE(bodyDiv,"BarChart","Creating a Bar Chart","Full Example of the Bar Chart","examples/charts/BarChart.quorum")
+    AddIDE(bodyDiv,"BarChart","Creating a Bar Chart","Full Example of the Bar Chart","examples/Charts/BarChart.quorum")
 
     bodyDiv:AddParagraph(" ")
-    bodyDiv:AddHeading("Final Chart",2)
-    bodyDiv:AddImage("/media/tutorials/charts/barchart1.svg","Bar Chart")
+    
+    File f
+    FileReader reader
+
+    bodyDiv:AddHeading("Final Chart", 2)
+
+    Division chart1
+    chart1:SetStyle("min-width: 200px; max-width: 800px")
+    f:SetPath("html/media/tutorials/charts/barchart1.svg")
+    reader:OpenForRead(f)
+    chart1:AddText(reader:Read())
+    reader:Close()
+    
+    bodyDiv:Add(chart1)
 
     bodyDiv:AddHeading("Further Useful Bar Chart Functions",2)
 

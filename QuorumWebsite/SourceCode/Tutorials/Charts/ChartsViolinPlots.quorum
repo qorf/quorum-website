@@ -14,6 +14,8 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Containers.Array
+use Libraries.System.FileReader
+use Libraries.System.File
 
 class ChartsViolinPlots is Lesson
     text dq = ""
@@ -26,6 +28,16 @@ class ChartsViolinPlots is Lesson
         //html header stuff
         SetWebPageTitle("Violin Plots - Quorum Programming Language")
         AddDefaultHeaders()
+
+         // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
         MainContent mainRegion
@@ -155,7 +167,7 @@ ViolinPlot chart = frame:ViolinPlot()
 chart:Display()
 "))
 
-        AddIDE(bodyDiv,"V1","Violin Plots: Reading in Data and Displaying","Example of loading our data and creating violin plot object","examples/charts/V1.quorum")
+        AddIDE(bodyDiv,"V1","Violin Plots: Reading in Data and Displaying","Example of loading our data and creating violin plot object","examples/Charts/V1.quorum")
 
         bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
    
@@ -215,7 +227,7 @@ chart:SetTitle("+dq+"Minimum and Maximum Life Expectancy for Various Cat Breeds"
         bodyDiv:AddParagraph("Note, if we would like to see the data chart so far, we can type "+dq+"chart:Display()"+dq+" to view it with the labels we created.
 ")
         
-        AddIDE(bodyDiv,"V2","Violin Plots: Labeling","Example of labeling our violin plot","examples/charts/V2.quorum")
+        AddIDE(bodyDiv,"V2","Violin Plots: Labeling","Example of labeling our violin plot","examples/Charts/V2.quorum")
 
         bodyDiv:AddHeading("Customizing the Data Chart", 2)
         
@@ -270,7 +282,7 @@ chart:SetFontSize(20)
 chart:FlipOrientation()
 "))
 
-        AddIDE(bodyDiv,"V3","Violin Plots: Customization","Example of customizing our violin plot","examples/charts/V3.quorum")
+        AddIDE(bodyDiv,"V3","Violin Plots: Customization","Example of customizing our violin plot","examples/Charts/V3.quorum")
 
         bodyDiv:AddParagraph("Congratulations, our Violin Plot is constructed! Now we can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the specified display.")
         bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display(1000, 750)"))      
@@ -280,11 +292,23 @@ chart:FlipOrientation()
     bodyDiv:AddLink("here ", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/ViolinExample1.quorum")
     bodyDiv:AddText("to view the file.")
 
-        AddIDE(bodyDiv,"ViolinPlot","Creating a Violin Plots","Full Example of the Violin Plot","examples/charts/ViolinPlot.quorum")
+        AddIDE(bodyDiv,"ViolinPlot","Creating a Violin Plots","Full Example of the Violin Plot","examples/Charts/ViolinPlot.quorum")
     
         bodyDiv:AddParagraph(" ")
-    bodyDiv:AddHeading("Final Chart",2)
-        bodyDiv:AddImage("/media/tutorials/charts/ViolionExample1.svg","Violin Chart")
+    
+        File f
+        FileReader reader
+    
+        bodyDiv:AddHeading("Final Chart", 2)
+    
+        Division chart1
+        chart1:SetStyle("min-width: 200px; max-width: 800px")
+        f:SetPath("html/media/tutorials/charts/violionchart1.svg")
+        reader:OpenForRead(f)
+        chart1:AddText(reader:Read())
+        reader:Close()
+        
+        bodyDiv:Add(chart1)
 
         bodyDiv:AddHeading("Further Useful Violin Plot Functions",2)
         Array<text> rubricText16
