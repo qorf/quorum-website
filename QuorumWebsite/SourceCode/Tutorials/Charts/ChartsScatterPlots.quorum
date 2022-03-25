@@ -14,6 +14,8 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Containers.Array
+use Libraries.System.FileReader
+use Libraries.System.File
 
 class ChartsScatterPlots is Lesson
     text dq = ""
@@ -26,6 +28,16 @@ class ChartsScatterPlots is Lesson
         //html header stuff
         SetWebPageTitle("Scatter Plots - Quorum Programming Language")
         AddDefaultHeaders()
+
+         // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
         MainContent mainRegion
@@ -300,8 +312,20 @@ chart:FlipOrientation()
         AddIDE(bodyDiv,"ScatterPlot","Scatter Plots: Customization","Full Example of the Scatter Plot","examples/Charts/ScatterPlot.quorum")
 
         bodyDiv:AddParagraph(" ")
-    bodyDiv:AddHeading("Final Chart",2)
-        bodyDiv:AddImage("/media/tutorials/charts/scatterplot1.svg","Scatter Plot")
+
+        File f
+        FileReader reader
+    
+        bodyDiv:AddHeading("Final Chart", 2)
+    
+        Division chart1
+        chart1:SetStyle("min-width: 200px; max-width: 800px")
+        f:SetPath("html/media/tutorials/charts/scatterplot1.svg")
+        reader:OpenForRead(f)
+        chart1:AddText(reader:Read())
+        reader:Close()
+        
+        bodyDiv:Add(chart1)
 
         bodyDiv:AddHeading("Further Useful Scatter Plot Functions",2)
         Array<text> rubricText18
