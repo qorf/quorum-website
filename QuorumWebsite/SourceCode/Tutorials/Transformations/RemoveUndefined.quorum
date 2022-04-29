@@ -1,0 +1,159 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class RemoveUndefined is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Transformations - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Removing Undefined Values", 1)
+        headDiv:AddText("This tutorial demonstrates how to remove values in our datasets")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Removing Undefined Values", 2)
+       
+        bodyDiv:AddParagraph("When cleaning a data set, it is tempting to open excel, or some other spreadsheet program, and to manually adjust a file. For many kinds of data, this is both normal and ok. For scientific data, however, we often want to create a record of exactly what we did. Otherwise, other scientists cannot reproduce our steps. ")
+        
+        bodyDiv:AddParagraph("As such, let us first write a computer program that loads our data, then removes any rows that have undefined values in them. This is not always the operation we want. Removing rows is acceptable only if it makes sense given the research questions we are trying to answer. For example, if we are trying to answer questions about a particular country in our data set, but we remove that row, then this would not make sense. ")
+
+
+        bodyDiv:AddParagraph("In other cases, removing rows is fine. Consider if we were looking at census data, where millions of people put in their information. In such a case, while removing rows where a person did not fill out certain information could distort conclusions, when looking at millions of people, this removal might be okay. Again, it depends on what questions we are trying to answer and whether our assumptions are fair.")
+        
+        bodyDiv:AddParagraph("In our case, because many individuals have not filled out headings such as 'Other monetary comp' or 'Currency - other,' they may be less meaningful to our dataset as a whole so it may be okay to remove them. By removing such headings, our data can be less cluttered with columns that have empty entries.")
+        
+        bodyDiv:AddParagraph("To accomplish this, we use the RemoveUndefinedRowsTransform class, which does the work for us. This class first makes a copy of our DataFrame, so it does not destroy anything, then returns us the copy. We use it by passing the transform to the DataFrame. We also have a brief description of how to use these functions for our dataset.")
+        
+         Array<text> rubricText1
+        rubricText1:Add("RemoveUndefinedRowsTransform transformedObject")
+        rubricText1:Add("This class will find any rows that are left blank and will remove them from our dataset. We will have to declare our object and then create a new DataFrame to save this changed data. From this we use our original DataFrame to clean the dataset. Note, this is only the object created.")
+        rubricText1:Add("RemoveUndefinedRowsTransform transform")
+
+        Array<text> rubricText2
+        rubricText2:Add("DataFrame:Transform(RemoveUndefinedRowsTransform  transform)")
+        rubricText2:Add("This Transform function belongs to the DataFrame class and takes in a RemoveUndefinedRowsTransform object which will help clean our dataset by removing unnecessary rows.")
+        rubricText2:Add("RemoveUndefinedRowsTransform transform
+DataFrame clean = frame:Transform(transform)")
+
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Class / Action", " "))
+        rubricHeader:Add(AddTextBoldFront("Description", " "))
+        rubricHeader:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+        rubricRows:Add(AddTableDataTag(rubricText2))
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Removing Undefined Values Helper Functions"))
+
+        bodyDiv:AddParagraph("What we want to do first is load our dataset which we do using our DataFrame object. In this case, we created a DataFrame and called it, 'frame.' Then we want to load in our AskAManager.csv file using the Load(text fileLocation) action within the DataFrame class.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/AskAManager.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Next, we will need to create a new transformation object, RemoveUndefinedRowsTransform and we will call it transform. We also want to create another DataFrame object to hold our modified 'frame'. This new DataFrame will be called 'clean' and we will be using the Transform function on 'frame' and pass in our RemoveUndefinedRowsTransform object as the parameter.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("RemoveUndefinedRowsTransform transform
+DataFrame clean = frame:Transform(transform)
+"))
+
+        bodyDiv:AddParagraph(" ")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/AskAManager.csv"+dq+")
+
+//This class transforms data by removing any rows that contain undefined
+//values. It is now always what we want, but can be useful
+RemoveUndefinedRowsTransform transform
+DataFrame clean = frame:Transform(transform)
+
+//We can save the frame or output it to the console, like we are doing here.
+output clean:ToText()"))
+
+        bodyDiv:AddHeading("Run the Example",2)
+        
+        AddIDE(bodyDiv,"RemoveValues","Removing Undefined Values","Removing undefined values for data transformations","examples/Transformations/RemoveUndefined.quorum")
+
+bodyDiv:AddParagraph(" ")
+bodyDiv:AddText("To view the program we have made, we can ")
+
+     Link link2
+        link2:AddText("download the program file")
+        link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/RemoveUndefinedValues.quorum")
+        link2:SetTarget(link2:newTab)
+        bodyDiv:Add(link2)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about removing undefined values in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "removing undefined values with DataFrames"
+    end
+
+    action GetName returns text
+        return "transformations overview "
+    end
+
+    action GetShortDescription returns text
+        return "removing undefined values"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Transformations/RemovingUndefined.html"
+    end
+end

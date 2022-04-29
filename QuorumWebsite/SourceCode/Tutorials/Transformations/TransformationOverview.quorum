@@ -1,0 +1,187 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class TransformationOverview is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Transformations - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Overview on Transformations", 1)
+        headDiv:AddText("This tutorial introduces our next set of lessons on using transformations in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Overview on transformations", 2)
+       
+        bodyDiv:AddParagraph("In this tutorial, we are going to examine some messy real-world data, clean it up, and then shuffle it around. We often do adjustments like this in data science because data we receive from nature, partners, or just that we made ourselves, is now always in a format we later find convenient. For this tutorial, we are going to use thefollowing data set: ")
+
+        
+        Link link
+        link:AddText("Salary Survey")
+        link:SetAddress("https://docs.google.com/spreadsheets/d/1IPS5dBSGtwYVbjsfbaMCYIWnOuRmJcbequohNxCyGVw/edit?resourcekey#gid=1625408792")
+        link:SetTarget(link:newTab)
+    
+        bodyDiv:Add(link)
+
+        bodyDiv:AddParagraph(" ")
+
+        Link link3 
+        link3:AddText("We can click this link to download the file for the CSV.")
+        link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/AskAManager.csv")
+        link3:SetTarget(link3:newTab)
+
+        bodyDiv:Add(link3)
+
+        bodyDiv:AddParagraph(" ")
+        bodyDiv:AddText("This dataset comes from a website called AskAManager.org and collects ")
+        
+Link link1
+        link1:AddText("live data")
+        link1:SetAddress("https://www.askamanager.org/2021/04/how-much-money-do-you-make-4.html")
+        link1:SetTarget(link1:newTab)
+        
+        bodyDiv:Add(link1)
+        bodyDiv:AddText(" responses from users about the industry they work in, salary, workplace location, etc. We want to thank Alison, the owner of the AskAManager survey for allowing us to use this dataset for these upcoming tutorials. 
+")
+
+        bodyDiv:AddParagraph("The reason we are looking at this dataset is because like any response form converted into a dataset, not all parts will be filled out, thus creating messy data. As we can see with this dataset, many individuals do not fill out all sections creating missing data such as in the sections of 'Additional context of job title' and 'Other monetary comp.' To follow along and work on transforming this dataset, we can download the dataset here.")
+
+        bodyDiv:AddParagraph("Here is a snippet of the AskAManager.csv file that we will be using:")
+
+         Array<text> rubricText1
+        rubricText1:Add("4/27/2021 11:02")
+        rubricText1:Add("25-34")
+        rubricText1:Add("Education (Higher Education)")
+        rubricText1:Add("Research and Instruction Librarian")
+        rubricText1:Add("55,000")
+        
+        Array<text> rubricText2
+        rubricText2:Add("4/27/2021 11:02")
+        rubricText2:Add("25-34")
+        rubricText2:Add("Computing or Tech")
+        rubricText2:Add("Change & Internal Communications Manager")
+        rubricText2:Add("54,600")
+        
+        Array<text> rubricText3
+        rubricText3:Add("4/27/2021 11:02")
+        rubricText3:Add("25-34")
+        rubricText3:Add("Accounting, Banking & Finance")
+        rubricText3:Add("Marketing Specialist")
+        rubricText3:Add("34,000")
+        
+        
+        Array<text> rubricText4
+        rubricText4:Add("4/27/2021 11:02")
+        rubricText4:Add("25-34")
+        rubricText4:Add("Nonprofits")
+        rubricText4:Add("Program Manager")
+        rubricText4:Add("62,000")
+        
+
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Timestamp", " "))
+        rubricHeader:Add(AddTextBoldFront("How old are you?", " "))
+        rubricHeader:Add(AddTextBoldFront("Industry", " "))
+        rubricHeader:Add(AddTextBoldFront("Job title", " "))
+        rubricHeader:Add(AddTextBoldFront("Annual salary", " "))
+   
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+        rubricRows:Add(AddTableDataTag(rubricText2))
+        rubricRows:Add(AddTableDataTag(rubricText3))
+        rubricRows:Add(AddTableDataTag(rubricText4))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "AskAManager.csv"))
+
+        bodyDiv:AddParagraph("Let's go in depth into why there are problems in this dataset. Note that some of the rows contain little information. In the heading of 'Other monetary comp' we can see that some users optionally put in data where users would enter in their information, leave in 0, or leave it blank. Another problem is that there are naming convention inconsistencies within the 'Country' For example, for the United States, users have entered in US, USA, United States, United States of America, etc. If this data would be graphed based on countries, all of these entities would have different points even though they are the same location. Overall, many of the headings where it asks about additional details are left blank, leaving large gaps. With these thoughts on the dataset in mind, and we might want to transform it, ")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/AskAManager.csv"+dq+")
+
+//The system loaded the file, but can also output it a text value, or the console, if we want that.
+output frame:ToText()
+"))
+
+        bodyDiv:AddHeading("Run the example", 2)
+
+       AddIDE(bodyDiv,"LoadingOverview","Loading and outputting our CSV","Load and output the AskAManager.csv file","examples/Transformations/Overview.quorum")
+
+bodyDiv:AddParagraph(" ")
+bodyDiv:AddText("To view the program we have made, we can ")
+
+     Link link2
+        link2:AddText("download the program file")
+        link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/OverviewLoading.quorum")
+        link2:SetTarget(link2:newTab)
+        bodyDiv:Add(link2)
+
+        bodyDiv:AddText(". We will be using other datasets to highlight some other features of transformations which will be available on those upcoming sections.")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about transformations in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "transformations overview with DataFrames"
+    end
+
+    action GetName returns text
+        return "transformations overview "
+    end
+
+    action GetShortDescription returns text
+        return "transformations overview using DataFrames"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Transformations/overview.html"
+    end
+end
