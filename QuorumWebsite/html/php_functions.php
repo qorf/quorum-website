@@ -21,6 +21,9 @@ function disconnect($conn) {
 }
 
 function getUserName($session) {
+    if($session  === null || $session === '') {
+        return "";
+    }
     $conn = connect();
     if ($conn != NULL) {
         $stmt = $conn->prepare("SELECT username FROM sessions WHERE session = :session");
@@ -38,58 +41,36 @@ function getUserName($session) {
     }
 }
 
-function saveCodeFile($user_name, $filename, $pageURL, $ide_name, $code) {
-    $conn = connect();
-    if ($conn != NULL) {
-        $stmt = $conn->prepare("INSERT INTO file_system (username, filename, pageURL, ide_name, code) VALUES (:user_name, :filename, :pageURL, :ide_name, :code)");
-        $stmt->bindParam(':user_name', $user_name);
-        $stmt->bindParam(':filename', $filename);
-        $stmt->bindParam(':pageURL', $pageURL);
-        $stmt->bindParam(':ide_name', $ide_name);
-        $stmt->bindParam(':code', $code);
-        $stmt->execute();
-        disconnect($conn);
-        return "Code saved for user: ".$user_name;
-    } else {
-        return "Failed to connect";
-    }
-}
 
-function loadCodeFile($user_name, $pageURL, $ide_name) {
+function saveRunCode($version, $code, $build, $timezone, $ip, $url, $ide) {
     $conn = connect();
     if ($conn != NULL) {
-        $stmt = $conn->prepare("SELECT filename, code FROM file_system WHERE username = :user_name AND pageURL = :url AND ide_name = :ide ORDER BY created DESC" );
-        $stmt->bindParam(':user_name', $user_name);
-        $stmt->bindParam(':url', $pageURL);
-        $stmt->bindParam(':ide', $ide_name);
-        $stmt->execute();
-        if ($stmt->rowCount() >= 1) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            $code = $row['code'];
-        }
-        disconnect($conn);
-        return $code;
-    }
-}
-
-function saveRunCode($user, $version, $code, $output, $button, $ip, $url, $ide) {
-    $conn = connect();
-    if ($conn != NULL) {
-        $stmt = $conn->prepare("INSERT INTO run_code (username, quorum_version, code, compiler_output, button, IP, pageURL, ide_name) VALUES (:user, :version, :code, :output, :button, :ip, :url, :ide)");
-        $stmt->bindParam(':user', $user);
+        $stmt = $conn->prepare("INSERT INTO run_code (quorum_version, build_only, address, timezone, pageURL, ide_name) VALUES (:version, :build, :address, :tz, :url, :ide)");
         $stmt->bindParam(':version', $version);
-        $stmt->bindParam(':code', $code);
-        $stmt->bindParam(':output', $output);
-        $stmt->bindParam(':button', $button);
-        $stmt->bindParam(':ip', $ip);
+        $stmt->bindParam(':build', $build);
+        $address = md5($_ENV["ADDRESS_SALT"] . $ip);
+        $stmt->bindParam(':address', $address);
+        $stmt->bindParam(':tz',$timezone);
         $stmt->bindParam(':url', $url);
         $stmt->bindParam(':ide', $ide);
         $stmt->execute();
+
+        $last_id = $conn->lastInsertId();
+        $fileSHA = sha1($code);
+        $stmt2 = $conn->prepare("INSERT INTO compiled_files (id, hash) VALUES (:id_num, :file_hash)");
+        $stmt2->bindParam(':id_num', $last_id);
+        $stmt2->bindParam(':file_hash', $fileSHA);
+        $stmt2->execute();
+    
+        $file_stmt = $conn->prepare("INSERT IGNORE INTO files (hash, code) VALUES (:file_hash, :code)");
+        $file_stmt->bindParam(':file_hash', $fileSHA);
+        $file_stmt->bindParam(':code', $code);
+        $file_stmt->execute();
         disconnect($conn);
     }
 }
 
-function hasProjectFile($user_name, $filename)
+function hasProject($user_name, $project)
 {
     $conn = connect();
     if ($conn === NULL)
@@ -97,9 +78,9 @@ function hasProjectFile($user_name, $filename)
         return false;
     }
     
-    $stmt = $conn->prepare("SELECT deleted FROM project_files WHERE username = :user_name AND filename = :filename ORDER BY deleted ASC" );
+    $stmt = $conn->prepare("SELECT deleted FROM projects WHERE username = :user_name AND project_name = :project ORDER BY deleted ASC" );
     $stmt->bindParam(':user_name', $user_name);
-    $stmt->bindParam(':filename', $filename);
+    $stmt->bindParam(':project', $project);
     $stmt->execute();
     disconnect($conn);
 
@@ -120,42 +101,80 @@ function hasProjectFile($user_name, $filename)
     return false;
 }
 
-function saveProjectFile($user_name, $filename, $code, $ide, $url, $overwrite)
+function saveProjectFile($user_name, $project_name, $code, $ide, $url, $overwrite)
 {
-    $found = hasProjectFile($user_name, $filename);
+    $found = hasProject($user_name, $project_name);
     
     if ($found)
     {
         if ($overwrite)
         {
+            // if overwriting 'delete' old one
             $value_zero = 0;
             $value_one = 1;
             
-            $update_conn = connect();
-            $update_stmt = $update_conn->prepare("UPDATE project_files SET deleted = :value WHERE username = :user AND filename = :file AND deleted = :delete");
-            $update_stmt->bindParam(':user', $user_name);
-            $update_stmt->bindParam(':file', $filename);
-            $update_stmt->bindParam(':value', $value_one);
-            $update_stmt->bindParam(':delete', $value_zero);
-            $update_stmt->execute();
+            $id = -1;
+            // get id of project
+            $conn = connect();
+            $id_stmt = $conn->prepare("SELECT id FROM projects WHERE username = :user AND project_name = :project");
+            $id_stmt->bindParam(":user", $user_name);
+            $id_stmt->bindParam(":project", $project_name);
+            $id_stmt->execute();
+            if ($id_stmt->rowCount() > 0) 
+            {
+                $row = $id_stmt->fetch(PDO::FETCH_ASSOC);
+                $id = $row['id'];
+        
+            } else {
+                return;
+            }
+        
+            // set project to deleted
+            $stmt = $conn->prepare("UPDATE projects SET deleted = :one WHERE id = :id_num");
+            $stmt->bindParam(":one", $value_one);
+            $stmt->bindParam(":id_num", $id);
+            $stmt->execute();
+        
+            // set files associated to project to deleted
+            $stmt2 = $conn->prepare("UPDATE project_files SET deleted = :one WHERE id = :id_num");
+            $stmt2->bindParam(":one", $value_one);
+            $stmt2->bindParam(":id_num", $id);
+            $stmt2->execute();
+            disconnect($conn);
         }
         else
         {
             return "A file already exists with that name.";
         }
     }
-        
+    
+    $fileSHA = sha1($code);
+
     $conn = connect();
-    $stmt = $conn->prepare("INSERT INTO project_files (username, filename, code, created, page_url, ide_name) VALUES (:user, :file, :code, now(), :url, :ide)");
+    $stmt = $conn->prepare("INSERT INTO projects (username, project_name, created, pageURL, ide_name) VALUES (:user, :project, now(), :url, :ide)");
     $stmt->bindParam(':user', $user_name);
-    $stmt->bindParam(':file', $filename);
-    $stmt->bindParam(':code', $code);
+    $stmt->bindParam(":project", $project_name);
     $stmt->bindParam(':url', $url);
     $stmt->bindParam(':ide', $ide);
     $stmt->execute();
+
+    $last_id = $conn->lastInsertId();
+    // UPDATE WHEN USERS CAN SET FILENAMES
+    $default_filename = "Main";
+    $project_stmt = $conn->prepare("INSERT INTO project_files (id, filename, hash) VALUES (:id_num, :filename, :file_hash)");
+    $project_stmt->bindParam(':id_num', $last_id);
+    $project_stmt->bindParam(':filename', $default_filename);
+    $project_stmt->bindParam(':file_hash', $fileSHA);
+    $project_stmt->execute();
+
+    $file_stmt = $conn->prepare("INSERT IGNORE INTO files (hash, code) VALUES (:file_hash, :code)");
+    $file_stmt->bindParam(':file_hash', $fileSHA);
+    $file_stmt->bindParam(':code', $code);
+    $file_stmt->execute();
+
     disconnect($conn);
 
-    return 'Your project was successfully saved as "' . $filename . '".';
+    return 'Your project was successfully saved as "' . $project_name . '".';
 }
 
 function getProjectTable()
@@ -170,7 +189,7 @@ function getProjectTable()
     $value_zero = 0;
     
     $conn = connect();
-    $stmt = $conn->prepare("SELECT shared_by, filename, modified, created, public FROM project_files WHERE username = :username AND deleted = :deleted ORDER BY modified DESC");
+    $stmt = $conn->prepare("SELECT shared_by, project_name, modified, created, public FROM projects WHERE username = :username AND deleted = :deleted ORDER BY modified DESC");
     $stmt->bindParam(':username', $user_name);
     $stmt->bindParam(':deleted', $value_zero);
     $stmt->execute();
@@ -185,10 +204,10 @@ function getProjectTable()
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
             $checked = $row['public'] == 0 ? '' : 'checked="checked"';
-            $share_link = 'quorumlanguage.com/project.php?user=' . htmlspecialchars($user_name) . '&file=' . htmlspecialchars(urlencode($row['filename']));
+            $share_link = 'quorumlanguage.com/project.php?user=' . htmlspecialchars($user_name) . '&file=' . htmlspecialchars(urlencode($row['project_name']));
             
             $table .= "<tr>";
-            $table .= "<td>" . $row['filename'] . "</td>";
+            $table .= "<td>" . $row['project_name'] . "</td>";
             if ($row['shared_by'] != null)
             {
                 $table .= "<td>" . $row['shared_by'] . "</td>";
@@ -198,14 +217,14 @@ function getProjectTable()
                 //$table .= "<td>" . $user_name . "</td>";
             }
             $table .= "<td>" . formatDate($row['modified']) . "</td>";
-            $table .= '<td class="centeredRow">' . '<input class="publicCheckbox" type="checkbox" id="publicBox' . $counter . '" name="public" value="' . htmlspecialchars($row['filename']) . '" ' . $checked . ' /></td>';
+            $table .= '<td class="centeredRow">' . '<input class="publicCheckbox" type="checkbox" id="publicBox' . $counter . '" name="public" value="' . htmlspecialchars($row['project_name']) . '" ' . $checked . ' /></td>';
             //$table .= "<td>" . $row['created'] . "</td>";
             $table .= "<td>" . '<form action="project.php">';
             $table .= '<input type="hidden" name="user" value="' . htmlspecialchars($user_name) . '"/>';
-            $table .= '<input type="hidden" name="file" value="' . htmlspecialchars($row['filename']) . '"/>';
+            $table .= '<input type="hidden" name="file" value="' . htmlspecialchars($row['project_name']) . '"/>';
             $table .= '<input class="profileButton" type="submit" value="Load"></form>' . "</td>";
             $table .= "<td>" . '<button class="profileButton" onclick="showShareModal(\'' . $share_link . '\')">Share</button>' . "</td>";
-            $table .= "<td>" . '<button class="profileButton" value="' . htmlspecialchars($row['filename']) . '" onclick="deleteRow(this)">Delete</button>' . "</td>";
+            $table .= "<td>" . '<button class="profileButton" value="' . htmlspecialchars($row['project_name']) . '" onclick="deleteRow(this)">Delete</button>' . "</td>";
             $table .= "<tr>";
         }
 
@@ -230,7 +249,7 @@ function getProjectSelect($id)
     $value_zero = 0;
     
     $conn = connect();
-    $stmt = $conn->prepare("SELECT shared_by, filename, modified FROM project_files WHERE username = :username AND deleted = :deleted ORDER BY modified DESC");
+    $stmt = $conn->prepare("SELECT shared_by, project_name, modified FROM projects WHERE username = :username AND deleted = :deleted ORDER BY modified DESC");
     $stmt->bindParam(':username', $user_name);
     $stmt->bindParam(':deleted', $value_zero);
     $stmt->execute();
@@ -241,13 +260,13 @@ function getProjectSelect($id)
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
-            $select .= '<option value="' . $row['filename'];
-            if ($row['shared_by' != null])
+            $select .= '<option value="' . $row['project_name'];
+            if ($row['shared_by'] != null)
             {
             //    $select .= '#' . $row['shared_by'];
             }
             //$select .= '">'. $row['filename'] . ' - <em>';
-            $select .= '">'. $row['filename'];
+            $select .= '">'. $row['project_name'];
             if ($row['shared_by'] != null)
             {
                 //$select .= "Shared by " . $row['shared_by'] . " - ";
@@ -272,15 +291,15 @@ function formatDate($timestamp)
     return date("F jS, Y", strtotime($timestamp));
 }
 
-function changeProjectPrivacy($user, $file, $public)
+function changeProjectPrivacy($user, $project, $public)
 {
     $value_zero = 0;
     
     $conn = connect();
-    $stmt = $conn->prepare("UPDATE project_files SET public = :public, modified = modified WHERE username = :user AND filename = :file AND deleted = :zero");
+    $stmt = $conn->prepare("UPDATE projects SET public = :public, modified = modified WHERE username = :user AND project_name = :project AND deleted = :zero");
     $stmt->bindParam(":public", $public);
     $stmt->bindParam(":user", $user);
-    $stmt->bindParam(":file", $file);
+    $stmt->bindParam(":project", $project);
     $stmt->bindParam(":zero", $value_zero);
     $stmt->execute();
 }
@@ -325,7 +344,7 @@ function changeUserPassword($key, $pass, $confirm)
 //        echo "RESULT: " . $hashed_pass;
         
         $password_update = connect();
-        $password_stmt = $password_update->prepare("UPDATE sodbeans_users SET password = :password WHERE email = :email");
+        $password_stmt = $password_update->prepare("UPDATE users SET password = :password WHERE email = :email");
         $password_stmt->bindParam(":password", $hashed_pass);
         $password_stmt->bindParam(":email", $email);
         $password_stmt->execute();

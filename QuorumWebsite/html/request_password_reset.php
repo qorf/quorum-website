@@ -82,7 +82,7 @@
     $ip_address = $_SERVER['REMOTE_ADDR'];
     
     $conn = connect();
-    $stmt = $conn->prepare("SELECT username FROM sodbeans_users WHERE email = :email");
+    $stmt = $conn->prepare("SELECT username FROM users WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     $conn = null;

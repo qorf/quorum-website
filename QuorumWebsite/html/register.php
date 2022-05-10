@@ -40,7 +40,7 @@
     }
     
     $connect = connect();
-    $statement = $connect->prepare("SELECT email FROM sodbeans_users WHERE email = :email");
+    $statement = $connect->prepare("SELECT email FROM users WHERE email = :email");
     $statement->bindParam(':email', $email);
     $statement->execute();
     if ($statement->rowCount() > 0) 
@@ -57,7 +57,7 @@
     }
     
     $connect = connect();
-    $statement = $connect->prepare("SELECT username FROM sodbeans_users WHERE username = :user");
+    $statement = $connect->prepare("SELECT username FROM users WHERE username = :user");
     $statement->bindParam(':user', $user_name);
     $statement->execute();
     if ($statement->rowCount() > 0) 
@@ -88,7 +88,7 @@
 
         $conn = connect();
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("INSERT INTO sodbeans_users (username, password, first_name, last_name, email, birthday, reset_password_expire, tries) VALUES (:username, :password, :first_name, :last_name, :email, :birthday, :reset_password_expire, :tries)");
+        $stmt = $conn->prepare("INSERT INTO users (username, password, first_name, last_name, email, birthday, reset_password_expire, tries) VALUES (:username, :password, :first_name, :last_name, :email, :birthday, :reset_password_expire, :tries)");
         $stmt->bindParam(':username', $user_name);
         $stmt->bindParam(':password', $hashed_password);
         $stmt->bindParam(':first_name', $first_name);
