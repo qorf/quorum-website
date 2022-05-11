@@ -52,7 +52,7 @@ function update_console() {
 
 var Module = {
     locateFile: function(path, prefix) {
-        if (path.endsWith(".data")) return "/script/" + path;
+        if (path.endsWith(".data")) return "https://quorumlanguage.com/script/" + path;
         return prefix + path;
     }
  };
