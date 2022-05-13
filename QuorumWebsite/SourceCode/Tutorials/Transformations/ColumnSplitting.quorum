@@ -1,0 +1,335 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.WebList
+
+class ColumnSplitting is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Transformations - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Column Splitting", 1)
+        headDiv:AddText("This tutorial demonstrates how to split columns in our datasets")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Column Splittng", 2)
+       
+        bodyDiv:AddParagraph("Let us immediately start off with an example to explain what it means to 'column split.' Imagine for a moment that we had a DataFrame below:")
+
+   
+        bodyDiv:AddParagraph(""+dq+"player,year,season,stats
+1,A,1,22-2
+2,A,2,29-3
+3,B,1,18-6
+4,B,2,11-8
+5,C,1,12-5
+6,C,2,19-2"+dq+"
+")
+
+        bodyDiv:AddParagraph("The basic idea in splitting columns is we need a way to separate out the value in the cells. For simple cases, like if there is a character between them, we can use the SplitSelectedColumns(Array<text>, text) action. For this, we first provide an array of the names of the headers for the new columns. Second, we provide it the character we want to split up the values by. Here is a brief description of how SplitSelectedColumns(Array, text) work:")
+
+        Array<text> rubricText1
+        rubricText1:Add("dataFrameObject:SplitSelectedColumns(Array<text> textHeader, text separatorChar)")
+        rubricText1:Add("This action takes in an array that would be the new header for the created column as well as the character we are looking for to separate values by. The character will go through that selected column and create a new header column with just the separated value.")
+        rubricText1:Add("frame:SplitSelectedColumns(newHeader,"+dq+"-"+dq+")")
+        
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Class / Action", " "))
+        rubricHeader:Add(AddTextBoldFront("Description", " "))
+        rubricHeader:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+      
+        rubricRows:Add(AddTableDataTag(rubricText1))
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Column Splitting Helper Functions"))
+
+
+        bodyDiv:AddParagraph("For this example, we will be using a sample file of player stats for an online game, league.csv. Here is an example of the CSV file:")
+        
+        Array<text> rubricText2
+        rubricText2:Add("jianhun")
+        rubricText2:Add("Challenger")
+        rubricText2:Add("1170")
+        rubricText2:Add("53")
+        rubricText2:Add("156-112")
+        rubricText2:Add("4/33/11")
+
+        Array<text> rubricText3
+        rubricText3:Add("TES 77")
+        rubricText3:Add("Challenger")
+        rubricText3:Add("1134")
+        rubricText3:Add("60")
+        rubricText3:Add("209-161")
+        rubricText3:Add("4/33/11")
+
+        Array<text> rubricText4
+        rubricText4:Add("Shadow BongBong")
+        rubricText4:Add("Challenger")
+        rubricText4:Add("1121")
+        rubricText4:Add("241")
+        rubricText4:Add("312-253")
+        rubricText4:Add("4/33/11")
+        
+         Array<text> rubricText5
+        rubricText5:Add("KING MIR")
+        rubricText5:Add("Challenger")
+        rubricText5:Add("1084")
+        rubricText5:Add("654")
+        rubricText5:Add("406-355")
+        rubricText5:Add("4/33/11")
+
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Player", " "))
+        rubricHeader1:Add(AddTextBoldFront("Tier", " "))
+        rubricHeader1:Add(AddTextBoldFront("LP", " "))
+         rubricHeader1:Add(AddTextBoldFront("Level", " "))
+         rubricHeader1:Add(AddTextBoldFront("Win Ratio", " "))
+         rubricHeader1:Add(AddTextBoldFront("Kills/Deaths/Assists", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText2))
+        rubricRows1:Add(AddTableDataTag(rubricText3))
+        rubricRows1:Add(AddTableDataTag(rubricText4))
+        rubricRows1:Add(AddTableDataTag(rubricText5))
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Column Splitting Helper Functions"))
+        
+        Link link3 
+        link3:AddText("We can click this link to download the file for the CSV.")
+        link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Culture%20and%20Entertainment/league.csv")
+        link3:SetTarget(link3:newTab)
+
+        bodyDiv:Add(link3)
+
+        bodyDiv:AddParagraph("What we want to do is try and separate the Win Ratio column so on one column, we have the wins and the next column we have the loses. So let us start off with downloading the provided file here. We will then want to create a DataFrame object, which we can call 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
+We first want to load the file, which we can do by calling Load(text fileLocation) and put it in the file location of our league.csv file.
+")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame frame
+frame:Load("+dq+"../Data/Culture and Entertainment/league.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate wins and loses, we will use the Add(text arrayElement) to add heading titles into our array. ")
+            
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Array<text> headers
+headers:Add("+dq+"Wins"+dq+")
+headers:Add("+dq+"Loses"+dq+")
+"))
+
+
+        bodyDiv:AddParagraph("Next, we have to select the column we are trying to separate. Remember that in a CSV file, columns start off with 0 so in this case, the column with the non-separated wins and loses will be column 4. We would call the action AddSelectedColumn(integer columnNumber) and pass in 4 which will read in the column of 'Win Ratio.' An alternative method that accomplishes the same read-in is to use the action AddSelectedColumns(text columnHeader) which we would pass in the 'Win Ratio' column header and read in that same column. For this tutorial, we will just add the numerical assigned column.")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedColumn(4)"))
+
+        bodyDiv:AddParagraph("The last step is to call the action SplitSelectedColumns(Array <text>, text) on our 'frame' object. For the first parameter, we will pass in the 'headers' array we created previously and in the second parameter, we will want to pass in the character we want to separate the column by. What this does is that it will search through the column and find that separator character. Once it finds the character, it separates the values from the left and right hand sides and puts them into separate columns. In this dataset, the values we want to separate are divided by a '-' so we will be inserting that character.")
+        bodyDiv:AddParagraph("We also want to save our newly created columns into a new DataFrame so we will assign this modified frame into a new frame called 'result.' We finally can output both DataFrames onto the console to see our changes.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame result = frame:SplitSelectedColumns(headers, "+dq+"-"+dq+")
+"))
+
+        bodyDiv:AddParagraph("Below is an example of the entire program: ")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Containers.Array
+    DataFrame frame
+    frame:Load("+dq+"../Data/Culture and Entertainment/league.csv"+dq+")
+    
+    //create the names for the new columns
+    Array<text> headers
+    headers:Add("+dq+"Wins"+dq+")
+    headers:Add("+dq+"Loses"+dq+")
+
+    //set which column or columns we want to split in this way
+    //then split the values and output them to the console
+    frame:AddSelectedColumn(4)
+    DataFrame result = frame:SplitSelectedColumns(headers, "+dq+"-"+dq+")
+
+    output "+dq+"original frame"+dq+"
+    output frame:ToText()
+
+    output "+dq+"column split frame of wins/loses"+dq+"
+    output result:ToText()
+"))
+        bodyDiv:AddHeading("Run the Example",2)
+        
+        AddIDE(bodyDiv,"ColumnSplit","Column Splitting","Column Splitting for data transformations","examples/Transformations/ColumnSplitting.quorum")
+
+    bodyDiv:AddParagraph(" ")
+bodyDiv:AddText("To view the program we have made, we can ")
+
+     Link link2
+        link2:AddText("download the program file")
+        link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/ColumnSplitting.quorum")
+        link2:SetTarget(link2:newTab)
+        bodyDiv:Add(link2)
+
+
+    bodyDiv:AddHeading("Column Splitting With Inheritance",2)
+
+    bodyDiv:AddParagraph(" ")
+    bodyDiv:AddText("While this works for a common case, for more complex examples, we may want to split up a value in any number of complicated ways. To do so is more complex. Specifically, we need to use ")
+    Link link4
+        link4:AddText("Inheritance")
+        link4:SetAddress("https://quorumlanguage.com/tutorials/language/inheritance.html")
+        link4:SetTarget(link4:newTab)
+
+    bodyDiv:Add(link4)
+    bodyDiv:AddText(". Overriding the class named ColumnSplitter, then overriding one action. Here is an example of the class that implements the basic splitting shown above:")
+
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("package Libraries.Compute.Statistics.Transforms
+use Libraries.Containers.Arrayi
+use Libraries.Compute.Statistics.DataFrame
+
+class LiteralColumnSplitter is ColumnSplitter
+text delimiter = undefined
+
+action SplitValue(text value) returns Array<text>
+    if delimiter = undefined or delimiter:IsEmpty()
+        alert("+dq+"Cannot split the column based on an undefined text splitter."+dq+")
+    end
+
+    if value = undefined or value:IsEmpty()
+        alert("+dq+"Cannot split the column based on an undefined text value."+dq+")
+    end
+
+    return value:Split(delimiter)
+end
+
+action GetDelimiter returns text
+    return delimiter
+end
+
+action SetDelimiter(text delimiter)
+    me:delimiter = delimiter
+end
+end
+"))
+
+bodyDiv:AddParagraph("Once we have created a new splitter, we can send it to any DataFrame using its Transform action. Now, we will go through the process on how to use this same idea with our DataFrames. Again, we will want to create a DataFrame object, which we can call it 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
+We first want to load the file, which we can do by calling Load(text fileLocation) and put it in the file location of our league.csv file.
+")
+
+bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame frame
+frame:Load("+dq+"../Data/Culture and Entertainment/league.csv"+dq+")
+"))
+
+bodyDiv:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate kills, deaths and assists, we will use the Add(text arrayElement) to add heading titles into our array. ")
+
+bodyDiv:Add(preformatter:GeneratePreformattedCode("Array <text> headers
+headers:Add("+dq+"Kills"+dq+")
+headers:Add("+dq+"Deaths"+dq+")
+headers:Add("+dq+"Assists"+dq+")
+
+"))
+
+bodyDiv:AddParagraph("Finally, we want to select the column we are splitting, 'Kills/Deaths/Assists' using our action AddSelectedColumns(text header). This will load our selected column into the DataFrame in order to properly split up the entries. We also want to call another action SplitSelectedColumns(Array <text>headers, text charDelim, bool hasDelimeter) which takes in three parameters: the array we have created, a character separating each value, and boolean to verify such delimiter in the column. This is very similar to our previous splitting action. Now that we have our column set up, let's create a new DataFrame and call it 'result' and save the result from SplitSelectedColumns().")
+
+bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Containers.Array
+
+DataFrame frame
+
+frame:Load("+dq+"../Data/Culture and Entertainment/league.csv"+dq+")
+ 
+    //create the names for the new columns
+    Array<text> headers
+    headers:Add("+dq+"Kills"+dq+")
+    headers:Add("+dq+"Deaths"+dq+")
+    headers:Add("+dq+"Assists"+dq+")
+
+
+    text delimiter = undefined
+    boolean hasDelimeter = true
+
+    frame:AddSelectedColumns("+dq+"Kills/Deaths/Assists"+dq+")
+    DataFrame result = frame:SplitSelectedColumns(headers, "+dq+"/"+dq+", hasDelimeter)
+
+    output result:ToText()
+    output frame:ToText()
+"))
+
+bodyDiv:AddHeading("Run the Example",2)
+        
+        AddIDE(bodyDiv,"ColumnSplitInheritance","Column Splitting with Inheritance","Column Splitting with Inheritance for data transformations","examples/Transformations/ColumnSplittingInheritance.quorum")
+
+    bodyDiv:AddParagraph(" ")
+bodyDiv:AddText("To view the program we have made, we can ")
+
+     Link link5
+        link5:AddText("download the program file")
+        link5:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/ColumnSplittingInheritance.quorum")
+        link5:SetTarget(link5:newTab)
+        bodyDiv:Add(link5)
+
+
+       WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", GetDataScienceDefaultKeywords() + 
+        ", data transformation, dplyr, reshape, data cleaning, split columns, split, column changing, column adjusting
+        column transformation")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about splitting columns in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "splitting columns values with DataFrames"
+    end
+
+    action GetName returns text
+        return "splitting columns"
+    end
+
+    action GetShortDescription returns text
+        return "splitting columns"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Transformations/ColumnSplit.html"
+    end
+end

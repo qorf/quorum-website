@@ -33,11 +33,11 @@
         curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($_POST));
         
         // set variables for database submission
-        $version = '9.5';     // hard code for each quorum release
+        $version = '9.6';     // hard code for each quorum release
         $code = $_POST['code'];
-        $output = '';       // filled below after compile
-        $button = '0';      // 0 for build | 1 for run
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $build = $_POST['build_only'];      // 1 for build | 0 for run
+        $tz = $_POST['timezone'];
+        $ip = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
         $url = $_POST['pageURL'];
         $ide = $_POST['ideName'];
         $OKToPost = TRUE;
@@ -66,6 +66,9 @@
         print curl_error($curlSession);
     } else {
 
+
+
+
         //clean duplicate header that seems to appear on fastcgi with output buffer on some servers!!
 		$response = str_replace("HTTP/1.1 100 Continue\r\n\r\n","",$response);
 		$response = str_replace("Content-Length: 0\r\n\r\n","",$response);
@@ -88,25 +91,13 @@
         $body = str_replace($base,$mydomain,$body);
         if(substr( $body, 0, 11 ) === "<div class=") {
             print rtrim($body);
-            
-            // set compiler output for database submission
-            $output = $body;
-            $output = str_replace('<div class= "compilerErrorList" >','',$output);
-            $output = str_replace('<p >','',$output);
-            $output = str_replace('<ol >','',$output);
-            $output = str_replace('<li >','\n',$output);
-            $output = str_replace('</p>','',$output);
-            $output = str_replace('</ol>','',$output);
-            $output = str_replace('</li>','',$output);
-            $output = str_replace('</div>','',$output);
         } else {
             print $body;
         }
         // put code submission into database
-        if ($OKToPost) {
+            if ($OKToPost) {
             require_once("php_functions.php");
-            $user = getUserName($_COOKIE["sessionID"]);
-            saveRunCode($user, $version, $code, $output, $button, $ip, $url, $ide);
+            saveRunCode($version, $code, $build, $tz, $ip, $url, $ide);
         }
     }
     curl_close ($curlSession);

@@ -24,7 +24,7 @@
         $domain = $_ENV["DOMAIN"];
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("SELECT username, password, tries, last_attempted_login FROM sodbeans_users WHERE username = :user");
+        $stmt = $conn->prepare("SELECT username, password, tries, last_attempted_login FROM users WHERE username = :user");
         $stmt->bindParam(':user', $requested_user);
         $stmt->execute();
         
@@ -49,7 +49,7 @@
             if ($tries >= 10)
             {
                 $try_update = connect();
-                $update_stmt = $try_update->prepare("UPDATE sodbeans_users SET tries = :tries WHERE username = :user");
+                $update_stmt = $try_update->prepare("UPDATE users SET tries = :tries WHERE username = :user");
                 $update_stmt->bindParam(':user', $requested_user);
                 $update_stmt->bindParam(':tries', $tries);
                 $update_stmt->execute();
@@ -68,7 +68,7 @@
                     {
                         $tries = 0;
                         $try_update = connect();
-                        $update_stmt = $try_update->prepare("UPDATE sodbeans_users SET tries = :tries, last_attempted_login = :time, last_successful_login = :time WHERE username = :user");
+                        $update_stmt = $try_update->prepare("UPDATE users SET tries = :tries, last_attempted_login = :time, last_successful_login = :time WHERE username = :user");
                         $update_stmt->bindParam(':user', $requested_user);
                         $update_stmt->bindParam(':tries', $tries);
                         $update_stmt->bindParam(':time', $current_time);
@@ -100,7 +100,7 @@
             else 
             {
                 $try_update = connect();
-                $update_stmt = $try_update->prepare("UPDATE sodbeans_users SET tries = :tries, last_attempted_login = :time WHERE username = :user");
+                $update_stmt = $try_update->prepare("UPDATE users SET tries = :tries, last_attempted_login = :time WHERE username = :user");
                 $update_stmt->bindParam(':user', $requested_user);
                 $update_stmt->bindParam(':tries', $tries);
                 $update_stmt->bindParam(':time', $current_time);

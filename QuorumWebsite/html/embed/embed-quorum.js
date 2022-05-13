@@ -126,10 +126,12 @@ var newRunCode = function (input, output, uiContainer, execute) {
     
     var pageURL = window.location.href;
     var ideName = input.replace("IdeInput","");
+    let button = execute ?  0 : 1;
+    let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     currentIDEInput_$Global_ = input;
     currentIDEOutput_$Global_ = output;
     currentUIContainer_$Global_ = uiContainer;
-    var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName};
+    var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName, build_only: button, timezone: tz};
 
     var xmlhttp = new XMLHttpRequest();
 
@@ -172,7 +174,7 @@ var newRunCode = function (input, output, uiContainer, execute) {
 
     xmlhttp.open("POST", "https://quorumlanguage.com/fastrun.php", true);
     xmlhttp.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-    xmlhttp.send("code=" + codeInput + "&" + "pageURL=" + pageURL + "&" + "ideName=" + ideName);
+    xmlhttp.send("code=" + codeInput + "&" + "pageURL=" + pageURL + "&" + "ideName=" + ideName + "&" + "build_only=" + button + "&" + "timezone=" + tz);
 };
 
 var InjectQuorumCodeExample = function(element, name, code) {

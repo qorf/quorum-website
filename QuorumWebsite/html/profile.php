@@ -29,13 +29,13 @@
             <nav class= "headerNavBar outermostContainer" >
                 <div class= "skiptocontent" ><a href= "#main" >skip to main content</a></div>
                 <ul >
-                    <li ><a id= "homePageLink" href= "https://quorumlanguage.com/" ><img src= "/media/QuorumLogoWhite.png" alt= "Home" >Quorum</a></li>
+                    <li ><a id= "homePageLink" href= "/index.html" ><img src= "/media/QuorumLogoWhite.png" alt= "Home" >Quorum</a></li>
                     <li ><a href= "/learn.html" >Learn</a></li>
                     <li ><a href= "/selection.html" >Hour of Code</a></li>
                     <li ><a href= "/reference.html" >Reference</a></li>
                     <li ><a href= "/libraries.html" >Libraries</a></li>
                     <li ><a href= "/download.html" >Download</a></li>
-                    <li ><a href= "https://quorum.atlassian.net" >Bugs</a></li><li ><a id= "profileButton" href= "profile.php" >My Projects</a></li><li ><a id= "loginButton" onclick= "loginButtonPressed()" href= "#" >Login</a></li>
+                    <li ><a href= "/bugs.html" >Bugs</a></li><li ><a id= "profileButton" href= "profile.php" >My Projects</a></li><li ><a id= "loginButton" onclick= "loginButtonPressed()" href= "#" >Login</a></li>
                 </ul>
                 <form action= "/search.php" id= "searchForm" role= "search" method= "post" >
                     <input id= "searchFormInput" title= "Search Input" type= "text" placeholder= "How do I create an array?" name= "search-query" /><input id= "searchFormButton" value= "Search" title= "Submit Button" type= "submit" />

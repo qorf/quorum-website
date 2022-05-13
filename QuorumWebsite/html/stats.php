@@ -46,7 +46,7 @@ if (True) {
         $row = $stmt->fetch();
         echo "<p>Quorum Studio Downloads: ".number_format($row['COUNT'])."</p>";
 
-	$stmt->close();
+	$stmt = null;
     } catch (PDOException $e) {
         echo "Connection failed: " . $e->getMessage();
     }
