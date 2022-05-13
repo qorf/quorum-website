@@ -1,0 +1,186 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class SummaryMode is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Descriptive Statistics - Quorum Programming Language")
+        AddDefaultHeaders()
+        AddMathHeader()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Learn About Calculating the Mode", 1)
+        headDiv:AddText("This tutorial describes how to calculate the mode")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Calculating the Mode",2)
+       
+        bodyDiv:AddParagraph("In data science, the mode is typically the number that occurs the most frequently in a dataset. Mode is unique because in a numerical dataset, there can be three types of modes: no mode, one mode, or multiple modes. In mode allows scientists to know what values would be most sampled in a dataset.")
+
+        AddMath(bodyDiv, "examples/MathXML/Mode.xml")    
+
+        bodyDiv:AddParagraph("The mode is calculated similarly to the others. We create the Mode class, then pass it to the column. Like the others, undefined values are automatically removed. One difference is that with Mode, if the column has more than one value that has an equally high frequency in the data set, like 1,1,2,2,3,3, then all three modes are returned. If we have a case where there are no duplicates at all, like 1,2,3,4,5,6, then the modes are technically all values in the column and this is returned. We can detect this case by calling the HasDuplicates() action by calling it inside the Mode class. ")
+        
+        bodyDiv:AddParagraph("This method we are doing will find all modes in a single column. In order to get the mode of a single column, we first need to extract it and store it inside a DataFrame column, named col. For this example, we will grab the 'Perimeter' column by calling GetColumn(int columnNumber) and insert 1 as the perimeter.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrameColumn col = frame:GetColumn(1)"))
+
+        bodyDiv:AddParagraph("Then, we need to create a mode class object, and note that this mode object takes account of any missing data so 0's would not be counted. We then use our col and call Calculate where we insert the mode object we also made as the parameter. 
+")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("col:Calculate(mode)"))
+
+        bodyDiv:AddParagraph("Then, we want to create a number array, called 'modes' and store all the modes found from our previous calculation and then sort it using the Sort() function on the array. This is so we can check if there are any duplicates as mentioned previously. To check for duplicates, we iterate through the 'modes' array with a repeat loop and output any of the modes with the most duplicates, so in this case we may result in many modes as the result. We can verify if the dataset contains duplicates with the function HasDuplicates() which is called from the mode object.")        
+
+        bodyDiv:AddParagraph("Here are brief descriptions of the objects and functions we have used throughout this tutorial:")
+
+        Array<text> rubricText1
+        rubricText1:Add("Mode objectName")
+        rubricText1:Add("This is the mode object used to calculate all the possible modes within a dataset.
+")
+        rubricText1:Add("Mode mode")
+
+        Array<text> rubricText2
+        rubricText2:Add("modeObjectName:GetModes()")
+        rubricText2:Add("Using an array, it retrieves all the modes found in a dataset.")
+        rubricText2:Add("Array<number> modes = mode:GetModes()")
+
+        
+        Array<text> rubricText3
+        rubricText3:Add("modeObjectName:HasDuplicates()
+")
+        rubricText3:Add("This checks the mode object for any duplicate values to determine if there are multiple modes.")
+        rubricText3:Add("mode:HasDuplicates()")
+        
+        Array<text> rubricHeader2
+        rubricHeader2:Add(AddTextBoldFront("Function / Class", " "))
+        rubricHeader2:Add(AddTextBoldFront("Description", " "))
+        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+   
+
+        Array<text> rubricRows2
+        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+      
+        rubricRows2:Add(AddTableDataTag(rubricText1))
+        rubricRows2:Add(AddTableDataTag(rubricText2))
+        rubricRows2:Add(AddTableDataTag(rubricText3))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Mode helper Function"))
+
+        bodyDiv:AddParagraph("Here is some code on how to calculate the mode:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Calculations.Mode
+use Libraries.Containers.Array
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the dryBeans file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/DryBeans.csv"+dq+")
+
+//Get the column we want, in this case "+dq+"perimeter"+dq+"
+DataFrameColumn col = frame:GetColumn(1)
+
+//The calculation for means automatically takes missing data into account
+Mode mode
+
+//we pass the Mean class to the column, which does the calculation and stores the answer
+//We can then get the answer in code or do something else with it, like output it to the screen
+col:Calculate(mode)
+Array<number> modes = mode:GetModes()
+modes:Sort()
+i = 0
+repeat while i < modes:GetSize()
+    output modes:Get(i)
+    i = i + 1
+end
+output mode:HasDuplicates()
+"))
+
+        bodyDiv:AddHeading("Run the Example",2)
+
+        AddIDE(bodyDiv,"Mode","Calculate the Mode","Example of calculating the mode","examples/DataFrames/Mode.quorum")
+
+        bodyDiv:AddParagraph("")
+
+        Paragraph para
+        para:AddText("Congrats! We have just learned how to calulate the mode! To view the whole file, we can click ")
+        
+        Link link
+        link:AddText("here")
+        link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Summarizing/SourceCode/BeanMode.quorum")
+        link:SetTarget(link:newTab)
+        
+        para:Add(link)
+        para:AddText(".")
+        bodyDiv:Add(para)
+
+        bodyDiv:AddParagraph(" ")
+        
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", GetDataScienceDefaultKeywords() + 
+        ", descriptive statistics, accessible equations, mathml, mode, measure of centricity")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about mode in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "mode"
+    end
+
+    action GetName returns text
+        return "mode"
+    end
+
+    action GetShortDescription returns text
+        return "calculating the mode"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Summarizing/mode.html"
+    end
+end

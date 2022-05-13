@@ -1,0 +1,168 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class SummarySDMean is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Summarizing Data - Quorum Programming Language")
+        AddDefaultHeaders()
+        AddMathHeader()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Learn About Calculating the Standard Deviation from Mean", 1)
+        headDiv:AddText("This tutorial describes how to calculate the standard deviation from the mean (Z Scores)")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Calculating the Standard Devation from Mean",2)
+       
+        bodyDiv:AddParagraph("In data science, the standard deviations from the mean is a way to determine whether a data set has outliers. Outliers are data points that have an abnormal distance from the other values in a dataset. One reason we do this is because if we observe very extreme outliers, it is rational to consider whether the data could have been coded incorrectly or whether the data is real. One easy way to do this is to calculate the number of standard deviations away from the mean. In statistics, the technical term for this is 'z-scores.' This is why the equation below uses z as a label.")
+    
+        AddMath(bodyDiv, "examples/MathXML/StandardDeviationFromMean.xml")
+
+        bodyDiv:AddParagraph("We can calculate z-scores, or the number of standard deviations from the mean, for an entire column using the StandardDeviationsFromMean class. In addition, this class has an action, CalculateStandardDeviationFromMean, which can return us the answer for a specific value. This returns to us a new column with numbers in it. Notably, a score of 0 means that the value for that data point was at the mean. A score of 1, or -1, means that the data point was one standard deviation above or below the mean, respectively. Having these values for a column lets us quickly skim them, or filter them, looking for points that may not belong.")
+        
+        bodyDiv:AddParagraph("The standard deviations from mean can be calculated in Quorum by using the StandardDeviationsFromMean class and passing it to a column. To do this, we will use our 'frame' object and will get the column by calling frame:GetColumn() function. In this case we will be calculating the standard deviations from mean of the area of dry bean classifications. Here is a brief description on how StandardDeviationsFromMean () works.
+")
+
+        
+        Array<text> rubricText1
+        rubricText1:Add("Calculate(zscores)")
+        rubricText1:Add("Calculates the Standard Deviations from Mean and stores the answer in the variable that is inside the parentheses")
+        rubricText1:Add("col:Calculate(zscores)")
+        
+
+        Array<text> rubricText2
+        rubricText2:Add("GetResultColumn()
+")
+        rubricText2:Add("Returns a column with all of the calculated standard deviations")
+        rubricText2:Add("NumberColumn result = zscores:GetResultColumn")
+        
+        Array<text> rubricHeader2
+        rubricHeader2:Add(AddTextBoldFront("Function", " "))
+        rubricHeader2:Add(AddTextBoldFront("Description", " "))
+        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+   
+
+        Array<text> rubricRows2
+        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+      
+        rubricRows2:Add(AddTableDataTag(rubricText1))
+        rubricRows2:Add(AddTableDataTag(rubricText2))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Z-Scores Functions"))
+
+        bodyDiv:AddParagraph("Here is the full code on how to find the standard deviations from the mean of a numerical dataset:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+
+//This is the calculation for the arithmetic mean
+use Libraries.Compute.Statistics.Calculations.StandardDeviationsFromMean
+use Libraries.Compute.Statistics.Columns.NumberColumn
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+//Using the default loader is enough for our purposes
+DataFrame frame
+frame:Load("+dq+"../Data/Miscellaneous/DryBeans.csv"+dq+")
+
+//Get the column we want, in this case "+dq+"survival"+dq+"
+DataFrameColumn col = frame:GetColumn(0)
+
+//The calculation automatically and take missing data into account
+StandardDeviationsFromMean zscores
+
+//we pass the Mean class to the column, which does the calculation and stores the answer
+//We can then get the answer in code or do something else with it, like output it to the screen
+col:Calculate(zscores)
+NumberColumn result = zscores:GetResultColumn()
+output result:ToText()
+
+"))
+
+        bodyDiv:AddHeading("Run the Example",2)
+
+        AddIDE(bodyDiv,"zscore","Calculate the Standard Deviations from the Mean","Example of calculating the standard deviations from the mean (z-scores)","examples/DataFrames/zscore.quorum")
+
+        bodyDiv:AddParagraph("")
+
+        Paragraph para
+        para:AddText("Congrats! We have just learned how to calulate the z-score! To view the whole file, we can click ")
+        
+        Link link
+        link:AddText("here")
+        link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Summarizing/SourceCode/CalculateStandardDeviationsFromMean.quorum")
+        link:SetTarget(link:newTab)
+        
+        para:Add(link)
+        para:AddText(".")
+        bodyDiv:Add(para)
+
+        bodyDiv:AddParagraph(" ")
+        
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", GetDataScienceDefaultKeywords() + 
+        ", descriptive statistics, accessible equations, mathml, standard deviation, standard deviation from the mean,
+        dispersion, measure of dispersion, variance")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about standard deviation from the mean in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "standard deviation from the mean"
+    end
+
+    action GetName returns text
+        return "standard deviation from the mean"
+    end
+
+    action GetShortDescription returns text
+        return "calculating the standard deviation from the mean (z-score)"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Summarizing/zscore.html"
+    end
+end

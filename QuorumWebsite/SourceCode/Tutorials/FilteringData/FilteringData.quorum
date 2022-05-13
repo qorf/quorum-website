@@ -1,0 +1,131 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+
+class FilteringData is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Filtering Data with DataFrames - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Filtering Data in a Dataset", 1)
+        headDiv:AddText("This tutorial tells us how to use the DataFrame to filter a dataset")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Filtering the data", 2)
+        
+        bodyDiv:AddParagraph("Being able to look at specific sections of our data may be useful when we have large amounts of entries in our dataset. For example, say that we have a survey sample of 2000 entries on music and we are wanting to look at data based off of entries that contain "+dq+"indie pop"+dq+" within the genre category. Instead of having to manually go through our data and find the individual rows containing "+dq+"indie pop"+dq+" we can simply make it easier on ourselves by filtering.")
+
+        bodyDiv:AddParagraph("The example we will be looking at is about dog breeds. In this dataset, it lists over 100 entries of different dog breeds and describes their life span, weight, height, temperament, etc. Now, looking at all these different dogs could be a bit overwhelming and right now, we want to only focus on dogs that may be good in an apartment, so it would make sense to possibly find smaller dogs. Instead of scrolling through every row to manually look for small dogs, we can now filter by the "+dq+"Breed Group."+dq+" To do we would be able to filter all the dog breeds we want using the Filter(text source) function within the DataFrames library.")
+
+        bodyDiv:AddParagraph("Here is a brief description of how the Filter() function works.")
+         
+         Array<text> rubricText1
+        rubricText1:Add("frame:Filter(text source)")
+        rubricText1:Add("This function takes in a string expression similar to writing an expression in Quorum.  This function will filter out specific rows based on columns. The expression will evaluate to true or false on each row and either filter that row or not.") 
+        rubricText1:Add("text dq = "+dq+"
+dq = dq:GetDoubleQuote()
+frame:Filter("+dq+"Breed = "+dq+" + dq + "+dq+"Toy"+dq+" + dq)
+")
+   
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Function", " "))
+        rubricHeader1:Add(AddTextBoldFront("Description", " "))
+        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText1))
+        
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Filter Helper Function"))
+
+
+        bodyDiv:AddParagraph("Let's try an example and retrieve all rows that contain "+dq+"Toy"+dq+" as the breed group. Doing so will create a copy of our data frame and contain ONLY the rows with "+dq+"Toy,"+dq+" hence we are filtering our dataset. Please note that in the Quorum Language, there is a flaw in the programming language in regard to usability and double quotes (notably, Quorum lacks escape characters), so we must manually make our double quotes as shown above.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Animals/Dogs.csv"+dq+")
+
+text dq = "+dq+""+dq+"
+dq = dq:GetDoubleQuote()
+//it's annoying, but we need to manually put in the double quotes, so
+//Quorum interprets the word "+dq+"toy"+dq+" as text
+//this then compares the value in the row Breed with
+//the constant text value "+dq+"Toy"+dq+"
+frame:Filter("+dq+"Breed = "+dq+" + dq + "+dq+"Toy"+dq+" + dq)
+
+//We can save the frame or output it to the console, like we are doing here.
+output frame:ToText()"))
+
+    AddIDE(bodyDiv,"FilterData","Filtering Data with DataFrames","Example of filtering data","examples/DataFrames/FilterData.quorum")
+
+    bodyDiv:AddParagraph(" ")
+    bodyDiv:AddText("Congratulations! We have successfully filtered the data from a dataset. To view the code we just ran, we can reference it")
+    bodyDiv:AddLink(" here","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FilterData.quorum")
+    bodyDiv:AddText(".")
+    bodyDiv:AddParagraph(" ")
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about filtering data in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "filtering data with DataFrames"
+    end
+
+    action GetName returns text
+        return "filtering data"
+    end
+
+    action GetShortDescription returns text
+        return "how to filter data using DataFrames"
+    end
+
+    action GetLocation returns text
+        return "tutorials/FilteringData/FilteringData.html"
+    end
+end

@@ -1,0 +1,172 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.WebList
+
+class FilterColumns is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Transformations - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Filtering Columns", 1)
+        headDiv:AddText("This tutorial demonstrates how to filter columns in our datasets")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        
+        bodyDiv:AddHeading("Filtering Columns", 2)
+       
+        bodyDiv:AddParagraph("While filtering rows can be a somewhat complicated operation, filtering columns is straightforward. In a DataFrame, we can remove any column we want to get rid of by calling RemoveColumnAt() and telling it which one we want to remove. We can also copy a data frame first before doing so, to preserve the original data, but for now, let us try to transform our data by removing the unnecessary columns. Here is a brief description of what the function we are using does.
+")        
+
+         Array<text> rubricText1
+        rubricText1:Add("DataFrame:RemoveColumnAt(integer columnNumber)")
+        rubricText1:Add("This function will remove unwanted columns from our dataset starting from 0 to N, where N is the number of total columns contained in the dataset. It takes in integers, signifying the corresponding column number to remove.")
+        rubricText1:Add("//This action removes various empty entries from our CSV  file
+frame:RemoveColumnAt(3) 
+")
+        
+        Array<text> rubricHeader1
+        rubricHeader1:Add(AddTextBoldFront("Action / Function", " "))
+        rubricHeader1:Add(AddTextBoldFront("Description", " "))
+        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+
+        Array<text> rubricRows1
+        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+      
+        rubricRows1:Add(AddTableDataTag(rubricText1))
+  
+      
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Filtering Helper Functions"))
+
+
+        bodyDiv:AddParagraph("To accomplish this, we will be going back to our AskAManager.csv file and begin to load it back into our DataFrame, 'frame' using the Load(text fileLocation) action. After properly loading our file, we will be able to use the RemoveColumnAt(integer num) action which will remove unwanted columns with empty entries. In this case, as when looking at the dataset, there are missing chunks of information on these columns: additional context on job title, other monetary comp, currency - other, and additional context on income. We would not want to have undefined values and mostly, we have decided that these columns are not useful pieces of information so it would be okay to get rid of them. ")
+
+        Link link3 
+        link3:AddText("We can click this link to download the file for the CSV.")
+        link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/AskAManager.csv")
+        link3:SetTarget(link3:newTab)
+
+        bodyDiv:Add(link3)
+
+        bodyDiv:AddParagraph(" ")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/AskAManager.csv"+dq+")
+"))
+
+        bodyDiv:AddParagraph("We want to figure out the corresponding column number to these columns. We will be calling RemoveColumnAt() action using our 'frame' object. Reminder that with a CSV file, columns start off at 0, therefore the corresponding column numbers for these headings we are filtering are as follows: ")
+
+
+        WebList startRemarks
+startRemarks:AddListItem("Additional context on job title: 3")
+startRemarks:AddListItem("Other monetary comp: 5")
+startRemarks:AddListItem("Currency - other: 7")
+startRemarks:AddListItem("Additional context on income: 8")
+bodyDiv:AddNestedTag(startRemarks)
+
+bodyDiv:AddParagraph(" ")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//This action removes various empty entries from our CSV  file
+frame:RemoveColumnAt(3) // additional context on job title
+frame:RemoveColumnAt(5) // other monetary comp
+frame:RemoveColumnAt(7) // currency - other
+frame:RemoveColumnAt(8) // additional context on income
+"))
+
+    bodyDiv:AddParagraph("Finally, we can output our dataset to confirm the filter using frame:ToText(). The full code is shown below.")
+
+    bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the AskAManager.csv file in the Data/Miscellaneous folder
+frame:Load("+dq+"../Data/Miscellaneous/AskAManager.csv"+dq+")
+
+//This action removes various empty entries from our CSV  file
+frame:RemoveColumnAt(3) // additional context on job title
+frame:RemoveColumnAt(5) // other monetary comp
+frame:RemoveColumnAt(7) // currency - other
+frame:RemoveColumnAt(8) // additional context on income
+
+//We can save the frame or output it to the console, like we are doing here.
+output frame:ToText()
+"))
+
+        bodyDiv:AddHeading("Run the Example",2)
+        
+        AddIDE(bodyDiv,"FilterCols","Filtering Columns","Filtering columns for data transformations","examples/Transformations/FilterColumns.quorum")
+
+bodyDiv:AddParagraph(" ")
+bodyDiv:AddText("To view the program we have made, we can ")
+
+     Link link2
+        link2:AddText("download the program file")
+        link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/FilterColumns.quorum")
+        link2:SetTarget(link2:newTab)
+        bodyDiv:Add(link2)
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about filtering columns in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "filtering columns values with DataFrames"
+    end
+
+    action GetName returns text
+        return "filtering columns"
+    end
+
+    action GetShortDescription returns text
+        return "filtering columns"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Transformations/FilteringColumns.html"
+    end
+end
