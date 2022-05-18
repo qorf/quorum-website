@@ -174,7 +174,7 @@ var newRunCode = function (input, output, uiContainer, execute) {
 
     xmlhttp.open("POST", "https://quorumlanguage.com/fastrun.php", true);
     xmlhttp.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-    xmlhttp.send("code=" + codeInput + "&" + "pageURL=" + pageURL + "&" + "ideName=" + ideName + "&" + "build_only=" + button + "&" + "timezone=" + tz);
+    xmlhttp.send("code=" + encodeURIComponent(codeInput) + "&" + "pageURL=" + encodeURIComponent(pageURL) + "&" + "ideName=" + encodeURIComponent(ideName) + "&" + "build_only=" + encodeURIComponent(button) + "&" + "timezone=" + encodeURIComponent(tz));
 };
 
 var InjectQuorumCodeExample = function(element, name, code) {
