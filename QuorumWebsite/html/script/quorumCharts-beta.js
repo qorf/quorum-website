@@ -20,12 +20,12 @@
 	 //ENTER
 	 if (event.keyCode == 13) {
 		console.log("CATEGORY ENTER");
-		this.firstChild.focus();
+		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
-	 //BACKSPACE
-	 else if (event.keyCode == 8) {
-		console.log("CATEGORY BACKSPACE");
+	 //ESCAPE
+	 else if (event.keyCode == 27) {
+		console.log("CATEGORY ESCAPE");
 		this.parentNode.focus();
 		flag = true;
 	 }
@@ -35,7 +35,7 @@
 		if(this.nextSibling)
 			this.nextSibling.focus();
 		else
-			this.parentNode.firstChild.focus();
+			this.parentNode.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
 	 //LEFT
@@ -58,9 +58,9 @@
  function barKeydown() {
 	 flag = false;
 	 console.log("KEYDOWN EVENT");
-	 //BACKSPACE
-	 if (event.keyCode == 8) {
-		console.log("BAR BACKSPACE");
+	 //ESCAPE
+	 if (event.keyCode == 27) {
+		console.log("BAR ESCAPE");
 		this.parentNode.focus();
 		flag = true;
 	 }
@@ -70,13 +70,13 @@
 		if(this.nextSibling)
 			this.nextSibling.focus();
 		else
-			this.parentNode.firstChild.focus();
+			this.parentNode.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
 	 //LEFT
 	 else if(event.keyCode == 37){
 		console.log("BAR LEFT");
-		if(this.previousSibling)
+		if(this.previousSibling && this.previousSibling.tagName == 'g')
 			this.previousSibling.focus();
 		else
 			this.parentNode.lastChild.focus();
