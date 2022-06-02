@@ -30,10 +30,26 @@
     $OKToPost = FALSE;
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         curl_setopt ($curlSession, CURLOPT_POST, 1);
-        curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($_POST));
+        $post_for_compiler = array();
+        
+        foreach ($_POST as $key => $value) {
+            if($key == 'code') {
+                $post_for_compiler[$key] = $value;
+            } else if ($key == 'build_only' ||
+                       $key == 'timezone' ||
+                       $key == 'build_only' ||
+                       $key == 'pageURL' ||
+                       $key == 'ideName'
+            ) { //do nothing with these keys
+            }
+            else {
+                $post_for_compiler[$key] = $value;
+            }
+        }
+        curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($post_for_compiler));
         
         // set variables for database submission
-        $version = '9.6';     // hard code for each quorum release
+        $version = '9.9';     // hard code for each quorum release
         $code = $_POST['code'];
         $build = $_POST['build_only'];      // 1 for build | 0 for run
         $tz = $_POST['timezone'];
