@@ -51,11 +51,11 @@
         // set variables for database submission
         $version = '9.9';     // hard code for each quorum release
         $code = $_POST['code'];
-        $build = $_POST['build_only'];      // 1 for build | 0 for run
-        $tz = $_POST['timezone'];
+        $build = isset($_POST['build_only']) ? $_POST['build_only'] : 0;      // 1 for build | 0 for run
+        $tz = isset($_POST['timezone']) ? $_POST['timezone'] : NULL;
         $ip = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
-        $url = $_POST['pageURL'];
-        $ide = $_POST['ideName'];
+        $url = isset($_POST['pageURL']) ? $_POST['pageURL'] : NULL;
+        $ide = isset($_POST['ideName']) ? $_POST['ideName'] : NULL;
         $OKToPost = TRUE;
     }
 
