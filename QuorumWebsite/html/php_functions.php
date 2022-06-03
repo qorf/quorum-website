@@ -56,16 +56,32 @@ function saveRunCode($version, $code, $build, $timezone, $ip, $url, $ide) {
         $stmt->execute();
 
         $last_id = $conn->lastInsertId();
-        $fileSHA = sha1($code);
+
         $stmt2 = $conn->prepare("INSERT INTO compiled_files (id, hash) VALUES (:id_num, :file_hash)");
         $stmt2->bindParam(':id_num', $last_id);
-        $stmt2->bindParam(':file_hash', $fileSHA);
-        $stmt2->execute();
     
         $file_stmt = $conn->prepare("INSERT IGNORE INTO files (hash, code) VALUES (:file_hash, :code)");
+
+        $fileSHA = sha1($code['code']);
+        $stmt2->bindParam(':file_hash', $fileSHA);
+        $stmt2->execute();
+
         $file_stmt->bindParam(':file_hash', $fileSHA);
-        $file_stmt->bindParam(':code', $code);
+        $file_stmt->bindParam(':code', $code['code']);
         $file_stmt->execute();
+
+        foreach ($code as $key => $value) {
+            if ($key == 'code') {
+                continue;
+            }
+            $fileSHA = sha1($value);
+            $stmt2->bindParam(':file_hash', $fileSHA);
+            $stmt2->execute();
+
+            $file_stmt->bindParam(':file_hash', $fileSHA);
+            $file_stmt->bindParam(':code', $value);
+            $file_stmt->execute();
+        }
         disconnect($conn);
     }
 }

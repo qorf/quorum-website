@@ -113,7 +113,7 @@
         // put code submission into database
             if ($OKToPost) {
             require_once("php_functions.php");
-            saveRunCode($version, $code, $build, $tz, $ip, $url, $ide);
+            saveRunCode($version, $post_for_compiler, $build, $tz, $ip, $url, $ide);
         }
     }
     curl_close ($curlSession);
