@@ -192,6 +192,46 @@
 		event.preventDefault();
 	  }
  }
+
+ function plotKeydown() {
+	flag = false;
+	console.log("KEYDOWN EVENT");
+	//ENTER
+	if (event.keyCode == 13) {
+	  console.log("PLOT ENTER");
+	  this.getElementsByTagName('g')[0].focus();
+	  flag = true;
+	 }
+	//ESCAPE
+	if (event.keyCode == 27) {
+	 console.log("PLOT ESCAPE");
+	 this.parentNode.focus();
+	 flag = true;
+	}
+	//RIGHT
+	else if(event.keyCode == 39){
+	 console.log("PLOT RIGHT");
+	 if(this.nextSibling)
+	   this.nextSibling.focus();
+	 else
+	   this.parentNode.getElementsByTagName('g')[0].focus();
+	 flag = true;
+	}
+	//LEFT
+	else if(event.keyCode == 37){
+	 console.log("PLOT LEFT");
+	 if(this.previousSibling && this.previousSibling.tagName == 'g')
+	   this.previousSibling.focus();
+	 else
+	   this.parentNode.lastChild.focus();
+	 flag = true;
+	}
+	
+	 if (flag) {
+	 event.stopPropagation();
+	 event.preventDefault();
+	 }
+  }
  
  function gainFocus(id) {
 	 document.getElementById(id).classList.add('focus');
@@ -237,5 +277,10 @@ window.addEventListener('load', function () {
   document.querySelectorAll('.quorum-chart-bar-list').forEach(item => {
 	  console.log("Adding chart area event handler");
 	  item.addEventListener('keydown', barKeydown, false)
+  })
+
+  document.querySelectorAll('.quorum-chart-plot-list').forEach(item => {
+	console.log("Adding chart area event handler");
+	item.addEventListener('keydown', plotKeydown, false)
   })
 });
