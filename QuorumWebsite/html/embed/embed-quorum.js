@@ -43,7 +43,7 @@ function update_console() {
         if (newLength > total_console_length239847239482734) {
             var dom = document.getElementById(currentIDEOutput_$Global_);
             if(dom != null) {
-                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(length, newLength));
+                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(0, newLength));
             }
             total_console_length239847239482734 = newLength;
         }
