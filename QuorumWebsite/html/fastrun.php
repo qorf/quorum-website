@@ -3,8 +3,15 @@
     session_start();
     ob_start();
     $base = "quorum_server:1269";  //set this to the url you want to scrape
+    $redisLocation = 'redis';
     $ckfile = '/var/apache/tmp/simpleproxy-cookie-' . session_id();
-
+    try {
+        $redis = new Redis();
+        $redis->connect($redisLocation);
+    }
+    catch (Exception $exception) {
+        $redis = NULL;
+    }
 
     /* all system code happens below - you should not need to edit it! */
 
@@ -27,6 +34,7 @@
     curl_setopt ($curlSession, CURLOPT_URL, $url);
     curl_setopt ($curlSession, CURLOPT_HEADER, 1);
 
+    $redisKey = "";
     $OKToPost = FALSE;
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         curl_setopt ($curlSession, CURLOPT_POST, 1);
@@ -35,6 +43,7 @@
         foreach ($_POST as $key => $value) {
             if($key == 'code') {
                 $post_for_compiler[$key] = $value;
+                $redisKey = $redisKey . "key: " . $key . "value:" . $value . "|";
             } else if ($key == 'build_only' ||
                        $key == 'timezone' ||
                        $key == 'build_only' ||
@@ -44,6 +53,7 @@
             }
             else {
                 $post_for_compiler[$key] = $value;
+                $redisKey = $redisKey . "key: " . $key . "value:" . $value . "|";
             }
         }
         curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($post_for_compiler));
@@ -74,7 +84,18 @@
     }
 
     //Send the request and store the result in an array
-    $response = curl_exec ($curlSession);
+    //first check if it's on redis
+    if($redis != NULL) {
+        $exists = $redis->exists($redisKey);
+    }
+
+    if(!$exists) {
+        $response = curl_exec ($curlSession);
+        $redis->set($redisKey, $response);
+    } else {
+        $response = $redis->get($redisKey);
+    }
+    
 
     // Check that a connection was made
     if (curl_error($curlSession)){
