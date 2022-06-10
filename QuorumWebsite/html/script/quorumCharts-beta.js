@@ -226,6 +226,70 @@
 	   this.parentNode.lastChild.focus();
 	 flag = true;
 	}
+	//UP
+	else if(event.keyCode == 38){
+		console.log("PLOT UP");
+		var svgId = getChartID(this);
+		
+		if (svgId == null)
+			return;
+		console.log("ID: " + svgId);
+		
+		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
+		var value_order = quorum_chart_value_order[svgId];
+		
+		if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
+			value_order = value_order[this.parentNode.id];
+			
+		if (value_order[this.id] != null) {
+				var current = value_order[this.id];
+				var index = Object.keys(value_order).indexOf(this.id);
+				var length = Object.keys(value_order).length
+				if(index < length - 1) {
+					var next = Object.keys(value_order)[index + 1];
+					document.getElementById(next).focus();
+				}
+				/*else {
+					var next = Object.keys(value_order)[0];
+					document.getElementById(next).focus();
+					flag = true;
+				}*/
+		}
+	}
+	flag = true;
+	}
+	//DOWN
+	else if(event.keyCode == 40){
+	console.log("PLOT DOWN");
+	var svgId = getChartID(this);
+	
+	if (svgId == null)
+		return;
+	console.log("ID: " + svgId);
+	
+	if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
+		var value_order = quorum_chart_value_order[svgId];
+		
+		if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
+			value_order = value_order[this.parentNode.id];
+		
+		if (value_order != null && value_order[this.id] != null) {
+				var current = value_order[this.id];
+				var index = Object.keys(value_order).indexOf(this.id);
+				if(index > 0) {
+					var previous = Object.keys(value_order)[index - 1];
+					document.getElementById(previous).focus();
+				}
+				/*else {
+					var length = Object.keys(value_order).length;
+					var previous = Object.keys(value_order)[length - 1];
+					document.getElementById(previous).focus();
+					flag = true;
+				}*/
+		}
+	}
+	flag = true;
+	}
 	
 	 if (flag) {
 	 event.stopPropagation();
