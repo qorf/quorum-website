@@ -98,18 +98,18 @@
 
     $requestedFile = $_GET['file'];
 
-    $studioVersionMajor = 3;
-    $studioVersionMinor = 5;
+    $studioVersionMajor = 4;
+    $studioVersionMinor = 0;
     $studioVersionSubminor = 0;
 
     $studioVersionName = "" . $studioVersionMajor . "." . $studioVersionMinor . "." . $studioVersionSubminor; 
     
-    $quorumVersionMajor = 9;
-    $quorumVersionMinor = 5;
+    $quorumVersionMajor = 10;
+    $quorumVersionMinor = 0;
     $quorumVersionRevision = 0;
     
-    $quorumStudioDailyMajor = 3;
-    $quorumStudioDailyMinor = 5;
+    $quorumStudioDailyMajor = 4;
+    $quorumStudioDailyMinor = 0;
 
     if ($requestedFile === "QuorumStudioWindows" . $studioVersionName . ".exe")
     {

@@ -43,7 +43,7 @@ function update_console() {
         if (newLength > total_console_length239847239482734) {
             var dom = document.getElementById(currentIDEOutput_$Global_);
             if(dom != null) {
-                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(length, newLength));
+                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(0, newLength));
             }
             total_console_length239847239482734 = newLength;
         }
@@ -52,7 +52,7 @@ function update_console() {
 
 var Module = {
     locateFile: function(path, prefix) {
-        if (path.endsWith(".data")) return "/script/" + path;
+        if (path.endsWith(".data")) return "https://quorumlanguage.com/script/" + path;
         return prefix + path;
     }
  };
@@ -174,7 +174,7 @@ var newRunCode = function (input, output, uiContainer, execute) {
 
     xmlhttp.open("POST", "https://quorumlanguage.com/fastrun.php", true);
     xmlhttp.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-    xmlhttp.send("code=" + codeInput + "&" + "pageURL=" + pageURL + "&" + "ideName=" + ideName + "&" + "build_only=" + button + "&" + "timezone=" + tz);
+    xmlhttp.send("code=" + encodeURIComponent(codeInput) + "&" + "pageURL=" + encodeURIComponent(pageURL) + "&" + "ideName=" + encodeURIComponent(ideName) + "&" + "build_only=" + encodeURIComponent(button) + "&" + "timezone=" + encodeURIComponent(tz));
 };
 
 var InjectQuorumCodeExample = function(element, name, code) {
