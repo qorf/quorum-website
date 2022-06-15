@@ -31,7 +31,7 @@ class Regression is Lesson
         LineBreak break //will be used multiple times
         
         //html header stuff
-        SetWebPageTitle("Descriptive Statistics")
+        SetWebPageTitle("Regression")
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
@@ -41,88 +41,181 @@ class Regression is Lesson
         //page header
         Header headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Descriptive Statistics", 1)
-        headDiv:AddText("Understanding statistics and how to calculate important values using Quorum")
+        headDiv:AddHeading("Regression", 1)
+        headDiv:AddText("Understanding regression to determine fitted data in Quorum")
         Add(headDiv)
 
         Division bodyDiv
         bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Descriptive Statistics", 1)
-        bodyDiv:AddParagraph("Descriptive statistics are foundational to the understanding of data science. As a matter of fact, the most commonly taught data science concepts within schools are topics related to central tendency (e.g., mean, median, mode) and dispersion (e.g., variance, standard deviation). For this session, we will review these concepts and practice programming them using a real data set.")
-
+        bodyDiv:AddHeading("Regression", 1)
+        bodyDiv:AddParagraph("Regression is basically creating a well-fitting line for data. Usually when people talk about regression, they're talking about linear regression. Linear regression is finding the best fitting straight line, so a line in the format y = mx + c. In 2D cases, we could use this line to predict y using x. However, regression can be used for as many dimensions as we want, drawing that line to allow us to predict a single factor based on multiple others.")
         
         bodyDiv:AddParagraph("Learning Objectives")
         Array<text> objectives
-        objectives:Add("Students will be able to explain the difference between quantitative and categorical variables.")
-        objectives:Add("Students will be able to determine what types of descriptive statistics are used with specific types of data.")
-        objectives:Add("Students will be able to use the online system and Quorum Studio to calculate mean, median, mode, variance, and standard deviation")
+        objectives:Add("Students will be able to understand the concept of regression and what it is used for.")
+        objectives:Add("Students can load data and calculate a regression with variables of their choosing.")
+        objectives:Add("Students can interpret the output of a regression.")
         OrderedList ol = GenerateList(objectives)
         bodyDiv:Add(ol)
 
+        bodyDiv:AddParagraph("While no documentation is yet available online, Quorum 10 has a new experimental system for calculating regression, which we will outline in this session. All of us should note that this system is quite new and is still in testing, meaning that the way we use this library will likely change in the future. We highlight it here because regression is a common topic in high-school and this shows how to write code to accomplish it.")
+        
+        bodyDiv:AddHeading("Load a DataFrame (10 minutes)",2)
+        
         Link link1
-        link1:AddText("Dry Beans CSV file")
-        link1:SetAddress("https://quorumlanguage.com/data/DryBeans.csv")
+        link1:AddText("ice cream sharks dataset")
+        link1:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Other/GoogleTrendsIceCreamSharks.csv")
         link1:SetTarget(link1:newTab)
 
         Link link2
-        link2:AddText("UC Irvine Machine Learning repository")
-        link2:SetAddress("https://archive.ics.uci.edu/ml/datasets/Dry+Bean+Dataset")
+        link2:AddText("downloading CSVs for our charts")
+        link2:SetAddress("https://quorumlanguage.com/tutorials/charts/downloading.html")
         link2:SetTarget(link2:newTab)
 
-        bodyDiv:AddHeading("Obtain and Examine the Dry Beans Dataset (5 minutes)",2)
-        bodyDiv:AddParagraph("The Quorum server contains a file we will use for these examples. In the first few minutes, obtain the Dry Beans CSV file. This dataset has been slightly modified from the original from the UC Irvine Machine Learning repository and focuses on the classification of seven bean types based on attributes such as area, perimeter, etc. Notice that the data set is large enough that calculating information by hand would be tedious. We will write software to give us information about the data. ")
+        bodyDiv:AddParagraph("First, we want to make sure we load in all the libraries we're going to need for this session. We're going to be using both Dataframe and Regression, so we should load both of those in.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
+"))
+
+        bodyDiv:AddParagraph(" ")
+        bodyDiv:AddText("To start us off we will download the dataset, so that we can have the means to create a bar chart. You can follow the link to download ")
         bodyDiv:Add(link1)
+        bodyDiv:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")
         bodyDiv:Add(link2)
+        bodyDiv:AddText(".")
+        
+        bodyDiv:AddParagraph("Now, we can load it in as our DataFrame:
+")    
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame frame
+frame:Load('../Data/Science/GoogleTrendsIceCreamSharks.csv')
 
-        bodyDiv:AddHeading("Calculating Mean (10 minutes)",2)
+output frame:ToText()
+"))
 
-        Link link3
-        link3:AddText("reference the mean tutorial")
-        link3:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/mean.html")
-        link3:SetTarget(link3:newTab)
+        AddIDE(bodyDiv,"Load the Dataset","Reading our shark ice cream datset","Using the dataframe to read the dataset and output","examples/Epiq/LoadDataFrameRegression.quorum")
+bodyDiv:AddParagraph(" ")
 
-        bodyDiv:AddParagraph("The mean is commonly referred to as the 'average' and is computed by adding all the terms and dividing by the number of terms. It is considered the 'balancing point' of a set of data. We will reference the mean tutorial to help us run these programs. ")
-        bodyDiv:Add(link3)   
 
-        bodyDiv:AddHeading("Calculating Median (10 minutes)",2)
+        bodyDiv:AddHeading("Setup Columns for the Regression (5 minutes)",2)
+
+        bodyDiv:AddParagraph("Just like with charts, we use a regression by telling it which columns are the variables we are interested in. For example, if we want the dependent variable to be the variable named 'y' and the others to be independent variables, the code would look as so:")
+        
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedColumn('shark attacks')
+frame:AddSelectedFactor('ice cream')
+frame:AddSelectedFactor('pools')
+"))
+
+        bodyDiv:AddParagraph("In this case, we're seeing how much pools and ice cream relate to shark attacks.")
+
+        AddIDE(bodyDiv,"Adding the Columns","Selecting columns we want to use to calculate regression","How we can select columns using the DataFrame","examples/Epiq/ColumnsRegression.quorum")
+bodyDiv:AddParagraph(" ")
+
+
+        bodyDiv:AddHeading("Calculate the Regression (15 minutes)",2)
 
         Link link4
         link4:AddText("reference the median tutorial")
         link4:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/median.html")
         link4:SetTarget(link4:newTab)
 
-        bodyDiv:AddText("The median is 'middle value in a group of ordered observations' and accounts of skewed distributions or when there are outliers that impact the mean. What skewed distributions mean is that if our data lies is visualized in a bell curve, we can see if one tail of the data leans more to one side versus the other side. Below is an image of different skewed distributions and how that affects our median.")         
-        bodyDiv:AddParagraph("We will reference the median tutorial to help us run these programs.")
-        bodyDiv:Add(link4)
+        bodyDiv:AddParagraph("Once we have set up the columns, we now calculate the regression information. Regression is itself a bit esoteric and is not particularly easy to understand. We start by feeding in the data to calculate a regression line (a straight line that minimizes the distance to each point):")        
 
-        bodyDiv:AddHeading("Calculating Mode (10 minutes)",2)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//now calculate a Regression
+Regression result = frame:RegressionOnSelected()
+"))
 
-        Link link5
-        link5:AddText("reference the mode tutorial")
-        link5:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/mode.html")
-        link5:SetTarget(link5:newTab)
+        bodyDiv:AddParagraph("There's also lots of relevant data that we can get from a regression line, which you can load in like this:")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("//provide information in a format often used in academia
+output result:GetFormalSummary()
 
-        bodyDiv:AddParagraph("The mode is the value that appears most frequently within a data set. Because mode is not guaranteed to be unique, the code for managing mode is more complicated than the other two measures of central tendency. We will reference the mode tutorial for this one. Note that it is not critical to understand all aspects of the code for mode, but on the other hand, it is important to know that code for accessing this is available and where to find it if we forget. After all, no programmer can possibly remember every permutation of code. As such, we use references to remind ourselves and find new information quite regularly.")
-        bodyDiv:Add(link5)  
+output 'Beta: ' + result:GetCoefficients():ToText()
+output 'Residuals: ' + result:GetResiduals():ToText()
+output 'Residual Sum of Squared: ' + result:GetResidualSumOfSquares()
+output 'Total Sum of Squared: ' + result:GetTotalSumOfSquares()
+output 'F ' + result:GetCriticalValue()
+output 'p = ' + result:GetProbabilityValue()
+output 'R^2: ' + result:GetEffectSize()
+"))
 
-        bodyDiv:AddHeading("Calculating Variance and Standard Deviation (15 minutes)",2)
+        AddIDE(bodyDiv,"Calculating Regression","Using our regression model to output our calculated data","Calculating regression model","examples/Epiq/CalculateRegression.quorum")
+bodyDiv:AddParagraph(" ")
 
-        Link link6
-        link6:AddText("reference the variance and standard deviation tutorial")
-        link6:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/varAndSD.html")
-        link6:SetTarget(link6:newTab)
 
-        bodyDiv:AddParagraph("Variance and standard deviation are measures used to determine the variability found within a dataset and are examples of understanding dispersion. We will reference the variance and standard deviation tutorial for this session. ")
-        bodyDiv:Add(link6)  
+    bodyDiv:AddParagraph("There's obviously a lot going on here, so we're going to go through this code in the context of what it means for this data.")
 
-        bodyDiv:AddHeading("Wrap-up with MathJax (10 minutes)",2)
+        bodyDiv:AddHeading("Interpreting the Output (20 minutes)",2)
 
-        bodyDiv:AddParagraph("In this wrap-up, note that each tutorial uses MathJax to represent the mathematical equations. Consider using a screen reader on a page, with a partner, to walk through how to use the equations using this modality.")
-        bodyDiv:AddParagraph("To use MathJax capabilities with our equations, all we need to do is right click the equation. We will then be seeing an option page that helps us with accessibility whether it is activating the screen reading capabilities or increasing the size of such equations. ")  
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Beta: |0.0000158, 0.0948, -0.0457|"))
+        bodyDiv:AddParagraph("The first is 'Beta.' Each factor is going to have a different amount of impact on the dependent variable. For this case, we can see that the amount of searches for ice cream (second value) has a larger impact on shark searches than the amount of searches for pools (third value). The first value is an added constant to try to take into account any factors we missed, and since it's fairly low we can tell that when people aren't searching for ice cream or pools, it's unlikely they'll search for sharks.")
+
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Residuals: |2.43, 2.11, ... "))
+        bodyDiv:AddParagraph("Points do not usually fall exactly on our regression line. The residual is the difference between the predicted value and the actual value measured. So in this case, if we predicted that 5 ice cream searches and 10 pool searches meant there would be 15 shark searches, but there were only 7, the residual would be 8. We want residuals to be as low as possible, since lower residuals mean we predicted more accurately. ")
+
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("Residual Sum of Squared: 1128
+Total Sum of Squared: 1546
+"))
+        bodyDiv:AddParagraph("The two lines about squaring refer to the squared distance between the points and the regression line, and the points and a straight line drawn at their average. These mainly show us how much the total residual amount (squared) has decreased when we added an actual regression line, and later we'll use this information to calculate a correlation.")
+        
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("F 47.7"))
+        bodyDiv:AddParagraph("It's important for us to know if any of the factors in our model are even related to the variable we want to predict. For this dataset, ice cream and sharks seem like they would be unrelated, so we should check the general relationship between everything, and that's where F comes in. If F is below our chosen significance level, then the factors are related.")
+
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("p = .001"))
+        bodyDiv:AddParagraph("The overall p value tells us the probability that our factors are related beyond chance. It is a statistical measurement that is used to validate or reject a hypothesis according to the collected data. In simpler terms, p-value measures the probability of obtaining the numbers that we have collected by research. Since p-value is a probability we need to understand that it can only be in the range from 0 up to 1, or in other words from 0% to 100%. In our case, a low p-value (less than or equal 0.05) indicates that the data is statistically significant. And the greater p-value (greater 0.05) means that the data is not statistically significant. Statistical significance means that we can connect the data to a specific cause that we are testing.")
 
         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("R^2: 0.270"))
+        bodyDiv:AddParagraph("R-Squared is often termed a 'variance accounted for' measure. In a sense, it provides us some evidence of how much variance, the wobble in our data, is contributing to the predictiveness of our model. So for the shark vs ice cream dataset, it would be how much the changes in searches for ice cream and pools can explain changes in shark searches. While these are correlated, shark searches are also impacted by other factors, like the time of year.
+")
 
-        WriteNextTutorial(bodyDiv)
+          bodyDiv:AddParagraph("This data also shows how correlation is not the same as causation. Although the various measurements show that Google searches for pools and ice cream are correlated to searches for sharks, why is not explained by these numbers. So ice cream and pool searches are correlated to shark searches, but we can imagine more likely explanations, like the time of year the search was made (e.g., in the summer).")
+       
+
+
+        Link link14
+link14:AddText("website")
+link14:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/")
+link14:SetTarget(link14:newTab)
+
+        Link link15
+link15:AddText("CCSS.MATH.CONTENT.8.SP.A.1")
+link15:SetAddress("http://www.corestandards.org/Math/Content/8/SP/A/1/")
+link15:SetTarget(link15:newTab)
+        
+        Link link16
+link16:AddText("CCSS.MATH.CONTENT.8.SP.A.2")
+link16:SetAddress("http://www.corestandards.org/Math/Content/8/SP/A/2/")
+link16:SetTarget(link16:newTab)
+
+    Link link17
+link17:AddText("CCSS.MATH.CONTENT.8.SP.A.3")
+link17:SetAddress("http://www.corestandards.org/Math/Content/8/SP/A/3/")
+link17:SetTarget(link17:newTab)
+
+
+        bodyDiv:AddHeading("Common Core Discussion in Regression",2)
+        bodyDiv:AddParagraph("")
+bodyDiv:AddText("We use the following ")
+bodyDiv:Add(link14)
+bodyDiv:AddText(" for common core standards in relation to histograms and measurements of distribution.")
+
+        bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(link15)
+        bodyDiv:AddText(" - Construct and interpret scatter plots for bivariate measurement data to investigate patterns of association between two quantities. Describe patterns such as clustering, outliers, positive or negative association, linear association, and nonlinear association.")       
+
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(link16)
+        bodyDiv:AddText(" - Know that straight lines are widely used to model relationships between two quantitative variables. For scatter plots that suggest a linear association, informally fit a straight line, and informally assess the model fit by judging the closeness of the data points to the line.")    
+
+         bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(link17)
+        bodyDiv:AddText(" - Use the equation of a linear model to solve problems in the context of bivariate measurement data, interpreting the slope and intercept. For example, in a linear model for a biology experiment, interpret a slope of 1.5 cm/hr as meaning that an additional hour of sunlight each day is associated with an additional 1.5 cm in mature plant height.")     
+
+       WriteNextTutorial(bodyDiv)
         mainRegion:Add(bodyDiv)
         Add(mainRegion)
         PageFooter footer
@@ -130,19 +223,30 @@ class Regression is Lesson
     end
 
     action GetMetaDescription returns text
-        return "Descriptive Statistics"
+        return "Regression"
     end
 
     action GetSummaryName returns text
-        return "Descriptive Statistics"
+        return "Regression"
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, data science, 
+        programming, anova, t-test, dispersion, centricity, mean, median, mode, variance, standard deviation,
+        chart, graph, accessibility, bar chart, histogram, box plot, violin plot, scatter plot,
+        regression, correlation, r, r squared, beta coefficient, residual,
+        computer science, computer languages, Quorum programming language, regression, regression model, residual")
+        AddMetaData(keywords)
     end
 
     action GetName returns text
-        return "Descriptive Statistics"
+        return "Regression"
     end
 
     action GetShortDescription returns text
-        return "Understanding statistics and how to calculate important values using Quorum."
+        return "Understanding the Regression model using Quorum."
     end
 
     action GetLocation returns text
