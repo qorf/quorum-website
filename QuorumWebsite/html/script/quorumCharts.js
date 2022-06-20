@@ -321,12 +321,10 @@
 	}
 	 //CTRL + RIGHT / UP or PAGE UP
 	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
-		console.log("PLOT UP");
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
 			return;
-		console.log("ID: " + svgId);
 		
 		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
 		var value_order = quorum_chart_value_order[svgId];
@@ -351,14 +349,12 @@
 	}
 	flag = true;
 	}
-	//DOWN
-	else if(event.keyCode == 40){
-	console.log("PLOT DOWN");
+	 //CTRL + LEFT / DOWN or PAGE DOWN
+	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
 	var svgId = getChartID(this);
 	
 	if (svgId == null)
 		return;
-	console.log("ID: " + svgId);
 	
 	if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
 		var value_order = quorum_chart_value_order[svgId];
