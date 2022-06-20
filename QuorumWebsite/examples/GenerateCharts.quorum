@@ -1,0 +1,86 @@
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.ScatterPlot
+use Libraries.Compute.Statistics.Columns.TextColumn
+use Libraries.Compute.Statistics.Columns.NumberColumn
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+
+/*
+    Generate SVGs for the Website- in progress
+*/
+
+
+// call to all the generations
+action Main
+
+    dataset = "insurance.csv"
+
+    Array<text> cols
+    cols:Add("bmi")
+    cols:Add("charges")
+
+    Array<text> factors
+    cols:Add("age")
+
+    frame = Generate(dataset, cols, factors)
+    GenerateScatter(frame)
+    
+end 
+
+action Generate(text dataset, Array<text> cols, Array<text> factors)
+
+    // create dataframe to read in data
+    DataFrame frame
+    
+    frame:Load("data/" + dataset)
+    
+    //create an iterator to traverse our array
+    Iterator<integer> colsIt = cols:GetIterator()
+
+    //Keep iterating if more elements exist
+    repeat while colsIt:HasNext()
+        frame:AddSelectedColumns(colsIt:Next())
+    end
+
+    //create an iterator to traverse our array
+    Iterator<integer> facIt = factors:GetIterator()
+
+    //Keep iterating if more elements exist
+    repeat while facIt:HasNext()
+        frame:AddSelectedFactors(facIt:Next())
+    end
+
+    output frame
+
+end
+
+action GenerateScatter(DataFrame frame)
+    ScatterPlot chart = frame:ScatterPlot()
+
+    // label your scatter plot
+    chart:SetXAxisTitle("Body Mass Index (BMI)")
+    chart:SetYAxisTitle("Insurance Cost (in $)")
+    chart:SetLegendTitle("Age Group")
+    chart:SetTitle("Charges of Insurance Based Off of BMI and Age")
+    // add subtitle for more description
+    chart:SetSubtitle("Does body weight and age affect cost of insurance?")
+
+    // set the legend location, choices are left, right, top and bottom
+    chart:SetLegendLocation("bottom")
+    
+    // show regression line trends
+    chart:ShowLinearRegression(true) 
+    
+    // color palette contains yellows, oranges, browns, and greens
+    chart:SetColorPaletteToDisturbing()
+    
+    // adjust font size by preference, here we set it to 30 pt
+    chart:SetFontSize(30)
+    
+    // if we would like to switch the x and y axis
+    chart:FlipOrientation()
+
+    // save the chart
+    chart:Save("linechart1.svg")
+
+end 

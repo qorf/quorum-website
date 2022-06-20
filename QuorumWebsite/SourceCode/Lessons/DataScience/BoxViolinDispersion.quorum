@@ -16,6 +16,8 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Containers.Array
 use Libraries.Web.Page.Link
+use Libraries.System.FileReader
+use Libraries.System.File
 
 class BoxViolinDispersion is Lesson
     // text version needs cleaning, then do code version
@@ -33,6 +35,16 @@ class BoxViolinDispersion is Lesson
         //html header stuff
         SetWebPageTitle("Box Plots, Violin Plots, and Understanding Dispersion")
         AddDefaultHeaders()
+
+         // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
         MainContent mainRegion
@@ -103,14 +115,44 @@ class BoxViolinDispersion is Lesson
         bodyDiv:AddText(".")
         bodyDiv:AddParagraph(" ")
 
-        bodyDiv:AddImage("/media/epiq/datascience/Dispersion.png","Example of High and Low Dispersion in relation to Data Density")
+        File f
+    FileReader reader
+
+    bodyDiv:AddHeading("Probability Density", 2)
+    bodyDiv:AddParagraph("We have a violin plot showcasing high and low dispersion. We can notice an obviously low dispersion in the last column of repeating violin plots meaning lower density. The violin plot is separated by what conditions the weather is in and we examine different factors according to the weather. A violin plot works great to see the changes in temperature since it displays the density.")
+
+    Division chart1
+    chart1:SetStyle("min-width: 100px; max-width: 75%;")
+    f:SetPath("html/media/epiq/datascience/ViolinPlotEpiq.svg")
+    reader:OpenForRead(f)
+    chart1:AddText(reader:Read())
+    reader:Close()
+    bodyDiv:Add(chart1)
+
+
         
         bodyDiv:AddParagraph(" ")
         bodyDiv:AddText("Interquartile range (IQR) is another measure of dispersion that fits well using a box plot. IQR measures the spread of the middle half of our data, meaning it takes the upper quartile of our data and subtracts it from the lower quartile of our data to get the middle (50%). The IQR will give us a measurement of how spread out our entire dataset is. We can learn more about how to calculate the IQR with the ")
         bodyDiv:Add(link2)
         bodyDiv:AddText(".")
         bodyDiv:AddParagraph(" ")
-        bodyDiv:AddImage("/media/epiq/datascience/iqr.png","Example of IQR in a Box Plot")
+
+        File f1
+    FileReader reader1
+
+    bodyDiv:AddHeading("IQR on a Box Plot", 2)
+    bodyDiv:AddParagraph("Here we have a box plot to examine the IQR. Note that the IQR is equal to subtracting the upper quartile from the lower quartile.  Box plot separates itself into four sections of 25% where we can see the upper and lower quartles, as well as the median.")
+
+    Division chart2
+    chart2:SetStyle("min-width: 200px; max-width: 600px")
+    f1:SetPath("html/media/epiq/datascience/BoxEpiq.svg")
+    reader1:OpenForRead(f1)
+    chart2:AddText(reader1:Read())
+    reader1:Close()
+    
+    bodyDiv:Add(chart2)
+
+
         bodyDiv:AddParagraph(" ")
 
         bodyDiv:AddText("Similar to histograms, box plots and violin plots also help describe the shape to determine dispersion within our datasets. ")
@@ -165,7 +207,7 @@ chart:FlipOrientation()
 chart:Display()
 ")) 
 
- AddIDE(bodyDiv,"BoxPlot","Example of a Box Plot with high and low lispersion","How we can graphically see high and low dispersion","examples/Epiq/BoxPlot.quorum")
+ AddIDE(bodyDiv,"BoxPlot","Example of a Box Plot with high and low dispersion","How we can graphically see high and low dispersion","examples/Epiq/BoxPlot.quorum")
 bodyDiv:AddParagraph(" ")
 
 bodyDiv:AddParagraph("Now, this is the same dataset but in the form of a violin plot. Let us notice the peaks of dispersion compared to sole values in a box plot. We can see the density of the dataset and visualize the distribution of test scores. Here we can easily see how many students have scored in the range between the upper and lower quartiles. We can still make the same assumption from the box plot on this data, but now we see exactly student performance more holistically.")
