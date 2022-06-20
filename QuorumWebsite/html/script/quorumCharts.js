@@ -14,14 +14,14 @@
 
  function seriesKeydown() {
 	 flag = false;
-	 //ENTER
-	 if (event.keyCode == 13) {
-		this.getElementsByTagName('g')[0].focus();
+	 //SHIFT + ENTER
+	 if (event.shiftKey && event.keyCode == 13) {
+		this.parentNode.focus();
 		flag = true;
 	 }
-	 //ESCAPE
-	 else if (event.keyCode == 27) {
-		this.parentNode.focus();
+	 //ENTER
+	 else if (event.keyCode == 13) {
+		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
 	 //RIGHT / UP
@@ -49,14 +49,14 @@
 
  function categoryKeydown() {
 	 flag = false;
-	 //ENTER
-	 if (event.keyCode == 13) {
-		this.getElementsByTagName('g')[0].focus();
+	 //SHIFT + ENTER
+	 if (event.shiftKey && event.keyCode == 13) {
+		this.parentNode.focus();
 		flag = true;
 	 }
-	 //ESCAPE
-	 else if (event.keyCode == 27) {
-		this.parentNode.focus();
+	 //ENTER
+	 else if (event.keyCode == 13) {
+		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
 	 //RIGHT / UP
@@ -85,13 +85,13 @@
  
  function barKeydown() {
 	 flag = false;
-	 //ESCAPE
-	 if (event.keyCode == 27) {
+	 //SHIFT + ENTER
+	 if (event.shiftKey && event.keyCode == 13) {
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //CTRL + RIGHT / UP or PAGE UP
-	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
+	 //PAGE UP
+	 else if(event.keyCode == 33){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -120,8 +120,8 @@
 		}
 		flag = true;
 	 }
-	 //CTRL + LEFT / DOWN or PAGE DOWN
-	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
+	 //PAGE DOWN
+	 else if(event.keyCode == 34){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -175,13 +175,13 @@
  
   function pointKeydown() {
 	 flag = false;
-	 //ESCAPE
-	 if (event.keyCode == 27) {
+	 //SHIFT + ENTER
+	 if (event.shiftKey && event.keyCode == 13) {
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //CTRL + RIGHT / UP or PAGE UP
-	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
+	 //PAGE UP
+	 else if(event.keyCode == 33){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -210,8 +210,8 @@
 		}
 		flag = true;
 	 }
-	 //CTRL + LEFT / DOWN or PAGE DOWN
-	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
+	 //PAGE DOWN
+	 else if(event.keyCode == 34){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -309,18 +309,18 @@
 
  function plotKeydown() {
 	flag = false;
-	//ENTER
-	if (event.keyCode == 13) {
-	  this.getElementsByTagName('g')[0].focus();
-	  flag = true;
-	 }
-	//ESCAPE
-	if (event.keyCode == 27) {
+	//SHIFT + ENTER
+	if (event.shiftKey && event.keyCode == 13) {
 	 this.parentNode.focus();
 	 flag = true;
 	}
-	 //CTRL + RIGHT / UP or PAGE UP
-	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
+	//ENTER
+	else if (event.keyCode == 13) {
+	  this.getElementsByTagName('g')[0].focus();
+	  flag = true;
+	 }
+	 //PAGE UP
+	 else if(event.keyCode == 33){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -349,8 +349,8 @@
 	}
 	flag = true;
 	}
-	 //CTRL + LEFT / DOWN or PAGE DOWN
-	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
+	 //PAGE DOWN
+	 else if(event.keyCode == 34){
 	var svgId = getChartID(this);
 	
 	if (svgId == null)
@@ -404,8 +404,8 @@
  
   function plotitemKeydown() {
 	flag = false;
-	//ESCAPE
-	if (event.keyCode == 27) {
+	//SHIFT + ENTER
+	if (event.shiftKey && event.keyCode == 13) {
 	 this.parentNode.focus();
 	 flag = true;
 	}
