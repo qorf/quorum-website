@@ -24,16 +24,16 @@
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //RIGHT
-	 else if(event.keyCode == 39){
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
 		if(this.nextSibling)
 			this.nextSibling.focus();
 		else
 			this.parentNode.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
-	 //LEFT
-	 else if(event.keyCode == 37){
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
 		if(this.previousSibling && this.previousSibling.tagName == 'g')
 			this.previousSibling.focus();
 		else
@@ -59,16 +59,16 @@
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //RIGHT
-	 else if(event.keyCode == 39){
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
 		if(this.nextSibling)
 			this.nextSibling.focus();
 		else
 			this.parentNode.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
-	 //LEFT
-	 else if(event.keyCode == 37){
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
 		if(this.previousSibling && this.previousSibling.tagName == 'g')
 			this.previousSibling.focus();
 		else
@@ -90,24 +90,8 @@
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //RIGHT
-	 else if(event.keyCode == 39){
-		if(this.nextSibling)
-			this.nextSibling.focus();
-		else
-			this.parentNode.getElementsByTagName('g')[0].focus();
-		flag = true;
-	 }
-	 //LEFT
-	 else if(event.keyCode == 37){
-		if(this.previousSibling && this.previousSibling.tagName == 'g')
-			this.previousSibling.focus();
-		else
-			this.parentNode.lastChild.focus();
-		flag = true;
-	 }
-	 //UP
-	 else if(event.keyCode == 38){
+	 //CTRL + RIGHT / UP or PAGE UP
+	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -136,8 +120,8 @@
 		}
 		flag = true;
 	 }
-	 //DOWN
-	 else if(event.keyCode == 40){
+	 //CTRL + LEFT / DOWN or PAGE DOWN
+	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
@@ -164,6 +148,22 @@
 				 }*/
 			}
 		}
+		flag = true;
+	 }
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
+		if(this.nextSibling)
+			this.nextSibling.focus();
+		else
+			this.parentNode.getElementsByTagName('g')[0].focus();
+		flag = true;
+	 }
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
+		if(this.previousSibling && this.previousSibling.tagName == 'g')
+			this.previousSibling.focus();
+		else
+			this.parentNode.lastChild.focus();
 		flag = true;
 	 }
 	 
@@ -180,15 +180,15 @@
 		this.parentNode.focus();
 		flag = true;
 	 }
-	 //RIGHT
-	 else if(event.keyCode == 39){
+	 //CTRL + RIGHT / UP or PAGE UP
+	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
 			return;
 		
 		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
-			var value_order = quorum_chart_value_order[svgId + "_x"];
+			var value_order = quorum_chart_value_order[svgId + "_y"];
 			
 			if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
 				value_order = value_order[this.parentNode.id];
@@ -210,15 +210,15 @@
 		}
 		flag = true;
 	 }
-	 //LEFT
-	 else if(event.keyCode == 37){
+	 //CTRL + LEFT / DOWN or PAGE DOWN
+	 else if((event.ctrlKey && (event.keyCode == 37 || event.keyCode == 40)) || event.keyCode == 34){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
 			return;
 		
 		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
-			var value_order = quorum_chart_value_order[svgId + "_x"];
+			var value_order = quorum_chart_value_order[svgId + "_y"];
 			
 			if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
 				value_order = value_order[this.parentNode.id];
@@ -240,15 +240,15 @@
 		}
 		flag = true;
 	 }
-	 //UP
-	 else if(event.keyCode == 38){
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
 			return;
 		
 		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
-			var value_order = quorum_chart_value_order[svgId + "_y"];
+			var value_order = quorum_chart_value_order[svgId + "_x"];
 			
 			if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
 				value_order = value_order[this.parentNode.id];
@@ -270,15 +270,15 @@
 		}
 		flag = true;
 	 }
-	 //DOWN
-	 else if(event.keyCode == 40){
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
 		var svgId = getChartID(this);
 		
 		if (svgId == null)
 			return;
 		
 		if(typeof quorum_chart_value_order != "undefined" && quorum_chart_value_order != null) {
-			var value_order = quorum_chart_value_order[svgId + "_y"];
+			var value_order = quorum_chart_value_order[svgId + "_x"];
 			
 			if (this.parentNode.classList.contains("quorum-chart-category-list") || this.parentNode.classList.contains("quorum-chart-series-list"))
 				value_order = value_order[this.parentNode.id];
@@ -319,24 +319,8 @@
 	 this.parentNode.focus();
 	 flag = true;
 	}
-	//RIGHT
-	else if(event.keyCode == 39){
-	 if(this.nextSibling)
-	   this.nextSibling.focus();
-	 else
-	   this.parentNode.getElementsByTagName('g')[0].focus();
-	 flag = true;
-	}
-	//LEFT
-	else if(event.keyCode == 37){
-	 if(this.previousSibling && this.previousSibling.tagName == 'g')
-	   this.previousSibling.focus();
-	 else
-	   this.parentNode.lastChild.focus();
-	 flag = true;
-	}
-	//UP
-	else if(event.keyCode == 38){
+	 //CTRL + RIGHT / UP or PAGE UP
+	 else if((event.ctrlKey && (event.keyCode == 39 || event.keyCode == 38)) || event.keyCode == 33){
 		console.log("PLOT UP");
 		var svgId = getChartID(this);
 		
@@ -398,6 +382,22 @@
 		}
 	}
 	flag = true;
+	}
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
+	 if(this.nextSibling)
+	   this.nextSibling.focus();
+	 else
+	   this.parentNode.getElementsByTagName('g')[0].focus();
+	 flag = true;
+	}
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
+	 if(this.previousSibling && this.previousSibling.tagName == 'g')
+	   this.previousSibling.focus();
+	 else
+	   this.parentNode.lastChild.focus();
+	 flag = true;
 	}
 	
 	 if (flag) {
