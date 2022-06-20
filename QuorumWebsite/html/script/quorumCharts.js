@@ -406,6 +406,36 @@
 	 }
   }
  
+  function plotitemKeydown() {
+	flag = false;
+	//ESCAPE
+	if (event.keyCode == 27) {
+	 this.parentNode.focus();
+	 flag = true;
+	}
+	//RIGHT or UP
+	else if(event.keyCode == 39 || event.keyCode == 38){
+	 if(this.nextSibling)
+	   this.nextSibling.focus();
+	 else
+	   this.parentNode.getElementsByTagName('g')[0].focus();
+	 flag = true;
+	}
+	//LEFT or DOWN
+	else if(event.keyCode == 37 || event.keyCode == 40){
+	 if(this.previousSibling && this.previousSibling.tagName == 'g')
+	   this.previousSibling.focus();
+	 else
+	   this.parentNode.lastChild.focus();
+	 flag = true;
+	}
+	
+	 if (flag) {
+	 event.stopPropagation();
+	 event.preventDefault();
+	 }
+  }
+
  function gainFocus(id) {
 	var node = document.getElementById(id)
 	if (node != null)
@@ -450,6 +480,10 @@ window.addEventListener('load', function () {
 
   document.querySelectorAll('.quorum-chart-plot-list').forEach(item => {
 	item.addEventListener('keydown', plotKeydown, false)
+  })
+
+  document.querySelectorAll('.quorum-chart-plotitem-list').forEach(item => {
+	item.addEventListener('keydown', plotitemKeydown, false)
   })
   
   document.querySelectorAll('.quorum-chart-point-list').forEach(item => {
