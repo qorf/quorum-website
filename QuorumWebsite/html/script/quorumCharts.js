@@ -1,7 +1,7 @@
   function chartAreaKeydown() {
 	 flag = false;
 	 //ENTER
-	 if (event.keyCode == 13) {
+	 if (event.shiftKey == false && event.keyCode == 13) {
 		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
@@ -20,7 +20,7 @@
 		flag = true;
 	 }
 	 //ENTER
-	 else if (event.keyCode == 13) {
+	 else if (event.shiftKey == false && event.keyCode == 13) {
 		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
@@ -55,7 +55,7 @@
 		flag = true;
 	 }
 	 //ENTER
-	 else if (event.keyCode == 13) {
+	 else if (event.shiftKey == false && event.keyCode == 13) {
 		this.getElementsByTagName('g')[0].focus();
 		flag = true;
 	 }
@@ -315,7 +315,7 @@
 	 flag = true;
 	}
 	//ENTER
-	else if (event.keyCode == 13) {
+	else if (event.shiftKey == false && event.keyCode == 13) {
 	  this.getElementsByTagName('g')[0].focus();
 	  flag = true;
 	 }
