@@ -1,9 +1,50 @@
+  function chartInformationKeydown() {
+	 flag = false;
+	 //ENTER
+	 if (event.keyCode == 13) {
+		flag = true;
+	 }
+	 //PAGE UP / PAGE DOWN
+	 else if(event.keyCode == 33 || event.keyCode == 34){
+		flag = true;
+	 }
+	 //RIGHT / UP
+	 else if(event.keyCode == 39 || event.keyCode == 38){
+		if(this.nextSibling)
+			this.nextSibling.focus();
+		//else
+		//	this.parentNode.getElementsByTagName('g')[0].focus();
+		flag = true;
+	 }
+	 //LEFT / DOWN
+	 else if(event.keyCode == 37 || event.keyCode == 40){
+		if(this.previousSibling)
+			this.previousSibling.focus();
+		//else
+		//	this.parentNode.lastChild.focus();
+		flag = true;
+	 }
+	 
+	  if (flag) {
+		event.stopPropagation();
+		event.preventDefault();
+	  }
+ }
+  
   function chartAreaKeydown() {
 	 flag = false;
 	 //ENTER
 	 if (event.shiftKey == false && event.keyCode == 13) {
 		this.getElementsByTagName('g')[0].focus();
 		flag = true;
+	 }
+	 //PAGE UP / PAGE DOWN
+	 else if(event.keyCode == 33 || event.keyCode == 34){
+		flag = true;
+	 }
+	 //ARROW KEYS
+	 else if(event.keyCode == 39 || event.keyCode == 38 || event.keyCode == 37 || event.keyCode == 40){
+		 flag = true;
 	 }
 	 
 	  if (flag) {
@@ -22,6 +63,10 @@
 	 //ENTER
 	 else if (event.shiftKey == false && event.keyCode == 13) {
 		this.getElementsByTagName('g')[0].focus();
+		flag = true;
+	 }
+	 //PAGE UP / PAGE DOWN
+	 else if(event.keyCode == 33 || event.keyCode == 34){
 		flag = true;
 	 }
 	 //RIGHT / UP
@@ -52,6 +97,10 @@
 	 //SHIFT + ENTER
 	 if (event.shiftKey && event.keyCode == 13) {
 		this.parentNode.focus();
+		flag = true;
+	 }
+	 //PAGE UP / PAGE DOWN
+	 else if(event.keyCode == 33 || event.keyCode == 34){
 		flag = true;
 	 }
 	 //ENTER
@@ -88,6 +137,10 @@
 	 //SHIFT + ENTER
 	 if (event.shiftKey && event.keyCode == 13) {
 		this.parentNode.focus();
+		flag = true;
+	 }
+	 //ENTER
+	 else if (event.keyCode == 13) {
 		flag = true;
 	 }
 	 //PAGE UP
@@ -178,6 +231,10 @@
 	 //SHIFT + ENTER
 	 if (event.shiftKey && event.keyCode == 13) {
 		this.parentNode.focus();
+		flag = true;
+	 }
+	 //ENTER
+	 else if (event.keyCode == 13) {
 		flag = true;
 	 }
 	 //PAGE UP
@@ -409,6 +466,14 @@
 	 this.parentNode.focus();
 	 flag = true;
 	}
+	 //ENTER
+	 else if (event.keyCode == 13) {
+		flag = true;
+	 }
+	 //PAGE UP / PAGE DOWN
+	 else if(event.keyCode == 33 || event.keyCode == 34){
+		flag = true;
+	 }
 	//RIGHT or UP
 	else if(event.keyCode == 39 || event.keyCode == 38){
 	 if(this.nextSibling)
@@ -457,7 +522,9 @@
  }
 
 window.addEventListener('load', function () {
-	
+  document.querySelectorAll('.quorum-chart-information-list').forEach(item => {
+	  item.addEventListener('keydown', chartInformationKeydown, false)
+  })
   document.querySelectorAll('.quorum-chart-area').forEach(item => {
 	  item.addEventListener('keydown', chartAreaKeydown, false)
   })
