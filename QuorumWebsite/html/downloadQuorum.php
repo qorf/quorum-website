@@ -100,7 +100,7 @@
 
     $studioVersionMajor = 4;
     $studioVersionMinor = 0;
-    $studioVersionSubminor = 2;
+    $studioVersionSubminor = 3;
 
     $studioVersionName = "" . $studioVersionMajor . "." . $studioVersionMinor . "." . $studioVersionSubminor; 
     
