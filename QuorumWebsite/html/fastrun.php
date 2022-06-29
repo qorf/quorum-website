@@ -59,7 +59,7 @@
         curl_setopt ($curlSession, CURLOPT_POSTFIELDS, http_build_query($post_for_compiler));
         
         // set variables for database submission
-        $version = '9.9';     // hard code for each quorum release
+        $version = '10.0.6';     // hard code for each quorum release
         $code = $_POST['code'];
         $build = isset($_POST['build_only']) ? $_POST['build_only'] : 0;      // 1 for build | 0 for run
         $tz = isset($_POST['timezone']) ? $_POST['timezone'] : NULL;
