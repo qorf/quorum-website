@@ -633,7 +633,7 @@ var login = function() {
 var loginWithParams = function(user, pwd, redirect) {
     $.ajax({
         type: "POST",
-        url: "/login.php",
+        url: "/login.quorum",
         data: {username: user, password: pwd},
         success: function (result) {
             if (result === "success") {
