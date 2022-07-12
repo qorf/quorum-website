@@ -43,7 +43,7 @@ $(document).ready(function() {
     });
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 showLogoutUI();
@@ -517,7 +517,7 @@ var validate = function (output) {
     var outputRegion = document.getElementById(output);
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 outputRegion.innerHTML = "User is logged in";
@@ -553,7 +553,7 @@ var hideLoginModal = function() {
 var showSaveModal = function(id) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 hideModals();
@@ -578,7 +578,7 @@ var hideSaveModal = function(id) {
 var showLoadModal = function(id) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 $.ajax({
@@ -632,8 +632,8 @@ var login = function() {
 
 var loginWithParams = function(user, pwd, redirect) {
     $.ajax({
-        type: "POST",
-        url: "/login.quorum",
+        type: "GET",
+        url: "/Login.quorum",
         data: {username: user, password: pwd},
         success: function (result) {
             if (result === "success") {
@@ -675,7 +675,7 @@ var logout = function() {
 var saveProject = function(id, input, output, namefield, overwrite) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 // UPDATE LATER FOR MULTIPLE FILES
@@ -724,7 +724,7 @@ var loadProject = function(id, select, input, output)
     var outputRegion = document.getElementById(output);
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 var inputRegion = document.getElementById(input);
