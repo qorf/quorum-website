@@ -1,4 +1,6 @@
   function chartInformationKeydown() {
+	var svgId = getChartID(this);
+	
 	 flag = false;
 	 //ENTER
 	 if (event.keyCode == 13) {
@@ -520,36 +522,72 @@
 		return getChartID(node.parentNode)
 	}
  }
+ 
+ function speechViewerFocus() {
+	var svgId = getChartID(this);
+	if (svgId != null) {
+		var speechViewer = document.getElementById(svgId + "_speechViewer") 
+		if (speechViewer != null) {
+			speechViewer.innerText = this.ariaLabel;
+		}
+	}
+ }
+ 
+ function speechViewerBlur() {
+	var svgId = getChartID(this);
+	if (svgId != null) {
+		var speechViewer = document.getElementById(svgId + "_speechViewer") 
+		if (speechViewer != null) {
+			speechViewer.innerText = "";
+		}
+	}
+ }
 
 window.addEventListener('load', function () {
   document.querySelectorAll('.quorum-chart-information-list').forEach(item => {
-	  item.addEventListener('keydown', chartInformationKeydown, false)
+	  item.addEventListener('keydown', chartInformationKeydown, false);
+	  item.addEventListener('focus', speechViewerFocus, false);
+	  item.addEventListener('blur', speechViewerBlur, false);
   })
   document.querySelectorAll('.quorum-chart-area').forEach(item => {
-	  item.addEventListener('keydown', chartAreaKeydown, false)
+	  item.addEventListener('keydown', chartAreaKeydown, false);
+	  item.addEventListener('focus', speechViewerFocus, false);
+	  item.addEventListener('blur', speechViewerBlur, false);
   })
   
   document.querySelectorAll('.quorum-chart-series-list').forEach(item => {
-	  item.addEventListener('keydown', seriesKeydown, false)
+	  item.addEventListener('keydown', seriesKeydown, false);
+	  item.addEventListener('focus', speechViewerFocus, false);
+	  item.addEventListener('blur', speechViewerBlur, false);
   })
   
   document.querySelectorAll('.quorum-chart-category-list').forEach(item => {
-	  item.addEventListener('keydown', categoryKeydown, false)
+	  item.addEventListener('keydown', categoryKeydown, false);
+	  item.addEventListener('focus', speechViewerFocus, false);
+	  item.addEventListener('blur', speechViewerBlur, false);
   })
   
   document.querySelectorAll('.quorum-chart-bar-list').forEach(item => {
-	  item.addEventListener('keydown', barKeydown, false)
+	  item.addEventListener('keydown', barKeydown, false);
+	  item.addEventListener('focus', speechViewerFocus, false);
+	  item.addEventListener('blur', speechViewerBlur, false);
   })
 
   document.querySelectorAll('.quorum-chart-plot-list').forEach(item => {
-	item.addEventListener('keydown', plotKeydown, false)
+	item.addEventListener('keydown', plotKeydown, false);
+	item.addEventListener('focus', speechViewerFocus, false);
+	item.addEventListener('blur', speechViewerBlur, false);
   })
 
   document.querySelectorAll('.quorum-chart-plotitem-list').forEach(item => {
-	item.addEventListener('keydown', plotitemKeydown, false)
+	item.addEventListener('keydown', plotitemKeydown, false);
+	item.addEventListener('focus', speechViewerFocus, false);
+	item.addEventListener('blur', speechViewerBlur, false);
   })
   
   document.querySelectorAll('.quorum-chart-point-list').forEach(item => {
-	item.addEventListener('keydown', pointKeydown, false)
+	item.addEventListener('keydown', pointKeydown, false);
+	item.addEventListener('focus', speechViewerFocus, false);
+	item.addEventListener('blur', speechViewerBlur, false);
   })
 });

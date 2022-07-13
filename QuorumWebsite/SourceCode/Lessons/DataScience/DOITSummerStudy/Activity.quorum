@@ -1,0 +1,185 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+use Libraries.System.FileReader
+use Libraries.System.File
+use Libraries.Web.Page.Script
+
+class Activity is Lesson
+    // text version needs cleaning, then do code version
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("DO-IT Summer Study: Activity")
+        AddDefaultHeaders()
+
+        VersionHelper versions
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("DO-IT Summer Study: Activity", 1)
+        headDiv:AddText("Overview of using charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("DO-IT Summer Study: Activity", 1)
+        
+
+        bodyDiv:AddHeading("Chart 1",2)
+
+        File f
+        FileReader reader
+
+        Division chart1
+        chart1:SetStyle("background: black; min-width: 200px; max-width: 800px")
+        chart1:SetIdentifier("chart1_activity")
+        f:SetPath("html/media/lessons/DataScience/DOITSummerStudy/histogram_activity.svg")
+        reader:OpenForRead(f)
+        chart1:AddText(reader:Read())
+        reader:Close()
+        
+        Division speechViewer1
+        speechViewer1:SetIdentifier("speechviewer1")
+        speechViewer1:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        
+        Script script1
+        script1:AddText("window.addEventListener('load', function () {" + cr + 
+        "var svg = document.getElementById('" + chart1:GetIdentifier():GetValue() + "').getElementsByTagName('svg');" + cr +
+        "var speechviewer = document.getElementById('" + speechViewer1:GetIdentifier():GetValue() + "');" + cr +
+        "speechviewer.id = svg[0].id + '_speechViewer';" + cr +
+        "document.querySelectorAll('.quorum-wrapper').forEach(item => {" + cr + 
+        "   item.classList.add('quorum-hidden');" + cr + 
+        "});" + cr +
+        "});")
+        chart1:Add(speechViewer1)
+        chart1:Add(script1)
+        
+        bodyDiv:Add(chart1)
+
+        bodyDiv:AddParagraph("Questions:")
+        Array<text> objectives
+        objectives:Add("What type of chart is this?")
+        objectives:Add("What does the x axis show?")
+        objectives:Add("What does the y axis show?")
+        objectives:Add("What is the frequency value of the bin between 4 and 6 rating in the Pepsi sub chart?")
+        objectives:Add("The highest frequency occured in the rating bin between __ and __ in the Coke sub chart?")
+        objectives:Add("What's the difference between the Pepsi and Coke sub charts' frequency in the bin between 2 and 4 rating?")
+        objectives:Add("Are either of the sub charts skewed? If so, in what direction?")
+        OrderedList ol = GenerateList(objectives)
+        bodyDiv:Add(ol)
+
+        
+
+        bodyDiv:AddHeading("Chart 2",2)
+
+        Division chart2
+        chart2:SetStyle("background: black; min-width: 200px; max-width: 800px")
+        chart2:SetIdentifier("chart2_activity")
+        f:SetPath("html/media/lessons/DataScience/DOITSummerStudy/scatter_activity.svg")
+        reader:OpenForRead(f)
+        chart2:AddText(reader:Read())
+        reader:Close()
+        
+        Division speechViewer2
+        speechViewer2:SetIdentifier("speechviewer2")
+        speechViewer2:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        
+        Script script2
+        script2:AddText("window.addEventListener('load', function () {" + cr + 
+        "var svg = document.getElementById('" + chart2:GetIdentifier():GetValue() + "').getElementsByTagName('svg');" + cr +
+        "var speechviewer = document.getElementById('" + speechViewer2:GetIdentifier():GetValue() + "');" + cr +
+        "speechviewer.id = svg[0].id + '_speechViewer';" + cr +
+        "});")
+        chart2:Add(speechViewer2)
+        chart2:Add(script2)
+        
+        bodyDiv:Add(chart2)
+
+        bodyDiv:AddParagraph("Questions:")
+        Array<text> objectives2
+        objectives2:Add("What type of chart is this?")
+        objectives2:Add("What does the x axis show?")
+        objectives2:Add("What does the y axis show?")
+        objectives2:Add("Can you describe the content of the chart?")
+        objectives2:Add("Does the plot have a trend? If so, what is the trend?")
+        objectives2:Add("Are there any outliers?")
+        objectives2:Add("Is the point at (34,721) above or below the trend line? By how many units?")
+        objectives2:Add("Do any of the points seem to be clustered together?")
+        OrderedList ol2 = GenerateList(objectives2)
+        bodyDiv:Add(ol2)
+
+        bodyDiv:AddHeading("Next: Feedback", 2)
+        Paragraph next = bodyDiv:AddParagraph("In the next section, we will dicuss some ")
+        Feedback feedback
+        next:AddLink(feedback:GetName(), "/" + feedback:GetLocation())
+        next:AddText(" about the charts.")
+
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "DO-IT Summer Study"
+    end
+
+    action GetSummaryName returns text
+        return "DO-IT Summer Study"
+    end
+
+    action GetName returns text
+        return "Activity"
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, data science, 
+        programming, chart, graph, accessibility, bar chart, histogram, scatter plot, DO-IT Summer Study,
+        computer science, computer languages, Quorum programming language")
+        AddMetaData(keywords)
+    end
+
+    action GetShortDescription returns text
+        return "DO-IT Summer Study Presentation, navigating accessible charts"
+    end
+
+    action GetLocation returns text
+        return "lessons/DataScience/DOITSummerStudy/activity.html"
+    end
+end

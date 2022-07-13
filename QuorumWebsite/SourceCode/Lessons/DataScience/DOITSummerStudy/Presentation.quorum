@@ -1,0 +1,265 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+use Libraries.System.FileReader
+use Libraries.System.File
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.TextArea
+use Libraries.Web.Page.Image
+
+class Presentation is Lesson
+    // text version needs cleaning, then do code version
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("DO-IT Summer Study: Presentation")
+        AddDefaultHeaders()
+
+        VersionHelper versions
+        // add necessary scripts
+        AddScript("/script/quorumCharts.js" + versions:GetChartsScriptVersionQuery())
+        // add necessary styles
+        AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("DO-IT Summer Study: Presentation", 1)
+        headDiv:AddText("Overview of using charts in Quorum")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:AddHeading("DO-IT Summer Study", 1)
+        
+//        bodyDiv:AddParagraph("Learning Objectives:")
+//        Array<text> objectives
+//        objectives:Add("Students will learn why it is important to have data visualizations in the form of accessible charts")
+//        objectives:Add("Students will learn the necessary features on making good charts")
+//        objectives:Add("Students will learn about various types of charts and when to use them")
+//        OrderedList ol = GenerateList(objectives)
+//        bodyDiv:Add(ol)
+
+        bodyDiv:AddHeading("Quorum Background (5 Minutes)",2)
+
+        bodyDiv:AddParagraph("The Quorum Programming Language is developed at the University of Nevada, Las Vegas. It was largely created with two goals in mind: 1) Make programming accessible for all by developing with features like screen reader support and 2) Use evidence-based decisions about design and syntax choices to make the language easier to use.")
+        bodyDiv:AddParagraph("The language supports a variety of applications, such as lego robotics, audio processing, 2D and 3D game development, as well as many more. The current work being done is the addition of data science tools that are fully accessible.")
+
+
+
+        bodyDiv:AddHeading("Introduction to Charts (5 Minutes)",2)
+        
+        bodyDiv:AddParagraph("When presenting data to others, our job is to translate our findings into a representation that makes the data easier to grasp. One common approach to do this is to present charts, which contain a visual component and can also be accessible with some care. Presenting our data as a chart allows us to quickly explain our analysis and draw conclusions from datasets we have collected without needing to present complex academic statistical analysis. In a sense, charts let us get the gist of what our data is telling us, supposing the chart is fairly presented.")
+        bodyDiv:AddParagraph("Let us imagine what it would be like if we had no way to present our data beyond the numbers themselves. We would have millions of values to explain and we would not be able to showcase trends easily that make sense to others. Charts can help us present our information better and help us remember our data versus examining a dataset. We can discuss how data charts are represented all throughout education and industries, providing examples of each.")
+
+
+
+        bodyDiv:AddHeading("How Charts Relate to Data Science (5 Minutes)",2)
+
+        bodyDiv:AddParagraph("Charts are important outside of academic settings, where many data scientists use data visualization to represent the information found on datasets. Since data in real life often involves large amounts of data, it's more important than ever that we can actually condense that information into something more meaningful.")
+        bodyDiv:AddParagraph("Showing the importance of graphical charts in data science allows us to identify and understand massive amounts of information. In Quorum, we have seven different chart types to represent data: Bar Charts, Pie Charts, Box Plots, Histograms, Violin Plots, Line Charts, and Scatter Plots. We will be learning how to use a few of these charts today.")
+
+        
+
+        bodyDiv:AddHeading("Chart Types (5 Minutes)",2)
+
+        bodyDiv:AddParagraph("Different charts are used to convey different types of information, meaning, there is no single chart we can use to represent all data. Today, we're going to focus on just two of these chart types: Histograms and Scatter Plots.")
+        
+        bodyDiv:AddHeading("Histograms", 3)
+
+        bodyDiv:AddParagraph("A very common chart for visualizing numeric data is through a histogram. Histograms are typically used to represent the distribution of numerical data. The variable we observe is divided into different intervals where as a whole, we can examine the shape of the graph whether it is skewed, normal, uniform, bimodal [two distinct curves], etc. and draw conclusions about the data. Typical datasets to look out for when wanting to construct a histogram would be datasets featuring costs, ages, GPAs, and test scores. Note that datasets with non-numeric data are not recommended for histograms.")
+
+        Division flatChart1
+        flatChart1:SetStyle("min-width: 200px; max-width: 800px")
+        Image image1
+        image1:SetAddress("/media/lessons/DataScience/DOITSummerStudy/histogram_example_alt.svg")
+        image1:SetAlternate("Student Preference: Hamburgers vs Hotdogs is a histogram. The x axis shows rating and ranges from 0 to 10. The y axis shows frequency and ranges from 0 to 30. There are two sub charts, one for hamburgers and one for hotdogs." +
+        " The hotdog chart has a high frequency in the 4 to 6 rating bin, and the hamburger chart is fairly evenly distributed.")
+        image1:SetStyle("margin-bottom: 5px;")
+        flatChart1:Add(image1)
+        Division caption1
+        caption1:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        caption1:AddText(image1:GetAlternate():GetValue())
+        flatChart1:Add(caption1)
+        bodyDiv:Add(flatChart1)
+        
+
+        bodyDiv:AddHeading("Scatter Plots", 3)
+
+        bodyDiv:AddParagraph("The next chart we will be learning to create would be a scatter plot. Scatter plots are used to observe relationships between two variables. An example of this would be comparing the heights and diameters of trees, where the position of each dot correlates to that specified height and diameter. The data as a whole can represent a relationship: strong positive/negative linear, moderate positive/negative linear, or no relationship. As a data scientist, one of the most important patterns is seeing how points cluster from other points, if there are any gaps within the dataset, and identifying outliers for within the set. We focus on these aspects to make predictions on future datasets and understand trends.")
+        
+        
+        Division flatChart2
+        flatChart2:SetStyle("min-width: 200px; max-width: 800px")
+        Image image2
+        image2:SetAddress("/media/lessons/DataScience/DOITSummerStudy/scatter_example_alt.svg")
+        image2:SetAlternate("Average Temperature vs Daily Icecream Profits is a scatter plot. The x axis shows temperature in fahrenheit and ranges from 0 to 120. The y axis shows icecream profits and ranges from 0 to 600." +
+        " There are 20 points on the chart and the trend line is positive. There is an outlier around (80,0) which is about 300 units below the trend line.")
+        image2:SetStyle("margin-bottom: 5px;")
+        flatChart2:Add(image2)
+        Division caption2
+        caption2:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        caption2:AddText(image2:GetAlternate():GetValue())
+        flatChart2:Add(caption2)
+        bodyDiv:Add(flatChart2)
+        
+        bodyDiv:AddHeading("Accessible Chart Navigation (10 Minutes)",2)
+
+        bodyDiv:AddHeading("Histogram",3)
+        bodyDiv:AddParagraph(" ")
+
+        File f
+        FileReader reader
+
+        Division chart1
+        chart1:SetStyle("min-width: 200px; max-width: 800px")
+        chart1:SetIdentifier("histogram_example")
+        f:SetPath("html/media/lessons/DataScience/DOITSummerStudy/histogram_example.svg")
+        reader:OpenForRead(f)
+        chart1:AddText(reader:Read())
+        reader:Close()
+        
+        Division speechViewer1
+        speechViewer1:SetIdentifier("speechviewer1")
+        speechViewer1:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        
+        Script script1
+        script1:AddText("window.addEventListener('load', function () {" + cr + 
+        "var svg = document.getElementById('" + chart1:GetIdentifier():GetValue() + "').getElementsByTagName('svg');" + cr +
+        "var speechviewer = document.getElementById('" + speechViewer1:GetIdentifier():GetValue() + "');" + cr +
+        "speechviewer.id = svg[0].id + '_speechViewer';" + cr +
+        "});")
+        chart1:Add(speechViewer1)
+        chart1:Add(script1)
+        bodyDiv:Add(chart1)
+        
+        
+
+        bodyDiv:AddHeading("Scatter Plot",3)
+        bodyDiv:AddParagraph(" ")
+
+        Division chart2
+        chart2:SetStyle("min-width: 200px; max-width: 800px")
+        chart2:SetIdentifier("scatter_example")
+        f:SetPath("html/media/lessons/DataScience/DOITSummerStudy/scatter_example.svg")
+        reader:OpenForRead(f)
+        chart2:AddText(reader:Read())
+        reader:Close()
+        
+        Division speechViewer2
+        speechViewer2:SetIdentifier("speechviewer2")
+        speechViewer2:SetStyle("padding: 10px; background: white; width: auto; min-height: 20px;")
+        
+        Script script2
+        script2:AddText("window.addEventListener('load', function () {" + cr + 
+        "var svg = document.getElementById('" + chart2:GetIdentifier():GetValue() + "').getElementsByTagName('svg');" + cr +
+        "var speechviewer = document.getElementById('" + speechViewer2:GetIdentifier():GetValue() + "');" + cr +
+        "speechviewer.id = svg[0].id + '_speechViewer';" + cr +
+        "});")
+        chart2:Add(speechViewer2)
+        chart2:Add(script2)
+        bodyDiv:Add(chart2)
+
+        bodyDiv:AddHeading("Additional Resources",2)
+
+        Link link1
+        link1:AddText("Core Track")
+        link1:SetAddress("https://quorumlanguage.com/lessons/core.html")
+        link1:SetTarget(link1:newTab)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(link1)
+        bodyDiv:AddText(": A good place to start for beginner programmers (not data science specific). This learning track will teach you the basics of types/variables, control structures, actions and classes.")
+
+        Link link2
+        link2:AddText("Data Science Professional Development Track")
+        link2:SetAddress("https://quorumlanguage.com/lessons/epiqDataScience.html")
+        link2:SetTarget(link2:newTab)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(link2)
+        bodyDiv:AddText(": This learning track will teach you about data science programming in Quorum. It takes you from start to finish with making charts.")
+
+        Link link3
+        link3:AddText("Quorum Reference Pages")
+        link3:SetAddress("https://quorumlanguage.com/reference.html")
+        link3:SetTarget(link3:newTab)
+
+        bodyDiv:AddParagraph("")
+        bodyDiv:Add(link3)
+        bodyDiv:AddText(": This site provides documentation on all of the pieces of Quorum. Some relevant sections to the data science content include Data Science, Data Transformations, Descriptive Statistics and Charts.")
+    
+                
+        bodyDiv:AddParagraph(" ")
+
+
+        
+        bodyDiv:AddHeading("Next: Activity", 2)
+        Paragraph next = bodyDiv:AddParagraph("In the next section, we will work through an ")
+        Activity activity
+        next:AddLink(activity:GetName(), "/" + activity:GetLocation())
+        next:AddText(" as a group.")
+
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetMetaDescription returns text
+        return "DO-IT Summer Study"
+    end
+
+    action GetSummaryName returns text
+        return "DO-IT Summer Study"
+    end
+
+    action GetName returns text
+        return "DO-IT Summer Study"
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, data science, 
+        programming, chart, graph, accessibility, bar chart, histogram, scatter plot, DO-IT Summer Study,
+        computer science, computer languages, Quorum programming language")
+        AddMetaData(keywords)
+    end
+
+    action GetShortDescription returns text
+        return "DO-IT Summer Study Presentation, learning the basics of accessible charts"
+    end
+
+    action GetLocation returns text
+        return "lessons/DataScience/DOITSummerStudy/presentation.html"
+    end
+end
