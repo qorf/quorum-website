@@ -528,7 +528,7 @@
 	if (svgId != null) {
 		var speechViewer = document.getElementById(svgId + "_speechViewer") 
 		if (speechViewer != null) {
-			speechViewer.innerText = this.ariaLabel;
+			speechViewer.innerText = this.getAttribute("aria-label");
 		}
 	}
  }
