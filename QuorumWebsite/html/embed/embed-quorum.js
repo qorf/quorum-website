@@ -190,6 +190,10 @@ var InjectQuorumCodeExample = function(element, name, code) {
 }
 
 var InjectQuorumEnvironment = function(element, name, code) {
+    InjectQuorumEnvironment(element, name, "Embed Quorum!","Enter Quorum code below and press \"Run Program\"", code );
+}
+
+var InjectQuorumEnvironment = function(element, name, code, title, subtitle) {
     if(code === undefined) {
         code = "output \"Hello, World!\"";
     }
@@ -197,7 +201,7 @@ var InjectQuorumEnvironment = function(element, name, code) {
     if(name === undefined) {
         name = "DefaultQuorumEnvironment";
     }
-    var result = GenerateQuorumEnvironment(name);
+    var result = GenerateQuorumEnvironment(name, title, subtitle);
     var div = document.createElement("div");
     div.id = name + "OuterQuorumEnvironment";
     div.innerHTML = result;
@@ -215,11 +219,12 @@ var InjectQuorumEnvironment = function(element, name, code) {
         prismScript.addEventListener("load", () => {editAreaUpdate(editor);});
     }
 }
-var GenerateQuorumEnvironment = function(name) {
+
+var GenerateQuorumEnvironment = function(name, title, subtitle) {
     var environment = 
         "<div id= \""+name+"Ide\" class= \"ideTotal\" >" + 
-            "<h2 class= \"allInOneIdeTitle\" ><label for= \""+name+"IdeInput\" >Embed Quorum!</label></h2>" +
-            "<p class= \"allInOneIdeSubtitle\" >Enter Quorum code below and press \"Run Program\"</p>" +
+            "<h2 class= \"allInOneIdeTitle\" ><label for= \""+name+"IdeInput\" >" + title + "</label></h2>" +
+            "<p class= \"allInOneIdeSubtitle\" >"+subtitle+"</p>" +
             "<h2 class= \"hidden\" >Code Area</h2>" + 
             "<section aria-labeledby= \""+name+"CodeArea\" >" +
                "<div class= \"flex-container\" >" +
