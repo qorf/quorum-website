@@ -656,7 +656,7 @@ var loginWithParams = function(user, pwd, redirect) {
 var logout = function() {
     $.ajax({
         type: "GET",
-        url: "/logout.php",
+        url: "/Logout.quorum",
         success: function (result) {
             if (result === "success") {
                 //$("#loginButton").text("Login");
@@ -686,7 +686,7 @@ var saveProject = function(id, input, output, namefield, overwrite) {
                 var codeData = {code: codeInput, project_name: projectName, overwrite: overwrite, ide: id, url: pageURL};
                 $.ajax({
                     type: "POST",
-                    url: "/project_save.php",
+                    url: "/ProjectSave.quorum",
                     data: codeData,
                     success: function (result) {
                         if (result === "A file already exists with that name.")
