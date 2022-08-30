@@ -746,7 +746,7 @@ var loadProject = function(id, select, input, output)
                 var codeData = {project_name: project, shared: sharedBy};
                 $.ajax({
                     type: "POST",
-                    url: "/load_project_file.php",
+                    url: "/LoadProjectFile.quorum",
                     data: codeData,
                     success: function (result) {
                         if (result !== "") {
