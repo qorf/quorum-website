@@ -174,7 +174,7 @@ var newRunCode = async function (input, output, uiContainer, execute) {
         }
     };
 
-    xmlhttp.open("POST", "https://quorumlanguage/fastrun.php", true);
+    xmlhttp.open("POST", "https://quorumlanguage.com/fastrun.php", true);
     xmlhttp.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
 
   resetVisualSize(codeInput, ideName);
