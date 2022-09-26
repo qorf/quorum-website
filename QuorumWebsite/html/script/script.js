@@ -479,7 +479,7 @@ var newRunCode = function (input, output, uiContainer, execute) {
     var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName, build_only: button, timezone: tz};
     $.ajax({
         type: "POST",
-        url: "/fastrun.php",
+        url: "/Fastrun.quorum",
         data: codeData,
         success: function (result) {
             outputRegion.innerHTML = "";
@@ -583,7 +583,7 @@ var showLoadModal = function(id) {
             if (result === "success") {
                 $.ajax({
                     type: "POST",
-                    url: "/load_project_select.php",
+                    url: "/LoadProjectSelect.quorum",
                     data: {id: id},
                     success: function(result)
                     {
@@ -624,6 +624,48 @@ var hideLoadModal = function(id) {
     document.getElementById(id + 'LoadModal').style.display='none';
 };
 
+$('.publicCheckbox').change(function() {
+    var public = this.checked ? 1 : 0;
+    var value = this.value;
+        $.ajax({
+            type: "POST",
+            url: "/ChangePrivacy.quorum",
+            data: {public: public, file: value},
+            success: function (result) {
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert("I could not connect to the server at quorumlanguage.com: " + thrownError);
+            }
+        });
+    });
+    
+    
+    
+var showShareModal = function(value) {
+    document.getElementById('shareModal').style.display='block';
+    document.getElementById('shareText').value = value;
+    document.getElementById('shareText').focus();
+    
+    try
+    {
+        document.getElementById('shareText').select();
+        var success = document.execCommand('copy');
+        if (success)
+            document.getElementById('clipboardCopyMessage').style.display='block';
+        else
+            document.getElementById('clipboardCopyMessage').style.display='none';
+    }
+    catch (error)
+    {
+        document.getElementById('clipboardCopyMessage').style.display='none';
+        console.log("There was an error while copying the project sharing link to the clipboard.");
+    }
+};
+
+var hideShareModal = function() {
+    document.getElementById('shareModal').style.display='none';
+};
+
 var login = function() {
     var user = $("#usernameInput").val();
     var pwd = $("#passwordInput").val();
@@ -632,7 +674,7 @@ var login = function() {
 
 var loginWithParams = function(user, pwd, redirect) {
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "/Login.quorum",
         data: {username: user, password: pwd},
         success: function (result) {
@@ -1767,7 +1809,7 @@ function registrationSubmit() {
         
         $.ajax({
             type: "POST",
-            url: "/register.php",
+            url: "/Register.quorum",
             data: {username: user, password: password, first_name: firstname, last_name: lastname, email: email, birthday: birthday, confirm_password: confirmPassword},
             success: function (result) {
                 // might need change for if condition
@@ -1808,7 +1850,7 @@ function forgotPasswordClick() {
 
         $.ajax({
             type: "POST",
-            url: "/request_password_reset.php",
+            url: "/RequestPasswordReset.quorum",
             data: {email: email},
             success: function (result) {
                 // might need change for if condition
@@ -1853,7 +1895,7 @@ function resetPasswordClick() {
 
         $.ajax({
             type: "POST",
-            url: "/confirm_reset_password.php",
+            url: "/ConfirmResetPassword.quorum",
             data: {reset_password: password, confirm_reset_password: passwordConfirm, pagekey: hiddenKey},
             success: function (result) {
                 // might need change for if condition
