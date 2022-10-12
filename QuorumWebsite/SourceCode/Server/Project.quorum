@@ -1,0 +1,98 @@
+
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+use Libraries.Web.Page.Paragraph
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Database.Server.ResponsePage
+use Libraries.Database.Server.SharedConnection
+
+class Project is ResponsePage
+
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_HTML = "text/html"
+
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers
+
+        text loggedInUser = con:GetUserFromCookie(exchange)
+        if loggedInUser = undefined or loggedInUser = ""
+            loggedInUser = ""
+        end
+
+        // page to be generated
+        ProjectPage page
+
+        // if there were params then adjust the page
+        if params:HasKey("user") and params:HasKey("file")
+            user = params:GetValue("user")
+            file = params:GetValue("file")
+
+            Connection connect = con:GetConnection()
+            Database database
+            database:Connect(connect)
+    
+            Find projectsQuery
+            projectsQuery:SetTable("projects")
+            projectsQuery:AddColumn("public")
+            projectsQuery:AddColumn("id")
+            projectsQuery:Filter("username = "+dq+user+dq+" and project_name = "+dq+file+dq+" and deleted = false")
+            projectsQuery:AddSort("modified", false)
+
+            QueryResult result = database:Find(projectsQuery)
+        
+            if result:HasNext()
+                result:Next()
+                if result:GetBoolean("public") or loggedInUser = user
+                    page:SetPublic(result:GetBoolean("public"))
+
+                    Find hashFind
+                    hashFind:SetTable("project_files")
+                    hashFind:AddColumn("hash")
+                    hashFind:Filter("id = "+result:GetInteger("id")+" and deleted = false")
+        
+                    Find codeFind
+                    codeFind:SetTable("files")
+                    codeFind:AddColumn("code")
+                    codeFind:AddSubquery("hashQuery", hashFind)
+                    codeFind:Filter("hash = hashQuery")
+                    QueryResult codeResult = database:Find(codeFind)
+                    // assume only one file will be found for now
+                    if codeResult:HasNext()
+                        codeResult:Next()
+                        page:SetCode(codeResult:GetText(0))
+                        page:SetUsername(user)
+                        page:SetProjectName(file)
+                    end
+                else
+                    page:SetPublic(false)
+                end
+            end
+            database:Close()
+        end
+
+        page:Setup()
+        response = page:Generate()
+        // SENDING HTML SO MUST CHANGE HEADERS
+        List<text> list
+        list:Add(TEXT_HTML+"; charset=UTF-8")
+        // this specifies that the content is made up of html tags
+        headers:Add(CONTENT_TYPE, list)
+
+        exchange:SetResponseHeaders(headers)
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action GetPath returns text
+        return "/Project.quorum"
+    end
+end

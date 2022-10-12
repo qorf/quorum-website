@@ -1,0 +1,156 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchangeListener
+use Libraries.Network.NetworkExchange
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.QueryMetaData
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+use Libraries.Containers.List
+use Libraries.System.DateTime
+use Libraries.Data.Database.Update
+use Libraries.Data.Database.Support.Parameter
+use Libraries.Data.Database.Insert
+
+class Login is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        text username = undefined
+        text password = undefined
+        if params:HasKey(con:USERNAME) and params:HasKey(con:PASSWORD)
+            username = params:GetValue(con:USERNAME)
+            password = params:GetValue(con:PASSWORD)
+        else
+            Failure(exchange)
+            return now
+        end
+        
+        Connection connection = con:GetConnection()
+        Database database = con:GetDatabase()
+        database:Connect(connection)
+
+        //TODO, while the database sanitizes automatically, let's do it here too just in case
+        if database:IsConnected()
+            QueryResult result = database:Find(con:USERS_TABLE, con:USERNAME + " = " + dq + username + dq)
+            if result = undefined
+                Failure(exchange)
+                return now
+            end
+
+            DateTime currentTime
+            boolean verified = false
+            boolean done = false
+            repeat while result:HasNext() and not done
+                result:Next()
+                text p = result:GetText(con:PASSWORD)
+                integer currentTries = result:GetInteger(con:TRIES)
+                DateTime lastLogin = result:GetDateTime(con:LAST_ATTEMPTED_LOGIN)
+                number difference = 0
+                if lastLogin = undefined
+                    difference = con:LOGIN_TIMEOUT_MINUTES
+                else
+                    difference = currentTime:GetMinuteDifference(lastLogin)
+                end
+
+                //if the number of tries is above 10, make them wait 10 minutes
+                if currentTries > 10 and difference < con:LOGIN_TIMEOUT_MINUTES
+                    database:Close()
+                    Failure(exchange)
+                    return now
+                else //otherwise we can login
+                    //use the verifier to determine if we have a valid hash
+                    verified = exchange:VerifyPassword(password, p)
+                    //if it's the wrong password, increase the tries count
+                    if not verified
+                        Update update
+                        update:SetTable(con:USERS_TABLE)
+                        update:Add(con:TRIES, currentTries + 1)
+                        update:Filter(con:USERNAME + " = " + dq + username + dq)
+        
+                        integer rows = database:Update(update)
+                        if rows not= 1
+                            database:Close()
+                            Failure(exchange)
+                            return now
+                        end
+                    end
+
+                end
+                done = true
+            end
+
+            text response = ""
+            //if this is a legit login, set a cookie
+            if verified
+                response = con:SUCCESS
+                text sessionID = exchange:GenerateSessionKey()
+
+                HashTable<text,List<text>> responseHeaders = exchange:GetResponseHeaders()
+                Cookie cookie
+                cookie:SetName(con:SESSION_ID)
+                cookie:SetValue(sessionID)
+                cookie:SetHttpOnly(true)
+                cookie:SetSecure(true)
+                cookie:SetDomain(con:GetDomain())
+                cookie:SetPath("/")
+                DateTime time
+                time:AddDays(30)
+                cookie:SetMaxAge(60 * 60 * 24 * 30) //30 days worth of seconds
+                cookie:SetExpires(time)
+                
+                cookie:AddToHeader(responseHeaders)
+        
+                //the cookie is set, not make the session persist
+                //this needs to take into account the time as well,
+                //but that appears to be missing from the Update class.
+                Update update
+                update:SetTable(con:USERS_TABLE)
+                update:Add(con:TRIES, 0)
+                text timeStamp = currentTime:GetTimestamp()
+                update:Add(con:LAST_ATTEMPTED_LOGIN, timeStamp)
+                update:Filter(con:USERNAME + " = " + dq + username + dq)
+
+                //something like this?
+                //DateTime date
+                //update:Add("time", date)
+                integer rows = database:Update(update)
+                if rows not= 1
+                    database:Close()
+                    Failure(exchange)
+                    return now
+                end
+
+                Insert insertion
+                insertion:Add(con:SESSION, sessionID)
+                insertion:Add(con:USERNAME, username)
+                insertion:SetTable(con:SESSIONS_TABLE)
+                rows = database:Insert(insertion)
+                if rows not= 1
+                    database:Close()
+                    Failure(exchange)
+                    return now
+                end
+                
+                exchange:SetResponseHeaders(responseHeaders)
+                responseHeaders = exchange:GetResponseHeaders()
+            else
+                response = con:FAILURE
+            end
+
+            database:Close()
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+        else
+            Failure(exchange)
+            return now
+        end
+    end
+
+    action GetPath returns text
+        return "/Login.quorum"
+    end
+end

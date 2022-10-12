@@ -1,0 +1,32 @@
+package Libraries.Database.Server
+
+use Libraries.Network.NetworkExchangeListener
+use Libraries.Network.NetworkExchange
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.QueryMetaData
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+use Libraries.Containers.List
+
+class Analytics is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        SharedConnection con
+        text user = con:GetUserFromCookie(exchange)
+
+        if user = undefined //not logged in
+            Failure(exchange)
+            return now
+        else
+            text response = con:SUCCESS
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+    end
+
+    action GetPath returns text
+        return "/Analytics.quorum"
+    end
+end

@@ -1,0 +1,154 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.System.DateTime
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.Array
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.Update
+use Libraries.Data.Database.Insert
+use Libraries.Containers.Iterator
+
+class ProjectSave is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+
+        text username = con:GetUserFromCookie(exchange)
+        if username = undefined or username = ""
+            Failure(exchange, "User not logged in")
+            return now
+        end
+        text projectName = ""
+        boolean overwrite = false
+        text code = ""
+        text ide = ""
+        text url = ""
+        if params:HasKey("project_name")
+        and params:HasKey("overwrite")
+        and params:HasKey("code")
+        and params:HasKey("ide")
+        and params:HasKey("url")
+            projectName = params:GetValue("project_name")
+            overwrite = (params:GetValue("overwrite") = "true")
+            code = params:GetValue("code")
+            ide = params:GetValue("ide")
+            url = params:GetValue("url")
+        else
+            Failure(exchange)
+            return now
+        end
+        
+        boolean found = HasProject(username, projectName)
+        // handle case where project already exists
+        if found
+            if overwrite
+                // if overwriting then 'delete' old one
+                // lazy delete by setting deleted to true
+                text id = ""
+                Connection connect = con:GetConnection()
+                Database database
+                database:Connect(connect)
+
+                // find id of project
+                Array<text> col
+                col:Add("id")
+                QueryResult result = database:Find(col, "projects", "username = "+dq+username+dq+" and project_name = "+dq+projectName+dq+" and deleted = false")
+                // this should only ever return one row
+                if result:HasNext()
+                    result:Next()
+                    id = result:GetText(0)
+                end
+
+                Update projectUpdate
+                projectUpdate:SetTable("projects")
+                projectUpdate:Add("deleted", true)
+                projectUpdate:Filter("id = "+id)
+                database:Update(projectUpdate)
+
+                Update fileUpdate
+                fileUpdate:SetTable("project_files")
+                fileUpdate:Add("deleted", true)
+                fileUpdate:Filter("id = "+id)
+                database:Update(fileUpdate)
+                database:Close()
+            else
+                response = "A file already exists with that name."
+                exchange:SendResponseHeaders(200, response)
+                exchange:SendResponse(response)
+                return now
+            end
+        end
+        // save new project
+        // if there was an overwrite then the old one was deleted so save as if it was new
+        fileHash = exchange:HashString("SHA-1", code)
+
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+        Insert projectInsert
+        projectInsert:SetTable("projects")
+        projectInsert:Add("username", username)
+        projectInsert:Add("project_name", projectName)
+        DateTime time
+        projectInsert:Add("created", time:GetTimestamp())
+        projectInsert:Add("pageURL", url)
+        projectInsert:Add("ide_name", ide)
+        database:Insert(projectInsert)
+        integer lastID = database:GetLastInsertedID()
+
+        // For now provide a default but when multiple files is on the frontend the names will
+        // be provided
+        text defaultFileName = "Main"
+        Insert projectFileInsert
+        projectFileInsert:SetTable("project_files")
+        projectFileInsert:Add("id", lastID)
+        projectFileInsert:Add("filename", defaultFileName)
+        projectFileInsert:Add("hash", fileHash)
+        database:Insert(projectFileInsert)
+
+        // save file with hash
+        Insert fileInsert
+        fileInsert:SetIgnore(true)
+        fileInsert:SetTable("files")
+        fileInsert:Add("hash", fileHash)
+        fileInsert:Add("code", code)
+        database:Insert(fileInsert)
+
+        database:Close()
+
+        exchange:SetResponseHeaders(headers)
+
+        response = "Your project was successfully saved as "+dq+ projectName +dq+"."
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action HasProject(text username, text projectName) returns boolean
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        SharedConnection con
+        Connection connection = con:GetConnection()
+        Database database = con:GetDatabase()
+        database:Connect(connection)
+
+        QueryResult result = database:Find("projects", "username = "+ dq+username+dq +" and project_name = "+ dq+projectName+dq +" and deleted = false")
+        // if anything came back then the project does exist
+        // no need to actually read the data 
+        if result:HasNext()
+            database:Close()
+            return true
+        end
+        database:Close()
+        return false
+    end
+
+    action GetPath returns text
+        return "/ProjectSave.quorum"
+    end
+end

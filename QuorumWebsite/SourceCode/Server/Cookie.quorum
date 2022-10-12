@@ -1,0 +1,173 @@
+package Libraries.Database.Server
+use Libraries.System.DateTime
+use Libraries.Containers.List
+use Libraries.Containers.HashTable
+use Libraries.Containers.Array
+
+class Cookie
+    constant text COOKIE_RESPONSE = "Set-Cookie"
+    constant text COOKIE_REPLY = "Cookie"
+    constant text EXPIRES = "Expires"
+    constant text MAX_AGE = "Max-Age"
+    constant text DOMAIN = "Domain"
+    constant text PATH = "Path"
+    constant text SECURE = "Secure"
+    constant text HTTP_ONLY = "HttpOnly"
+    constant text SAME_SITE = "SameSite"
+
+    text name = ""
+    text value = ""
+    DateTime expires = undefined
+    private integer maxAge = -1
+    text domain = undefined
+    text path = undefined
+    boolean secure = false
+    boolean httpOnly = false
+    text sameSite = undefined
+
+    action AddToHeader(HashTable<text, List<text>> headers)
+        List<text> value = GetValuesAsList()
+        headers:Add(COOKIE_RESPONSE, value)
+    end
+
+    action ParseCookies(List<text> values) returns HashTable<text, text>
+        if values = undefined or values:GetSize() < 1
+            return undefined
+        end
+        HashTable<text, text> cookies
+        
+        //it's only one text value
+        text cookie = values:Get(0)
+        Array<text> pairs = cookie:Split(";")
+        i = 0
+        repeat while i < pairs:GetSize()
+            text pair = pairs:Get(i)
+            Array<text> split = pair:Split("=")
+            if split not= undefined and split:GetSize() = 2
+                text name = split:Get(0):Trim()
+                text value = split:Get(1):Trim()
+                cookies:Add(name, value)
+            end
+            i = i + 1
+        end
+        return cookies
+    end
+
+    action GetValuesAsList returns List<text>
+        List<text> values
+        result = name + "=" + value
+
+        //looks like we need UTC for this
+        //https://stackoverflow.com/questions/11136372/which-date-formats-can-i-use-when-specifying-the-expiry-date-when-setting-a-cook
+        //also note it looks like browsers vary in how they manage expired tokens.
+        //safari and firefox are currently making me close and restart the browser for it to take effect.
+        if expires not= undefined
+            result = result + "; " + EXPIRES + "=" + expires:ToText()
+        end
+
+        if maxAge not= -1
+            result = result + "; " + MAX_AGE + "=" + maxAge
+        end
+
+        if domain not= undefined
+            result = result + "; " + DOMAIN + "=" + domain
+        end
+        
+        if path not= undefined
+            result = result + "; " + PATH + "=" + path
+        end
+
+        if secure
+            result = result + "; " + SECURE + "=" + secure
+        end
+
+        if httpOnly
+            result = result + "; " + HTTP_ONLY + "=" + httpOnly
+        end
+
+        if sameSite not= undefined
+            result = result + "; " + SAME_SITE + "=" + sameSite
+        end
+
+        values:Add(result) //and add the others too
+        return values
+    end
+    
+    action ToText returns text
+        text result = name + "=" + value
+        
+        return result
+    end
+
+    action GetName returns text
+        return name
+    end
+
+    action SetName(text name)
+        me:name = name
+    end
+
+    action GetValue returns text
+        return value
+    end
+
+    action SetValue(text value)
+        me:value = value
+    end
+
+    action GetExpires returns DateTime
+        return expires
+    end
+
+    action SetExpires(DateTime expires)
+        me:expires = expires
+    end
+
+    action GetMaxAge returns integer
+        return maxAge
+    end
+
+    action SetMaxAge(integer maxAge)
+        me:maxAge = maxAge
+    end
+
+    action GetDomain returns text
+        return domain
+    end
+
+    action SetDomain(text domain)
+        me:domain = domain
+    end
+
+    action GetPath returns text
+        return path
+    end
+
+    action SetPath(text path)
+        me:path = path
+    end
+
+    action GetSecure returns boolean
+        return secure
+    end
+
+    action SetSecure(boolean secure)
+        me:secure = secure
+    end
+
+    action GetHttpOnly returns boolean
+        return httpOnly
+    end
+
+    action SetHttpOnly(boolean httpOnly)
+        me:httpOnly = httpOnly
+    end
+
+    action GetSameSite returns text
+        return sameSite
+    end
+
+    action SetSameSite(text sameSite)
+        me:sameSite = sameSite
+    end
+end
