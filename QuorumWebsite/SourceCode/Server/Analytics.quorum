@@ -1,4 +1,3 @@
-package Libraries.Database.Server
 
 use Libraries.Network.NetworkExchangeListener
 use Libraries.Network.NetworkExchange
@@ -9,21 +8,63 @@ use Libraries.Data.Database.Database
 use Libraries.Containers.HashTable
 use Libraries.Containers.Iterator
 use Libraries.Containers.List
+use Libraries.Database.Server.ResponsePage
+use Libraries.Database.Server.SharedConnection
+use Libraries.Data.Database.Find
 
 class Analytics is ResponsePage
+
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_HTML = "text/html"
+
     action ResponseReceived(NetworkExchange exchange)
         SharedConnection con
         text user = con:GetUserFromCookie(exchange)
-
+        HashTable<text, List<text>> headers
+        text response = ""
+        text dq = response:GetDoubleQuote()
         if user = undefined //not logged in
             Failure(exchange)
             return now
+        end
+
+        // UNCOMMENT TO ADD ADMIN CHECK
+        /*
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        Find adminQuery
+        adminQuery:SetTable("users")
+        adminQuery:AddColumn("is_admin")
+        adminQuery:Filter("username = "+dq+user+dq)
+        QueryResult result = database:Find(adminQuery)
+        if result:HasNext()
+            result:Next()
+            boolean isAdmin = result:GetBoolean("is_admin")
+            if not isAdmin
+                Failure(exchange, "You must be logged into an admin account to access this page.")
+                return now
+            end
         else
-            text response = con:SUCCESS
-            exchange:SendResponseHeaders(200, response)
-            exchange:SendResponse(response)
+            Failure(exchange)
             return now
         end
+        database:Close()
+        */
+
+        AnalyticsPage page
+        page:Setup()
+        response = page:Generate()
+        // SENDING HTML SO MUST CHANGE HEADERS
+        List<text> list
+        list:Add(TEXT_HTML+"; charset=UTF-8")
+        // this specifies that the content is made up of html tags
+        headers:Add(CONTENT_TYPE, list)
+
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+        return now
     end
 
     action GetPath returns text
