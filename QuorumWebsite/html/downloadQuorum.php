@@ -250,6 +250,9 @@
         if ($requestedFile === "QuorumStudioMacDaily.pkg") {
             header('Content-Type: application/x-newton-compatible-pkg');
         }
+        elseif ($requestedFile === "QuorumStudioMacM1" . $studioVersionName . ".pkg") {
+            header('Content-Type: application/x-newton-compatible-pkg');
+        }
         elseif ($requestedFile === "QuorumMac" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip") {
             header('Content-Type: application/zip');
         }
