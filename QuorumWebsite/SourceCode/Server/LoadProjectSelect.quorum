@@ -1,0 +1,99 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Select
+use Libraries.Web.Page.Option
+
+
+class LoadProjectSelect is ResponsePage
+
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_HTML = "text/html"
+
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers //= exchange:GetHeaders()
+
+        text username = con:GetUserFromCookie(exchange)
+        if username = undefined or username = ""
+            Paragraph p
+            p:SetStyle("text-align: center; color: black;")
+            p:AddText("You must be logged in to load a project.")
+            response = p:Generate()
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+
+        text selectListID = ""
+        if params:HasKey("id")
+            selectListID = params:GetValue("id")
+        else
+            output "key was missing"
+            Failure(exchange)
+            return now
+        end
+
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        Find projectsQuery
+        projectsQuery:SetTable("projects")
+        projectsQuery:AddColumn("project_name")
+        projectsQuery:Filter("username = "+dq+username+dq+" and deleted = false")
+        projectsQuery:AddSort("modified", false)
+        QueryResult result = database:Find(projectsQuery)
+
+        if result:HasNext()
+            Select select
+            select:SetClassAttribute("loadProjectSelect")
+            select:SetIdentifier(selectListID + "LoadProjectSelect")
+            select:SetSize("10")
+            select:SetTabIndex("0")
+            select:AddAttribute("data-prefix", selectListID)
+
+            repeat while result:HasNext()
+                result:Next()
+                Option opt
+                opt:SetDefaultValue(result:GetText(0))
+                opt:AddText(result:GetText(0))
+                select:Add(opt)
+            end
+
+            database:Close()
+            response = select:Generate()
+            // SENDING HTML SO MUST CHANGE HEADERS
+            List<text> list
+            list:Add(TEXT_HTML+"; charset=UTF-8")
+            // this specifies that the content is made up of html tags
+            headers:Add(CONTENT_TYPE, list)
+            
+            exchange:SetResponseHeaders(headers)
+
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+        database:Close()
+        Paragraph p
+        p:SetStyle("text-align: center; color: black;")
+        p:AddText("You must be logged in to load a project.")
+        response = p:Generate()
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action GetPath returns text
+        return "/LoadProjectSelect.quorum"
+    end
+end

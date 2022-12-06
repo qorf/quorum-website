@@ -1,0 +1,71 @@
+package Libraries.Database.Server
+
+use Libraries.Network.NetworkExchangeListener
+use Libraries.Network.NetworkExchange
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.QueryMetaData
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+use Libraries.Containers.List
+use Libraries.Data.Database.Update
+
+class ChangePrivacy is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        SharedConnection con
+        text user = con:GetUserFromCookie(exchange)
+
+        if user = undefined //not logged in
+            Failure(exchange)
+            return now
+        else
+            text response = con:SUCCESS
+            HashTable<text,text> params = exchange:GetParameters()
+            text file = undefined
+            boolean isPublic = false
+            if params:HasKey("file") and params:HasKey("public")
+                file = params:GetValue("file")
+                isPublic = (params:GetValue("public") = "1") 
+            else
+                Failure(exchange)
+                return now
+            end
+
+            Connection connection = con:GetConnection()
+            Database database = con:GetDatabase()
+            database:Connect(connection)
+
+            if database:IsConnected()
+                Update update
+                update:SetTable("projects")
+                update:Add("public", isPublic)
+                text dq = ""
+                dq = dq:GetDoubleQuote()
+                update:Filter("username = "+ dq+user+dq +" and project_name = "+ dq+file+dq +" and deleted = false")
+
+                database:Update(update)
+
+                integer rows = database:Update(update)
+                if rows not= 1
+                    database:Close()
+                    Failure(exchange)
+                    return now
+                end
+            else
+                Failure(exchange)
+                return now
+            end
+
+
+            database:Close()
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+    end
+
+    action GetPath returns text
+        return "/ChangePrivacy.quorum"
+    end
+end

@@ -1,0 +1,69 @@
+
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+use Libraries.Web.Page.Paragraph
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Database.Server.ResponsePage
+use Libraries.Database.Server.SharedConnection
+
+class Profile is ResponsePage
+
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_HTML = "text/html"
+
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers
+
+        text username = con:GetUserFromCookie(exchange)
+        if username = undefined or username = ""
+            Paragraph p
+            p:SetStyle("text-align: center; color: black;")
+            p:AddText("You must be logged in to load a project.")
+            response = p:Generate()
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        Find projectsQuery
+        projectsQuery:SetTable("projects")
+        projectsQuery:AddColumn("project_name")
+        projectsQuery:AddColumn("modified")
+        projectsQuery:AddColumn("public")
+        projectsQuery:Filter("username = "+dq+username+dq+" and deleted = false")
+        projectsQuery:AddSort("modified", false)
+        DataFrame result = database:FindAsDataFrame(projectsQuery)
+        ProfilePage page
+        page:SetUsername(username)
+        page:SetProjects(result)
+        page:Setup()
+        response = page:Generate()
+        database:Close()
+        // SENDING HTML SO MUST CHANGE HEADERS
+        List<text> list
+        list:Add(TEXT_HTML+"; charset=UTF-8")
+        // this specifies that the content is made up of html tags
+        headers:Add(CONTENT_TYPE, list)
+        
+        exchange:SetResponseHeaders(headers)
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action GetPath returns text
+        return "/Profile.quorum"
+    end
+end

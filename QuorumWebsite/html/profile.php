@@ -90,7 +90,7 @@
                             var value = this.value;
                                 $.ajax({
                                     type: "POST",
-                                    url: "/change_privacy.php",
+                                    url: "/ChangePrivacy.quorum",
                                     data: {public: public, file: value},
                                     success: function (result) {
                                     },

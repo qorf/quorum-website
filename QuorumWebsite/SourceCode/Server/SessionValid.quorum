@@ -1,0 +1,26 @@
+package Libraries.Database.Server
+
+use Libraries.Network.NetworkExchangeListener
+use Libraries.Network.NetworkExchange
+use Libraries.Data.Database.Connection
+
+class SessionValid is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        SharedConnection con
+        text user = con:GetUserFromCookie(exchange)
+
+        if user = undefined //not logged in
+            Failure(exchange)
+            return now
+        else
+            text response = con:SUCCESS
+            exchange:SendResponseHeaders(200, response)
+            exchange:SendResponse(response)
+            return now
+        end
+    end
+
+    action GetPath returns text
+        return "/SessionValid.quorum"
+    end
+end
