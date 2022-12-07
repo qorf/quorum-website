@@ -105,11 +105,11 @@
     $studioVersionName = "" . $studioVersionMajor . "." . $studioVersionMinor . "." . $studioVersionSubminor; 
     
     $quorumVersionMajor = 10;
-    $quorumVersionMinor = 0;
+    $quorumVersionMinor = 5;
     $quorumVersionRevision = 0;
     
     $quorumStudioDailyMajor = 4;
-    $quorumStudioDailyMinor = 0;
+    $quorumStudioDailyMinor = 5;
 
     if ($requestedFile === "QuorumStudioWindows" . $studioVersionName . ".exe")
     {
