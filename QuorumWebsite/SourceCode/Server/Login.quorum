@@ -25,19 +25,19 @@ class Login is ResponsePage
             username = params:GetValue(con:USERNAME)
             password = params:GetValue(con:PASSWORD)
         else
-            Failure(exchange)
+            Failure(exchange, "Empty username or password")
             return now
         end
         
         Connection connection = con:GetConnection()
         Database database = con:GetDatabase()
         database:Connect(connection)
-
+        
         //TODO, while the database sanitizes automatically, let's do it here too just in case
         if database:IsConnected()
             QueryResult result = database:Find(con:USERS_TABLE, con:USERNAME + " = " + dq + username + dq)
-            if result = undefined
-                Failure(exchange)
+            if result = undefined or not result:HasNext()
+                Failure(exchange, ": Login Failed")
                 return now
             end
 
@@ -59,7 +59,7 @@ class Login is ResponsePage
                 //if the number of tries is above 10, make them wait 10 minutes
                 if currentTries > 10 and difference < con:LOGIN_TIMEOUT_MINUTES
                     database:Close()
-                    Failure(exchange)
+                    Failure(exchange, "Too many tries, try again later")
                     return now
                 else //otherwise we can login
                     //use the verifier to determine if we have a valid hash
@@ -74,6 +74,7 @@ class Login is ResponsePage
                         integer rows = database:Update(update)
                         if rows not= 1
                             database:Close()
+                            output "failed to update current try"
                             Failure(exchange)
                             return now
                         end
@@ -120,6 +121,7 @@ class Login is ResponsePage
                 integer rows = database:Update(update)
                 if rows not= 1
                     database:Close()
+                    output "failed to update last attempt"
                     Failure(exchange)
                     return now
                 end
@@ -138,13 +140,14 @@ class Login is ResponsePage
                 exchange:SetResponseHeaders(responseHeaders)
                 responseHeaders = exchange:GetResponseHeaders()
             else
-                response = con:FAILURE
+                response = con:FAILURE + ": Login Failed"
             end
 
             database:Close()
             exchange:SendResponseHeaders(200, response)
-            exchange:SendResponse(response)
+            exchange:SendResponse(response) 
         else
+            output "Failed to connect to database"
             Failure(exchange)
             return now
         end
