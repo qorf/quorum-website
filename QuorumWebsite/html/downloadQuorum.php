@@ -127,13 +127,13 @@
         $minor = $studioVersionMinor;
         $download_name = "Quorum Studio Mac";
     }
-    elseif ($requestedFile === "QuorumStudioMacM1" . $studioVersionName . ".pkg")
+    elseif ($requestedFile === "QuorumStudioMacARM" . $studioVersionName . ".pkg")
     {
-        $file_name = 'Quorum Studio ' . $studioVersionName . ' M1.pkg';
+        $file_name = 'Quorum Studio ' . $studioVersionName . ' ARM.pkg';
         $file = '/var/www/downloads/' . $file_name;
         $major = $studioVersionMajor;
         $minor = $studioVersionMinor;
-        $download_name = "Quorum Studio Mac M1";
+        $download_name = "Quorum Studio Mac ARM";
     }
     elseif ($requestedFile === "QuorumStudioWindowsDaily.exe")
     {
