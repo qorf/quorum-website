@@ -1,0 +1,92 @@
+use Libraries.Network.NetworkRequestListener
+use Libraries.Network.NetworkResponseEvent
+use Libraries.Network.NetworkRequest
+use Libraries.Containers.HashTable
+use Libraries.Network.NetworkConnection
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+
+class DownloadCounter is NetworkRequestListener
+
+    boolean failed = false
+
+    integer armCount = 0
+    integer intelCount = 0
+    integer windowsCount = 0 
+    integer releases = 0
+    text latestRelease = ""
+
+    action RequestReleaseInfo
+        NetworkRequest request
+        request:SetRequestTypeToGet()
+        request:SetWebAddress("https://api.github.com/repos/qorf/quorum-studio/releases")
+
+        request:AddHeader("Accept", "application/vnd.github+json")
+        request:AddHeader("X-GitHub-Api-Version","2022-11-28")
+
+        NetworkConnection http
+        http:AddListener(me)
+
+        check
+            http:SendRequest(request)
+        detect e
+            failed = true
+        end
+    end
+
+    action ResponseReceived(NetworkResponseEvent requestResponse)
+        text response = requestResponse:GetResponseText()
+        JavaScriptObjectNotation json
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        json:Read("{"+dq+"releases"+dq+":"+response+"}")
+        JavaScriptObjectNotation releases = json:Get(0):GetArray()
+        me:releases = releases:GetSize()
+        integer i = 0
+        repeat releases:GetSize() times
+            JavaScriptObjectNotation release = releases:Get(i)
+            latestRelease = release:GetValue("name")
+            JavaScriptObjectNotation assets = release:GetObject("assets"):GetArray()
+            integer j = 0
+            repeat assets:GetSize() times
+                JavaScriptObjectNotation asset = assets:Get(j)
+                text name = asset:GetValue("name")
+                if name = "Quorum-Studio-Mac-ARM.pkg"
+                    armCount = armCount + asset:GetInteger("download_count")
+                elseif name = "Quorum-Studio-Mac-Intel.pkg"
+                    intelCount = intelCount + asset:GetInteger("download_count")
+                elseif name = "Quorum-Studio-Windows.exe"
+                    windowsCount = windowsCount + asset:GetInteger("download_count")
+                end
+                j = j + 1
+            end
+            i = i + 1
+        end
+
+    end
+
+    action HasFailed returns boolean
+        return failed
+    end
+
+    action GetArmCount returns integer
+        return armCount
+    end
+
+    action GetIntelCount returns integer
+        return intelCount
+    end
+
+    action GetWindowsCount returns integer
+        return windowsCount
+    end
+
+    action GetNumberOfReleases returns integer
+        return releases
+    end
+
+    action GetLatestReleaseName returns text
+        return latestRelease
+    end
+
+end

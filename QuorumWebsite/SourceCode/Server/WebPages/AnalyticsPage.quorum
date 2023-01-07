@@ -30,20 +30,7 @@ class AnalyticsPage is WebPage
     cr = cr:GetCarriageReturn()
     text scriptsLocation = "/script/"
 
-    /*
-        This page can't connect to the database so the response page will get the projects
-        and pass the projects as a DataFrame so the page can generate correctly.
-    */
-    DataFrame projectTable = undefined
-    text username = ""
-
-    action SetProjects(DataFrame table)
-        me:projectTable = table
-    end
-
-    action SetUsername(text username)
-        me:username = username
-    end
+    DownloadCounter counter = undefined
 
     action Setup
         //html header stuff
@@ -63,6 +50,13 @@ class AnalyticsPage is WebPage
         Division bodyDiv
         bodyDiv:SetClassAttribute("bodyContainer")
 
+        // This will be called by the server when pinged to make the page
+        //  counter:RequestReleaseInfo()
+        bodyDiv:AddParagraph("Number of Releases: " + counter:GetNumberOfReleases())
+        bodyDiv:AddParagraph( "Latest Release: " + counter:GetLatestReleaseName())
+        bodyDiv:AddParagraph( "Mac ARM downloads: " + counter:GetArmCount())
+        bodyDiv:AddParagraph( "Mac Intel downloads: " + counter:GetIntelCount())
+        bodyDiv:AddParagraph( "Windows downloads: " + counter:GetWindowsCount())
 
         mainRegion:Add(bodyDiv)
         Add(mainRegion)
@@ -218,6 +212,10 @@ class AnalyticsPage is WebPage
 
     action GetMetaDescription returns text
         return "Create, edit, share, and delete projects."
+    end
+
+    action SetDownloadCount(DownloadCounter counter)
+        me:counter = counter
     end
 
 end
