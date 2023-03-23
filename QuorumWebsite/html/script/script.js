@@ -2,20 +2,6 @@ var currentIDEInput_$Global_ = '';
 var currentIDEOutput_$Global_ = 'frontPageIdeOutput';
 var currentUIContainer_$Global_ = 'QuorumUIContainer';
 var total_console_length239847239482734 = 0;
-setInterval(update_console, 500);
-
-function update_console() {
-    if (typeof OuTpUt_$tRiNg_ !== 'undefined' && typeof currentIDEOutput_$Global_ !== 'undefined') {
-        var newLength = OuTpUt_$tRiNg_.length;
-        if (newLength > total_console_length239847239482734) {
-            var dom = document.getElementById(currentIDEOutput_$Global_);
-            if(dom != null) {
-                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(length, newLength));
-            }
-            total_console_length239847239482734 = newLength;
-        }
-    }
-}
 
 var slideNr = 0;
 
