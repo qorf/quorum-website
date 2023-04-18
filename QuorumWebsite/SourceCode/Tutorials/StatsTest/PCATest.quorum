@@ -1,0 +1,195 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class PCA is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Tests to Reduce Datasets - Quorum Programming Lanugage")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Reduce Big Dataset", 1)
+        headDiv:AddText("This tutorial introduces a statistical procedure that reduces large datasets")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+            
+        bodyDiv:AddHeading("Reduce Large Sets of Data For Analysis ", 2)
+        bodyDiv:AddHeading("Technical Name: Principal Component AnalysiS", 3)
+
+        Link link
+        link:AddText("Link to Wikipedia Page")
+        link:SetAddress("https://en.wikipedia.org/wiki/Principal_component_analysis")
+        link:SetTarget(link:newTab)
+
+        bodyDiv:Add(link)
+        bodyDiv:AddText(".")
+        bodyDiv:AddParagraph("The PrincipalComponentAnalysis (PCA) class in Quorum is a procedure in statistics that attempts to condense or summarize the information explained by large datasets (i.e. a large number of 
+                              factors or variables) into a smaller set of components that can be easier to analyze or visualize.")
+        bodyDiv:AddParagraph("One example would be figuring out what has caused cancer (generally). There can be many factors like genetics, diet, exposure, location, and so on which can be hard to understand. 
+                              Using Principal Component Analysis, we can try to summarize these factors into a smaller number of components that will explain the variance between all of the factors and expose the 
+                                key factors related to cancer.")
+        bodyDiv:AddParagraph("It finds all the important information that could be related to what caused the cancer by looking at all the factors and figuring which ones are most different from each other. It then combines
+                              all those factors into a couple of new ones, called principal components, that get all the most important information.")
+
+        bodyDiv:AddHeading("Rotations", 3)
+        bodyDiv:AddParagraph("Factors have a habit of loading on lots of variables, so to help us interpret them, we can “rotate” the results. This can maximize or minimize the loading of a particular variable 
+                              on a particular factor. ")
+
+        Array<text> statClass1
+        statClass1:Add("Uncorrelated Component Rotation")
+        statClass1:Add("Orthogonal Varimax Rotation - keeps factors unrelated")  
+        statClass1:Add("UseUncorrelatedRotation()")       
+
+        Array<text> statClass2
+        statClass2:Add("Correlated Component Rotation")
+        statClass2:Add("Oblique Direct Quartimin Rotation - allows factors to be correlated") 
+        statClass2:Add("UseCorrelatedRotation()")
+        
+        Array<text> rHeader
+        rHeader:Add(AddTextBoldFront("Rotations", " "))        
+        rHeader:Add(AddTextBoldFront("Purpose", " "))
+        rHeader:Add(AddTextBoldFront("Function Call", " ")) 
+
+        Array<text> rRows
+        rRows:Add(AddTableHeaderTag(rHeader))
+      
+        rRows:Add(AddTableDataTag(statClass1))
+        rRows:Add(AddTableDataTag(statClass2))
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rRows), "Rotations for PCA")) 
+            
+        bodyDiv:AddHeading("Customize Rotations", 3)
+        bodyDiv:AddParagraph("Use the functions below to customize the rotations.")
+    
+        Array<text> statClass3
+        statClass3:Add("Normalize()")
+        statClass3:Add("Signifies if a Kaiser normalization takes place on the loading before the rotation. Resets to un-normalized afterwards.")         
+        
+    
+        Array<text> statClass4
+        statClass4:Add("SetEpsilon()")
+        statClass4:Add("Signifies the convergence threshold (the percentage variance used to define key metrics as converged) compared to the difference of the criterion for each iteration in the rotation algorithm ")         
+        
+
+        Array<text> statClass5
+        statClass5:Add("SetMaximumIterations()")
+        statClass5:Add("Signifies the stopping point even if convergence is not reached during a rotation")         
+             
+  
+    
+        Array<text> rubricHeader
+        rubricHeader:Add(AddTextBoldFront("Functions", " "))        
+        rubricHeader:Add(AddTextBoldFront("Purpose", " "))        
+
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        rubricRows:Add(AddTableDataTag(statClass3))
+        rubricRows:Add(AddTableDataTag(statClass4))
+        rubricRows:Add(AddTableDataTag(statClass5))
+       
+
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Custom Functions for the Compare Group Class"))       
+    
+        bodyDiv:AddParagraph("An example of the PCA test implemented in Quorum is below.")        
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.PrincipalComponentAnalysis
+
+DataFrame frame
+frame:Load(“Data.csv”)
+frame:SelectAllColumns()
+
+
+PrincipalComponentAnalysis pca
+pca:Calculate(frame)
+output pca:GetSummary()
+
+DataFrame loadings = pca:GetFactorLoadings()
+loadings:Save(" + dq + "files/loadings.csv" + dq + ")
+
+Vector h2 = pca:GetCommunality()
+Vector u2 = pca:GetUniqueness()
+Vector vaf = pca:GetVarianceAccountedFor()"))
+        
+        bodyDiv:AddParagraph("Below is what you should get in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A Principal Component Analysis based on the correlation matrix was modeled on 23 extracted components.
+Statistic (Empirical ?2): 0.0
+Degrees Of Freedom: -23.0
+Probability: 0.0
+Model Fit: 1.0"))
+
+       bodyDiv:AddParagraph("If we change the last line output result:GetSummary() to output result:GetFormalSummary(),we can get another summary result.")
+       bodyDiv:Add(preformatter:GeneratePreformattedCode("A One Sample t-test was conducted on one sample B. B had a higher overall mean (M = 8, SD = 1.58) compared to  (M = 0)
+The difference was indicated to be statistically significant, t(4) = 11.31, p < .001, d = 5.06."))
+       
+     
+  
+        
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+              
+        
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Principal Component Analysis on Quorum Language."
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "statistical tests, groups, data, statistical analysis, statitistical tests for visually impaired")
+        AddMetaData(keywords)
+    end
+
+    action GetSummaryName returns text
+        return "Principal Component Analysis Procedure"
+    end
+
+    action GetName returns text
+        return "Principal Component Analysis"
+    end
+
+    action GetShortDescription returns text
+        return "how to reduce big datasets"
+    end
+
+    action GetLocation returns text
+        return "tutorials/statstest/pcaTest.html"
+    end
+end

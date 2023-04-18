@@ -1,0 +1,154 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class ReducibilityStrengthTest is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Check Reducibility Strength - Quorum Programming Lanugage")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Check Reducibility Strength of Data", 1)
+        headDiv:AddText("This tutorial introduces statistical tests that check sampling adequacy")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+            
+        bodyDiv:AddHeading("Check Reducibility Strength", 2)
+        bodyDiv:AddParagraph("The CheckReducibilityStrength Class in Quorum implements suitability checks before factor analysis. It determines what amount of variance in our data or variables may be caused by underlying factors. ")
+        bodyDiv:AddParagraph("The test listed below is used to check sampling adequacy. For example, is it random? What is the size of the sample? Is it likely to change? How accurate do we want to be?")
+        
+        Array<text> statClass1
+        statClass1:Add("Kaiser-Meyer-Olkin Measure of Sampling Adequacy")
+        statClass1:Add("CheckReducibilityStrength")                 
+    
+        Array<text> statTest
+        statTest:Add(AddTextBoldFront("Formal Test", " "))        
+        statTest:Add(AddTextBoldFront("Action in CompareGroups Class", " ")) 
+    
+
+        Array<text> rubricRows
+        rubricRows:Add(AddTableHeaderTag(statTest))
+      
+        rubricRows:Add(AddTableDataTag(statClass1))
+
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Tests to Check for Suitability"))
+
+        bodyDiv:AddHeading("Check if Data is Good Enough", 3)
+        bodyDiv:AddHeading("Technical Test Name: Kaiser-Meyer-Olkin Measure of Sampling Adequacy", 4)
+        
+        Link link
+        link:AddText("Link to Wikipedia Page")
+        link:SetAddress("https://en.wikipedia.org/wiki/Kaiser%E2%80%93Meyer%E2%80%93Olkin_test")
+        link:SetTarget(link:newTab)
+
+        bodyDiv:Add(link)
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("A Kaiser-Meyer-Olkin Measure of Sampling Adequacy is a way to see if the data that we have collected is good enough to use in certain statistical analysis. ")
+        bodyDiv:AddParagraph("Let�s say we have a bunch of puzzle pieces that we want to put together to see a big picture. This test is basically making sure that we have all the pieces of the
+                              puzzle before we start actually putting things together. ")
+        bodyDiv:AddParagraph("It looks at how each puzzle piece is related to other pieces. If they are alike, it means we might now have data that is good enough to get a good analysis. 
+                              But if they are different from each other, then we have a lot of different things to work with. ")
+        bodyDiv:AddParagraph("Data needs to be suitable for factor analysis to work. Basically, this test measures how suited your data is for factor analysis and 
+                              what quantity of variance is in the data that might be caused by underlying factors. The higher the difference, the more suited your data is for factor analysis ")
+      
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.CheckReducibility
+
+DataFrame frame
+frame:LoadFromCommaSeparatedValue( " + dq + 
+"A, B, C, D, E
+1, 6, 19. 13, 24
+2, 9, 4, 5, 8
+6, 8, 53, 34, 5
+4, 9, 5, 12, 24
+5, 10, 7, 132, 4" + dq + ")
+frame:AddSelectedColumnRange(0,4)
+CheckReducibilityStrength test = frame:CheckReducibilityStrength()
+output test:GetSummary()"))
+
+        bodyDiv:AddParagraph("You should get something similar in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A Kaiser-Meyer-Olkin measure of sampling adequacy was conducted across 23 variables.
+Statistic (KMO): 0.93
+Strength: Marvelous"))
+
+/*bodyDiv:AddParagraph("If we change the last line output result:GetSummary() to output result:GetFormalSummary(),we can get another summary result.")
+       bodyDiv:Add(preformatter:GeneratePreformattedCode("A Pearson's Chi-Squared Test of Independence was performed to assess the relationship between B and C.
+There was a significant relationship between the two variables, χ2(16, N = 5) = 20, p = .22.
+
+A Pearson's Chi-Squared Test of Independence was performed to assess the relationship between A and B.
+There was a significant relationship between the two variables, χ2(16, N = 5) = 20, p = .22.
+
+A Pearson's Chi-Squared Test of Independence was performed to assess the relationship between A and C.
+There was a significant relationship between the two variables, χ2(16, N = 5) = 20, p = .22."))*/
+        
+       
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+              
+        
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Reducibility Strength on Quorum Language."
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "statistical tests, groups, data, statistical analysis, statitistical tests for visually impaired")
+        AddMetaData(keywords)
+    end
+
+    action GetSummaryName returns text
+        return "Check Reducibility Strength Statistical Tests"
+    end
+
+    action GetName returns text
+        return "Check Reducibility Strength"
+    end
+
+    action GetShortDescription returns text
+        return "how to check the reducibility strength of your data"
+    end
+
+    action GetLocation returns text
+        return "tutorials/statstest/reducibilityStrength.html"
+    end
+end

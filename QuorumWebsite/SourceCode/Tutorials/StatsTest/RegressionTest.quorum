@@ -1,0 +1,125 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class RegressionTest is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Regression - Quorum Programming Lanugage")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Regression", 1)
+        headDiv:AddText("This tutorial introduces a statistical procedure that predicts an outcome")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+        // ADD LINK TO REGRESSION PAGE!!!!!
+        bodyDiv:AddHeading("Regression", 2)
+
+        Link link
+        link:AddText("Link to Wikipedia Page")
+        link:SetAddress("https://en.wikipedia.org/wiki/Regression_analysis")
+        link:SetTarget(link:newTab)
+
+        bodyDiv:Add(link)
+        bodyDiv:AddText(".")
+        bodyDiv:AddParagraph("The Regression Class in Quorum is a statistical procedure that uses existing datasets (i.e. a large number of factors or variables) to create an equation that predicts 
+                              unknown outcome variables. Quorum conducts an Ordinary Least Squares regression.")
+        bodyDiv:AddParagraph("It basically takes independent variables as the input and gives us the dependent variable or outcome as the output which is what we are trying to predict. ")               
+        bodyDiv:AddParagraph("For example, a sales manager is trying to predict next year’s sales. There are so many factors that could affect them from a new competitor, bad marketing, 
+                              or even the climate. Regression will then determine which variable or factors have an impact. ")
+             
+        bodyDiv:AddParagraph("It takes what has happened in the past to predict what might happen in the future")
+       
+        bodyDiv:AddParagraph("Below is an example in Quorum.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
+
+DataFrame frame
+frame:LoadFromCommaSeparatedValue(" + dq + 
+"A,B
+1,6
+2,9
+6,8
+4,9
+5,10" + dq + ")
+
+frame:AddSelectedColumn(0)
+frame:AddSelectedFactor(1)
+
+Regression result = frame:RegressionOnSelected()
+output result:GetFormalSummary()"))
+
+        bodyDiv:AddParagraph("Below is what you should get in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A multiple linear regression was calculated, R-squared = .292, F(1, 3) = 1.239, p = .347"))
+
+   
+
+      
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+              
+        
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about Regression on Quorum Language."
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "statistical tests, groups, data, statistical analysis, statitistical tests for visually impaired")
+        AddMetaData(keywords)
+    end
+
+    action GetSummaryName returns text
+        return "Regression Statistical Procedure"
+    end
+
+    action GetName returns text
+        return "Regression"
+    end
+
+    action GetShortDescription returns text
+        return "how to predict the outcome"
+    end
+
+    action GetLocation returns text
+        return "tutorials/statstest/regressionTest.html"
+    end
+end
