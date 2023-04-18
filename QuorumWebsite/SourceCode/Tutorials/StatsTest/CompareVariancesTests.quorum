@@ -1,0 +1,310 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+
+class CompareVarianceTest is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Compare Variances - Quorum Programming Lanugage")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Tutorial: Compare Variances", 1)
+        headDiv:AddText("This tutorial introduces statistical tests that compare variances of data")
+        Add(headDiv)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+            
+        bodyDiv:AddHeading("Compare Variances", 2)
+        bodyDiv:AddParagraph("The CompareVariances Class in Quorum implements multiple tests to check different properties  to see if they vary in a similar way under different conditions. It is how different each value in the data is 
+                              from the average. Listed below are functions that allow you to customize the statistical tests that you run. For example, the Ranked() function would be called when you want the results to be ranked 
+                              or the call the RepeatedMeasures() function for tests that use repeated measures.")
+
+        Array<text> func1
+        func1:Add("UseMedianAsCenter()")
+        func1:Add("Set the useMedianAsCenter boolean to false. Default is true.")         
+
+        Array<text> func2
+        func2:Add("UseMeanAsCenter()")
+        func2:Add("Set the useMeanAsCenter boolean to true. Default is false.") 
+        
+    
+        Array<text> func3
+        func3:Add("UseTrimmedMeanAsCenter()")
+        func3:Add("Set the useTrimmedMeanAsCenter boolean to true. Default is false.")
+
+        Array<text> func4
+        func4:Add("RepeatedMeasures()")
+        func4:Add("Set the repeatedMeasures boolean to true in an N-sample test. Default is false.")
+
+        Array<text> funcHeader
+        funcHeader:Add(AddTextBoldFront("Custom Functions", " "))        
+        funcHeader:Add(AddTextBoldFront("Purpose", " "))        
+
+
+        Array<text> funcRows
+        funcRows:Add(AddTableHeaderTag(funcHeader))     
+        funcRows:Add(AddTableDataTag(func1))
+        funcRows:Add(AddTableDataTag(func2))
+        funcRows:Add(AddTableDataTag(func3))
+        funcRows:Add(AddTableDataTag(func4))
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(funcRows), "Custom Functions for the Compare Group Class"))
+
+        bodyDiv:AddHeading("Check For Variance Equality - Different Subjects Per Group", 2)
+        bodyDiv:AddParagraph("The tests listed below are used for two or more independent groups in T-Tests and Anovas.")
+             
+        Array<text> varGroupT
+        varGroupT:Add("Levene's Homogeneity Of Variances Test")
+        varGroupT:Add("CompareIndependentVariances")
+        
+        Array<text> varGroupT2
+        varGroupT2:Add("Brown-Forsythe Homogeneity Of Variances Test")
+        varGroupT2:Add("CompareIndependentVariances") 
+
+        Array<text> varTest
+        varTest:Add(AddTextBoldFront("Formal Test", " "))        
+        varTest:Add(AddTextBoldFront("Action in CompareGroups Class", " ")) 
+
+        Array<text> varRow
+        varRow:Add(AddTableHeaderTag(varTest))      
+        varRow:Add(AddTableDataTag(varGroupT))
+        varRow:Add(AddTableDataTag(varGroupT2)) 
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(varRow), "Tests to Check Varaince Equality for Different Subjects"))
+
+        bodyDiv:AddHeading("Check if Groups Vary Using Mean", 3)
+        bodyDiv:AddHeading("Technical Test Name: Levene's Homogeneity of Variances Test", 4)
+        
+        Link link
+        link:AddText("Link to Wikipedia Page")
+        link:SetAddress("https://en.wikipedia.org/wiki/Levene%27s_test")
+        link:SetTarget(link:newTab)
+
+        bodyDiv:Add(link)
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("We use Levene's Homogeneity of Variances Test to determine if the groups vary in the same way by using the mean. Below is an example of the test implemented in Quorum.") 
+        bodyDiv:AddParagraph("It checks if the variances of two or more groups are the same or not. Let's say we want to compare the heights of students in two different classes. We measure the heights in the two classes and then calculate the mean. But, the spread of data, variance, 
+                              for each class might be different like one class could have a wider range of heights than the other class.")
+        bodyDiv:AddParagraph("Levene's Test checks if the variances are equal and if they are not, then it means one class might have more height differences than the other class.")
+        bodyDiv:AddParagraph("To do this test in Quorum, refer to the example below.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.CompareVariances
+
+DataFrame frame
+frame:LoadFromCommaSeparatedValue(" + dq + 
+"A,B, C
+8,6, 6
+9,7, 8
+6,8, 9
+6,9, 8
+6,10, 7"
++ dq + 
+")
+// get all the columns
+frame:AddSelectedColumnRange(0,2)
+// compare groups with mean
+CompareVariances compare = frame:CompareSelectedVariancesUsingMean()
+output compare:GetSummary()"))
+
+        
+        bodyDiv:AddParagraph("Below is what you should get in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A Levene's Test of Homogeneity with mean as center was conducted across 3 independent samples.
+Degrees Of Freedom Between Groups: 2.0
+Degrees Of Freedom Within Groups: 12.0
+Statistic (F): 0.416
+Probability: 0.669
+Effect Size (Eta-Squared): 0.065"))
+
+       bodyDiv:AddParagraph("If we change the last line output result:GetSummary() to output result:GetFormalSummary(),we can get another summary result.")
+       bodyDiv:Add(preformatter:GeneratePreformattedCode("A Levene's Test of Homogeneity with mean as center was conducted across 3 independent samples.
+There was not a statistically significant difference in the variances, F(2, 12) = 0.42, p = .669."))
+        
+
+        bodyDiv:AddHeading("Check if Groups Vary Using Median", 3)
+        
+        bodyDiv:AddHeading("Technical Test Name: Brown-Forsythe Homogeneity Of Variances Test" , 4)
+                       
+        Link link2
+        link2:AddText("Link to Wikipedia Page")
+        link2:SetAddress("https://en.wikipedia.org/wiki/Brown%E2%80%93Forsythe_test")
+        link2:SetTarget(link2:newTab)
+        bodyDiv:Add(link2)
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("A Brown-Forsythe Homogeneity Of Variances Test is used to determine if the groups vary in the same way by using the median or trimmed mean. It checks whether the variance or spread of two or more 
+                              groups of data is similar or not.")
+        bodyDiv:AddParagraph("Let's say you have two groups of students and you want to compare their test scores. Before you do that, you want to make sure that the spread of scores within each group is roughly the same.
+                              We can use this statistical test to check it.")
+                              
+        bodyDiv:AddParagraph("Below is an example of the test using the median in Quorum.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.CompareVariances
+
+DataFrame frame
+frame:LoadFromCommaSeparatedValue(" + dq + 
+"A,B, C
+8,6, 6
+9,7, 8
+6,8, 9
+6,9, 8
+6,10, 7"
++ dq + 
+")
+// Quorum uses the median as the center automatically
+frame:AddSelectedColumnRange(0,2)
+CompareVariances compare = frame:CompareSelectedVariances()
+output compare:GetSummary()"))
+        
+        bodyDiv:AddParagraph("Below is what you should get in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A Levene's Test of Homogeneity with median as center was conducted across 3 independent samples.
+Degrees Of Freedom Between Groups: 2.0
+Degrees Of Freedom Within Groups: 12.0
+Statistic (F): 0.176
+Probability: 0.84
+Effect Size (Eta-Squared): 0.029"))
+
+       bodyDiv:AddParagraph("If we change the last line output result:GetSummary() to output result:GetFormalSummary(),we can get another summary result.")
+       bodyDiv:Add(preformatter:GeneratePreformattedCode("A Levene's Test of Homogeneity with median as center was conducted across 3 independent samples.
+There was not a statistically significant difference in the variances, F(2, 12) = 0.18, p = .84."))
+        
+        bodyDiv:AddHeading("Check For Variance Sphericity - Same Subjects Per Group (Repeated Measurements)", 2)
+        bodyDiv:AddParagraph("The tests listed below are used for two or more dependent groups in Repeated Measures Anovas. ")
+             
+        Array<text> var2GroupT
+        var2GroupT:Add("Mauchly's Test Of Sphericity")
+        var2GroupT:Add("CompareDependentVariances")
+
+        Array<text> var2Test
+        var2Test:Add(AddTextBoldFront("Formal Test", " "))        
+        var2Test:Add(AddTextBoldFront("Action in CompareGroups Class", " ")) 
+
+        Array<text> var2Row
+        var2Row:Add(AddTableHeaderTag(var2Test))      
+        var2Row:Add(AddTableDataTag(var2GroupT))        
+
+        bodyDiv:AddParagraph(AddTableTag(AddRowTag(var2Row), "Tests to Check Varaince Sphericity for the Same Subjects"))
+
+        bodyDiv:AddHeading("Check if Groups Vary With Repeated Measures", 3)
+        bodyDiv:AddHeading("Technical Test Name: Mauchly's Test of Sphericity", 4)
+        
+        Link link3
+        link3:AddText("Link to Wikipedia Page")
+        link3:SetAddress("https://en.wikipedia.org/wiki/Mauchly%27s_sphericity_test")
+        link3:SetTarget(link3:newTab)
+
+        bodyDiv:Add(link3)
+        bodyDiv:AddText(".")
+
+        bodyDiv:AddParagraph("Mauchly's Test of Sphericity determines if the variances of the differences, or sphericity, are equal. Essentially, it checks if several groups vary in a similar way when they are repeated 
+                              measures or where something is tested more than once. ") 
+        bodyDiv:AddParagraph("It checks if a Repeated-Measures ANOVA is right to analyze this type of data. If the variances of differences are not equal, then a Repeated-Measures ANOVA might not be the best to analyze your 
+                              data. An example of how to conduct this test in Quorum is below.")        
+        bodyDiv:AddParagraph("To do this test in Quorum, refer to the example below.")
+
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.CompareVariances
+
+DataFrame frame
+frame:LoadFromCommaSeparatedValue(" + dq + 
+"A,B, C
+8,6, 6
+9,7, 8
+6,8, 9
+6,9, 8
+6,10, 7"
++ dq + 
+")
+// get all the columns
+frame:AddSelectedColumnRange(0,2)
+// compare groups with mean
+CompareVariances compare = frame:CompareSelectedVariancesUsingMean()
+output compare:GetSummary()"))
+
+        
+        bodyDiv:AddParagraph("Below is what you should get in the terminal after running the above code")
+        bodyDiv:AddHeading("Output: GetSummary()", 5)
+        bodyDiv:Add(preformatter:GeneratePreformattedCode("A Mauchly's Test of Sphericity was conducted across 3 dependent samples.
+Statistic (W): 0.0
+Statistic (Approximate χ2): 87.764
+Degrees Of Freedom: 2.0
+Probability: 0.0
+Greenhouse-Geisser Correction (ε): 0.726
+Huynh-Feldt Correction (ε): 1.033
+Lower-Bound Correction (ε): 0.5"))
+
+       bodyDiv:AddParagraph("If we change the last line output result:GetSummary() to output result:GetFormalSummary(),we can get another summary result.")
+       bodyDiv:Add(preformatter:GeneratePreformattedCode("A Mauchly's Test of Sphericity was conducted across 3 dependent samples.
+There was a statistically significant difference in the variances, χ2(2) = 87.76, p < .001."))
+          
+
+         // !!!!!! add the names and links to the pages for the test they respond to
+
+        WriteNextTutorial(bodyDiv)
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+              
+        
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to compare distributions on Quorum Language."
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "statistical tests, groups, data, statistical analysis, statitistical tests for visually impaired")
+        AddMetaData(keywords)
+    end
+
+    action GetSummaryName returns text
+        return "Compare Variances Statistical Tests"
+    end
+
+    action GetName returns text
+        return "Compare Variances"
+    end
+
+    action GetShortDescription returns text
+        return "how to compare the variances between groups"
+    end
+
+    action GetLocation returns text
+        return "tutorials/statstest/compareVariances.html"
+    end
+end
