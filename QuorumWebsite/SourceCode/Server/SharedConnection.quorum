@@ -1,0 +1,127 @@
+package Libraries.Database.Server
+use Libraries.System.Properties
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Containers.Iterator
+
+shared class SharedConnection
+    constant text MYSQL_NAME = "MYSQL_NAME"
+    constant text MYSQL_PORT = "MYSQL_PORT"
+    constant text MYSQL_PASSWORD = "MYSQL_PASSWORD"
+    constant text MYSQL_DATABASE = "MYSQL_DATABASE"
+    constant text MYSQL_USER = "MYSQL_USER"
+    constant text DOMAIN = "DOMAIN"
+    public constant number LOGIN_TIMEOUT_MINUTES = 10.0
+
+    public constant text COOKIE = "Cookie"
+    public constant text SESSION_ID = "sessionID"
+    //generic messages to not be too specific on client error/success
+    public constant text SUCCESS = "success"
+    public constant text FAILURE = "failure"
+
+    //table/column pairs now follow
+    public constant text USERS_TABLE = "users"
+    public constant text USERNAME = "username"
+    public constant text PASSWORD = "password"
+    public constant text TRIES = "tries"
+    public constant text LAST_ATTEMPTED_LOGIN = "last_attempted_login"
+
+    public constant text SESSIONS_TABLE = "sessions"
+    public constant text SESSION = "session"
+
+    text databaseName = ""
+    integer databasePort = -1
+    text databasePassword = ""
+    text databaseToSelect = ""
+    text databaseUser = ""
+    text domain = ""
+    Connection connection
+    Database database
+
+    on create
+        Load()
+    end
+
+    action Load
+        Properties prop
+        databaseName = prop:GetEnvironmentVariable(MYSQL_NAME)
+        databasePort = cast(integer, prop:GetEnvironmentVariable(MYSQL_PORT))
+        databasePassword = prop:GetEnvironmentVariable(MYSQL_PASSWORD)
+        databaseToSelect = prop:GetEnvironmentVariable(MYSQL_DATABASE)
+        databaseUser = prop:GetEnvironmentVariable(MYSQL_USER)
+        domain = prop:GetEnvironmentVariable(DOMAIN)
+
+        connection:SetLocation(databaseName)
+        connection:SetDatabase(databaseToSelect)
+        connection:SetUsername(databaseUser)
+        connection:SetPassword(databasePassword)
+        connection:SetPort(databasePort)
+    end
+
+    action GetConnection returns Connection
+        return connection
+    end
+
+    action GetDatabase returns Database
+        return database
+    end
+
+    action GetUserFromSession(text session) returns text
+        Connection connection = GetConnection()
+        Database database = GetDatabase()
+        database:Connect(connection)
+
+        //if the connection failed, show an error
+        if not database:IsConnected()
+            database:GetConnectionError()
+        end
+
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        QueryResult result = database:Find(SESSIONS_TABLE, SESSION + " = " + dq + session + dq)
+        if result = undefined
+            database:Close()
+            return undefined
+        end
+
+        boolean verified = false
+        text user = undefined
+        repeat while result:HasNext()
+            result:Next()
+            user = result:GetText(USERNAME)
+        end
+        database:Close()
+        return user
+    end
+
+    action GetUserFromCookie(NetworkExchange exchange) returns text
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+        List<text> cookie = headers:GetValue(COOKIE)
+        if cookie = undefined
+            return undefined
+        end
+        SharedConnection con
+        Cookie yummy
+        HashTable<text, text> cookies = yummy:ParseCookies(cookie)
+        if cookies = undefined or not cookies:HasKey(con:SESSION_ID)
+            return undefined
+        end
+         
+        text session = cookies:GetValue(con:SESSION_ID)
+        text user = GetUserFromSession(session)
+
+        if user = undefined //not logged in
+            return undefined
+        else
+            return user
+        end
+    end
+
+    action GetDomain returns text
+        return domain
+    end
+end

@@ -1,0 +1,129 @@
+
+use Libraries.Network.NetworkExchangeListener
+use Libraries.Network.WebServer
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.System.DateTime
+use Libraries.System.Properties
+use Libraries.Containers.Iterator
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.DatabaseMetaData
+use Libraries.Data.Database.DatabaseTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.QueryMetaData
+use Libraries.Network.SocketConnection
+use Libraries.Database.Server.Login
+use Libraries.Database.Server.Logout
+use Libraries.Database.Server.SessionValid
+use Libraries.Database.Server.ChangePrivacy
+use Libraries.Database.Server.Search
+use Libraries.Database.Server.ProjectSave
+use Libraries.Database.Server.LoadProjectFile
+use Libraries.Database.Server.LoadProjectSelect
+use Libraries.Database.Server.Register
+use Libraries.Database.Server.RequestPasswordReset
+use Libraries.Database.Server.ConfirmResetPassword
+use Libraries.Database.Server.Fastrun
+use Libraries.Database.Server.ResponsePage
+
+class DatabaseServer is NetworkExchangeListener
+    integer port = 9746
+    HashTable<text, NetworkExchangeListener> responders
+    action Main
+        SetupPages()
+        StartServer()
+    end
+
+    action SetupPages
+        Login login
+        Logout logout
+        Analytics analytics
+        SessionValid session
+        ChangePrivacy changePrivacy
+        Search search
+        ProjectSave projectSave
+        LoadProjectFile loadProjectFile
+        LoadProjectSelect loadProjectSelect
+        Profile profile
+        Project project
+        Register register
+        RequestPasswordReset requestReset
+        ResetPasswordResponsePage resetPassword
+        ConfirmResetPassword confirmPassword
+        Fastrun fastrun
+
+        Add(login)
+        Add(logout)
+        Add(analytics)
+        Add(session)
+        Add(changePrivacy)
+        Add(search)
+        Add(projectSave)
+        Add(loadProjectFile)
+        Add(loadProjectSelect)
+        Add(profile)
+        Add(project)
+        Add(register)
+        Add(requestReset)
+        Add(resetPassword)
+        Add(confirmPassword)
+        Add(fastrun)
+    end
+
+    private action Add(ResponsePage page)
+        responders:Add(page:GetPath(), page)
+    end
+
+    /*
+        This is probably wrong. I suspect the add function is supposed to do what the hash table
+        is doing, but I'm experimenting
+    */
+    action StartServer
+        WebServer server
+        server:Create(port)
+        server:Add("/", me)
+        output "Listening ..."
+        server:Start()
+    end
+
+    action ResponseReceived(NetworkExchange exchange)
+        DateTime time
+        number start = time:GetEpochTime()
+        text response = ""
+        text path = exchange:GetPath()
+        
+        check
+            NetworkExchangeListener responder = responders:GetValue(path)
+            if responder not= undefined
+                responder:ResponseReceived(exchange)
+            else 
+                response = "Could not find web page"
+                exchange:SendResponseHeaders(404, response)
+                exchange:SendResponse(response)
+            end
+
+            number stop = time:GetEpochTime()
+            output exchange:GetPath() + ": " + exchange:GetHost() + ": " + time:GetYear() + "-" + time:GetMonth() + "-" + time:GetDayOfMonth() + " " +
+                time:GetHour() + ":" + time:GetMinute() + ":" + time:GetSecond() + ", " + (stop - start)
+            output "END"
+            output ""
+        detect e
+            output "------------ ERROR ------------"
+            output "Path: " + path 
+            output "Stack Trace"
+            output e:GetStackTraceMessage()
+            output ""
+            output "Status"
+            output exchange:GetPath() + ": " + exchange:GetHost() + ": " + time:GetYear() + "-" + time:GetMonth() + "-" + time:GetDayOfMonth() + " " +
+                time:GetHour() + ":" + time:GetMinute() + ":" + time:GetSecond()
+            output "------------ ERROR ------------"
+            response = "The server encountered a fatal error and could not fulfill the request"
+            exchange:SendResponseHeaders(500, response)
+            exchange:SendResponse(response)
+        end        
+    end
+end

@@ -1,0 +1,380 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.StrongText
+use Libraries.Web.Page.HeaderLink
+use Libraries.Web.Page.WebPageHeader
+use Libraries.Web.Page.MainContent
+use Libraries.Containers.Array
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.WebTable
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TableData
+use Libraries.Web.Page.Input
+use Libraries.Web.Page.Form
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.System.DateTime
+
+
+class ProfilePage is WebPage
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text scriptsLocation = "/script/"
+
+    /*
+        This page can't connect to the database so the response page will get the projects
+        and pass the projects as a DataFrame so the page can generate correctly.
+    */
+    DataFrame projectTable = undefined
+    text username = ""
+
+    action SetProjects(DataFrame table)
+        me:projectTable = table
+    end
+
+    action SetUsername(text username)
+        me:username = username
+    end
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Quorum Lessons - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("My Projects", 1)
+        headDiv:AddText("On this page you can create, edit, share, and delete projects.")
+        Add(headDiv)
+
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        // add table
+        Division projectTable
+        projectTable:SetClassAttribute("projectTable")
+        projectTable:Add(GetProjectTable())
+        bodyDiv:Add(projectTable)
+
+        Script checkboxScript
+        checkboxScript:SetCode("$('.publicCheckbox').change(function() {
+var public = this.checked ? 1 : 0;
+var value = this.value;
+    $.ajax({
+        type: 'POST',
+        url: '/ChangePrivacy.quorum',
+        data: {public: public, file: value},
+        success: function (result) {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('I could not connect to the server at quorumlanguage.com: ' + thrownError);
+        }
+    });
+});")
+
+        bodyDiv:Add(checkboxScript)
+        // new project button
+        Division buttonDiv
+        Form newProjectButton
+        newProjectButton:SetFormAction("Project.quorum")
+        Input submit
+        submit:SetType("submit")
+        submit:SetClassAttribute("newProjectButton")
+        submit:SetDefaultValue("Create a New Project")
+        newProjectButton:Add(submit)
+        buttonDiv:Add(newProjectButton)
+        bodyDiv:Add(buttonDiv)
+
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetName returns text
+        return "Profile"
+    end
+
+    action GetShortDescription returns text
+        return "Profile"
+    end
+
+    action GetProjectTable returns WebTable
+        WebTable table
+
+        // make header row
+        TableRow headerRow
+        TableHeaderCell nameHeader
+        TableHeaderCell dateHeader
+        TableHeaderCell publicHeader
+        TableHeaderCell loadHeader
+        TableHeaderCell shareHeader
+        TableHeaderCell deleteHeader
+
+        nameHeader:AddText("Project Name")
+        dateHeader:AddText("Last Modified")
+        publicHeader:AddText("Public")
+        loadHeader:AddText("Load")
+        shareHeader:AddText("Share")
+        deleteHeader:AddText("Delete")
+
+        headerRow:Add(nameHeader)
+        headerRow:Add(dateHeader)
+        headerRow:Add(publicHeader)
+        headerRow:Add(loadHeader)
+        headerRow:Add(shareHeader)
+        headerRow:Add(deleteHeader)
+        table:Add(headerRow)
+
+        DataFrameColumn projectNames = projectTable:GetColumn("project_name")
+        DataFrameColumn modifiedDates = projectTable:GetColumn("modified")
+        DataFrameColumn publicList = projectTable:GetColumn("public")
+        integer i = 0
+        
+        repeat while i < projectNames:GetSize()
+            projectName = projectNames:GetAsText(i)
+            text modified = modifiedDates:GetAsText(i)
+            check
+                DateTime modifiedDate = modifiedDates:GetAsDateTime(i)
+                modified = modifiedDate:GetMonthName()+" "+ modifiedDate:GetDayOfMonth()+", "+modifiedDate:GetYear()
+            detect e
+
+            end
+            isPublic = publicList:GetAsText(i)
+
+            boolean checked = (isPublic = "1")
+            text shareLink = "quorumlanguage.com/Project.quorum?user=" + SanitizeForHTML(username) + "&file=" + SanitizeForHTML(projectName)
+
+            TableRow row
+            TableData nameCell
+            TableData dateCell
+            TableData checkboxCell
+            TableData projectCell
+            TableData shareCell
+            TableData deleteCell
+
+            // projectName
+            nameCell:AddText(projectName)
+            // lastModified
+            dateCell:AddText(modified)
+            // public checkbox
+            checkboxCell:SetClassAttribute("centeredRow")
+            Input checkbox
+            checkbox:SetClassAttribute("publicCheckbox")
+            checkbox:SetType("checkbox")
+            checkbox:SetChecked(checked)
+            checkbox:SetIdentifier("publicBox"+i)
+            checkbox:SetName("public")
+            checkbox:SetDefaultValue(SanitizeForHTML(projectName))
+            checkboxCell:Add(checkbox)
+            // load
+            Form loadButton
+            loadButton:SetFormAction("Project.quorum")
+            Input userInput
+            userInput:SetType("hidden")
+            userInput:SetName("user")
+            userInput:SetDefaultValue(SanitizeForHTML(username))
+            Input fileInput
+            fileInput:SetType("hidden")
+            fileInput:SetName("file")
+            fileInput:SetDefaultValue(SanitizeForHTML(projectName))
+            Input profileButton
+            profileButton:SetClassAttribute("profileButton")
+            profileButton:SetType("submit")
+            profileButton:SetDefaultValue("Load")
+            loadButton:Add(userInput)
+            loadButton:Add(fileInput)
+            loadButton:Add(profileButton)
+            projectCell:Add(loadButton)
+            // share
+            Button shareButton
+            shareButton:SetClassAttribute("profileButton")
+            shareButton:SetOnClick("showShareModal('"+shareLink+"')")
+            shareButton:AddText("Share")
+            shareCell:Add(shareButton)
+            // delete
+            
+            Button deleteButton
+            deleteButton:SetClassAttribute("profileButton")
+            deleteButton:AddAttribute("value", SanitizeForHTML(projectName))
+            deleteButton:SetOnClick("deleteRow(this)")
+            deleteButton:AddText("Delete")
+            deleteCell:Add(deleteButton)
+
+            row:Add(nameCell)
+            row:Add(dateCell)
+            row:Add(checkboxCell)
+            row:Add(projectCell)
+            row:Add(shareCell)
+            row:Add(deleteCell)
+            table:Add(row)
+            i = i + 1
+        end
+        return table
+    end
+
+    action SanitizeForHTML(text string) returns text
+        string = string:Replace("&", "&amp;")
+        string = string:Replace(dq, "&quot;")
+        string = string:Replace("'", "&#039;")
+        string = string:Replace("<", "&lt;")
+        string = string:Replace(">", "&gt;")
+        return string
+    end
+
+    action AddDefaultHeaders
+        //add language headers
+        me:AddAttribute("xml:lang", "en")
+        me:SetLanguage("en")
+
+        //add the meta-data character set
+        MetaData charset
+        charset:SetCharacterSet("UTF-8")
+        AddMetaData(charset)
+
+        MetaData viewport
+        viewport:SetContent("width=device-width, initial-scale=1")
+        viewport:SetName("viewport")
+        AddMetaData(viewport)
+
+        text metaDescriptionContent = GetMetaDescription()
+        if metaDescriptionContent not= undefined
+            MetaData description
+            description:SetContent(metaDescriptionContent)
+            description:SetName("description")
+            AddMetaData(description)
+        end
+
+        // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        AddKeywords()
+        AddScript("/script/jquery-1.8.3.min.js")
+        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+        AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
+        Script moduleLocateFile
+        moduleLocateFile:SetCode("        var Module = {
+            locateFile: function(path, prefix) {
+                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
+                return prefix + path;
+            }
+        };")
+        GetWebPageHeader():Add(moduleLocateFile)
+        AddScript("/script/load.js" + versions:GetLoadVersionQuery())
+
+        //add style sheet tags
+        AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
+        AddStylesheet("/style/style.css")
+        AddStylesheet("/style/google.css")
+        AddIcon("/media/favicon.ico")
+
+        //Add Responsive Stylesheets
+        WebPageHeader webHeader = me:GetWebPageHeader()
+        webHeader:Add(GetMediaStyleSheet("/style/style-small.css" + versions:GetCSSVersionQuery(), "(max-width: 500px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css" + versions:GetCSSVersionQuery(), "(min-width: 501px) and (max-width: 1000px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-large.css" + versions:GetCSSVersionQuery(), "(min-width: 1001px)"))
+
+        //Add the navigation bar
+        NavigationBar navigation
+        // add share modal here
+        Division shareDiv
+
+        shareDiv:SetClassAttribute("modal")
+        shareDiv:SetIdentifier("shareModal")
+        shareDiv:AddAttribute("role", "dialog")
+        shareDiv:AddAttribute("aria-labelledby", "shareTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division shareTitleDiv
+        shareTitleDiv:SetClassAttribute("sharetitle")
+        shareTitleDiv:SetIdentifier("shareTitleDiv")
+        shareTitleDiv:AddText("Share my Project")
+        modalDialog:Add(shareTitleDiv)
+
+        Division contentDiv
+        contentDiv:SetIdentifier("shareContent")
+        contentDiv:SetClassAttribute("sharecontent")
+
+        Input shareText
+        shareText:SetIdentifier("shareText")
+        shareText:SetType("text")
+        shareText:SetDefaultValue("Name")
+        shareText:SetClassAttribute("sharetext")
+        shareText:SetReadOnly(true)
+        contentDiv:Add(shareText)
+
+        Paragraph publicMessage
+        publicMessage:SetClassAttribute("sharePublicMessage")
+        publicMessage:AddText("This link goes to your project. If the project is private, no one will be able to look at the project except you.
+        If you want to share it with others, the project must be public.")
+        contentDiv:Add(publicMessage)
+
+        Paragraph copyMessage
+        copyMessage:SetClassAttribute("sharePublicMessage")
+        copyMessage:SetIdentifier("clipboardCopyMessage")
+        copyMessage:SetStyle("display: none;")
+        copyMessage:AddText("The link has been copied to your clipboard.")
+        contentDiv:Add(copyMessage)
+
+        modalDialog:Add(contentDiv)
+
+        Button hideButton
+        hideButton:SetTabIndex("0")
+        hideButton:SetOnClick("hideShareModal()")
+        hideButton:SetClassAttribute("sharebutton")
+        hideButton:SetType("button")
+        hideButton:AddText("Close")
+        modalDialog:Add(hideButton)
+
+        shareDiv:Add(modalDialog)
+        navigation:Add(shareDiv)
+        Add(navigation)
+    end
+
+    action AdjustMain(MainContent mainRegion)
+        mainRegion:AddAttribute("role","main")
+        mainRegion:SetIdentifier("main")
+        mainRegion:SetTabIndex("-1")
+    end
+
+    action GetMediaStyleSheet(text name, text media) returns HeaderLink
+        HeaderLink link
+        link:SetAddress(name)
+        link:SetType("text/css")
+        link:SetRelationship("stylesheet")
+        link:SetMedia(media)
+        return link
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, game programming, 
+        lego programming, computer courses, programming 3D, programming,
+        animation, graphics, multimedia, games, accessibility, computer science for all,
+        computer science, computer languages, Quorum programming language, robot programming,
+        online programming")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Create, edit, share, and delete projects."
+    end
+
+end

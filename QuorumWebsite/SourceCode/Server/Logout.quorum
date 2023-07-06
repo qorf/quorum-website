@@ -1,0 +1,48 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.System.DateTime
+
+class Logout is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        SharedConnection con
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+        List<text> cookieList = headers:GetValue(con:COOKIE)
+        if cookieList = undefined
+            Failure(exchange)
+            return now
+        end
+        Cookie yummy
+        HashTable<text, text> cookies = yummy:ParseCookies(cookieList)
+        if cookies = undefined or not cookies:HasKey(con:SESSION_ID)
+            Failure(exchange)
+            return now
+        end
+
+        text session = cookies:GetValue(con:SESSION_ID)
+        Cookie cookie
+        cookie:SetName(con:SESSION_ID)
+        cookie:SetValue("deleted")
+        cookie:SetHttpOnly(true)
+        cookie:SetSecure(true)
+        cookie:SetDomain(con:GetDomain())
+        DateTime time
+        time:SubtractHours(1)
+        cookie:SetMaxAge(0)
+        cookie:SetExpires(time)
+        cookie:SetPath("/")
+        cookie:AddToHeader(headers)
+
+        exchange:SetResponseHeaders(headers)
+
+        response = con:SUCCESS
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action GetPath returns text
+        return "/Logout.quorum"
+    end
+end

@@ -23,6 +23,93 @@ class ReleaseNotes is Lesson
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
 
+    action QuorumStudio4_6Notes(Division bodyDiv)
+        bodyDiv:AddHeading("Quorum Studio 4.6 and Quorum 10.6: January 9th, 2023", 1)
+        bodyDiv:AddParagraph("We have created a small maintenance release for Quorum Studio. This release was made because in Quorum 10.5, there was a change to the way shaders and batching worked in the graphics engine, which was causing several interface components to render a bit funny. We like funny as much as the next folk, but this was not intended. While working on those systems, we noticed a number of performance and memory issues that we have now fixed. In internal testing, the performance improvements compared to Quorum 4.0.3 are quite substantial. Notes follow:")
+        OrderedList list1
+        list1:AddListItem("Fixed an issue with checkboxes and radio boxes in terms of rendering, which was causing them to look visually like they were not responding. Accessibility was not impacted and they still worked under the hood.")
+        list1:AddListItem("Fixed several small graphical and unmemorable glitches in Quorum Studio. We say unmemorable because we cannot really remember what they were, but they annoyed us so we fixed them.")
+        list1:AddListItem("Significantly reduced the memory footprint of the Matrix class. The difference is quite large. In internal testing, it is in the ballpark of a 90% reduction, although the actual number depends on the size of the matrix.")
+        list1:AddListItem("Removed instantiating Object from the multiple inheritance architecture, rewriting the semantics of what it means in Quorum. Assuming we did not make a mistake, users will not observe any difference in how they use the language, however the memory footprint of Quorum has been significantly reduced because of this change. In Quorum Studio, for example, we are clocking a reduction of about 150 million unneeded objects no longer being created. The objects were small in size, but there were a lot of them, which means that in our internal tests, the memory footprint dropped by about 5%. Other tests, like charts, were more dramatic, with nearly a 35% reduction achievable only by recompiling the same program.")
+        list1:AddListItem("Because of the change to the multiple inheritance system, Quorum throws away less useless objects and no longer has to create them, reducing garbage collection. In internal tests, we are noticing about a 25% reduction in the amount of memory reported by the operating system after bootup")
+        list1:AddListItem("Completed the multiple inheritance change in JavaScript mode as well. This shrinks the overall rather large uncompressed standard library file by about 1.5%, due to cutting out a series of operations that were no longer needed in this version. The memory optimization impact was not carefully evaluated, but it should have theoretically similar impacts to bytecode modes.")
+        list1:AddListItem("On ARM processors for Mac, after all of the optimizations and comparing the Intel version of 4.0.3 to ARM, we are noticing a 57% decrease in bootup time and a 9% drop in CPU usage. ")
+        list1:AddListItem("Significantly reduced memory consumption of scatter plots. While it depends on what you pass, in our test, which used an approximately 1200 x 15 sized data frame, this reduced memory consumption by 88.5% and dramatically sped up rendering and loading speeds. While this is nice in general, it also improves screen reader accessibility speed significantly.")
+        list1:AddListItem("Because of the inheritance changes, Quorum Studio 4.6 is not binary compatible with previous versions. We have added a double bootstrapping function to Quorum to auto-build Quorum Studio using both an overridden standard library and a source compiler. We recognize this is barely English, but are really just saying that we added some code to make it easier to make breaking changes to the backend compiler in the future and to integrate those automatically in Quorum Studio for usage in our tests.")
+        list1:AddListItem("Replaced the table implementation in matrix with the newer DataFrame class behind the scenes")
+        list1:AddListItem("Added a VectorColumn for more optimized numerical operations in DataFrames. This removes auto-boxing inside of a frame, which means if this column is used, no undefined values can be allowed. It is a speed trade-off and optional")
+        list1:AddListItem("Added an optimization to the Comparison class for default primitive sorting")
+        list1:AddListItem("Added support for Comparisons inside of the Vector class")
+        list1:AddListItem("Fixed a memory leak in ShaderProgram causing a considerable number of Text objects to be auto-boxed accidentally")
+        list1:AddListItem("Changed the Item and Control classes to not instantiate all of its arrays by default, which saves memory")
+        list1:AddListItem("By default, the Regression class no longer retains matrices related to the computations it made. This passes all of our internal unit tests and on code inspection, seems ok. The purpose is to reduce memory consumption after the regression is done calculating and this is significant for large files. That said, if for some reason we cannot think of, a user needs that object retained after computation, a flag may be needed to support it, even if the default is to destroy it.")
+        list1:AddListItem("Fixed a bug with ChartComparison where it was creating and throwing away extra objects")
+        list1:AddListItem("Lowered the default number of vertices used in the Polygon class, as it was not using the vertices for the common case. ")
+        list1:AddListItem("Fixed a bug in Polygon that was creating an extra vector that was being thrown away.")
+        list1:AddListItem("Fixed a bug where HTML reserved characters were not properly handled when processing SVG images.")
+        list1:AddListItem("Fixed an issue where if you were on an ARM chip on Mac, the updater would grab the Intel based version of Quorum Studio. Users need to re-download from the website to fix this, but it should be easier to update from here on")
+        list1:AddListItem("Migrated file downloads to github releases. We will be using this system from here forward to reduce server load and just generally more conventional.")
+        list1:AddListItem("Removed the final PHP file from the server backend. Quorum now uses only Quorum for hosting Quorum on the Quorum server. ")
+        list1:AddListItem("Fixed a bug in Quorum Studio where in the code completion, if you had an empty set returned, it would be too aggressive on showing you an empty window")
+        list1:AddListItem("Changed the auto-update scripts to account for the change to github")
+        list1:AddListItem("Fixed a bug in text fields where double click was not working")
+        list1:AddListItem("Fixed a view in text fields where the view was not correctly updating visually with the cursor in some situations")
+        list1:AddListItem("Fixed a bug in text fields where triple click was not working")
+        bodyDiv:Add(list1)
+    end
+
+    action QuorumStudio4_5Notes(Division bodyDiv)
+        bodyDiv:AddHeading("Quorum Studio 4.5 and Quorum 10.5: December 7th, 2022", 1)
+        bodyDiv:AddParagraph("Quorum Studio 4.5 is the next major version of Quorum Studio and contains a series of enhancements and changes. As our current focus is on especially our move toward adding accessible blocks to the language, in addition to accessible data science, this is an intermediary release along that path. This is also the first release to officially support the M1 mac, as we slowly move toward improving our Mac support. For this first release supporting this chip, those on M1 chips need a separate download on the website and should not use the auto-updater. ")
+
+        bodyDiv:AddHeading("Accessible Data Science", 2)
+        bodyDiv:AddParagraph("We have added support for a considerable number of statistical tests and procedures, along with many bug fixes. We did a considerable amount of refactoring along the way, which means we should be ready by next summer to have users try the statistical aspects of the system")
+
+        OrderedList list1
+        list1:AddListItem("Fixed a host of issues related to charts across the board")
+        list1:AddListItem("Added support for a variety of parametric tests, including repeated measures anova, sphericity tests, chi-squared, shapiro-wilk, and others")
+        list1:AddListItem("Added support for a variety of non-parametric tests, including Mann-Whitney, Kruskal-Wallis, Friedman, and others")
+        list1:AddListItem("Adjusted, improved, and implemented various corrections, like Bonferroni, Tukey, Huynh-Feldt, Games-Howell,and Greenhouse-Geisser")
+        list1:AddListItem("Added a set of convenience actions related to obtaining the results of statistical tests")
+        list1:AddListItem("Added convenience actions for various kinds of statistical actions, like obtaining correlation matrices")
+        list1:AddListItem("Added a helper action for generating scree plots for factor analysis")
+        list1:AddListItem("Added a set of tests for factor analysis, including Bartlett, Kaiser-Meyer-Olkin, and others")
+        list1:AddListItem("Adjusted and improved Accessibility across many chart types")
+        list1:AddListItem("Added a feature for live captioning of charts as you navigate them")
+        list1:AddListItem("Fixed many bugs related to statistical actions, which now have much more rigorous testing related to what they output")
+        bodyDiv:Add(list1)
+
+        bodyDiv:AddHeading("Planning for Accessible Blocks", 2)
+        bodyDiv:AddParagraph("The Quorum team is targeting adding a block mode to Quorum online and Quorum Studio by approximately Quorum Studio 5 and Quorum 11. Along the way, we have been developing a custom accessible rendering pipeline related to such systems and this includes at least the following features:")
+        OrderedList list2
+        list2:AddListItem("Expanded the shader system to account for the design of blocks. This way, you do not need images or SVGs for rendering and it can be done in hardware. ")
+        list2:AddListItem("Created a hardware batched rendering system generally, with especially an eye out for blocks. This significantly improves performance for graphics across many systems, but is especially useful for charts and blocks. User interfaces do not yet take advantage of this approach, but may also benefit in the future from it")
+        list2:AddListItem("Migrated the code for the scene editing system from Quorum Studio to the Quorum Standard Library. The purpose in this was to have accessible scene editing offline and online, available both inside and outside of Quorum Studio. We hope this technology could make it possible for curriculum like Computer Science Discovery to be fully accessible")
+        list2:AddListItem("Integrated a number of fixes to Quorum's shaders, including those impacting Pie Charts on Android")
+        bodyDiv:Add(list2)
+
+        bodyDiv:AddHeading("Database and Web Services", 2)
+        bodyDiv:AddParagraph("The Quorum Database library has been a work in progress since publishing our paper on polyglot programming. We are now feature complete with this work and are pushing the system live across our stack. Finishing this system has significantly improved the ability of Quorum to be used in a common docker container for backend web services.  Now that it is finally going live, the most current features include:")
+        OrderedList list3
+        list3:AddListItem("We implemented a series of minor bug fixes in the database system. ")
+        list3:AddListItem("Pushed the database stack live and replaced any database related code with Quorum")
+        list3:AddListItem("Added a series of web service libraries necessary for server side scripting in Quorum")
+        list3:AddListItem("Replaced the Quorum live server's PHP system with Quorum, with the exception of the download page, which we didn't bother with this release")
+        list3:AddListItem("We have added a considerable amount of documentation for the database system onto the Quorum reference page")
+        list3:AddListItem("Because PHP has been replaced with Quorum, Quorum's live server can now service compilation requests an order of magnitude faster than before")
+        list3:AddListItem("Added a way to send raw network requests from TCP in the SocketConnection class in Quorum")
+        bodyDiv:Add(list3)
+
+        bodyDiv:AddHeading("General Features", 2)
+        bodyDiv:AddParagraph("We made a number of improvements to the system broadly. Big picture, these included:")
+        OrderedList list4
+        list4:AddListItem("Added support on mac for the M1 processor to Quorum-language and integrated it additionally into Quorum Studio. This significantly improves speed on this platform. Machines on Intel based chips are still supported")
+        list4:AddListItem("Rewrote the native libraries on Mac to considerably clean it up for future development")
+        list4:AddListItem("Added preliminary support for the Talkback screen reader on Android. This is a preliminary proof of concept release targeting charts and is not yet feature complete. It is, however, a start and now that we have successfully tapped in, it can be adjusted over time if there is interest from the community")
+        list4:AddListItem("Fixed a number of minor issues in the Quorum compiler")
+        bodyDiv:Add(list4)
+    end
+
     action QuorumStudio4_0Notes(Division bodyDiv)
         bodyDiv:AddHeading("Quorum Studio 4.0 and Quorum 10.0: June 15th, 2022", 1)
         bodyDiv:AddParagraph("Quorum 10.0 and Quorum Studio 4.0 is the 2022 release for the programming language and corresponding development environment. We focused considerably for 10.0 on improvements to the language in regard to making it better for data science. This includes significant improvements to charts, many data science actions, and the database system. Besides this, Quorum 10 includes a significant change to the look and feel of any user interfaces built into the system, including Quorum Studio. There are many new colors across everything and are swappable as light or dark modes. As always, we have continued to tweak and improve accessibility. With this release, we focused on getting the ground work in place for a future Quorum Blocks mode, which involved a great deal of refactoring behind the scenes.")
@@ -793,6 +880,8 @@ class ReleaseNotes is Lesson
         Division bodyDiv
         bodyDiv:SetClassAttribute("bodyContainer")
 
+        QuorumStudio4_6Notes(bodyDiv)
+        QuorumStudio4_5Notes(bodyDiv)
         QuorumStudio4_0Notes(bodyDiv)
         QuorumStudio3_5Notes(bodyDiv)
         QuorumStudio3_0_1Notes(bodyDiv)

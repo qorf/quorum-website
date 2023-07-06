@@ -1,0 +1,77 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+
+
+class LoadProjectFile is ResponsePage
+
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+
+        text username = con:GetUserFromCookie(exchange)
+        if username = undefined or username = ""
+            Failure(exchange, "User not logged in")
+            return now
+        end
+        text projectName = ""
+        if params:HasKey("project_name")
+        and params:HasKey("shared")
+            projectName = params:GetValue("project_name")
+        else
+            output "key was missing"
+            Failure(exchange)
+            return now
+        end
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        Find projectIDQuery
+        projectIDQuery:SetTable("projects")
+        projectIDQuery:AddColumn("id")
+        projectIDQuery:Filter("username = "+dq+username+dq+" and project_name ="+dq+projectName+dq+" and deleted = false")
+        projectIDQuery:AddSort("modified", false)
+        QueryResult result = database:Find(projectIDQuery)
+
+        // NOTE
+        // will need to be adjust for multiple files later
+        repeat while result:HasNext()
+            result:Next()
+            Find hashFind
+            hashFind:SetTable("project_files")
+            hashFind:AddColumn("hash")
+            hashFind:Filter("id = "+result:GetInteger("id")+" and deleted = false")
+
+            Find codeFind
+            codeFind:SetTable("files")
+            codeFind:AddColumn("code")
+            codeFind:AddSubquery("hashQuery", hashFind)
+            codeFind:Filter("hash = hashQuery")
+            QueryResult codeResult = database:Find(codeFind)
+            // assume only one file will be found for now
+            if codeResult:HasNext()
+                codeResult:Next()
+                response = codeResult:GetText(0)
+                exchange:SendResponseHeaders(200, response)
+                exchange:SendResponse(response)
+                database:Close()
+                return now
+            end
+        end
+        database:Close()
+        Failure(exchange, "Could not find project")
+    end
+
+    action GetPath returns text
+        return "/LoadProjectFile.quorum"
+    end
+end

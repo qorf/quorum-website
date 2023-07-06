@@ -1,0 +1,221 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.StrongText
+use Libraries.Web.Page.HeaderLink
+use Libraries.Web.Page.WebPageHeader
+use Libraries.Web.Page.MainContent
+use Libraries.Containers.Array
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.WebTable
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TableData
+use Libraries.Web.Page.Input
+use Libraries.Web.Page.Form
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.System.DateTime
+
+
+class AnalyticsPage is WebPage
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text scriptsLocation = "/script/"
+
+    DownloadCounter counter = undefined
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Quorum Lessons - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:AddHeading("Analytics", 1)
+//        headDiv:AddText("")
+        Add(headDiv)
+
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        Division bodyDiv
+        bodyDiv:SetClassAttribute("bodyContainer")
+
+        // This will be called by the server when pinged to make the page
+        //  counter:RequestReleaseInfo()
+        bodyDiv:AddParagraph("Number of Releases: " + counter:GetNumberOfReleases())
+        bodyDiv:AddParagraph( "Latest Release: " + counter:GetLatestReleaseName())
+        bodyDiv:AddParagraph( "Mac ARM downloads: " + counter:GetArmCount())
+        bodyDiv:AddParagraph( "Mac Intel downloads: " + counter:GetIntelCount())
+        bodyDiv:AddParagraph( "Windows downloads: " + counter:GetWindowsCount())
+
+        mainRegion:Add(bodyDiv)
+        Add(mainRegion)
+        PageFooter footer
+        Add(footer)
+    end
+
+    action GetName returns text
+        return "Profile"
+    end
+
+    action GetShortDescription returns text
+        return "Profile"
+    end
+
+    action AddDefaultHeaders
+        //add language headers
+        me:AddAttribute("xml:lang", "en")
+        me:SetLanguage("en")
+
+        //add the meta-data character set
+        MetaData charset
+        charset:SetCharacterSet("UTF-8")
+        AddMetaData(charset)
+
+        MetaData viewport
+        viewport:SetContent("width=device-width, initial-scale=1")
+        viewport:SetName("viewport")
+        AddMetaData(viewport)
+
+        text metaDescriptionContent = GetMetaDescription()
+        if metaDescriptionContent not= undefined
+            MetaData description
+            description:SetContent(metaDescriptionContent)
+            description:SetName("description")
+            AddMetaData(description)
+        end
+
+        // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        AddKeywords()
+        AddScript("/script/jquery-1.8.3.min.js")
+        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+        AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
+        Script moduleLocateFile
+        moduleLocateFile:SetCode("        var Module = {
+            locateFile: function(path, prefix) {
+                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
+                return prefix + path;
+            }
+        };")
+        GetWebPageHeader():Add(moduleLocateFile)
+        AddScript("/script/load.js" + versions:GetLoadVersionQuery())
+
+        //add style sheet tags
+        AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
+        AddStylesheet("/style/style.css")
+        AddStylesheet("/style/google.css")
+        AddIcon("/media/favicon.ico")
+
+        //Add Responsive Stylesheets
+        WebPageHeader webHeader = me:GetWebPageHeader()
+        webHeader:Add(GetMediaStyleSheet("/style/style-small.css" + versions:GetCSSVersionQuery(), "(max-width: 500px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css" + versions:GetCSSVersionQuery(), "(min-width: 501px) and (max-width: 1000px)"))
+        webHeader:Add(GetMediaStyleSheet("/style/style-large.css" + versions:GetCSSVersionQuery(), "(min-width: 1001px)"))
+
+        //Add the navigation bar
+        NavigationBar navigation
+        // add share modal here
+        Division shareDiv
+
+        shareDiv:SetClassAttribute("modal")
+        shareDiv:SetIdentifier("shareModal")
+        shareDiv:AddAttribute("role", "dialog")
+        shareDiv:AddAttribute("aria-labelledby", "shareTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division shareTitleDiv
+        shareTitleDiv:SetClassAttribute("sharetitle")
+        shareTitleDiv:SetIdentifier("shareTitleDiv")
+        shareTitleDiv:AddText("Share my Project")
+        modalDialog:Add(shareTitleDiv)
+
+        Division contentDiv
+        contentDiv:SetIdentifier("shareContent")
+        contentDiv:SetClassAttribute("sharecontent")
+
+        Input shareText
+        shareText:SetIdentifier("shareText")
+        shareText:SetType("text")
+        shareText:SetDefaultValue("Name")
+        shareText:SetClassAttribute("sharetext")
+        shareText:SetReadOnly(true)
+        contentDiv:Add(shareText)
+
+        Paragraph publicMessage
+        publicMessage:SetClassAttribute("sharePublicMessage")
+        publicMessage:AddText("This link goes to your project. If the project is private, no one will be able to look at the project except you.
+        If you want to share it with others, the project must be public.")
+        contentDiv:Add(publicMessage)
+
+        Paragraph copyMessage
+        copyMessage:SetClassAttribute("sharePublicMessage")
+        copyMessage:SetIdentifier("clipboardCopyMessage")
+        copyMessage:SetStyle("display: none;")
+        copyMessage:AddText("The link has been copied to your clipboard.")
+        contentDiv:Add(copyMessage)
+
+        modalDialog:Add(contentDiv)
+
+        Button hideButton
+        hideButton:SetTabIndex("0")
+        hideButton:SetOnClick("hideShareModal()")
+        hideButton:SetClassAttribute("sharebutton")
+        hideButton:SetType("button")
+        hideButton:AddText("Close")
+        modalDialog:Add(hideButton)
+
+        shareDiv:Add(modalDialog)
+        navigation:Add(shareDiv)
+        Add(navigation)
+    end
+
+    action AdjustMain(MainContent mainRegion)
+        mainRegion:AddAttribute("role","main")
+        mainRegion:SetIdentifier("main")
+        mainRegion:SetTabIndex("-1")
+    end
+
+    action GetMediaStyleSheet(text name, text media) returns HeaderLink
+        HeaderLink link
+        link:SetAddress(name)
+        link:SetType("text/css")
+        link:SetRelationship("stylesheet")
+        link:SetMedia(media)
+        return link
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, game programming, 
+        lego programming, computer courses, programming 3D, programming,
+        animation, graphics, multimedia, games, accessibility, computer science for all,
+        computer science, computer languages, Quorum programming language, robot programming,
+        online programming")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Create, edit, share, and delete projects."
+    end
+
+    action SetDownloadCount(DownloadCounter counter)
+        me:counter = counter
+    end
+
+end

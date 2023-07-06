@@ -1,0 +1,39 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+
+class Search is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        
+        // Get the search query and build a google search
+        text query = undefined
+        if params:HasKey("search-query")
+            query = "https://www.google.com/search?q=" + exchange:URLEncodeValue("site:quorumlanguage.com " + params:GetValue("search-query"))
+        else
+            Failure(exchange)
+            return now
+        end
+        // convert to a list so it can be added to the header
+        List<text> value
+        value:Add(query)
+
+        // add a location header for the redirect
+        HashTable<text,List<text>> responseHeaders = exchange:GetResponseHeaders()
+        responseHeaders:Add("Location", value)
+        exchange:SetResponseHeaders(responseHeaders)
+    
+        response = con:SUCCESS
+        // This is a redirect so the code should not be 200
+        // 302 is status code php would use
+        exchange:SendResponseHeaders(302, response)
+        exchange:SendResponse(response)
+    end
+
+    action GetPath returns text
+        return "/Search.quorum"
+    end
+end

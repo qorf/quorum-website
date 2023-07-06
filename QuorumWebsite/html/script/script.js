@@ -2,31 +2,8 @@ var currentIDEInput_$Global_ = '';
 var currentIDEOutput_$Global_ = 'frontPageIdeOutput';
 var currentUIContainer_$Global_ = 'QuorumUIContainer';
 var total_console_length239847239482734 = 0;
-setInterval(update_console, 500);
-
-function update_console() {
-    if (typeof OuTpUt_$tRiNg_ !== 'undefined' && typeof currentIDEOutput_$Global_ !== 'undefined') {
-        var newLength = OuTpUt_$tRiNg_.length;
-        if (newLength > total_console_length239847239482734) {
-            var dom = document.getElementById(currentIDEOutput_$Global_);
-            if(dom != null) {
-                dom.insertAdjacentHTML('beforeend', OuTpUt_$tRiNg_.substring(length, newLength));
-            }
-            total_console_length239847239482734 = newLength;
-        }
-    }
-}
 
 var slideNr = 0;
-
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-26662794-3', 'auto');
-ga('require', 'displayfeatures');
-ga('send', 'pageview');
                 
 $(document).ready(function() {
     // add a click handler to all links 
@@ -43,7 +20,7 @@ $(document).ready(function() {
     });
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 showLogoutUI();
@@ -479,7 +456,7 @@ var newRunCode = function (input, output, uiContainer, execute) {
     var codeData = {code: codeInput, pageURL: pageURL, ideName:ideName, build_only: button, timezone: tz};
     $.ajax({
         type: "POST",
-        url: "/fastrun.php",
+        url: "/Fastrun.quorum",
         data: codeData,
         success: function (result) {
             outputRegion.innerHTML = "";
@@ -517,7 +494,7 @@ var validate = function (output) {
     var outputRegion = document.getElementById(output);
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 outputRegion.innerHTML = "User is logged in";
@@ -553,7 +530,7 @@ var hideLoginModal = function() {
 var showSaveModal = function(id) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 hideModals();
@@ -578,12 +555,12 @@ var hideSaveModal = function(id) {
 var showLoadModal = function(id) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 $.ajax({
                     type: "POST",
-                    url: "/load_project_select.php",
+                    url: "/LoadProjectSelect.quorum",
                     data: {id: id},
                     success: function(result)
                     {
@@ -624,6 +601,48 @@ var hideLoadModal = function(id) {
     document.getElementById(id + 'LoadModal').style.display='none';
 };
 
+$('.publicCheckbox').change(function() {
+    var public = this.checked ? 1 : 0;
+    var value = this.value;
+        $.ajax({
+            type: "POST",
+            url: "/ChangePrivacy.quorum",
+            data: {public: public, file: value},
+            success: function (result) {
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert("I could not connect to the server at quorumlanguage.com: " + thrownError);
+            }
+        });
+    });
+    
+    
+    
+var showShareModal = function(value) {
+    document.getElementById('shareModal').style.display='block';
+    document.getElementById('shareText').value = value;
+    document.getElementById('shareText').focus();
+    
+    try
+    {
+        document.getElementById('shareText').select();
+        var success = document.execCommand('copy');
+        if (success)
+            document.getElementById('clipboardCopyMessage').style.display='block';
+        else
+            document.getElementById('clipboardCopyMessage').style.display='none';
+    }
+    catch (error)
+    {
+        document.getElementById('clipboardCopyMessage').style.display='none';
+        console.log("There was an error while copying the project sharing link to the clipboard.");
+    }
+};
+
+var hideShareModal = function() {
+    document.getElementById('shareModal').style.display='none';
+};
+
 var login = function() {
     var user = $("#usernameInput").val();
     var pwd = $("#passwordInput").val();
@@ -633,7 +652,7 @@ var login = function() {
 var loginWithParams = function(user, pwd, redirect) {
     $.ajax({
         type: "POST",
-        url: "/login.php",
+        url: "/Login.quorum",
         data: {username: user, password: pwd},
         success: function (result) {
             if (result === "success") {
@@ -656,7 +675,7 @@ var loginWithParams = function(user, pwd, redirect) {
 var logout = function() {
     $.ajax({
         type: "GET",
-        url: "/logout.php",
+        url: "/Logout.quorum",
         success: function (result) {
             if (result === "success") {
                 //$("#loginButton").text("Login");
@@ -675,7 +694,7 @@ var logout = function() {
 var saveProject = function(id, input, output, namefield, overwrite) {
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 // UPDATE LATER FOR MULTIPLE FILES
@@ -686,7 +705,7 @@ var saveProject = function(id, input, output, namefield, overwrite) {
                 var codeData = {code: codeInput, project_name: projectName, overwrite: overwrite, ide: id, url: pageURL};
                 $.ajax({
                     type: "POST",
-                    url: "/project_save.php",
+                    url: "/ProjectSave.quorum",
                     data: codeData,
                     success: function (result) {
                         if (result === "A file already exists with that name.")
@@ -724,7 +743,7 @@ var loadProject = function(id, select, input, output)
     var outputRegion = document.getElementById(output);
     $.ajax({
         type: "GET",
-        url: "/session_valid.php",
+        url: "/SessionValid.quorum",
         success: function (result) {
             if (result === "success") {
                 var inputRegion = document.getElementById(input);
@@ -746,7 +765,7 @@ var loadProject = function(id, select, input, output)
                 var codeData = {project_name: project, shared: sharedBy};
                 $.ajax({
                     type: "POST",
-                    url: "/load_project_file.php",
+                    url: "/LoadProjectFile.quorum",
                     data: codeData,
                     success: function (result) {
                         if (result !== "") {
@@ -1767,7 +1786,7 @@ function registrationSubmit() {
         
         $.ajax({
             type: "POST",
-            url: "/register.php",
+            url: "/Register.quorum",
             data: {username: user, password: password, first_name: firstname, last_name: lastname, email: email, birthday: birthday, confirm_password: confirmPassword},
             success: function (result) {
                 // might need change for if condition
@@ -1808,7 +1827,7 @@ function forgotPasswordClick() {
 
         $.ajax({
             type: "POST",
-            url: "/request_password_reset.php",
+            url: "/RequestPasswordReset.quorum",
             data: {email: email},
             success: function (result) {
                 // might need change for if condition
@@ -1853,7 +1872,7 @@ function resetPasswordClick() {
 
         $.ajax({
             type: "POST",
-            url: "/confirm_reset_password.php",
+            url: "/ConfirmResetPassword.quorum",
             data: {reset_password: password, confirm_reset_password: passwordConfirm, pagekey: hiddenKey},
             success: function (result) {
                 // might need change for if condition

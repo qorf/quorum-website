@@ -99,17 +99,17 @@
     $requestedFile = $_GET['file'];
 
     $studioVersionMajor = 4;
-    $studioVersionMinor = 0;
-    $studioVersionSubminor = 3;
+    $studioVersionMinor = 5;
+    $studioVersionSubminor = 0;
 
     $studioVersionName = "" . $studioVersionMajor . "." . $studioVersionMinor . "." . $studioVersionSubminor; 
     
     $quorumVersionMajor = 10;
-    $quorumVersionMinor = 0;
+    $quorumVersionMinor = 5;
     $quorumVersionRevision = 0;
     
     $quorumStudioDailyMajor = 4;
-    $quorumStudioDailyMinor = 0;
+    $quorumStudioDailyMinor = 5;
 
     if ($requestedFile === "QuorumStudioWindows" . $studioVersionName . ".exe")
     {
@@ -126,6 +126,14 @@
         $major = $studioVersionMajor;
         $minor = $studioVersionMinor;
         $download_name = "Quorum Studio Mac";
+    }
+    elseif ($requestedFile === "QuorumStudioMacARM" . $studioVersionName . ".pkg")
+    {
+        $file_name = 'Quorum Studio ' . $studioVersionName . ' ARM.pkg';
+        $file = '/var/www/downloads/' . $file_name;
+        $major = $studioVersionMajor;
+        $minor = $studioVersionMinor;
+        $download_name = "Quorum Studio Mac ARM";
     }
     elseif ($requestedFile === "QuorumStudioWindowsDaily.exe")
     {
@@ -240,6 +248,9 @@
             header('Content-Type: application/x-newton-compatible-pkg');
         }
         if ($requestedFile === "QuorumStudioMacDaily.pkg") {
+            header('Content-Type: application/x-newton-compatible-pkg');
+        }
+        elseif ($requestedFile === "QuorumStudioMacM1" . $studioVersionName . ".pkg") {
             header('Content-Type: application/x-newton-compatible-pkg');
         }
         elseif ($requestedFile === "QuorumMac" . $quorumVersionMajor . "." . $quorumVersionMinor . ".zip") {

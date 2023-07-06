@@ -1,0 +1,173 @@
+package Libraries.Database.Server
+
+use Libraries.Network.SocketConnection
+use Libraries.Containers.Array
+
+
+class Redis
+    
+    SocketConnection redisConnection = undefined
+    text CRLF = ""
+    //data types
+    public constant text SIMPLE_STRING = "+"
+    public constant text BULK_STRING = "$"
+    public constant text ERROR = "-"
+    public constant text INTEGER = ":"
+    public constant text ARRAY = "*"
+
+    on create
+        CRLF = CRLF:GetCarriageReturn() + CRLF:GetLineFeed() 
+    end
+
+    private action Parse(text type) returns text
+
+        if type = SIMPLE_STRING
+            return ParseSimpleString()
+        elseif type = ERROR
+            return ParseError()
+        elseif type = BULK_STRING
+            return ParseBulkString()
+        elseif type = INTEGER
+            return "" + ParseInteger()
+        elseif type = ARRAY
+        end
+
+        return ""
+    end
+
+    private action ParseSimpleString() returns text
+        return redisConnection:ReadLine()
+    end
+
+    private action ParseBulkString() returns text
+        integer size = redisConnection:ReadLine():Trim():ParseInteger()
+        result = redisConnection:Read(size)
+        // clear the crlf
+        //redisConnection:Read(2)
+        return result
+    end
+
+    private action ParseInteger() returns integer
+        return redisConnection:ReadLine():Trim():ParseInteger()
+    end
+
+    private action ParseError() returns text
+        return redisConnection:ReadLine()
+    end
+
+    private action EncodeTextArray(Array<text> array) returns text
+        text result = ""
+        if array:GetSize() = 0
+            return "*0"+CRLF
+        end
+        result = "*" + array:GetSize() + CRLF
+        integer i = 0
+        repeat while i < array:GetSize()
+            result = result + EncodeText(array:Get(i))
+            i = i + 1
+        end
+        return result
+    end
+
+    private action EncodeText(text string) returns text
+        text result = ""
+        if string = undefined
+            string = ""
+        end
+        result = result + "$" + string:GetSize()+CRLF+string+CRLF
+        return result
+    end
+
+    private action EncodeInteger(integer value) returns text
+        text result = ":"
+        result = result + value + CRLF
+        return result
+    end
+
+    private action SendCommand(text command) returns text
+        if not IsConnected()
+            return ""
+        end
+        result = ""
+        redisConnection:Write(command)
+        result = GetResponse()     
+        return result
+    end
+
+    private action GetResponse returns text
+        text type = redisConnection:Read(1)
+        return Parse(type)
+    end
+
+    action Connect(text hostname)
+        Connect(hostname, 6379)
+    end
+
+    action Connect(text hostname, integer port)
+        SocketConnection con
+        con:Open(hostname, port)
+        redisConnection = con
+    end
+
+    action IsConnected returns boolean
+        return (redisConnection not= undefined)
+    end
+
+    action Close
+        if IsConnected()
+            redisConnection:Close()
+            redisConnection = undefined
+        end
+    end
+
+    action Set(text key, text value) returns text
+        if not IsConnected()
+            return "fail"
+        end
+
+        Array<text> command
+        command:Add("SET")
+        command:Add(key)
+        command:Add(value)
+        text result = SendCommand(EncodeTextArray(command))
+
+        return result
+    end
+
+    action Get(text key) returns text
+        if not IsConnected()
+            return ""
+        end
+
+        Array<text> command
+        command:Add("GET")
+        command:Add(key)
+        text result = SendCommand(EncodeTextArray(command))
+        return result
+    end
+
+    action Exists(text key) returns boolean
+        if not IsConnected()
+            return false
+        end
+
+        Array<text> command
+        command:Add("EXISTS")
+        command:Add(key)
+        text result = SendCommand(EncodeTextArray(command))
+
+        return (result:ParseInteger() = 1)
+    end
+
+    action Ping returns text
+        if not IsConnected()
+            return "Failed"
+        end
+        Array<text> command
+        command:Add("PING")
+        text result = SendCommand(EncodeTextArray(command))
+        return result
+    end
+
+
+end

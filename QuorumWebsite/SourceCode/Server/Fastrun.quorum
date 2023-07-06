@@ -1,0 +1,164 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.System.DateTime
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.Array
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.Update
+use Libraries.Network.NetworkRequest
+use Libraries.Network.NetworkConnection
+use Libraries.Network.NetworkRequestListener
+use Libraries.Network.NetworkResponseEvent
+use Libraries.Data.Database.Insert
+use Libraries.System.Properties
+
+class Fastrun is ResponsePage, NetworkRequestListener
+
+    constant text COMPILER_VERSION = "10.6.0"
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_PLAIN = "text/plain"
+
+    NetworkExchange returnExchange
+    Redis redis
+    text codeToSave = ""
+    text codeHash = ""
+
+    boolean build = false
+    text timezone = undefined
+    text ip = ""
+    text url = undefined
+    text ideName = undefined
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers
+
+        me:returnExchange = exchange
+        List<text> list
+        list:Add(TEXT_PLAIN+"; charset=UTF-8")
+        headers:Add(CONTENT_TYPE, list)
+        returnExchange:SetResponseHeaders(headers)
+        // code if for compiler
+        text code = ""
+        // rest is for database submission
+        build = false
+        timezone = ""
+        ip = exchange:GetHost()
+        url = ""
+        ideName = ""
+
+        if params:HasKey("code")
+            code = params:GetValue("code")
+        end
+        if params:HasKey("build_only")
+            build = (params:GetValue("build_only") = "1")
+        end
+        if params:HasKey("timezone")
+            timezone = params:GetValue("timezone")
+        end
+        if params:HasKey("pageURL")
+            url = params:GetValue("pageURL")
+        end
+        if params:HasKey("ideName")
+            ideName = params:GetValue("ideName")
+        end
+
+        codeToSave = code
+
+        redis:Connect("redis")
+        codeHash = exchange:HashString("SHA-1", code)
+        if redis:Exists(codeHash)
+            response = redis:Get(codeHash)
+            returnExchange:SendResponseHeaders(200, response)
+            returnExchange:SendResponse(response)
+            // save to database
+            SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName)
+            return now
+        end
+
+        NetworkRequest request
+        request:SetRequestTypeToGet()
+        // timeout compile after 10 seconds
+        request:SetReadTimeout(10000)
+        request:SetWebAddress("http://quorum_server:1269")
+
+        HashTable<text, text> data
+        data:Add("code", codeToSave)
+        request:SetParameters(data)
+
+        NetworkConnection http
+        http:AddListener(me)
+
+        check
+            http:SendRequest(request)
+        detect e
+            output "Compiler Request Failed"
+            output "Code"
+            output code
+                Failure(returnExchange, "Failed to connect")
+            return now
+        end
+
+        // do not send response here wait for compiler to come back
+
+    end
+
+
+    action ResponseReceived(NetworkResponseEvent requestResponse)
+        text response = requestResponse:GetResponseText()
+        returnExchange:SendResponseHeaders(200, response)
+        returnExchange:SendResponse(response)
+        // user got the compiler response so now save to redis
+        redis:Set(codeHash, response)
+
+        // save to database
+        SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName)
+
+    end
+
+    action SaveRunFile(text version, text code, boolean build, text timezone, text ip, text url, text ide)
+        SharedConnection con
+        Connection connect = con:GetConnection()
+        Database db
+        db:Connect(connect)
+
+        Insert runCodeInsert
+        runCodeInsert:SetTable("run_code")
+        runCodeInsert:Add("quorum_version",version)
+        runCodeInsert:Add("build_only",build)
+        Properties prop
+        text hashedIP = prop:GetEnvironmentVariable("ADDRESS_SALT") + ip
+        NetworkExchange exchange
+        hashedIP = exchange:HashString("MD5", hashedIP)
+        runCodeInsert:Add("address", hashedIP)
+        runCodeInsert:Add("timezone",timezone)
+        runCodeInsert:Add("pageURL",url)
+        runCodeInsert:Add("ide_name",ide)
+        db:Insert(runCodeInsert)
+
+        integer lastID = db:GetLastInsertedID()
+        text fileHash = exchange:HashString("SHA-1", code)
+
+        Insert compiledFilesInsert
+        compiledFilesInsert:SetTable("compiled_files")
+        compiledFilesInsert:Add("id",lastID)
+        compiledFilesInsert:Add("hash",fileHash)
+        db:Insert(compiledFilesInsert)
+
+        Insert filesInsert
+        filesInsert:SetTable("files")
+        filesInsert:SetIgnore(true)
+        filesInsert:Add("hash",fileHash)
+        filesInsert:Add("code",code)
+        db:Insert(filesInsert)
+    end
+
+    action GetPath returns text
+        return "/Fastrun.quorum"
+    end
+end

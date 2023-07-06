@@ -1,0 +1,164 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.System.DateTime
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.Array
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.Update
+use Libraries.Data.Database.Insert
+use Libraries.Containers.Iterator
+use Libraries.Data.Database.Find
+
+class Register is ResponsePage
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+
+        text username = ""
+        text password = ""
+        text firstName = ""
+        text lastName = ""
+        text email = ""
+        text birthday = ""
+        text confirmPassword = ""
+        if params:HasKey("username")
+        and params:HasKey("password")
+        and params:HasKey("first_name")
+        and params:HasKey("last_name")
+        and params:HasKey("email")
+        and params:HasKey("birthday")
+        and params:HasKey("confirm_password")
+            username = params:GetValue("username")
+            password = params:GetValue("password")
+            firstName = params:GetValue("first_name")
+            lastName = params:GetValue("last_name")
+            email = params:GetValue("email")
+            birthday = params:GetValue("birthday")
+            confirmPassword = params:GetValue("confirm_password")
+        else
+            Failure(exchange, "Required fields are missing.")
+            return now
+        end
+
+        if username = "" or password = "" or email = "" or birthday = "" or confirmPassword = ""
+            Failure(exchange, "Required fields are missing.")
+            return now
+        end
+
+        DateTime userBirthday
+        check
+            userBirthday:ParseAmericanDate(birthday)
+        detect e
+            Failure(exchange, "The birthday is given in the wrong format.")
+            return now
+        end
+
+        DateTime ageCheck
+        ageCheck:SetEpochTime(ageCheck:Now())
+        ageCheck:SubtractYears(13)
+        
+        if userBirthday:IsAfter(ageCheck)
+            Failure(exchange, "Sorry, but you must be 13 years or older to create a Quorum account.")
+            return now
+        end
+        
+        if (not email:Contains("@")) and email:Split("@"):GetSize() = 2
+            Failure(exchange, "You must provide a valid email address.")
+            return now
+        end
+
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        QueryResult emailCheck = database:Find("users", "email = "+dq+email+dq)
+
+        if emailCheck:HasNext()
+            Failure(exchange, "An account already exists for this email.")
+            database:Close()
+            return now
+        end
+        database:Close()
+
+        if not IsAlphanumeric(username)
+            Failure(exchange, "The username can only contain letters and numbers.")
+            return now
+        end
+
+        database:Connect(connect)
+        QueryResult userCheck = database:Find("users", "username = "+dq+username+dq)
+
+        if userCheck:HasNext()
+            Failure(exchange, "This username is unavailable.")
+            database:Close()
+            return now
+        end
+        database:Close()
+
+        if password:GetSize() < 9
+            Failure(exchange, "Passwords must be at least 9 characters long.")
+            return now
+        end
+
+        if password not= confirmPassword
+            Failure(exchange, "The password and confirm password fields must match.")
+            return now
+        end
+
+        hashedPassword = exchange:HashPassword(password)
+
+        check
+            integer currentTries = 0
+            text formattedBirthday = userBirthday:DateToText()
+            DateTime current
+            text currentTime = current:GetTimestamp()
+            database:Connect(connect)
+
+            Insert newUserQuery
+            newUserQuery:SetTable("users")
+            newUserQuery:Add("username",username)
+            newUserQuery:Add("password",hashedPassword)
+            newUserQuery:Add("first_name",firstName)
+            newUserQuery:Add("last_name",lastName)
+            newUserQuery:Add("email",email)
+            newUserQuery:Add("birthday",formattedBirthday)
+            newUserQuery:Add("reset_password_expire",currentTime)
+            newUserQuery:Add("tries",0)
+
+            database:Insert(newUserQuery)
+
+            database:Close()
+        detect e
+            Failure(exchange, e:GetErrorMessage())
+            return now
+        end
+
+        response = con:SUCCESS
+        exchange:SendResponseHeaders(200, response)
+        exchange:SendResponse(response)
+    end
+
+    action IsAlphanumeric(text string) returns boolean
+        integer i = 0
+        repeat string:GetSize() times
+            text char = string:GetCharacter(i)
+            if not ((char >= "0" and char <= "9")
+                or (char >= "a" and char <= "z")
+                or (char >= "A" and char <= "Z"))
+                return false
+            end
+            i = i + 1
+        end
+        return true
+    end
+
+    action GetPath returns text
+        return "/Register.quorum"
+    end
+end
