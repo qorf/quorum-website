@@ -34,7 +34,7 @@ var hightlightCode = function() {
 
 LoadPrism();
 LoadScript("https://quorumlanguage.com/script/load.js");
-LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js?version=10.6.0");
+LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js?version=11.1.0");
 
 
 
