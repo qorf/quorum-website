@@ -1,19 +1,37 @@
 use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class CourseCard is Division
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
     Image image = undefined
     Heading heading_card = undefined
-    Link link_preview = undefined
+    Button previewButton = undefined
     Link link_course = undefined
     Paragraph p_description = undefined
 
-    action Create(text imageSrc, text title, text description, text previewLink, text courseLink) returns CourseCard
+    action Create(text imageSrc, text imageAltText, text title, text description, text previewLink, text courseLink, text section) returns CourseCard
         AddClassAttribute("bg-neutral-white rounded-lg shadow-md flex flex-col items-center justify-center max-w-sm box-border overflow-hidden")
+        Array<text> title_array = section:Split(" ")
+        
+        text section_formatted = ""
+        integer i = 0
+        repeat while i < title_array:GetSize()
+            section_formatted = section_formatted + "_"  + title_array:Get(i)
+            i = i + 1
+        end
+
+        SetIdentifier("courseCard" + section_formatted + "_" + title)
+        
 
         Division imageDiv
         imageDiv:AddClassAttribute("w-full h-32 relative")
         Image image
         image:SetAddress(imageSrc)
+        image:SetAlternate(imageAltText)
         image:AddClassAttribute("w-full h-full object-cover")
         me:image = image
         imageDiv:Add(image)
@@ -36,17 +54,17 @@ class CourseCard is Division
         contentDiv:Add(p_description)
         
         Division buttonDiv
-        buttonDiv:AddClassAttribute("flex justify-between w-full gap-2 mt-4")
+        buttonDiv:AddClassAttribute("flex justify-end w-full gap-2 mt-4")
 
-        Link link_preview
-        link_preview:AddClassAttribute("text-quorum-blue-50 border-quorum-blue-50 border px-4 py-2 rounded-md")
-        link_preview:SetAddress(previewLink)
-        link_preview:AddText("Preview")
-        me:link_preview = link_preview
-        buttonDiv:Add(link_preview)
+        Button previewButton
+        previewButton:AddClassAttribute("text-quorum-blue-100 px-4 py-2")
+        previewButton:AddText("Preview")
+        previewButton:AddAttribute("data-test", "previewButton" + "_" + title)
+        me:previewButton = previewButton
+        buttonDiv:Add(previewButton)
 
         Link link_course
-        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-md w-36 font-medium text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900")
+        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 font-medium text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900")
         link_course:SetAddress(courseLink)
         link_course:AddText("Go to Course")
         me:link_course = link_course
@@ -54,6 +72,60 @@ class CourseCard is Division
 
         contentDiv:Add(buttonDiv)
         Add(contentDiv)
+
+
+        previewButton:SetOnClick("
+            // Inner function to adjust the preview bar's position
+            function adjustPreviewBar(title, section_formatted) {
+                const previewBar = document.getElementById(`previewBar` + title);
+        
+                // Hide all other previewBars first
+                const previewBars = document.querySelectorAll(`[id^=previewBar]`);
+                previewBars.forEach(bar => {
+                    bar.classList.add(`hidden`);
+                });
+        
+                // Determine the number of cards per row
+                let cardsPerRow;
+                const viewportWidth = window.innerWidth;
+                if (viewportWidth >= 1024) {
+                    cardsPerRow = 3;
+                } else if (viewportWidth >= 768) {
+                    cardsPerRow = 2;
+                } else {
+                    cardsPerRow = 1;
+                }
+        
+                // Get all the cards in the grid
+                const grid = previewBar.parentElement;
+                const cards = grid.querySelectorAll(`[id^=courseCard${section_formatted}]`);
+                const clickedCard = event.target.closest(`[id^=courseCard${section_formatted}]`);
+                const cardIndex = Array.from(cards).indexOf(clickedCard);
+        
+                const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
+                const targetIndex = rowIndexStart + cardsPerRow;
+        
+                // Position the preview bar after the entire row
+                if (cards.length > targetIndex) {
+                    grid.insertBefore(previewBar, cards[targetIndex]);
+                } else {
+                    grid.appendChild(previewBar);
+                }
+        
+                // Show the preview bar
+                previewBar.classList.toggle(`hidden`);
+            }
+        
+            // Call the function when button is clicked
+            adjustPreviewBar(" + "`" + title + "`" + ", " + "`" + section_formatted + "`" + ");
+        
+            // Adjust position on window resize
+            window.onresize = function() {
+                adjustPreviewBar(" + "`" + title + "`" + ", " + "`" + section_formatted + "`" + ");
+            };
+        ")
+
+
         
         return me
     end

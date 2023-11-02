@@ -16,6 +16,7 @@ use Libraries.Web.Page.Section
 use Libraries.Web.Page.Button
 use Libraries.System.File
 use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.Array
 
 class Learn is Lesson
     text dq = ""
@@ -35,15 +36,16 @@ class Learn is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
         mainRegion:SetIdentifier("mainRegion")
+        mainRegion:AddClassAttribute("flex flex-col items-center justify-center space-y-6")
 
 
         //Main Region
         Section blueSection = makeBlueSection()
         Section usingQuorumSection = usingQuorumSection()
-        //Section coursesSection = makeCoursesSection()
+        Section coursesSection = makeCoursesSection()
         mainRegion:Add(blueSection)
         mainRegion:Add(usingQuorumSection)
-        //mainRegion:Add(coursesSection)
+        mainRegion:Add(coursesSection)
 
         Add(mainRegion)
         PageFooter footer
@@ -52,7 +54,7 @@ class Learn is Lesson
 
     action makeBlueSection returns Section
         Section blueSection
-        blueSection:AddClassAttribute("bg-neutral-white flex flex-row items-center justify-center py-10 w-full")
+        blueSection:AddClassAttribute("bg-quorum-blue-25 flex flex-row items-center justify-center py-10 w-full")
     
         // Quorum Icon and Text section
         Division leftText
@@ -113,13 +115,12 @@ class Learn is Lesson
       Heading h3
       h3:SetScale(3)
       h3:AddText("New to Quorum?")
-      h3:AddClassAttribute("text-xl font-bold mb-2 w-4")
+      h3:AddClassAttribute("text-xl font-bold mb-2")
       Paragraph p2
       p2:AddClassAttribute("text-sm mb-4 w-4/5")
       p2:AddText("Quorum is a great first language if you are just starting your programming journey. To get started into using the language, check out this introductory tutorial to help you run your first program!")
       Link link_getStarted
       link_getStarted:AddText("Get Started")
-
       // move text to the bottom right of the div
       link_getStarted:AddClassAttribute("self-end font-bold py-2.5 px-4 text-center rounded-3xl w-56 duration-150 block p text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900 md:inline")
       link_getStarted:SetAddress("/tutorials/firstProgram.html")
@@ -132,58 +133,84 @@ class Learn is Lesson
       return section
     end
 
-    action makeCoursesSection returns Section
-       File file
-        file:SetPath("/json/courses.json")
-        JavaScriptObjectNotation test
-        Section s
-        return s
-//        List<JavaScriptObjectNotation> coursesList = Read(file)
-//        Section section
-//        section:AddClassAttribute("mx-12 md:mx-24")
-//        Heading h2
-//        h2:SetScale(2)
-//        h2:AddText("Quorum Courses")
-//        h2:AddClassAttribute("text-2xl font-bold font-sans")
-//        section:Add(h2)
-//
-//        Division courses
-//        courses:AddClassAttribute("grid gap-5 justify-items-center lg:grid-cols-3 md:grid-cols-2 xsm:grid-cols-1")
-//
-//        integer i = 0
-//        repeat while i < coursesList:GetSize()
-//            JavaScriptObjectNotation courseSection = coursesList:Get(i)
-//            JavaScriptObjectNotation items = courseSection:GetArray("items")
-//
-//            integer j = 0
-//            repeat while j < items:GetSize()
-//                JavaScriptObjectNotation item = items:Get(j)
-//                text title = item:GetValue("name")
-//                text description = item:GetValue("description")
-//                text imageSrc = item:GetValue("image")
-//                text link = item:GetValue("slug")  //assuming the slug is used as link
-//
-//                CourseCard courseCard
-//                courseCard:Create(imageSrc, title, description, "/preview", link)  // assuming "/preview" is static for all cards
-//                courses:Add(courseCard)
-//
-//                j = j + 1
-//            end
-//
-//            i = i + 1
-//        end
-//
-//        section:Add(courses)
-//        return section
-    end
+   action makeCoursesSection returns Section
+        Section section
+        section:AddClassAttribute("mx-12 md:mx-24")
+        Array<text> courses
+        courses:Add("Quorum Courses")
+        courses:Add("Hour of Code")
+         courses:Add("Legacy Courses")
+        integer i = 0
+        repeat while i < courses:GetSize()
+            Division courseDiv
+            courseDiv:AddClassAttribute("my-9 space-y-12")
+            Heading courseHeader
+            courseHeader:AddClassAttribute("text-2xl font-semibold uppercase tracking-wider text-gray-400")
+            courseHeader:SetScale(2)
+            courseHeader:AddText(courses:Get(i))
+            JavaScriptObjectNotation quorumCourse = GetCourseJson(courses:Get(i))
+            JavaScriptObjectNotation items = quorumCourse:GetObject("items")
+            JavaScriptObjectNotation itemsArray = items:Get(0)
+            integer j = 0
+            Division courseCards
+            courseCards:AddClassAttribute("grid gap-4 grid-cols-1 auto-rows-auto md:grid-cols-2 lg:grid-cols-3")
 
-//    action Read(File file) returns list<JavascriptOb>
-//        text value = file:Read()
-//        JavaScriptObjectNotation notate
-//        notate:Read(value)
-//        JavaScriptObjectNotation courses = notate:GetArray("courses")
-//        return courses
-//    end
+            repeat while j < itemsArray:GetSize()
+                //json received from /html/json/courses.json
+                JavaScriptObjectNotation item = itemsArray:Get(j)
+                text imageUrl = item:GetValue("image")
+                text imageAltText = item:GetValue("imageAltText")
+                text title = item:GetValue("title")
+                text description = item:GetValue("description")
+                text previewUrl = item:GetValue("previewUrl")   
+                text courseUrl = item:GetValue("courseUrl")
+                JavaScriptObjectNotation previewJson = item:GetObject("preview")
+                CourseCard courseCard
+                courseCard:Create(imageUrl, imageAltText, title, description, previewUrl, courseUrl, courses:Get(i))
+                courseCards:Add(courseCard)
+
+                CardPreview cardPreview
+                cardPreview:Create(title, previewJson)
+                courseCards:Add(cardPreview)
+
+                j = j + 1
+            end
+            
+            courseDiv:Add(courseHeader)
+            courseDiv:Add(courseCards)
+            
+            i = i + 1
+            section:Add(courseDiv)
+        end
+        return section
+    end
+    
+    action GetCourseJson(text courseToGet) returns JavaScriptObjectNotation
+        File file
+        file:SetPath("/html/json/courses.json")
+        text value = file:Read()
+        JavaScriptObjectNotation notate
+        notate:Read(value)
+
+        JavaScriptObjectNotation courses = notate:GetObject("courses")
+        JavaScriptObjectNotation topLevel = courses:Get(0)
+
+        JavaScriptObjectNotation returnCourse = undefined
+        integer i = 0
+        boolean break = false
+        
+        repeat while i < topLevel:GetSize() or not break
+            JavaScriptObjectNotation course = topLevel:Get(i)
+            text courseArray = course:GetValue("name")
+
+            if courseArray = courseToGet
+                 returnCourse = course
+                 break = true
+            end
+            i = i + 1
+        end
+        return returnCourse
+    end
 
     action GetMetaDescription returns text
         return "Learn the Quorum programming language in tracks dedicated to audio or visual games, robotics, or through core computer science principles."

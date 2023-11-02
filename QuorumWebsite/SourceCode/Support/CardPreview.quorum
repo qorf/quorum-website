@@ -1,0 +1,162 @@
+use Libraries.Web.Page.all
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.Array
+use Libraries.System.File
+
+class CardPreview is Division
+
+    action Create(text title, JavaScriptObjectNotation previewJson) returns CardPreview
+        // Extracting data from JSON
+        text grades = previewJson:GetValue("grades")
+        text description = previewJson:GetValue("description")
+        text timeToComplete = previewJson:GetValue("timeToComplete")
+        JavaScriptObjectNotation topicsJson = previewJson:GetObject("Topics")
+        JavaScriptObjectNotation topicsArray = topicsJson:GetArray()
+
+        // Building topicsText from topicsArray
+        integer i = 0
+        text topicsText = ""
+        repeat while i < topicsArray:GetSize()
+            JavaScriptObjectNotation item = topicsArray:Get(i)
+            topicsText = topicsText + item:GetText()
+            if i < topicsArray:GetSize() - 1
+                topicsText = topicsText + ", "
+            end
+            i = i + 1
+        end
+
+        // Setting card attributes
+        SetIdentifier("previewBar" + title)
+        AddAttribute("data-test", "previewBar" + title)
+        //make the max width the col 3 span
+        AddClassAttribute("bg-neutral-white font-sans rounded-2xl box-border p-6 w-full gap-y-2 flex flex-col hidden sm:col-span-1 md:col-span-2 lg:col-span-3 max-w-[1200px]")
+
+        // Top heading
+        Heading h2
+        h2:AddText(title)
+        h2:AddClassAttribute("text-2xl font-bold text-neutral-grey-90")
+
+        Add(h2)
+
+        // Content
+        Division content
+        content:AddClassAttribute("w-full flex flex-col space-y-4 md:space-y-0 gap-x-10 md:flex-row")
+
+        // Left side content
+        Division leftContent
+        leftContent:AddClassAttribute("w-full md:w-3/4 flex flex-col justify-between gap-y-4")
+
+        // Information divisions: grades, time to complete, topics
+        Division div_information
+        Division div_grades 
+        Division div_timeToComplete
+        Division div_topics
+        div_information:AddClassAttribute("flex gap-2 w-full gap-x-2 flex-col md:flex-row")
+        div_grades:AddClassAttribute("w-full md:w-3/12 flex  gap-x-1 items-center flex-row md:flex-col lg:flex-row text-left md:text-center lg:text-left")
+        div_timeToComplete:AddClassAttribute("w-full md:w-4/12 flex  gap-x-1 items-center flex-row md:flex-col lg:flex-row text-left md:text-center lg:text-left" )
+        div_topics:AddClassAttribute("w-full md:w-5/12 flex  gap-x-1 items-center flex-row md:flex-col lg:flex-row text-left md:text-center lg:text-left")
+
+        Image groupImage
+        groupImage:SetAddress("/media/userInterface/quorumAssets/group.png")
+        groupImage:AddClassAttribute("w-10 h-10 object-contain object-center bg-white p-1")
+        div_grades:Add(groupImage)
+        div_grades:AddText("Grades: " + grades)
+
+        Span span_timeToComplete
+        span_timeToComplete:AddText(timeToComplete)
+        span_timeToComplete:AddClassAttribute("break-keep whitespace-nowrap")
+        Image clockImage
+        clockImage:SetAddress("/media/userInterface/quorumAssets/Access time.png")
+        clockImage:AddClassAttribute("w-10 h-10 object-contain object-center bg-white p-1")
+        div_timeToComplete:Add(clockImage)
+        Span timeText
+        timeText:AddText("Completion Time: ")
+        timeText:Add(span_timeToComplete)
+        div_timeToComplete:Add(timeText)
+
+        Image bookImage
+        bookImage:SetAddress("/media/userInterface/quorumAssets/Menu book.png")
+        bookImage:AddClassAttribute("w-10 h-10 object-contain object-center bg-white p-1")
+        div_topics:Add(bookImage)
+        div_topics:AddText("Topics: " + topicsText)
+
+        div_information:Add(div_grades)
+        div_information:Add(div_timeToComplete)
+        div_information:Add(div_topics)
+
+        // Description division
+        Division div_description
+        div_description:AddText(description)
+
+        // Compatibility division
+        Division div_compatibility
+        div_compatibility:AddClassAttribute("flex flex-row justify-start gap-x-3 flex-wrap")
+
+        JavaScriptObjectNotation compatibilityJson = previewJson:GetObject("compatibility")
+        i = 0
+        repeat while i < compatibilityJson:GetSize()
+            JavaScriptObjectNotation device = compatibilityJson:Get(i)
+            text deviceText = device:GetKey()
+            boolean comp = device:GetBoolean()
+            Image boolIcon
+            boolIcon:SetHeight("24")
+            boolIcon:SetWidth("24")
+            if comp
+                boolIcon:SetAddress("/media/userInterface/quorumAssets/checkmark-full.png")
+            else
+                boolIcon:SetAddress("/media/userInterface/quorumAssets/false-check.png")
+            end
+            Span compSpan
+            compSpan:AddText(deviceText)
+            Division div_deviceComp
+            div_deviceComp:AddClassAttribute("flex flex-row space-x-1 items-center")
+            
+            div_deviceComp:Add(boolIcon)
+            div_deviceComp:Add(compSpan)
+            div_compatibility:Add(div_deviceComp)
+            i = i + 1
+        end
+
+        // Add to left side content
+        leftContent:Add(div_information)
+        leftContent:Add(div_description)
+        leftContent:Add(div_compatibility)
+        content:Add(leftContent)
+
+        // Right side content
+        Division rightContent
+        rightContent:AddClassAttribute("w-full md:w-1/4")
+
+        Heading h3
+        h3:AddText("Available Resources")
+        h3:AddClassAttribute("text-xl font-bold text-neutral-black")
+
+        JavaScriptObjectNotation resourcesJson = previewJson:GetObject("Resources")
+        JavaScriptObjectNotation linksJson = resourcesJson:GetObject("links")
+        JavaScriptObjectNotation linksArray = linksJson:GetArray()
+        i = 0
+        UnorderedList ul
+        repeat while i < linksArray:GetSize()
+            JavaScriptObjectNotation item = linksArray:Get(i)
+            text linkText = item:GetValue("title")
+            text url = item:GetValue("url")
+            ListItem li
+            Link link
+            link:AddClassAttribute("underline text-quorum-blue-50")
+            link:AddText(linkText)
+            link:SetAddress(url)
+            li:Add(link)
+            ul:Add(li)
+            i = i + 1
+        end
+        rightContent:Add(h3)
+        rightContent:Add(ul)
+        content:Add(rightContent)
+
+        // Add main content to card
+        Add(content)
+
+        return me
+    end
+
+end
