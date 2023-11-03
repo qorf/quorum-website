@@ -43,9 +43,11 @@ class Learn is Lesson
         Section blueSection = makeBlueSection()
         Section usingQuorumSection = usingQuorumSection()
         Section coursesSection = makeCoursesSection()
+        Section idePlaygroundSection = makeIdePlaygroundSection()
         mainRegion:Add(blueSection)
         mainRegion:Add(usingQuorumSection)
         mainRegion:Add(coursesSection)
+        mainRegion:Add(idePlaygroundSection)
 
         Add(mainRegion)
         PageFooter footer
@@ -149,7 +151,7 @@ class Learn is Lesson
             courseHeader:SetScale(2)
             courseHeader:AddText(courses:Get(i))
             JavaScriptObjectNotation quorumCourse = GetCourseJson(courses:Get(i))
-            JavaScriptObjectNotation items = quorumCourse:GetObject("items")
+            JavaScriptObjectNotation items = quorumCourse:GetObject("courses")
             JavaScriptObjectNotation itemsArray = items:Get(0)
             integer j = 0
             Division courseCards
@@ -158,15 +160,13 @@ class Learn is Lesson
             repeat while j < itemsArray:GetSize()
                 //json received from /html/json/courses.json
                 JavaScriptObjectNotation item = itemsArray:Get(j)
-                text imageUrl = item:GetValue("image")
-                text imageAltText = item:GetValue("imageAltText")
                 text title = item:GetValue("title")
-                text description = item:GetValue("description")
-                text previewUrl = item:GetValue("previewUrl")   
                 text courseUrl = item:GetValue("courseUrl")
+
+                JavaScriptObjectNotation cardJson = item:GetObject("courseCard")
                 JavaScriptObjectNotation previewJson = item:GetObject("preview")
                 CourseCard courseCard
-                courseCard:Create(imageUrl, imageAltText, title, description, previewUrl, courseUrl, courses:Get(i))
+                courseCard:Create(cardJson, title, courseUrl)
                 courseCards:Add(courseCard)
 
                 CardPreview cardPreview
@@ -192,7 +192,7 @@ class Learn is Lesson
         JavaScriptObjectNotation notate
         notate:Read(value)
 
-        JavaScriptObjectNotation courses = notate:GetObject("courses")
+        JavaScriptObjectNotation courses = notate:GetObject("sections")
         JavaScriptObjectNotation topLevel = courses:Get(0)
 
         JavaScriptObjectNotation returnCourse = undefined
@@ -210,6 +210,31 @@ class Learn is Lesson
             i = i + 1
         end
         return returnCourse
+    end
+
+    action makeIdePlaygroundSection returns Section
+      Section section
+      section:AddClassAttribute("mx-12 md:mx-24")
+
+      Heading h2
+      h2:SetScale(2)
+      h2:AddText("Not Sure Where to Start?")
+      h2:AddClassAttribute("text-2xl font-bold font-sans")
+      section:Add(h2)
+
+      Paragraph p
+      p:AddText("Play around with the Quorum IDE and get a feel for the language. Start by typing output " + dq + "Hello World!" + dq + " into the text editor and see what you can do. There is so much that you can learn when using Quorum.")
+      section:Add(p)
+
+      Division idePlayground
+      idePlayground:SetIdentifier("idePlayground")
+      idePlayground:AddClassAttribute("data11y-code")
+      idePlayground:AddAttribute("simple", "true")
+      AddIDEScript()
+      
+      section:Add(idePlayground)
+
+      return section
     end
 
     action GetMetaDescription returns text

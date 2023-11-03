@@ -1,5 +1,6 @@
 use Libraries.Web.Page.all
 use Libraries.Containers.Array
+use Libraries.Data.Formats.JavaScriptObjectNotation
 
 class CourseCard is Division
     text dq = ""
@@ -13,20 +14,15 @@ class CourseCard is Division
     Link link_course = undefined
     Paragraph p_description = undefined
 
-    action Create(text imageSrc, text imageAltText, text title, text description, text previewLink, text courseLink, text section) returns CourseCard
+    action Create(JavaScriptObjectNotation cardJson, text title, text courseLink) returns CourseCard
+        text imageSrc = cardJson:GetValue("image")
+        text imageAltText = cardJson:GetValue("imageAltText")
+        text description = cardJson:GetValue("description")
+
         AddClassAttribute("bg-neutral-white rounded-lg shadow-md flex flex-col items-center justify-center max-w-sm box-border overflow-hidden")
-        Array<text> title_array = section:Split(" ")
         
-        text section_formatted = ""
-        integer i = 0
-        repeat while i < title_array:GetSize()
-            section_formatted = section_formatted + "_"  + title_array:Get(i)
-            i = i + 1
-        end
-
-        SetIdentifier("courseCard" + section_formatted + "_" + title)
+        SetIdentifier("courseCard" + title)
         
-
         Division imageDiv
         imageDiv:AddClassAttribute("w-full h-32 relative")
         Image image
@@ -75,14 +71,16 @@ class CourseCard is Division
 
 
         previewButton:SetOnClick("
-            // Inner function to adjust the preview bar's position
-            function adjustPreviewBar(title, section_formatted) {
-                const previewBar = document.getElementById(`previewBar` + title);
+            function adjustPreviewBar(title) {
+                const previewBar = document.getElementById('previewBar' + title);
+        
+                // Determine if we are hiding or showing the previewBar
+                const isHidden = previewBar.classList.contains('hidden');
         
                 // Hide all other previewBars first
-                const previewBars = document.querySelectorAll(`[id^=previewBar]`);
+                const previewBars = document.querySelectorAll('[id^=previewBar]');
                 previewBars.forEach(bar => {
-                    bar.classList.add(`hidden`);
+                    bar.classList.add('hidden');
                 });
         
                 // Determine the number of cards per row
@@ -98,8 +96,8 @@ class CourseCard is Division
         
                 // Get all the cards in the grid
                 const grid = previewBar.parentElement;
-                const cards = grid.querySelectorAll(`[id^=courseCard${section_formatted}]`);
-                const clickedCard = event.target.closest(`[id^=courseCard${section_formatted}]`);
+                const cards = grid.querySelectorAll('[id^=courseCard]');
+                const clickedCard = event.target.closest('[id^=courseCard]');
                 const cardIndex = Array.from(cards).indexOf(clickedCard);
         
                 const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
@@ -112,18 +110,23 @@ class CourseCard is Division
                     grid.appendChild(previewBar);
                 }
         
-                // Show the preview bar
-                previewBar.classList.toggle(`hidden`);
+                // Show or hide the preview bar based on its previous state
+                if (isHidden) {
+                    previewBar.classList.remove('hidden');
+                } else {
+                    previewBar.classList.add('hidden');
+                }
             }
         
             // Call the function when button is clicked
-            adjustPreviewBar(" + "`" + title + "`" + ", " + "`" + section_formatted + "`" + ");
+            adjustPreviewBar('" + title + "');
         
             // Adjust position on window resize
             window.onresize = function() {
-                adjustPreviewBar(" + "`" + title + "`" + ", " + "`" + section_formatted + "`" + ");
+                adjustPreviewBar('" + title + "');
             };
         ")
+
 
 
         
