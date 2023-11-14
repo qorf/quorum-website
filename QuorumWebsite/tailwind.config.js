@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './html/**/*.html'  // Include all HTML files in the 'html' folder and its nested folders
+    './html/**/*.html',  // Include all HTML files in the 'html' folder and its nested folders
+    './html/style/**/*.css' // Include all CSS files in the 'html/style' folder and its nested folders
   ],
   theme: {
     extend: {
@@ -10,11 +11,17 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-    },
-    //add font Montserrat
-    fontFamily: {
-      sans: ["Montserrat", "sans-serif"],
-      mono: ["monospace"],
+      transitionProperty: {
+        'height': 'height',
+      },
+      minHeight: {
+        'body': 'calc(100vh - 172px - 70px)',
+      },
+      //add font Montserrat
+      fontFamily: {
+        sans: ["Montserrat", "sans-serif"],
+        mono: ["monospace"],
+      },
     },
     colors: {
       primary: {
@@ -82,7 +89,9 @@ module.exports = {
           blue: "rgba(16, 69, 172, 1)",
           pink: "rgba(204, 5, 55, 1)",
           orange: "rgba(157, 75, 0, 1)",
-          green: "rgba(41, 116, 6, 1)",
+          green: "rgba(41, 16, 6, 1)",
+          red: "rgba(107,0,0,1)",
+          gray: "rgba(101, 101, 101, 1)",
         },
       },
       secondary: {

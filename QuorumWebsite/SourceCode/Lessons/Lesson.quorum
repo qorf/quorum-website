@@ -13,6 +13,12 @@ use Libraries.Containers.Array
 use Libraries.Web.Page.OrderedList
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.MathML
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.NavigationDivision
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.Attributes
 
 
 class Lesson is WebPage
@@ -22,7 +28,10 @@ class Lesson is WebPage
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
     Lesson nextLesson = undefined
+    Lesson prevLesson = undefined
     text scriptsLocation = "/script/"
+    boolean IdeScriptSet = false
+    Array<Heading> headingArray
 
 
     action Setup
@@ -68,7 +77,251 @@ class Lesson is WebPage
 
     action SetNextLesson(Lesson next)
         nextLesson = next
+        if nextLesson not= undefined
+            nextLesson:SetPreviousLesson(me)
+        end
     end
+
+    action GetPreviousLesson returns Lesson
+        return prevLesson
+    end
+
+    action SetPreviousLesson(Lesson prev)
+        prevLesson = prev
+    end
+
+    action CreateLinkedArrays() returns Array<Lesson>
+        // Initialize the arrays if not already done
+        Array<Lesson> chronologicalLinks
+    
+        // Collect links of all previous lessons
+        Lesson prevLesson = GetPreviousLesson()
+        Array<Lesson> pastLessons
+        repeat while prevLesson not= undefined
+            pastLessons:Add(prevLesson)
+            prevLesson = prevLesson:GetPreviousLesson()
+        end
+        
+        // Since we collected the previous lessons in reverse order, we need to reverse the array
+        // to put the lessons in chronological order
+        integer i = pastLessons:GetSize() - 1
+        repeat while i >= 0 // Include the first lesson at index 0
+            chronologicalLinks:Add(pastLessons:Get(i))
+            i = i - 1
+        end
+
+    
+        // Add the current lesson
+        chronologicalLinks:Add(me)
+        
+        // Add all next lessons in order
+        Lesson nextLesson = GetNextLesson()
+        repeat while nextLesson not= undefined
+            chronologicalLinks:Add(nextLesson)
+            nextLesson = nextLesson:GetNextLesson()
+        end
+    
+        // Return the single array with all lessons in chronological order
+        return chronologicalLinks
+    end
+
+
+    //used for making the table of contents on the right side of screen
+    action AddToHeadingArray(Heading heading) returns Heading
+        text lowerCase = heading:GetAttribute("data-text"):GetValue():ToLowerCase()
+        text formattedHeadingText = lowerCase:Replace(" ", "_")
+        output formattedHeadingText
+        heading:SetIdentifier(formattedHeadingText)
+        heading:AddAttribute("data-test", formattedHeadingText)
+        heading:AddAttribute("data-onpage-toc", "true")
+        headingArray:Add(heading)
+        return heading
+    end
+
+    action GetHeadingArray returns Array<Heading>
+        return headingArray
+    end
+
+    action CreateHeadingTableOfContents returns Division
+        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Division div
+        div:AddClassAttribute("h-toc overflow-auto")
+        Division innerDiv
+        NavigationDivision nav
+        nav:SetIdentifier("onPageTableOfContents")
+        nav:AddClassAttribute("font-sans")
+        Heading h2
+        h2:SetScale(2)
+        h2:AddClassAttribute("font-bold uppercase")
+        h2:AddText("On this page")
+        nav:Add(h2)
+        UnorderedList ul
+        ul:AddClassAttribute("space-y-2")
+        integer i = 0
+        repeat while i < headingArray:GetSize()
+            Heading headingIndex = headingArray:Get(i)
+            
+            ListItem li
+            li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
+            
+            Link headingLink
+            headingLink:AddClassAttribute("block w-full py-1 px-2")
+            headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
+            headingLink:SetAddress("#" + headingIndex:GetIdentifier():GetValue())
+            li:Add(headingLink)
+            ul:Add(li)
+            i = i + 1
+        end
+        nav:Add(ul)
+
+        Script script
+
+script:SetCode("
+    document.addEventListener('DOMContentLoaded', () => {
+        // Only select headings with the 'data-onpage-toc' attribute
+        const headings = document.querySelectorAll('#content section h1[data-onpage-toc], #content section h2[data-onpage-toc], #content section h3[data-onpage-toc]');
+        const links = document.querySelectorAll('#onPageTableOfContents ul li a');
+        let currentSectionIndex = -1;
+        let isClickScrolling = false; // Flag to indicate scroll triggered by a click
+        let scrollTimeout = null; // Variable to store the timeout ID
+
+        // Function to clear all active classes
+        function clearActiveStates() {
+            links.forEach(function(link) {
+                link.classList.remove('font-bold');
+            });
+        }
+
+        // Function to update active link on scroll
+        function updateActiveLinkOnScroll() {
+            if (isClickScrolling) return; // Do nothing if scroll is due to a click
+
+            var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+            headings.forEach((heading, index) => {
+                if (heading.getBoundingClientRect().top - 150 <= 0) {
+                    currentSectionIndex = index;
+                }
+            });
+
+            clearActiveStates();
+            if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
+                links[currentSectionIndex].classList.add('font-bold');
+            }
+        }
+
+        // Add click event listeners to each link
+        links.forEach((link, index) => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                isClickScrolling = true;
+                currentSectionIndex = index;
+                clearActiveStates();
+                link.classList.add('font-bold');
+
+                const id = link.getAttribute('href').substring(1);
+                const headingToScrollTo = document.getElementById(id);
+                if (headingToScrollTo) {
+                    headingToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    // Clear any existing timeout to reset the timer
+                    clearTimeout(scrollTimeout);
+                    // Set a new timeout to reset the flag after scrolling finishes
+                    scrollTimeout = setTimeout(() => {
+                        isClickScrolling = false;
+                    }, 1000); // Adjust time as needed
+                }
+            });
+        });
+
+        updateActiveLinkOnScroll(); // Initial call
+        window.addEventListener('scroll', updateActiveLinkOnScroll); // Add scroll event listener
+    });
+")
+
+        Add(script)
+        innerDiv:Add(nav)
+        div:Add(innerDiv)
+
+        return div
+    end
+
+    action CreateTableOfContents returns Division
+        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Division div
+        div:AddClassAttribute("h-toc overflow-auto")
+        Division innerDiv
+        NavigationDivision nav
+        nav:AddClassAttribute("font-sans")
+        Heading h2
+        h2:SetScale(2)
+        h2:AddClassAttribute("font-bold uppercase")
+        h2:AddText(GetSectionName())
+        nav:Add(h2)
+        UnorderedList ul
+        ul:AddClassAttribute("space-y-2")
+        integer i = 0
+        repeat while i < lessonArray:GetSize()
+            Lesson LessonIndex = lessonArray:Get(i)
+            
+            ListItem li
+            li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
+            
+            Link lessonLink
+            lessonLink:AddClassAttribute("block w-full py-1 px-2 capitalize")
+            lessonLink:SetAddress("/" + LessonIndex:GetLocation())
+            lessonLink:AddText(LessonIndex:GetLinkName())
+            
+            if LessonIndex:GetLocation() = GetLocation()
+                lessonLink:AddClassAttribute("bg-quorum-blue-50 font-bold rounded-xl")
+            end
+            li:Add(lessonLink)
+            ul:Add(li)
+            i = i + 1
+        end   
+        nav:Add(ul)
+
+        Script script
+ script:SetCode("
+        // Define the function outside the event listener
+        function updateViewableHeight(main) {
+            const rect = main.getBoundingClientRect();
+            let visibleHeight;
+        
+            // Calculate the visible height of the element
+            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+            visibleHeight = rect.height; // Fully visible
+            } else if (rect.bottom > 0 && rect.top < 0) {
+            visibleHeight = rect.bottom; // Partly visible, top is out of view
+            } else if (rect.top < window.innerHeight && rect.bottom > window.innerHeight) {
+            visibleHeight = window.innerHeight - rect.top; // Partly visible, bottom is out of view
+            } else {
+            visibleHeight = 0; // Not visible
+            }
+        
+            // Update the CSS variable
+            document.documentElement.style.setProperty('--main-viewable-height', `${visibleHeight}px`);
+        }
+        
+        // Event listener for DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Call the function on initial load
+            const main = document.getElementById('mainDiv');
+            updateViewableHeight(main);
+        
+            // Set up the event listener for scrolling
+            window.addEventListener('scroll', () => {
+                updateViewableHeight(main);
+            });
+        });
+        ")
+    
+        Add(script)
+        innerDiv:Add(nav)
+        div:Add(innerDiv)
+
+        return div
+    end
+
 
     action GenerateList(Array<text> list) returns OrderedList
         OrderedList ol
@@ -88,10 +341,21 @@ class Lesson is WebPage
     action GetShortDescription returns text
         return ""
     end
+
+    action GetLinkName returns text
+        return ""
+    end
+    
+    action GetSectionName returns text
+        return ""
+    end
     
     action AddIDEScript
-        VersionHelper versions
-        AddScript("/script/widgets/IDE/widget-js/IDE-"+ versions:GetIDEVersion() +".js")
+        if IdeScriptSet not= true
+            VersionHelper versions
+            AddScript("/script/widgets/IDE/widget-js/IDE-"+ versions:GetIDEVersion() +".js")
+            IdeScriptSet = true
+        end
     end
 
     action AddDefaultHeaders
@@ -355,14 +619,12 @@ googleScript2:AddText(
             end
         end
     end
-
    
     action AddMath(Division div, text fileName)
        MathML math
        math:AddSource(fileName)
        div:AddNestedTag(math)
     end
-
 
     action AddCodeSample(Division div, text codePath)
         if codePath not= undefined
@@ -376,6 +638,13 @@ googleScript2:AddText(
             end
         end
         
+    end
+
+    action AddIDE() returns IDE
+        AddIDEScript()
+        IDE ide
+        ide:Init()
+        return ide
     end
 
     action AddIDE(Division div, text ideName, text title, text subtitle)
@@ -416,7 +685,7 @@ googleScript2:AddText(
     end
 
     action WriteNextTutorial(Division div)
-        //Link to the next tutorial
+        // Link to the next tutorial
         Lesson lesson = GetNextLesson()
         if lesson not= undefined
             div:AddHeading("Next Tutorial", 2)
@@ -425,4 +694,92 @@ googleScript2:AddText(
             next:AddText(", which describes " + lesson:GetShortDescription() + ".")
         end
     end
+
+      action WriteNextTutorial(Section div)
+        // Link to the next tutorial
+        Lesson lesson = GetNextLesson()
+        if lesson not= undefined
+            Heading nextTutorial = div:AddHeading("Next Tutorial", 2)
+            nextTutorial:AddAttribute("data-text", "Next Tutorial")
+            AddToHeadingArray(nextTutorial)
+            nextTutorial:AddClassAttribute("text-2xl font-bold")
+            Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
+            next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            next:AddText(", which describes " + lesson:GetShortDescription() + ".")
+            Division button_div
+            button_div:AddClassAttribute("flex flex-col md:flex-row justify-end")
+            if GetPreviousLesson() not= undefined
+                Link previousLesson
+                previousLesson:AddClassAttribute("py-2 px-5 bg-neutral-grey-25 font-bold captitalize rounded-2xl")
+                previousLesson:SetAddress("/" + GetPreviousLesson():GetLocation())
+                previousLesson:AddText("Go Back")
+                button_div:Add(previousLesson)
+            end
+            
+            if GetNextLesson() not= undefined
+                Link nextLesson
+                nextLesson:AddClassAttribute("py-2 px-10 w-fit bg-quorum-blue-100 ml-4 font-bold captitalize rounded-2xl")
+                nextLesson:SetAddress("/" + GetNextLesson():GetLocation())
+                nextLesson:AddText("Next Tutorial")
+                button_div:Add(nextLesson)
+            end
+            div:Add(button_div)
+        end
+    end
+
+    /*
+    * returns array of Divisions 
+    * div 0 is the left table of contents
+    * div 1 is the body
+    * div 2 is the on page table of contents
+    */
+    action InitializeTutorialPage returns Array<Division>
+        Division outerDiv
+        outerDiv:AddClassAttribute("flex flex-col h-full-body box-border")
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        mainRegion:AddClassAttribute("my-8 mx-16 box-border flex-grow")
+        AdjustMain(mainRegion)
+        
+
+        Division innerDiv
+        innerDiv:SetIdentifier("mainDiv")
+        innerDiv:AddClassAttribute("flex flex-row box-border h-full")
+                
+        /*
+            lesson table of contents
+        */
+        Division tocDiv
+        tocDiv:Add(CreateTableOfContents())
+        tocDiv:AddClassAttribute("w-1/5 sticky top-8 h-0")
+
+        Division bodyDiv
+        bodyDiv:SetIdentifier("content")
+        bodyDiv:AddClassAttribute("flex flex-col w-3/5 mx-4 overflow-auto gap-y-3")
+
+        /*
+            On this page table of contents
+        */
+        Division onPageDiv
+        onPageDiv:AddClassAttribute("w-1/5 sticky top-8 h-0")
+
+
+        innerDiv:Add(tocDiv)
+        innerDiv:Add(bodyDiv)
+        innerDiv:Add(onPageDiv)
+
+        PageFooter footer
+        mainRegion:Add(innerDiv)
+        outerDiv:Add(mainRegion)
+        outerDiv:Add(footer)
+        Add(outerDiv)
+
+        Array<Division> divs
+        divs:Add(tocDiv)
+        divs:Add(bodyDiv)
+        divs:Add(onPageDiv)
+        return divs
+    end
+
 end
