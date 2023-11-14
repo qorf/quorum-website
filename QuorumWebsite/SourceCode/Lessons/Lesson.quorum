@@ -19,6 +19,13 @@ use Libraries.Web.Page.Heading
 use Libraries.Web.Page.Section
 use Libraries.Web.Page.Button
 use Libraries.Web.Page.Attributes
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableData
+use Libraries.Web.Page.TableBody
 
 
 class Lesson is WebPage
@@ -188,7 +195,7 @@ script:SetCode("
         // Function to clear all active classes
         function clearActiveStates() {
             links.forEach(function(link) {
-                link.classList.remove('font-bold');
+                link.classList.remove('font-bold', 'text-quorum-blue-150');
             });
         }
 
@@ -205,7 +212,7 @@ script:SetCode("
 
             clearActiveStates();
             if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
-                links[currentSectionIndex].classList.add('font-bold');
+                links[currentSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
             }
         }
 
@@ -216,7 +223,7 @@ script:SetCode("
                 isClickScrolling = true;
                 currentSectionIndex = index;
                 clearActiveStates();
-                link.classList.add('font-bold');
+                link.classList.add('font-bold', 'text-quorum-blue-150');
 
                 const id = link.getAttribute('href').substring(1);
                 const headingToScrollTo = document.getElementById(id);
@@ -532,6 +539,60 @@ googleScript2:AddText(
     // general format is add tags to text, then add text to array (for both rows and columns) 
     // then the "rows" array 
 
+    action AddTableHeaderRow(Array<text> tableHeaderArray) returns TableHeader
+        integer i = 0
+        TableHeader tableHeader
+        tableHeader:AddClassAttribute("bg-neutral-black text-neutral-white overflow-hidden")
+        TableRow rowHeader
+
+        repeat while i < tableHeaderArray:GetSize()
+            TableHeaderCell th
+            th:AddClassAttribute("text-left py-3 px-4 font-semibold text-sm first:rounded-tl-lg last:rounded-tr-lg")
+            th:AddText(tableHeaderArray:Get(i))
+            rowHeader:Add(th)
+            i = i + 1
+        end
+
+        tableHeader:Add(rowHeader)
+        return tableHeader
+    end
+
+    action AddTableBody returns TableBody
+        TableBody tableBody
+        tableBody:AddClassAttribute("bg-neutral-grey-25")
+        return tableBody
+    end
+
+    action AddTableBodyRow(Array<text> rowEntries) returns TableRow
+        TableRow row
+        row:AddClassAttribute("border-y border-neutral-grey-40 last:border-t last:border-y-0")
+
+        integer i = 0
+        repeat while i < rowEntries:GetSize()
+            TableData cell
+            cell:AddText(rowEntries:Get(i))
+            cell:AddClassAttribute("text-left py-3 px-4")
+            if i = 0
+                cell:AddClassAttribute("font-bold")
+            end
+            row:Add(cell)
+            i = i + 1
+        end
+        
+        return row
+    end
+
+
+    action AddWebTable(text captionText) returns WebTable 
+         WebTable table
+         table:AddClassAttribute("rounded-lg shadow overflow-hidden border-collapse")
+         TableCaption caption
+         caption:AddClassAttribute("text-xl font-bold p-4 bg-[transparent]")
+         caption:AddText(captionText)
+         table:Add(caption)
+         return table
+    end
+
     action AddTableHeaderTag(Array<text> headerText) returns text
         text columnTextWithTags = ""
         integer iterator = 0
@@ -754,6 +815,9 @@ googleScript2:AddText(
         tocDiv:Add(CreateTableOfContents())
         tocDiv:AddClassAttribute("w-1/5 sticky top-8 h-0")
 
+        /*
+            content body
+        */
         Division bodyDiv
         bodyDiv:SetIdentifier("content")
         bodyDiv:AddClassAttribute("flex flex-col w-3/5 mx-4 overflow-auto gap-y-3")
@@ -763,7 +827,6 @@ googleScript2:AddText(
         */
         Division onPageDiv
         onPageDiv:AddClassAttribute("w-1/5 sticky top-8 h-0")
-
 
         innerDiv:Add(tocDiv)
         innerDiv:Add(bodyDiv)
