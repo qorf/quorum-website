@@ -14,6 +14,11 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Containers.Array
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeader
 
 class SavingData is Lesson
     text dq = ""
@@ -27,32 +32,33 @@ class SavingData is Lesson
         SetWebPageTitle("Data Science - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        mainRegion:AddClassAttribute("flex flex-row")
-        AdjustMain(mainRegion)
-
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Saving data back to disk", 1)
-        headDiv:AddText("This tutorial tells use the DataFrame to save data back to disk")
-        Add(headDiv)
-
-        Division tocDiv
-        tocDiv:Add(CreateTableOfContents())
-        mainRegion:Add(tocDiv)
-
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
         
-        bodyDiv:AddHeading("Saving Data", 2)
-        
-        bodyDiv:AddParagraph("Just like with loading, we can save DataFrame objects back to disk if we want to. Copying data is plausibly useful, but where this becomes more helpful is after cleaning. For example, in a typical data set in data science, we often gather data, clean it up to remove problems, and then make a copy of that cleaned data. We can automate that process in code, then save it back, so that we can then reproduce our results later. We will be showing two examples of how to save the data we have created using our DataFrames.")
+       //page header
+        Section headerSection
+        Heading head = headerSection:AddHeading("Saving data back to disk", 1)
+        head:AddAttribute("data-text", "Saving data back to disk")
+        head:AddClassAttribute("text-3xl font-bold") 
+        AddToHeadingArray(head)       
+        headerSection:AddText("This tutorial tells use the DataFrame to save data back to disk")
+        bodyDiv:Add(headerSection)
 
-        bodyDiv:AddParagraph("The first way is possibly the easiest way to save our data, which uses the Load(text fileLocation) function to read in a preexisting file such as:")
-         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        Section section_save
+        section_save:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_save)
+        
+        Heading h2_save = section_save:AddHeading("Loading data "+dq+"by Hand"+dq+"", 2)
+        h2_save:AddAttribute("data-text", "Loading data "+dq+"by Hand"+dq+"")
+        
+        h2_save:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_save)
+
+        section_save:AddParagraph("Just like with loading, we can save DataFrame objects back to disk if we want to. Copying data is plausibly useful, but where this becomes more helpful is after cleaning. For example, in a typical data set in data science, we often gather data, clean it up to remove problems, and then make a copy of that cleaned data. We can automate that process in code, then save it back, so that we can then reproduce our results later. We will be showing two examples of how to save the data we have created using our DataFrames.")
+        section_save:AddParagraph("The first way is possibly the easiest way to save our data, which uses the Load(text fileLocation) function to read in a preexisting file such as:")
+        
+        section_save:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 
 //Create a DataFrame, which is essentially a table that understands 
@@ -61,46 +67,68 @@ DataFrame frame
 
 //This loads the project relative to the project, so the Population.csv file in the Data folder
 //If we deploy our program, this path is relative to the binary.
-frame:Load("+dq+"../Data/Geography/US States.csv"+dq+")
-"))
+frame:Load("+dq+"../Data/Geography/US States.csv"+dq+")"))
+        
+        section_save:AddParagraph("And in this program, we end up manipulating the data by either removing unnecessary columns or adding more to our dataset. In order to save our modified dataset without changing the preexisting one, we can use the Save(text fileDestination) function in order to create a new copy of our new data. Here is a brief description of what our Save(text fileDestination) function does:")
 
-        bodyDiv:AddParagraph("And in this program, we end up manipulating the data by either removing unnecessary columns or adding more to our dataset. In order to save our modified dataset without changing the preexisting one, we can use the Save(text fileDestination) function in order to create a new copy of our new data. Here is a brief description of what our Save(text fileDestination) function does:")
+         WebTable table = AddWebTable("Save Helper Function")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Function")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage")
 
-         Array<text> rubricText1
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)
+
+        Array<text> rubricText1
         rubricText1:Add("frame:Save(text fileDestination)")
         rubricText1:Add("This function takes in a string which is the file path of where we want this new dataset to be located in our file explorer. Note that the extension of our dataset must be a CSV file.") 
         rubricText1:Add("frame:Save("+dq+"..\Data\catsNew.csv"+dq+")")
-   
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Description", " "))
-        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Save Helper Function"))
+        tableBody:Add(AddTableBodyRow(rubricText1))
 
+        table:Add(tableBody)
+        section_save:Add(table)
+        section_save:AddParagraph("Here is an example of changing our loaded dataset and saving it onto a new dataset:")
 
-        bodyDiv:AddParagraph("Here is an example of changing our loaded dataset and saving it onto a new dataset:")
-        
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We can now save this. This is not very useful in this example,
+        section_save:Add(preformatter:GeneratePreformattedCode("//We can now save this. This is not very useful in this example,
 //but can be if we have data frames we have generated or transformed
 frame:Save("+dq+"../Data/Geography/US States.csv"+dq+")"))
 
-       AddIDE(bodyDiv,"Saving1","Saving a File with DataFrames","Example of saving a file","examples/DataFrames/Saving1.quorum")
+        Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself: Saving a File", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself: Saving a File")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself: Saving a File")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
 
-    bodyDiv:AddParagraph(" ")
-    bodyDiv:AddText("To view the whole code, we can click this")
-    bodyDiv:AddLink(" link","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileSaveExample1.quorum")
-    bodyDiv:AddText(".")
-    bodyDiv:AddParagraph(" ")
+    CodeForIDE code1
+    code1:AddFileUrl("Saving.quorum", "examples/DataFrames/Saving1.quorum")
+    IDE ide = AddIDE()
+    ide:SetLightTheme()
+    ide:SetCodeForIDE(code1:GetJsonArray())
+    ide:SetIdeTitle("Saving a File with DataFrames")
+    section_try_yourself:Add(ide)
 
-    bodyDiv:AddParagraph("The other method is to use our data creation "+dq+"by hand"+dq+" and save the data we made within Quorum onto our computer. To do this, let's take an example program:")
+     
+    Section section_code_example       
+    section_code_example:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_code_example)        
+    
+    Heading h2_code_example = section_code_example:AddHeading("Code Example: Saving a File by Hand", 2)
+    h2_code_example:AddAttribute("data-text", "Code Example: Saving a File by Hand")
+    
+    h2_code_example:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_code_example)
 
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+    section_code_example:AddParagraph("The other method is to use our data creation "+dq+"by hand"+dq+" and save the data we made within Quorum onto our computer. To do this, let's take an example program:")
+
+    section_code_example:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.Columns.NumberColumn
 use Libraries.Containers.Array
@@ -151,23 +179,38 @@ frame:AddColumn(numColumn)
 //The system loaded the file, but can also output it a text value, or the console, if we want that.
 output frame:ToText()"))
 
-    bodyDiv:AddParagraph(" ")
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("// save onto destination
-frame:Save("+dq+"..\Data\Miscellaneous\IceCream.csv"+dq+")"))
+    Section section_try_yourself1
+    section_try_yourself1:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself1)
+    Heading h2_try_yourself1 = section_try_yourself1:AddHeading("Try it Yourself: Saving a File by Hand", 2)
+    h2_try_yourself1:AddAttribute("data-text", "Try it Yourself: Saving a File by Hand")
+    h2_try_yourself1:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself1)
+    section_try_yourself1:AddAttribute("data-text", "Try it Yourself: Saving a File by Hand")
+    section_try_yourself1:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
 
-    AddIDE(bodyDiv,"Saving2","Saving a File by Hand with DataFrames","Example of saving a file by hand","examples/DataFrames/Saving2.quorum")
+    CodeForIDE code2
+    code2:AddFileUrl("Saving.quorum", "examples/DataFrames/Saving2.quorum")
+    IDE ide2 = AddIDE()
+    ide2:SetLightTheme()
+    ide2:SetCodeForIDE(code1:GetJsonArray())
+    ide2:SetIdeTitle("Saving a File by Hand with DataFrames")
+    section_try_yourself1:Add(ide2)
 
-    bodyDiv:AddParagraph(" ")
-    bodyDiv:AddText("To view the whole code, we can click this")
-    bodyDiv:AddLink(" link","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileSaveExample2.quorum")
-    bodyDiv:AddText(".")
-    bodyDiv:AddParagraph("")
+    Paragraph paragraph
+    paragraph:AddText("To view the whole code, we can click this")
+    paragraph:AddLink(" link","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileSaveExample2.quorum")
+    paragraph:AddText(".")
+    
+    section_try_yourself1:Add(paragraph)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+
+    Section nextLesson
+    nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(nextLesson)
+    WriteNextTutorial(nextLesson)   
+    onPageDiv:Add(CreateHeadingTableOfContents())
+        
     end
 
     action AddKeywords
