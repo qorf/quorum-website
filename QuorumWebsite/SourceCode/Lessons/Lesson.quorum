@@ -26,6 +26,7 @@ use Libraries.Web.Page.TableCaption
 use Libraries.Web.Page.WebTable
 use Libraries.Web.Page.TableData
 use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.Image
 
 
 class Lesson is WebPage
@@ -143,6 +144,77 @@ class Lesson is WebPage
         heading:AddAttribute("data-onpage-toc", "true")
         headingArray:Add(heading)
         return heading
+    end
+
+    action ZoomImages
+        // Outer container for the zoomed image and its description
+        Division div
+            div:SetIdentifier("zoomedImageContainer")
+            // Use 'flex-col' to stack children vertically and 'items-center' to center them horizontally
+            div:AddClassAttribute("hidden fixed inset-0 bg-neutral-grey-65 bg-opacity-50 flex flex-col items-center p-8 z-50")
+        
+        // Container for the image
+        Image image
+            image:SetIdentifier("zoomedImage")
+            // 'mb-8' adds margin at the bottom of the image, creating space for the paragraph below
+            image:AddClassAttribute("h-5/6 object-contain mb-8")
+        
+        // Adding the image to the main container
+        div:Add(image)
+        
+        // Paragraph for the image description
+        Paragraph paragraph
+            paragraph:SetIdentifier("zoomedAltText")
+            // 'text-white' for white text color, 'text-xl' for font size, and 'px-6 py-4' for padding
+            // 'bg-neutral-800' for a darker background and 'rounded' for rounded corners to make the text more legible
+            paragraph:AddClassAttribute("h-1/6 text-neutral-white text-2xl px-6 py-4 bg-neutral-800 rounded")
+        
+        // Adding the paragraph to the main container
+        div:Add(paragraph)
+        
+        // Adding the main container to the page
+        Add(div)
+
+
+
+        Script script
+        script:SetCode("
+             document.addEventListener('DOMContentLoaded', () => {
+                // Function to zoom the image
+                function zoomImage(src, alt) {
+                  const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                  const zoomedImage = document.getElementById('zoomedImage');
+                  const zoomedAltText = document.getElementById('zoomedAltText');
+                
+                  // Set the source of the zoomed image to the clicked image's source
+                  zoomedImage.src = src;
+
+                  zoomedAltText.textContent = alt
+                
+                  // Show the zoomed image container
+                  zoomedImageContainer.classList.remove('hidden');
+                }
+                
+                // Function to hide the zoomed image
+                function unzoomImage() {
+                  const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                  
+                  // Hide the zoomed image container
+                  zoomedImageContainer.classList.add('hidden');
+                }
+                
+               document.querySelectorAll('img[data-zoom]').forEach(img => {
+                  img.addEventListener('click', () => zoomImage(img.src, img.alt)); // Removed img.alt if not needed
+                  img.tabIndex = 0;
+                  img.setAttribute('aria-label', 'Click to zoom image');
+                  img.style.cursor = 'pointer';
+                });
+                
+                let unzoomContainer = document.getElementById('zoomedImageContainer');
+                unzoomContainer.addEventListener('click', unzoomImage);
+            })
+        ")
+        Add(script)
     end
 
     action GetHeadingArray returns Array<Heading>
@@ -759,15 +831,14 @@ googleScript2:AddText(
 
       action WriteNextTutorial(Section div)
         // Link to the next tutorial
-        Lesson lesson = GetNextLesson()
-        if lesson not= undefined
+        if GetPreviousLesson() not= undefined or GetNextLesson() not= undefined 
             Heading nextTutorial = div:AddHeading("Next Tutorial", 2)
             nextTutorial:AddAttribute("data-text", "Next Tutorial")
             AddToHeadingArray(nextTutorial)
             nextTutorial:AddClassAttribute("text-2xl font-bold")
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-            next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
-            next:AddText(", which describes " + lesson:GetShortDescription() + ".")
+            next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation())
+            next:AddText(", which describes " + GetNextLesson():GetShortDescription() + ".")
             Division button_div
             button_div:AddClassAttribute("flex flex-col md:flex-row justify-end")
             if GetPreviousLesson() not= undefined
@@ -787,6 +858,7 @@ googleScript2:AddText(
             end
             div:Add(button_div)
         end
+        ZoomImages()
     end
 
     /*
