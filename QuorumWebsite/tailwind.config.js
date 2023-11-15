@@ -1,25 +1,36 @@
 const fs = require('fs');
 const execSync = require('child_process').execSync;
 
-// Function to get the path of the global node_modules directory
+// Function to check if npm is available
+function checkNpmExists() {
+  try {
+    execSync('npm -v', { stdio: 'ignore' });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function getGlobalNodeModulesPath() {
   const npmRoot = execSync('npm root -g').toString().trim();
   return npmRoot;
 }
 
-const globalNodeModulesPath = getGlobalNodeModulesPath();
-const debugScreensPath = `${globalNodeModulesPath}/tailwindcss-debug-screens`;
-
-// Check if the plugin exists in the global node_modules
-const pluginExists = fs.existsSync(debugScreensPath);
-
-// Initialize an array to hold any plugins
-const plugins = [];
-
-// Check the environment variable and conditionally add a plugin
-if (process.env.TAILWIND_ENV === 'development' && pluginExists) {
-  const debugScreensPlugin = require(debugScreensPath);
-  plugins.push(debugScreensPlugin);
+// Check if npm exists and if we're in development mode
+if (checkNpmExists() && process.env.TAILWIND_ENV === 'development') {
+  // Assuming the plugin is installed locally in the project
+  const debugScreensPluginPath = getGlobalNodeModulesPath() + '/tailwindcss-debug-screens';
+  // Check if the plugin exists in the local node_modules
+  if (fs.existsSync(debugScreensPluginPath)) {
+    const debugScreensPlugin = require(debugScreensPluginPath);
+    plugins.push(debugScreensPlugin);
+  } else {
+    console.log('Hint: tailwindcss-debug-screens plugin is not installed, run `npm install -g tailwindcss-debug-screens` to use the debug screens plugin');
+  }
+} else if (!checkNpmExists()) {
+  console.log('Hint: npm is not available, please install npm to use the debug screens plugin');
+} else {
+  console.log('Hint: in production mode, debug screens plugin is not enabled');
 }
 
 /** @type {import('tailwindcss').Config} */
