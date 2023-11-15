@@ -179,41 +179,58 @@ class Lesson is WebPage
 
         Script script
         script:SetCode("
-             document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', () => {
                 // Function to zoom the image
                 function zoomImage(src, alt) {
-                  const zoomedImageContainer = document.getElementById('zoomedImageContainer');
-                  const zoomedImage = document.getElementById('zoomedImage');
-                  const zoomedAltText = document.getElementById('zoomedAltText');
-                
-                  // Set the source of the zoomed image to the clicked image's source
-                  zoomedImage.src = src;
-
-                  zoomedAltText.textContent = alt
-                
-                  // Show the zoomed image container
-                  zoomedImageContainer.classList.remove('hidden');
+                    const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                    const zoomedImage = document.getElementById('zoomedImage');
+                    const zoomedAltText = document.getElementById('zoomedAltText');
+                    
+                    // Set the source and alt text of the zoomed image
+                    zoomedImage.src = src;
+                    zoomedAltText.textContent = alt;
+                    
+                    // Show the zoomed image container
+                    zoomedImageContainer.classList.remove('hidden');
                 }
                 
                 // Function to hide the zoomed image
                 function unzoomImage() {
-                  const zoomedImageContainer = document.getElementById('zoomedImageContainer');
-                  
-                  // Hide the zoomed image container
-                  zoomedImageContainer.classList.add('hidden');
+                    const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                    
+                    // Hide the zoomed image container
+                    zoomedImageContainer.classList.add('hidden');
                 }
                 
-               document.querySelectorAll('img[data-zoom]').forEach(img => {
-                  img.addEventListener('click', () => zoomImage(img.src, img.alt)); // Removed img.alt if not needed
-                  img.tabIndex = 0;
-                  img.setAttribute('aria-label', 'Click to zoom image');
-                  img.style.cursor = 'pointer';
+                // Add click event listeners to images with data-zoom attribute
+                document.querySelectorAll('img[data-zoom]').forEach(img => {
+                    img.addEventListener('click', () => zoomImage(img.src, img.alt));
+                    img.tabIndex = 0;
+                    img.setAttribute('aria-label', 'Click to zoom image');
+                    img.style.cursor = 'pointer';
                 });
                 
+                // Event listener for the zoomed image container to hide it on click
                 let unzoomContainer = document.getElementById('zoomedImageContainer');
                 unzoomContainer.addEventListener('click', unzoomImage);
+        
+                // Keyboard shortcuts
+                document.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        unzoomImage();
+                    }
+        
+                    // Assuming you want to zoom in on an image with Enter if it is focused
+                    if (event.key === 'Enter') {
+                        const activeElement = document.activeElement;
+                        if (activeElement.hasAttribute('data-zoom')) {
+                            zoomImage(activeElement.src, activeElement.alt);
+                        }
+                    }
+                });
             })
         ")
+
         Add(script)
     end
 
@@ -832,13 +849,21 @@ googleScript2:AddText(
       action WriteNextTutorial(Section div)
         // Link to the next tutorial
         if GetPreviousLesson() not= undefined or GetNextLesson() not= undefined 
-            Heading nextTutorial = div:AddHeading("Next Tutorial", 2)
-            nextTutorial:AddAttribute("data-text", "Next Tutorial")
+            text HeaderText = ""
+            if GetNextLesson() not= undefined
+                HeaderText = "Next Tutorial"
+            else
+                HeaderText = "End of Lesson"
+            end
+            Heading nextTutorial = div:AddHeading(HeaderText, 2)
+            nextTutorial:AddAttribute("data-text", HeaderText)
             AddToHeadingArray(nextTutorial)
             nextTutorial:AddClassAttribute("text-2xl font-bold")
+            if GetNextLesson() not= undefined
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
             next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation())
             next:AddText(", which describes " + GetNextLesson():GetShortDescription() + ".")
+            end
             Division button_div
             button_div:AddClassAttribute("flex flex-col md:flex-row justify-end")
             if GetPreviousLesson() not= undefined
