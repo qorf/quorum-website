@@ -1,6 +1,8 @@
 const fs = require('fs');
 const execSync = require('child_process').execSync;
 
+const plugins = [];
+
 // Function to check if npm is available
 function checkNpmExists() {
   try {
