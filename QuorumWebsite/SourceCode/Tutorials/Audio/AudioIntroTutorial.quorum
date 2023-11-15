@@ -10,6 +10,10 @@ use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.PreformattedText
 use Libraries.Web.Page.Comment
 use Libraries.Web.Page.Span
+use Libraries.Containers.Array
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Image
 
 class AudioIntroTutorial is Lesson
     text dq = ""
@@ -26,16 +30,27 @@ class AudioIntroTutorial is Lesson
         SetWebPageTitle("Playing Sounds in Quorum - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //page header
-        Division headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Playing Sounds in Quorum", 1)
-        headDiv:AddText("This tutorial teaches you how to play audio files in Quorum.")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("An Introduction to Playing Sounds in Quorum", 2)
+        //page header
+        Section headerSection
+        headerSection:SetClassAttribute("pageHeader outermostContainer")
+        Heading h_heading = headerSection:AddHeading("Tutorial: Playing Sounds in Quorum", 1)
+        h_heading:AddClassAttribute("text-2xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Playing Sounds in Quorum")
+        AddToHeadingArray(h_heading)
+
+        headerSection:AddText("This tutorial teaches you how to play audio files in Quorum.")
+        bodyDiv:Add(headerSection)
+
+        Section section_introduction
+        Heading h_intro = section_introduction:AddHeading("An Introduction to Playing Sounds in Quorum", 2)
+        h_intro:AddClassAttribute("text-2xl font-bold")
+        h_intro:AddAttribute("data-text", "An Introduction to Playing Sounds in Quorum")
+        AddToHeadingArray(h_intro)
+        
 
         Paragraph introParagraph
         introParagraph:AddText("This tutorial will explain how to add and manipulate sounds by using the Quorum Audio library. "
@@ -52,15 +67,17 @@ class AudioIntroTutorial is Lesson
         introParagraph:AddText(" extensions."
                             +  "In order to use sounds, we first need to place a copy of the sound file into our project. "
                             +  "It does not matter where in our project we place it, but for this example, we make a new folder in the main project folder called " + dq + "Sounds." + dq + " It is placed next to the folder labeled " + dq + "Source Code." + dq + "This looks like so:")
-        bodyDiv:Add(introParagraph)
+        section_introduction:Add(introParagraph)
 
-        bodyDiv:AddImage("/media/games/AudioProjectWindow.png", "This is an image of the Audio Project Window")
+        Image image = section_introduction:AddImage("/media/games/AudioProjectWindow.png", "This is an image of the Audio Project Window")
+        image:AddAttribute("data-zoom", "")
 
-
-        bodyDiv:AddText(  "To make things easier to get started in this tutorial, a project containing many different sounds has been provided in this ")
-        bodyDiv:AddLink( "zip file" , "/files/games/AudioProject.zip" ) 
-        bodyDiv:AddText(".")
-
+        Paragraph p_imageCaption
+        p_imageCaption:AddText(  "To make things easier to get started in this tutorial, a project containing many different sounds has been provided in this ")
+        p_imageCaption:AddLink( "zip file" , "/files/games/AudioProject.zip" ) 
+        p_imageCaption:AddText(".")
+        section_introduction:Add(p_imageCaption)
+        bodyDiv:Add(section_introduction)
 
         //the section on Getting Started: Playing Sounds
         bodyDiv:AddHeading("Getting Started: Playing Sounds", 2)
@@ -131,9 +148,7 @@ class AudioIntroTutorial is Lesson
         bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
 
         WriteNextTutorial(bodyDiv)
-        Add(bodyDiv)
-        PageFooter footer
-        Add(footer)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
