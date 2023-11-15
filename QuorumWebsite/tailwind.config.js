@@ -1,3 +1,27 @@
+const fs = require('fs');
+const execSync = require('child_process').execSync;
+
+// Function to get the path of the global node_modules directory
+function getGlobalNodeModulesPath() {
+  const npmRoot = execSync('npm root -g').toString().trim();
+  return npmRoot;
+}
+
+const globalNodeModulesPath = getGlobalNodeModulesPath();
+const debugScreensPath = `${globalNodeModulesPath}/tailwindcss-debug-screens`;
+
+// Check if the plugin exists in the global node_modules
+const pluginExists = fs.existsSync(debugScreensPath);
+
+// Initialize an array to hold any plugins
+const plugins = [];
+
+// Check the environment variable and conditionally add a plugin
+if (process.env.TAILWIND_ENV === 'development' && pluginExists) {
+  const debugScreensPlugin = require(debugScreensPath);
+  plugins.push(debugScreensPlugin);
+}
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -114,6 +138,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: plugins,
 }
 
