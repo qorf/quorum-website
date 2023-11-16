@@ -19,7 +19,7 @@ function getGlobalNodeModulesPath() {
 }
 
 // Check if npm exists and if we're in development mode
-if (checkNpmExists() && process.env.TAILWIND_ENV === 'development') {
+if (checkNpmExists() && (process.env.TAILWIND_ENV === 'development' || process.env.TAILWIND_ENV === undefined)) {
   // Assuming the plugin is installed locally in the project
   const debugScreensPluginPath = getGlobalNodeModulesPath() + '/tailwindcss-debug-screens';
   // Check if the plugin exists in the local node_modules

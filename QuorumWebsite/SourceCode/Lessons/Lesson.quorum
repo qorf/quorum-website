@@ -138,7 +138,6 @@ class Lesson is WebPage
     action AddToHeadingArray(Heading heading) returns Heading
         text lowerCase = heading:GetAttribute("data-text"):GetValue():ToLowerCase()
         text formattedHeadingText = lowerCase:Replace(" ", "_")
-        output formattedHeadingText
         heading:SetIdentifier(formattedHeadingText)
         heading:AddAttribute("data-test", formattedHeadingText)
         heading:AddAttribute("data-onpage-toc", "true")
@@ -180,6 +179,7 @@ class Lesson is WebPage
         Script script
         script:SetCode("
             document.addEventListener('DOMContentLoaded', () => {
+                console.log('getting image')
                 // Function to zoom the image
                 function zoomImage(src, alt) {
                     const zoomedImageContainer = document.getElementById('zoomedImageContainer');
@@ -204,6 +204,7 @@ class Lesson is WebPage
                 
                 // Add click event listeners to images with data-zoom attribute
                 document.querySelectorAll('img[data-zoom]').forEach(img => {
+                    console.log(img)
                     img.addEventListener('click', () => zoomImage(img.src, img.alt));
                     img.tabIndex = 0;
                     img.setAttribute('aria-label', 'Click to zoom image');
@@ -538,6 +539,7 @@ googleScript2:AddText(
         Add(googleScript2)
         //Add the navigation bar
         NavigationBar navigation
+        ZoomImages()
         Add(navigation)
     end
 
@@ -854,7 +856,8 @@ googleScript2:AddText(
         if lesson not= undefined
             div:AddHeading("Next Tutorial", 2)
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-            next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            Link nextLink = next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            
             next:AddText(", which describes " + lesson:GetShortDescription() + ".")
         end
     end
@@ -874,7 +877,7 @@ googleScript2:AddText(
             nextTutorial:AddClassAttribute("text-2xl font-bold")
             if GetNextLesson() not= undefined
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-            next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation())
+            next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation()):AddClassAttribute("underline text-quorum-blue-150")
             next:AddText(", which describes " + GetNextLesson():GetShortDescription() + ".")
             end
             Division button_div
@@ -889,14 +892,14 @@ googleScript2:AddText(
             
             if GetNextLesson() not= undefined
                 Link nextLesson
-                nextLesson:AddClassAttribute("py-2 px-10 w-fit bg-neutral-grey-25 ml-4 font-bold captitalize rounded-2xl")
+                nextLesson:AddClassAttribute("py-2 px-10 w-fit bg-quorum-blue-100 ml-4 font-bold captitalize rounded-2xl")
                 nextLesson:SetAddress("/" + GetNextLesson():GetLocation())
                 nextLesson:AddText("Next Tutorial")
                 button_div:Add(nextLesson)
             end
             div:Add(button_div)
         end
-        ZoomImages()
+        
     end
 
     /*
