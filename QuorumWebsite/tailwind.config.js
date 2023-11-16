@@ -126,7 +126,7 @@ module.exports = {
           blue: "rgba(16, 69, 172, 1)",
           pink: "rgba(204, 5, 55, 1)",
           orange: "rgba(157, 75, 0, 1)",
-          green: "rgba(41, 16, 6, 1)",
+          green: "rgba(41, 116, 6, 1)",
           red: "rgba(107,0,0,1)",
           gray: "rgba(101, 101, 101, 1)",
         },
