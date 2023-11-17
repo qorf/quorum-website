@@ -1,23 +1,7 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.WebList
 use Libraries.Containers.Array
 use Libraries.System.FileReader
 use Libraries.System.File
-use Libraries.Web.Page.Link
+use Libraries.Web.Page.all
 
 class ChartsBarCharts is Lesson
     text dq = ""
@@ -42,24 +26,38 @@ class ChartsBarCharts is Lesson
         AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Charts", 1)
-        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Bar Charts", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Bar Charts")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial introduces how to make Bar Charts in Quorum")
+        bodyDiv:Add(headDiv)
+
+        Section section_barIntro
+        section_barIntro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_barIntro)
         
-        bodyDiv:AddHeading("Making a Bar Chart", 2)
+        Heading h2_barIntro = section_barIntro:AddHeading("Making a Bar Chart", 2)
+        h2_barIntro:AddAttribute("data-text", "Making a Bar Chart")
+        
+        h2_barIntro:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_barIntro)
 
-        bodyDiv:AddParagraph("The first chart type we will be using a new type of dataset to make a Bar Chart. Bar charts are useful for data scientists to compare the quantities of different types of groups.  This dataset being used showcases the costs of night out activities around different parts of the country. We will be using it to compare how much total these activities cost per country.")
+        section_barIntro:AddParagraph("The first chart type we will be using a new type of dataset to make a Bar Chart. Bar charts are useful for data scientists to compare the quantities of different types of groups.  This dataset being used showcases the costs of night out activities around different parts of the country. We will be using it to compare how much total these activities cost per country.")
 
-        bodyDiv:AddParagraph("First step to this process is that we will need to load in the dataset and format it. It is best to keep track of where we are storing our data files. For this tutorial, we will have our dataset inside of a Data folder contained in another internal folder called "+dq+"Miscellaneous."+dq+"
+        section_barIntro:AddParagraph("First step to this process is that we will need to load in the dataset and format it. It is best to keep track of where we are storing our data files. For this tutorial, we will have our dataset inside of a Data folder contained in another internal folder called "+dq+"Miscellaneous."+dq+"
 ")
 
         Paragraph para
@@ -72,10 +70,22 @@ class ChartsBarCharts is Lesson
         
         para:Add(link)
         para:AddText(".")
-        bodyDiv:Add(para)   
+        section_barIntro:Add(para)  
 
-
-        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+        section_barIntro:AddParagraph("Here is a snippet of what the dataset should look like:")
+        
+        WebTable table = AddWebTable("World Night Out CSV")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Category")
+        tableHeaderArray:Add("City") 
+        tableHeaderArray:Add("Country")
+        tableHeaderArray:Add("Item")
+        tableHeaderArray:Add("Cost")
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
 
         Array<text> rubricText5
         rubricText5:Add("Date night")
@@ -83,6 +93,7 @@ class ChartsBarCharts is Lesson
         rubricText5:Add("Spain")
         rubricText5:Add("Dinner")
         rubricText5:Add("69.38")
+        tableBody:Add(AddTableBodyRow(rubricText5))
 
         Array<text> rubricText6
         rubricText6:Add("Date night")
@@ -90,6 +101,7 @@ class ChartsBarCharts is Lesson
         rubricText6:Add("Spain")
         rubricText6:Add("Dinner and Dessert")
         rubricText6:Add("21.28")
+        tableBody:Add(AddTableBodyRow(rubricText6))
 
         Array<text> rubricText7
         rubricText7:Add("Date night")
@@ -97,6 +109,7 @@ class ChartsBarCharts is Lesson
         rubricText7:Add("Spain")
         rubricText7:Add("Cinema entry")
         rubricText7:Add("11.87")
+        tableBody:Add(AddTableBodyRow(rubricText7))
 
         Array<text> rubricText8
         rubricText8:Add("Date night")
@@ -104,6 +117,7 @@ class ChartsBarCharts is Lesson
         rubricText8:Add("Spain")
         rubricText8:Add("Taxi")
         rubricText8:Add("10.92")
+        tableBody:Add(AddTableBodyRow(rubricText8))
 
         Array<text> rubricText9
         rubricText9:Add("Date night")
@@ -111,6 +125,7 @@ class ChartsBarCharts is Lesson
         rubricText9:Add("Spain")
         rubricText9:Add("Big Mac")
         rubricText9:Add("4.75")
+        tableBody:Add(AddTableBodyRow(rubricText9))
 
         Array<text> rubricHeader1
         rubricHeader1:Add(AddTextBoldFront("Category", " "))
@@ -119,23 +134,22 @@ class ChartsBarCharts is Lesson
         rubricHeader1:Add(AddTextBoldFront("Item", " "))
         rubricHeader1:Add(AddTextBoldFront("Cost", " "))
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText5))
-        rubricRows1:Add(AddTableDataTag(rubricText6))
-        rubricRows1:Add(AddTableDataTag(rubricText7))
-        rubricRows1:Add(AddTableDataTag(rubricText8))
-        rubricRows1:Add(AddTableDataTag(rubricText9))
+        table:Add(tableBody)
+        section_barIntro:Add(table)
+
+        Section section_formatting
+        section_formatting:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_formatting)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "World Night Out CSV"))
+        Heading h2_formatting = section_formatting:AddHeading("Loading and Formatting", 2)
+        h2_formatting:AddAttribute("data-text", "Loading and Formatting")
+        
+        h2_formatting:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_formatting)
 
-        bodyDiv:AddHeading("Loading and Formatting", 2)
+        section_formatting:AddParagraph("As mentioned previously, to load and read in the dataset, we will need a DataFrame. Using the frame, we use the Load function and type in the file path of the Night Outs CSV. A comma separated file (CSV) file is a plain text file that separates data with commas.")
 
-        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, we will need a DataFrame. Using the frame, we use the Load function and type in the file path of the Night Outs CSV. A comma separated file (CSV) file is a plain text file that separates data with commas.")
-
-
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        section_formatting:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Interface.Controls.Charts.BarChart
 
 // Create a dataframe to hold the data.
@@ -144,35 +158,38 @@ DataFrame frame
 // Load your data file into the frame.
 frame:Load("+dq+"data/WorldNightOut.csv"+dq+")
 "))
-        bodyDiv:AddParagraph("In a chart, we typically want to categorize / separate our data in a way where we can see a relationship or draw comparisons from. An example of this is trying to find the profit out of grocery store items; instead of having each item be its own category (ex. milk products such as ice cream, cheese, etc), we can group food items to see the overall profit (ex. dairy). We approach our categories of data using this approach through factoring. Later we will be examining an action that allows us to categorize our data, sorting each entry into its respective factor.")
-        bodyDiv:AddParagraph("For this next part, we will want to select two columns of the dataset that we are comparing: Country and Cost. For Country, we will categorize this data because there are multiple activities listed for one country. This helps format the totals in which we will use Cost to add how much these activities cost per country. To select the Country column in our dataset, we would want to use the function, AddSelectedFactors(text textHeader). This will put countries listed on the x-axis. Adding an additional factor will separate our bar chart even further into smaller bars that can categorize items based on a broader factor, such as countries. We will also be extracting "+dq+"Items"+dq+" from the dataset and this will separate each activity from the country and display on the legend.")
+        section_formatting:AddParagraph("In a chart, we typically want to categorize / separate our data in a way where we can see a relationship or draw comparisons from. An example of this is trying to find the profit out of grocery store items; instead of having each item be its own category (ex. milk products such as ice cream, cheese, etc), we can group food items to see the overall profit (ex. dairy). We approach our categories of data using this approach through factoring. Later we will be examining an action that allows us to categorize our data, sorting each entry into its respective factor.")
+        section_formatting:AddParagraph("For this next part, we will want to select two columns of the dataset that we are comparing: Country and Cost. For Country, we will categorize this data because there are multiple activities listed for one country. This helps format the totals in which we will use Cost to add how much these activities cost per country. To select the Country column in our dataset, we would want to use the function, AddSelectedFactors(text textHeader). This will put countries listed on the x-axis. Adding an additional factor will separate our bar chart even further into smaller bars that can categorize items based on a broader factor, such as countries. We will also be extracting "+dq+"Items"+dq+" from the dataset and this will separate each activity from the country and display on the legend.")
 
-        bodyDiv:AddParagraph("Similarly, to get the Cost column from the dataset, we use the action AddSelectedColumns("+dq+"Cost"+dq+"). This will add up the totals of these columns based on the categorized country and display them on the y axis. We will also briefly describe these two functions below in a table.")
+        section_formatting:AddParagraph("Similarly, to get the Cost column from the dataset, we use the action AddSelectedColumns("+dq+"Cost"+dq+"). This will add up the totals of these columns based on the categorized country and display them on the y axis. We will also briefly describe these two functions below in a table.")
 
-         Array<text> rubricTextA
+        WebTable tableFormat = AddWebTable("DataFrame Data Extraction Actions")
+        TableBody tableBodyFormat = AddTableBody()
+        
+        Array<text> tableHeaderArrayFormat
+        tableHeaderArrayFormat:Add("Function")
+        tableHeaderArrayFormat:Add("Description") 
+        tableHeaderArrayFormat:Add("Usage")
+
+        TableHeader theadFormat = AddTableHeaderRow(tableHeaderArrayFormat)
+        tableFormat:Add(theadFormat) 
+
+        Array<text> rubricTextA
         rubricTextA:Add("dataFrameObject:AddSelectedColumns(text heading)")
         rubricTextA:Add("AddSelectedFactors() takes in a string that matches a column heading from our dataset. This function is used to format our legend and separate our data into categories For this tutorial, we will be calling this function twice and extract "+dq+"Country"+dq+" and "+dq+"Item"+dq+"") 
         rubricTextA:Add("frame:AddSelectedFactors("+dq+"heading"+dq+")")    
+        tableBodyFormat:Add(AddTableBodyRow(rubricTextA))
 
-         Array<text> rubricTextB
+        Array<text> rubricTextB
         rubricTextB:Add("dataFrameObject:AddSelectedColumns(text heading)")
         rubricTextB:Add("AddSelectedColumns() takes in a string that matches a column heading from our dataset. This function is used to format our axises. For this tutorial, we will extract "+dq+"Cost"+dq+"") 
         rubricTextB:Add("frame:AddSelectedColumns("+dq+"heading"+dq+")")     
-
-        Array<text> rubricHeader2
-        rubricHeader2:Add(AddTextBoldFront("Function", " "))
-        rubricHeader2:Add(AddTextBoldFront("Description", " "))
-        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
-
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricTextA))
-        rubricRows2:Add(AddTableDataTag(rubricTextB))
+        tableBodyFormat:Add(AddTableBodyRow(rubricTextB))
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "DataFrame Data Extraction Actions"))
+        tableFormat:Add(tableBodyFormat)
+        section_formatting:Add(tableFormat)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("// Select data from the frame that you wish to use in your bar chart.
+        section_formatting:Add(preformatter:GeneratePreformattedCode("// Select data from the frame that you wish to use in your bar chart.
 // Note: In Bar Charts, factors are used as the independent data, and Columns are used as the dependent data.
 // For this example we will be categorizing by "+dq+"Country"+dq+" and "+dq+"Item"+dq+" and calculating the bar value by "+dq+"Cost"+dq+".
 frame:AddSelectedFactors("+dq+"Country"+dq+")
@@ -180,32 +197,47 @@ frame:AddSelectedFactors("+dq+"Item"+dq+")
 frame:AddSelectedColumns("+dq+"Cost"+dq+")
 "))
 
-        bodyDiv:AddParagraph("Now we create a bar chart object:")
+        section_formatting:AddParagraph("Now we create a bar chart object:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("// Using the frame, create a BarChart object.
+        section_formatting:Add(preformatter:GeneratePreformattedCode("// Using the frame, create a BarChart object.
 BarChart chart = frame:BarChart()
 
 // Display your bar chart.
 chart:Display()
 "))
 
-    AddIDE(bodyDiv,"BC1","Bar Charts: Reading in Data and Displaying","Example of loading our data and creating bar chart object","examples/Charts/BC1.quorum")
-        
-    bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+    CodeForIDE code1
+    code1:AddFileUrl("BarChart.quorum", "examples/Charts/BC1.quorum")
+    IDE ide = AddIDE()
+    ide:SetLightTheme()
+    ide:SetCodeForIDE(code1:GetJsonArray())
+    ide:SetIdeTitle("Reading in and Displaying")
+    section_formatting:Add(ide)
 
-    bodyDiv:AddHeading("Labeling the Bar Chart", 2)
+    section_formatting:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
 
-    bodyDiv:AddParagraph("We have successfully created our BarChart object! Now it is time to add features and tidy it up so we are able to present our data to viewers and have them understand what they are looking at. We will now be setting the title, the x axis title, and the y axis title. We will also be setting the font size so our data chart can be read easily.")
+    Section section_labeling
+    section_labeling:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_labeling)
+    
+    Heading h2_labeling = section_labeling:AddHeading("Labeling the Bar Chart", 2)
+    h2_labeling:AddAttribute("data-text", "Labeling the Bar Chart")
+    
+    h2_labeling:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_labeling)
 
-    bodyDiv:AddParagraph("To label the titles, we must call the following functions now using our "+dq+"chart"+dq+" component: SetTitle(text title), SetXAxisTitle(text title), and SetYAxisTitle(text title). SetTitle(text title) takes in a string as the parameter so we can come up with a title that briefly describes our comparisons; in this case our title can be "+dq+"How Expensive are Night Outs Per Country."+dq+" The next part is about labeling the x axis and y axis. 
+
+    section_labeling:AddParagraph("We have successfully created our BarChart object! Now it is time to add features and tidy it up so we are able to present our data to viewers and have them understand what they are looking at. We will now be setting the title, the x axis title, and the y axis title. We will also be setting the font size so our data chart can be read easily.")
+
+    section_labeling:AddParagraph("To label the titles, we must call the following functions now using our "+dq+"chart"+dq+" component: SetTitle(text title), SetXAxisTitle(text title), and SetYAxisTitle(text title). SetTitle(text title) takes in a string as the parameter so we can come up with a title that briefly describes our comparisons; in this case our title can be "+dq+"How Expensive are Night Outs Per Country."+dq+" The next part is about labeling the x axis and y axis. 
 ")
-    bodyDiv:AddParagraph("For the x axis, we again will call our SetXAxisTitle(text title) function from our chart component which takes in a string; we should label this "+dq+"Countries"+dq+" and put it inside the parameter. The same process follows for SetYAxisTitle(text title) in which it should be labeled as "+dq+"Cost (in USD $)"+dq+" because our data calculates the cost in US dollars.")
+    section_labeling:AddParagraph("For the x axis, we again will call our SetXAxisTitle(text title) function from our chart component which takes in a string; we should label this "+dq+"Countries"+dq+" and put it inside the parameter. The same process follows for SetYAxisTitle(text title) in which it should be labeled as "+dq+"Cost (in USD $)"+dq+" because our data calculates the cost in US dollars.")
 
-    bodyDiv:AddParagraph("We should also add a subtitle in our chart so we give clarity for our viewers of what the chart is about. This can be any small description or any useful / additional information. In this case, we would call SetSubtitle(text title) and insert a string inside the parameters. We will make our string "+dq+"Various nightly activities cost in different countries."+dq+"")
+    section_labeling:AddParagraph("We should also add a subtitle in our chart so we give clarity for our viewers of what the chart is about. This can be any small description or any useful / additional information. In this case, we would call SetSubtitle(text title) and insert a string inside the parameters. We will make our string "+dq+"Various nightly activities cost in different countries."+dq+"")
 
-    bodyDiv:AddParagraph("We should have the following code:")
+    section_labeling:AddParagraph("We should have the following code:")
 
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("// Give the chart a descriptive title.
+    section_labeling:Add(preformatter:GeneratePreformattedCode("// Give the chart a descriptive title.
 chart:SetTitle("+dq+"How Expensive are Night Outs Per Country?"+dq+")
 
 // Add a subtitle for further description.
@@ -223,28 +255,44 @@ chart:SetYAxisTitle("+dq+"Cost (in USD $)"+dq+")
 //
 //    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:SetFontSize(30)"))
     
-    AddIDE(bodyDiv,"BC2","Bar Charts: Labeling","Example of labeling our bar chart","examples/Charts/BC2.quorum")
 
-    bodyDiv:AddHeading("Customizing the Bar Chart", 2)
+    CodeForIDE code2
+    code2:AddFileUrl("BarChart.quorum", "examples/Charts/BC2.quorum")
+    IDE ide1 = AddIDE()
+    ide1:SetLightTheme()
+    ide1:SetCodeForIDE(code2:GetJsonArray())
+    ide1:SetIdeTitle("Labeling Bar Charts")
+    section_labeling:Add(ide1)
 
-    bodyDiv:AddParagraph("
+    Section section_customizing
+    section_customizing:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_customizing)
+    
+    Heading h2_customizing = section_customizing:AddHeading("Customizing the Bar Chart", 2)
+    h2_customizing:AddAttribute("data-text", "Customizing the Bar Chart")
+    
+    h2_customizing:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_customizing)
+
+    
+    section_customizing:AddParagraph("
 With our bar chart, we are also able to change the color palette, the legend title, and the legend location. Before we display our chart, let us take a look at how to further customize this bar chart.
 
 For this tutorial, we will be selecting the Colorgorical palette.
 ")
 
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("// If needed, you can change the color palette to a predefined palette or create a custom one.
+    section_customizing:Add(preformatter:GeneratePreformattedCode("// If needed, you can change the color palette to a predefined palette or create a custom one.
 // By default, the palette is set to Colorgorical which helps give our graphs aesthetic and discriminable elements.
 chart:SetColorPaletteToColorgorical()
 "))
 
-    bodyDiv:AddParagraph("Lastly, we will play around with the legend. Labeling our legend is important so that it provides clarity for the data, especially giving meaning to our categories created in the bar chart.
+    section_customizing:AddParagraph("Lastly, we will play around with the legend. Labeling our legend is important so that it provides clarity for the data, especially giving meaning to our categories created in the bar chart.
 To label the legend, we must call the SetLegendTitle(text title) function which takes in a string value, which we will label as "+dq+"Countries."+dq+" Next we can change the position of the legend; by default, it is displayed on the right side, but it can be positioned at top, bottom, and left as well. Let us call the function, SetLegendLocationToBottom() which will set the location to the bottom of the chart.
 ")
 
-    bodyDiv:AddParagraph("We should have the following code:")
+    section_customizing:AddParagraph("We should have the following code:")
 
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("// If needed, you can change the legend location to either left, right, top or bottom. 
+    section_customizing:Add(preformatter:GeneratePreformattedCode("// If needed, you can change the legend location to either left, right, top or bottom. 
 // By default, the legend is displayed on the right when showing.
 chart:SetLegendLocationToBottom()
 
@@ -252,16 +300,28 @@ chart:SetLegendLocationToBottom()
 chart:SetLegendTitle("+dq+"Activity"+dq+")
 "))
 
-    AddIDE(bodyDiv,"BC3","Bar Charts: Customization","Example of customizing our bar chart","examples/Charts/BC3.quorum")
+    CodeForIDE code3
+    code3:AddFileUrl("BarChart.quorum", "examples/Charts/BC3.quorum")
+    IDE ide2 = AddIDE()
+    ide2:SetLightTheme()
+    ide2:SetCodeForIDE(code3:GetJsonArray())
+    ide2:SetIdeTitle("Customizing Bar Charts")
+    section_customizing:Add(ide1)
 
-
-    bodyDiv:AddHeading("Displaying The Chart",2)
-    bodyDiv:AddParagraph("Congratulations, our bar chart is constructed! Now we can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display to show the bar chart.")
-       
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
-
-    bodyDiv:AddParagraph(" ")
+    Section section_display
+    section_display:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_display)
     
+    Heading h2_display = section_display:AddHeading("Displaying The Chart", 2)
+    h2_display:AddAttribute("data-text", "Displaying The Chart")
+    
+    h2_display:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_display)
+
+    section_display:AddParagraph("Congratulations, our bar chart is constructed! Now we can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display to show the bar chart.")
+       
+    section_display:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+
     Paragraph para1
     para1:AddText("Now, feel free to clean, build, and run the program and we shortly should see a Game window pop-up. This is our Bar Chart! To view the entire code, click ")
     
@@ -269,20 +329,44 @@ chart:SetLegendTitle("+dq+"Activity"+dq+")
     link1:AddText("here")
     link1:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/BarChartExample.quorum")
     link1:SetTarget(link1:newTab)
+    link1:AddClassAttribute("underlined quorum-blue-150")
 
     para1:Add(link1)
     para1:AddText(" to view the file.")
-    bodyDiv:Add(para1) 
+    section_display:Add(para1) 
 
-    bodyDiv:AddHeading("Run the program",2)
-    AddIDE(bodyDiv,"BarChart","Creating a Bar Chart","Full Example of the Bar Chart","examples/Charts/BarChart.quorum")
-
-    bodyDiv:AddParagraph(" ")
+    Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    section_try_yourself:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+    
+    CodeForIDE code4
+    code4:AddFileUrl("BarChart.quorum", "examples/Charts/BarChart.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Full Bar Chart Example")
+    section_try_yourself:Add(ide3)
     
     File f
     FileReader reader
 
-    bodyDiv:AddHeading("Final Chart", 2)
+    Section section_final
+    section_final:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_final)
+    
+    Heading h2_final = section_final:AddHeading("Final Chart", 2)
+    h2_final:AddAttribute("data-text", "Final Chart")
+    
+    h2_final:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_final)
 
     Division chart1
     chart1:SetStyle("min-width: 100px; max-width: 100%;")
@@ -291,46 +375,57 @@ chart:SetLegendTitle("+dq+"Activity"+dq+")
     chart1:AddText(reader:Read())
     reader:Close()
     
-    bodyDiv:Add(chart1)
+    section_final:Add(chart1)
 
-    bodyDiv:AddHeading("Further Useful Bar Chart Functions",2)
+    Section section_additional
+    section_additional:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_additional)
+    
+    Heading h2_additional = section_additional:AddHeading("Further Useful Bar Chart Functions", 2)
+    h2_additional:AddAttribute("data-text", "Further Useful Bar Chart Functions")
+    
+    h2_additional:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_additional)
+
+   
+    WebTable tableActions = AddWebTable("DataFrame Data Extraction Actions")
+    TableBody tableBodyActions = AddTableBody()
+        
+    Array<text> tableHeaderArrayActions
+    tableHeaderArrayActions:Add("Function")
+    tableHeaderArrayActions:Add("Description") 
+    tableHeaderArrayActions:Add("Usage")
+
+    TableHeader theadActions = AddTableHeaderRow(tableHeaderArrayActions)
+    tableActions:Add(theadActions) 
 
     Array<text> rubricText1
         rubricText1:Add("StackBars(boolean)")
         rubricText1:Add("StackBars() will stack bars on top of each other when a group contains multiple bars. They are not stacked by default.") 
         rubricText1:Add("chart:StackBars(true)")
+    tableBodyActions:Add(AddTableBodyRow(rubricText1))
 
     Array<text> rubricText2
         rubricText2:Add("SortByBarSize()")
         rubricText2:Add("SortByBarSize() takes in no parameters and will sort the bars from largest bar to smallest bar. Note that it only will work with one factor added.") 
         rubricText2:Add("chart:SortByBarSize()")
+    tableBodyActions:Add(AddTableBodyRow(rubricText2))
 
     Array<text> rubricText3
         rubricText3:Add("SeparateByFactor(integer)")
         rubricText3:Add("SeparateByFactor() will separate the chart into a grid of subcharts based on the bar groups. It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid.")
         rubricText3:Add("chart:SeparateByFactor(4)")
+    tableBodyActions:Add(AddTableBodyRow(rubricText3))
 
     Array<text> rubricText4
         rubricText4:Add("SeparateBySeries(integer)")
         rubricText4:Add("SeparateBySeries() will separate the chart into a grid of subcharts based on the legend (series). It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid.")
         rubricText4:Add("chart:SeparateBySeries(4)")
+    tableBodyActions:Add(AddTableBodyRow(rubricText4))
 
-     Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Function", " "))
-        rubricHeader:Add(AddTextBoldFront("Description", " "))
-        rubricHeader:Add(AddTextBoldFront("Usage", " "))
-
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
-      
-        rubricRows:Add(AddTableDataTag(rubricText1))
-        rubricRows:Add(AddTableDataTag(rubricText2))
-        rubricRows:Add(AddTableDataTag(rubricText3))
-        rubricRows:Add(AddTableDataTag(rubricText4))
- 
-       bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Other Useful Bar Chart Functions"))
-
-        bodyDiv:AddParagraph("")
+   
+        tableActions:Add(tableBodyActions)
+        section_additional:Add(tableActions)
 
         Paragraph para2
         para2:AddText("To view more examples with charts, we can reference the Quorum Curriculum Repository for ")      
@@ -339,18 +434,18 @@ chart:SetLegendTitle("+dq+"Activity"+dq+")
         link2:AddText("charts")
         link2:SetAddress("https://github.com/qorf/curriculum/tree/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode")
         link2:SetTarget(link2:newTab)
+        link2:SetClassAttribute("underlined quorum-blue-150")
         
         para2:Add(link2)
         para2:AddText(".")
-        bodyDiv:Add(para2)
-
-        bodyDiv:AddParagraph(" ")
-
-         WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        section_additional:Add(para2)
+       
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
+         
     end
 
     action GetMetaDescription returns text
