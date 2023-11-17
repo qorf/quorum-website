@@ -1,19 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class DataOverview is Lesson
     text dq = ""
@@ -30,36 +16,45 @@ class DataOverview is Lesson
         //html header stuff
         SetWebPageTitle("Reading and Writing Data Overview")
         AddDefaultHeaders()
+        AddJsonPrism()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Reading and Writing Data Overview", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Reading and Writing Data Overview", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Reading and Writing Data Overview")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("Reading and Writing data using JavaScript Object Notation (JSON)")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+Section section_overview
+section_overview:SetClassAttribute("flex flex-col gap-y-2")
 
-bodyDiv:AddHeading("Overview", 2)
-bodyDiv:AddParagraph("JavaScript Object Notation (JSON) is a human-readable way 
+Heading h_overview = section_overview:AddHeading("Overview", 2)
+h_overview:AddClassAttribute("text-2xl font-bold")
+h_overview:AddAttribute("data-text", "Overview")
+AddToHeadingArray(h_overview)
+
+section_overview:AddParagraph("JavaScript Object Notation (JSON) is a human-readable way 
 to format data and is commonly used for transmission between a server and web 
 applications. JavaScript Object Notation (JSON) is a more “lightweight” and 
 understandable format than another commonly used alternative known as Extensible 
 Markup Language (XML).  Because of these advantages and the fact that it is 
 understood natively by the JavaScript programming language used in browsers, it 
 is generally the preferred format today.")
-bodyDiv:AddParagraph("JavaScript Object Notation (JSON) objects are a set of unordered key-value pairs, separated by a colon (“:“) and encapsulated with curly brackets (“{“ “}”), also called braces. The key portion of the pair is a name in double quotes and the value can be a text, integer, number, boolean or array value. Each of the pairs is separated by a comma (“,”) and any whitespace is ignored.")
-bodyDiv:AddParagraph("In the following example, the first key name is “firstName” with a text value of “Joe”, the second key name is “lastName” with a text value of “Smith”, the third key name is “age” with an integer value of 15, and the fourth key name is “student” with a boolean value of true.")
+section_overview:AddParagraph("JavaScript Object Notation (JSON) objects are a set of unordered key-value pairs, separated by a colon (“:“) and encapsulated with curly brackets (“{“ “}”), also called braces. The key portion of the pair is a name in double quotes and the value can be a text, integer, number, boolean or array value. Each of the pairs is separated by a comma (“,”) and any whitespace is ignored.")
+section_overview:AddParagraph("In the following example, the first key name is “firstName” with a text value of “Joe”, the second key name is “lastName” with a text value of “Smith”, the third key name is “age” with an integer value of 15, and the fourth key name is “student” with a boolean value of true.")
 
-bodyDiv:AddParagraph("Example JavaScript Object Notation format:")
+section_overview:AddParagraph("Example JavaScript Object Notation format:")
 PreformattedText jsonExample1
-bodyDiv:Add(jsonExample1)
-jsonExample1:AddAttribute("class", "code")
+section_overview:Add(jsonExample1)
+jsonExample1:AddAttribute("class", "language-json")
 
 CodeBlock code1
         code1:AddText("{" + cr
@@ -70,21 +65,32 @@ CodeBlock code1
     +"}")
 jsonExample1:Add(code1)
 
-bodyDiv:AddHeading("JSON in Quorum", 2)
-bodyDiv:AddParagraph("In order to access the JavaScriptObjectNotation class we 
+Section section_json_in_quorum
+section_json_in_quorum:SetClassAttribute("flex flex-col gap-y-2")
+
+Heading h_json_in_quorum = section_json_in_quorum:AddHeading("JSON in Quorum", 2)
+h_json_in_quorum:AddClassAttribute("text-2xl font-bold")
+h_json_in_quorum:AddAttribute("data-text", "JSON in Quorum")
+AddToHeadingArray(h_json_in_quorum)
+
+section_json_in_quorum:AddParagraph("In order to access the JavaScriptObjectNotation class we 
 must add the 
 “use Libraries.Data.Formats.JavaScriptObjectNotation” 
 statement at the beginning of our class definitions when working with 
 JavaScript Object Notation (JSON). 
 ")
 
+bodyDiv:Add(section_overview)
+bodyDiv:Add(section_json_in_quorum)
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+
+
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -102,5 +108,11 @@ JavaScript Object Notation (JSON).
     end
     action GetLocation returns text
         return "tutorials/data/overview.html"
+    end
+    action GetLinkName returns text
+        return "Overview of JavaScript Object Notation (JSON) Data"
+    end
+    action GetSectionName returns text
+        return "Reading and Writing JavaScript Object Notation (JSON) Data"
     end
 end
