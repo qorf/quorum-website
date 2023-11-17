@@ -1,19 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class DataNesting is Lesson
     text dq = ""
@@ -30,23 +16,31 @@ class DataNesting is Lesson
         //html header stuff
         SetWebPageTitle("Adding a JavaScriptObjectNotation Value Type to a JavaScriptObjectNotation Object (Nesting)")
         AddDefaultHeaders()
+        AddJsonPrism()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Adding a JavaScriptObjectNotation Value Type to a JavaScriptObjectNotation Object (Nesting)", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Adding a JavaScriptObjectNotation Value Type to a JavaScriptObjectNotation Object (Nesting)", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Adding a JavaScriptObjectNotation Value Type to a JavaScriptObjectNotation Object (Nesting)")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial tells you how to nest JavaScriptObjectNotation object values within a JavaScriptObjectNotation object")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+Section section_nesting
+section_nesting:AddClassAttribute("flex flex-col gap-y-2")
 
-bodyDiv:AddHeading("Adding a JavaScriptObjectNotation Value Type to a JavaScriptObjectNotation Object (Nesting)", 2)
-bodyDiv:AddParagraph("In this tutorial, we will create a JavaScriptObjectNotation 
+Heading h_nesting = section_nesting:AddHeading("Nesting", 2)
+h_nesting:AddClassAttribute("text-2xl font-bold")
+h_nesting:AddAttribute("data-text", "Nesting")
+AddToHeadingArray(h_nesting)
+
+section_nesting:AddParagraph("In this tutorial, we will create a JavaScriptObjectNotation 
 object “data” which will be nested in another JavaScriptObjectNotation object 
 “json” and then output the final result. We begin by creating the JavaScriptObjectNotation object 
 that we plan on nesting, “data” and “Add”ing the necessary { name : value } 
@@ -61,17 +55,17 @@ CodeBlock cb1
         cb1:AddText("       data:Add(" + dq + "item2" + dq + ", " + dq + "b" + dq + ")" + cr) 
         cb1:AddText("       data:Add(" + dq + "item3" + dq + ", " + dq + "c" + dq + ")" + cr) 
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_nesting:Add(preformatter:GeneratePreformattedCode(cb1))
 
-bodyDiv:AddParagraph("We then create the JavaScriptObjectNotation object, which 
+section_nesting:AddParagraph("We then create the JavaScriptObjectNotation object, which 
 will encapsulate the nested object, “json” and “Add” the necessary 
 { name : value } pairs. To add the JavaScriptObjectNotation object to a 
 { name : value } pair we change the value to the object to be nested, in this 
 case “data.”")
 
-bodyDiv:Add(preformatter:GeneratePreformattedCode("     json:Add(" + dq + "detail" + dq + ", data)"))
+section_nesting:Add(preformatter:GeneratePreformattedCode("     json:Add(" + dq + "detail" + dq + ", data)"))
 
-bodyDiv:AddParagraph("Here is the complete code section which will create a 
+section_nesting:AddParagraph("Here is the complete code section which will create a 
 nested JavaScriptObjectNotation object and output the formatted 
 JavaScriptObjectNotation objects.")
 
@@ -90,34 +84,44 @@ CodeBlock cb2
         cb2:AddText("       output json:ToText()" + cr)
         cb2:AddText("   end" + cr)
         cb2:AddText("end" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
-AddSideBySideIDE(bodyDiv, "dataNestingIDE1", "Activity: Nesting a JavaScriptObjectNotation object", 
-            "This code will output a JavaScriptObjectNotation object value nested within another JavaScriptObjectNotation object")
+        section_nesting:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        CodeForIDE code1
+        code1:AddFileText("Nesting.quorum", "//This code will output a JavaScriptObjectNotation object value nested within another JavaScriptObjectNotation object")
+        IDE ide1 = AddIDE()
+        ide1:SetLightTheme()
+        ide1:SetCodeForIDE(code1:GetJsonArray())
+        ide1:SetIdeTitle("Activity: Nesting a JavaScriptObjectNotation object")
+        section_nesting:Add(ide1)
 
 
 
 
-bodyDiv:AddParagraph("The output should look something like this, with the 
+section_nesting:AddParagraph("The output should look something like this, with the 
 nested JavaScriptObjectNotation object enclosed by an inner pair of curly braces 
 following its corresponding key name “detail”:")
 
+PreformattedText jsonExample1
+jsonExample1:AddClassAttribute("language-json line-numbers")
 CodeBlock cb3
-        cb3:AddText("{" + cr)
-        cb3:AddText("       " + dq + "data1" + dq + ": " + dq + "A" + dq + "," + cr)
-        cb3:AddText("       " + dq + "data2" + dq + ": " + dq + "B" + dq + "," + cr)
-        cb3:AddText("       " + dq + "detail" + dq + ":   {" + cr)
-        cb3:AddText("               " + dq + "item1" + dq + ": " + dq + "a" + dq + "," + cr)
-        cb3:AddText("               " + dq + "item2" + dq + ": " + dq + "b" + dq + "," + cr)
-        cb3:AddText("               " + dq + "item3" + dq + ": " + dq + "c" + dq + cr)
-        cb3:AddText("       }" + cr)
-        cb3:AddText("}")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        cb3:AddText("{" + cr
+        + "   " + dq + "data1" + dq + ": " + dq + "A" + dq + "," + cr
+        + "   " + dq + "data2" + dq + ": " + dq + "B" + dq + "," + cr
+        + "   " + dq + "detail" + dq + ":   {" + cr
+        + "           " + dq + "item1" + dq + ": " + dq + "a" + dq + "," + cr
+        + "           " + dq + "item2" + dq + ": " + dq + "b" + dq + "," + cr
+        + "           " + dq + "item3" + dq + ": " + dq + "c" + dq + cr
+        + "   }" + cr
+        + "}")
+        jsonExample1:Add(cb3)
+        section_nesting:Add(jsonExample1)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_nesting)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -135,5 +139,11 @@ CodeBlock cb3
     end
     action GetLocation returns text
         return "tutorials/data/nesting.html"
+    end
+    action GetLinkName returns text
+        return "Nesting"
+    end
+    action GetSectionName returns text
+        return "Reading and Writing JavaScript Object Notation (JSON) Data"
     end
 end
