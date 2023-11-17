@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class DatabaseOverview is Lesson
     text dq = ""
@@ -28,19 +13,20 @@ class DatabaseOverview is Lesson
         SetWebPageTitle("Databases Overview - Quorum Programming Lanugage")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        //page header
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Databases", 1)
-        headDiv:AddText("This tutorial introduces what databases are and their basic structures")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Databases", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Databases")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial introduces what databases are and their basic structures")
+        bodyDiv:Add(headDiv)
         
         bodyDiv:AddHeading("Databases Overview", 2)
         bodyDiv:AddParagraph("Data is all around us, from Amazon history purchases to student grades contained inside a gradebook. What to do with all this data depends on context, but all data requires storage. Most websites today use databases, including  video streaming, social media, e-commerce, finances, and many others. ")
@@ -277,11 +263,10 @@ Here are brief descriptions of the many different types of databases organizatio
         para1:AddText(".")
         bodyDiv:Add(para1)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -310,5 +295,13 @@ Here are brief descriptions of the many different types of databases organizatio
 
     action GetLocation returns text
         return "tutorials/databases/overview.html"
+    end
+
+    action GetLinkName returns text
+        return "Databases Overview"
+    end
+
+    action GetSectionName returns text
+        return "Databases"
     end
 end
