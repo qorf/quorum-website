@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class UserInterfacesFileChooser is Lesson
     text dq = ""
@@ -30,15 +17,20 @@ class UserInterfacesFileChooser is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: File Chooser", 1)
-        headDiv:AddText("This tutorial tells you how to use File Choosers in Quorum")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: File Chooser", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: File Chooser")
+        AddToHeadingArray(h_heading)
+
+        headDiv:AddText("This tutorial tells you how to use File Choosers in Quorum")
+        bodyDiv:Add(headDiv)
+        
         
         bodyDiv:AddHeading("Introduction to File Choosers in Quorum", 2)
         bodyDiv:AddParagraph("As noted in the name, File Choosers are meant to be used when interacting with Files and it is important to have at least a small understanding of how Files work in Quorum to use them. For this tutorial we will be doing minimal interaction with Files as the focus of this tutorial is with the File Chooser GUI component instead of the Files themselves which deal more with the internals of the System.")
@@ -151,11 +143,10 @@ class UserInterfacesFileChooser is Lesson
                                         +"end"))
         bodyDiv:AddParagraph("Note that we also added to a Focus Cycle to ensure that our application is accessible.")
         bodyDiv:AddParagraph("Now we can run the program and there will be three Buttons and you can activate a Button to open one of the File Chooser Dialogs. After interacting with the Dialogs the File chosen will be returned and the program will output the absolute path to the File and the File’s name. ")
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -176,5 +167,12 @@ class UserInterfacesFileChooser is Lesson
 
     action GetLocation returns text
         return "tutorials/ui/fileChooser.html"
+    end
+    action GetLinkName returns text
+        return "File Chooser"
+    end
+
+    action GetSectionName returns text
+        return "User Interfaces"
     end
 end

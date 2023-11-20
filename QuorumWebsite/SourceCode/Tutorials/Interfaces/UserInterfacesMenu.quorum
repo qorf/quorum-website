@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class UserInterfacesMenu is Lesson
     text dq = ""
@@ -31,15 +19,20 @@ class UserInterfacesMenu is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Menu", 1)
-        headDiv:AddText("This tutorial tells you how to use Menus in Quorum")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Menu", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Menu")
+        AddToHeadingArray(h_heading)
+
+        headDiv:AddText("This tutorial tells you how to use Menus in Quorum")
+        bodyDiv:Add(headDiv)
+        
         bodyDiv:AddHeading("An Introduction to Menus in Quorum", 2)
         bodyDiv:AddParagraph("In this tutorial, we will learn how to use Menus in the Quorum Game Engine. Menus are GUI tools very similar to Trees in that the 
                             items have a similar hierarchical structure, but the MenuItems are arranged on a MenuBar differently than TreeItems on a Tree. You will 
@@ -601,11 +594,10 @@ class UserInterfacesMenu is Lesson
         bodyDiv:AddHeading("Run the Program", 2)
         AddIDE(bodyDiv, "menuTutorial","Activity: Menu", "Try making a User Interface", "examples/UserInterface/Menu/Main.quorum")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -626,5 +618,12 @@ class UserInterfacesMenu is Lesson
 
     action GetLocation returns text
         return "tutorials/ui/menu.html"
+    end
+    action GetLinkName returns text
+        return "Menu"
+    end
+
+    action GetSectionName returns text
+        return "User Interfaces"
     end
 end
