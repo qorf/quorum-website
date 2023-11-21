@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class UserInterfacesDialog is Lesson
     text dq = ""
@@ -30,15 +17,20 @@ class UserInterfacesDialog is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
-        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Dialog", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Dialog", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Dialog")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial tells you how to use Dialogs in Quorum")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
         
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
         
         bodyDiv:AddHeading("Introduction to Dialogs in Quorum", 2)
         bodyDiv:AddParagraph("In Quorum, a Dialog is subwindow inside of the main window that is used to carry a temporary information apart from the information in the main application. Many Dialogs present an error message or warning to a user, but Dialogs can present any UI component. A common Dialog is one with a message and then an OK or Yes/No Button that will close the Dialog.")
@@ -164,11 +156,10 @@ class UserInterfacesDialog is Lesson
         bodyDiv:AddHeading("Run the Program", 2)
         AddIDE(bodyDiv, "dialogTutorial","Activity: Dialog", "Try making a User Interface", "examples/UserInterface/Dialog/OptionDialogExample.quorum")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -189,5 +180,12 @@ class UserInterfacesDialog is Lesson
 
     action GetLocation returns text
         return "tutorials/ui/dialog.html"
+    end
+    action GetLinkName returns text
+        return "Dialog"
+    end
+
+    action GetSectionName returns text
+        return "User Interfaces"
     end
 end
