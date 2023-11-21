@@ -1,21 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Link
-
-use Libraries.Web.Page.AttributeAccepter 
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.Attribute 
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class CollisionEventsTutorial is Lesson
     text dq = ""
@@ -32,39 +16,54 @@ class CollisionEventsTutorial is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
 
-        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Collision Events", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Collision Events", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Collision Events")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial shows how to use collision events in Quorum.")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
+        
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading(     "Introduction to Collision Events in Quorum", 2)
+        Section section_collison
+        section_collison:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_collison)
+        
+        Heading h2_collison = section_collison:AddHeading("Detecting Collisions with Events", 2)
+        h2_collison:AddAttribute("data-text", "Detecting Collisions with Events")
+        
+        h2_collison:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_collison)
 
-        bodyDiv:AddParagraph(   "In this tutorial, we will learn about collision events.")
+
+        section_collison:AddParagraph(   "In this tutorial, we will learn about collision events.")
 
 
-
-        bodyDiv:AddHeading(     "Detecting Collisions with Events", 3)
-
-        bodyDiv:AddText(            "In addition to testing for input using events, we can also use events to detect when two Items have collided in our game. " 
+        Paragraph paraA
+        
+        paraA:AddText(            "In addition to testing for input using events, we can also use events to detect when two Items have collided in our game. " 
                             +   "In this last sample program, a black rectangle will be at the center of the screen. "
                             +   "A white circle will be on the left side of the screen, which will pass over the rectangle as it moves off the right edge of the screen, and reappears on the left side. "
                             +   "Every time the circle and the rectangle begin overlapping, a sound will play, the rectangle will turn blue, and the circle will turn red. "
                             +   "Every time the circle and the rectangle begin overlapping, a sound will play, the rectangle will turn blue, and the circle will turn red. "
                             +   "The complete sample, including audio, can be downloaded by clicking ")
-        bodyDiv:AddLink( "here" , "/files/games/CollisionEventProject.zip" )
-        bodyDiv:AddText(" .")
+        paraA:AddLink( "here" , "/files/games/CollisionEventProject.zip" ):SetClassAttribute("underlined quorum-blue-150")
+        paraA:AddText(" .")
+        section_collison:Add(paraA)
 
-        bodyDiv:AddParagraph(   "Our code is in a single file." )
+        section_collison:AddParagraph(   "Our code is in a single file." )
 
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+        section_collison:Add(preformatter:GeneratePreformattedCode(
             "use Libraries.Game.Game" + cr  
         +   "use Libraries.Game.Graphics.Drawable" + cr 
         +   "use Libraries.Game.Graphics.Color" + cr 
@@ -177,7 +176,7 @@ class CollisionEventsTutorial is Lesson
                     +   "In this case, our Main class also listens for collisions between two 2D items via the line ")
         p18:Add(cb33)
         p18:AddText(    ". Similarly to other events, the game engine automatically passes an object representing the event to our actions for handling that event; in this case, we are passed a CollisionEvent2D object representing a collision between two 2D items in our BeginCollision and FinishCollision actions.")
-        bodyDiv:Add(p18)
+        section_collison:Add(p18)
 
 
         Paragraph p19
@@ -187,14 +186,14 @@ class CollisionEventsTutorial is Lesson
                     +   "We do this by calling the SetCollidable action on the items with the parameter ")
         p19:Add(cb34)
         p19:AddText(    ". A handy place to do this is in our CreateGame action.")
-        bodyDiv:Add(p19)
+        section_collison:Add(p19)
 
         bodyDiv:Add(preformatter:GeneratePreformattedCode(
             "// These two lines are used to make the two items detect collisions." + cr  
         +   "block:SetCollidable(true)" + cr 
         +   "circle:SetCollidable(true)" + cr ))
 
-        bodyDiv:AddParagraph(   "It is important to note that collidable items can only collide with other items that have been declared collidable. " 
+        section_collison:AddParagraph(   "It is important to note that collidable items can only collide with other items that have been declared collidable. " 
                             +   "So, if two items are overlapping in our game, but one of them has not been set to be collidable, we will not receive a collision event for those two items. "
                             +   "On the other hand, if two items are overlapping and both of them have been declared collidable, we will receive a collision event for these two items.")
 
@@ -202,21 +201,21 @@ class CollisionEventsTutorial is Lesson
                             +   "We do so by calling the AddCollisionListener action and passing it the object that should be listening for collisions. "
                             +   "Again, a great place to do this is in our CreateGame action.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+        section_collison:Add(preformatter:GeneratePreformattedCode(
             "// This line is used to make our Game class listen for and handle collisions" + cr  
         +   "AddCollisionListener(me)" + cr))
 
-        bodyDiv:AddParagraph(   "All objects declared as collision listeners should implement an action for handling when items start to collide, called BeginCollision. " 
+        section_collison:AddParagraph(   "All objects declared as collision listeners should implement an action for handling when items start to collide, called BeginCollision. " 
                             +   "This action is passed a CollisionEvent2D or CollisionEvent3D object (depending on whether the listener is listening for 2D or 3D collisions) that represents the collision.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+        section_collison:Add(preformatter:GeneratePreformattedCode(
             "action BeginCollision(CollisionEvent2D event)" + cr  + cr  
         +   "end" + cr))
 
-        bodyDiv:AddParagraph(   "Similarly, objects declared as collision listeners should implement an action called FinishCollision for handling when two items stop colliding. " 
+       section_collison:AddParagraph(   "Similarly, objects declared as collision listeners should implement an action called FinishCollision for handling when two items stop colliding. " 
                             +   "This action also takes as a parameter an event object representing either the 2D or 3D collision event.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+        section_collison:Add(preformatter:GeneratePreformattedCode(
             "action FinishCollision(CollisionEvent2D event)" + cr  + cr  
         +   "end" + cr))
 
@@ -233,9 +232,9 @@ class CollisionEventsTutorial is Lesson
         p20:Add(cb36)
         p20:AddText(    " actions on the event object. "
                     +   "From there, we can do the things that we want to happen when items are overlapping such as playing a sound or changing the color of the items.")
-        bodyDiv:Add(p20)
+        section_collison:Add(p20)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
+        section_collison:Add(preformatter:GeneratePreformattedCode(
             "action BeginCollision(CollisionEvent2D event)" + cr  
         +   "   // First things first, play the begin collision sound" + cr 
         +   "   beginSound:Play()" + cr + cr 
@@ -260,32 +259,45 @@ class CollisionEventsTutorial is Lesson
         +   "   end" + cr 
         +   "end" + cr ))
 
-        bodyDiv:AddParagraph(   "With our Main class filled, our program is ready. " 
+        section_collison:AddParagraph(   "With our Main class filled, our program is ready. " 
                             +   "The Game should consist of a circle moving from left to right, making a sound when it begins overlapping the rectangle and changing its color to red and the rectangle's color to white. "
                             +   "When it stops overlapping with the rectangle, a different sound is played, it changes color to white, and the rectangle changes color to black.")
 
-        bodyDiv:AddParagraph(   "The Image on the left is when the red circle make a sound that it has collided with the blue rectangle and the picture on the right is when the white circle leaves the black rectangle making a sound.")
+        section_collison:AddParagraph(   "The Image on the left is when the red circle make a sound that it has collided with the blue rectangle and the picture on the right is when the white circle leaves the black rectangle making a sound.")
 
-        bodyDiv:AddImage("/media/games/Circle_Enters_Rectangle_2.png", "This is an image of a red circle enter in a blue rectangle ")
+        Image image = section_collison:AddImage("/media/games/Circle_Enters_Rectangle_2.png", "This is an image of a red circle enter in a blue rectangle ")
+        image:AddAttribute("data-zoom","")
+    
+        Image image1 = section_collison:AddImage("/media/games/Circle_Leaves_Rectangle.png", "This is an image of a white circle leave in a black rectangle ")
+        image1:AddAttribute("data-zoom","")
 
-        bodyDiv:AddImage("/media/games/Circle_Leaves_Rectangle.png", "This is an image of a white circle leave in a black rectangle ")
+         Section section_resources
+        section_resources:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_resources)
+        
+        Heading h2_resources = section_resources:AddHeading("Resources", 2)
+        h2_resources:AddAttribute("data-text", "Resources")
+        
+        h2_resources:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_resources)
+        
+        
+        Paragraph paraB
+        paraB:AddText(       "The" + dq + "lightSound.wav" + dq + "sound file is used under the Creative Commons Attribution 3.0 license: ")
+        paraB:AddLink("Sword Swing",  "http://soundbible.com/1176-Sword-Swing.html" ):SetClassAttribute("underlined quorum-blue-150") 
+        paraB:AddText(". ")
+        section_resources:Add(paraB)
 
+        Paragraph paraC
+        paraC:AddText(       "The" + dq + "heavySound.wav" + dq + "sound file is used under the Creative Commons Attribution 3.0 license: ")
+        paraC:AddLink("Battle Axe Sound" , "http://soundbible.com/1163-Battle-Axe-Swing.html"  ):SetClassAttribute("underlined quorum-blue-150")  
+        section_resources:Add(paraC)
 
-
-        bodyDiv:AddHeading(     "Resources", 4)
-
-        bodyDiv:AddText(       "The" + dq + "lightSound.wav" + dq + "sound file is used under the Creative Commons Attribution 3.0 license: ")
-        bodyDiv:AddLink("Sword Swing",  "http://soundbible.com/1176-Sword-Swing.html" ) 
-        bodyDiv:AddText(". ")
-
-        bodyDiv:AddText(       "The" + dq + "heavySound.wav" + dq + "sound file is used under the Creative Commons Attribution 3.0 license: ")
-        bodyDiv:AddLink("Battle Axe Sound" , "http://soundbible.com/1163-Battle-Axe-Swing.html"  ) 
-
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -310,5 +322,13 @@ class CollisionEventsTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/games/collisionEvents.html"
+    end
+
+    action GetLinkName returns text
+        return "Collison Events"
+    end
+
+    action GetSectionName returns text
+        return "User Interaction and Events"
     end
 end

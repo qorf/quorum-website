@@ -1,21 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Link
-
-use Libraries.Web.Page.AttributeAccepter 
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.Attribute 
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class GamesEventsTutorial is Lesson
     text dq = ""
@@ -32,33 +16,48 @@ class GamesEventsTutorial is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Input and Events in Quorum", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Input and Events in Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Input and Events in Quorum")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial shows how to use input and events in our games.")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading(     "Introduction to Game Input and Events in Quorum", 2)
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        
+        Heading h2_intro = section_intro:AddHeading("Input Polling", 2)
+        h2_intro:AddAttribute("data-text", "Input Polling")
+        
+        h2_intro:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_intro)
 
-        bodyDiv:AddParagraph(   "In this tutorial, we will learn about using player input and the game engine’s event system. "
+
+        section_intro:AddParagraph(   "In this tutorial, we will learn about using player input and the game engine’s event system. "
                             +   "With these tools, our games will be able to react to mouse and keyboard input, as well as to colliding game objects.")
 
 
 
-
-        bodyDiv:AddHeading(     "Input Polling", 3)
-
-        bodyDiv:AddText(    "The first method we will discuss for getting player input is known as ")
+        Paragraph pB
+        pB:AddText(    "The first method we will discuss for getting player input is known as ")
         Bold CSPtitle
         CSPtitle:AddText("polling")
-        bodyDiv:Add(CSPtitle)
-        bodyDiv:AddText(    " . Polling is a technique which involves regularly checking the current state of the mouse or keyboard to see if the player is giving us any input. ")
+        pB:Add(CSPtitle)
+        pB:AddText(    ".Polling is a technique which involves regularly checking the current state of the mouse or keyboard to see if the player is giving us any input. ")
+        
+        section_intro:Add(pB)
 
         Paragraph p1
         CodeBlock cb1
@@ -70,21 +69,23 @@ class GamesEventsTutorial is Lesson
         p1:AddText(". If we want to monitor keyboard input, we will also include the KeyboardEvent library with the statement ")
         p1:Add(cb2)
         p1:AddText(".")
-        bodyDiv:Add(p1)
+        section_intro:Add(p1)
 
 
-        bodyDiv:AddText(             "To see input polling in action, we will use a sample program which will play a sound when we press the spacebar on the keyboard or when we click inside the screen. "
+        Paragraph pA
+        pA:AddText(             "To see input polling in action, we will use a sample program which will play a sound when we press the spacebar on the keyboard or when we click inside the screen. "
                             +   "To download a sample project that includes audio files, click ")
 
-        bodyDiv:AddLink( "here" , "/files/games/InputPollingProject.zip" ) 
-        bodyDiv:AddText(             ".")
+       pA:AddLink( "here" , "/files/games/InputPollingProject.zip" ) 
+        pA:AddText(             ".")
+        section_intro:Add(pA)
 
 
-        bodyDiv:AddParagraph(   "To begin with this sample, let’s start by looking at the objects we will use in our program.")
+       section_intro:AddParagraph(   "To begin with this sample, let’s start by looking at the objects we will use in our program.")
 
 
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("InputMonitor monitor" + cr
+        section_intro:Add(preformatter:GeneratePreformattedCode("InputMonitor monitor" + cr
                                                         + "KeyboardEvent keys" + cr 
                                                         + "Audio keySound" + cr 
                                                         + "Audio mouseSound"))
@@ -121,7 +122,7 @@ class GamesEventsTutorial is Lesson
         li03:Add(p0)
         goalList1:Add(li03)
 
-        bodyDiv:Add(goalList1)
+        section_intro:Add(goalList1)
 
 
 
@@ -146,7 +147,7 @@ class GamesEventsTutorial is Lesson
                    +    "            keySound:Play()" + cr
                    +    "        end" + cr 
                    +    "    end" + cr )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_intro:Add(preformatter:GeneratePreformattedCode(cb3))
 
 
         Paragraph p3
@@ -161,7 +162,7 @@ class GamesEventsTutorial is Lesson
         p3:AddText(" we ask the InputMonitor to check if any of the mouse buttons are currently being held down. If any of them are, we will enter the code inside the ")
         p3:Add(cb4)
         p3:AddText(" block.")
-        bodyDiv:Add(p3)
+        section_intro:Add(p3)
 
         Paragraph p4
         CodeBlock cb6
@@ -171,23 +172,42 @@ class GamesEventsTutorial is Lesson
         p4:AddText(" . The InputMonitor action IsKeyPressed will test if a particular key on the keyboard is being held down. Inside the action, we have to tell Quorum which key we want to test, so we give it the value of SPACE from the KeyboardEvent class. To see the names of all the keys refer to the ")
         p4:AddLink("KeyboardEvent", "/Libraries/Interface/Events/KeyboardEvent.html" )
         p4:AddText(" documentation.")
-        bodyDiv:Add(p4)
+        section_intro:Add(p4)
 
-        bodyDiv:AddText(             "These two actions are enough to test for input from both mouse and keyboard, but the InputMonitor has other actions to poll for other kinds of information, such as the current location of the mouse. "
+        Paragraph p5
+        p5:AddText(             "These two actions are enough to test for input from both mouse and keyboard, but the InputMonitor has other actions to poll for other kinds of information, such as the current location of the mouse. "
                             +   "For full details on what an InputMonitor can do, see its documentation page ")
-        bodyDiv:AddLink( "here" , "/Libraries/Game/InputMonitor.html" + dq ) 
-        bodyDiv:AddText(             ".")
+        p5:AddLink( "here" , "/Libraries/Game/InputMonitor.html" + dq ) 
+        p5:AddText(             ".")
+        section_intro:Add(p5)
 
-        bodyDiv:AddParagraph(   "Try it out below:")
+        section_intro:AddParagraph(   "Try it out below:")
 
-        AddIDE(bodyDiv, "gamesAnimating2DIDE2", "Activity: Play Sounds with Input Polling", 
-            "Try the above code block.", "examples/Games/Events/Main.quorum")
-
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        
+          Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("PlaySounds.quorum", "examples/Games/Events/Main.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Play Sounds with Input Polling")
+    section_try_yourself:Add(ide3)
+    
+    
+     Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -212,5 +232,13 @@ class GamesEventsTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/games/events.html"
+    end
+    
+    action GetLinkName returns text
+        return "Input Polling"
+    end
+
+    action GetSectionName returns text
+        return "User Interaction and Events"
     end
 end
