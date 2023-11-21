@@ -124,7 +124,7 @@ class Lesson is WebPage
         Division div
             div:SetIdentifier("zoomedImageContainer")
             // Use 'flex-col' to stack children vertically and 'items-center' to center them horizontally
-            div:AddClassAttribute("hidden fixed inset-0 bg-neutral-grey-65 bg-opacity-50 flex flex-col items-center p-8 z-50")
+            div:AddClassAttribute("hidden flex fixed inset-0 bg-neutral-grey-65 bg-opacity-50 flex-col items-center p-8 z-50")
         
         // Container for the image
         Image image
@@ -217,29 +217,71 @@ class Lesson is WebPage
         Array<Lesson> lessonArray = CreateLinkedArrays()
         Division div
         div:AddClassAttribute("h-toc overflow-auto")
+
         Division innerDiv
         innerDiv:AddClassAttribute("px-0.5")
+
         NavigationDivision nav
         nav:SetIdentifier("onPageTableOfContents")
         nav:AddClassAttribute("font-sans")
+
         Heading h2
         h2:SetScale(2)
         h2:AddClassAttribute("font-bold uppercase")
         h2:AddText("On this page")
         nav:Add(h2)
+
         UnorderedList ul
-        ul:AddClassAttribute("space-y-2")
+
         integer i = 0
         repeat while i < headingArray:GetSize()
             Heading headingIndex = headingArray:Get(i)
-            
+
             ListItem li
             li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
+
+            // Normalize the heading text
+            text headingText = headingIndex:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
             
+            // Count the occurrences of this heading text in previous headings
+            integer count = 0
+            integer j = 0
+            repeat while j <= i
+                Heading tempHeading = headingArray:Get(j)
+                text tempText = tempHeading:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
+                if tempText = headingText
+                    count = count + 1
+                end
+                j = j + 1
+            end
+
+            // Set a unique identifier for each heading
+            text uniqueId = headingText
+            if count > 1
+                uniqueId = uniqueId + "_" + count
+            end
+            headingIndex:SetIdentifier(uniqueId)
+
             Link headingLink
             headingLink:AddClassAttribute("block w-full py-1 px-2")
             headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
-            headingLink:SetAddress("#" + headingIndex:GetIdentifier():GetValue())
+            headingLink:SetAddress("#" + uniqueId)
+            
+            // Apply font size based on heading level using if-else conditions
+            integer headingScale = headingIndex:GetScale()
+            //h1 and h2 should be the starts of new sections
+            if headingScale = 1 or headingScale = 2 
+                headingLink:AddClassAttribute("text-[16px] ml-0 mt-4")
+             elseif headingScale = 3 
+                headingLink:AddClassAttribute("text-[15px] ml-2 mt-2")
+             elseif headingScale = 4 
+                headingLink:AddClassAttribute("text-[14px] ml-4 mt-2")
+             elseif headingScale = 5 
+                headingLink:AddClassAttribute("text-[13px] ml-6 mt-2")
+             elseif headingScale = 6 
+                headingLink:AddClassAttribute("text-[12px] ml-8 mt-2") 
+            end
+
             li:Add(headingLink)
             ul:Add(li)
             i = i + 1
@@ -249,65 +291,61 @@ class Lesson is WebPage
         Script script
 
 script:SetCode("
-    document.addEventListener('DOMContentLoaded', () => {
-          // Only select headings with the 'data-onpage-toc' attribute
-          const headings = document.querySelectorAll('#content * h1[data-onpage-toc], #content * h2[data-onpage-toc], #content * h3[data-onpage-toc]');
-          const links = document.querySelectorAll('#onPageTableOfContents ul li a');
-          let currentSectionIndex = -1;
-          let isClickScrolling = false; // Flag to indicate scroll triggered by a click
-          let scrollTimeout = null; // Variable to store the timeout ID
+document.addEventListener('DOMContentLoaded', () => {
+    const headings = document.querySelectorAll('#content * h1[data-onpage-toc], #content * h2[data-onpage-toc], #content * h3[data-onpage-toc], #content * h4[data-onpage-toc], #content * h5[data-onpage-toc], #content * h6[data-onpage-toc]');
+    const links = document.querySelectorAll('#onPageTableOfContents ul li a');
 
-          // Function to clear all active classes
-          function clearActiveStates() {
-              links.forEach(function(link) {
-                  link.classList.remove('font-bold', 'text-quorum-blue-150');
-              });
-          }
+    let headingCounts = {};
+    let headingLinksCount = {};
+    let currentSectionIndex = -1;
+    let isClickScrolling = false;
+    let scrollTimeout = null;
 
-          // Function to update active link on scroll
-          function updateActiveLinkOnScroll() {
-              if (isClickScrolling) return; // Do nothing if scroll is due to a click
+    function clearActiveStates() {
+        links.forEach(link => {
+            link.classList.remove('font-bold', 'text-quorum-blue-150');
+        });
+    }
 
-              var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-              headings.forEach((heading, index) => {
-                  if (heading.getBoundingClientRect().top - 150 <= 0) {
-                      currentSectionIndex = index;
-                  }
-              });
+    function updateActiveLinkOnScroll() {
+        if (isClickScrolling) return;
+        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        headings.forEach((heading, index) => {
+            if (heading.getBoundingClientRect().top - 150 <= 0) {
+                currentSectionIndex = index;
+            }
+        });
 
-              clearActiveStates();
-              if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
-                  links[currentSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
-              }
-          }
+        clearActiveStates();
+        if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
+            links[currentSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
+        }
+    }
 
-          // Add click event listeners to each link
-          links.forEach((link, index) => {
-              link.addEventListener('click', function(event) {
-                  event.preventDefault();
-                  isClickScrolling = true;
-                  currentSectionIndex = index;
-                  clearActiveStates();
-                  link.classList.add('font-bold', 'text-quorum-blue-150');
+    links.forEach((link, index) => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            isClickScrolling = true;
+            currentSectionIndex = index;
+            clearActiveStates();
+            link.classList.add('font-bold', 'text-quorum-blue-150');
 
-                  const id = link.getAttribute('href').substring(1);
-                  const headingToScrollTo = document.getElementById(id);
-                  if (headingToScrollTo) {
-                      headingToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      
-                      // Clear any existing timeout to reset the timer
-                      clearTimeout(scrollTimeout);
-                      // Set a new timeout to reset the flag after scrolling finishes
-                      scrollTimeout = setTimeout(() => {
-                          isClickScrolling = false;
-                      }, 1000); // Adjust time as needed
-                  }
-              });
-          });
+            const id = link.getAttribute('href').substring(1);
+            const headingToScrollTo = document.getElementById(id);
+            if (headingToScrollTo) {
+                headingToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-          updateActiveLinkOnScroll(); // Initial call
-          window.addEventListener('scroll', updateActiveLinkOnScroll); // Add scroll event listener
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isClickScrolling = false;
+                }, 1000);
+            }
+        });
     });
+
+    updateActiveLinkOnScroll();
+    window.addEventListener('scroll', updateActiveLinkOnScroll);
+});
 ")
 
         Add(script)
