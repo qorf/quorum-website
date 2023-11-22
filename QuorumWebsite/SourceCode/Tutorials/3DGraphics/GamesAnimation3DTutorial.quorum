@@ -1,17 +1,6 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class GamesAnimation3DTutorial is Lesson
     text dq = ""
@@ -28,45 +17,65 @@ class GamesAnimation3DTutorial is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Moving and Animating in 3D with Quorum", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Moving and Animating in 3D with Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Moving and Animating in 3D with Quorum")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial tells you how to move and animate items on a screen in 3 dimensions")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Moving and Animating Items", 2)
-        bodyDiv:AddParagraph(   "This tutorial will discuss Quorum's 3D coordinate system, and how to make 3D items move, rotate, and scale in your game.")
+        Section section_animate
+        section_animate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_animate)
+        AddHeading(section_animate, "Moving and Animating Items", 2)
 
-        AddSideBySideIDE(bodyDiv, "animate3DtutorialIDE", "Moving Items in 3D", "")
+        section_animate:AddParagraph("This tutorial will discuss Quorum's 3D coordinate system, and how to make 3D items move, rotate, and scale in your game.")
 
-        //the section on coordinate system
-        bodyDiv:AddHeading("Quorum's 3D Coordinate System", 2)
-        bodyDiv:AddParagraph(   "Before we can begin to animate 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
+        CodeForIDE code1
+        code1:AddFileText("Animate3D.quorum", " ")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Try actions")
+        section_animate:Add(ide)
+
+        AddHeading(section_animate, "Quorum's 3D Coordinate System", 3)
+     
+        section_animate:AddParagraph(   "Before we can begin to animate 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
                             +   "3D objects are called 3D because they have three dimensions. A 2D object has width and height and a 3D object adds depth. "
                             +   "In 2D animation, the position and size of an object on the screen can be explained using two measurements: "
                             +   "one horizontal across the center of the screen (the x-axis) and one vertical across the center of the screen (the y-axis). "
                             +   "When we add a third measurement for 3D, it runs from the user through the screen, getting farther away (we call this the z-axis). "
                             +   "All 3D modeling is based on these three axes, but different programs use them differently." )
-        bodyDiv:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
+        section_animate:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
                             +   "the y-axis is positive in the up direction and the x-axis is positive to the right. The difference between the two is the z-axis. "
                             +   "In the left-handed system, the z-axis is positive away from the user. In the right-handed system, the z-axis is positive toward the user. "
                             +   "Quorum uses the left-handed coordinate system. This is important because if we want an object to move closer or farther away, "
                             +   "we need to know if we should increase or decrease the z coordinate. "
                             +   "Below is an image that represents the left-handed coordinate system using a computer monitor.")
-        bodyDiv:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+        Image image = section_animate:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+        image:AddAttribute("data-zoom","")
 
         //the section on moving objects
-        bodyDiv:AddHeading("Moving Objects", 2)
+        AddHeading(section_animate, "Moving Objects", 3)
 
-        bodyDiv:AddText(         "Before we can learn how to move an object around the screen, we must first create a Model object. Refer to the ")
-        bodyDiv:AddLink("Drawing in 3D", "/tutorials/games/drawing3D.html")
-        bodyDiv:AddText(         " tutorial for a refresher on how Models and drawing in 3D works. Remember to perform the following steps:")
+        Paragraph paraA
+        paraA:AddText(         "Before we can learn how to move an object around the screen, we must first create a Model object. Refer to the ")
+        Link linkA = paraA:AddLink("Drawing in 3D", "/tutorials/games/drawing3D.html")
+        linkA:SetClassAttribute("underlime quorum-blue-150")
+        paraA:AddText(         " tutorial for a refresher on how Models and drawing in 3D works. Remember to perform the following steps:")
+        section_animate:Add(paraA)
 
         UnorderedList list
         list:AddListItem("include your use statement for the Model library, as well as the Color, Camera, AmbientLight, and DirectionalLight libraries")
@@ -76,9 +85,9 @@ class GamesAnimation3DTutorial is Lesson
         list:AddListItem("load the cylinder primitive into the Model (use a width, height, and depth of 1.5 and the color object for this example)")
         list:AddListItem("add the Model object to the game")
         list:AddListItem("set up the lighting (directional and ambient)")
-        bodyDiv:Add(list)
+        section_animate:Add(list)
 
-        bodyDiv:AddParagraph(        "Our code should look like this:")
+        section_animate:AddParagraph(        "Our code should look like this:")
 
         CodeBlock cb1
         Span s0
@@ -151,19 +160,20 @@ class GamesAnimation3DTutorial is Lesson
                     +   "    action Update(number seconds)" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb1))
 
 
-        bodyDiv:AddParagraph(   "The code above loads a cylinder in the middle of our screen:")
-        bodyDiv:AddImage("/media/games/cylinder.png", "This is an image of the cylinder")
-        bodyDiv:AddParagraph(   "Now that our initial cylinder is drawn, we can explore how it can move on the screen. "
+        section_animate:AddParagraph(   "The code above loads a cylinder in the middle of our screen:")
+        Image image1 = section_animate:AddImage("/media/games/cylinder.png", "This is an image of the cylinder")
+        image:AddAttribute("data-zoom","")
+        section_animate:AddParagraph(   "Now that our initial cylinder is drawn, we can explore how it can move on the screen. "
                             +   "In order to move the object we need to set its new position on the game screen. Every Model has a set of properties attached to it. "
                             +   "Three of those properties are its x, y, and z position on the game screen. By default, Models are located at position (0, 0, 0), "
                             +   "which is the middle the screen. Since we haven't previously set new coordinates, all the objects we've drawn so far have been positioned at the default "
                             +   "(0,0,0) position. If we want to position an item in a different location, we can use the SetX, SetY, and SetZ actions that are part of the Model class. "
                             +   "These actions each take a number parameter that represents the new x, y, or z coordinate of the Model. "
                             +   "In the 2D animation tutorial, we used movement along the x and y axes, so we will focus on movement along the z-axis in this tutorial." )
-        bodyDiv:AddParagraph(   "Navigate to the CreateGame action and place the following line of code after Add(cylinder):")
+        section_animate:AddParagraph(   "Navigate to the CreateGame action and place the following line of code after Add(cylinder):")
 
         CodeBlock cb2
         Span s10
@@ -171,9 +181,9 @@ class GamesAnimation3DTutorial is Lesson
         s10:SetClassAttribute("comment")
         cb2:Add(s10)
         cb2:AddText(    "cylinder:SetZ(-2)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb2))
 
-        bodyDiv:AddParagraph(   "In order to move our cylinder farther away, edit that line to read:")
+        section_animate:AddParagraph(   "In order to move our cylinder farther away, edit that line to read:")
 
         CodeBlock cb3
         Span s11
@@ -181,16 +191,16 @@ class GamesAnimation3DTutorial is Lesson
         s11:SetClassAttribute("comment")
         cb3:Add(s11)
         cb3:AddText(    "cylinder:SetZ(2)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb3))
 
-        bodyDiv:AddParagraph(   "For now, let's set the initial position of our cylinder to be a little farther away and to the lower left of our screen by adding these three lines:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "cylinder:SetX(-2)" + cr
+        section_animate:AddParagraph(   "For now, let's set the initial position of our cylinder to be a little farther away and to the lower left of our screen by adding these three lines:")
+        section_animate:Add(preformatter:GeneratePreformattedCode(  "cylinder:SetX(-2)" + cr
                                                         +   "cylinder:SetY(-2)" + cr
                                                         +   "cylinder:SetZ(2)"))
-        bodyDiv:AddParagraph(   "The same animation principles mentioned in the 2D animation tutorial also apply in 3D. To achieve smooth movement across a number of frames, "
+        section_animate:AddParagraph(   "The same animation principles mentioned in the 2D animation tutorial also apply in 3D. To achieve smooth movement across a number of frames, "
                             +   "we must move the image incrementally over a period of time. To do this, remember that we can take advantage of our Update action, "
                             +   "which is called by the engine on each frame while game's main loop is active." )
-        bodyDiv:AddParagraph(   "If we want to insert movement code in the update action, navigate to the Update(number seconds) action. "
+        section_animate:AddParagraph(   "If we want to insert movement code in the update action, navigate to the Update(number seconds) action. "
                             +   "This is where we write our code to move the Model through three space on each frame. To do this, "
                             +   "we need three number parameters that represent the new x position, the new y position, and the new z position calculated during the game's main loop. "
                             +   "We can calculate the new x, y, and z positions by getting the current x and y positions plus some speed value multiplied by the seconds parameter. "
@@ -198,7 +208,7 @@ class GamesAnimation3DTutorial is Lesson
                             +   "The speed value represents how many pixels to move in a second. So, if the number chosen is small, the movement will be slow, maybe even too slow to see! "
                             +   "Likewise, if the number chosen is too large, the movement will not appear smooth; instead, the Model will appear to jump through space. "
                             +   "Play around with different speed values to see their effect." )
-        bodyDiv:AddParagraph(   "An example of code that moves a Model across the screen is below:")
+        section_animate:AddParagraph(   "An example of code that moves a Model across the screen is below:")
 
         CodeBlock cb4
         Span s12
@@ -212,21 +222,25 @@ class GamesAnimation3DTutorial is Lesson
                     +   "        number newZ = cylinder:GetZ() - 2 * seconds" + cr
                     +   "        cylinder:SetPosition(newX, newY, newZ)" + cr
                     +   "    end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb4))
 
 
-        bodyDiv:AddParagraph(   "If we run our program now (F6), we will see our cylinder move across the screen and closer until it eventually leaves the screen.")
+        section_animate:AddParagraph(   "If we run our program now (F6), we will see our cylinder move across the screen and closer until it eventually leaves the screen.")
+
+        Section section_rotate
+        section_rotate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_rotate)
+        AddHeading(section_rotate, "Rotating and Scaling Objects", 2)
 
         //the section on rotating and scaling objects
-        bodyDiv:AddHeading("Rotating and Scaling Objects", 2)
-        bodyDiv:AddParagraph(   "In addition to moving across the screen, Models can also be rotated and scaled using the Quorum Game Library. "
+        section_rotate:AddParagraph(   "In addition to moving across the screen, Models can also be rotated and scaled using the Quorum Game Library. "
                             +   "This section will cover how to rotate and scale your Model during your game." )
-        bodyDiv:AddParagraph(   "Models can be rotated or scaled during a game. Internally, Models store information relating to their orientation about a 3D axis, "
+        section_rotate:AddParagraph(   "Models can be rotated or scaled during a game. Internally, Models store information relating to their orientation about a 3D axis, "
                             +   "including the degree of rotation and whether the Model has been scaled.")
 
         //the section on rotation
-        bodyDiv:AddHeading("Rotation", 3)
-        bodyDiv:AddParagraph(   "Let's start with rotation. Models have actions that allow us to change their rotation in our game. The Rotate action takes 4 numbers: "
+        AddHeading(section_rotate, "Rotation", 3)
+        section_rotate:AddParagraph(   "Let's start with rotation. Models have actions that allow us to change their rotation in our game. The Rotate action takes 4 numbers: "
                             +   "one to indicate the direction around each axis (x,y,z) and a number that represents the rotation angle in degrees. "
                             +   "So, passing the values (1, 0, 0, 90) to this action will rotate our Model 90 degrees clockwise around the x axis. "
                             +   "Negative values can be passed to this function as well, having the effect of changing the direction of rotation. "
@@ -270,14 +284,15 @@ class GamesAnimation3DTutorial is Lesson
                     +   "    action Update(number seconds)" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+       section_rotate:Add(preformatter:GeneratePreformattedCode(cb5))
 
 
-        bodyDiv:AddParagraph(   "These lines of code produce the following effect on our cylinder:")
-        bodyDiv:AddImage("/media/games/rotated_cylinder.png", "This is an image of a rotated cyclinder")
-        bodyDiv:AddParagraph(   "Recall that in 2D drawing, Drawables have two separate rotation actions: SetRotation() and Rotate(). "
+        section_rotate:AddParagraph(   "These lines of code produce the following effect on our cylinder:")
+        Image image2 = section_rotate:AddImage("/media/games/rotated_cylinder.png", "This is an image of a rotated cyclinder")
+        image2:AddAttribute("data-zoom","")
+        section_rotate:AddParagraph(   "Recall that in 2D drawing, Drawables have two separate rotation actions: SetRotation() and Rotate(). "
                             +   "The Model action Rotate() is just like the 2D Rotate action: it tells the model to rotate the given number of degrees from its current position." )
-        bodyDiv:AddParagraph(   "Rotation can also be performed in the Update loop of our game to have the Model rotate throughout the game. "
+        section_rotate:AddParagraph(   "Rotation can also be performed in the Update loop of our game to have the Model rotate throughout the game. "
                             +   "Simply place the call to rotate the Model in the Update action instead of the CreateGame action. An example of this is shown below, "
                             +   "but you can try different values in order to change the direction and the speed of rotation. "
                             +   "This code will cause our cylinder to rotate clockwise around the z-axis.")
@@ -319,14 +334,14 @@ class GamesAnimation3DTutorial is Lesson
         cb6:AddText(    "        cylinder:Rotate(0, 0, 1, 1)" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb6))
 
 
 
 
         //the section on scaling
-        bodyDiv:AddHeading("Scaling", 2)
-        bodyDiv:AddParagraph(   "Sometimes, you may want to make your object appear larger or smaller on the screen. In Quorum (and many other applications), this is known as scaling. "
+        AddHeading(section_rotate, "Scaling", 3)
+        section_rotate:AddParagraph(   "Sometimes, you may want to make your object appear larger or smaller on the screen. In Quorum (and many other applications), this is known as scaling. "
                             +   "To scale a Model in Quorum, we can call the Scale() action. "
                             +   "This action takes three number parameters that represent the factor the image will be scaled by in each direction (x, y, z). "
                             +   "If we want our object’s proportions to stay the same, we need to put the same number for each direction. "
@@ -391,12 +406,13 @@ class GamesAnimation3DTutorial is Lesson
                     +   "    action Update(number seconds)" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb7))
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb7))
 
 
-        bodyDiv:AddParagraph(   "The image below shows the result of the above code.")
-        bodyDiv:AddImage("/media/games/scaled_cylinder.png", "This is an image of a scaled cylinder")
-        bodyDiv:AddParagraph(   "Scaling can be a difficult concept to visualize. The code below is for a game to explore scaling. Copy and run this code. "
+        section_rotate:AddParagraph(   "The image below shows the result of the above code.")
+        Image image3 = section_rotate:AddImage("/media/games/scaled_cylinder.png", "This is an image of a scaled cylinder")
+        image3:AddAttribute("data-zoom", "")
+        section_rotate:AddParagraph(   "Scaling can be a difficult concept to visualize. The code below is for a game to explore scaling. Copy and run this code. "
                             +   "In the game, the left and right arrow keys control the width scale (the z-axis), "
                             +   "the up and down arrow keys control the height scale (the y-axis), shift + the up and down arrow keys controls the depth scale (the z-axis). "
                             +   "To scale the whole model press the space key (shift + space to decrease size).")
@@ -497,16 +513,16 @@ class GamesAnimation3DTutorial is Lesson
                     +   "               math:Round(cylinder:GetWidth() * cylinder:GetTransform():GetScaleZ(), 3) + " + dq + ")" + dq + cr 
                     +   "        end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb8))
 
 
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -531,5 +547,13 @@ class GamesAnimation3DTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/games/animation3D.html"
+    end
+
+    action GetLinkName returns text
+        return "3D Animation"
+    end
+
+    action GetSectionName returns text
+        return "3D Graphics"
     end
 end

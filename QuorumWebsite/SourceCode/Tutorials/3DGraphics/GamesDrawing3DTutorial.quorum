@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class GamesDrawing3DTutorial is Lesson
     text dq = ""
@@ -28,54 +16,82 @@ class GamesDrawing3DTutorial is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Drawing in 3D", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Drawing in 3D with Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Drawing in 3D with Quorum")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial tells you how to draw 3D objects on the screen in Quorum")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("An Introduction to Drawing in 3D in Quorum", 2)
-
-        bodyDiv:AddText(             "This tutorial will cover 1) loading primitive shapes, 2) basic camera setup, and 3) basic lighting. "
+        Section section_animate
+        section_animate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_animate)
+        AddHeading(section_animate, "Drawing in 3D", 2)
+        
+        Paragraph para
+        para:AddText(             "This tutorial will cover 1) loading primitive shapes, 2) basic camera setup, and 3) basic lighting. "
                             +   "These topics will help the reader learn to load basic 3D shapes and view and light a 3D scene in the Quorum Game Engine. You can download ")
-        bodyDiv:AddLink("this program template", "/files/games/Drawing3DTutorial.zip")
-        bodyDiv:AddText(             " which contains the image we will use. You may also use the IDE below." )
+        Link link = para:AddLink("this program template", "/files/games/Drawing3DTutorial.zip")
+        link:AddClassAttribute("underline quorum-blue-150")
+        para:AddText(             " which contains the image we will use. You may also use the IDE below." )
+        section_animate:Add(para)
 
-        AddSideBySideIDE(bodyDiv, "draw3DtutorialIDE", "Activity: Try actions", "")
-
-
-        bodyDiv:AddHeading(   "Quorum's 3D Coordinate System", 2)
-        bodyDiv:AddParagraph(   "Before we begin to draw 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
+        CodeForIDE code1
+        code1:AddFileText("Drawing3D.quorum", " ")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Try actions")
+        section_animate:Add(ide)
+    
+        Section section_coordinates
+        section_coordinates:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_coordinates)
+        AddHeading(section_coordinates, "Quorum's 3D Coordinate System", 2)
+    
+        section_coordinates:AddParagraph(   "Before we begin to draw 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
                             +   "3D objects are called 3D because they have three dimensions. A 2D object has width and height and a 3D object adds depth. "
                             +   "In 2D animation, the position and size of an object on the screen can be explained using two measurements: "
                             +   "one horizontal across the center of the screen (the x-axis) and one vertical across the center of the screen (the y-axis). "
                             +   "When we add a third measurement for 3D, it runs from the user through the screen, getting farther away (we call this the z-axis). "
                             +   "All 3D modeling is based on these three axes, but different programs use them differently." )
-        bodyDiv:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
+       section_coordinates:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
                             +   "the y-axis is positive in the up direction and the x-axis is positive to the right. The difference between the two is the z-axis. "
                             +   "In the left-handed system, the z-axis is positive away from the user. In the right-handed system, the z-axis is positive toward the user. "
                             +   "Quorum uses the left-handed coordinate system. This is important because if we want an object to move closer or farther away, "
                             +   "we need to know if we should increase or decrease the z coordinate. Below is an image that represents the left-handed coordinate system "
                             +   "using a computer monitor.")
 
-        bodyDiv:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+        Image image = section_coordinates:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+        image:AddAttribute("data-zoom","")
+
 
         //the section on loading primitives
-        bodyDiv:AddHeading("Loading Primitives", 2)
-        bodyDiv:AddParagraph(   "3D Drawing is very similar to 2D drawing. The template you downloaded or any new game application will already have the use statement "
+
+        Section section_primatives
+        section_primatives:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_primatives)
+        AddHeading(section_primatives, "Loading Primitives", 2)
+
+        section_primatives:AddParagraph(   "3D Drawing is very similar to 2D drawing. The template you downloaded or any new game application will already have the use statement "
                             +   "for the game library. Now, just like we need to tell Quorum where to find the code to create a 2D image (a Drawable), "
                             +   "in order to draw a 3D shape (or a Model in Quorum), we need to add the use statement:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Model"))
-        bodyDiv:AddParagraph(   "This tells the compiler where to find the commands for the standard library Model class. "
+        section_primatives:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Model"))
+        section_primatives:AddParagraph(   "This tells the compiler where to find the commands for the standard library Model class. "
                             +   "We will also use the Speech library in order to give our box a description.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Sound.Speech"))
-        bodyDiv:AddParagraph(   "Then, we need to instantiate (or create and name) our model and our speech object:")
+        section_primatives:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Sound.Speech"))
+        section_primatives:AddParagraph(   "Then, we need to instantiate (or create and name) our model and our speech object:")
 
         CodeBlock cb1
         Span s0
@@ -97,13 +113,13 @@ class GamesDrawing3DTutorial is Lesson
                     +   "    action Update(number seconds)" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_primatives:Add(preformatter:GeneratePreformattedCode(cb1))
 
 
-        bodyDiv:AddParagraph(   "Quorum has some primitive 3D shapes that are ready to be used: a box or a cylinder for example. "
+        section_primatives:AddParagraph(   "Quorum has some primitive 3D shapes that are ready to be used: a box or a cylinder for example. "
                             +   "Let’s start by loading a box. We could have a box that is one solid color, but in order to add a file to texture the outside of our box, "
                             +   "download the Logo.png file and let’s put that in our project directory. In the template, it is provided in the media folder." )
-        bodyDiv:AddParagraph(   "Inside the CreateGame action we will use the code below to load a box and set its description:")
+        section_primatives:AddParagraph(   "Inside the CreateGame action we will use the code below to load a box and set its description:")
 
         CodeBlock cb2
         Span s2
@@ -121,12 +137,12 @@ class GamesDrawing3DTutorial is Lesson
         bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
 
 
-        bodyDiv:AddParagraph(   "In order to make Quorum read the description of our box when the space key is pressed, we can use input polling "
+        section_primatives:AddParagraph(   "In order to make Quorum read the description of our box when the space key is pressed, we can use input polling "
                             +   "(For more information on handling input see the Events tutorial). This can be done with just a few extra lines of code. "
                             +   "First, we need two use statements:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.InputMonitor" + cr
+        section_primatives:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.InputMonitor" + cr
                                                         +   "use Libraries.Interface.Events.KeyboardEvent"))
-        bodyDiv:AddParagraph(   "Then we need an object to monitor the input of the game (e.g., keystrokes). We can do that like this:")
+        section_primatives:AddParagraph(   "Then we need an object to monitor the input of the game (e.g., keystrokes). We can do that like this:")
 
         CodeBlock cb3
         Span s4
@@ -139,10 +155,10 @@ class GamesDrawing3DTutorial is Lesson
         s5:SetClassAttribute("comment")
         cb3:Add(s5)
         cb3:AddText(    "KeyboardEvent keys")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_primatives:Add(preformatter:GeneratePreformattedCode(cb3))
 
 
-        bodyDiv:AddParagraph(   "Finally, we need to add code into our update loop to check when the space bar is pressed. We do that like this:")
+        section_primatives:AddParagraph(   "Finally, we need to add code into our update loop to check when the space bar is pressed. We do that like this:")
 
         CodeBlock cb4
         Span s6
@@ -155,10 +171,10 @@ class GamesDrawing3DTutorial is Lesson
                     +   "        speech:Say(model:GetDescription())" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        section_primatives:Add(preformatter:GeneratePreformattedCode(cb4))
 
 
-        bodyDiv:AddParagraph(   "And this is what our game code should look like altogether:")
+        section_primatives:AddParagraph(   "And this is what our game code should look like altogether:")
 
         CodeBlock cb5
         Span s7
@@ -215,19 +231,24 @@ class GamesDrawing3DTutorial is Lesson
                     +   "        end" + cr
                     +   "    end" + cr
                     +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        section_primatives:Add(preformatter:GeneratePreformattedCode(cb5))
 
 
-        bodyDiv:AddParagraph(   "Now Quorum will read the description of our box when the space key is pressed. If we run this program just like that, the rendered box is pretty boring:")
-        bodyDiv:AddImage("/media/games/boring_box_1.png", "This is an image of a boring box in 2D")
-        bodyDiv:AddParagraph(   "There are two important aspects of a 3D scene that we have not set up yet: the camera and lighting.")
+        section_primatives:AddParagraph(   "Now Quorum will read the description of our box when the space key is pressed. If we run this program just like that, the rendered box is pretty boring:")
+        Image image2 = section_primatives:AddImage("/media/games/boring_box_1.png", "This is an image of a boring box in 2D")
+        image2:AddAttribute("data-zoom","")
+        section_primatives:AddParagraph(   "There are two important aspects of a 3D scene that we have not set up yet: the camera and lighting.")
 
+
+         Section section_camera
+        section_camera:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_camera)
+        AddHeading(section_camera, "Basic Camera", 2)
         //the section on basic camera
-        bodyDiv:AddHeading("Basic Camera", 2)
-        bodyDiv:AddParagraph(   "Our scene has a default perspective, but we can move the camera in order to see our box from another angle. "
+        section_camera:AddParagraph(   "Our scene has a default perspective, but we can move the camera in order to see our box from another angle. "
                             +   "First add this use statement for the Camera object:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Camera"))
-        bodyDiv:AddParagraph(   "Then, in the CreateGame action, we can set up our camera like this:")
+        section_camera:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.Camera"))
+        section_camera:AddParagraph(   "Then, in the CreateGame action, we can set up our camera like this:")
 
         CodeBlock cb6
         Span s14
@@ -246,22 +267,26 @@ class GamesDrawing3DTutorial is Lesson
         s16:SetClassAttribute("comment")
         cb6:Add(s16)
         cb6:AddText(    "    camera:LookAt(0, 0, 0)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+        section_camera:Add(preformatter:GeneratePreformattedCode(cb6))
 
 
-        bodyDiv:AddParagraph(   "Now we have a completely different perspective on our box:")
-        bodyDiv:AddImage("/media/games/camera_box_1.png", "This is an image of a camera box ")
+        section_camera:AddParagraph(   "Now we have a completely different perspective on our box:")
+       section_camera:AddImage("/media/games/camera_box_1.png", "This is an image of a camera box ")
 
         //the section on basic lighting
-        bodyDiv:AddHeading("Basic Lighting", 2)
-        bodyDiv:AddParagraph(   "Our final step that will make our box even better is adding lighting to our scene. Quorum has a few different kinds of light we could add, "
+        Section section_lighting
+        section_lighting:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_lighting)
+        AddHeading(section_lighting, "Basic Lighting", 2)
+
+        section_lighting:AddParagraph(   "Our final step that will make our box even better is adding lighting to our scene. Quorum has a few different kinds of light we could add, "
                             +   "but for our box we will use directional and ambient lighting. Neither of these types of lighting has a specific origin point. "
                             +   "Directional lighting comes from a certain direction and ambient lighting is the light that is present in a scene without a specific source. " 
                             +   "We can add some directional light coming from the right, and some ambient light to our scene, "
                             +   "but we first have to add these use statements so that Quorum can find the lighting code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.AmbientLight" + cr
+        section_lighting:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.AmbientLight" + cr
                                                         +   "use Libraries.Game.Graphics.DirectionalLight"))
-        bodyDiv:AddParagraph(   "Then in our createGame action we will add the code to create the lights (and let’s not forget to update our box description). "
+        section_lighting:AddParagraph(   "Then in our createGame action we will add the code to create the lights (and let’s not forget to update our box description). "
                             +   "Here is what our code will look like altogether now:")
 
         CodeBlock cb8
@@ -312,19 +337,19 @@ class GamesDrawing3DTutorial is Lesson
                     +   "        end" + cr
                     +   "    end" + cr
                     +   "end ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        section_lighting:Add(preformatter:GeneratePreformattedCode(cb8))
 
 
-        bodyDiv:AddParagraph(   "When we run this code we can see how important lighting is to 3D animation:")
-        bodyDiv:AddImage("/media/games/final_box_1.png", "his is an image of a final box in 3D")
-        bodyDiv:AddParagraph(   "Now we can load primitive shapes and setup basic cameras and lighting!")
+        section_lighting:AddParagraph(   "When we run this code we can see how important lighting is to 3D animation:")
+        section_lighting:AddImage("/media/games/final_box_1.png", "his is an image of a final box in 3D")
+        section_lighting:AddParagraph(   "Now we can load primitive shapes and setup basic cameras and lighting!")
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+         Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -349,5 +374,13 @@ class GamesDrawing3DTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/games/drawing3D.html"
+    end
+
+    action GetLinkName returns text
+        return "3D Drawing"
+    end
+
+    action GetSectionName returns text
+        return "3D Graphics"
     end
 end
