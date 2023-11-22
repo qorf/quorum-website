@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class InheritanceTutorial is Lesson
     text dq = ""
@@ -32,16 +20,22 @@ class InheritanceTutorial is Lesson
         AdjustMain(mainRegion)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Inheritance in Quorum", 1)
-        headDiv:AddText("Quorum uses inheritance for establishing relationships between classes.")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("On Inheritance", 2)
-        bodyDiv:AddParagraph(   "We start our exploration of inheritance, a 
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Inheritance in Quorum", 1)
+
+        headDiv:AddText("Quorum uses inheritance for establishing relationships between classes.")
+        bodyDiv:Add(headDiv)
+
+        Section section_inheritance
+        section_inheritance:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_inheritance, "On Inheritance", 2)
+        section_inheritance:AddParagraph(   "We start our exploration of inheritance, a 
             method for reusing code commonly seen in many programming languages, 
             with an example on inheriting from Quorum’s math class. Imagine, for 
             example, there were certain mathematical operators that we wanted to 
@@ -50,7 +44,7 @@ class InheritanceTutorial is Lesson
             from it. There are good reasons we might want to do either one, but 
             first, we examine what we type:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_inheritance:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Math" + cr 
             +   "class Main is Math" + cr
             +   "     action Main" + cr
@@ -58,27 +52,33 @@ class InheritanceTutorial is Lesson
             +   "     end" + cr
             +   "end" + cr))
 
-        AddSideBySideIDE(bodyDiv, "inheritance1", "Activity: Try Inheritance", 
-            "Try inheriting from Math")
+        CodeForIDE code_inheritance
+        code_inheritance:AddFileText("Main.quorum", "//Try inheriting from Math")
+        IDE ide_inheritance = AddIDE()
+        ide_inheritance:HideDisplay()
+        ide_inheritance:SetCodeForIDE(code_inheritance:GetJsonArray())
+        ide_inheritance:SetIdeTitle("Activity: Try Inheritance")
+        section_inheritance:Add(ide_inheritance)
 
-        bodyDiv:AddParagraph("Notice that we accomplish this by first putting 
+        section_inheritance:AddParagraph("Notice that we accomplish this by first putting 
             in a use statement for the Math class, indicating where it lives. 
             Second, after the definition of our class, Main, we use the keyword 
             is and then the name of the class we want to inherit from. Next, 
             we define our Main action normally and, just so something appears 
             in our console for this example, an output statement.")
 
-        bodyDiv:AddParagraph("Now that we have inherited from the Math class, 
+        section_inheritance:AddParagraph("Now that we have inherited from the Math class, 
             we can access all of its actions. Here is a list of the actions 
             Math provides by default:")
 
-        bodyDiv:AddLink("Quorum's Math Class","https://quorumlanguage.com/Libraries/Compute/Math.php")
+        Link link1 = section_inheritance:AddLink("Quorum's Math Class","https://quorumlanguage.com/Libraries/Compute/Math.html")
+        link1:AddClassAttribute("underline w-fit text-quorum-blue-150")
 
-        bodyDiv:AddParagraph("Since we have inherited from Math we can call 
+        section_inheritance:AddParagraph("Since we have inherited from Math we can call 
             one of the Math actions even though we did not define them. For 
             example, the following example returns 4.0:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_inheritance:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Math" + cr 
             +   "class Main is Math" + cr
             +   "     action Main" + cr
@@ -87,18 +87,26 @@ class InheritanceTutorial is Lesson
             +   "     end" + cr
             +   "end" + cr))
 
-        AddSideBySideIDE(bodyDiv, "inheritance2", "Activity: Try using a Parent Action", 
-            "Try inheriting the Raise to Power action from Math")
+        CodeForIDE code_inheritance2
+        code_inheritance2:AddFileText("Main.quorum", "//Try inheriting the Raise to Power action from Math")
+        IDE ide_inheritance2 = AddIDE()
+        ide_inheritance2:HideDisplay()
+        ide_inheritance2:SetCodeForIDE(code_inheritance2:GetJsonArray())
+        ide_inheritance2:SetIdeTitle("Activity: Try using a Parent Action")
+        section_inheritance:Add(ide_inheritance2)
 
-        bodyDiv:AddParagraph("The key here is to realize that the RaiseToPower 
+        section_inheritance:AddParagraph("The key here is to realize that the RaiseToPower 
             action, the parameters here making its meaning 2-squared, can be 
             called because the Math class has such an action. By inheriting, 
             we are asking the Math class for permission to use it. Because this 
             action is public, Math gives permission.")
 
         //the section on inheriting a single class
-        bodyDiv:AddHeading("Overriding Actions", 2)
-        bodyDiv:AddParagraph("In addition to using actions from the Math class, 
+        Section section_overriding
+        section_overriding:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overriding, "Overriding Actions", 2)
+        section_overriding:AddParagraph("In addition to using actions from the Math class, 
             we can also add our own and even change the meaning of some of the 
             parent actions. This is a common thing to do. If we are using the 
             Game class to write games in Quorum, we might override the Update 
@@ -108,7 +116,7 @@ class InheritanceTutorial is Lesson
             approach. Here is an example of inheriting and calling an action 
             from the Random class:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_overriding:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Random" + cr 
             +   "class Main is Random" + cr
             +   "     action Main" + cr
@@ -117,10 +125,15 @@ class InheritanceTutorial is Lesson
             +   "     end" + cr
             +   "end" + cr))
 
-        AddSideBySideIDE(bodyDiv, "inheritance3", "Activity: Try Inheriting from Random", 
-            "Try inheriting the RandomInteger action from Random")
+        CodeForIDE code_inheritance3
+        code_inheritance3:AddFileText("Main.quorum", "//Try inheriting the RandomInteger action from Random")
+        IDE ide_inheritance3 = AddIDE()
+        ide_inheritance3:HideDisplay()
+        ide_inheritance3:SetCodeForIDE(code_inheritance3:GetJsonArray())
+        ide_inheritance3:SetIdeTitle("Activity: Try Inheriting from Random")
+        section_overriding:Add(ide_inheritance3)
 
-        bodyDiv:AddParagraph("By default, the RandomInteger action returns a 
+        section_overriding:AddParagraph("By default, the RandomInteger action returns a 
             number between 0 and the maximum integer on the system, which is 
             2,147,483,646. Suppose, however, that we needed this action to 
             return a different maximum number. Normally, this would not be 
@@ -130,7 +143,7 @@ class InheritanceTutorial is Lesson
             this case a relatively weak design, takes practice and iteration. 
             Here is our example, now with action overriding:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_overriding:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Random" + cr 
             +   "class Main is Random" + cr
             +   "     action Main" + cr
@@ -143,17 +156,24 @@ class InheritanceTutorial is Lesson
             +   "end" + cr))
 
 
-        AddSideBySideIDE(bodyDiv, "inheritance4", "Activity: Try Inheriting from Random", 
-            "Try overriding the RandomInteger action")
+        CodeForIDE code_inheritance4
+        code_inheritance4:AddFileText("Main.quorum", "//Try overriding the RandomInteger action")
+        IDE ide_inheritance4 = AddIDE()
+        ide_inheritance4:HideDisplay()
+        ide_inheritance4:SetCodeForIDE(code_inheritance4:GetJsonArray())
+        ide_inheritance4:SetIdeTitle("Activity: Try Inheriting from Random")
+        section_overriding:Add(ide_inheritance4)
 
-        bodyDiv:AddParagraph("In this case, the RandomInteger returns integer 
+        section_overriding:AddParagraph("In this case, the RandomInteger returns integer 
             action now provides numbers between 0 and 1000. Even though we have 
             inherited from Random, users of our class will receive our 
             functionality, not that of the parent class.")
         
-        bodyDiv:AddHeading("Inheriting from Multiple Classes", 2)
+        Section section_inherit_multiple
+        section_inherit_multiple:SetClassAttribute("flex flex-col gap-y-2") 
+        section_inherit_multiple:AddHeading("Inheriting from Multiple Classes", 2)
 
-        bodyDiv:AddParagraph("Programming languages differ significantly in 
+        section_inherit_multiple:AddParagraph("Programming languages differ significantly in 
             how inheritance works. Some programming languages, like Java, have 
             different styles of inheritance as compared to C++ or other 
             languages. Unfortunately, how this impacts programmers in 
@@ -163,11 +183,11 @@ class InheritanceTutorial is Lesson
             multiple inheritance, although it differs significantly from 
             well-known systems of multiple inheritance in languages like C++.")
 
-        bodyDiv:AddParagraph("If we wanted to inherit from two classes in 
+        section_inherit_multiple:AddParagraph("If we wanted to inherit from two classes in 
             Quorum, we create a comma separated list of the names in the class 
             definition, like so:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_inherit_multiple:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Random" + cr 
             +   "use Libraries.Compute.Math" + cr
             +   "class Main is Math, Random" + cr
@@ -180,24 +200,30 @@ class InheritanceTutorial is Lesson
             +   "     end" + cr
             +   "end" + cr))
 
-        AddSideBySideIDE(bodyDiv, "inheritance5", "Activity: Try Inheriting from two classes", 
-            "Try inheriting from Math and Random")
+        CodeForIDE code_inheritance5
+        code_inheritance5:AddFileText("Main.quorum", "//Try inheriting from Math and Random")
+        IDE ide_inheritance5 = AddIDE()
+        ide_inheritance5:HideDisplay()
+        ide_inheritance5:SetCodeForIDE(code_inheritance5:GetJsonArray())
+        ide_inheritance5:SetIdeTitle("Activity: Try Inheriting from two classes")
+        section_inherit_multiple:Add(ide_inheritance5)
 
-        bodyDiv:AddParagraph("In this case, notice that we can now call 
+        section_inherit_multiple:AddParagraph("In this case, notice that we can now call 
             actions from the Random class, like RandomInteger, and from the 
             Math class, like AbsoluteValue. This process works in a similar 
             way conceptually to how many programming languages, like Java, 
             C#, or C++, use inheritance. The difference is in how we access 
             variables from the parents (Math and Random).")
 
-        bodyDiv:AddHeading("Accessing Parent Variables", 2)
+        Section section_accessing_parent_variables
+        AddHeading(section_accessing_parent_variables, "Accessing Parent Variables", 2)
 
-        bodyDiv:AddParagraph("The Math class in Quorum has variables inside of 
+        section_accessing_parent_variables:AddParagraph("The Math class in Quorum has variables inside of 
             it, including some common constants like pi. To access them, we 
             need to tell Quorum where the variable comes from. So, if we wanted 
             to output the value of pi to the screen, we could do it like so:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_accessing_parent_variables:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Compute.Random" + cr 
             +   "use Libraries.Compute.Math" + cr
             +   "class Main is Math, Random" + cr
@@ -207,10 +233,17 @@ class InheritanceTutorial is Lesson
             +   "     end" + cr
             +   "end" + cr))
 
-        AddSideBySideIDE(bodyDiv, "inheritance6", "Activity: Try Inheriting Parent Variables", 
-            "Try using variables stored in the Math parent")
 
-        bodyDiv:AddParagraph("The crucial point here is that we first use a 
+        CodeForIDE code_inheritance6
+        code_inheritance6:AddFileText("Main.quorum", "//Try using variables stored in the Math parent")
+        IDE ide_inheritance6 = AddIDE()
+        ide_inheritance6:HideDisplay()
+        ide_inheritance6:SetCodeForIDE(code_inheritance6:GetJsonArray())
+        ide_inheritance6:SetIdeTitle("Activity: Try Inheriting Parent Variables")
+        section_accessing_parent_variables:Add(ide_inheritance6)
+
+
+        section_accessing_parent_variables:AddParagraph("The crucial point here is that we first use a 
             special keyword, called parent, and then provide which class we 
             want to obtain a variable from. In this case, that is Math. Then, 
             we say which variable we would like to obtain, in this case pi, 
@@ -218,7 +251,7 @@ class InheritanceTutorial is Lesson
             regardless of the parent and the type. Only public variables 
             from the parent can be accessed.")
 
-        bodyDiv:AddParagraph("Inheritance can be a complicated topic and 
+        section_accessing_parent_variables:AddParagraph("Inheritance can be a complicated topic and 
             students in college level courses may spend a few weeks or more 
             going over the various details, depending on the language and its 
             quirks. Even once the mechanics are understood, there are many 
@@ -228,11 +261,15 @@ class InheritanceTutorial is Lesson
             advanced functionality than hinted at here and is an important 
             part of the game engine.")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_inheritance)
+        bodyDiv:Add(section_overriding)
+        bodyDiv:Add(section_inherit_multiple)
+        bodyDiv:Add(section_accessing_parent_variables)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -257,5 +294,13 @@ class InheritanceTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/language/inheritance.html"
+    end
+
+    action GetLinkName returns text
+        return "Inheritance"
+    end
+
+    action GetSectionName returns text
+        return "Advanced Quorum"
     end
 end

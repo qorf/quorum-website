@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class HandlingErrorsTutorial is Lesson
     text dq = ""
@@ -32,20 +20,25 @@ class HandlingErrorsTutorial is Lesson
         AdjustMain(mainRegion)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Handling Errors", 1)
-        headDiv:AddText("How to deal with the inevitable.")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Error Handling", 2)
-        bodyDiv:AddParagraph(   "In Quorum, we may occasionally encounter an error. Errors in computer programs we write can be caused by a wide variety of problems, "
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Handling Errors", 1)
+
+        headDiv:AddText("How to deal with the inevitable.")
+        bodyDiv:Add(headDiv)
+        Section section_error_handling
+        section_error_handling:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_error_handling, "Error Handling", 2)
+        section_error_handling:AddParagraph(   "In Quorum, we may occasionally encounter an error. Errors in computer programs we write can be caused by a wide variety of problems, "
                             +   "from incorrect user input to bugs in our programs. For example, if a user attempts to divide a number by zero, "
                             +   "Quorum will alert us to a DivideByZeroError. We can reproduce this error in Quorum with the following code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number result = 12/0" + cr + "output result"))
-        bodyDiv:AddParagraph(   "When this error is encountered Quorum will stop running and the user will be provided an error message, "
+        section_error_handling:Add(preformatter:GeneratePreformattedCode(  "number result = 12/0" + cr + "output result"))
+        section_error_handling:AddParagraph(   "When this error is encountered Quorum will stop running and the user will be provided an error message, "
                             +   "indicating that a divide by zero error has occurred." + cr + cr
                             +   "Sometimes we may want Quorum to do something more intelligent when an error is encountered. "
                             +   "This is what error handling will allow us to do. "
@@ -62,26 +55,30 @@ class HandlingErrorsTutorial is Lesson
 
 
         //the section on error class
-        bodyDiv:AddHeading("The Error class", 2)
-        bodyDiv:AddParagraph(   "The error class is a class in the Quorum standard library that represents a general error in Quorum(Quorum.Language.Errors.Error). "
+        Section section_error_class
+        AddHeading(section_error_class, "The Error class", 2)
+        section_error_class:AddParagraph(   "The error class is a class in the Quorum standard library that represents a general error in Quorum(Quorum.Language.Errors.Error). "
                             +   "This error stores an error message, a general message telling the user something about the error, and a stack trace, "
                             +   "the state of the call stack when the error occurred." + cr )
-        bodyDiv:AddParagraph(   "All errors in Quorum inherit from the Error class (this is important when we create our own custom error). "
+        section_error_class:AddParagraph(   "All errors in Quorum inherit from the Error class (this is important when we create our own custom error). "
                             +   "Some of these errors include, CastError, IndexOutOfBoundsError, and DivideByZeroError.")
 
  
 
         //the section on detecting an error
-        bodyDiv:AddHeading("Detecting an Error", 2)
-        bodyDiv:AddParagraph(   "Sometimes we might want to handle an error that has occurred. For example, using the divide by zero example, "
+        Section section_detecting_error
+        section_detecting_error:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_detecting_error, "Detecting an Error", 2)
+        section_detecting_error:AddParagraph(   "Sometimes we might want to handle an error that has occurred. For example, using the divide by zero example, "
                             +   "suppose our code asked the user to enter a divisor. "
                             +   "If the user entered 0 your program would stop running and display an error message(see the following code example).")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "text userInput = input(" + dq + "divide by?" + dq + ")" + cr
+        section_detecting_error:Add(preformatter:GeneratePreformattedCode(  "text userInput = input(" + dq + "divide by?" + dq + ")" + cr
                                                         +   "integer divisor = cast(integer, userInput)" + cr
                                                         +   "result = 12/divisor" + cr + "output result"))
-        bodyDiv:AddParagraph(   "Instead of causing the program to fail, we could detect the error, let the user know about the problem, and set the divisor to 1. "
+        section_detecting_error:AddParagraph(   "Instead of causing the program to fail, we could detect the error, let the user know about the problem, and set the divisor to 1. "
                             +   "We can do this using the check/detect statement. In the check block you place the code that may cause the error.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "integer result = 0" + cr 
+        section_detecting_error:Add(preformatter:GeneratePreformattedCode(  "integer result = 0" + cr 
                                                         +   "check" + cr
                                                         +   "    text userInput = input(" + dq + "divide by?" + dq + ")" + cr
                                                         +   "    integer divisor = cast(integer, userInput)" + cr
@@ -98,24 +95,24 @@ class HandlingErrorsTutorial is Lesson
         p1:AddText(" It first specifies the name of the error variable "
                 +   "(this can be a name of your choosing, but we use " + dq + "e" + dq + "). "
                 +   "Then you can specify the type of error you will detect. In this case we want the DivideByZeroError.")
-        bodyDiv:Add(p1)
+        section_detecting_error:Add(p1)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "detect e is DivideByZeroError" + cr
+        section_detecting_error:Add(preformatter:GeneratePreformattedCode(  "detect e is DivideByZeroError" + cr
                                                         +   "    //give the user the error and set the divisor to 1" + cr
                                                         +   "    say e:GetErrorMessage()" + cr
                                                         +   "    result = 12/1" + cr
                                                         +   "end" + cr + "output result"))
-        bodyDiv:AddParagraph(   "In addition to the check and detect blocks, we can specify an optional always block. "
+        section_detecting_error:AddParagraph(   "In addition to the check and detect blocks, we can specify an optional always block. "
                             +   "In the always block you can specify code that needed to execute no matter what the outcome of the check block "
                             +   "(it will execute if an error occurred or no error occurred).")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "always" + cr
+        section_detecting_error:Add(preformatter:GeneratePreformattedCode(  "always" + cr
                                                         +   "    output " + dq + "calculating result" + dq + cr
                                                         +   "end"))
-        bodyDiv:AddParagraph(   "Putting it all together: the following code will ask the user for a number and check it for the specified error. "
+        section_detecting_error:AddParagraph(   "Putting it all together: the following code will ask the user for a number and check it for the specified error. "
                             +   "In this detect block we will detect more than one type of error, a general Error and a DivideByZeroError, "
                             +   "because the user could input text which would also be invalid (e.g. " + dq + "zero" + dq + "). "
                             +   "Once the check and detect blocks are executed the always will be called and a result will be given.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Language.Errors.Error" + cr
+        section_detecting_error:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Language.Errors.Error" + cr
                                                         +   "use Libraries.Language.Errors.DivideByZeroError" + cr + cr
                                                         +   "class Main" + cr
                                                         +   "    action Main" + cr
@@ -143,12 +140,14 @@ class HandlingErrorsTutorial is Lesson
 
 
         //the section on alerts
-        bodyDiv:AddHeading("Alerts", 2)
-        bodyDiv:AddParagraph(   "Sometimes we may need to trigger an error manually. This can be done using alerts which follow two formats, "
+        Section section_alerts
+        section_alerts:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_alerts, "Alerts", 2)
+        section_alerts:AddParagraph(   "Sometimes we may need to trigger an error manually. This can be done using alerts which follow two formats, "
                             +   "alert(&#60text&#62) and alert(&#60error&#62). In the first format an error of type Error is generated with the message specified by &#60text&#62.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "alert(" + dq + "Zero is not a valid input" + dq + ")"))
-        bodyDiv:AddParagraph(   "In the last format the full error is passed. The following is an example:")
-          bodyDiv:Add(preformatter:GeneratePreformattedCode(    "DivideByZeroError error" + cr
+        section_alerts:Add(preformatter:GeneratePreformattedCode(  "alert(" + dq + "Zero is not a valid input" + dq + ")"))
+        section_alerts:AddParagraph(   "In the last format the full error is passed. The following is an example:")
+          section_alerts:Add(preformatter:GeneratePreformattedCode(    "DivideByZeroError error" + cr
                                                             +   "error:SetErrorMessage(" + dq + "Zero is not a valid input" + dq + ")" + cr
                                                             +   "alert(error)"))
 
@@ -160,12 +159,14 @@ class HandlingErrorsTutorial is Lesson
 //        bodyDiv:Add(alertsIDE)
 
         //the section on custom errors
-        bodyDiv:AddHeading("Custom Errors", 2)
-        bodyDiv:AddParagraph(   "Creating your own custom errors in Quorum is requires that we extend the Libraries.Language.Errors.Error class.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Language.Errors.Error" + cr
+        Section section_custom_errors
+        section_custom_errors:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_custom_errors, "Custom Errors", 2)
+        section_custom_errors:AddParagraph(   "Creating your own custom errors in Quorum is requires that we extend the Libraries.Language.Errors.Error class.")
+        section_custom_errors:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Language.Errors.Error" + cr
                                                         +   "class MyError is Error" + cr
                                                         +   "end"))
-        bodyDiv:AddParagraph(   "It is also important to note that the error 
+        section_custom_errors:AddParagraph(   "It is also important to note that the error 
             handling system does not support inheritance hierarchies, 
             like most of Quorum. In other words, errors can inherit from only 
             one other class: Error. When using the detect statement, we 
@@ -179,11 +180,16 @@ class HandlingErrorsTutorial is Lesson
 //        customErrorsIDE:GetIDESubtitle():AddText("Try the above code blocks.")
 //        bodyDiv:Add(customErrorsIDE)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_error_handling)
+        bodyDiv:Add(section_error_class)
+        bodyDiv:Add(section_detecting_error)
+        bodyDiv:Add(section_alerts)
+        bodyDiv:Add(section_custom_errors)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -208,5 +214,13 @@ class HandlingErrorsTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/language/errors.html"
+    end
+
+    action GetLinkName returns text
+        return "Error Handling"
+    end
+
+    action GetSectionName returns text
+        return "Advanced Quorum"
     end
 end

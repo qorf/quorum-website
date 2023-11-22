@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class AutoboxingTutorial is Lesson
     text dq = ""
@@ -32,23 +20,29 @@ class AutoboxingTutorial is Lesson
         AdjustMain(mainRegion)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Advanced use of Primitive Types", 1)
-        headDiv:AddHeading("Advanced Topics with Primitive Types.", 3)
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Calling Actions on Primitives", 1)
-        bodyDiv:AddParagraph("Primitive types in Quorum, like integers, often 
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Advanced use of Primitive Types", 1)
+
+        headDiv:AddText("Advanced Topics with Primitive Types.")
+        bodyDiv:Add(headDiv)
+
+        Section section_actions_on_primitives
+        section_actions_on_primitives:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_actions_on_primitives, "Calling Actions on Primitives", 2)
+        section_actions_on_primitives:AddParagraph("Primitive types in Quorum, like integers, often 
             have certain kinds of limitations in programming. In Quorum, while 
             these types are sent to memory and the processor as usual in most 
             cases, they can be used in code very similarly to how objects and 
             classes are. Namely, we can call actions on primitive types. 
             Let’s start with an example using integers:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_actions_on_primitives:Add(preformatter:GeneratePreformattedCode(  
                 "integer zero = 0" + cr
             +   "integer max = zero:GetMaximumValue()" + cr
             +   "integer min = zero:GetMinimumValue()" + cr
@@ -58,16 +52,22 @@ class AutoboxingTutorial is Lesson
             +   "output min" + cr
         ))
 
-        AddSideBySideIDE(bodyDiv, "autobox1", "Activity: Try using an action on a primitive", 
-            "Try calling an action on a primitive integer type")
+        CodeForIDE code_autobox1
+        code_autobox1:AddFileText("Main.quorum", "//Try using an action on a primitive integer type")
+        IDE ide_autobox1 = AddIDE()
+        ide_autobox1:HideDisplay()
+        ide_autobox1:SetCodeForIDE(code_autobox1:GetJsonArray())
+        ide_autobox1:SetIdeTitle("Activity: Try using an action on a primitive")
+        section_actions_on_primitives:Add(ide_autobox1)
 
-        bodyDiv:AddParagraph("In the first line, we create a regular primitive 
+        section_actions_on_primitives:AddParagraph("In the first line, we create a regular primitive 
             integer, which takes up 4 bytes of memory. The way this is stored 
             in what is called two’s complement. We can read more about that here:")
 
-        bodyDiv:AddLink("Wikipedia page on Two's complement","https://en.wikipedia.org/wiki/Two%27s_complement")
+        Link link1 = section_actions_on_primitives:AddLink("Wikipedia page on Two's complement","https://en.wikipedia.org/wiki/Two%27s_complement")
+        link1:AddClassAttribute("underline text-quorum-blue-150")
 
-        bodyDiv:AddParagraph("While in some programming languages, storing our 
+        section_actions_on_primitives:AddParagraph("While in some programming languages, storing our 
             integer in this way prohibits us from using the primitive to call 
             actions, in Quorum this is not the case. Behind the scenes, Quorum 
             uses a trick to allow actions to be called efficiently. Many 
@@ -78,20 +78,52 @@ class AutoboxingTutorial is Lesson
             in the following pages:")
 
         UnorderedList unordered
-        unordered:AddListItemLink("Boolean class","https://quorumlanguage.com/Libraries/Language/Types/Boolean.php")
-        unordered:AddListItemLink("Integer class","https://quorumlanguage.com/Libraries/Language/Types/Integer.php")
-        unordered:AddListItemLink("Number class","https://quorumlanguage.com/Libraries/Language/Types/Number.php")
-        unordered:AddListItemLink("Text class","https://quorumlanguage.com/Libraries/Language/Types/Text.php")
-        bodyDiv:Add(unordered)
+        unordered:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem li_class1
+        Link link_class1
+        link_class1:AddText("Boolean class")
+        link_class1:SetAddress("https://quorumlanguage.com/Libraries/Language/Types/Boolean.html")
+        link_class1:AddClassAttribute("underline text-quorum-blue-150")
+        li_class1:Add(link_class1)
+
+        ListItem li_class2
+        Link link_class2
+        link_class2:AddText("Integer class")
+        link_class2:SetAddress("https://quorumlanguage.com/Libraries/Language/Types/Integer.html")
+        link_class2:AddClassAttribute("underline text-quorum-blue-150")
+        li_class2:Add(link_class2)
+
+        ListItem li_class3
+        Link link_class3
+        link_class3:AddText("Number class")
+        link_class3:SetAddress("https://quorumlanguage.com/Libraries/Language/Types/Number.html")
+        link_class3:AddClassAttribute("underline text-quorum-blue-150")
+        li_class3:Add(link_class3)
+
+        ListItem li_class4
+        Link link_class4
+        link_class4:AddText("Text class")
+        link_class4:SetAddress("https://quorumlanguage.com/Libraries/Language/Types/Text.html")
+        link_class4:AddClassAttribute("underline text-quorum-blue-150")
+        li_class4:Add(link_class4)
+
+        unordered:Add(li_class1)
+        unordered:Add(li_class2)
+        unordered:Add(li_class3)
+        unordered:Add(li_class4)
+        section_actions_on_primitives:Add(unordered)
         
         //the section on mutator function
-        bodyDiv:AddHeading("Autoboxing", 2)
+        Section section_autoboxing
+        section_autoboxing:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("When we use containers, how primitives are handled is 
+        AddHeading(section_autoboxing, "Autoboxing", 2)
+
+        section_autoboxing:AddParagraph("When we use containers, how primitives are handled is 
             slightly different. Take Lists, for example. Just like in the 
             generics tutorial, we might have code like the following:")
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  
+        section_autoboxing:Add(preformatter:GeneratePreformattedCode(  
                 "use Libraries.Containers.List" + cr
             +   "List<<integer>integer> list" + cr
             +   "list:Add(1)" + cr
@@ -105,10 +137,15 @@ class AutoboxingTutorial is Lesson
             +   "output c" + cr
         ))
 
-        AddSideBySideIDE(bodyDiv, "autobox2", "Activity: Try Autoboxing", 
-            "Try to understand how primitives can be used in generic types")
+        CodeForIDE code_autobox2
+        code_autobox2:AddFileText("Main.quorum", "//Try to understand how primitives can be used in generic types")
+        IDE ide_autobox2 = AddIDE()
+        ide_autobox2:HideDisplay()
+        ide_autobox2:SetCodeForIDE(code_autobox2:GetJsonArray())
+        ide_autobox2:SetIdeTitle("Activity: Try Autoboxing")
+        section_autoboxing:Add(ide_autobox2)
 
-        bodyDiv:AddParagraph("Let us discuss what this code is doing in more 
+        section_autoboxing:AddParagraph("Let us discuss what this code is doing in more 
             detail. Notably, when the first Add action is called, Quorum takes 
             the 1 and, behind the scenes, converts it into an Integer object, 
             not an integer primitive. This takes up more space in memory, 
@@ -118,11 +155,13 @@ class AutoboxingTutorial is Lesson
             list using the RemoveFromFront action, the primitive is converted 
             back from an object into a primitive.")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_actions_on_primitives)
+        bodyDiv:Add(section_autoboxing)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -147,5 +186,13 @@ class AutoboxingTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/language/autoboxing.html"
+    end
+
+    action GetLinkName returns text
+        return "Auto-boxing"
+    end
+
+    action GetSectionName returns text
+        return "Advanced Quorum"
     end
 end
