@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class OperatorsTutorial is Lesson
     text dq = ""
@@ -31,15 +19,17 @@ class OperatorsTutorial is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
         //page banner --- change this to either a role
-        //if this is a heading
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Operators", 1)
-        headDiv:AddText("How to use +, -, *, /, and other operators with various types.")
-        Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Operators", 1)
+
+        headDiv:AddText("How to use +, -, *, /, and other operators with various types.")
+        bodyDiv:Add(headDiv)
         bodyDiv:AddHeading("What are Operators?", 2)
         bodyDiv:AddParagraph("In computer science, we often want to ask the "+
             "computer to do certain mathematical operations. For example, we may"+
@@ -175,11 +165,10 @@ This is called concatenation. The following code would give the variable
         bodyDiv:Add(preformatter:GeneratePreformattedCode("text a = "+dq+" My favorite number is " + dq + " + 5" + cr + "output a"))
         AddSideBySideIDE(bodyDiv, "concatenateIDE", "Activity: Try Concatenate")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddSideBySideIDE(Division div, text ideName, text activity)
@@ -213,5 +202,13 @@ This is called concatenation. The following code would give the variable
 
     action GetLocation returns text
         return "tutorials/language/operators.html"
+    end
+
+    action GetLinkName returns text
+        return "Operators"
+    end
+
+    action GetSectionName returns text
+        return "Introduction to Quorum"
     end
 end
