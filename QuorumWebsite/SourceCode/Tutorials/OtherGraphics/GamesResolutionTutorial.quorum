@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class GamesResolutionTutorial is Lesson
     text dq = ""
@@ -27,27 +15,40 @@ class GamesResolutionTutorial is Lesson
         SetWebPageTitle("Screen Resolutions - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Screen Resolutions and Fullscreen in Quorum", 1)
+              Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Screen Resolutions and Fullscreen in Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Screen Resolutions and Fullscreen in Quorum")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial tells you how to change the screen resolution of games in Quorum")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("An Introduction to Screen Resolutions in Quorum", 2)
+        
+        Section section_intro
+       section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "An Introduction to Screen Resolutions in Quorum", 2)
 
-        bodyDiv:AddText("This tutorial discusses changing the size of the game window. "
+
+        section_intro:AddParagraph("This tutorial discusses changing the size of the game window. "
             + "This includes how to make a game fullscreen and the way screen resolution on the screen relates to cameras.")
 
-        bodyDiv:AddHeading("Setting the Size of the Game Window", 2)
 
-        bodyDiv:AddParagraph("When creating a Quorum game for use on Windows or Mac, by default a game will launch in a window "
+          Section section_size
+       section_size:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_size)
+        AddHeading(section_size, "Setting the Size of the Game Window", 2)
+
+
+        section_size:AddParagraph("When creating a Quorum game for use on Windows or Mac, by default a game will launch in a window "
             + "that is 800 pixels wide and 600 pixels tall. To change the size of the window, we use the SetScreenSize action "
             + "from the Game class. In the example below, we use SetScreenSize before calling StartGame. This will ensure that "
             + "when the game launches and that the window that appears is the correct size.")
@@ -60,9 +61,9 @@ class GamesResolutionTutorial is Lesson
                 +   "        StartGame()" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_size:Add(preformatter:GeneratePreformattedCode(cb1))
 
-        bodyDiv:AddParagraph("We can also change the size of the screen at any time after launching a game. The example below "
+        section_size:AddParagraph("We can also change the size of the screen at any time after launching a game. The example below "
             + "shows how to change the size of the game after StartGame is called. As a reminder, CreateGame is called after "
             + "the window has been opened and is shown on the screen. SetScreenSize can be used to set the game window to any "
             + "given positive width and height.")
@@ -77,15 +78,19 @@ class GamesResolutionTutorial is Lesson
                 +   "        SetScreenSize(1000, 8000)" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        section_size:Add(preformatter:GeneratePreformattedCode(cb2))
 
-        bodyDiv:AddHeading("Fullscreen Games", 2)
+          Section section_fullscreen
+       section_fullscreen:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_fullscreen)
+        AddHeading(section_fullscreen, "Fullscreen Games", 2)
+  
 
-        bodyDiv:AddParagraph("When running an application in fullscreen mode, desktop displays have a limited number of "
+        section_fullscreen:AddParagraph("When running an application in fullscreen mode, desktop displays have a limited number of "
             + "supported resolutions (width x height). These resolutions can differ with different kinds of computers and "
             + "platforms, which means there is no universal fullscreen resolution that will work everywhere.")
 
-        bodyDiv:AddParagraph("To see what resolutions are supported by a particular monitor, there is an action built in to "
+        section_fullscreen:AddParagraph("To see what resolutions are supported by a particular monitor, there is an action built in to "
             + "Quorum called GetAvailableResolutions. This will give us an Array of ScreenResolution objects.")
 
         CodeBlock cb3
@@ -110,18 +115,19 @@ class GamesResolutionTutorial is Lesson
                 +   "        end" + cr
                 +   "    end" + cr)
         cb3:AddText("end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_fullscreen:Add(preformatter:GeneratePreformattedCode(cb3))
 
-        bodyDiv:AddParagraph("In the above code, we get the available screen resolutions and output some information about "
+        section_fullscreen:AddParagraph("In the above code, we get the available screen resolutions and output some information about "
             + "them. Each ScreenResolution object contains the following information:")
         UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
         list:AddListItem("Width: How many pixels wide the screen resolution is.")
         list:AddListItem("Height: How many pixels tall the screen resolution is.")
         list:AddListItem("Frequency: How many times per second the monitor updates its image when using this resolution.")
         list:AddListItem("Bits Per Pixel: How many bits are used to store information on each pixel. 32 bits is typical.")
         list:AddListItem("Fullscreen Support: If the monitor can display this resolution in fullscreen mode.")
-        bodyDiv:Add(list)
-        bodyDiv:AddParagraph("Once we have found a ScreenResolution we want to use, we can make our game fullscreen by using the SetScreenResolution action.")
+        section_fullscreen:Add(list)
+        section_fullscreen:AddParagraph("Once we have found a ScreenResolution we want to use, we can make our game fullscreen by using the SetScreenResolution action.")
 
         CodeBlock cb4
         Span s1
@@ -151,14 +157,14 @@ class GamesResolutionTutorial is Lesson
                 +   "        end" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        section_fullscreen:Add(preformatter:GeneratePreformattedCode(cb4))
 
-        bodyDiv:AddParagraph("In some cases, we might want to look at all the available screen resolutions and choose "
+        section_fullscreen:AddParagraph("In some cases, we might want to look at all the available screen resolutions and choose "
             + "the one which best suits our game. One way we might do that is to get the resolution currently on "
             + "the user's desktop. The GetDesktopResolution action will give us this information. We can also call "
             + "UseDesktopResolution to tell our game to use it as a default.")
 
-        bodyDiv:AddParagraph("Let’s look at what our last example would look like if we use the desktop resolution:")
+        section_fullscreen:AddParagraph("Let’s look at what our last example would look like if we use the desktop resolution:")
 
         CodeBlock cb5
         Span s3
@@ -180,20 +186,25 @@ class GamesResolutionTutorial is Lesson
                 +   "        end" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        section_fullscreen:Add(preformatter:GeneratePreformattedCode(cb5))
 
-        bodyDiv:AddParagraph("Note that in the two prior code samples we included a way for the game to exit. A "
+        section_fullscreen:AddParagraph("Note that in the two prior code samples we included a way for the game to exit. A "
             +   "fullscreen game does not have an exit button like a windowed game does, so it’s important for the "
             +   "programmer to provide a way to shut it down. If we ever create a fullscreen game without a way to "
             +   "exit, we can still close it via keyboard shortcuts (COMMAND + Q on Mac or ALT + F4 on Windows).")
 
-        bodyDiv:AddHeading("Screen Displays and Game Cameras", 2)
+        
+        Section section_display
+       section_display:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_display)
+        AddHeading(section_display, "Screen Displays and Game Cameras", 2)
 
-        bodyDiv:AddParagraph("At any time before or after a game has started running, it’s possible to change the size of "
+
+        section_display:AddParagraph("At any time before or after a game has started running, it’s possible to change the size of "
             +   "the game window or change the fullscreen resolution. However, changing the size of the display may "
             +   "change the appearance of a game, especially in 2D games.")
         
-        bodyDiv:AddParagraph("To see how this can happen, let’s look at some sample code.")
+        section_display:AddParagraph("To see how this can happen, let’s look at some sample code.")
 
         CodeBlock cb6
         cb6:AddText("use Libraries.Game.Game" + cr
@@ -221,44 +232,46 @@ class GamesResolutionTutorial is Lesson
                 +   "        end" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+        section_display:Add(preformatter:GeneratePreformattedCode(cb6))
 
-        bodyDiv:AddParagraph("This program starts with the window at the default size of 800 pixels by 600 pixels. "
+        section_display:AddParagraph("This program starts with the window at the default size of 800 pixels by 600 pixels. "
             + "It contains two black squares, which are 100 pixels tall and wide. The first square is placed in the "
             + "bottom left corner, and the second square is placed in the top right corner. Pressing the spacebar "
             + "will resize the window to 1000 pixels wide and 800 pixels tall.")
 
-        bodyDiv:AddImage("/media/games/ResolutionDefault.png", "This is an image of the default 800 by 600 pixel window "
+        Image image2 = section_display:AddImage("/media/games/ResolutionDefault.png", "This is an image of the default 800 by 600 pixel window "
             + "with a black square in the bottom left corner and another in the top right corner.")
-        
-        bodyDiv:AddParagraph("After pressing the spacebar, the first square is still in the bottom left corner, but "
+        image2:AddAttribute("data-zoom","")
+
+        section_display:AddParagraph("After pressing the spacebar, the first square is still in the bottom left corner, but "
             + "the second square is no longer touching the top right corner of the screen. The resized screen is "
             + "larger, so now there is an extra 200 pixels above the square and 200 pixels to the right of it.")
 
-        bodyDiv:AddImage("/media/games/ResolutionCameraAdjusted.png", "This is an image of a 1000 by 800 pixel window "
+        Image image3 = section_display:AddImage("/media/games/ResolutionCameraAdjusted.png", "This is an image of a 1000 by 800 pixel window "
             + "with a black square in the bottom left corner and another that is close to the top right corner, but is "
             + " not touching it.")
+        image3:AddAttribute("data-zoom","")
 
-        bodyDiv:AddParagraph("When the screen is resized, the game engine also automatically adjusts the game’s default "
+        section_display:AddParagraph("When the screen is resized, the game engine also automatically adjusts the game’s default "
             + "cameras to match the new dimensions. Since our game launched in a 800x600 window, the default cameras are "
             + "set to view an 800x600 region. When we changed the screen size to 1000x800, the default cameras were also "
             + "resized to view a 1000x800 area. The default 2D camera is also moved slightly to keep the bottom left corner "
             + "in the same position on the screen.")
 
-        bodyDiv:AddParagraph("Sometimes, we may want to adjust the screen size without adjusting the cameras. If we had "
+        section_display:AddParagraph("Sometimes, we may want to adjust the screen size without adjusting the cameras. If we had "
             + "done that in our previous example, after pressing the spacebar our screen would be 1000x800 pixels on the "
             + "screen, but the game’s camera would be “zoomed in” on an area that was still only 800x600 game units.")
 
-        bodyDiv:AddParagraph("All actions that adjust the screen size, namely SetScreenSize, SetScreenResolution, and "
+        section_display:AddParagraph("All actions that adjust the screen size, namely SetScreenSize, SetScreenResolution, and "
             + "UseDesktopResolution, can be given a boolean value as their last parameter. If this value is false, then "
             + "the game area will be resized without adjusting the cameras. Where we set the screen size in our last "
             + "example, let’s replace it with this line of code:")
 
         CodeBlock cb7
         cb7:AddText("SetScreenSize(1000, 800, false)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb7))
+        section_display:Add(preformatter:GeneratePreformattedCode(cb7))
 
-        bodyDiv:AddParagraph("Here’s what our resulting code looks like:")
+        section_display:AddParagraph("Here’s what our resulting code looks like:")
 
         CodeBlock cb8
         cb8:AddText("use Libraries.Game.Game" + cr
@@ -286,22 +299,22 @@ class GamesResolutionTutorial is Lesson
                 +   "        end" + cr
                 +   "    end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        section_display:Add(preformatter:GeneratePreformattedCode(cb8))
 
-        bodyDiv:AddParagraph("Now when we press the spacebar, the square in the top right is still touching the top "
+        section_display:AddParagraph("Now when we press the spacebar, the square in the top right is still touching the top "
             + "right corner of the window. Each square is still the exact same size in the engine (100 units wide by "
             + "100 units tall), but on the screen they appear slightly larger than they did before we resized the "
             + "screen. Here’s what it looks like:")
 
-        bodyDiv:AddImage("/media/games/ResolutionCameraUnadjusted.png", "This is an image of a 1000 by 800 pixel window "
+        Image image = section_display:AddImage("/media/games/ResolutionCameraUnadjusted.png", "This is an image of a 1000 by 800 pixel window "
             + "with a black square in the bottom left corner and another in the top right corner. The squares are slightly "
             + "larger than in the previous image.")
+        image:AddAttribute("data-zoom","")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -326,5 +339,13 @@ class GamesResolutionTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/games/resolutions.html"
+    end
+
+    action GetLinkName returns text
+        return "Screen Resolution"
+    end
+
+    action GetSectionName returns text
+        return "Other Graphics"
     end
 end
