@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class PluginsTutorial is Lesson
     text dq = ""
@@ -32,16 +20,22 @@ class PluginsTutorial is Lesson
         AdjustMain(mainRegion)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Writing Quorum Plugins", 1)
-        headDiv:AddText("How to connect to Java (or other languages) from Quorum")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Calling Java or C++ from Quorum", 2)
-        bodyDiv:AddParagraph(   "It is sometimes necessary, in any programming language, to want to use a feature found in another, like Java or C++. "
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Writing Quorum Plugins", 1)
+
+        headDiv:AddText("How to connect to Java (or other languages) from Quorum")
+        bodyDiv:Add(headDiv)
+
+        Section section_java_cpp
+        section_java_cpp:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_java_cpp, "Calling Java or C++ from Quorum", 2)
+        section_java_cpp:AddParagraph(   "It is sometimes necessary, in any programming language, to want to use a feature found in another, like Java or C++. "
                             +   "Given this, many languages provide a method for calling from one language to another, and this includes Quorum. "
                             +   "In Java, for example, we might use the Java Native Interface (JNI) to call down to C or C++. Or, in C, we might embed assembly code. "
                             +   "In Quorum, we accomplish the same kind of idea through plugins. "
@@ -51,26 +45,29 @@ class PluginsTutorial is Lesson
                             +   "Advanced users that want more information should ask through our various social media services (e.g., email list, Facebook) if more information is needed.")
 
 
-        bodyDiv:AddHeading("Creating System Actions", 2)
+        Section section_system_actions
+        section_system_actions:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph(   "In order to make a call down to Java, we first must write a Quorum class that defines " + dq + "system actions." + dq + " "
+        AddHeading(section_system_actions, "Creating System Actions", 2)
+
+        section_system_actions:AddParagraph(   "In order to make a call down to Java, we first must write a Quorum class that defines " + dq + "system actions." + dq + " "
                             +   "A system action, by definition, is an action that calls down to another programming language.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("package Libraries.Mine" + cr + cr 
+        section_system_actions:Add(preformatter:GeneratePreformattedCode("package Libraries.Mine" + cr + cr 
                                                         + "class MyPlugin" + cr 
                                                         + "    system action Test" + cr 
                                                         + "end"))
 
-        bodyDiv:AddParagraph(   "In the above code, notice that we have defined a regular class, but we have an action with the word " + dq + "system"  + dq + "before it, with no " + dq + "end" + dq + " at the end of the line. "
+        section_system_actions:AddParagraph(   "In the above code, notice that we have defined a regular class, but we have an action with the word " + dq + "system"  + dq + "before it, with no " + dq + "end" + dq + " at the end of the line. "
                             +   "This signifies to the compiler that the content of this action will be defined by Java. Here is a second example with more complex system actions.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("package Libraries.Mine" + cr + cr 
+        section_system_actions:Add(preformatter:GeneratePreformattedCode("package Libraries.Mine" + cr + cr 
                                                         + "class MyPlugin" + cr 
                                                         + "    system action Test" + cr 
                                                         + "    system action Add(number a, number b) returns number" + cr 
                                                         + "end"))
 
-        bodyDiv:AddParagraph(   "Notice that the second action defines parameters, return values, and otherwise looks like a normal action. "
+        section_system_actions:AddParagraph(   "Notice that the second action defines parameters, return values, and otherwise looks like a normal action. "
                             +   "This is normal, as all features of a typical action are allowed in system actions.")
 
 //        SideBySideIDE creatingSystemActionsIDE
@@ -81,12 +78,15 @@ class PluginsTutorial is Lesson
 //        bodyDiv:Add(creatingSystemActionsIDE)
 
 
-        bodyDiv:AddHeading("Creating the Java Plugins", 2)
+        Section section_java_plugins
+        section_java_plugins:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph(   "Once we have created our system actions, we need to create corresponding Java plugins, so our system actions have something to call. "
+        AddHeading(section_java_plugins, "Creating the Java Plugins", 2)
+
+        section_java_plugins:AddParagraph(   "Once we have created our system actions, we need to create corresponding Java plugins, so our system actions have something to call. "
                             +   "Let's define a plugin for our second code example to show how this can be done.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("package plugins.quorum.Libraries.Mine" + cr + cr 
+        section_java_plugins:Add(preformatter:GeneratePreformattedCode("package plugins.quorum.Libraries.Mine" + cr + cr 
                                                         + "public class MyPlugin" + cr 
                                                         + "    public java.lang.Object me_ = null;" + cr 
                                                         + "    public void Test() {" + cr 
@@ -96,16 +96,16 @@ class PluginsTutorial is Lesson
                                                         + "    }" + cr
                                                         + "end"))
 
-        bodyDiv:AddParagraph(   "In the first line of our plugin, notice that the package is defined as plugins.quorum.Libraries.Mine. "
+        section_java_plugins:AddParagraph(   "In the first line of our plugin, notice that the package is defined as plugins.quorum.Libraries.Mine. "
                             +   "This is required, as the Quorum compiler will expect that, since we are defining a system action in the class MyPlugin in the package Libraries.Mine, that the Java plugin is also called MyPlugin and that it is located in the package plugins.quorum.Libraries.Mine.")
 
-        bodyDiv:AddParagraph(   "Second, notice that Quorum actions translate directly into public methods in the plugin. "
+        section_java_plugins:AddParagraph(   "Second, notice that Quorum actions translate directly into public methods in the plugin. "
                             +   "The Test action, which in Quorum has no return type, translates into a void method in Java. " + cr
                             +   "Similarly, actions in Quorum that have parameters are translated according to their values. "
                             +   "With primitives, the translation is integer to int, number to double, boolean to boolean, and text to String. "
                             +   "For object types, an object with a fully qualified name of org.Test in Quorum would be quorum.org.Test when used in a parameter.")
 
-        bodyDiv:AddParagraph(   "As one final point, notice the line public java.lang.Object me_ = null;. "
+        section_java_plugins:AddParagraph(   "As one final point, notice the line public java.lang.Object me_ = null;. "
                             +   "All Java plugins for Quorum are required to have this line, otherwise we will throw an exception at runtime. "
                             +   "This line allows Quorum to pass the original object that will call down to our plugin, in case we need it. "
                             +   "This variable, me_, will be a valid value once the plugin first boots.")
@@ -118,27 +118,35 @@ class PluginsTutorial is Lesson
 //        bodyDiv:Add(creatingTheJavaPluginsIDE)
 
 
-        bodyDiv:AddHeading("Using Plugins", 2)
+        Section section_using_plugins
+        section_using_plugins:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph(   "We can add plugins directly compiled with other tools directly from the user interface in NetBeans. "
+        AddHeading(section_using_plugins, "Using Plugins", 2)
+
+        section_using_plugins:AddParagraph(   "We can add plugins directly compiled with other tools directly from the user interface in NetBeans. "
                             +   "To do this, we first either use the keyboard hotkey or the mouse to right click on our project and select Properties. "
                             +   "This will open a window that looks like the following:")
 
-        bodyDiv:AddImage("/media/QuorumApplicationProject.png", "This is an image of the plugins QuorumApplicationProject")
+        Image image1 = section_using_plugins:AddImage("/media/QuorumApplicationProject.png", "This is an image of the plugins QuorumApplicationProject")
+        image1:AddAttribute("data-zoom", "")
 
-        bodyDiv:AddParagraph(   "This window contains a variety of options for projects and contains two panes. "
+        section_using_plugins:AddParagraph(   "This window contains a variety of options for projects and contains two panes. "
                             +   "On the left pane are two options, Project Information and Games, which can be navigated with the up and down arrow keys as well as the mouse. "
                             +   "On the right is the project information tab, which allows us to change the project type (normal or Lego), the project compiled name, and has two additional text boxes for plugins or Jar files.")
 
-        bodyDiv:AddParagraph(   "If we have created a plugin, we can add it into the compiled source of our project by selecting the Add button in the tab order of the pugins List. "
+        section_using_plugins:AddParagraph(   "If we have created a plugin, we can add it into the compiled source of our project by selecting the Add button in the tab order of the pugins List. "
                             +   "This will open a dialog and we can select the build folder of where our plugin was built. "
                             +   "Finally, if all plugins are contained in a jar, we can similarly load a jar file using this window, which will cause Quorum to write it into the path of the executable we are building.")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_java_cpp)
+        bodyDiv:Add(section_system_actions)
+        bodyDiv:Add(section_java_plugins)
+        bodyDiv:Add(section_using_plugins)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -163,5 +171,13 @@ class PluginsTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/language/plugins.html"
+    end
+
+    action GetLinkName returns text
+        return "Plugins"
+    end
+
+    action GetSectionName returns text
+        return "Advanced Quorum"
     end
 end

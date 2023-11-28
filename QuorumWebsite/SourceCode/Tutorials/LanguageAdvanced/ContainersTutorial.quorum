@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class ContainersTutorial is Lesson
     text dq = ""
@@ -32,37 +20,52 @@ class ContainersTutorial is Lesson
         AdjustMain(mainRegion)
 
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Containers", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Containers", 1)
+
         headDiv:AddText("Storing Information in memory")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Using Containers in Quorum", 2)
+        Section section_containers
+        section_containers:SetClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddText(             "Like many programming languages, Quorum has a variety of support classes for storing information in memory. "
+        AddHeading(section_containers, "Using Containers in Quorum", 2)
+
+        Paragraph p_containers
+        p_containers:AddText(             "Like many programming languages, Quorum has a variety of support classes for storing information in memory. "
                             +   "In Quorum, these are generally called containers. In other tutorials, we have learned how to use the ")
-        bodyDiv:AddLink("Array", "/tutorials/language/arrays.html")
-        bodyDiv:AddText(        " class. In this tutorial, we will discuss one more container, the List. This tutorial is intended as a high level overview of the most basic operations. "
+        Link link1 = p_containers:AddLink("Array", "/tutorials/language/arrays.html")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        " class. In this tutorial, we will discuss one more container, the List. This tutorial is intended as a high level overview of the most basic operations. "
                             +   "The full documentation can be found at the ")
-        bodyDiv:AddLink("List page", "/libraries/Containers/List.php")
-        bodyDiv:AddText(        ". Besides arrays and lists, Quorum has a variety of other data structures, including a ")
-
-        bodyDiv:AddLink("Hashtable", "/libraries/Containers/HashTable.php")
-        bodyDiv:AddText(        ", ")
-        bodyDiv:AddLink("Queue", "/libraries/Containers/Queue.php")
-        bodyDiv:AddText(        ", ")
-        bodyDiv:AddLink("Stack", "/libraries/Containers/Stack.php")
-        bodyDiv:AddText(        ", and ")
-        bodyDiv:AddLink("Table", "/libraries/Containers/Table.php")
-        bodyDiv:AddText(        ". In this tutorial, while we discuss lists, the other 
+        Link link2 = p_containers:AddLink("List page", "/libraries/Containers/List.php")
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        ". Besides arrays and lists, Quorum has a variety of other data structures, including a ")
+        Link link3 = p_containers:AddLink("Hashtable", "/libraries/Containers/HashTable.php")
+        link3:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        ", ")
+        Link link4 = p_containers:AddLink("Queue", "/libraries/Containers/Queue.php")
+        link4:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        ", ")
+        Link link5 = p_containers:AddLink("Stack", "/libraries/Containers/Stack.php")
+        link5:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        ", and ")
+        Link link6 = p_containers:AddLink("Table", "/libraries/Containers/Table.php")
+        link6:SetClassAttribute("underline text-quorum-blue-150")
+        p_containers:AddText(        ". In this tutorial, while we discuss lists, the other 
             data structures are comparable.")
 
+        section_containers:Add(p_containers)
+
         //the section on adding elements
-        bodyDiv:AddHeading("Adding to a List", 2)
-        bodyDiv:AddParagraph(   "We can add to a list using code like the following:")
+        Section section_adding
+        AddHeading(section_adding, "Adding to a List", 2)
+        section_adding:AddParagraph(   "We can add to a list using code like the following:")
 
         CodeBlock cb1
         Span s1
@@ -77,9 +80,9 @@ class ContainersTutorial is Lesson
         cb1:Add(s2)
         cb1:AddText("list:Add(5)" + cr)
         cb1:AddText("output " + dq + "We added an item to the list." + dq + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_adding:Add(preformatter:GeneratePreformattedCode(cb1))
 
-        bodyDiv:AddParagraph(   "Quorum does not allow us to add types to a templated value unless it matches exactly the type specified in the generic. "
+        section_adding:AddParagraph(   "Quorum does not allow us to add types to a templated value unless it matches exactly the type specified in the generic. "
                             +   "So, for example, the following would be a compiler error:")
 
         CodeBlock cb2
@@ -90,17 +93,24 @@ class ContainersTutorial is Lesson
         cb2:AddText("List&lt;integer&gt; list" + cr + cr)
         cb2:Add(s3)
         cb2:AddText("list:Add(5.0)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        section_adding:Add(preformatter:GeneratePreformattedCode(cb2))
 
-        AddSideBySideIDE(bodyDiv, "addingElementsIDE", "Activity: Try adding elements to a list", 
-            "Try adding integers into a list")
+        CodeForIDE code_containers1
+        code_containers1:AddFileText("Main.quorum", "//Try adding integers into a list")
+        IDE ide_containers1 = AddIDE()
+        ide_containers1:HideDisplay()
+        ide_containers1:SetCodeForIDE(code_containers1:GetJsonArray())
+        ide_containers1:SetIdeTitle("Activity: Try adding elements to a list")
+        section_adding:Add(ide_containers1)
 
 
 
 
         //the section on getting elements
-        bodyDiv:AddHeading("Getting Items From a List", 2)
-        bodyDiv:AddParagraph("Once we have added values to a list, we can obtain them individually using the Get action, like so:")
+        Section section_getting
+        section_getting:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_getting, "Getting Elements From a List", 2)
+        section_getting:AddParagraph("Once we have added values to a list, we can obtain them individually using the Get action, like so:")
 
         CodeBlock cb3
         Span s4
@@ -117,14 +127,22 @@ class ContainersTutorial is Lesson
         cb3:Add(s5)
         cb3:AddText("integer value = myList:Get(0)"+ cr
                 +   "output value")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_getting:Add(preformatter:GeneratePreformattedCode(cb3))
 
-        AddSideBySideIDE(bodyDiv, "gettingElementsIDE", "Activity: Try getting elements from a list", 
-            "Try getting the integers back")
+        CodeForIDE code_containers2
+        code_containers2:AddFileText("Main.quorum", "//Try getting the integers back")
+        IDE ide_containers2 = AddIDE()
+        ide_containers2:HideDisplay()
+        ide_containers2:SetCodeForIDE(code_containers2:GetJsonArray())
+        ide_containers2:SetIdeTitle("Activity: Try getting elements from a list")
+        section_getting:Add(ide_containers2)
 
         //the section on removing elements
-        bodyDiv:AddHeading("Removing Items From a List", 2)
-        bodyDiv:AddParagraph(   "Similarly to getting, we can remove items from 
+        Section section_removing
+        section_removing:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_removing, "Removing Items From a List", 2)
+        section_removing:AddParagraph(   "Similarly to getting, we can remove items from 
             a list. If we want to remove just the first version of a value "
             +   "(values are not guaranteed to be unique), then we can call 
             Remove. If we want to remove all instances of an item, we can 
@@ -143,14 +161,22 @@ class ContainersTutorial is Lesson
         cb4:Add(s6)
         cb4:AddText("boolean removed = myList:Remove(43)"+ cr
                 +   "output removed")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        section_removing:Add(preformatter:GeneratePreformattedCode(cb4))
 
-        AddSideBySideIDE(bodyDiv, "removingElementsIDE", "Activity: Try removing elements from a list", 
-            "Try removing integers we have added")
+
+        CodeForIDE code_containers3
+        code_containers3:AddFileText("Main.quorum", "//Try removing integers we have added")
+        IDE ide_containers3 = AddIDE()
+        ide_containers3:HideDisplay()
+        ide_containers3:SetCodeForIDE(code_containers3:GetJsonArray())
+        ide_containers3:SetIdeTitle("Activity: Try removing elements from a list")
+        section_removing:Add(ide_containers3)
 
         //the section on iterating
-        bodyDiv:AddHeading("Iterating Over a List", 2)
-        bodyDiv:AddParagraph(   "Finally, we often want to traverse over all elements in a list. "
+        Section section_iterating
+        section_iterating:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_iterating, "Iterating Over a List", 2)
+        section_iterating:AddParagraph(   "Finally, we often want to traverse over all elements in a list. "
                             +   "To do this, we can use the Iterator class and ask it for each element, one at a time. The following example shows us how we might do this:")
 
         CodeBlock cb5
@@ -186,29 +212,109 @@ class ContainersTutorial is Lesson
                 +   "       end" + cr
                 +   "   end" + cr
                 +   "end")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        section_iterating:Add(preformatter:GeneratePreformattedCode(cb5))
    
-        AddSideBySideIDE(bodyDiv, "iteratingIDE", "Activity: Try Iterating", 
-            "Try iterating over the data structure")
+        CodeForIDE code_containers4
+        code_containers4:AddFileText("Main.quorum", "//Try iterating over the data structure")
+        IDE ide_containers4 = AddIDE()
+        ide_containers4:HideDisplay()
+        ide_containers4:SetCodeForIDE(code_containers4:GetJsonArray())
+        ide_containers4:SetIdeTitle("Activity: Try Iterating")
+        section_iterating:Add(ide_containers4)
 
-        bodyDiv:AddHeading("Additional Resources for Quorum Containers", 2)
+        Section section_resources
+        section_resources:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_resources, "Additional Resources for Quorum Containers", 2)
+
         UnorderedList unordered
-            unordered:AddListItemLink("Linked List Wikipedia Page","https://en.wikipedia.org/wiki/Linked_list")
-            unordered:AddListItemLink("Quorum List Source Code","https://bitbucket.org/stefika/quorum-language/src/2c3e193e650bebd7a46200827d89a02fd1073e0b/Quorum3/Library/Standard/Libraries/Containers/List.quorum?at=master&fileviewer=file-view-default")
-            unordered:AddListItemLink("Hashtable Wikipedia Page","https://en.wikipedia.org/wiki/Hash_table")
-            unordered:AddListItemLink("Quorum Hashtable Source Code","https://bitbucket.org/stefika/quorum-language/src/2c3e193e650bebd7a46200827d89a02fd1073e0b/Quorum3/Library/Standard/Libraries/Containers/HashTable.quorum?at=master&fileviewer=file-view-default")
-            unordered:AddListItemLink("Queue Wikipedia Page","https://en.wikipedia.org/wiki/Queue_(abstract_data_type)")
-            unordered:AddListItemLink("Quorum Queue Source Code","https://bitbucket.org/stefika/quorum-language/src/2c3e193e650bebd7a46200827d89a02fd1073e0b/Quorum3/Library/Standard/Libraries/Containers/Queue.quorum?at=master&fileviewer=file-view-default")
-            unordered:AddListItemLink("Stack Wikipedia Page","https://en.wikipedia.org/wiki/Stack_(abstract_data_type)")
-            unordered:AddListItemLink("Quorum Stack Source Code","https://bitbucket.org/stefika/quorum-language/src/2c3e193e650bebd7a46200827d89a02fd1073e0b/Quorum3/Library/Standard/Libraries/Containers/Stack.quorum?at=master&fileviewer=file-view-default")
-            unordered:AddListItemLink("Quorum Table Source Code","https://bitbucket.org/stefika/quorum-language/src/2c3e193e650bebd7a46200827d89a02fd1073e0b/Quorum3/Library/Standard/Libraries/Containers/Table.quorum?at=master&fileviewer=file-view-default")
-        bodyDiv:Add(unordered)
+            unordered:AddClassAttribute("list-disc list-outside pl-8")
+            ListItem li_ref1
+            Link link_ref1
+            link_ref1:AddText("Linked List Wikipedia Page")
+            link_ref1:SetAddress("https://en.wikipedia.org/wiki/Linked_list")
+            link_ref1:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref1:Add(link_ref1)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+            ListItem li_ref2
+            Link link_ref2
+            link_ref2:AddText("Quorum List Source Code")
+            link_ref2:SetAddress("https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/List.quorum")
+            link_ref2:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref2:Add(link_ref2)
+
+            ListItem li_ref3
+            Link link_ref3
+            link_ref3:AddText("Hashtable Wikipedia Page")
+            link_ref3:SetAddress("https://en.wikipedia.org/wiki/Hash_table")
+            link_ref3:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref3:Add(link_ref3)
+
+            ListItem li_ref4
+            Link link_ref4
+            link_ref4:AddText("Quorum Hashtable Source Code")
+            link_ref4:SetAddress("https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/HashTable.quorum")
+            link_ref4:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref4:Add(link_ref4)
+
+            
+            ListItem li_ref5
+            Link link_ref5
+            link_ref5:AddText("Queue Wikipedia Page")
+            link_ref5:SetAddress("https://en.wikipedia.org/wiki/Queue_(abstract_data_type)")
+            link_ref5:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref5:Add(link_ref5)
+
+            ListItem li_ref6
+            Link link_ref6
+            link_ref6:AddText("Quorum Queue Source Code")
+            link_ref6:SetAddress("https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/Queue.quorum")
+            link_ref6:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref6:Add(link_ref6)
+
+            ListItem li_ref7
+            Link link_ref7
+            link_ref7:AddText("Stack Wikipedia Page")
+            link_ref7:SetAddress("https://en.wikipedia.org/wiki/Stack_(abstract_data_type)")
+            link_ref7:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref7:Add(link_ref7)
+
+            ListItem li_ref8
+            Link link_ref8
+            link_ref8:AddText("Quorum Stack Source Code")
+            link_ref8:SetAddress("https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/Stack.quorum")
+            link_ref8:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref8:Add(link_ref8)
+
+            ListItem li_ref9
+            Link link_ref9
+            link_ref9:AddText("Quorum Table Source Code")
+            link_ref9:SetAddress("https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/Table.quorum")
+            link_ref9:SetClassAttribute("underline text-quorum-blue-150")
+            li_ref9:Add(link_ref9)
+
+            unordered:Add(li_ref1)
+            unordered:Add(li_ref2)
+            unordered:Add(li_ref3)
+            unordered:Add(li_ref4)
+            unordered:Add(li_ref5)
+            unordered:Add(li_ref6)
+            unordered:Add(li_ref7)
+            unordered:Add(li_ref8)
+            unordered:Add(li_ref9)
+
+        section_resources:Add(unordered)
+
+        bodyDiv:Add(section_containers)
+        bodyDiv:Add(section_adding)
+        bodyDiv:Add(section_getting)
+        bodyDiv:Add(section_removing)
+        bodyDiv:Add(section_iterating)
+        bodyDiv:Add(section_resources)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -233,5 +339,13 @@ class ContainersTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/language/containers.html"
+    end
+
+    action GetLinkName returns text
+        return "Containers"
+    end
+
+    action GetSectionName returns text
+        return "Advanced Quorum"
     end
 end
