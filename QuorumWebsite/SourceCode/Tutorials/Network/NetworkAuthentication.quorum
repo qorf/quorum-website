@@ -1,19 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class NetworkAuthentication is Lesson
     text dq = ""
@@ -36,80 +22,99 @@ class NetworkAuthentication is Lesson
         AdjustMain(mainRegion)
 
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Network Authentication Overview", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Network Authentication Overview", 1)
+
         headDiv:AddText("Obtaining Authentication using Hypertext Transfer Protocol (HTTP)")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Section section_overview
+        section_overview:SetClassAttribute("flex flex-col gap-y-2")
 
-bodyDiv:AddHeading("Overview", 2)
-Bold b1
-Bold b2
-    b1:AddText("Authentication")
-    b2:AddText("Authorized")
-bodyDiv:Add(b1)
-bodyDiv:AddText(" is a way of proving your identity, that you are who you say you are. Only after a user has been Authenticated can it be determined if they are ")
-bodyDiv:Add(b2)
-bodyDiv:AddText(" (or not Authorized) to access the requested resource from the server.")
+        AddHeading(section_overview, "Overview", 2)
+        Paragraph p_overview
+          Bold b1
+          Bold b2
+              b1:AddText("Authentication")
+              b2:AddText("Authorized")
+          p_overview:Add(b1)
+          p_overview:AddText(" is a way of proving your identity, that you are who you say you are. Only after a user has been Authenticated can it be determined if they are ")
+          p_overview:Add(b2)
+          p_overview:AddText(" (or not Authorized) to access the requested resource from the server.")
+        section_overview:Add(p_overview)
 
 
-bodyDiv:AddHeading("Basic Authentication", 2)
-bodyDiv:AddParagraph("Basic Authentication using the Hypertext Transfer Protocol 
-(HTTP) is one of the most well-known forms of authentication with a user providing 
-a username and password, otherwise known as their credentials, to verify their 
-identity to the server. The username and password are combined, separated only by 
-a colon " + dq + ":" + dq + ", encoded, and passed to the server as the corresponding value to the 
-" + dq + "Authorization" + dq + " request header as shown below: (It is important to note that the 
-username and password are only encoded, not encrypted, which is a security 
-downfall using the Basic Authentication method as it is easy to reverse an 
-encoding on the credentials).")
+        Section section_authentication
+        section_authentication:SetClassAttribute("flex flex-col gap-y-2")
 
-CodeBlock cb1
-        cb1:AddText("GET https://quorumlanguage.com/GETtest.php HTTP/1.1" + cr)
-        cb1:AddText("Authorization: Basic [your encoded username:password]" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        AddHeading(section_overview, "Basic Authentication", 2)
+        section_overview:AddParagraph("Basic Authentication using the Hypertext Transfer Protocol 
+        (HTTP) is one of the most well-known forms of authentication with a user providing 
+        a username and password, otherwise known as their credentials, to verify their 
+        identity to the server. The username and password are combined, separated only by 
+        a colon " + dq + ":" + dq + ", encoded, and passed to the server as the corresponding value to the 
+        " + dq + "Authorization" + dq + " request header as shown below: (It is important to note that the 
+        username and password are only encoded, not encrypted, which is a security 
+        downfall using the Basic Authentication method as it is easy to reverse an 
+        encoding on the credentials).")
 
-bodyDiv:AddParagraph("If the credentials passed in the Request Message match the 
-credentials the server has stored in their list of users, then the server will 
-respond with the requested resource. If the credentials passed do not match (authentication failed), or 
-if the user does not have access to the requested resource (authorization failed), then the server will 
-respond with a Status Code and associated Status Text indicating either " + dq + "401 authentication 
-failed" + dq + " or " + dq + "403 the user is not authorized to access the requested resource" + dq + ".")
+        CodeBlock cb1
+                cb1:AddText("GET https://quorumlanguage.com/GETtest.php HTTP/1.1" + cr)
+                cb1:AddText("Authorization: Basic [your encoded username:password]" + cr)
+        section_overview:Add(preformatter:GeneratePreformattedCode(cb1))
 
-bodyDiv:AddHeading("OAuth", 2)
-Bold b3
-    b3:AddText("Access Token")
-bodyDiv:AddText("Rather than using a user’s personal credentials as a means 
-of authentication and/or authorization, OAuth allows users to request authentication and 
-authorization through an ")
-bodyDiv:Add(b3)
-bodyDiv:AddText(". The access token must be obtained from the 
-owner (server) of the resource(s) being requested prior to the request. The access 
-token is then sent to the server in the request message as shown below to 
-authenticate and authorize access to the resource: ")
-bodyDiv:AddParagraph("")
+        section_overview:AddParagraph("If the credentials passed in the Request Message match the 
+        credentials the server has stored in their list of users, then the server will 
+        respond with the requested resource. If the credentials passed do not match (authentication failed), or 
+        if the user does not have access to the requested resource (authorization failed), then the server will 
+        respond with a Status Code and associated Status Text indicating either " + dq + "401 authentication 
+        failed" + dq + " or " + dq + "403 the user is not authorized to access the requested resource" + dq + ".")
 
-CodeBlock cb2
-        cb2:AddText("GET https://quorumlanguage.com/GETtest.php HTTP/1.1" + cr)
-        cb2:AddText("Authorization: Bearer [your access token-value]"+ cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        Section section_oauth
+        section_oauth:SetClassAttribute("flex flex-col gap-y-2")
 
-bodyDiv:AddParagraph("")
-bodyDiv:AddText("To see OAuth in practice see our ")
-bodyDiv:AddLink("Skynet Tutorial", "https://quorumlanguage.com/tutorials/network/skynet.html")
-bodyDiv:AddText(" where an OAuth access token is sent in the request message 
-and used to authenticate a user before they are able to obtain an observation. 
-If you do not have a valid token you will not be able to access the requested 
-resource (or observation in this case).")
+        AddHeading(section_oauth, "OAuth", 2)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Paragraph p_oath
+          Bold b3
+              b3:AddText("Access Token")
+          p_oath:AddText("Rather than using a user’s personal credentials as a means 
+          of authentication and/or authorization, OAuth allows users to request authentication and 
+          authorization through an ")
+          p_oath:Add(b3)
+          p_oath:AddText(". The access token must be obtained from the 
+          owner (server) of the resource(s) being requested prior to the request. The access 
+          token is then sent to the server in the request message as shown below to 
+          authenticate and authorize access to the resource: ")
+        section_oauth:Add(p_oath)
+
+        CodeBlock cb2
+          cb2:AddText("GET https://quorumlanguage.com/GETtest.php HTTP/1.1" + cr)
+          cb2:AddText("Authorization: Bearer [your access token-value]"+ cr)
+        section_oauth:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        Paragraph p_oath2
+        p_oath2:AddText("To see OAuth in practice see our ")
+        Link link = p_oath2:AddLink("Skynet Tutorial", "https://quorumlanguage.com/tutorials/network/skynet.html")
+        link:AddClassAttribute("underline text-quorum-blue-150")
+        p_oath2:AddText(" where an OAuth access token is sent in the request message 
+        and used to authenticate a user before they are able to obtain an observation. 
+        If you do not have a valid token you will not be able to access the requested 
+        resource (or observation in this case).")
+
+        bodyDiv:Add(section_overview)
+        bodyDiv:Add(section_authentication)
+        bodyDiv:Add(section_oauth)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -127,5 +132,13 @@ resource (or observation in this case).")
     end
     action GetLocation returns text
         return "tutorials/network/authentication.html"
+    end
+
+    action GetLinkName returns text
+        return "Authentication"
+    end
+
+    action GetSectionName returns text
+        return "Network"
     end
 end
