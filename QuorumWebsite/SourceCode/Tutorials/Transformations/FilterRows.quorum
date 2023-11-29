@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class FilterRows is Lesson
     text dq = ""
@@ -29,56 +14,80 @@ class FilterRows is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Filtering Rows", 1)
-        headDiv:AddText("This tutorial demonstrates how to filter rows in our datasets")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Filtering Rows", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Filtering Rows")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial demonstrates how to filter rows in our datasets")
+        bodyDiv:Add(headDiv)
+
         
-        bodyDiv:AddHeading("Filtering Rows", 2)
+        Section section_filter
+        section_filter:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_filter)
+        AddHeading(section_filter, "Filtering a Row", 2)
+
        
-        bodyDiv:AddParagraph("In addition to removing or replacing undefined values, we also sometimes want to remove rows that follow a particular pattern. Consider, for example, the following DataFrame:")
+        section_filter:AddParagraph("In addition to removing or replacing undefined values, we also sometimes want to remove rows that follow a particular pattern. Consider, for example, the following DataFrame:")
+
+        WebTable table = AddWebTable("Example of a small DataFrame")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("x")
+        tableHeaderArray:Add("y") 
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
 
         Array<text> rubricText1
         rubricText1:Add("1")
         rubricText1:Add("5")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
          Array<text> rubricText2
         rubricText2:Add("2")
         rubricText2:Add("6")
+         tableBody:Add(AddTableBodyRow(rubricText2))
 
          Array<text> rubricText3
         rubricText3:Add("3")
         rubricText3:Add("7")
+         tableBody:Add(AddTableBodyRow(rubricText3))
 
          Array<text> rubricText4
         rubricText4:Add("4")
         rubricText4:Add("8")
+         tableBody:Add(AddTableBodyRow(rubricText4))
         
-        Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("x", " "))
-        rubricHeader:Add(AddTextBoldFront("y", " "))
+        table:Add(tableBody)
+        section_filter:Add(table)
+        
 
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        section_filter:AddParagraph("If we had such a frame, we might want to remove certain rows inside it. For example, we might want to remove any rows in the y column that are greater than 6. In real-world examples, while we could do this by hand, for large data sets this can get clunky and error prone. Again, if this data was in a spreadsheet, we could select the two offending columns and delete them. In this section, in order to make the operations on our data more reproducible, we are going to automate this.")
+        
+        section_filter:AddParagraph("Filtering is a tricky problem and this system uses an action in Quorum's DataFrame system called Filter(text expression). By default, filter takes in a special form of text, an expression related to our DataFrame, and then processes the entire file row by row. Here is a brief description of what Filter(text expression) does:")
+
+          WebTable tableAction = AddWebTable("Filtering Helper Functions")
+        TableBody tableBodyAction = AddTableBody()
+        
+        Array<text> tableHeaderArrayAction
+        tableHeaderArrayAction:Add("Class / Action")
+        tableHeaderArrayAction:Add("Description") 
+        tableHeaderArrayAction:Add("Usage")
       
-        rubricRows:Add(AddTableDataTag(rubricText1))
-        rubricRows:Add(AddTableDataTag(rubricText2))
-        rubricRows:Add(AddTableDataTag(rubricText3))
-        rubricRows:Add(AddTableDataTag(rubricText4))
-
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Example of a small DataFrame"))
-
-        bodyDiv:AddParagraph("If we had such a frame, we might want to remove certain rows inside it. For example, we might want to remove any rows in the y column that are greater than 6. In real-world examples, while we could do this by hand, for large data sets this can get clunky and error prone. Again, if this data was in a spreadsheet, we could select the two offending columns and delete them. In this section, in order to make the operations on our data more reproducible, we are going to automate this.")
-        
-        bodyDiv:AddParagraph("Filtering is a tricky problem and this system uses an action in Quorum's DataFrame system called Filter(text expression). By default, filter takes in a special form of text, an expression related to our DataFrame, and then processes the entire file row by row. Here is a brief description of what Filter(text expression) does:")
+        TableHeader theadAction = AddTableHeaderRow(tableHeaderArrayAction)
+        tableAction:Add(theadAction)        
 
          Array<text> rubricText5
         rubricText5:Add("dataFrameObject:Filter(text expression)")
@@ -86,57 +95,67 @@ class FilterRows is Lesson
 This is such as only wanting to keep values pertaining to a certain range within a numerical column.
 ")
 rubricText5:Add("frame:Filter("+dq+"x < 5"+dq+")")
-        
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Action / Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Description", " "))
-        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+         tableBodyAction:Add(AddTableBodyRow(rubricText5))
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText5))
   
-      
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Filtering Helper Functions"))
+        tableAction:Add(tableBodyAction)
+        section_filter:Add(tableAction)
         
-        bodyDiv:AddParagraph("Let's take an example. We will be using a simple dataset to show this process of how to filter rows. Here is a snippet of this dataset (unrelated to our AskAManager.csv dataset):")        
+       section_filter:AddParagraph("Let's take an example. We will be using a simple dataset to show this process of how to filter rows. Here is a snippet of this dataset (unrelated to our AskAManager.csv dataset):")        
+
+        WebTable tableRandom = AddWebTable("Example of random.csv file")
+        TableBody tableBodyRandom = AddTableBody()
+        
+        Array<text> tableHeaderArrayRandom
+        tableHeaderArrayRandom:Add("id")
+        tableHeaderArrayRandom:Add("a") 
+        tableHeaderArrayRandom:Add("b")
+        tableHeaderArrayRandom:Add("c")
+
+        TableHeader theadRandom = AddTableHeaderRow(tableHeaderArrayRandom)
+        tableRandom:Add(theadRandom)
 
         Array<text> rubricText6
         rubricText6:Add("1")
         rubricText6:Add("45")
         rubricText6:Add("3")
         rubricText6:Add("9")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText6))
 
         Array<text> rubricText7
         rubricText7:Add("2")
         rubricText7:Add("57")
         rubricText7:Add("67")
         rubricText7:Add("5")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText7))
         
         Array<text> rubricText8
         rubricText8:Add("3")
         rubricText8:Add("183")
         rubricText8:Add("70")
         rubricText8:Add("18")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText8))
 
         Array<text> rubricText9
         rubricText9:Add("4")
         rubricText9:Add("322")
         rubricText9:Add("20")
         rubricText9:Add("48")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText9))
 
         Array<text> rubricText10
         rubricText10:Add("5")
         rubricText10:Add("10")
         rubricText10:Add("15")
         rubricText10:Add("90")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText10))
 
         Array<text> rubricText11
         rubricText11:Add("6")
         rubricText11:Add("29")
         rubricText11:Add("11")
         rubricText11:Add("25")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText11))
 
         Array<text> rubricHeader2
         rubricHeader2:Add(AddTextBoldFront("id", " "))
@@ -144,29 +163,21 @@ rubricText5:Add("frame:Filter("+dq+"x < 5"+dq+")")
         rubricHeader2:Add(AddTextBoldFront("b", " "))
         rubricHeader2:Add(AddTextBoldFront("c", " "))
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricText6))
-        rubricRows2:Add(AddTableDataTag(rubricText7))
-        rubricRows2:Add(AddTableDataTag(rubricText8))
-        rubricRows2:Add(AddTableDataTag(rubricText9))
-        rubricRows2:Add(AddTableDataTag(rubricText10))
-        rubricRows2:Add(AddTableDataTag(rubricText11))
+        tableRandom:Add(tableBodyRandom)
+        section_filter:Add(tableRandom)
 
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Example of random.csv file"))
-
-        bodyDiv:AddParagraph(" ")
+        section_filter:AddParagraph(" ")
 
      Link link3
         link3:AddText("We can download this sample dataset, random.csv by clicking this link.")
         link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/random.csv")
         link3:SetTarget(link3:newTab)
-        bodyDiv:Add(link3)
+        link3:SetClassAttribute("underline text-quorum-blue-150")
+        section_filter:Add(link3)
         
-        bodyDiv:AddParagraph("Here we would like to take a look at column 'c' and want to filter out any rows that are less than the value 35. In order to accomplish this, we would call our Filter action within the DataFrame's class and insert 'c < 35' inside the parameter. This will go through the entire column and remove the entire row for any rows that contain a value less than 35 within the 'c' column. Here is an example of this:")
+        section_filter:AddParagraph("Here we would like to take a look at column 'c' and want to filter out any rows that are less than the value 35. In order to accomplish this, we would call our Filter action within the DataFrame's class and insert 'c < 35' inside the parameter. This will go through the entire column and remove the entire row for any rows that contain a value less than 35 within the 'c' column. Here is an example of this:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        section_filter:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
 
@@ -192,11 +203,11 @@ output "+dq+"modified frame"+dq+"
 output frame:ToText()
 "))
 
-        bodyDiv:AddParagraph("What this code is doing is complicated. On the surface, we are telling the DataFrame to process our expression, c < 35, and convert it into what is in reality a separate small computer program. 
+        section_filter:AddParagraph("What this code is doing is complicated. On the surface, we are telling the DataFrame to process our expression, c < 35, and convert it into what is in reality a separate small computer program. 
 To highlight our process we first loaded our file, random.csv and read it into our DataFrame, 'frame.' Because we are eventually going to manipulate our 'frame' we want to save the original DataFrame so we create a new DataFrame called 'copy.' We simply call 'frame:Copy()' and save it into the 'copy' object which will give us the exact same frame. 
 ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
+        section_filter:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
 //more information about the data that is being loaded.
 DataFrame frame
 DataFrame copy
@@ -208,33 +219,49 @@ frame:Load("+dq+"../Data/Miscellaneous/random.csv"+dq+")
 copy = frame:Copy()
 "))
 
-        bodyDiv:AddParagraph("Next, we call Filter() on frame and insert the equation we have (y < 35) as the parameter for Filter(). Finally, what we are doing is outputting both the original frame (copy) and the newly modified frame (frame). As we can see, our 'frame' object has been filtered by removing any row in column y with a value less than 35. ")
+        section_filter:AddParagraph("Next, we call Filter() on frame and insert the equation we have (y < 35) as the parameter for Filter(). Finally, what we are doing is outputting both the original frame (copy) and the newly modified frame (frame). As we can see, our 'frame' object has been filtered by removing any row in column y with a value less than 35. ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:Filter("+dq+"c < 35"+dq+")"))
+        section_filter:Add(preformatter:GeneratePreformattedCode("frame:Filter("+dq+"c < 35"+dq+")"))
 
 
-        bodyDiv:AddParagraph("Just like in normal Quorum programs, the syntax and semantics of these filters is the same. If we wanted to write c < 35 + 1, or many other kinds of expressions, we could, although we point out that the variety of programs we can write in the filter is intentionally limited. Thus, while the code we write matches normal code in the language, not all possible expressions are allowed.")
+        section_filter:AddParagraph("Just like in normal Quorum programs, the syntax and semantics of these filters is the same. If we wanted to write c < 35 + 1, or many other kinds of expressions, we could, although we point out that the variety of programs we can write in the filter is intentionally limited. Thus, while the code we write matches normal code in the language, not all possible expressions are allowed.")
 
-        bodyDiv:AddParagraph("One last point is that in this expression, the value c represents a column, yet the program is filtering the entire DataFrame. This is because this expression is tested on the c column, re-evaluated for every row. If a row evaluates to true, then the row is retained. If the row calculation results in false, then the row is removed. ")
+        section_filter:AddParagraph("One last point is that in this expression, the value c represents a column, yet the program is filtering the entire DataFrame. This is because this expression is tested on the c column, re-evaluated for every row. If a row evaluates to true, then the row is retained. If the row calculation results in false, then the row is removed. ")
 
-        bodyDiv:AddHeading("Run the Example",2)
+        Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/Transformations/FilterRows.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Filtering Rows")
+    section_try_yourself:Add(ide3)
         
-        AddIDE(bodyDiv,"FilterRows","Filtering Rows","Filtering rows for data transformations","examples/Transformations/FilterRows.quorum")
 
-bodyDiv:AddParagraph(" ")
-bodyDiv:AddText("To view the program we have made, we can ")
+Paragraph para
+para:AddText("To view the program we have made, we can ")
 
      Link link2
         link2:AddText("download the program file")
         link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/FilterRows.quorum")
         link2:SetTarget(link2:newTab)
-        bodyDiv:Add(link2)
-
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        para:Add(link2)
+        section_try_yourself:Add(para)
+        
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -263,5 +290,13 @@ bodyDiv:AddText("To view the program we have made, we can ")
 
     action GetLocation returns text
         return "tutorials/Transformations/FilteringRows.html"
+    end
+
+         action GetLinkName returns text
+        return "Filtering Rows"
+    end
+
+    action GetSectionName returns text
+        return "Data Transformations"
     end
 end

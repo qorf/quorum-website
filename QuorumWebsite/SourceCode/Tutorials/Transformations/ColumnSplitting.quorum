@@ -1,21 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.WebList
 
 class ColumnSplitting is Lesson
     text dq = ""
@@ -30,25 +14,33 @@ class ColumnSplitting is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Column Splitting", 1)
-        headDiv:AddText("This tutorial demonstrates how to split columns in our datasets")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Column Splitting", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Column Splitting")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial demonstrates how to split columns in our datasets")
+        bodyDiv:Add(headDiv)
+
         
-        bodyDiv:AddHeading("Column Splittng", 2)
+        Section section_split
+        section_split:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_split)
+        AddHeading(section_split, "Splitting a Column", 2)
+
        
-        bodyDiv:AddParagraph("Let us immediately start off with an example to explain what it means to 'column split.' Imagine for a moment that we had a DataFrame below:")
+        section_split:AddParagraph("Let us immediately start off with an example to explain what it means to column split. Imagine for a moment that we had a DataFrame below:")
 
    
-        bodyDiv:AddParagraph(""+dq+"player,year,season,stats
+        section_split:AddParagraph(""+dq+"player,year,season,stats
 1,A,1,22-2
 2,A,2,29-3
 3,B,1,18-6
@@ -57,28 +49,45 @@ class ColumnSplitting is Lesson
 6,C,2,19-2"+dq+"
 ")
 
-        bodyDiv:AddParagraph("The basic idea in splitting columns is we need a way to separate out the value in the cells. For simple cases, like if there is a character between them, we can use the SplitSelectedColumns(Array<text>, text) action. For this, we first provide an array of the names of the headers for the new columns. Second, we provide it the character we want to split up the values by. Here is a brief description of how SplitSelectedColumns(Array, text) work:")
+        section_split:AddParagraph("The basic idea in splitting columns is we need a way to separate out the value in the cells. For simple cases, like if there is a character between them, we can use the SplitSelectedColumns(Array<text>, text) action. For this, we first provide an array of the names of the headers for the new columns. Second, we provide it the character we want to split up the values by. Here is a brief description of how SplitSelectedColumns(Array, text) work:")
+
+         
+         WebTable table = AddWebTable("Calculate Columns Helper Functions")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Class / Action")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage")
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
 
         Array<text> rubricText1
         rubricText1:Add("dataFrameObject:SplitSelectedColumns(Array<text> textHeader, text separatorChar)")
         rubricText1:Add("This action takes in an array that would be the new header for the created column as well as the character we are looking for to separate values by. The character will go through that selected column and create a new header column with just the separated value.")
         rubricText1:Add("frame:SplitSelectedColumns(newHeader,"+dq+"-"+dq+")")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
-        Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Class / Action", " "))
-        rubricHeader:Add(AddTextBoldFront("Description", " "))
-        rubricHeader:Add(AddTextBoldFront("Usage", " "))
+        table:Add(tableBody)
+        section_split:Add(table)
 
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        section_split:AddParagraph("For this example, we will be using a sample file of player stats for an online game, league.csv. Here is an example of the CSV file:")
+        
+         WebTable tableLeague = AddWebTable("League of Legends Stats")
+        TableBody tableBodyLeague = AddTableBody()
+        
+        Array<text> tableHeaderArrayLeague
+        tableHeaderArrayLeague:Add("Player")
+        tableHeaderArrayLeague:Add("Tier") 
+        tableHeaderArrayLeague:Add("LP")
+        tableHeaderArrayLeague:Add("Level")
+        tableHeaderArrayLeague:Add("Win Ratio")
+         tableHeaderArrayLeague:Add("Kills/Deaths/Assists")
       
-        rubricRows:Add(AddTableDataTag(rubricText1))
+        TableHeader theadLeague = AddTableHeaderRow(tableHeaderArrayLeague)
+        tableLeague:Add(theadLeague)        
 
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Column Splitting Helper Functions"))
-
-
-        bodyDiv:AddParagraph("For this example, we will be using a sample file of player stats for an online game, league.csv. Here is an example of the CSV file:")
-        
         Array<text> rubricText2
         rubricText2:Add("jianhun")
         rubricText2:Add("Challenger")
@@ -86,6 +95,7 @@ class ColumnSplitting is Lesson
         rubricText2:Add("53")
         rubricText2:Add("156-112")
         rubricText2:Add("4/33/11")
+        tableBodyLeague:Add(AddTableBodyRow(rubricText2))
 
         Array<text> rubricText3
         rubricText3:Add("TES 77")
@@ -94,6 +104,7 @@ class ColumnSplitting is Lesson
         rubricText3:Add("60")
         rubricText3:Add("209-161")
         rubricText3:Add("4/33/11")
+         tableBodyLeague:Add(AddTableBodyRow(rubricText3))
 
         Array<text> rubricText4
         rubricText4:Add("Shadow BongBong")
@@ -102,6 +113,7 @@ class ColumnSplitting is Lesson
         rubricText4:Add("241")
         rubricText4:Add("312-253")
         rubricText4:Add("4/33/11")
+         tableBodyLeague:Add(AddTableBodyRow(rubricText4))
         
          Array<text> rubricText5
         rubricText5:Add("KING MIR")
@@ -110,62 +122,50 @@ class ColumnSplitting is Lesson
         rubricText5:Add("654")
         rubricText5:Add("406-355")
         rubricText5:Add("4/33/11")
+         tableBodyLeague:Add(AddTableBodyRow(rubricText5))
 
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Player", " "))
-        rubricHeader1:Add(AddTextBoldFront("Tier", " "))
-        rubricHeader1:Add(AddTextBoldFront("LP", " "))
-         rubricHeader1:Add(AddTextBoldFront("Level", " "))
-         rubricHeader1:Add(AddTextBoldFront("Win Ratio", " "))
-         rubricHeader1:Add(AddTextBoldFront("Kills/Deaths/Assists", " "))
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
-        rubricRows1:Add(AddTableDataTag(rubricText5))
-
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Column Splitting Helper Functions"))
+        tableLeague:Add(tableBodyLeague)
+        section_split:Add(tableLeague)
         
         Link link3 
         link3:AddText("We can click this link to download the file for the CSV.")
         link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Culture%20and%20Entertainment/league.csv")
         link3:SetTarget(link3:newTab)
+        link3:SetClassAttribute("underline text-quorum-blue-150")
 
-        bodyDiv:Add(link3)
+        section_split:Add(link3)
 
-        bodyDiv:AddParagraph("What we want to do is try and separate the Win Ratio column so on one column, we have the wins and the next column we have the loses. So let us start off with downloading the provided file here. We will then want to create a DataFrame object, which we can call 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
+        section_split:AddParagraph("What we want to do is try and separate the Win Ratio column so on one column, we have the wins and the next column we have the loses. So let us start off with downloading the provided file here. We will then want to create a DataFrame object, which we can call 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
 We first want to load the file, which we can do by calling Load(text fileLocation) and put it in the file location of our league.csv file.
 ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        section_split:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Containers.Array
 
 DataFrame frame
 frame:Load(" + dq + "data/league.csv" + dq +")"))
 
-        bodyDiv:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate wins and loses, we will use the Add(text arrayElement) to add heading titles into our array. ")
+        section_split:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate wins and loses, we will use the Add(text arrayElement) to add heading titles into our array. ")
             
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//create the names for the new columns
+        section_split:Add(preformatter:GeneratePreformattedCode("//create the names for the new columns
 Array<text> headers
 headers:Add(" + dq + "Wins" + dq+ ")
 headers:Add(" + dq + "Loses" + dq + ")"))
 
 
-        bodyDiv:AddParagraph("Next, we have to select the column we are trying to separate. Remember that in a CSV file, columns start off with 0 so in this case, the column with the non-separated wins and loses will be column 4. We would call the action AddSelectedColumn(integer columnNumber) and pass in 4 which will read in the column of 'Win Ratio.' An alternative method that accomplishes the same read-in is to use the action AddSelectedColumns(text columnHeader) which we would pass in the 'Win Ratio' column header and read in that same column. For this tutorial, we will just add the numerical assigned column.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedColumn(4)"))
+        section_split:AddParagraph("Next, we have to select the column we are trying to separate. Remember that in a CSV file, columns start off with 0 so in this case, the column with the non-separated wins and loses will be column 4. We would call the action AddSelectedColumn(integer columnNumber) and pass in 4 which will read in the column of 'Win Ratio.' An alternative method that accomplishes the same read-in is to use the action AddSelectedColumns(text columnHeader) which we would pass in the 'Win Ratio' column header and read in that same column. For this tutorial, we will just add the numerical assigned column.")
+        section_split:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedColumn(4)"))
 
-        bodyDiv:AddParagraph("The last step is to call the action SplitSelectedColumns(Array <text>, text) on our 'frame' object. For the first parameter, we will pass in the 'headers' array we created previously and in the second parameter, we will want to pass in the character we want to separate the column by. What this does is that it will search through the column and find that separator character. Once it finds the character, it separates the values from the left and right hand sides and puts them into separate columns. In this dataset, the values we want to separate are divided by a '-' so we will be inserting that character.")
-        bodyDiv:AddParagraph("We also want to save our newly created columns into a new DataFrame so we will assign this modified frame into a new frame called 'result.' We finally can output both DataFrames onto the console to see our changes.")
+        section_split:AddParagraph("The last step is to call the action SplitSelectedColumns(Array <text>, text) on our 'frame' object. For the first parameter, we will pass in the 'headers' array we created previously and in the second parameter, we will want to pass in the character we want to separate the column by. What this does is that it will search through the column and find that separator character. Once it finds the character, it separates the values from the left and right hand sides and puts them into separate columns. In this dataset, the values we want to separate are divided by a '-' so we will be inserting that character.")
+        section_split:AddParagraph("We also want to save our newly created columns into a new DataFrame so we will assign this modified frame into a new frame called 'result.' We finally can output both DataFrames onto the console to see our changes.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame result = frame:SplitSelectedColumns(headers, "+dq+"-"+dq+")
+        section_split:Add(preformatter:GeneratePreformattedCode("DataFrame result = frame:SplitSelectedColumns(headers, "+dq+"-"+dq+")
 "))
 
-        bodyDiv:AddParagraph("Below is an example of the entire program: ")
+        section_split:AddParagraph("Below is an example of the entire program: ")
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        section_split:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Containers.Array
 DataFrame frame
 frame:Load(" + dq + "data/league.csv"+ dq + ")
@@ -186,34 +186,54 @@ output frame:ToText()
 output " + dq + "column split frame of wins/loses" + dq + "
 output result:ToText()"))
 
-        bodyDiv:AddHeading("Run the Example",2)
-        
-        AddIDE(bodyDiv,"ColumnSplit","Column Splitting","Column Splitting for data transformations","examples/Transformations/ColumnSplitting.quorum")
-
-    bodyDiv:AddParagraph(" ")
-bodyDiv:AddText("To view the program we have made, we can ")
+    Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself: Splitting", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself: Splitting")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself: Splitting")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/Transformations/ColumnSplitting.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Column Splitting")
+    section_try_yourself:Add(ide3)
+    
+    Paragraph para
+para:AddText("To view the program we have made, we can ")
 
      Link link2
         link2:AddText("download the program file")
         link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/ColumnSplitting.quorum")
         link2:SetTarget(link2:newTab)
-        bodyDiv:Add(link2)
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        para:Add(link2)
+    section_try_yourself:Add(para)
 
+        
+    Section section_inherit
+    section_inherit:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_inherit)
+    AddHeading(section_inherit, "Column Splitting With Inheritance", 2)
 
-    bodyDiv:AddHeading("Column Splitting With Inheritance",2)
-
-    bodyDiv:AddParagraph(" ")
-    bodyDiv:AddText("While this works for a common case, for more complex examples, we may want to split up a value in any number of complicated ways. To do so is more complex. Specifically, we need to use ")
+    Paragraph para1
+    para1:AddText("While this works for a common case, for more complex examples, we may want to split up a value in any number of complicated ways. To do so is more complex. Specifically, we need to use ")
     Link link4
         link4:AddText("Inheritance")
         link4:SetAddress("https://quorumlanguage.com/tutorials/language/inheritance.html")
         link4:SetTarget(link4:newTab)
+        link4:SetClassAttribute("underline text-quorum-blue-150")
 
-    bodyDiv:Add(link4)
-    bodyDiv:AddText(". Overriding the class named ColumnSplitter, then overriding one action. Here is an example of the class that implements the basic splitting shown above:")
+    para1:Add(link4)
+    para1:AddText(". Overriding the class named ColumnSplitter, then overriding one action. Here is an example of the class that implements the basic splitting shown above:")
+    section_inherit:Add(para)
 
-
-    bodyDiv:Add(preformatter:GeneratePreformattedCode("package Libraries.Compute.Statistics.Transforms
+    section_inherit:Add(preformatter:GeneratePreformattedCode("package Libraries.Compute.Statistics.Transforms
 use Libraries.Containers.Array
 use Libraries.Compute.Statistics.DataFrame
 
@@ -242,24 +262,24 @@ end
 end
 "))
 
-bodyDiv:AddParagraph("Once we have created a new splitter, we can send it to any DataFrame using its Transform action. Now, we will go through the process on how to use this same idea with our DataFrames. Again, we will want to create a DataFrame object, which we can call it 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
+section_inherit:AddParagraph("Once we have created a new splitter, we can send it to any DataFrame using its Transform action. Now, we will go through the process on how to use this same idea with our DataFrames. Again, we will want to create a DataFrame object, which we can call it 'frame.' Our 'frame' object will contain all the actions we need in order to successfully split our column.
 We first want to load the file, which we can do by calling Load(text fileLocation) and put it in the file location of our league.csv file.
 ")
 
-bodyDiv:Add(preformatter:GeneratePreformattedCode("DataFrame frame
+section_inherit:Add(preformatter:GeneratePreformattedCode("DataFrame frame
 frame:Load(" + dq  + "data/league.csv" + dq  + ")"))
 
-bodyDiv:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate kills, deaths and assists, we will use the Add(text arrayElement) to add heading titles into our array. ")
+section_inherit:AddParagraph("Next, we want to create a text array in which they will be the newly separated columns. Since we want to separate kills, deaths and assists, we will use the Add(text arrayElement) to add heading titles into our array. ")
 
-bodyDiv:Add(preformatter:GeneratePreformattedCode("//create the names for the new columns
+section_inherit:Add(preformatter:GeneratePreformattedCode("//create the names for the new columns
 Array<text> headers
 headers:Add(" + dq  + "Kills" + dq  + ")
 headers:Add(" + dq + "Deaths" + dq + ")
 headers:Add(" + dq + "Assists" + dq + ")"))
 
-bodyDiv:AddParagraph("Finally, we want to select the column we are splitting, 'Kills/Deaths/Assists' using our action AddSelectedColumns(text header). This will load our selected column into the DataFrame in order to properly split up the entries. We also want to call another action SplitSelectedColumns(Array <text>headers, text charDelim, bool hasDelimeter) which takes in three parameters: the array we have created, a character separating each value, and boolean to verify such delimiter in the column. This is very similar to our previous splitting action. Now that we have our column set up, let's create a new DataFrame and call it 'result' and save the result from SplitSelectedColumns().")
+section_inherit:AddParagraph("Finally, we want to select the column we are splitting, 'Kills/Deaths/Assists' using our action AddSelectedColumns(text header). This will load our selected column into the DataFrame in order to properly split up the entries. We also want to call another action SplitSelectedColumns(Array <text>headers, text charDelim, bool hasDelimeter) which takes in three parameters: the array we have created, a character separating each value, and boolean to verify such delimiter in the column. This is very similar to our previous splitting action. Now that we have our column set up, let's create a new DataFrame and call it 'result' and save the result from SplitSelectedColumns().")
 
-bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+section_inherit:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Containers.Array
 
 DataFrame frame
@@ -282,25 +302,42 @@ DataFrame result = frame:SplitSelectedColumns(headers, " + dq + "/"  + dq + ", h
 output result:ToText()
 output frame:ToText()"))
 
-bodyDiv:AddHeading("Run the Example",2)
+      Section section_try_yourself1
+    section_try_yourself1:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself1)
+    Heading h2_try_yourself1 = section_try_yourself1:AddHeading("Try it Yourself: Splitting with Inheritance", 2)
+    h2_try_yourself1:AddAttribute("data-text", "Try it Yourself: Splitting with Inheritance")
+    h2_try_yourself1:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself1)
+    section_try_yourself1:AddAttribute("data-text", "Try it Yourself: Splitting with Inheritance")
+    section_try_yourself1:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code5
+    code5:AddFileUrl("Main.quorum", "examples/Transformations/ColumnSplittingInheritance.quorum")
+    IDE ide4 = AddIDE()
+    ide4:SetLightTheme()
+    ide4:SetCodeForIDE(code5:GetJsonArray())
+    ide4:SetIdeTitle("Column Splitting with Inheritance")
+    section_try_yourself1:Add(ide4)
         
-        AddIDE(bodyDiv,"ColumnSplitInheritance","Column Splitting with Inheritance","Column Splitting with Inheritance for data transformations","examples/Transformations/ColumnSplittingInheritance.quorum")
 
-    bodyDiv:AddParagraph(" ")
-bodyDiv:AddText("To view the program we have made, we can ")
+    Paragraph para2
+para2:AddText("To view the program we have made, we can ")
 
      Link link5
         link5:AddText("download the program file")
         link5:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/ColumnSplittingInheritance.quorum")
         link5:SetTarget(link5:newTab)
-        bodyDiv:Add(link5)
+        link5:SetClassAttribute("underline text-quorum-blue-150")
+        para2:Add(link5)
 
+        section_try_yourself1:Add(para2)
 
-       WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -330,5 +367,13 @@ bodyDiv:AddText("To view the program we have made, we can ")
 
     action GetLocation returns text
         return "tutorials/Transformations/ColumnSplit.html"
+    end
+
+         action GetLinkName returns text
+        return "Splitting Columns"
+    end
+
+    action GetSectionName returns text
+        return "Data Transformations"
     end
 end
