@@ -225,81 +225,132 @@ class Lesson is WebPage
         nav:SetIdentifier("onPageTableOfContents")
         nav:AddClassAttribute("font-sans")
 
-        Heading h2
-        h2:SetScale(2)
-        h2:AddClassAttribute("font-bold uppercase")
-        h2:AddText("On this page")
-        nav:Add(h2)
+//        UnorderedList ul
+//        ul:AddAttribute("role", "tree")
+//        integer currentScale = 1
+//
+//        integer i = 0
+//        repeat while i < headingArray:GetSize()
+//            Heading headingIndex = headingArray:Get(i)
+//
+//            ListItem li
+//            li:AddClassAttribute("rounded-xl hover:bg-quorum-blue-25")
+//
+//            // Normalize the heading text
+//            text headingText = headingIndex:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
+//            
+//            // Count the occurrences of this heading text in previous headings
+//            integer count = 0
+//            integer j = 0
+//            repeat while j <= i
+//                Heading tempHeading = headingArray:Get(j)
+//                text tempText = tempHeading:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
+//                if tempText = headingText
+//                    count = count + 1
+//                end
+//                j = j + 1
+//            end
+//
+//            // Set a unique identifier for each heading
+//            text uniqueId = headingText
+//            if count > 1
+//                uniqueId = uniqueId + "_" + count
+//            end
+//            headingIndex:SetIdentifier(uniqueId)
+//            
+//            integer headingScale = headingIndex:GetScale()
+//            Link headingLink
+//            headingLink:AddClassAttribute("block w-full py-1 px-2")
+//            headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
+//            headingLink:AddAttribute("aria-level", headingScale+"")
+//            headingLink:AddAttribute("role", "treeitem")
+//            headingLink:SetAddress("#" + uniqueId)
+//            
+//            // Apply font size based on heading level using if-else conditions
+//            
+//            //h1 and h2 should be the starts of new sections
+//            if headingScale = 1 or headingScale = 2 
+//                headingLink:AddClassAttribute("text-[16px] ml-0 mt-4")
+//                li:Add(headingLink)
+//                ul:Add(li)
+//             elseif headingScale = 3 
+//                if currentScale < 3
+//                    UnorderedList ul_h3
+//                    li:Add(headingLink)
+//                    ul:Add(li)
+//                end
+//                headingLink:AddClassAttribute("text-[15px] ml-2 mt-2")
+//             elseif headingScale = 4 
+//                headingLink:AddClassAttribute("text-[14px] ml-4 mt-2")
+//             elseif headingScale = 5 
+//                headingLink:AddClassAttribute("text-[13px] ml-6 mt-2")
+//             elseif headingScale = 6 
+//                headingLink:AddClassAttribute("text-[12px] ml-8 mt-2") 
+//            end
+//
+//            i = i + 1
+//        end
+//        nav:Add(ul)
 
-        UnorderedList ul
-
-        integer i = 0
-        repeat while i < headingArray:GetSize()
-            Heading headingIndex = headingArray:Get(i)
-
-            ListItem li
-            li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
-
-            // Normalize the heading text
-            text headingText = headingIndex:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-            
-            // Count the occurrences of this heading text in previous headings
-            integer count = 0
-            integer j = 0
-            repeat while j <= i
-                Heading tempHeading = headingArray:Get(j)
-                text tempText = tempHeading:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-                if tempText = headingText
-                    count = count + 1
-                end
-                j = j + 1
-            end
-
-            // Set a unique identifier for each heading
-            text uniqueId = headingText
-            if count > 1
-                uniqueId = uniqueId + "_" + count
-            end
-            headingIndex:SetIdentifier(uniqueId)
-
-            Link headingLink
-            headingLink:AddClassAttribute("block w-full py-1 px-2")
-            headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
-            headingLink:SetAddress("#" + uniqueId)
-            
-            // Apply font size based on heading level using if-else conditions
-            integer headingScale = headingIndex:GetScale()
-            //h1 and h2 should be the starts of new sections
-            if headingScale = 1 or headingScale = 2 
-                headingLink:AddClassAttribute("text-[16px] ml-0 mt-4")
-             elseif headingScale = 3 
-                headingLink:AddClassAttribute("text-[15px] ml-2 mt-2")
-             elseif headingScale = 4 
-                headingLink:AddClassAttribute("text-[14px] ml-4 mt-2")
-             elseif headingScale = 5 
-                headingLink:AddClassAttribute("text-[13px] ml-6 mt-2")
-             elseif headingScale = 6 
-                headingLink:AddClassAttribute("text-[12px] ml-8 mt-2") 
-            end
-
-            li:Add(headingLink)
-            ul:Add(li)
-            i = i + 1
-        end
-        nav:Add(ul)
+        Division hiddenDivForTailwindCSS
+        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 hidden")
+        Add(hiddenDivForTailwindCSS)
 
         Script script
 
 script:SetCode("
 document.addEventListener('DOMContentLoaded', () => {
-    const headings = document.querySelectorAll('#content * h1[data-onpage-toc], #content * h2[data-onpage-toc], #content * h3[data-onpage-toc], #content * h4[data-onpage-toc], #content * h5[data-onpage-toc], #content * h6[data-onpage-toc]');
-    const links = document.querySelectorAll('#onPageTableOfContents ul li a');
+     const toc = document.querySelector('#onPageTableOfContents');
+    if (!toc) return; // Early exit if the TOC container is not found
+    
+    const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
+    const navStack = [document.createElement('nav')];
+    const ulStack = [document.createElement('ul')];
+    ulStack[0].setAttribute('role', 'tree');
+    navStack[0].appendChild(ulStack[0]);
+    toc.appendChild(navStack[0]);
 
-    let headingCounts = {};
-    let headingLinksCount = {};
-    let currentSectionIndex = -1;
-    let isClickScrolling = false;
-    let scrollTimeout = null;
+    headings.forEach(heading => {
+        const level = parseInt(heading.tagName.substring(1), 10);
+
+        while (ulStack.length > level) {
+            ulStack.pop(); // Remove the last ul from the stack to match the current heading level
+            navStack.pop(); // Also pop the last nav
+        }
+
+        while (ulStack.length < level) {
+            let newNav = document.createElement('nav');
+            if (level > 1) {
+                // Set aria-label for inner navs
+                let lastLi = ulStack[ulStack.length - 1].lastElementChild;
+                let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
+                newNav.setAttribute('aria-label', ariaLabel);
+                newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+            }
+            let newUl = document.createElement('ul');
+            newUl.setAttribute('role', 'group');
+            newNav.appendChild(newUl);
+            ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
+            navStack.push(newNav); // Push the new nav onto the stack
+            ulStack.push(newUl); // Push the new ul onto the stack
+        }
+        
+        let li = document.createElement('li');
+        li.setAttribute('role', 'treeitem');
+        li.setAttribute('aria-level', level.toString());
+        if(level == 2){
+            li.classList.add('mt-2'); // Add margin-top for level 2 headings
+        }
+
+        let link = document.createElement('a');
+        link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
+        link.textContent = heading.textContent;
+        link.href = '#' + heading.id;
+        li.appendChild(link);
+
+        ulStack[ulStack.length - 1].appendChild(li);
+    });
+
 
     function clearActiveStates() {
         links.forEach(link => {
@@ -400,14 +451,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
             // Calculate the visible height of the element
             if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-            visibleHeight = rect.height; // Fully visible
-            } else if (rect.bottom > 0 && rect.top < 0) {
-            visibleHeight = rect.bottom; // Partly visible, top is out of view
-            } else if (rect.top < window.innerHeight && rect.bottom > window.innerHeight) {
-            visibleHeight = window.innerHeight - rect.top; // Partly visible, bottom is out of view
+                visibleHeight = rect.height; // Fully visible
+            } else if (rect.top < 0 && rect.bottom > window.innerHeight) {
+                visibleHeight = window.innerHeight; // Larger than the window, take full window height
+            } else if (rect.top < 0) {
+                visibleHeight = rect.bottom; // Partly visible, top is out of view
+            } else if (rect.bottom > window.innerHeight) {
+                visibleHeight = window.innerHeight - rect.top; // Partly visible, bottom is out of view
             } else {
-            visibleHeight = 0; // Not visible
+                visibleHeight = 0; // Not visible
             }
+
+            visibleHeight = Math.min(visibleHeight, window.innerHeight);
         
             // Update the CSS variable
             document.documentElement.style.setProperty('--main-viewable-height', `${visibleHeight}px`);
@@ -421,6 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
             // Set up the event listener for scrolling
             window.addEventListener('scroll', () => {
+                updateViewableHeight(main);
+            });
+
+            // Also update when the window is resized
+            window.addEventListener('resize', () => {
                 updateViewableHeight(main);
             });
         });
@@ -983,6 +1043,7 @@ googleScript2:AddText(
         divs:Add(tocDiv)
         divs:Add(bodyDiv)
         divs:Add(onPageDiv)
+        onPageDiv:AddHeading("On this page", 2):AddClassAttribute("font-bold uppercase")
         return divs
     end
 
