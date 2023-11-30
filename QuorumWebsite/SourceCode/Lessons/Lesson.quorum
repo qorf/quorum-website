@@ -216,6 +216,7 @@ class Lesson is WebPage
     action CreateHeadingTableOfContents returns Division
         Array<Lesson> lessonArray = CreateLinkedArrays()
         Division div
+        div:SetIdentifier("onPageTableOfContentsScrolling")
         div:AddClassAttribute("h-toc overflow-auto")
 
         Division innerDiv
@@ -225,75 +226,8 @@ class Lesson is WebPage
         nav:SetIdentifier("onPageTableOfContents")
         nav:AddClassAttribute("font-sans")
 
-//        UnorderedList ul
-//        ul:AddAttribute("role", "tree")
-//        integer currentScale = 1
-//
-//        integer i = 0
-//        repeat while i < headingArray:GetSize()
-//            Heading headingIndex = headingArray:Get(i)
-//
-//            ListItem li
-//            li:AddClassAttribute("rounded-xl hover:bg-quorum-blue-25")
-//
-//            // Normalize the heading text
-//            text headingText = headingIndex:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-//            
-//            // Count the occurrences of this heading text in previous headings
-//            integer count = 0
-//            integer j = 0
-//            repeat while j <= i
-//                Heading tempHeading = headingArray:Get(j)
-//                text tempText = tempHeading:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-//                if tempText = headingText
-//                    count = count + 1
-//                end
-//                j = j + 1
-//            end
-//
-//            // Set a unique identifier for each heading
-//            text uniqueId = headingText
-//            if count > 1
-//                uniqueId = uniqueId + "_" + count
-//            end
-//            headingIndex:SetIdentifier(uniqueId)
-//            
-//            integer headingScale = headingIndex:GetScale()
-//            Link headingLink
-//            headingLink:AddClassAttribute("block w-full py-1 px-2")
-//            headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
-//            headingLink:AddAttribute("aria-level", headingScale+"")
-//            headingLink:AddAttribute("role", "treeitem")
-//            headingLink:SetAddress("#" + uniqueId)
-//            
-//            // Apply font size based on heading level using if-else conditions
-//            
-//            //h1 and h2 should be the starts of new sections
-//            if headingScale = 1 or headingScale = 2 
-//                headingLink:AddClassAttribute("text-[16px] ml-0 mt-4")
-//                li:Add(headingLink)
-//                ul:Add(li)
-//             elseif headingScale = 3 
-//                if currentScale < 3
-//                    UnorderedList ul_h3
-//                    li:Add(headingLink)
-//                    ul:Add(li)
-//                end
-//                headingLink:AddClassAttribute("text-[15px] ml-2 mt-2")
-//             elseif headingScale = 4 
-//                headingLink:AddClassAttribute("text-[14px] ml-4 mt-2")
-//             elseif headingScale = 5 
-//                headingLink:AddClassAttribute("text-[13px] ml-6 mt-2")
-//             elseif headingScale = 6 
-//                headingLink:AddClassAttribute("text-[12px] ml-8 mt-2") 
-//            end
-//
-//            i = i + 1
-//        end
-//        nav:Add(ul)
-
         Division hiddenDivForTailwindCSS
-        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 hidden")
+        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 text-[16px] text-[15px] text-[14px] text-[13px] text-[12px] hidden")
         Add(hiddenDivForTailwindCSS)
 
         Script script
@@ -309,6 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ulStack[0].setAttribute('role', 'tree');
     navStack[0].appendChild(ulStack[0]);
     toc.appendChild(navStack[0]);
+    // create an array called links
+    let links = [];
+
+    let isClickScrolling = false; 
+    let headingLinksCount = {};
+    let currentSectionIndex = -1;
 
     headings.forEach(heading => {
         const level = parseInt(heading.tagName.substring(1), 10);
@@ -326,6 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
                 newNav.setAttribute('aria-label', ariaLabel);
                 newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+                if(level > 2){
+                  newNav.classList.add(`text-[${16 - (level - 1)}px]`); // Adjust the multiplier as needed for smaller font size
+                }else{
+                  newNav.classList.add(`text-[${16}px]`); // Adjust the multiplier as needed for smaller font size
+                }
             }
             let newUl = document.createElement('ul');
             newUl.setAttribute('role', 'group');
@@ -346,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
         link.textContent = heading.textContent;
         link.href = '#' + heading.id;
+        links.push(link);
         li.appendChild(link);
 
         ulStack[ulStack.length - 1].appendChild(li);
@@ -361,36 +307,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateActiveLinkOnScroll() {
         if (isClickScrolling) return;
         var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        let newSectionIndex = -1;
         headings.forEach((heading, index) => {
             if (heading.getBoundingClientRect().top - 150 <= 0) {
-                currentSectionIndex = index;
+                newSectionIndex = index;
             }
         });
 
-        clearActiveStates();
-        if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
-            links[currentSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
+        if (newSectionIndex !== currentSectionIndex) {
+            clearActiveStates();
+            if (newSectionIndex !== -1 && links[newSectionIndex]) {
+                links[newSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
+                
+                // Scroll the onPageTableOfContentsScrolling div to the active link
+                const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+                const activeLink = links[newSectionIndex];
+                const activeLinkRect = activeLink.getBoundingClientRect();
+                const tocScrollingDivRect = tocScrollingDiv.getBoundingClientRect();
+
+                // Calculate if the active link is out of view and needs scrolling
+                if (activeLinkRect.top < tocScrollingDivRect.top || activeLinkRect.bottom > tocScrollingDivRect.bottom) {
+                    // Align the active link to the center of the table of contents div
+                    tocScrollingDiv.scrollTop += activeLinkRect.top - tocScrollingDivRect.top - tocScrollingDiv.clientHeight / 2 + activeLink.clientHeight / 2;
+                }
+            }
+            currentSectionIndex = newSectionIndex;
         }
     }
 
     links.forEach((link, index) => {
         link.addEventListener('click', function(event) {
-            event.preventDefault();
-            isClickScrolling = true;
             currentSectionIndex = index;
             clearActiveStates();
             link.classList.add('font-bold', 'text-quorum-blue-150');
-
-            const id = link.getAttribute('href').substring(1);
-            const headingToScrollTo = document.getElementById(id);
-            if (headingToScrollTo) {
-                headingToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isClickScrolling = false;
-                }, 1000);
-            }
         });
     });
 
