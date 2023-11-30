@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class Mutate is Lesson
     text dq = ""
@@ -28,149 +13,162 @@ class Mutate is Lesson
         SetWebPageTitle("Transformations - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //Figure out getting main regions properly. 
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Calculating Columns (Mutating)", 1)
-        headDiv:AddText("This tutorial demonstrates how to calculate columns (mutate) in our datasets")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Calculating Columns (Mutating)", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Calculating Columns (Mutating)")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial demonstrates how to calculate columns (mutate) in our datasets")
+        bodyDiv:Add(headDiv)
+
         
-        bodyDiv:AddHeading("Calculate Columns", 2)
+        Section section_mutate
+        section_mutate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_mutate)
+        AddHeading(section_mutate, "Calculate Columns", 2)
        
-        bodyDiv:AddParagraph("Another topic of interest in regard to rows is automatically calculating columns, sometimes called mutation. In many programming languages, the idea is that similarly to Filter, we can write an expression and calculate a new column based on that expression. The rules in mutation are identical to those in Filter, except that the result of each row's result becomes the value in the new column. There are two actions we can use for this: AddColumn(text, text) and CalculateColumn(text, text). Here are brief descriptions of both of these actions:")
+        section_mutate:AddParagraph("Another topic of interest in regard to rows is automatically calculating columns, sometimes called mutation. In many programming languages, the idea is that similarly to Filter, we can write an expression and calculate a new column based on that expression. The rules in mutation are identical to those in Filter, except that the result of each row's result becomes the value in the new column. There are two actions we can use for this: AddColumn(text, text) and CalculateColumn(text, text). Here are brief descriptions of both of these actions:")
         
+         WebTable table = AddWebTable("Calculate Columns Helper Functions")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Class / Action")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage")
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
+
         Array<text> rubricText1
         rubricText1:Add("dataFrameObject:AddColumn(text columnName, text expression)")
         rubricText1:Add("This action takes in two parameters: the name of the newly added column and an expression in which we would take values from other columns, manipulate them in some way (with our expression) and translate this into the newly added column.")
         rubricText1:Add("frame:AddColumn("+dq+"new column"+dq+", "+dq+"x + y + z"+dq+")")
+         tableBody:Add(AddTableBodyRow(rubricText1))
 
          Array<text> rubricText2
         rubricText2:Add("dataFrameObject:CalculateColumn(text columnName, text expression)")
         rubricText2:Add("This action takes in two parameters: the name of the newly added column and an expression in which we would take values from other columns, manipulate them in some way (with our expression) and translate this into the newly added column. However, this would not be added into the DataFrame.")
         rubricText2:Add("frame:CalculateColumn("+dq+"new column"+dq+", "+dq+"a < 45"+dq+")")
+          tableBody:Add(AddTableBodyRow(rubricText2))
+    
+        table:Add(tableBody)
+        section_mutate:Add(table)
 
+        section_mutate:AddParagraph("The AddColumn action has two parameters, one for the name of the column to be added and the second for our Filter-like expression. Imagine we had a DataFrame like before:")
+
+          WebTable tableDF = AddWebTable("Example DataFrames")
+        TableBody tableBodyDF = AddTableBody()
         
-        Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Class / Action", " "))
-        rubricHeader:Add(AddTextBoldFront("Description", " "))
-        rubricHeader:Add(AddTextBoldFront("Usage", " "))
-
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        Array<text> tableHeaderArrayDF
+        tableHeaderArrayDF:Add("x")
+        tableHeaderArrayDF:Add("y") 
       
-        rubricRows:Add(AddTableDataTag(rubricText1))
-        rubricRows:Add(AddTableDataTag(rubricText2))
-
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Calculate Columns Helper Functions"))
-
-        bodyDiv:AddParagraph("The AddColumn action has two parameters, one for the name of the column to be added and the second for our Filter-like expression. Imagine we had a DataFrame like before:")
+        TableHeader theadDF = AddTableHeaderRow(tableHeaderArrayDF)
+        tableDF:Add(theadDF)
 
         Array<text> rubricText3
         rubricText3:Add("1")
         rubricText3:Add("5")
+        tableBodyDF:Add(AddTableBodyRow(rubricText3))
 
         Array<text> rubricText4
         rubricText4:Add("2")
         rubricText4:Add("6")
+        tableBodyDF:Add(AddTableBodyRow(rubricText4))
 
         Array<text> rubricText5
         rubricText5:Add("3")
         rubricText5:Add("7")
+        tableBodyDF:Add(AddTableBodyRow(rubricText5))
 
         Array<text> rubricText6
         rubricText6:Add("4")
         rubricText6:Add("8")
+        tableBodyDF:Add(AddTableBodyRow(rubricText6))
         
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("x", " "))
-        rubricHeader1:Add(AddTextBoldFront("y", " "))
+        tableDF:Add(tableBodyDF)
+        section_mutate:Add(tableDF)
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
-        rubricRows1:Add(AddTableDataTag(rubricText5))
-        rubricRows1:Add(AddTableDataTag(rubricText6))
+        section_mutate:AddParagraph("If we had an expression like AddColumn("+dq+"NewColumn"+dq+", "+dq+"x + y"+dq+") then we would then add a new column to our existing DataFrame that is the sum of these two columns. We again will be using the simple numerical dataset, random.csv which can be downloaded here. This is a snippet of our dataset being used.")
 
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Example DataFrame"))
+        WebTable tableRandom = AddWebTable("Example of random.csv file")
+        TableBody tableBodyRandom = AddTableBody()
+        
+        Array<text> tableHeaderArrayRandom
+        tableHeaderArrayRandom:Add("id")
+        tableHeaderArrayRandom:Add("a") 
+        tableHeaderArrayRandom:Add("b")
+        tableHeaderArrayRandom:Add("c")
 
-        bodyDiv:AddParagraph("If we had an expression like AddColumn("+dq+"NewColumn"+dq+", "+dq+"x + y"+dq+") then we would then add a new column to our existing DataFrame that is the sum of these two columns. We again will be using the simple numerical dataset, random.csv which can be downloaded here. This is a snippet of our dataset being used.")
+        TableHeader theadRandom = AddTableHeaderRow(tableHeaderArrayRandom)
+        tableRandom:Add(theadRandom)
 
         Array<text> rubricText7
         rubricText7:Add("1")
         rubricText7:Add("45")
         rubricText7:Add("3")
         rubricText7:Add("9")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText7))
         
         Array<text> rubricText8
         rubricText8:Add("2")
         rubricText8:Add("57")
         rubricText8:Add("67")
         rubricText8:Add("5")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText8))
 
         Array<text> rubricText9
         rubricText9:Add("3")
         rubricText9:Add("183")
         rubricText9:Add("70")
         rubricText9:Add("18")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText9))
 
         Array<text> rubricText10
         rubricText10:Add("4")
         rubricText10:Add("322")
         rubricText10:Add("20")
         rubricText10:Add("48")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText10))
 
         Array<text> rubricText11
         rubricText11:Add("5")
         rubricText11:Add("10")
         rubricText11:Add("15")
         rubricText11:Add("90")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText11))
 
         Array<text> rubricText12
         rubricText12:Add("6")
         rubricText12:Add("29")
         rubricText12:Add("11")
         rubricText12:Add("25")
+        tableBodyRandom:Add(AddTableBodyRow(rubricText12))
 
-        Array<text> rubricHeader2
-        rubricHeader2:Add(AddTextBoldFront("id", " "))
-        rubricHeader2:Add(AddTextBoldFront("a", " "))
-        rubricHeader2:Add(AddTextBoldFront("b", " "))
-        rubricHeader2:Add(AddTextBoldFront("c", " "))
+         tableRandom:Add(tableBodyRandom)
+        section_mutate:Add(tableRandom)
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricText7))
-        rubricRows2:Add(AddTableDataTag(rubricText8))
-        rubricRows2:Add(AddTableDataTag(rubricText9))
-        rubricRows2:Add(AddTableDataTag(rubricText10))
-        rubricRows2:Add(AddTableDataTag(rubricText11))
-        rubricRows2:Add(AddTableDataTag(rubricText12))
-
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Example of random.csv file"))
-
-        
-        bodyDiv:AddParagraph(" ")
-
+        section_mutate:AddParagraph("")
      Link link3
         link3:AddText("We can download this sample dataset, random.csv by clicking this link.")
         link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/random.csv")
         link3:SetTarget(link3:newTab)
-        bodyDiv:Add(link3)
+        link3:SetClassAttribute("underline text-quorum-blue-150")
+        section_mutate:Add(link3)
 
-        bodyDiv:AddParagraph("To highlight our process we first loaded our file, random.csv and read it into our DataFrame, 'frame.' Because we are eventually going to manipulate our 'frame' we want to save the original DataFrame so we create a new DataFrame called 'copy.' We simply call 'frame:Copy()' and save it into the 'copy' object which will give us the exact same frame. 
+        section_mutate:AddParagraph("To highlight our process we first loaded our file, random.csv and read it into our DataFrame, 'frame.' Because we are eventually going to manipulate our 'frame' we want to save the original DataFrame so we create a new DataFrame called 'copy.' We simply call 'frame:Copy()' and save it into the 'copy' object which will give us the exact same frame. 
 ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
+        section_mutate:Add(preformatter:GeneratePreformattedCode("//Create a DataFrame, which is essentially a table that understands 
 //more information about the data that is being loaded.
 DataFrame frame
 DataFrame copy
@@ -182,13 +180,13 @@ frame:Load("+dq+"../Data/Miscellaneous/random.csv"+dq+")
 copy = frame:Copy()
 "))
 
-        bodyDiv:AddParagraph("Next, we call AddColumn() on the frame, and the heading title, 'new' and insert the equation we have (a + b + c) as the second parameter. Finally, what we are doing is outputting both the original frame (copy) and the newly modified frame (frame). As we can see, our 'frame' object has a new column called 'new' and is the sum of the a + b + c columns. ")
+        section_mutate:AddParagraph("Next, we call AddColumn() on the frame, and the heading title, 'new' and insert the equation we have (a + b + c) as the second parameter. Finally, what we are doing is outputting both the original frame (copy) and the newly modified frame (frame). As we can see, our 'frame' object has a new column called 'new' and is the sum of the a + b + c columns. ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddColumn("+dq+"new"+dq+", "+dq+"a + b + c"+dq+")"))        
+        section_mutate:Add(preformatter:GeneratePreformattedCode("frame:AddColumn("+dq+"new"+dq+", "+dq+"a + b + c"+dq+")"))        
 
-        bodyDiv:AddParagraph("We have the full code example below:")
+        section_mutate:AddParagraph("We have the full code example below:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame:AddColumn("+dq+"new"+dq+", "+dq+"a + b + c"+dq+")
+        section_mutate:Add(preformatter:GeneratePreformattedCode("frame:AddColumn("+dq+"new"+dq+", "+dq+"a + b + c"+dq+")
 
 //We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
@@ -216,26 +214,42 @@ output "+dq+"modified frame"+dq+"
 output frame:ToText()
 "))
 
-    bodyDiv:AddParagraph("Like before, this calculation is actually compiling our expression in real-time, once per call to AddColumn, and as such it is slower than other areas of Quorum. Conducting the operation manually through other calls can be faster. However, for many applications, the extra speed increase is nominal and as such, with the exception of very large data sets, this operation has many possible uses. Finally, while AddColumn creates a new column, CalculateColumn runs the script and returns the column, but does not add it to the frame. Either can be used depending on the need. ")
+    section_mutate:AddParagraph("Like before, this calculation is actually compiling our expression in real-time, once per call to AddColumn, and as such it is slower than other areas of Quorum. Conducting the operation manually through other calls can be faster. However, for many applications, the extra speed increase is nominal and as such, with the exception of very large data sets, this operation has many possible uses. Finally, while AddColumn creates a new column, CalculateColumn runs the script and returns the column, but does not add it to the frame. Either can be used depending on the need. ")
 
-        bodyDiv:AddHeading("Run the Example",2)
-        
-        AddIDE(bodyDiv,"Mutate","Calculate Columns (Mutate)","Mutating for data transformations","examples/Transformations/Mutate.quorum")
+         Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/Transformations/Mutate.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Mutating Data")
+    section_try_yourself:Add(ide3)
 
-bodyDiv:AddParagraph(" ")
-bodyDiv:AddText("To view the program we have made, we can ")
+
+    Paragraph para
+    para:AddText("To view the program we have made, we can ")
 
      Link link2
         link2:AddText("download the program file")
         link2:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Transformations/Mutate.quorum")
         link2:SetTarget(link2:newTab)
-        bodyDiv:Add(link2)
+        para:Add(link2)
+        section_try_yourself:Add(para)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -264,5 +278,13 @@ bodyDiv:AddText("To view the program we have made, we can ")
 
     action GetLocation returns text
         return "tutorials/Transformations/CalcColumns.html"
+    end
+
+      action GetLinkName returns text
+        return "Calculate Columns (Mutate)"
+    end
+
+    action GetSectionName returns text
+        return "Data Transformations"
     end
 end

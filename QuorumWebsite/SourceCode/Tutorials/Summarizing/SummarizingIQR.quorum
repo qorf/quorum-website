@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class SummaryIQR is Lesson
     text dq = ""
@@ -30,31 +15,52 @@ class SummaryIQR is Lesson
         AddMathHeader()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+       Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Learn About Calculating the Interquartile Range", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Learn About Calculating the Interquartile Range", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Learn About Calculating the Interquartile Range")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial describes how to calculate the interquartile range")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Calculating the Interquartile Range", 2)
         
-        bodyDiv:AddHeading("Calculating the Interquartile Range",2)
       
-        bodyDiv:AddParagraph("In data science, the Interquartile Range (IQR) is a measure of variability, based on dividing a data set into quartiles. Specifically, IQR will describe the spread of the middle half of the distribution. For example, say we have a box plot of four quartiles, the IQR would calculate the two middle quartiles, notably Q1 through Q3. The interquartile range provides us a spread between regions of the data. ")
+        section_intro:AddParagraph("In data science, the Interquartile Range (IQR) is a measure of variability, based on dividing a data set into quartiles. Specifically, IQR will describe the spread of the middle half of the distribution. For example, say we have a box plot of four quartiles, the IQR would calculate the two middle quartiles, notably Q1 through Q3. The interquartile range provides us a spread between regions of the data. ")
         
-        AddMath(bodyDiv, "examples/MathXML/IQR.xml")
+        Division mathDiv
+        AddMath(mathDiv, "examples/MathXML/IQR.xml")
+        text equation = mathDiv:ToText()
+        section_intro:AddText(equation)
 
-        bodyDiv:AddParagraph("The Interquartile Range is calculated by using a helper action within the DataFrame's class. We will calculate the Interquartile Range (IQR) for the 'Area' column. To do this, we will use our 'frame' object and call the function InterQuartileRange (). In this case we will be calculating the IQR of the area of dry bean classifications. Here is a brief description on how InterQuartileRange() works.")
+        section_intro:AddParagraph("The Interquartile Range is calculated by using a helper action within the DataFrame's class. We will calculate the Interquartile Range (IQR) for the 'Area' column. To do this, we will use our 'frame' object and call the function InterQuartileRange (). In this case we will be calculating the IQR of the area of dry bean classifications. Here is a brief description on how InterQuartileRange() works.")
+
+        WebTable table = AddWebTable("IQR Function")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Function")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage") 
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
 
         Array<text> rubricText1
         rubricText1:Add("frame:InterQuartileRange()")
         rubricText1:Add("This action sorts the following selected column and calculates the IQR of the column. Note that it can only calculate the IQR of one column at a time.")
         rubricText1:Add("frame:InterQuartileRange()")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
       
         Array<text> rubricHeader2
@@ -62,59 +68,54 @@ class SummaryIQR is Lesson
         rubricHeader2:Add(AddTextBoldFront("Description", " "))
         rubricHeader2:Add(AddTextBoldFront("Usage", " "))
    
+        table:Add(tableBody)
+        section_intro:Add(table)
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
+         section_intro:AddParagraph("Here are other functions that we use in the example: ")
         
+
+
+        WebTable tableAction = AddWebTable("Helper Functions for IQR")
+        TableBody tableBodyAction = AddTableBody()
+        
+        Array<text> tableHeaderArrayAction
+        tableHeaderArrayAction:Add("Function")
+        tableHeaderArrayAction:Add("Description") 
+        tableHeaderArrayAction:Add("Usage") 
       
-        rubricRows2:Add(AddTableDataTag(rubricText1))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "IQR Function"))
+        TableHeader theadAction = AddTableHeaderRow(tableHeaderArrayAction)
+        tableAction:Add(theadAction)        
 
-         bodyDiv:AddParagraph("Here are other functions that we use in the example: ")
-        
         Array<text> rubricText2
         rubricText2:Add("InterQuartileRange range = frame:InterQuartileRange()")
         rubricText2:Add("Initializes the IQR class named range to the frame we created earlier")
         rubricText2:Add("InterQuartileRange range")
+         tableBodyAction:Add(AddTableBodyRow(rubricText2))
 
          Array<text> rubricText3
         rubricText3:Add("range:GetMinimum()")
         rubricText3:Add("Returns the minimum value that is not an outlier, that is inside the IQR range")
         rubricText3:Add("output "+dq+"Minimum: "+dq+" + range:GetMinimum()")
+           tableBodyAction:Add(AddTableBodyRow(rubricText3))
 
          Array<text> rubricText4
         rubricText4:Add("range:GetMaximum()")
         rubricText4:Add("Returns the maximum value that is not an outlier, that is inside the IQR range")
-        rubricText4:Add("output "+dq+"Maximum: "+dq+" + range:GetMinimum()")
+        rubricText4:Add("output "+dq+"Maximum: "+dq+" + range:GetMaximum()")
+           tableBodyAction:Add(AddTableBodyRow(rubricText4))
 
          Array<text> rubricText5
         rubricText5:Add("range:GetInterQuartileRange()")
         rubricText5:Add("Returns the range of the IQR calculated from a given dataset")
         rubricText5:Add("output "+dq+"Range: "+dq+" + range:GetInterQuartileRange()")
+          tableBodyAction:Add(AddTableBodyRow(rubricText5))
         
-      
-        Array<text> rubricHeader3
-        rubricHeader3:Add(AddTextBoldFront("Function", " "))
-        rubricHeader3:Add(AddTextBoldFront("Description", " "))
-        rubricHeader3:Add(AddTextBoldFront("Usage", " "))
-   
+        tableAction:Add(tableBodyAction)
+        section_intro:Add(tableAction)
 
-        Array<text> rubricRows3
-        rubricRows3:Add(AddTableHeaderTag(rubricHeader3))
-        
-      
-        rubricRows3:Add(AddTableDataTag(rubricText2))
-        rubricRows3:Add(AddTableDataTag(rubricText3))
-        rubricRows3:Add(AddTableDataTag(rubricText4))
-        rubricRows3:Add(AddTableDataTag(rubricText5))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows3), "Helper Functions for IQR"))
-        
-  
 
-        bodyDiv:AddParagraph("Here is some code on how to calculate the IQR:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        section_intro:AddParagraph("Here is some code on how to calculate the IQR:")
+        section_intro:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 //This is the calculation for the arithmetic mean
 use Libraries.Compute.Statistics.Calculations.InterQuartileRange
@@ -136,11 +137,26 @@ output "+dq+"Range: "+dq+" + range:GetInterQuartileRange()
 
 "))
 
-        bodyDiv:AddHeading("Run the Example",2)
+       
+          
+        Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/DataFrames/IQR.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Calculate the IQR")
+    section_try_yourself:Add(ide3)
 
-        AddIDE(bodyDiv,"IQR","Calculate the IQR","Example of calculating the interquartile range","examples/DataFrames/IQR.quorum")
-
-        bodyDiv:AddParagraph("")
 
         Paragraph para
         para:AddText("Congrats! We have just learned how to calculate the Interquartile Range! To view the whole file, we can click ")
@@ -149,18 +165,17 @@ output "+dq+"Range: "+dq+" + range:GetInterQuartileRange()
         link:AddText("here")
         link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Summarizing/SourceCode/CalculateInterquartile.quorum")
         link:SetTarget(link:newTab)
+        link:SetClassAttribute("underline text-quorum-blue-150")
         
         para:Add(link)
         para:AddText(".")
-        bodyDiv:Add(para) 
+        section_try_yourself:Add(para) 
 
-        bodyDiv:AddParagraph(" ")
         
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+                Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -189,5 +204,13 @@ output "+dq+"Range: "+dq+" + range:GetInterQuartileRange()
 
     action GetLocation returns text
         return "tutorials/Summarizing/iqr.html"
+    end
+
+    action GetLinkName returns text
+        return "Interquartile Range"
+    end
+
+    action GetSectionName returns text
+        return "Descriptive Statistics"
     end
 end

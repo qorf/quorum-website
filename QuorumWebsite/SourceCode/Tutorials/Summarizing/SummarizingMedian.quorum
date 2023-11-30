@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class SummaryMedian is Lesson
     text dq = ""
@@ -30,48 +15,61 @@ class SummaryMedian is Lesson
         AddMathHeader()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+       Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Learn About Calculating the Median", 1)
-        headDiv:AddText("This tutorial describes how to calculate the median")
-        Add(headDiv)
+         Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Learn About Calculating the Median", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Learn About Calculating the Median")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial describes how to calculate the mean")
+        bodyDiv:Add(headDiv)
+
         
-        bodyDiv:AddHeading("Calculating the Median",2)
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Calculating the Median", 2)
+
        
-        bodyDiv:AddParagraph("In data statistics, the median is the middle number of a sorted (either ascending or descending) numerical dataset. Depending on context, a median may describe a dataset better than the average because it is not skewed by possible outliers in our datasets. The median basically is the separating factor between the upper and lower halves of a dataset.")
+        section_intro:AddParagraph("In data statistics, the median is the middle number of a sorted (either ascending or descending) numerical dataset. Depending on context, a median may describe a dataset better than the average because it is not skewed by possible outliers in our datasets. The median basically is the separating factor between the upper and lower halves of a dataset.")
 
-        AddMath(bodyDiv, "examples/MathXML/Median.xml")
+        Division mathDiv
+        AddMath(mathDiv, "examples/MathXML/Median.xml")
+        text equation = mathDiv:ToText()
+        section_intro:AddText(equation)
 
-        bodyDiv:AddParagraph("The median is calculated using the helper action Median() which is within the DataFrame's class. We again calculate this for the survival column. To do this, we will use our 'frame' object and call the function Median(). In this case we will be calculating the median of the perimeter and the area of dry bean classifications. Here is a brief description on how Median() works.")
+        section_intro:AddParagraph("The median is calculated using the helper action Median() which is within the DataFrame's class. We again calculate this for the survival column. To do this, we will use our 'frame' object and call the function Median(). In this case we will be calculating the median of the perimeter and the area of dry bean classifications. Here is a brief description on how Median() works.")
     
+        WebTable table = AddWebTable("Median Function")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Function")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage") 
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
+
+
         Array<text> rubricText1
         rubricText1:Add("dataFrameObject:Median()")
         rubricText1:Add("This action sorts the following selected column and calculates the middle value of that column. Note that it can only calculate the median of one column at a time.")
         rubricText1:Add("frame:Median()")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
-        
-        Array<text> rubricHeader2
-        rubricHeader2:Add(AddTextBoldFront("Function", " "))
-        rubricHeader2:Add(AddTextBoldFront("Description", " "))
-        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
-   
+        table:Add(tableBody)
+        section_intro:Add(table)
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricText1))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Median Function"))
 
-        bodyDiv:AddParagraph("Here is some code on how to calculate the median:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        section_intro:AddParagraph("Here is some code on how to calculate the median:")
+        section_intro:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 
 //Create a DataFrame, which is essentially a table that understands 
@@ -88,11 +86,24 @@ output someText1
 output frame:Median()
 "))
 
-        bodyDiv:AddHeading("Run the Example",2)
+ Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/DataFrames/Median.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Calculate the Median")
+    section_try_yourself:Add(ide3)
 
-        AddIDE(bodyDiv,"Median","Calculate the Median","Example of calculating the median","examples/DataFrames/Median.quorum")
-
-        bodyDiv:AddParagraph("")
 
         Paragraph para
         para:AddText("Congrats! We have just learned how to calulate the median! To view the whole file, we can click ")
@@ -101,18 +112,17 @@ output frame:Median()
         link:AddText("here")
         link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Summarizing/SourceCode/BeanMedian.quorum")
         link:SetTarget(link:newTab)
+        link:SetClassAttribute("underline text-quorum-blue-150")
         
         para:Add(link)
         para:AddText(".")
-        bodyDiv:Add(para) 
+        section_try_yourself:Add(para) 
 
-        bodyDiv:AddParagraph(" ")
         
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -142,5 +152,13 @@ output frame:Median()
 
     action GetLocation returns text
         return "tutorials/Summarizing/median.html"
+    end
+
+           action GetLinkName returns text
+        return "Median"
+    end
+
+    action GetSectionName returns text
+        return "Descriptive Statistics"
     end
 end
