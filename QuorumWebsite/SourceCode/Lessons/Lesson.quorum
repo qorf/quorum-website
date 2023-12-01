@@ -213,7 +213,7 @@ class Lesson is WebPage
         return headingArray
     end
 
-    action CreateHeadingTableOfContents returns Division
+   action CreateHeadingTableOfContents returns Division
         Array<Lesson> lessonArray = CreateLinkedArrays()
         Division div
         div:SetIdentifier("onPageTableOfContentsScrolling")
@@ -232,121 +232,136 @@ class Lesson is WebPage
 
         Script script
 
-script:SetCode("
-document.addEventListener('DOMContentLoaded', () => {
-     const toc = document.querySelector('#onPageTableOfContents');
-    if (!toc) return; // Early exit if the TOC container is not found
-    
-    const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
-    const navStack = [document.createElement('nav')];
-    const ulStack = [document.createElement('ul')];
-    ulStack[0].setAttribute('role', 'tree');
-    navStack[0].appendChild(ulStack[0]);
-    toc.appendChild(navStack[0]);
-    // create an array called links
-    let links = [];
+        script:SetCode("
+        document.addEventListener('DOMContentLoaded', () => {
+             const toc = document.querySelector('#onPageTableOfContents');
+            if (!toc) return; // Early exit if the TOC container is not found
+            
+            const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
+            const navStack = [document.createElement('nav')];
+            const ulStack = [document.createElement('ul')];
+            ulStack[0].setAttribute('role', 'tree');
+            navStack[0].appendChild(ulStack[0]);
+            toc.appendChild(navStack[0]);
+            // create an array called links
+            let links = [];
 
-    let isClickScrolling = false; 
-    let headingLinksCount = {};
-    let currentSectionIndex = -1;
+            let isClickScrolling = false; 
+            let headingLinksCount = {};
+            let currentSectionIndex = -1;
 
-    headings.forEach(heading => {
-        const level = parseInt(heading.tagName.substring(1), 10);
+            headings.forEach(heading => {
+                const level = parseInt(heading.tagName.substring(1), 10);
 
-        while (ulStack.length > level) {
-            ulStack.pop(); // Remove the last ul from the stack to match the current heading level
-            navStack.pop(); // Also pop the last nav
-        }
-
-        while (ulStack.length < level) {
-            let newNav = document.createElement('nav');
-            if (level > 1) {
-                // Set aria-label for inner navs
-                let lastLi = ulStack[ulStack.length - 1].lastElementChild;
-                let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
-                newNav.setAttribute('aria-label', ariaLabel);
-                newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
-                if(level > 2){
-                  newNav.classList.add(`text-[${16 - (level - 1)}px]`); // Adjust the multiplier as needed for smaller font size
-                }else{
-                  newNav.classList.add(`text-[${16}px]`); // Adjust the multiplier as needed for smaller font size
+                while (ulStack.length > level) {
+                    ulStack.pop(); // Remove the last ul from the stack to match the current heading level
+                    navStack.pop(); // Also pop the last nav
                 }
-            }
-            let newUl = document.createElement('ul');
-            newUl.setAttribute('role', 'group');
-            newNav.appendChild(newUl);
-            ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
-            navStack.push(newNav); // Push the new nav onto the stack
-            ulStack.push(newUl); // Push the new ul onto the stack
-        }
-        
-        let li = document.createElement('li');
-        li.setAttribute('role', 'treeitem');
-        li.setAttribute('aria-level', level.toString());
-        if(level == 2){
-            li.classList.add('mt-2'); // Add margin-top for level 2 headings
-        }
 
-        let link = document.createElement('a');
-        link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
-        link.textContent = heading.textContent;
-        link.href = '#' + heading.id;
-        links.push(link);
-        li.appendChild(link);
-
-        ulStack[ulStack.length - 1].appendChild(li);
-    });
-
-
-    function clearActiveStates() {
-        links.forEach(link => {
-            link.classList.remove('font-bold', 'text-quorum-blue-150');
-        });
-    }
-
-    function updateActiveLinkOnScroll() {
-        if (isClickScrolling) return;
-        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        let newSectionIndex = -1;
-        headings.forEach((heading, index) => {
-            if (heading.getBoundingClientRect().top - 150 <= 0) {
-                newSectionIndex = index;
-            }
-        });
-
-        if (newSectionIndex !== currentSectionIndex) {
-            clearActiveStates();
-            if (newSectionIndex !== -1 && links[newSectionIndex]) {
-                links[newSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
+                while (ulStack.length < level) {
+                    let newNav = document.createElement('nav');
+                    if (level > 1) {
+                        // Set aria-label for inner navs
+                        let lastLi = ulStack[ulStack.length - 1].lastElementChild;
+                        let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
+                        newNav.setAttribute('aria-label', ariaLabel);
+                        newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+                        if(level > 2){
+                          newNav.classList.add(`text-[${16 - (level - 1)}px]`); // Adjust the multiplier as needed for smaller font size
+                        }else{
+                          newNav.classList.add(`text-[${16}px]`); // Adjust the multiplier as needed for smaller font size
+                        }
+                    }
+                    let newUl = document.createElement('ul');
+                    newUl.setAttribute('role', 'group');
+                    newNav.appendChild(newUl);
+                    ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
+                    navStack.push(newNav); // Push the new nav onto the stack
+                    ulStack.push(newUl); // Push the new ul onto the stack
+                }
                 
-                // Scroll the onPageTableOfContentsScrolling div to the active link
-                const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
-                const activeLink = links[newSectionIndex];
-                const activeLinkRect = activeLink.getBoundingClientRect();
-                const tocScrollingDivRect = tocScrollingDiv.getBoundingClientRect();
+                let li = document.createElement('li');
+                li.setAttribute('role', 'treeitem');
+                li.setAttribute('aria-level', level.toString());
+                if(level == 2){
+                    li.classList.add('mt-2'); // Add margin-top for level 2 headings
+                }
 
-                // Calculate if the active link is out of view and needs scrolling
-                if (activeLinkRect.top < tocScrollingDivRect.top || activeLinkRect.bottom > tocScrollingDivRect.bottom) {
-                    // Align the active link to the center of the table of contents div
-                    tocScrollingDiv.scrollTop += activeLinkRect.top - tocScrollingDivRect.top - tocScrollingDiv.clientHeight / 2 + activeLink.clientHeight / 2;
+                let link = document.createElement('a');
+                link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
+                link.textContent = heading.textContent;
+                link.href = '#' + heading.id;
+                links.push(link);
+                li.appendChild(link);
+
+                ulStack[ulStack.length - 1].appendChild(li);
+            });
+
+
+            function clearActiveStates() {
+                links.forEach(link => {
+                    link.classList.remove('font-bold', 'text-quorum-blue-150');
+                });
+            }
+
+            function updateActiveLinkOnScroll() {
+                if (isClickScrolling) return;
+                
+                let newSectionIndex = -1;
+                headings.forEach((heading, index) => {
+                    if (heading.getBoundingClientRect().top <= window.innerHeight / 2) {
+                        newSectionIndex = index;
+                    }
+                });
+
+                if (newSectionIndex !== currentSectionIndex && newSectionIndex >= 0) {
+                    clearActiveStates();
+                    const activeLink = links[newSectionIndex];
+                    activeLink.classList.add('font-bold', 'text-quorum-blue-150');
+                    
+                    // Get the bounding rectangle of the active link
+                    const linkRect = activeLink.getBoundingClientRect();
+                    const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+                    const tocRect = tocScrollingDiv.getBoundingClientRect();
+
+                    // Calculate the position to scroll to in the TOC
+                    // so the active link is in the middle of the TOC div.
+                    // This checks if the next link is up or down from the current.
+                    let scrollPosition = activeLink.offsetTop - tocScrollingDiv.offsetTop - (tocRect.height / 2) + (linkRect.height / 2);
+                    
+                    // If we're going up, we subtract, if we're going down, we add
+                    scrollPosition += (newSectionIndex > currentSectionIndex ? 1 : -1) * linkRect.height;
+                    
+                    // Scroll the TOC div to the new position
+                    tocScrollingDiv.scrollTop = scrollPosition;
+
+                    currentSectionIndex = newSectionIndex;
                 }
             }
-            currentSectionIndex = newSectionIndex;
-        }
-    }
 
-    links.forEach((link, index) => {
-        link.addEventListener('click', function(event) {
-            currentSectionIndex = index;
-            clearActiveStates();
-            link.classList.add('font-bold', 'text-quorum-blue-150');
+           links.forEach((link, index) => {
+                link.addEventListener('click', (event) => {
+                    const sectionId = link.getAttribute('href').substring(1);
+                    const section = document.getElementById(sectionId);
+
+                    isClickScrolling = true;
+                    currentSectionIndex = index;
+                    clearActiveStates();
+                    link.classList.add('font-bold', 'text-quorum-blue-150');
+
+                    setTimeout(() => {
+                        isClickScrolling = false;
+                    }, 200);
+                });
+            });
+
+            updateActiveLinkOnScroll();
+            window.addEventListener('scroll', function(){
+              console.log('scrolling')
+              updateActiveLinkOnScroll();
+            });
         });
-    });
-
-    updateActiveLinkOnScroll();
-    window.addEventListener('scroll', updateActiveLinkOnScroll);
-});
-")
+        ")
 
         Add(script)
         innerDiv:Add(nav)
@@ -393,6 +408,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Script script
  script:SetCode("
+
+        function isScrolledToBottom(container) {
+            // Check if the scroll position is at the bottom taking into account the scrollHeight, scrollTop, and clientHeight
+            return container.scrollHeight - container.scrollTop <= container.clientHeight;
+        }
+
+        // Define a helper function to scroll the container to the bottom
+        function scrollToBottom(container) {
+            // Scroll to the bottom of the container
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+        }
+
         // Define the function outside the event listener
         function updateViewableHeight(main) {
             const rect = main.getBoundingClientRect();
@@ -413,8 +440,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             visibleHeight = Math.min(visibleHeight, window.innerHeight);
         
+            // Get the onPageTableOfContentsScrolling div
+            const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+            // Check if we are at the bottom before the change
+            const atBottom = isScrolledToBottom(tocScrollingDiv);
+
             // Update the CSS variable
             document.documentElement.style.setProperty('--main-viewable-height', `${visibleHeight}px`);
+
+            // If we are at the bottom, after the update, scroll to the bottom
+            if (atBottom) {
+                scrollToBottom(tocScrollingDiv);
+            }
         }
         
         // Event listener for DOMContentLoaded
