@@ -216,6 +216,7 @@ class Lesson is WebPage
     action CreateHeadingTableOfContents returns Division
         Array<Lesson> lessonArray = CreateLinkedArrays()
         Division div
+        div:SetIdentifier("onPageTableOfContentsScrolling")
         div:AddClassAttribute("h-toc overflow-auto")
 
         Division innerDiv
@@ -225,179 +226,143 @@ class Lesson is WebPage
         nav:SetIdentifier("onPageTableOfContents")
         nav:AddClassAttribute("font-sans")
 
-//        UnorderedList ul
-//        ul:AddAttribute("role", "tree")
-//        integer currentScale = 1
-//
-//        integer i = 0
-//        repeat while i < headingArray:GetSize()
-//            Heading headingIndex = headingArray:Get(i)
-//
-//            ListItem li
-//            li:AddClassAttribute("rounded-xl hover:bg-quorum-blue-25")
-//
-//            // Normalize the heading text
-//            text headingText = headingIndex:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-//            
-//            // Count the occurrences of this heading text in previous headings
-//            integer count = 0
-//            integer j = 0
-//            repeat while j <= i
-//                Heading tempHeading = headingArray:Get(j)
-//                text tempText = tempHeading:GetAttribute("data-text"):GetValue():ToLowerCase():Replace(" ", "_")
-//                if tempText = headingText
-//                    count = count + 1
-//                end
-//                j = j + 1
-//            end
-//
-//            // Set a unique identifier for each heading
-//            text uniqueId = headingText
-//            if count > 1
-//                uniqueId = uniqueId + "_" + count
-//            end
-//            headingIndex:SetIdentifier(uniqueId)
-//            
-//            integer headingScale = headingIndex:GetScale()
-//            Link headingLink
-//            headingLink:AddClassAttribute("block w-full py-1 px-2")
-//            headingLink:AddText(headingIndex:GetAttribute("data-text"):GetValue())
-//            headingLink:AddAttribute("aria-level", headingScale+"")
-//            headingLink:AddAttribute("role", "treeitem")
-//            headingLink:SetAddress("#" + uniqueId)
-//            
-//            // Apply font size based on heading level using if-else conditions
-//            
-//            //h1 and h2 should be the starts of new sections
-//            if headingScale = 1 or headingScale = 2 
-//                headingLink:AddClassAttribute("text-[16px] ml-0 mt-4")
-//                li:Add(headingLink)
-//                ul:Add(li)
-//             elseif headingScale = 3 
-//                if currentScale < 3
-//                    UnorderedList ul_h3
-//                    li:Add(headingLink)
-//                    ul:Add(li)
-//                end
-//                headingLink:AddClassAttribute("text-[15px] ml-2 mt-2")
-//             elseif headingScale = 4 
-//                headingLink:AddClassAttribute("text-[14px] ml-4 mt-2")
-//             elseif headingScale = 5 
-//                headingLink:AddClassAttribute("text-[13px] ml-6 mt-2")
-//             elseif headingScale = 6 
-//                headingLink:AddClassAttribute("text-[12px] ml-8 mt-2") 
-//            end
-//
-//            i = i + 1
-//        end
-//        nav:Add(ul)
-
         Division hiddenDivForTailwindCSS
-        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 hidden")
+        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 text-[16px] text-[15px] text-[14px] text-[13px] text-[12px] hidden")
         Add(hiddenDivForTailwindCSS)
 
         Script script
 
-script:SetCode("
-document.addEventListener('DOMContentLoaded', () => {
-     const toc = document.querySelector('#onPageTableOfContents');
-    if (!toc) return; // Early exit if the TOC container is not found
-    
-    const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
-    const navStack = [document.createElement('nav')];
-    const ulStack = [document.createElement('ul')];
-    ulStack[0].setAttribute('role', 'tree');
-    navStack[0].appendChild(ulStack[0]);
-    toc.appendChild(navStack[0]);
+  script:SetCode("
+        document.addEventListener('DOMContentLoaded', () => {
+             const toc = document.querySelector('#onPageTableOfContents');
+            if (!toc) return; // Early exit if the TOC container is not found
+            
+            const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
+            const navStack = [document.createElement('nav')];
+            const ulStack = [document.createElement('ul')];
+            ulStack[0].setAttribute('role', 'tree');
+            navStack[0].appendChild(ulStack[0]);
+            toc.appendChild(navStack[0]);
+            // create an array called links
+            let links = [];
 
-    headings.forEach(heading => {
-        const level = parseInt(heading.tagName.substring(1), 10);
+            let isClickScrolling = false; 
+            let headingLinksCount = {};
+            let currentSectionIndex = -1;
 
-        while (ulStack.length > level) {
-            ulStack.pop(); // Remove the last ul from the stack to match the current heading level
-            navStack.pop(); // Also pop the last nav
-        }
+            headings.forEach(heading => {
+                const level = parseInt(heading.tagName.substring(1), 10);
 
-        while (ulStack.length < level) {
-            let newNav = document.createElement('nav');
-            if (level > 1) {
-                // Set aria-label for inner navs
-                let lastLi = ulStack[ulStack.length - 1].lastElementChild;
-                let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
-                newNav.setAttribute('aria-label', ariaLabel);
-                newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+                while (ulStack.length > level) {
+                    ulStack.pop(); // Remove the last ul from the stack to match the current heading level
+                    navStack.pop(); // Also pop the last nav
+                }
+
+                while (ulStack.length < level) {
+                    let newNav = document.createElement('nav');
+                    if (level > 1) {
+                        // Set aria-label for inner navs
+                        let lastLi = ulStack[ulStack.length - 1].lastElementChild;
+                        let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
+                        newNav.setAttribute('aria-label', ariaLabel);
+                        newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+                        if(level > 2){
+                          newNav.classList.add(`text-[${16 - (level - 1)}px]`); // Adjust the multiplier as needed for smaller font size
+                        }else{
+                          newNav.classList.add(`text-[${16}px]`); // Adjust the multiplier as needed for smaller font size
+                        }
+                    }
+                    let newUl = document.createElement('ul');
+                    newUl.setAttribute('role', 'group');
+                    newNav.appendChild(newUl);
+                    ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
+                    navStack.push(newNav); // Push the new nav onto the stack
+                    ulStack.push(newUl); // Push the new ul onto the stack
+                }
+                
+                let li = document.createElement('li');
+                li.setAttribute('role', 'treeitem');
+                li.setAttribute('aria-level', level.toString());
+                if(level == 2){
+                    li.classList.add('mt-2'); // Add margin-top for level 2 headings
+                }
+
+                let link = document.createElement('a');
+                link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
+                link.textContent = heading.textContent;
+                link.href = '#' + heading.id;
+                links.push(link);
+                li.appendChild(link);
+
+                ulStack[ulStack.length - 1].appendChild(li);
+            });
+
+
+            function clearActiveStates() {
+                links.forEach(link => {
+                    link.classList.remove('font-bold', 'text-quorum-blue-150');
+                });
             }
-            let newUl = document.createElement('ul');
-            newUl.setAttribute('role', 'group');
-            newNav.appendChild(newUl);
-            ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
-            navStack.push(newNav); // Push the new nav onto the stack
-            ulStack.push(newUl); // Push the new ul onto the stack
-        }
-        
-        let li = document.createElement('li');
-        li.setAttribute('role', 'treeitem');
-        li.setAttribute('aria-level', level.toString());
-        if(level == 2){
-            li.classList.add('mt-2'); // Add margin-top for level 2 headings
-        }
 
-        let link = document.createElement('a');
-        link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
-        link.textContent = heading.textContent;
-        link.href = '#' + heading.id;
-        li.appendChild(link);
+            function updateActiveLinkOnScroll() {
+                if (isClickScrolling) return;
+                
+                let newSectionIndex = -1;
+                headings.forEach((heading, index) => {
+                    //change the fraction to change when the active link changes
+                    if (heading.getBoundingClientRect().top <= window.innerHeight / 5) {
+                        newSectionIndex = index;
+                    }
+                });
 
-        ulStack[ulStack.length - 1].appendChild(li);
-    });
+                if (newSectionIndex !== currentSectionIndex && newSectionIndex >= 0) {
+                    clearActiveStates();
+                    const activeLink = links[newSectionIndex];
+                    activeLink.classList.add('font-bold', 'text-quorum-blue-150');
+                    
+                    // Get the bounding rectangle of the active link
+                    const linkRect = activeLink.getBoundingClientRect();
+                    const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+                    const tocRect = tocScrollingDiv.getBoundingClientRect();
 
+                    // Calculate the position to scroll to in the TOC
+                    // so the active link is in the middle of the TOC div.
+                    // This checks if the next link is up or down from the current.
+                    let scrollPosition = activeLink.offsetTop - tocScrollingDiv.offsetTop - (tocRect.height / 2) + (linkRect.height / 2);
+                    
+                    // If we're going up, we subtract, if we're going down, we add
+                    scrollPosition += (newSectionIndex > currentSectionIndex ? 1 : -1) * linkRect.height;
+                    
+                    // Scroll the TOC div to the new position
+                    tocScrollingDiv.scrollTop = scrollPosition;
 
-    function clearActiveStates() {
-        links.forEach(link => {
-            link.classList.remove('font-bold', 'text-quorum-blue-150');
-        });
-    }
-
-    function updateActiveLinkOnScroll() {
-        if (isClickScrolling) return;
-        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        headings.forEach((heading, index) => {
-            if (heading.getBoundingClientRect().top - 150 <= 0) {
-                currentSectionIndex = index;
+                    currentSectionIndex = newSectionIndex;
+                }
             }
+
+           links.forEach((link, index) => {
+                link.addEventListener('click', (event) => {
+                    const sectionId = link.getAttribute('href').substring(1);
+                    const section = document.getElementById(sectionId);
+
+                    isClickScrolling = true;
+                    currentSectionIndex = index;
+                    clearActiveStates();
+                    link.classList.add('font-bold', 'text-quorum-blue-150');
+
+                    setTimeout(() => {
+                        isClickScrolling = false;
+                    }, 200);
+                });
+            });
+
+            updateActiveLinkOnScroll();
+            window.addEventListener('scroll', function(){
+              console.log('scrolling')
+              updateActiveLinkOnScroll();
+            });
         });
-
-        clearActiveStates();
-        if (currentSectionIndex !== -1 && links[currentSectionIndex]) {
-            links[currentSectionIndex].classList.add('font-bold', 'text-quorum-blue-150');
-        }
-    }
-
-    links.forEach((link, index) => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            isClickScrolling = true;
-            currentSectionIndex = index;
-            clearActiveStates();
-            link.classList.add('font-bold', 'text-quorum-blue-150');
-
-            const id = link.getAttribute('href').substring(1);
-            const headingToScrollTo = document.getElementById(id);
-            if (headingToScrollTo) {
-                headingToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isClickScrolling = false;
-                }, 1000);
-            }
-        });
-    });
-
-    updateActiveLinkOnScroll();
-    window.addEventListener('scroll', updateActiveLinkOnScroll);
-});
-")
+        ")
 
         Add(script)
         innerDiv:Add(nav)
@@ -443,7 +408,19 @@ document.addEventListener('DOMContentLoaded', () => {
         nav:Add(ul)
 
         Script script
- script:SetCode("
+   script:SetCode("
+
+        function isScrolledToBottom(container) {
+            // Check if the scroll position is at the bottom taking into account the scrollHeight, scrollTop, and clientHeight
+            return container.scrollHeight - container.scrollTop <= container.clientHeight;
+        }
+
+        // Define a helper function to scroll the container to the bottom
+        function scrollToBottom(container) {
+            // Scroll to the bottom of the container
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+        }
+
         // Define the function outside the event listener
         function updateViewableHeight(main) {
             const rect = main.getBoundingClientRect();
@@ -464,8 +441,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             visibleHeight = Math.min(visibleHeight, window.innerHeight);
         
+            // Get the onPageTableOfContentsScrolling div
+            const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+            // Check if we are at the bottom before the change
+            const atBottom = isScrolledToBottom(tocScrollingDiv);
+
             // Update the CSS variable
             document.documentElement.style.setProperty('--main-viewable-height', `${visibleHeight}px`);
+
+            // If we are at the bottom, after the update, scroll to the bottom
+            if (atBottom) {
+                scrollToBottom(tocScrollingDiv);
+            }
         }
         
         // Event listener for DOMContentLoaded
@@ -484,8 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateViewableHeight(main);
             });
         });
-        ")
-    
+        ") 
+
         Add(script)
         innerDiv:Add(nav)
         div:Add(innerDiv)
