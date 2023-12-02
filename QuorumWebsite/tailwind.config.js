@@ -61,6 +61,7 @@ module.exports = {
       },
     },
     colors: {
+      transparent: "transparent",
       primary: {
         hover: "rgba(1, 115, 163, 1)",
       },
