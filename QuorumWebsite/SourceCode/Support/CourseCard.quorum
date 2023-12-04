@@ -9,32 +9,33 @@ class CourseCard is Division
     cr = cr:GetCarriageReturn()
 
     Image image = undefined
+    Division imageDiv = undefined
     Heading heading_card = undefined
     Button previewButton = undefined
     Link link_course = undefined
     Paragraph p_description = undefined
 
-    action Create(JavaScriptObjectNotation cardJson, text title, text courseLink) returns CourseCard
-        text imageSrc = cardJson:GetValue("image")
-        text imageAltText = cardJson:GetValue("imageAltText")
-        text description = cardJson:GetValue("description")
-
-        AddClassAttribute("bg-neutral-white rounded-lg shadow-md flex flex-col items-center justify-center max-w-sm box-border overflow-hidden")
+    action Create(text imageSrc, text imageAltText, text description,  text title, text courseLink, boolean isPreviewButton) returns Array<WebTag>
+ 
+        AddClassAttribute("bg-neutral-white rounded-lg shadow-md flex flex-col items-center justify-center col-span-1 box-border overflow-hidden")
         
         SetIdentifier("courseCard" + title)
         
         Division imageDiv
-        imageDiv:AddClassAttribute("w-full h-32 relative")
-        Image image
-        image:SetAddress(imageSrc)
-        image:SetAlternate(imageAltText)
-        image:AddClassAttribute("w-full h-full object-cover")
-        me:image = image
-        imageDiv:Add(image)
+        me:imageDiv = imageDiv
+        imageDiv:AddClassAttribute("w-full h-32 relative flex-grow-0 flex-shrink-0")
+        if imageSrc not=""
+          Image image
+          image:SetAddress(imageSrc)
+          image:SetAlternate(imageAltText)
+          image:AddClassAttribute("w-full h-full object-cover mx-auto my-0 block")
+          me:image = image
+          imageDiv:Add(image)
+        end
         Add(imageDiv)
 
         Division contentDiv
-        contentDiv:AddClassAttribute("bg-neutral-grey-15 p-4 flex-grow flex flex-col justify-between")
+        contentDiv:AddClassAttribute("bg-neutral-grey-15 w-full p-4 flex-grow flex flex-col justify-between")
 
         Heading heading_card
         heading_card:SetScale(3)
@@ -52,15 +53,80 @@ class CourseCard is Division
         Division buttonDiv
         buttonDiv:AddClassAttribute("flex justify-end w-full gap-2 mt-4")
 
-        Button previewButton
-        previewButton:AddClassAttribute("text-quorum-blue-100 px-4 py-2")
-        previewButton:AddText("Preview")
-        previewButton:AddAttribute("data-test", "previewButton" + "_" + title)
-        me:previewButton = previewButton
-        buttonDiv:Add(previewButton)
+        if isPreviewButton 
+          Button previewButton
+          previewButton:AddClassAttribute("text-quorum-blue-100 font-bold px-4 py-2")
+          previewButton:AddText("Preview")
+          previewButton:AddAttribute("data-test", "previewButton" + "_" + title)
+          me:previewButton = previewButton
+          buttonDiv:Add(previewButton)
+
+          previewButton:SetOnClick("
+              function adjustPreviewBar(title, resizing) {
+              const previewBar = document.getElementById('previewBar' + title);
+
+              // Determine if we are hiding or showing the previewBar
+              const isHidden = previewBar.classList.contains('hidden');
+
+              // Hide all other previewBars first
+              const previewBars = document.querySelectorAll('[id^=previewBar]');
+              previewBars.forEach(bar => {
+                  if(previewBar !== bar) {
+                  bar.classList.add('hidden');
+                  }
+                  });
+
+              // Determine the number of cards per row
+              let cardsPerRow;
+              const viewportWidth = window.innerWidth;
+              if (viewportWidth >= 1536) {
+                cardsPerRow = 5;
+              } else if (viewportWidth >= 1280) {
+                cardsPerRow = 4;
+              } else if (viewportWidth >= 1024) {
+                cardsPerRow = 3;
+              } else if (viewportWidth >= 768) {
+                cardsPerRow = 2;
+              } else {
+                cardsPerRow = 1;
+              }
+
+              // Get all the cards in the grid
+              const grid = previewBar.parentElement;
+              const cards = grid.querySelectorAll('[id^=courseCard]');
+              const clickedCard = event.target.closest('[id^=courseCard]');
+              const cardIndex = Array.from(cards).indexOf(clickedCard);
+
+              const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
+              const targetIndex = rowIndexStart + cardsPerRow;
+
+              // Position the preview bar after the entire row
+              if (cards.length > targetIndex) {
+                grid.insertBefore(previewBar, cards[targetIndex]);
+              } else {
+                grid.appendChild(previewBar);
+              }
+
+              // Show or hide the preview bar based on its previous state
+              if (isHidden) {
+                previewBar.classList.remove('hidden');
+              } else if(!resizing) {
+                previewBar.classList.add('hidden');
+              }
+              }
+
+              // Call the function when button is clicked
+              adjustPreviewBar('" + title + "', false);
+
+              // Adjust position on window resize
+              window.onresize = function() {
+                adjustPreviewBar('" + title + "', true);
+              };
+              ")
+        end
 
         Link link_course
-        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 font-medium text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900")
+        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900")
         link_course:SetAddress(courseLink)
         link_course:AddText("Go to Course")
         me:link_course = link_course
@@ -69,70 +135,20 @@ class CourseCard is Division
         contentDiv:Add(buttonDiv)
         Add(contentDiv)
 
+        Array<WebTag> tags
+        tags:Add(me)
+        tags:Add(imageDiv)
+        tags:Add(contentDiv)
+        return tags
+    end
 
-        previewButton:SetOnClick("
-            function adjustPreviewBar(title, resizing) {
-                const previewBar = document.getElementById('previewBar' + title);
-        
-                // Determine if we are hiding or showing the previewBar
-                const isHidden = previewBar.classList.contains('hidden');
-        
-                // Hide all other previewBars first
-                const previewBars = document.querySelectorAll('[id^=previewBar]');
-                previewBars.forEach(bar => {
-                    if(previewBar !== bar) {
-                        bar.classList.add('hidden');
-                    }
-                });
-        
-                // Determine the number of cards per row
-                let cardsPerRow;
-                const viewportWidth = window.innerWidth;
-                if (viewportWidth >= 1024) {
-                    cardsPerRow = 3;
-                } else if (viewportWidth >= 768) {
-                    cardsPerRow = 2;
-                } else {
-                    cardsPerRow = 1;
-                }
-        
-                // Get all the cards in the grid
-                const grid = previewBar.parentElement;
-                const cards = grid.querySelectorAll('[id^=courseCard]');
-                const clickedCard = event.target.closest('[id^=courseCard]');
-                const cardIndex = Array.from(cards).indexOf(clickedCard);
-        
-                const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
-                const targetIndex = rowIndexStart + cardsPerRow;
-        
-                // Position the preview bar after the entire row
-                if (cards.length > targetIndex) {
-                    grid.insertBefore(previewBar, cards[targetIndex]);
-                } else {
-                    grid.appendChild(previewBar);
-                }
-        
-                // Show or hide the preview bar based on its previous state
-                if (isHidden) {
-                    previewBar.classList.remove('hidden');
-                } else if(!resizing) {
-                    previewBar.classList.add('hidden');
-                }
-            }
-        
-            // Call the function when button is clicked
-            adjustPreviewBar('" + title + "', false);
-        
-            // Adjust position on window resize
-            window.onresize = function() {
-                adjustPreviewBar('" + title + "', true);
-            };
-        ")
+    action GetImage returns Image
+        return me:image
+    end
 
-
-
-        
-        return me
+    action GetImageDiv returns Division
+        return me:imageDiv
     end
 end
 
+ 
