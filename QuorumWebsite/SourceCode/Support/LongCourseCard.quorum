@@ -2,7 +2,7 @@ use Libraries.Web.Page.all
 use Libraries.Containers.Array
 use Libraries.Data.Formats.JavaScriptObjectNotation
 
-class CourseCard is Division
+class LongCourseCard is Division
     text dq = ""
     dq = dq:GetDoubleQuote()
     text cr = ""
@@ -17,25 +17,25 @@ class CourseCard is Division
 
     action Create(text imageSrc, text imageAltText, text description,  text title, text courseLink, boolean isPreviewButton) returns Array<WebTag>
  
-        AddClassAttribute("bg-neutral-white rounded-lg flex flex-col items-center justify-center col-span-1 box-border overflow-hidden")
+        AddClassAttribute("bg-neutral-grey-15 rounded-lg flex flex-col md:flex-row items-center justify-center col-span-full box-border overflow-hidden h-fit")
         
-        SetIdentifier("courseCard" + title)
+        SetIdentifier("longCourseCard" + title)
         
         Division imageDiv
         me:imageDiv = imageDiv
-        imageDiv:AddClassAttribute("w-full h-48 relative flex-grow-0 flex-shrink-0")
+        imageDiv:AddClassAttribute("h-32 md:h-full relative flex-grow-0 flex-shrink-0 w-full md:w-1/3 lg:w-1/4 xl:w-1/5")
         if imageSrc not=""
           Image image
           image:SetAddress(imageSrc)
           image:SetAlternate(imageAltText)
-          image:AddClassAttribute("w-full h-full object-fill mx-auto my-0 block")
+          image:AddClassAttribute("w-full h-full object-cover mx-auto my-0 block")
           me:image = image
           imageDiv:Add(image)
         end
         Add(imageDiv)
 
         Division contentDiv
-        contentDiv:AddClassAttribute("bg-neutral-grey-15 w-full p-4 flex-grow flex flex-col justify-between")
+        contentDiv:AddClassAttribute("p-4 flex-grow flex flex-col h-fit md:h-full justify-center w-full md:w-2/3 lg:w-3/4 xl:w-4/5")
 
         Heading heading_card
         heading_card:SetScale(3)
@@ -63,7 +63,7 @@ class CourseCard is Division
           buttonDiv:Add(previewButton)
 
           previewButton:SetOnClick("
-            function adjustPreviewBar(title, resizing) {
+              function adjustPreviewBar(title, resizing) {
               const previewBar = document.getElementById('previewBar' + title);
 
               // Determine if we are hiding or showing the previewBar
@@ -72,41 +72,21 @@ class CourseCard is Division
               // Hide all other previewBars first
               const previewBars = document.querySelectorAll('[id^=previewBar]');
               previewBars.forEach(bar => {
-                if (previewBar !== bar) {
+                  if(previewBar !== bar) {
                   bar.classList.add('hidden');
-                }
-              });
-
-              // Get the grid container and its classes
-              const grid = previewBar.parentElement;
-              const gridClasses = grid.className;
-
-              // Use regex to match Tailwind's grid-cols classes
-              const regex = /grid-cols-(\d+)/g;
-              let match;
-              let cardsPerRow = 1; // Default to 1 if no matching class is found
-
-              // Extract the number of columns for each breakpoint
-              const breakpoints = {
-                'sm': 640,
-                'md': 768,
-                'lg': 1024,
-                'xl': 1280,
-                '2xl': 1536
-              };
-
-              // Check which grid-cols class applies based on the current viewport width
-              while ((match = regex.exec(gridClasses)) !== null) {
-                for (const [breakpoint, width] of Object.entries(breakpoints)) {
-                  if (window.innerWidth >= width && gridClasses.includes(`${breakpoint}:grid-cols-${match[1]}`)) {
-                    cardsPerRow = parseInt(match[1], 10);
                   }
-                }
-              }
+                  });
+
+              // Determine the number of cards per row
+              let cardsPerRow;
+              const viewportWidth = window.innerWidth;
+
+              cardsPerRow = 1;
 
               // Get all the cards in the grid
-              const cards = grid.querySelectorAll('[id^=courseCard]');
-              const clickedCard = event.target.closest('[id^=courseCard]');
+              const grid = previewBar.parentElement;
+              const cards = grid.querySelectorAll('[id^=longCourseCard]');
+              const clickedCard = event.target.closest('[id^=longCourseCard]');
               const cardIndex = Array.from(cards).indexOf(clickedCard);
 
               const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
@@ -138,12 +118,12 @@ class CourseCard is Division
         end
 
         Link link_course
-        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-10 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed")
+        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-100 aria-disabled:bg-neutral-grey-25 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed")
         link_course:AddAttribute("aria-disabled", "true")
-        link_course:AddAttribute("role", "link")
-        link_course:SetIdentifier("courseLink" + title)
         link_course:AddAttribute("data-href", courseLink)
+        link_course:SetIdentifier("courseLink" + title)
 
+        link_course:SetAddress(courseLink)
         link_course:AddText("Coming Soon")
         me:link_course = link_course
         buttonDiv:Add(link_course)
@@ -157,7 +137,7 @@ class CourseCard is Division
                   var links = document.querySelectorAll('a[id^=courseLink]'); // Selects all links with IDs starting with 'courseLink'
                   links.forEach(function(link) { // Iterates over each link
                       var http = new XMLHttpRequest();
-                      var courseLink = link.getAttribute('data-href');
+                      var courseLink = link.getAttribute('data-href'); // Gets the link's href attribute
                       http.open('HEAD', courseLink, true); // true for asynchronous request
                       http.onreadystatechange = function() { // Event listener for when the request state changes
                           if (http.readyState === XMLHttpRequest.DONE) { // When the request is complete
@@ -167,11 +147,10 @@ class CourseCard is Division
                                   if(previewLink != undefined) {
                                     previewLink.classList.add('hidden');
                                   }
-                                  link.textContent = 'View Course';
+                                  link.textContent = 'Go to Course';
                                   //give it the correct aria labels
-                                  link.setAttribute('aria-label', 'View Course');
+                                  link.setAttribute('aria-label', 'Go to Course');
                                   link.setAttribute('aria-disabled', 'false');
-                                  link.classList.add('bg-quorum-blue-100');
                                   link.href = courseLink;
                               }
                           }
