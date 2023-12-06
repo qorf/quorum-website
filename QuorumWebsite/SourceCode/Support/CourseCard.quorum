@@ -137,51 +137,52 @@ class CourseCard is Division
               ")
         end
 
-        Link link_course
-        link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-10 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed")
-        link_course:AddAttribute("aria-disabled", "true")
-        link_course:AddAttribute("role", "link")
-        link_course:SetIdentifier("courseLink" + title)
-        link_course:AddAttribute("data-href", courseLink)
+        if courseLink not= ""
+          Link link_course
+          link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-10 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed")
+          link_course:AddAttribute("aria-disabled", "true")
+          link_course:AddAttribute("role", "link")
+          link_course:SetIdentifier("courseLink" + title)
+          link_course:AddAttribute("data-href", courseLink)
 
-        link_course:AddText("Coming Soon")
-        me:link_course = link_course
-        buttonDiv:Add(link_course)
+          link_course:AddText("Coming Soon")
+          me:link_course = link_course
+          buttonDiv:Add(link_course)
+
+          Script script
+          script:SetCode("
+                document.addEventListener('DOMContentLoaded', function() {
+                    var links = document.querySelectorAll('a[id^=courseLink]'); // Selects all links with IDs starting with 'courseLink'
+                    links.forEach(function(link) { // Iterates over each link
+                        var http = new XMLHttpRequest();
+                        var courseLink = link.getAttribute('data-href');
+                        http.open('HEAD', courseLink, true); // true for asynchronous request
+                        http.onreadystatechange = function() { // Event listener for when the request state changes
+                            if (http.readyState === XMLHttpRequest.DONE) { // When the request is complete
+                                if (http.status !== 404) {
+                                    let linkText = link.textContent;
+                                    let previewLink = document.getElementById('previewButton' + linkText);
+                                    if(previewLink != undefined) {
+                                      previewLink.classList.add('hidden');
+                                    }
+                                    link.textContent = 'View Course';
+                                    //give it the correct aria labels
+                                    link.setAttribute('aria-label', 'View Course');
+                                    link.setAttribute('aria-disabled', 'false');
+                                    link.classList.add('bg-quorum-blue-100');
+                                    link.href = courseLink;
+                                }
+                            }
+                        };
+                        http.send(); // Sends the request
+                    });
+                });
+          ")
+          Add(script)
+        end
 
         contentDiv:Add(buttonDiv)
         Add(contentDiv)
-
-        Script script
-        script:SetCode("
-              document.addEventListener('DOMContentLoaded', function() {
-                  var links = document.querySelectorAll('a[id^=courseLink]'); // Selects all links with IDs starting with 'courseLink'
-                  links.forEach(function(link) { // Iterates over each link
-                      var http = new XMLHttpRequest();
-                      var courseLink = link.getAttribute('data-href');
-                      http.open('HEAD', courseLink, true); // true for asynchronous request
-                      http.onreadystatechange = function() { // Event listener for when the request state changes
-                          if (http.readyState === XMLHttpRequest.DONE) { // When the request is complete
-                              if (http.status !== 404) {
-                                  let linkText = link.textContent;
-                                  let previewLink = document.getElementById('previewButton' + linkText);
-                                  if(previewLink != undefined) {
-                                    previewLink.classList.add('hidden');
-                                  }
-                                  link.textContent = 'View Course';
-                                  //give it the correct aria labels
-                                  link.setAttribute('aria-label', 'View Course');
-                                  link.setAttribute('aria-disabled', 'false');
-                                  link.classList.add('bg-quorum-blue-100');
-                                  link.href = courseLink;
-                              }
-                          }
-                      };
-                      http.send(); // Sends the request
-                  });
-              });
-        ")
-        Add(script)
-
 
         Array<WebTag> tags
         tags:Add(me)

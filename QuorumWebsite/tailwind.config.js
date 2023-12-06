@@ -66,9 +66,16 @@ module.exports = {
         '20%': '20%',
         '10%': '10%',
         '5%': '5%',
+        '4%': '4%',
+        '3%': '3%',
+        '2%': '2%',
+        '1%': '1%',
       },
     },
     colors: {
+      website: {
+        bg: "#F3F3F3",
+      },
       transparent: "transparent",
       primary: {
         hover: "rgba(1, 115, 163, 1)",
