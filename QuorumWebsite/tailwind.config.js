@@ -51,13 +51,21 @@ module.exports = {
       transitionProperty: {
         'height': 'height',
       },
-      minHeight: {
-        'body': 'calc(100vh - 172px - 70px)',
-      },
       //add font Montserrat
       fontFamily: {
         sans: ["Montserrat", "sans-serif"],
         mono: ["monospace"],
+      },
+      spacing: {
+        '80%': '80%',
+        '70%': '70%',
+        '60%': '60%',
+        '50%': '50%',
+        '40%': '40%',
+        '30%': '30%',
+        '20%': '20%',
+        '10%': '10%',
+        '5%': '5%',
       },
     },
     colors: {
