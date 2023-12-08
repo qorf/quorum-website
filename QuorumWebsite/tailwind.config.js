@@ -43,6 +43,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundColor: {
+        'modal-black-50': 'rgba(0, 0, 0, 0.5)',
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
