@@ -932,30 +932,30 @@ $(document).ready(function() {
  */
 function hourOfCodeSetup() {
   // Hook loading of slides into HourOfCode
-  var currurl = window.location.pathname;
-  var page = getPageName(currurl);
-  if (page === "part1") {
-    submitCodeSampleHourOfCode(1);
-    slideShow(part1Slides());
-  } else if (page === "part2") {
-    submitCodeSampleHourOfCode(2);
-    slideShow(part2Slides());
-  } else if (page === "part3") {
-    submitCodeSampleHourOfCode(3);
-    slideShow(part3Slides());
-  } else if (page === "part4") {
-    submitCodeSampleHourOfCode(4);
-    slideShow(part4Slides());
-  } else if (page === "part5") {
-    submitCodeSampleHourOfCode(5);
-    slideShow(part5Slides());
-  } else if (page === "part6") {
-    submitCodeSampleHourOfCode(6);
-    slideShow(part6Slides());
-  } else if (page === "part7") {
-    submitCodeSampleHourOfCode(7);
-    slideShow(part7Slides());
-  }
+  // var currurl = window.location.pathname;
+  // var page = getPageName(currurl);
+  // if (page === "part1") {
+  // submitCodeSampleHourOfCode(1);
+  slideShow(part1Slides());
+  // } else if (page === "part2") {
+  //   submitCodeSampleHourOfCode(2);
+  //   slideShow(part2Slides());
+  // } else if (page === "part3") {
+  //   submitCodeSampleHourOfCode(3);
+  //   slideShow(part3Slides());
+  // } else if (page === "part4") {
+  //   submitCodeSampleHourOfCode(4);
+  //   slideShow(part4Slides());
+  // } else if (page === "part5") {
+  //   submitCodeSampleHourOfCode(5);
+  //   slideShow(part5Slides());
+  // } else if (page === "part6") {
+  //   submitCodeSampleHourOfCode(6);
+  //   slideShow(part6Slides());
+  // } else if (page === "part7") {
+  //   submitCodeSampleHourOfCode(7);
+  //   slideShow(part7Slides());
+  // }
 }
 
 function getPageName(url) {
@@ -1088,10 +1088,6 @@ function slideShow(slideArray) {
       slideNr++;
     }
     $('#content-box-wrapper').attr('aria-live', 'none');
-    //            $('#slide-box').hide('slide', { direction: direction }, 400, function(){
-    //                $('#slide-box').replaceWith($.parseHTML(slideArray[index]));
-    //                $('#content-box-wrapper').attr('aria-live', 'polite');
-    //            });
     $('#slide-box').replaceWith($.parseHTML(slideArray[index]));
     $('#content-box-wrapper').attr('aria-live', 'polite');
   };

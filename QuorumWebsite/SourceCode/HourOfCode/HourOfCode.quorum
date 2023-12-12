@@ -1,26 +1,6 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.NavigationDivision
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.InlineFrame
-use Libraries.Web.Page.Button
-use Libraries.Web.Page.Label
-use Libraries.Web.Page.TextArea
-use Libraries.Web.Page.Image
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Heading
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
 
 class HourOfCode is Lesson
     text dq = ""
@@ -32,49 +12,99 @@ class HourOfCode is Lesson
     text MEDIA_FOLDER = "media/hourofcode/"
     integer SELECTED = 1
 
-    action Setup(text nextPart, text title, text header, text subHeader, text moveOnText, text youtubeAddress, integer selected)
+    action Setup(text title, text header, text subHeader,text slidesHeader, text moveOnText, text youtubeAddress, integer selected, Array<Division> slides)
         LineBreak break //will be used multiple times
         
         //html header stuff
         SetWebPageTitle(title)
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
-        
-
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        rightDiv:AddClassAttribute("hidden")
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading(header, 1)
-        headDiv:AddText(subHeader)
-        Add(headDiv)
-
-        Division bodyDiv
-        bodyDiv:AddClassAttribute("bodyContainerHOC")
-        bodyDiv:AddClassAttribute("box-size-fix topmargin")
-
-       
-        bodyDiv:Add(NavigationArea(selected))
-        bodyDiv:Add(ContentBox(youtubeAddress))
-
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Hour of Code: Code with Mary", 1)
+        bodyDiv:Add(headDiv)
+            
         Image codeDotOrgTrackerImage
         codeDotOrgTrackerImage:SetAddress("http://code.org/api/hour/begin_quorum.png/")
-        codeDotOrgTrackerImage:SetStyle("display:none")
-
+        codeDotOrgTrackerImage:AddClassAttribute("hidden")
         bodyDiv:Add(codeDotOrgTrackerImage)
 
-        mainRegion:Add(bodyDiv)
-        Add(CompletedModal(nextPart, moveOnText))
-        Add(NoCodeModal())
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section section_video
+        section_video:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_video, "Part " + selected + ": " + subHeader, 2)
+
+
+        InlineFrame videoIFrame
+        videoIFrame:SetIdentifier("youtubeiframe")
+        videoIFrame:SetAddress(youtubeAddress)
+        videoIFrame:AddAttribute("height", "500px")
+        videoIFrame:AddClassAttribute("w-full")
+        videoIFrame:AddAttribute("frameborder", "0")
+        videoIFrame:AddAttribute("allowfullscreen", "")
+        Script heightScript
+        heightScript:SetCode("
+        function setIframeHeight() {
+            var iframe = document.getElementById('youtubeiframe');
+            if (iframe) {
+                var width = iframe.offsetWidth; // Get the current width of the iframe
+                var height = (width / 16) * 9; // Calculate the height based on 16:9 aspect ratio
+                iframe.style.height = height + 'px'; // Set the new height
+                iframe.height = height + 'px';
+            }
+        }
+
+        // Initial setup
+        window.onload = setIframeHeight;
+        window.onresize = setIframeHeight; // Adjust the height when the window is resized
+        //run when the dom is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+          setIframeHeight()
+        });
+
+        ")
+        section_video:Add(heightScript)
+
+
+        section_video:Add(videoIFrame)
+
+        Section section_slides
+        section_slides:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_slides, slidesHeader, 2)
+
+        section_slides:Add(SlideContainer(slides))
+
+        Section section_code
+        section_code:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_code, "Try it Yourself", 2)
+        
+        AddHourOfCodeIDE(section_code, "hour-of-code-IDE", "Type your Code Here!")
+
+        bodyDiv:Add(CompletedModal(selected, moveOnText))
+        bodyDiv:Add(NoCodeModal())
+
+        bodyDiv:Add(section_video)
+        bodyDiv:Add(section_slides)
+        bodyDiv:Add(section_code)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        rightDiv:Add(CreateHeadingTableOfContents())
     end
 
 
-    action CompletedModal (text nextPart, text moveOnText) returns Division
+    action CompletedModal (integer nextPart, text moveOnText) returns Division
         Division modal
         modal:SetIdentifier("modal")
         modal:AddAttribute("aria-hidden", "true")
@@ -82,6 +112,7 @@ class HourOfCode is Lesson
         modal:AddAttribute("aria-describedby", "modalDescription")
         modal:AddAttribute("aria-live", "polite")
         modal:AddAttribute("role", "dialog")
+        modal:AddClassAttribute("hidden")
         
         Division modalDescription
         modalDescription:SetIdentifier("modalDescription")
@@ -106,13 +137,6 @@ class HourOfCode is Lesson
         modaltext:AddText("Would you like to...")
 
         overlayContent:Add(modaltext)
-        
-        Link nextPartLink
-        nextPartLink:SetAddress(nextPart)
-        nextPartLink:AddClassAttribute("overlay-option")
-        nextPartLink:AddText(moveOnText)
-
-        overlayContent:Add(nextPartLink)
         
         Button closeButton
         closeButton:SetIdentifier("modalCloseButton")
@@ -143,6 +167,7 @@ class HourOfCode is Lesson
         modal:AddAttribute("aria-describedby", "noCodeModalDescription")
         modal:AddAttribute("aria-live", "assertive")
         modal:AddAttribute("role", "dialog")
+        modal:AddClassAttribute("hidden")
         
         Division modalDescription
         modalDescription:SetIdentifier("noCodeModalDescription")
@@ -182,254 +207,192 @@ class HourOfCode is Lesson
         return modal
     end
 
-
-    action NavigationArea (integer selected) returns Division
-        Division sidebarDiv
-        sidebarDiv:SetIdentifier("sidebar")
-
-        NavigationDivision navDiv
-        navDiv:SetIdentifier("sidebar-navigation")
-        
-        UnorderedList navigationItems
-        
-        Link item1Link
-        Link item2Link
-        Link item3Link
-        Link item4Link
-        Link item5Link
-        Link item6Link
-        Link item7Link
-        
-        item1Link:SetAddress("part1.html")
-        item2Link:SetAddress("part2.html")
-        item3Link:SetAddress("part3.html")
-        item4Link:SetAddress("part4.html")
-        item5Link:SetAddress("part5.html")
-        item6Link:SetAddress("part6.html")
-        item7Link:SetAddress("part7.html")
-
-        item1Link:AddText("Part 1: Got a New Gig")
-        item2Link:AddText("Part 2: Sayin' Stuff")
-        item3Link:AddText("Part 3: This or That")
-        item4Link:AddText("Part 4: Clothing Picker")
-        item5Link:AddText("Part 5: Choose My Clothing!")
-        item6Link:AddText("Part 6: Mutate the Bugs")
-        item7Link:AddText("Part 7: The End of the World")
-        
-
-        ListItem listItem1
-        ListItem listItem2
-        ListItem listItem3
-        ListItem listItem4
-        ListItem listItem5
-        ListItem listItem6
-        ListItem listItem7
-
-        
-        listItem1:SetIdentifier("sidebar-part1")
-        listItem2:SetIdentifier("sidebar-part2")
-        listItem3:SetIdentifier("sidebar-part3")
-        listItem4:SetIdentifier("sidebar-part4")
-        listItem5:SetIdentifier("sidebar-part5")
-        listItem6:SetIdentifier("sidebar-part6")
-        listItem7:SetIdentifier("sidebar-part7")
-        
-        listItem1:AddClassAttribute("sidebar-link")
-        listItem2:AddClassAttribute("sidebar-link")
-        listItem3:AddClassAttribute("sidebar-link")
-        listItem4:AddClassAttribute("sidebar-link")
-        listItem5:AddClassAttribute("sidebar-link")
-        listItem6:AddClassAttribute("sidebar-link")
-        listItem7:AddClassAttribute("sidebar-link")
+    action SlideContainer(Array<Division> slides) returns Division
+        Division slideContainer
+        slideContainer:AddClassAttribute("w-full h-fit flex flex-col gap-y-4")
 
 
-        if selected = 1
-            listItem1:AddClassAttribute("sidebar-selected")
-        elseif selected = 2
-            listItem2:AddClassAttribute("sidebar-selected")
-        elseif selected = 3
-            listItem3:AddClassAttribute("sidebar-selected")
-        elseif selected = 4
-            listItem4:AddClassAttribute("sidebar-selected")
-        elseif selected = 5
-            listItem5:AddClassAttribute("sidebar-selected")
-        elseif selected = 6
-            listItem6:AddClassAttribute("sidebar-selected")
-        elseif selected = 7
-            listItem7:AddClassAttribute("sidebar-selected")
-        end
-
-       
-
-        listItem1:Add(item1Link)
-        listItem2:Add(item2Link)
-        listItem3:Add(item3Link)
-        listItem4:Add(item4Link)
-        listItem5:Add(item5Link)
-        listItem6:Add(item6Link)
-        listItem7:Add(item7Link)
-        
-        navigationItems:Add(listItem1)
-        navigationItems:Add(listItem2)
-        navigationItems:Add(listItem3)
-        navigationItems:Add(listItem4)
-        navigationItems:Add(listItem5)
-        navigationItems:Add(listItem6)
-        navigationItems:Add(listItem7)
-
-        navDiv:Add(navigationItems)
-
-        sidebarDiv:Add(navDiv)
-
-        Link finishLink
-        finishLink:SetIdentifier("finish")
-        finishLink:AddImage("/media/HourOfCodeDark.png", "")
-        finishLink:SetAddress("http://code.org/api/hour/finish")
-        finishLink:AddText("I'm done with my Hour of Code!")
-        
-        sidebarDiv:Add(finishLink)
-        return sidebarDiv
-    end
-
-    action ContentBox(text youtubeAddress) returns Division
-        Division contentBox
-        contentBox:SetIdentifier("content-box")
-        
-        Division videoContainer
-        videoContainer:SetIdentifier("video-container")
-
-        Division videoHeader
-        videoHeader:SetIdentifier("video-header")
-        Paragraph value = videoHeader:AddParagraph("Mary's Video Log")
-        value:SetClassAttribute("hourOfCodeIDELabel")
-
-        InlineFrame videoIFrame
-        videoIFrame:SetIdentifier("youtubeiframe")
-        videoIFrame:SetAddress(youtubeAddress)
-        videoIFrame:AddAttribute("frameborder", "0")
-        videoIFrame:AddAttribute("allowfullscreen", "")
-
-        videoContainer:Add(videoHeader)
-        videoContainer:Add(videoIFrame)
-
-
-        Division slideContentBox
-        slideContentBox:SetIdentifier("slide-content-box")
-        
         Division slideNavigation
-        slideNavigation:SetIdentifier("slide-navigation")
-        
-        Division slideBoxWrapper
-        slideBoxWrapper:SetIdentifier("slide-box-wrapper")
-        slideBoxWrapper:AddAttribute("role", "description")
-        slideBoxWrapper:AddAttribute("aria-live", "polite")
-        
-        Button leftArrowButton
-        leftArrowButton:SetIdentifier("leftArrow")
-        leftArrowButton:AddClassAttribute("leftArrow-disabled")
-        leftArrowButton:AddAttribute("aria-hidden" , "true")
-        leftArrowButton:AddAttribute("aria-label" , "Previous Slide")
+        slideNavigation:AddClassAttribute("flex flex-row gap-x-2 justify-between items-center font-bold")
+        slideNavigation:AddAttribute("data-current-slide", "1")
+        Button leftArrow
+        leftArrow:SetIdentifier("leftSlideArrow")
+        leftArrow:AddClassAttribute("flex flex-row gap-x-2 items-center disabled:opacity-50 disabled:cursor-not-allowed")
 
-        Division slideBox
-        slideBox:SetIdentifier("slide-box")
+        Span leftChevronIcon
+        HtmlFileLoader leftChevronIconFile
+        File file
+        file:SetPath("html/media/userInterface/SVG/chevron-left.svg")
+        leftChevronIconFile:SetLoaded(file:Read())
+        leftChevronIcon:AddText(leftChevronIconFile:ToText())
 
-        slideBoxWrapper:Add(leftArrowButton)
-        slideBoxWrapper:Add(slideBox)
-        
-        Button rightArrowButton
-        rightArrowButton:SetIdentifier("rightArrow")
-        rightArrowButton:AddAttribute("aria-label" , "Next Slide")
+        leftArrow:AddText(leftChevronIcon:ToText())
+        leftArrow:AddText("Previous Slide")
+        leftArrow:AddAttribute("disabled", "true")
 
-        slideContentBox:Add(slideNavigation)
-        slideContentBox:Add(slideBoxWrapper)
-        slideContentBox:Add(rightArrowButton)
-      
-        contentBox:Add(videoContainer)
-        contentBox:Add(slideContentBox)
-        
-        AddHourOfCodeIDE(contentBox, "hour-of-code-IDE", "Type your Code Here!", "")
-        
-        //contentBox:Add(HourOfCodeIDE())
-        //contentBox:Add(OutputContainer())
+        leftArrow:SetOnClick("
+          var slidesAmount = "+ slides:GetSize() +"
+          var slideNav = document.querySelector('[data-current-slide]')
+          var currentSlideNumber = slideNav.getAttribute('data-current-slide')
+          var previousSlideNumber = parseInt(currentSlideNumber) - 1
+          var currentSlide = document.querySelector('[data-slide=\'' + currentSlideNumber + '\']')
+          var previousSlide = document.querySelector('[data-slide=\'' + previousSlideNumber + '\']')
+          var currentSlideNav = document.querySelector('[data-slide-nav=\'' + currentSlideNumber + '\']')
+          var previousSlideNav = document.querySelector('[data-slide-nav=\'' + previousSlideNumber + '\']')
+          if (previousSlide) {
+            slideNav.setAttribute('data-current-slide', previousSlideNumber)
+            currentSlide.setAttribute('aria-selected', 'false')
+            currentSlide.classList.add('hidden')
+            previousSlide.setAttribute('aria-selected', 'true')
+            previousSlide.classList.remove('hidden')
+            currentSlideNav.setAttribute('aria-selected', 'false')
+            previousSlideNav.setAttribute('aria-selected', 'true')
 
-        return contentBox
+            let leftArrow = document.querySelector('#leftSlideArrow')
+            let rightArrow = document.querySelector('#rightSlideArrow')
+            if(previousSlideNumber <= 1) {
+              leftArrow.setAttribute('disabled', 'true')
+              rightArrow.removeAttribute('disabled')
+            }else if(previousSlideNumber < slidesAmount) {
+              rightArrow.removeAttribute('disabled')
+            }
+
+          }
+        ")
+        slideNavigation:Add(leftArrow)
+
+        integer i = 0
+        Division div_navigation_buttons
+        div_navigation_buttons:AddClassAttribute("flex flex-row gap-x-6 justify-center items-center")
+        repeat while i < slides:GetSize()
+            Division slideContentContainer
+            slideContentContainer:AddClassAttribute("flex flex-col min-h-[350px] rounded-b-lg bg-neutral-white")
+            slideContentContainer:AddAttribute("data-slide", "" + (i + 1))
+            Division slide = slides:Get(i)
+            slideContentContainer:Add(AddSlideHeader(slide:GetAttributeValue("data-heading")))
+            slideContentContainer:Add(slide)
+            Button slideNavigationButton
+            slideNavigationButton:AddClassAttribute("text-xl hover:text-quorum-blue-100 aria-selected:text-quorum-blue-100")
+            slideNavigationButton:AddText("" + (i + 1))
+            slideNavigationButton:AddAttribute("data-slide-nav", "" + (i + 1))
+            slideNavigationButton:SetOnClick("
+              var slidesAmount = "+ slides:GetSize() +"
+              var slideNumber = this.getAttribute('data-slide-nav')
+              var slideNav = document.querySelector('[data-current-slide]')
+              var currentSlideNumber = slideNav.getAttribute('data-current-slide')
+              var nextSlide = document.querySelector('[data-slide=\'' + slideNumber + '\']')
+              var currentSlide = document.querySelector('[data-slide=\'' + currentSlideNumber + '\']')
+              var currentSlideNav = document.querySelector('[data-slide-nav=\'' + currentSlideNumber + '\']')
+              var nextSlideNav = document.querySelector('[data-slide-nav=\'' + slideNumber + '\']')
+              //make sure that the slide number is not the same as the current slide number
+              if (nextSlide && slideNumber != currentSlideNumber) {
+                  slideNav.setAttribute('data-current-slide', slideNumber)
+                  nextSlide.setAttribute('aria-selected', 'true')
+                  nextSlide.classList.remove('hidden')
+                  currentSlide.setAttribute('aria-selected', 'false')
+                  currentSlide.classList.add('hidden')
+                  currentSlideNav.setAttribute('aria-selected', 'false')
+                  nextSlideNav.setAttribute('aria-selected', 'true')
+
+                  let leftArrow = document.querySelector('#leftSlideArrow')
+                  let rightArrow = document.querySelector('#rightSlideArrow')
+                  if(slideNumber <= 1) {
+                    leftArrow.setAttribute('disabled', 'true')
+                    rightArrow.removeAttribute('disabled')
+                  }else if(slideNumber >= slidesAmount) {
+                    rightArrow.setAttribute('disabled', 'true')
+                    leftArrow.removeAttribute('disabled')
+                  }else {
+                    leftArrow.removeAttribute('disabled')
+                    rightArrow.removeAttribute('disabled')
+                  }
+              }
+            ")
+
+            slide:AddClassAttribute("flex flex-col gap-y-4 rounded-lg p-4")
+            if i = 0
+                slideNavigationButton:AddAttribute("aria-selected", "true")
+                slideContentContainer:AddClassAttribute("flex")
+            else
+                slideNavigationButton:AddAttribute("aria-selected", "false")
+                slideContentContainer:AddClassAttribute("flex hidden")
+            end
+            div_navigation_buttons:Add(slideNavigationButton)
+            slideContainer:Add(slideContentContainer)
+            i = i + 1
+        end
+        slideNavigation:Add(div_navigation_buttons)
+
+        Button rightArrow
+        rightArrow:SetIdentifier("rightSlideArrow")
+        rightArrow:AddClassAttribute("flex flex-row gap-x-2 items-center disabled:opacity-50 disabled:cursor-not-allowed")
+
+        Span rightChevronIcon
+        HtmlFileLoader rightChevronIconFile
+        File fileRight
+        fileRight:SetPath("html/media/userInterface/SVG/chevron-right.svg")
+        rightChevronIconFile:SetLoaded(fileRight:Read())
+        rightChevronIcon:AddText(rightChevronIconFile:ToText())
+
+        rightArrow:AddText("Next Slide")
+        rightArrow:AddText(rightChevronIcon:ToText())
+
+        rightArrow:SetOnClick("
+          var slidesAmount = " + slides:GetSize() + "
+          var slideNav = document.querySelector('[data-current-slide]')
+          var currentSlideNumber = slideNav.getAttribute('data-current-slide')
+          var nextSlideNumber = parseInt(currentSlideNumber) + 1
+          var currentSlide = document.querySelector('[data-slide=\'' + currentSlideNumber + '\']')
+          var nextSlide = document.querySelector('[data-slide=\'' + nextSlideNumber + '\']')
+          var currentSlideNav = document.querySelector('[data-slide-nav=\'' + currentSlideNumber + '\']')
+          var nextSlideNav = document.querySelector('[data-slide-nav=\'' + nextSlideNumber + '\']')
+          if (nextSlide) {
+            slideNav.setAttribute('data-current-slide', nextSlideNumber)
+            currentSlide.setAttribute('aria-selected', 'false')
+            currentSlide.classList.add('hidden')
+            nextSlide.setAttribute('aria-selected', 'true')
+            nextSlide.classList.remove('hidden')
+            currentSlideNav.setAttribute('aria-selected', 'false')
+            nextSlideNav.setAttribute('aria-selected', 'true')
+
+            let rightArrow = document.querySelector('#rightSlideArrow')
+            let leftArrow = document.querySelector('#leftSlideArrow')
+            if(nextSlideNumber >= slidesAmount) {
+              rightArrow.setAttribute('disabled', 'true')
+              leftArrow.removeAttribute('disabled')
+            }else if(nextSlideNumber > 1) {
+              leftArrow.removeAttribute('disabled')
+            }
+          }
+        ")
+
+
+        slideNavigation:Add(rightArrow)
+
+        slideContainer:Add(slideNavigation)
+
+        return slideContainer
     end
 
-    action AddHourOfCodeIDE(Division div, text ideName, text title, text subtitle)
-        SideBySideIDE ide
-        ide:SetHourOfCodeEnvironment(true)
-        ide:SetDevelopmentLabel(title)
-        ide:SetUniqueIdentifier(ideName)
-        ide:Setup()
-        ide:GetIDESubtitle():AddText(subtitle)
-        div:Add(ide)
+    action AddHourOfCodeIDE(Section section, text id, text headerText)
+        CodeForIDE code
+        code:AddFileText("Main.quorum", " ")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetIdentifier(id)
+        ide:SetCodeForIDE(code:GetJsonArray())
+        ide:SetIdeTitle(headerText)
+        section:Add(ide)
     end
 
-    action HourOfCodeIDE returns Division
-        Division maindiv
-        maindiv:SetIdentifier("hour-of-code-IDE")
-        maindiv:AddClassAttribute("small-IDE")
-        
-        Division inputHeader
-        inputHeader:SetIdentifier("input-header")
-        Paragraph value = inputHeader:AddParagraph("Type your Code Here!")
-        value:SetClassAttribute("hourOfCodeIDELabel")
-
-        maindiv:Add(inputHeader)
-
-        Label textarealabel
-        textarealabel:AddAttribute("for", "hour-of-code-IDE-input")
-        textarealabel:AddClassAttribute("hidden")
-        textarealabel:AddText("Code input area")
-        
-        TextArea ideTextArea
-        ideTextArea:SetIdentifier("hour-of-code-IDE-input")
-        ideTextArea:AddClassAttribute("inputArea small-IDE-input")
-        ideTextArea:AddAttribute("role", "textbox")
-        ideTextArea:AddAttribute("aria-multiline", "true")
-        
-        maindiv:Add(textarealabel)
-        maindiv:Add(ideTextArea)
-        
-        Button runButton
-        runButton:SetIdentifier("hour-of-code-run-button")
-        runButton:AddText("Click Here to Run Your Code")
-        
-        maindiv:Add(runButton)
-
-        return maindiv
-    end
-
-    action OutputContainer returns Division
-        Division outputContainer
-        outputContainer:SetIdentifier("hour-of-code-IDE-output-container")
-
-
-        Heading outputLabel
-        outputLabel:SetScale(2)
-        outputLabel:AddText("Code output")
-        outputLabel:AddClassAttribute("hidden")
-        outputLabel:SetIdentifier("output-label")
-        outputContainer:Add(outputLabel)
-
-        Image monitorImage
-        monitorImage:SetIdentifier("outputMonitor")
-        monitorImage:SetAddress(MEDIA_FOLDER + "outputMonitor.png")
-        monitorImage:SetAlternate("An image of a monitor surrounding the code output")
-        monitorImage:AddAttribute("aria-hidden", "true")
-        
-        outputContainer:Add(monitorImage)
-        
-        PreformattedText outputArea
-        outputArea:SetIdentifier("hour-of-code-IDE-output")
-        outputArea:AddClassAttribute("outputArea")
-        outputArea:AddAttribute("role", "log")
-        outputArea:AddAttribute("aria-labeledby", "output-label")
-        outputArea:AddAttribute("aria-live", "assertive")
-
-        outputContainer:Add(outputArea)
-
-        return outputContainer
+    action AddSlideHeader(text headerText) returns Division
+      Division headingDiv
+      Heading h4
+      h4:SetScale(4)
+      h4:AddText(headerText)
+      h4:AddClassAttribute("text-left py-2 px-6 w-full font-bold bg-[#0173A3] text-neutral-white rounded-t-lg")
+      headingDiv:Add(h4)
+      return headingDiv
     end
 
     action GetMetaDescription returns text
