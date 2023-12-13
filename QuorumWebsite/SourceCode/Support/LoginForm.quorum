@@ -7,6 +7,7 @@ class LoginForm is Division
     Division SignInModal = undefined
     Division forgotPasswordModal = undefined
     Division signUpModal = undefined
+    Button exitButton = undefined
 
     on create
         SetupModalPortion()
@@ -22,22 +23,7 @@ class LoginForm is Division
       loginDiv:AddAttribute("role", "dialog")
       loginDiv:AddAttribute("aria-labelledby", "loginTitleDiv")
       loginDiv:SetClassAttribute("z-10 hidden fixed  w-screen h-screen bg-modal-black-50")
-      loginDiv:AddAttribute("onclick", "if(event.target.id === 'loginModal' || event.target.id === 'innerLoginDiv') {
-        let signInModal = document.getElementById('signInModal');
-        let forgotPasswordModal = document.getElementById('forgotPasswordModal');
-        let registerModal = document.getElementById('signUpModal');
 
-        signInModal.classList.add('flex');
-        signInModal.classList.remove('hidden');
-
-        forgotPasswordModal.classList.add('hidden');
-        forgotPasswordModal.classList.remove('flex');
-
-        registerModal.classList.add('hidden');
-        registerModal.classList.remove('flex');
-        hideLoginModal() 
-
-      }")
 
 
       Division innerDiv
@@ -51,12 +37,47 @@ class LoginForm is Division
       Add(loginDiv)
     end
 
+    action addExitButton() returns Button
+      Button exitButton
+      exitButton:SetClassAttribute("flex items-center justify-center absolute top-0 right-0 m-4 text-3xl font-bold text-quorum-blue-100 hover:text-quorum-blue-200 visible")
+
+      //cross icon start
+      HtmlFileLoader crossIconFile
+      File file
+      file:SetPath("html/media/userInterface/SVG/exit-cross.svg")
+      crossIconFile:SetLoaded(file:Read())
+      exitButton:AddText(crossIconFile:ToText())
+      //cross icon end
+
+      exitButton:SetOnClick("
+        let signInModal = document.getElementById('signInModal');
+        let forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        let registerModal = document.getElementById('signUpModal');
+
+        signInModal.classList.add('flex');
+        signInModal.classList.remove('hidden');
+
+        forgotPasswordModal.classList.add('hidden');
+        forgotPasswordModal.classList.remove('flex');
+
+        registerModal.classList.add('hidden');
+        registerModal.classList.remove('flex');
+        hideLoginModal() 
+      ")
+      me:exitButton = exitButton
+      return exitButton
+    end
+
     action SetupSignInModal()
         Division SignInModal
         me:SignInModal = SignInModal
         SignInModal:SetIdentifier("signInModal")
-        SignInModal:SetClassAttribute("z-20 h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex flex-col gap-6")
+        SignInModal:SetClassAttribute("z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex flex-col gap-6")
         SignInModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeSignInModal")
+        SignInModal:Add(closeButton)
 
         Division modalContent
 
@@ -131,8 +152,9 @@ class LoginForm is Division
 
          forgotPasswordModal.classList.add('flex');
          forgotPasswordModal.classList.remove('hidden');
-          
 
+         //focus on email input
+         document.getElementById('emailForgotInput').focus();
         ")
         forgotButton:AddAttribute("target", "_blank")
         forgotButton:AddAttribute("rel", "noopener noreferrer")
@@ -143,7 +165,6 @@ class LoginForm is Division
         fieldContainerDiv:Add(forgotPasswordSpan)
 
         SignInModal:Add(fieldContainerDiv)
-
 
 
         Division footbar
@@ -163,6 +184,9 @@ class LoginForm is Division
 
          registerModal.classList.add('flex');
          registerModal.classList.remove('hidden');
+
+         //focus on username input
+         document.getElementById('userNameInput').focus();
          ")
         registerButton:AddAttribute("target", "_blank")
         registerButton:AddAttribute("rel", "noopener noreferrer")
@@ -173,6 +197,7 @@ class LoginForm is Division
 
         Button submitButton
         submitButton:SetClassAttribute("px-8 py-2 rounded-xl bg-quorum-blue-100 text-neutral-black font-bold text-xl hover:shadow-lg")
+        submitButton:SetIdentifier("submitSignInForm")
         submitButton:SetType("submit")
         submitButton:AddText("Login")
         submitButton:SetOnClick("login()")
@@ -188,8 +213,12 @@ class LoginForm is Division
         Division forgotPasswordModal
         me:forgotPasswordModal = forgotPasswordModal
         forgotPasswordModal:SetIdentifier("forgotPasswordModal")
-        forgotPasswordModal:SetClassAttribute("z-20 h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex hidden flex-col gap-6")
+        forgotPasswordModal:SetClassAttribute("z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex hidden flex-col gap-6")
         forgotPasswordModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeForgotPasswordModal")
+        forgotPasswordModal:Add(closeButton)
 
         Heading forgotPasswordTitle
         forgotPasswordTitle:SetClassAttribute("text-3xl font-bold")
@@ -212,18 +241,18 @@ class LoginForm is Division
         Label emailLabel
         emailLabel:AddText("Email")
         emailLabel:SetClassAttribute("capitalize")
-        emailLabel:AddAttribute("for", "emailInput")
+        emailLabel:AddAttribute("for", "emailForgotInput")
         emailLabel:SetIdentifier("emailLabel")
         usernameDiv:Add(emailLabel)
 
         Input email
         email:SetTitle("Email")
-        email:SetIdentifier("emailInput")
+        email:SetIdentifier("emailForgotInput")
         email:SetPlaceHolder("Please enter your email")
         email:SetType("text")
         email:SetName("email")
         email:SetClassAttribute("p-2 rounded-md border border-neutral-grey-50")
-        email:AddAttribute("onblur", "checkValidityExists('emailInput', 'Email required');")
+        email:AddAttribute("onblur", "checkValidityExists('emailForgotInput', 'Email required');")
 
         usernameDiv:Add(email)
         
@@ -233,7 +262,7 @@ class LoginForm is Division
         submitDiv:SetClassAttribute("flex flex-row justify-end items-center")
 
         Input submitButton
-        submitButton:SetIdentifier("submitFormButton")
+        submitButton:SetIdentifier("submitForgotPasswordForm")
         submitButton:SetDefaultValue("Request Reset")
         submitButton:SetType("submit")
         submitButton:SetTitle("Request Reset")
@@ -251,8 +280,12 @@ class LoginForm is Division
         Division signUpModal
         me:signUpModal = signUpModal
         signUpModal:SetIdentifier("signUpModal")
-        signUpModal:SetClassAttribute("z-20 h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex hidden flex-col gap-6")
+        signUpModal:SetClassAttribute("z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex hidden flex-col gap-6")
         signUpModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeSignUpModal")
+        signUpModal:Add(closeButton)
 
         Heading signUpTitle
         signUpTitle:SetClassAttribute("text-3xl font-bold")
@@ -267,7 +300,6 @@ class LoginForm is Division
 
         form:SetIdentifier("registrationForm")
         form:SetPost(true)
-
 
 
         Label userNameLabel
@@ -320,16 +352,16 @@ class LoginForm is Division
         Label emailLabel
         emailLabel:AddText("Email: ")
         emailLabel:SetClassAttribute("capitalize mt-4")
-        emailLabel:AddAttribute("for", "emailInput")
+        emailLabel:AddAttribute("for", "emailRegistrationInput")
         emailLabel:SetIdentifier("emailLabel")
 
         Input email
         email:SetTitle("Email")
-        email:SetIdentifier("emailInput")
+        email:SetIdentifier("emailRegistrationInput")
         email:SetPlaceHolder("Email")
         email:SetType("text")
         email:SetName("email")  
-        email:AddAttribute("onblur", "checkValidityEmail('emailInput', 'Email address required');")
+        email:AddAttribute("onblur", "checkValidityEmail('emailRegistrationInput', 'Email address required');")
         email:AddClassAttribute("p-2 rounded-md border border-neutral-grey-50 mt-1")
 
         Label birthdayLabel
@@ -411,6 +443,8 @@ class LoginForm is Division
 
           signInModal.classList.add('flex');
           signInModal.classList.remove('hidden');
+          //focus on username input
+          document.getElementById('usernameInput').focus();
         ")
 
         haveAccountParagraph:Add(signInButton)
@@ -426,7 +460,7 @@ class LoginForm is Division
           registrationForm.submit();
         ")
 
-        submitButton:SetIdentifier("submitFormButton")
+        submitButton:SetIdentifier("submitRegistrationForm")
         submitButton:AddAttribute("form", "registrationForm")
         submitDiv:Add(submitButton)
 
