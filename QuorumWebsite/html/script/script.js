@@ -36,19 +36,72 @@ $(document).ready(function() {
     }
   });
 
-  document.getElementById('registerAccountLink').addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display === 'block') {
-      document.getElementById('usernameInput').focus();
-      event.preventDefault();
-    }
-  });
-
+  // sign in modal keyboard navigation
   document.getElementById('usernameInput').addEventListener("keydown", function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display === 'block') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
+
+  document.getElementById('submitSignInForm').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+      document.getElementById('closeSignInModal').focus();
+      event.preventDefault();
+    }
+  });
+
+  document.getElementById('closeSignInModal').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+      document.getElementById('usernameInput').focus();
+      event.preventDefault();
+    }
+  });
+  //forgot password modal keyboard navigation
+  document.getElementById('emailForgotInput').addEventListener("keydown", function(event) {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+      document.getElementById('registerAccountLink').focus();
+      event.preventDefault();
+    }
+  });
+
+  document.getElementById('submitForgotPasswordForm').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+      document.getElementById('closeForgotPasswordModal').focus();
+      event.preventDefault();
+    }
+  });
+
+  document.getElementById('closeForgotPasswordModal').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+      document.getElementById('emailForgotInput').focus();
+      event.preventDefault();
+    }
+  });
+
+  //Create An Account modal keyboard navigation
+  document.getElementById('userNameInput').addEventListener("keydown", function(event) {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+      document.getElementById('registerAccountLink').focus();
+      event.preventDefault();
+    }
+  });
+
+  document.getElementById('submitRegistrationForm').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+      document.getElementById('closeSignUpModal').focus();
+      event.preventDefault();
+    }
+  });
+
+  document.getElementById('closeSignUpModal').addEventListener("keydown", function(event) {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+      document.getElementById('userNameInput').focus();
+      event.preventDefault();
+    }
+  });
+
+  //end login modal keyboard navigations
 
   $(".loadcancelbtn").keydown(function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'LoadModal').style.display === 'block') {
@@ -936,7 +989,7 @@ function hourOfCodeSetup() {
   // var page = getPageName(currurl);
   // if (page === "part1") {
   // submitCodeSampleHourOfCode(1);
-  slideShow(part1Slides());
+  //slideShow(part1Slides());
   // } else if (page === "part2") {
   //   submitCodeSampleHourOfCode(2);
   //   slideShow(part2Slides());
@@ -1676,7 +1729,7 @@ function registrationSubmit() {
   var user = $('#userNameInput').val();
   var firstname = $('#firstNameInput').val();
   var lastname = $('#lastNameInput').val();
-  var email = $('#emailInput').val();
+  var email = $('#emailRegistrationInput').val();
   var birthday = $('#birthdayInput').val();
   var password = $('#passwordEnterInput').val();
   var confirmPassword = $('#confirmPasswordInput').val();
@@ -1695,8 +1748,8 @@ function registrationSubmit() {
     $('#lastNameInput').attr("aria-invalid", "true");
   } else if (email === '' || email.indexOf('@') < 0) {
     alertMessageOn("Email required!");
-    $('#emailInput').addClass("inputWarn");
-    $('#emailInput').attr("aria-invalid", "true");
+    $('#emailRegistrationInput').addClass("inputWarn");
+    $('#emailRegistrationInput').attr("aria-invalid", "true");
   } else if (birthday === '' || !checkBirthday(birthday)) {
     alertMessageOn("Birthday required!");
     $('#birthdayInput').addClass("inputWarn");
@@ -1723,8 +1776,8 @@ function registrationSubmit() {
     $('#firstNameInput').attr("aria-invalid", "false");
     $('#lastNameInput').removeClass("inputWarn");
     $('#lastNameInput').attr("aria-invalid", "false");
-    $('#emailInput').removeClass("inputWarn");
-    $('#emailInput').attr("aria-invalid", "false");
+    $('#emailRegistrationInput').removeClass("inputWarn");
+    $('#emailRegistrationInput').attr("aria-invalid", "false");
     $('#birthdayInput').removeClass("inputWarn");
     $('#birthdayInput').attr("aria-invalid", "false");
     $('#passwordConfirmInput').removeClass("inputWarn");
@@ -1770,18 +1823,18 @@ function checkBirthday(date) {
 }
 
 function forgotPasswordClick() {
-  var email = $('#emailInput').val();
+  var email = $('#emailForgotInput').val();
 
   if (email === '') {
     alertMessageOn("Email required!");
-    $('#emailInput').addClass("inputWarn");
-    $('#emailInput').attr("aria-invalid", "true");
+    $('#emailForgotInput').addClass("inputWarn");
+    $('#emailForgotInput').attr("aria-invalid", "true");
   } else {
     // Cleanup
     alertMessageOff();
     feedbackMessageOff();
-    $('#emailInput').attr("aria-invalid", "false");
-    $('#emailInput').removeClass("inputWarn");
+    $('#emailForgotInput').attr("aria-invalid", "false");
+    $('#emailForgotInput').removeClass("inputWarn");
 
     $.ajax({
       type: "POST",

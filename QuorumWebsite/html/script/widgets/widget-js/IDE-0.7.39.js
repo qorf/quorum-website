@@ -6940,7 +6940,10 @@ var __publicField = (obj, key, value) => {
     const runButton = getDiv("runButton");
     if (!inputSection || !QuUiContainer || !lineNumberDiv || !runButton)
       return;
-    runButton.focus();
+    if (document.activeElement && document.activeElement.id.startsWith(preId)) {
+      console.log("focus on run button: " + preId);
+      runButton.focus();
+    }
     const computedWidth = getComputedStyle(inputSection).getPropertyValue("width");
     const halfComputedWidth = (parseInt(computedWidth) / 2).toString() + "px";
     const TorF = `${inputSection.dataset.showingText},${inputSection.dataset.showingGraphic}`;
