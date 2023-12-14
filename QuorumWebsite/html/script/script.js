@@ -101,6 +101,14 @@ $(document).ready(function() {
     }
   });
 
+  $('#passwordEnterInput, #confirmPasswordInput').on('oninput', function() {
+    checkConfirmPassword();
+    checkRegistrationFieldsValidity();
+  });
+
+
+  $('#submitRegistrationForm').prop('disabled', true);
+
   //end login modal keyboard navigations
 
   $(".loadcancelbtn").keydown(function(event) {
@@ -549,8 +557,32 @@ var showLoginModal = function() {
 
 var hideLoginModal = function() {
   document.getElementById('loginModal').style.display = 'none';
+  //login modal
   document.getElementById('usernameInput').value = "";
   document.getElementById('passwordInput').value = "";
+  //forgot password modal
+  document.getElementById('emailForgotInput').value = "";
+  //create an account modal
+  document.getElementById('userNameInput').value = "";
+  document.getElementById('emailRegistrationInput').value = "";
+  document.getElementById('passwordEnterInput').value = "";
+  document.getElementById('confirmPasswordInput').value = "";
+  document.getElementById('firstNameInput').value = "";
+  document.getElementById('lastNameInput').value = "";
+  document.getElementById('birthdayInput').value = "";
+
+  //hide all error messages remove all aria-invalid
+  document.getElementById('userNameInput').removeAttribute('aria-invalid');
+  document.getElementById('emailRegistrationInput').removeAttribute('aria-invalid');
+  document.getElementById('passwordEnterInput').removeAttribute('aria-invalid');
+  document.getElementById('confirmPasswordInput').removeAttribute('aria-invalid');
+  document.getElementById('firstNameInput').removeAttribute('aria-invalid');
+  document.getElementById('lastNameInput').removeAttribute('aria-invalid');
+  document.getElementById('birthdayInput').removeAttribute('aria-invalid');
+
+  document.getElementById('alertMessage').ariaHidden = true;
+  document.getElementById('feedbackMessage').ariaHidden = true;
+  document.getElementById('successMessage').ariaHidden = true;
 };
 
 var showSaveModal = function(id) {
@@ -1691,37 +1723,118 @@ function hideModal() {
   focusedElementBeforeModal.focus();
 }
 
-function feedbackMessageOn(content) {
-  $('#feedbackMessage').text(content);
+function successMessageOn(text) {
+  let header = 'Success';
+  switch (text) {
+    case "An email has been sent to this address. Please check your email and follow the instructions to reset your account password.":
+      header = "Missing Fields";
+      break;
+    case "Password successfully reset. You may now close this page and log in to the website.":
+      header = "Password Reset";
+      break;
+    default:
+      header = "Success";
+      break;
+  }
+  if (header)
+    $('#successMessageHeader').text(header);
+  if (text)
+    $('#successMessageText').text(text);
+  $('#successMessage').attr("aria-hidden", "false");
+}
+
+function successMessageOff() {
+  $('#successMessage').attr("aria-hidden", "true");
+}
+
+function feedbackMessageOn(text) {
+  let header = 'Info';
+  switch (text) {
+    case "An email has been sent to this address. Please check your email and follow the instructions to reset your account password.":
+      header = "Missing Fields";
+      break;
+    default:
+      header = "Info";
+      break;
+  }
+
+  if (header)
+    $('#feedbackMessageHeader').text(header);
+  if (text)
+    $('#feedbackMessageText').text(text);
   $('#feedbackMessage').attr("aria-hidden", "false");
-  $('#feedbackMessage').removeClass("off");
 }
 
-function feedbackMessageOff(aMsg) {
-
-  $('#feedbackMessage').text("");
+function feedbackMessageOff() {
   $('#feedbackMessage').attr("aria-hidden", "true");
-  $('#feedbackMessage').addClass("off");
 }
 
-function alertMessageOn(content) {
-  $('#alertMessage').text(content);
+function alertMessageOn(text) {
+  let header = 'Error';
+  //make headers for all the error messages above, they can be the same if similar
+  switch (text) {
+    case "Required fields are missing.":
+      header = "Missing Fields";
+      break;
+    case "The birthday is given in the wrong format.":
+      header = "Invalid Birthday";
+      break;
+    case "Sorry, but you must be 13 years or older to create a Quorum account.":
+      header = "Age Restriction";
+      break;
+    case "You must provide a valid email address.":
+      header = "Invalid Email";
+      break;
+    case "An account already exists for this email.":
+      header = "Account Exists";
+      break;
+    case "The username can only contain letters and numbers.":
+      header = "Invalid Username";
+      break;
+    case "This username is unavailable.":
+      header = "Username Unavailable";
+      break;
+    case "Passwords must be at least 9 characters long.":
+      header = "Password Too Short";
+      break;
+    case "The password and confirm password fields must match.":
+      header = "Password Mismatch";
+      break;
+    case "This email is not registered with a Quorum account. You may have made an account with a different email. If you don't have an account, you can create one from the login area.":
+      header = "Email Not Registered";
+      break;
+    case "An unexpected error occurred. Please try again.":
+      header = "Unexpected Error";
+      break;
+    case "You cannot request any more password resets at this time. Please try again later.":
+      header = "Reset Limit Reached";
+      break;
+    case "I could not connect to the server at quorumlanguage.com.":
+      header = "Connection Error";
+      break;
+    case "We were unable to send a reset email at this time. Please try again later.":
+      header = "Email Sending Error";
+      break;
+    default:
+      header = "Error"; // This could be used for the generic error message
+      break;
+  }
+
+  if (header)
+    $('#alertMessageHeader').text(header);
+  if (text)
+    $('#alertMessageText').text(text);
   $('#alertMessage').attr("aria-hidden", "false");
-  $('#alertMessage').removeClass("off");
 }
 
 function alertMessageOff(aMsg) {
   if (aMsg && aMsg.length > 0) {
     if ($('#alertMessage').text() === aMsg) {
-      $('#alertMessage').text("");
       $('#alertMessage').attr("aria-hidden", "true");
-      $('#alertMessage').addClass("off");
     }
   }
   else {
-    $('#alertMessage').text("");
     $('#alertMessage').attr("aria-hidden", "true");
-    $('#alertMessage').addClass("off");
   }
 }
 
@@ -1735,55 +1848,32 @@ function registrationSubmit() {
   var confirmPassword = $('#confirmPasswordInput').val();
 
   if (user === '') {
-    alertMessageOn("Username required!");
-    $('#userNameInput').addClass("inputWarn");
     $('#userNameInput').attr("aria-invalid", "true");
   } else if (firstname === '') {
-    alertMessageOn("First Name required!");
-    $('#firstNameInput').addClass("inputWarn");
     $('#firstNameInput').attr("aria-invalid", "true");
   } else if (lastname === '') {
-    alertMessageOn("Last Name required!");
-    $('#lastNameInput').addClass("inputWarn");
     $('#lastNameInput').attr("aria-invalid", "true");
   } else if (email === '' || email.indexOf('@') < 0) {
-    alertMessageOn("Email required!");
-    $('#emailRegistrationInput').addClass("inputWarn");
     $('#emailRegistrationInput').attr("aria-invalid", "true");
   } else if (birthday === '' || !checkBirthday(birthday)) {
-    alertMessageOn("Birthday required!");
-    $('#birthdayInput').addClass("inputWarn");
     $('#birthdayInput').attr("aria-invalid", "true");
   } else if (password === '') {
-    alertMessageOn("Password required!");
-    $('#passwordEnterInput').addClass("inputWarn");
     $('#passwordEnterInput').attr("aria-invalid", "true");
   } else if (confirmPassword === '') {
-    alertMessageOn("Confirm Password required!");
-    $('#passwordConfirmInput').addClass("inputWarn");
     $('#passwordConfirmInput').attr("aria-invalid", "true");
   } else if (confirmPassword != password) {
-    alertMessageOn("Passwords entered are not equal!");
-    $('#passwordConfirmInput').addClass("inputWarn");
     $('#passwordConfirmInput').attr("aria-invalid", "true");
   } else {
     // Cleanup
     alertMessageOff();
     feedbackMessageOff();
     $('#userNameInput').attr("aria-invalid", "false");
-    $('#userNameInput').removeClass("inputWarn");
-    $('#firstNameInput').removeClass("inputWarn");
     $('#firstNameInput').attr("aria-invalid", "false");
-    $('#lastNameInput').removeClass("inputWarn");
     $('#lastNameInput').attr("aria-invalid", "false");
-    $('#emailRegistrationInput').removeClass("inputWarn");
     $('#emailRegistrationInput').attr("aria-invalid", "false");
-    $('#birthdayInput').removeClass("inputWarn");
     $('#birthdayInput').attr("aria-invalid", "false");
-    $('#passwordConfirmInput').removeClass("inputWarn");
-    $('#passwordConfirmInput').attr("aria-invalid", "false");
-    $('#passwordEnterInput').removeClass("inputWarn");
     $('#passwordEnterInput').attr("aria-invalid", "false");
+    $('#passwordConfirmInput').attr("aria-invalid", "false");
 
     /*
 $user_name = $_POST['username'];
@@ -1802,17 +1892,29 @@ $confirm_pass = $_POST['confirm_password'];
       success: function(result) {
         // might need change for if condition
         if (result === "success") {
-          feedbackMessageOn("Your account was successfully created!");
+          successMessageOn("Your account was successfully created!");
           loginWithParams(user, password, "https://quorumlanguage.com");
         } else {
           alertMessageOn(result);
         }
       },
       error: function(xhr, ajaxOptions, thrownError) {
-        alert("I could not connect to the server at quorumlanguage.com: " + xhr.status + ", " + xhr.responseText + ", " + thrownError);
+        alertMessageOn("I could not connect to the server at quorumlanguage.com: " + xhr.status + ", " + xhr.responseText + ", " + thrownError);
       }
     });
   }
+}
+
+function checkRegistrationFieldsValidity() {
+  var allValid = $('#userNameInput').attr("aria-invalid") === "false" &&
+    $('#firstNameInput').attr("aria-invalid") === "false" &&
+    $('#lastNameInput').attr("aria-invalid") === "false" &&
+    $('#emailRegistrationInput').attr("aria-invalid") === "false" &&
+    $('#birthdayInput').attr("aria-invalid") === "false" &&
+    $('#passwordEnterInput').attr("aria-invalid") === "false" &&
+    $('#confirmPasswordInput').attr("aria-invalid") === "false";
+
+  $('#submitRegistrationForm').attr("disabled", !allValid);
 }
 
 function checkBirthday(date) {
@@ -1826,15 +1928,12 @@ function forgotPasswordClick() {
   var email = $('#emailForgotInput').val();
 
   if (email === '') {
-    alertMessageOn("Email required!");
-    $('#emailForgotInput').addClass("inputWarn");
     $('#emailForgotInput').attr("aria-invalid", "true");
   } else {
     // Cleanup
     alertMessageOff();
     feedbackMessageOff();
     $('#emailForgotInput').attr("aria-invalid", "false");
-    $('#emailForgotInput').removeClass("inputWarn");
 
     $.ajax({
       type: "POST",
@@ -1849,7 +1948,7 @@ function forgotPasswordClick() {
         }
       },
       error: function(xhr, ajaxOptions, thrownError) {
-        alert("I could not connect to the server at quorumlanguage.com: " + xhr.status + ", " + xhr.responseText + ", " + thrownError);
+        alertMessageOn("I could not connect to the server at quorumlanguage.com: " + xhr.status + ", " + xhr.responseText + ", " + thrownError);
       }
     });
   }
@@ -1861,24 +1960,16 @@ function resetPasswordClick() {
   var hiddenKey = $('#hidden_reset_key').val();
 
   if (password === '') {
-    alertMessageOn("Password required!");
-    $('#passwordEnterInput').addClass("inputWarn");
     $('#passwordEnterInput').attr("aria-invalid", "true");
   } else if (passwordConfirm === '') {
-    alertMessageOn("Confirm Password required!");
-    $('#passwordConfirmInput').addClass("inputWarn");
     $('#passwordConfirmInput').attr("aria-invalid", "true");
   } else if (passwordConfirm != password) {
-    alertMessageOn("The new password and confirm password fields must match.");
-    $('#passwordConfirmInput').addClass("inputWarn");
     $('#passwordConfirmInput').attr("aria-invalid", "true");
   } else {
     // Cleanup
     alertMessageOff();
     feedbackMessageOff();
-    $('#passwordConfirmInput').removeClass("inputWarn");
     $('#passwordConfirmInput').attr("aria-invalid", "false");
-    $('#passwordEnterInput').removeClass("inputWarn");
     $('#passwordEnterInput').attr("aria-invalid", "false");
 
     $.ajax({
@@ -1888,7 +1979,7 @@ function resetPasswordClick() {
       success: function(result) {
         // might need change for if condition
         if (result === "Password successfully reset. You may now close this page and log in to the website.") {
-          feedbackMessageOn(result);
+          successMessageOn(result);
         } else {
           alertMessageOn(result);
         }
@@ -1902,62 +1993,50 @@ function resetPasswordClick() {
 }
 
 
-function checkValidityEmail(aID, aMsg) {
-  var elem = $('#' + aID)
+function checkValidityEmail() {
+  var elem = $('#' + this.id)
   var invalid = (elem.val().indexOf('@') < 0);
   if (invalid) {
     elem.attr("aria-invalid", "true");
-    alertMessageOn(aMsg);
-    elem.addClass("inputWarn");
   } else {
     elem.attr("aria-invalid", "false");
-    elem.removeClass("inputWarn");
-    alertMessageOff(aMsg);
   }
+  checkRegistrationFieldsValidity();
 }
 
-function checkValidityExists(aID, aMsg) {
-  var elem = $('#' + aID);
+function checkValidityExists() {
+  var elem = $('#' + this.id)
   var invalid = (elem.val().length === 0);
   if (invalid) {
     elem.attr("aria-invalid", "true");
-    alertMessageOn(aMsg);
-    elem.addClass("inputWarn");
   } else {
     elem.attr("aria-invalid", "false");
-    elem.removeClass("inputWarn");
-    alertMessageOff(aMsg);
   }
+  checkRegistrationFieldsValidity();
 }
 
-function checkValidityDate(aID, aMsg) {
-  var elem = $('#' + aID);
+function checkValidityDate() {
+  var elem = $('#' + this.id);
   var invalid = !checkBirthday(elem.val());
   if (invalid) {
     elem.attr("aria-invalid", "true");
-    alertMessageOn(aMsg);
-    elem.addClass("inputWarn");
   } else {
     elem.attr("aria-invalid", "false");
-    elem.removeClass("inputWarn");
-    alertMessageOff(aMsg);
   }
+  checkRegistrationFieldsValidity();
 }
 
 function checkConfirmPassword() {
   var elem = $('#confirmPasswordInput');
-  var aMsg = "Passwords entered are not equal!";
   var password = $('#passwordEnterInput');
+
   var invalid = elem.val() != password.val();
   if (invalid) {
     elem.attr("aria-invalid", "true");
-    alertMessageOn(aMsg);
-    elem.addClass("inputWarn");
   } else {
     elem.attr("aria-invalid", "false");
-    elem.removeClass("inputWarn");
-    alertMessageOff(aMsg);
   }
+  checkRegistrationFieldsValidity();
 }
 
 // Remove a row from the profile project table.
