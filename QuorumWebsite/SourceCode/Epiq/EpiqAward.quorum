@@ -17,6 +17,10 @@ use Libraries.Web.Page.TableHeaderCell
 use Libraries.Web.Page.TableData
 use Libraries.Web.Page.WebTable
 use Libraries.Web.Page.Link
+use Libraries.Web.Page.Section
+use Libraries.Containers.Array
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeader
 
 class EpiqAward is Lesson
     text dq = ""
@@ -33,139 +37,101 @@ class EpiqAward is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("EPIQ Award", 1)
-        headDiv:AddText("This page describes the annual EPIQ Award")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "EPIQ Award", 1)
+        headDiv:AddText("This page describes the (nearly) annual EPIQ Award")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("EPIQ Award", 2)
-        bodyDiv:AddParagraph("The EPIQ Award began in EPIQ 2014 as an honor for an 
-            early member of the steering committee that contributed significantly 
-            to the development of the conference. It is now given annually to a 
-            member, or members, of the committee that has contributed to the 
-            community in some particularly epiq way. To be eligible, a participant must 
-            be accepted to EPIQ and attend. From there, members submit 
-            their materials to the award chair of the Steering Committee.")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("While the first year of the award was chosen, in secret, 
-            by several members of the steering committee, all subsequent awards have been 
-            given by popular vote. For EPIQ 2017, there are two awards: 1) EPIQ Programming, and 
-            2) EPIQ Teaching to honor both contributions. Multiple members of the community may team up to try
-            and win either award, but only one trophy is given for a team. As always, 
-            the EPIQ award is intended to be a fun activity for all members.")
+        AddHeading(introSection, "EPIQ Award", 2)
+        introSection:AddParagraph("The EPIQ Award began in EPIQ 2014 as an honor for Sherry Hahn, an early member of the steering committee that helped establish the conference. It ran for five years, then stopped especially while EPIQ was online during the pandemic. It has started again in 2024 in honor of the first in-person version of EPIQ in several years.")
 
-        bodyDiv:AddHeading("EPIQ Programming, 2018", 3)
-        bodyDiv:AddParagraph("The EPIQ Programming Award is won by creating a computer program, teaching materials, or other resources for the community. For 2018, the rules are as follows:")
-        UnorderedList programmingAward
-        programmingAward:AddListItem("The winner of the award will be selected by popular vote of registered EPIQ attendees.")
-        programmingAward:AddListItem("The created resources must have been developed 
-            after EPIQ 2016 and before the final competition at EPIQ 2017.")
-        programmingAward:AddListItem("The resources must be open source and available on github or another free resource, tagged with the 
-            labels Quorum and EPIQ2018. Additional tags are allowed.")
-        programmingAward:AddListItem("The license for the software must be BSD or creative commons, in order to allow
-            other attendees to share and re-mix software on their own. While the software 
-            must be open source, the developer may later commercialize versions 
-            of the software however they wish, under any license they choose. However, the version 
-            of the software that won the award must remain open source.")
-        programmingAward:AddListItem("While re-mixing and collaborating on software is highly
-            encouraged, outright copying of a complete program is not. If there is a 
-            debate for a particular entry, the Steering 
-            Committee will make any final determination by a majority vote. In the case 
-            of a tie, the decision will be made by the current steering committee
-            chair.")
-        bodyDiv:Add(programmingAward)
-
-        bodyDiv:AddParagraph("The winner (s) of the 2018 EPIQ Award will 
-            be honored with a trophy and will have their materials placed online 
-            with other award winners.")
-
-        bodyDiv:AddHeading("EPIQ Award Winners", 2)
-        bodyDiv:Add(AddEPIQWinners())
+        introSection:AddParagraph("While the first year of the award was chosen, in secret, by several members of the steering committee, all subsequent awards have been given by popular vote. This vote varies year to year based on the whims of the community. Some years it is a programming contest based on content for the year. Others it can be for different reasons, like a lesson or educational content.")
+        introSection:Add(AddEPIQWinners())
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(introSection)
+
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     private action AddEPIQWinners returns WebTable
-        WebTable table
-        table:SetBorder(true)
+        WebTable tableFormat = AddWebTable("EPIQ Award Winners")
+        TableBody tableBodyFormat = AddTableBody()
 
-        TableRow headerRow
-        TableHeaderCell trialsCell
-        trialsCell:AddText("Who")
-        TableHeaderCell distanceCell
-        distanceCell:AddText("Year")
-        TableHeaderCell endingYear
-        endingYear:AddText("Reason")
-        headerRow:Add(trialsCell)
-        headerRow:Add(distanceCell)
-        headerRow:Add(endingYear)
+        Array<text> tableHeaderArrayFormat
+        tableHeaderArrayFormat:Add("Who")
+        tableHeaderArrayFormat:Add("Year") 
+        tableHeaderArrayFormat:Add("Reason")
 
-        TableRow row2018a
-        row2018a:Add(GetDataCell("Amanda Storaasli, Donna Clemens, Leanna MacDonald"))
-        row2018a:Add(GetDataCell("2018"))
-        row2018a:Add(GetDataCell("Created tactile representations of street crossings."))
+        TableHeader theadFormat = AddTableHeaderRow(tableHeaderArrayFormat)
+        tableFormat:Add(theadFormat) 
 
-        TableRow row2018n
-        row2018n:Add(GetDataCell("Ko Inamura, Steve Raparelli"))
-        row2018n:Add(GetDataCell("2018"))
-        row2018n:Add(GetDataCell("Created a 3D intersection traffic simulator."))
+        Array<text> row2018a
+        row2018a:Add("Amanda Storaasli, Donna Clemens, Leanna MacDonald")
+        row2018a:Add("2018")
+        row2018a:Add("Created tactile representations of street crossings.")
+        tableBodyFormat:Add(AddTableBodyRow(row2018a))
 
-        TableRow row2017
-        row2017:Add(GetDataCell("Jennifer Jesso and Tim Lockwood"))
-        row2017:Add(GetDataCell("2017"))
-        TableData cell2017 = GetDataCell("Creating the highest a maze game with speech and sound effects for nonvisual players (Jennifer) and elementary programming lessons with Quorum and Robots (Tim):
-These are a sequence of 12 unites of elementary (grades 3-6) computer science lessons with related Physical Science , Life Sciences , Mathematics, and Fine Arts goals and content. ")
+        Array<text> row2018n
+        row2018n:Add("Ko Inamura, Steve Raparelli")
+        row2018n:Add("2018")
+        row2018n:Add("Created a 3D intersection traffic simulator.")
+        tableBodyFormat:Add(AddTableBodyRow(row2018n))
+
+        Array<text> row2017
+        row2017:Add("Jennifer Jesso and Tim Lockwood")
+        row2017:Add("2017")
+        row2017:Add("Creating the highest a maze game with speech and sound effects for nonvisual players (Jennifer) and elementary programming lessons with Quorum and Robots (Tim):
+These are a sequence of 12 unites of elementary (grades 3-6) computer science lessons with related Physical Science , Life Sciences , Mathematics, and Fine Arts goals and content. 
+")
+        tableBodyFormat:Add(AddTableBodyRow(row2017))
         
-        Link link
-        link:AddText("Jennifer's project on github.")
-        link:SetAddress("https://github.com/jjesso/quorum-epiq2017")
-        cell2017:Add(link)
-        row2017:Add(cell2017)
+//        Link link
+//        link:AddText("Jennifer's project on github.")
+//        link:SetAddress("https://github.com/jjesso/quorum-epiq2017")
+//        cell2017:Add(link)
+//        row2017:Add(cell2017)
 
-        TableRow row2016
-        row2016:Add(GetDataCell("Sina Bahram, Sam Shaw, Steve Raparelli, and Ko Inamura"))
-        row2016:Add(GetDataCell("2016"))
-        row2016:Add(GetDataCell("Creating a 3D computer game for Sina, Sam, and 
-            Steve to find their friend Ko, who was mysteriously lost playing Pokemon Go."))
+        Array<text> row2016
+        row2016:Add("Sina Bahram, Sam Shaw, Steve Raparelli, and Ko Inamura")
+        row2016:Add("2016")
+        row2016:Add("Creating a 3D computer game for Sina, Sam, and 
+            Steve to find their friend Ko, who was mysteriously lost playing Pokemon Go.")
+        tableBodyFormat:Add(AddTableBodyRow(row2016))
 
-        TableRow row2015
-        row2015:Add(GetDataCell("Tim Lockwood"))
-        row2015:Add(GetDataCell("2015"))
-        row2015:Add(GetDataCell("For an amazing collaborative musical performance between him and his LEGO Robot."))
+        Array<text> row2015
+        row2015:Add("Tim Lockwood")
+        row2015:Add("2015")
+        row2015:Add("For an amazing collaborative musical performance between him and his LEGO Robot.")
+        tableBodyFormat:Add(AddTableBodyRow(row2015))
 
-        TableRow row2014
-        row2014:Add(GetDataCell("Sherry Hahn"))
-        row2014:Add(GetDataCell("2014"))
-        row2014:Add(GetDataCell("Sherry was one of the co-creators of EPIQ and it would not exist today if it were not for her help."))
+        Array<text> row2014
+        row2014:Add("Sherry Hahn")
+        row2014:Add("2014")
+        row2014:Add("Sherry was one of the co-creators of EPIQ and it would not exist today if it were not for her help.")
+        tableBodyFormat:Add(AddTableBodyRow(row2014))
+        tableFormat:Add(tableBodyFormat)
 
-
-        table:Add(headerRow)
-        table:Add(row2018a)
-        table:Add(row2018n)
-        table:Add(row2017)
-        table:Add(row2016)
-        table:Add(row2015)
-        table:Add(row2014)
-
-        return table
+        return tableFormat
     end
 
     private action GetDataCell(text value) returns TableData
         TableData data
         data:AddText(value)
         return data
+    end
+
+    action GetLinkName returns text
+        return "EPIQ Awards"
     end
 
     action GetMetaDescription returns text
