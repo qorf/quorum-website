@@ -53,6 +53,7 @@ module.exports = {
       },
       width: {
         'inherit': 'inherit',
+        '5/5': '100%',
       },
       height: {
         'inherit': 'inherit',
