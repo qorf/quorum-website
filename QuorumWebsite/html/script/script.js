@@ -1632,7 +1632,7 @@ function resetPasswordClick() {
       success: function(result) {
         // might need change for if condition
         if (result === "Password successfully reset. You may now close this page and log in to the website.") {
-          window.location.href = "/";
+          document.location.href = "/"; 
         } else {
           alertMessageOn(result);
         }
