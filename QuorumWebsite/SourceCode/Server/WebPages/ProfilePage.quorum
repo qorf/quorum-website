@@ -1,29 +1,11 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.HeaderLink
-use Libraries.Web.Page.WebPageHeader
-use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.Script
-use Libraries.Web.Page.WebTable
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.DataFrameColumn
-use Libraries.Web.Page.TableRow
-use Libraries.Web.Page.TableData
-use Libraries.Web.Page.Input
-use Libraries.Web.Page.Form
-use Libraries.Web.Page.Button
-use Libraries.Web.Page.TableHeaderCell
 use Libraries.System.DateTime
 
 
-class ProfilePage is WebPage
+class ProfilePage is Lesson
     text dq = ""
     dq = dq:GetDoubleQuote()
     text cr = ""
@@ -51,17 +33,21 @@ class ProfilePage is WebPage
         AddDefaultHeaders()
 
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden sm:block w-1/5 sticky top-8 h-0")
+        bodyDiv:SetClassAttribute("flex flex-col w-5/5 sm:w-4/5 mx-4 overflow-auto gap-y-4")
+        rightDiv:SetClassAttribute("hidden")
+
+        //page header
         Division headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
         headDiv:AddHeading("My Projects", 1)
         headDiv:AddText("On this page you can create, edit, share, and delete projects.")
         Add(headDiv)
-
-        MainContent mainRegion
-        AdjustMain(mainRegion)
-
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
 
         // add table
         Division projectTable
@@ -98,10 +84,6 @@ var value = this.value;
         buttonDiv:Add(newProjectButton)
         bodyDiv:Add(buttonDiv)
 
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
     end
 
     action GetName returns text
@@ -113,31 +95,20 @@ var value = this.value;
     end
 
     action GetProjectTable returns WebTable
-        WebTable table
+        WebTable table = AddWebTable("Project Table")
+        TableBody body = AddTableBody()
 
         // make header row
-        TableRow headerRow
-        TableHeaderCell nameHeader
-        TableHeaderCell dateHeader
-        TableHeaderCell publicHeader
-        TableHeaderCell loadHeader
-        TableHeaderCell shareHeader
-        TableHeaderCell deleteHeader
 
-        nameHeader:AddText("Project Name")
-        dateHeader:AddText("Last Modified")
-        publicHeader:AddText("Public")
-        loadHeader:AddText("Load")
-        shareHeader:AddText("Share")
-        deleteHeader:AddText("Delete")
-
-        headerRow:Add(nameHeader)
-        headerRow:Add(dateHeader)
-        headerRow:Add(publicHeader)
-        headerRow:Add(loadHeader)
-        headerRow:Add(shareHeader)
-        headerRow:Add(deleteHeader)
-        table:Add(headerRow)
+        Array<text> tableHeaders
+        tableHeaders:Add("Project Name")
+        tableHeaders:Add("Last Modified")
+        tableHeaders:Add("Public")
+        tableHeaders:Add("Load")
+        tableHeaders:Add("Share")
+        tableHeaders:Add("Delete")
+        TableHeader thead = AddTableHeaderRow(tableHeaders)
+        table:Add(thead)
 
         DataFrameColumn projectNames = projectTable:GetColumn("project_name")
         DataFrameColumn modifiedDates = projectTable:GetColumn("modified")
@@ -145,7 +116,7 @@ var value = this.value;
         integer i = 0
         
         repeat while i < projectNames:GetSize()
-            projectName = projectNames:GetAsText(i)
+            text projectName = projectNames:GetAsText(i)
             text modified = modifiedDates:GetAsText(i)
             check
                 DateTime modifiedDate = modifiedDates:GetAsDateTime(i)
@@ -158,20 +129,14 @@ var value = this.value;
             boolean checked = (isPublic = "1")
             text shareLink = "quorumlanguage.com/Project.quorum?user=" + SanitizeForHTML(username) + "&file=" + SanitizeForHTML(projectName)
 
-            TableRow row
-            TableData nameCell
-            TableData dateCell
-            TableData checkboxCell
-            TableData projectCell
-            TableData shareCell
-            TableData deleteCell
+            Array<text> projectRow
+
 
             // projectName
-            nameCell:AddText(projectName)
+            projectRow:Add(projectName)
             // lastModified
-            dateCell:AddText(modified)
+            projectRow:Add(modified)
             // public checkbox
-            checkboxCell:SetClassAttribute("centeredRow")
             Input checkbox
             checkbox:SetClassAttribute("publicCheckbox")
             checkbox:SetType("checkbox")
@@ -179,18 +144,21 @@ var value = this.value;
             checkbox:SetIdentifier("publicBox"+i)
             checkbox:SetName("public")
             checkbox:SetDefaultValue(SanitizeForHTML(projectName))
-            checkboxCell:Add(checkbox)
+            projectRow:Add(checkbox:ToText())
             // load
             Form loadButton
             loadButton:SetFormAction("Project.quorum")
+
             Input userInput
             userInput:SetType("hidden")
             userInput:SetName("user")
             userInput:SetDefaultValue(SanitizeForHTML(username))
+
             Input fileInput
             fileInput:SetType("hidden")
             fileInput:SetName("file")
             fileInput:SetDefaultValue(SanitizeForHTML(projectName))
+
             Input profileButton
             profileButton:SetClassAttribute("profileButton")
             profileButton:SetType("submit")
@@ -198,31 +166,27 @@ var value = this.value;
             loadButton:Add(userInput)
             loadButton:Add(fileInput)
             loadButton:Add(profileButton)
-            projectCell:Add(loadButton)
+            projectRow:Add(loadButton:ToText())
+
             // share
             Button shareButton
             shareButton:SetClassAttribute("profileButton")
             shareButton:SetOnClick("showShareModal('"+shareLink+"')")
             shareButton:AddText("Share")
-            shareCell:Add(shareButton)
+            projectRow:Add(shareButton:ToText())
+
             // delete
-            
             Button deleteButton
             deleteButton:SetClassAttribute("profileButton")
             deleteButton:AddAttribute("value", SanitizeForHTML(projectName))
             deleteButton:SetOnClick("deleteRow(this)")
             deleteButton:AddText("Delete")
-            deleteCell:Add(deleteButton)
+            projectRow:Add(deleteButton:ToText())
+            body:Add(AddTableBodyRow(projectRow))
 
-            row:Add(nameCell)
-            row:Add(dateCell)
-            row:Add(checkboxCell)
-            row:Add(projectCell)
-            row:Add(shareCell)
-            row:Add(deleteCell)
-            table:Add(row)
             i = i + 1
         end
+        table:Add(body)
         return table
     end
 
@@ -235,115 +199,7 @@ var value = this.value;
         return string
     end
 
-    action AddDefaultHeaders
-        //add language headers
-        me:AddAttribute("xml:lang", "en")
-        me:SetLanguage("en")
 
-        //add the meta-data character set
-        MetaData charset
-        charset:SetCharacterSet("UTF-8")
-        AddMetaData(charset)
-
-        MetaData viewport
-        viewport:SetContent("width=device-width, initial-scale=1")
-        viewport:SetName("viewport")
-        AddMetaData(viewport)
-
-        text metaDescriptionContent = GetMetaDescription()
-        if metaDescriptionContent not= undefined
-            MetaData description
-            description:SetContent(metaDescriptionContent)
-            description:SetName("description")
-            AddMetaData(description)
-        end
-
-        // The VersionHelper has up-to-date query strings for the source files.
-        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
-        VersionHelper versions
-
-        AddKeywords()
-        AddScript("/script/jquery-1.8.3.min.js")
-        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
-        AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
-        Script moduleLocateFile
-        moduleLocateFile:SetCode("        var Module = {
-            locateFile: function(path, prefix) {
-                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
-                return prefix + path;
-            }
-        };")
-        GetWebPageHeader():Add(moduleLocateFile)
-        AddScript("/script/load.js" + versions:GetLoadVersionQuery())
-
-        //add style sheet tags
-        //AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
-        //AddStylesheet("/style/style.css")
-        AddStylesheet("/style/google.css")
-        AddStylesheet("/style/output.css")
-        AddIcon("/media/favicon.ico")
-
-        //Add Responsive Stylesheets
-        WebPageHeader webHeader = me:GetWebPageHeader()
-
-        //Add the navigation bar
-        NavigationBar navigation
-        // add share modal here
-        Division shareDiv
-
-        shareDiv:SetClassAttribute("modal")
-        shareDiv:SetIdentifier("shareModal")
-        shareDiv:AddAttribute("role", "dialog")
-        shareDiv:AddAttribute("aria-labelledby", "shareTitleDiv")
-
-        Division modalDialog
-        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
-
-        Division shareTitleDiv
-        shareTitleDiv:SetClassAttribute("sharetitle")
-        shareTitleDiv:SetIdentifier("shareTitleDiv")
-        shareTitleDiv:AddText("Share my Project")
-        modalDialog:Add(shareTitleDiv)
-
-        Division contentDiv
-        contentDiv:SetIdentifier("shareContent")
-        contentDiv:SetClassAttribute("sharecontent")
-
-        Input shareText
-        shareText:SetIdentifier("shareText")
-        shareText:SetType("text")
-        shareText:SetDefaultValue("Name")
-        shareText:SetClassAttribute("sharetext")
-        shareText:SetReadOnly(true)
-        contentDiv:Add(shareText)
-
-        Paragraph publicMessage
-        publicMessage:SetClassAttribute("sharePublicMessage")
-        publicMessage:AddText("This link goes to your project. If the project is private, no one will be able to look at the project except you.
-        If you want to share it with others, the project must be public.")
-        contentDiv:Add(publicMessage)
-
-        Paragraph copyMessage
-        copyMessage:SetClassAttribute("sharePublicMessage")
-        copyMessage:SetIdentifier("clipboardCopyMessage")
-        copyMessage:SetStyle("display: none;")
-        copyMessage:AddText("The link has been copied to your clipboard.")
-        contentDiv:Add(copyMessage)
-
-        modalDialog:Add(contentDiv)
-
-        Button hideButton
-        hideButton:SetTabIndex("0")
-        hideButton:SetOnClick("hideShareModal()")
-        hideButton:SetClassAttribute("sharebutton")
-        hideButton:SetType("button")
-        hideButton:AddText("Close")
-        modalDialog:Add(hideButton)
-
-        shareDiv:Add(modalDialog)
-        navigation:Add(shareDiv)
-        Add(navigation)
-    end
 
     action AdjustMain(MainContent mainRegion)
         mainRegion:AddAttribute("role","main")

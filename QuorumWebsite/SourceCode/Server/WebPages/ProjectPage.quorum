@@ -1,25 +1,7 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.HeaderLink
-use Libraries.Web.Page.WebPageHeader
-use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.Script
-use Libraries.Web.Page.WebTable
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.DataFrameColumn
-use Libraries.Web.Page.TableRow
-use Libraries.Web.Page.TableData
-use Libraries.Web.Page.Input
-use Libraries.Web.Page.Form
-use Libraries.Web.Page.Button
-use Libraries.Web.Page.TableHeaderCell
 use Libraries.System.File
 
 
@@ -29,6 +11,7 @@ class ProjectPage is WebPage
     text cr = ""
     cr = cr:GetCarriageReturn()
     text scriptsLocation = "/script/"
+    boolean IdeScriptSet = false
 
 
     text username = ""
@@ -58,13 +41,17 @@ class ProjectPage is WebPage
 
     action Setup
         //html header stuff
+        ContentModal modal
+        modal:GetContentModal():Add(AddSaveDialog())
+        Add(modal)
+
         SetWebPageTitle("Quorum Project Page - Quorum Programming Language")
         AddDefaultHeaders()
 
         //page header
         Division headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        text header = "Run Quorum Online"
+        text header = "Run Quorum Online test"
         if projectName not= ""
             header = dq+SanitizeForHTML(projectName)+dq + " by " + username
         end
@@ -88,6 +75,8 @@ class ProjectPage is WebPage
         if projectName not= undefined and projectName not= ""
             ideName = projectName
         end
+
+
         AddIDE(bodyDiv, "writeCodeIde", ideName, code)
 
         mainRegion:Add(bodyDiv)
@@ -114,12 +103,37 @@ class ProjectPage is WebPage
     end
 
     action AddIDE(Division div, text ideName, text title, text code)
-        CodingOnline ide
-        ide:SetDevelopmentLabel(title)
-        ide:SetUniqueIdentifier(ideName)
-        ide:Setup()
+        CodeForIDE code_files
+        code_files:AddFileText("Main.quorum", code)
+        IDE ide = AddIDE()
+        ide:SetIdentifier("writeCodeIde")
+        ide:HideDisplay()
+        ide:SetCodeForIDE(code_files:GetJsonArray())
+        ide:SetIdeTitle(title)
         div:Add(ide)
-        ide:GetIDEInputArea():AddText(code)
+
+        Script saveProject
+        saveProject:SetCode("
+            document.addEventListener(`DOMContentLoaded`, function() {
+              //get the data-test with topSidebar and add button to it that says save Project
+              let topSidebar = document.querySelector(`[data-test='topSidebar']`)
+              //get the data-test exportButton and get the style attribute value from it
+              let exportButton = document.querySelector(`[data-test='exportButton']`)
+              let exportButtonStyle = exportButton.getAttribute(`style`)
+              let saveProjectButton = document.createElement(`button`)
+              saveProjectButton.setAttribute(`style`, exportButtonStyle)
+              saveProjectButton.setAttribute(`data-test`, `saveProjectButton`)
+              saveProjectButton.innerHTML = `Save Project`
+              saveProjectButton.id = `writeCodeIdesaveProjectButton`
+              saveProjectButton.addEventListener(`click`, function() {
+                let outerContentModal = document.getElementById(`outerContentModal`)
+                outerContentModal.classList.add(`flex`)
+                outerContentModal.classList.remove(`hidden`)
+              })
+              topSidebar.appendChild(saveProjectButton)
+            })
+        ")
+        Add(saveProject)
     end
 
     action AddDefaultHeaders
@@ -207,6 +221,104 @@ class ProjectPage is WebPage
 
     action GetMetaDescription returns text
         return "Create, edit, share, and delete projects."
+    end
+
+    action AddIDEScript
+        if IdeScriptSet not= true
+            VersionHelper versions
+            AddScript("/script/widgets/widget-js/IDE-"+ versions:GetIDEVersion() +".js")
+            IdeScriptSet = true
+        end
+    end
+
+    action AddIDE() returns IDE
+        AddIDEScript()
+        IDE ide
+        ide:Init()
+        return ide
+    end
+
+    private action AddSaveDialog returns Division
+        Division saveDiv
+        text id = "writeCodeIde"
+
+        saveDiv:SetClassAttribute("flex z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex-col gap-6")
+        saveDiv:SetIdentifier(id + "SaveModal")
+        saveDiv:AddAttribute("role", "dialog")
+        saveDiv:AddAttribute("aria-labelledby", id + "SaveTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division saveTitleDiv
+        saveTitleDiv:SetClassAttribute("text-3xl font-bold")
+        saveTitleDiv:SetIdentifier(id + "SaveTitleDiv")
+        saveTitleDiv:AddText("Save this Project")
+        modalDialog:Add(saveTitleDiv)
+
+        Form saveForm
+        saveForm:SetClassAttribute("accountupdateForm")
+        saveForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        fieldContainerDiv:SetClassAttribute("saveFieldContainer")
+        
+        Division projectNameDiv
+        projectNameDiv:SetClassAttribute("projectnamediv formfielddiv")
+
+        Label projectNameLabel
+        projectNameLabel:AddText("Project Name: ")
+        projectNameDiv:Add(projectNameLabel)
+        
+        Input projectNameInput
+        projectNameInput:SetType("text")
+        projectNameInput:SetClassAttribute("SaveField")
+        projectNameInput:SetName("projectname")
+        projectNameInput:SetIdentifier(id + "projectNameInput")
+        projectNameInput:AddAttribute("data-prefix", id)
+        projectNameInput:SetRequired(true)
+        
+        projectNameDiv:Add(projectNameInput)
+
+        fieldContainerDiv:Add(projectNameDiv)
+
+        Division footbar
+        footbar:SetClassAttribute("footbar")
+
+        
+        Button submitButton
+        submitButton:SetClassAttribute("savebtn")
+        submitButton:SetType("button")
+        submitButton:AddText("Save Project")
+        submitButton:SetTabIndex("0")
+        submitButton:SetOnClick("(function(){
+          // Get data-test of IdeInput and get the ide and the value without the IdeInput
+          let ideInput = document.querySelector('[data-test=\'IdeInput\']');
+          let id = ideInput.getAttribute('id');
+          let ide = id.replace('IdeInput', '');
+
+          saveProject(ide, ide + 'IdeInput', ide + 'consoleSection', '"+id+"'+ 'projectNameInput', 'false');
+          })();
+        ")
+
+        saveForm:Add(fieldContainerDiv)
+
+        Division buttonContainerDiv
+        buttonContainerDiv:SetClassAttribute("saveContainer")
+
+
+        buttonContainerDiv:Add(submitButton)
+
+        footbar:Add(buttonContainerDiv)
+
+        saveForm:Add(footbar)
+
+        modalDialog:Add(saveForm)
+         // Add Close or Exit Button
+
+        saveDiv:Add(modalDialog)
+
+        return saveDiv
     end
 
 end

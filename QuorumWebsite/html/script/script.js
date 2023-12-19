@@ -267,12 +267,16 @@ function detectOperatingSystem() {
 
 function showLoginUI() {
   $("#loginButton").text("Login");
-  document.getElementById('profileButton').style.display = 'none';
+  let liItem = document.getElementById('profileButton').parentElement
+  liItem.classList.add("hidden");
+  liItem.classList.remove("block");
 }
 
 function showLogoutUI() {
   $("#loginButton").text("Logout");
-  document.getElementById('profileButton').style.display = 'inline-block';
+  let liItem = document.getElementById('profileButton').parentElement
+  liItem.classList.add("block");
+  liItem.classList.remove("hidden");
 }
 
 //Front page IDE dropdown menu
@@ -708,18 +712,14 @@ var loginWithParams = function(user, pwd, redirect) {
     data: { username: user, password: pwd },
     success: function(result) {
       if (result === "success") {
-        //$("#loginButton").text("Logout");
         showLogoutUI();
         hideLoginModal();
-        if (redirect !== null) {
-          window.location.href = redirect;
-        }
       } else {
-        alert(result);
+        alertMessageOn(result);
       }
     },
     error: function(xhr, ajaxOptions, thrownError) {
-      alert("I could not connect to the server at quorumlanguage.com: " + thrownError);
+      alertMessageOn("I could not connect to the server at quorumlanguage.com: " + thrownError);
     }
   });
 };
@@ -730,11 +730,14 @@ var logout = function() {
     url: "/Logout.quorum",
     success: function(result) {
       if (result === "success") {
-        //$("#loginButton").text("Login");
         showLoginUI();
-        ;
+        //if path is in array it will redirect to home page on logout
+        let arrayOfExclusiveUrls = ["/Profile.quorum"]
+        if (arrayOfExclusiveUrls.includes(window.location.pathname)) {
+          window.location.href = "/";
+        }
       } else {
-        alert("Logout failed");
+        alert("Logout failed: " + result);
       }
     },
     error: function(xhr, ajaxOptions, thrownError) {
@@ -751,6 +754,7 @@ var saveProject = function(id, input, output, namefield, overwrite) {
     success: function(result) {
       if (result === "success") {
         // UPDATE LATER FOR MULTIPLE FILES
+        console.log(`id: ${id}, input: ${input}, output: ${output}, namefield: ${namefield}, overwrite: ${overwrite}`);
         var codeInput = document.getElementById(input).value;
         // -----
         var projectName = document.getElementById(namefield).value;
@@ -1261,387 +1265,6 @@ function slideShow(slideArray) {
 
 }
 
-function part1Slides() {
-  //slide array
-  var slideArray = [];
-  slideArray[0] = "<h4 class=\"slideHeader\" role=\"heading\">Variables</h4>\n\
-        <ul>\n\
-        <li>In programming, a <code>variable</code> is a container to store information that can be used at a later time.</li>\n\
-        <li>In Quorum, there are four types of basic variables: <code>text</code>, <code>number</code>, <code>integer</code> and <code>boolean</code>.  Each type of variable holds a different kind of information.</li>\n\
-        <li>In this first example, we will create a <code>text</code> variable, which holds a text string of anything you want to type in. We'll explain the other types in the next sections.</li>\n\
-        <li>Notice that a <code>text</code> string is enclosed in two double quotation marks.</li>\n\
-        </ul><br><p>Move on to the next slide when you are ready.<p>";
-
-  slideArray[1] = "<h4 class=\"slideHeader\" role=\"heading\">Creating Variables</h4>\n\
-        <ul>\n\
-        <li>To create a variable in Quorum, we start by telling the computer what type of variable we want to make, in this case it's a <code>text</code> variable, followed by a space and a name for the variable.</li>\n\
-        <li>The important thing to remember about naming a variable is that a variable needs to start with a letter.  After that, you can have numbers or more letters in the name.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Create a text variable named dna in the code box below by typing the code: <code>text dna</code> then go to the next slide.</div>\n\
-        </ul>";
-
-  slideArray[2] = "<h4 class=\"slideHeader\" role=\"heading\">Storing Text in Variables: Literals</h4>\n\
-        <ul>\n\
-        <li>Now we have made a variable named <code>dna</code>, but we haven't stored any information in it yet, so it's empty.</li>\n\
-        <li>To store a value into a variable we use the <code>=</code> operator, followed by the information we want stored.</li>\n\
-        <li>For this example, let's store the text string \"GATTACA\" in our <code>dna</code> variable.</li>\n\
-        <li>Remember to put double quotes around the string we're storing in a text variable to tell the computer we want to store exactly what we typed.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Store the text \"GATTACA\" to the <code>dna</code> variable: <code>text dna = \"GATTACA\"</code> then go to the next slide.</div>\n\
-        </ul>";
-
-  //rewrite the example to include a literal string concatenate with a variable holding a string
-  slideArray[3] = "<h4 class=\"slideHeader\" role=\"heading\">Using Variables for Output</h4>\n\
-        <ul>\n\
-        <li>Now that we've stored something in our variable, we can refer to its contents whenever we need to by using the variable name.</li>\n\
-        <li>To demonstrate this, let's take what we have stored in our variable and display it to the screen.</li>\n\
-        <li>In Quorum, to output information to the screen we type the word <code>output</code> followed by a space and then whatever we want to show up on screen.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Output the contents of the dna variable by typing <code>output dna</code> on a new second line and hit the green Run button to see the output.</div>\n\
-        </ul>";
-
-  slideArray[4] = "<h4 class=\"slideHeader\" role=\"heading\">Storing Text in Variables: From Variables</h4>\n\
-        <ul>\n\
-        <li>If we want to assign the value of one variable to another variable, we can use the <code>=</code> operator to copy the contents.</li>\n\
-        <li>We can also use the <code>+</code> operator to put more than one thing into a variable.</li>\n\
-        <li>For <code>text</code> variables putting two strings into the same variable puts them one after the other.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-            <div class =\"task\">Create a new variable called <code>text msg</code> and then use the <code>=</code> operator to put the string and variable <code>\"Welcome to \" + dna</code> into it.  On the next line, output the msg variable: <code>output msg</code>.</div>\n\
-        </ul>";
-
-  slideArray[5] = "<h4 class=\"slideHeader\" role=\"heading\">Additional Information Regarding Variables</h4>\n\
-        <ul>\n\
-        <li>Names are case sensitive: dna is not the same as DNA.</li>\n\
-        <li>When storing a string into a text variable, be sure to use double quotes.</li>\n\
-        <li>Because variables are just containers, if we change what is stored inside of it we can still use the same output statement and get a different result on screen.</li>\n\
-        <li>If you've been following along, you can test this by changing what is initally stored in the <code>dna</code> variable.</li>\n\
-        </ul>";
-  return slideArray;
-}
-
-function part2Slides() {
-  //slide array
-  var slideArray = [];
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Number Variables</h5>\n\
-        <ul>\n\
-        <li>Another type of variable often used in programming is a real (or decimal) number. In Quorum to create this type of variable we use the keyword <code>number</code>.</li>\n\
-        <li>A <code>number</code> variable holds numeric values that can include decimal places such as 8.3439 or 42.0 or even 19.</li>\n\
-        <li>Unlike text variables, we never use double quotes when storing a number, we just type it.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Create a number variable with the following code: <code>number pi = 3.14159</code> then move to the next slide.</div>\n\
-        </ul>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Arithmetic with Number Variables</h5>\n\
-        <ul>\n\
-        <li>We can do arithmetic calculations with <code>number</code> variables, just like we would on the numbers themselves.</li>\n\
-        <li>The computer substitutes the actual number in the variable into the formula and performs the calculation.</li>\n\
-        <li>For example, if we make a new variable that holds the radius of a circle, then we can calculate its area using the formula area = pi X radius X radius.  On a computer, the multiplication operator is the <code>*</code>.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Create a variable to hold your circle's radius: <code>number radius = 3</code> and then calculate the area: <code>number area = pi * radius * radius</code></div>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Make the Computer Talk with: Say</h5>\n\
-        <ul>\n\
-        <li>Quorum has a built in feature to instruct the computer to say things out loud.  This is done by using the keyword <code>say</code> followed by whatever we want it to say.</li>\n\
-        <li>Just like with output statements, the computer can say the contents of a variable or a string that we type in.</li>\n\
-        <li><span class = \"bold\">Note:</span> Say statements may not work with all web browsers.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">Tell the computer to say the result of the area calculation you just completed by typing a new line: <code>say \"The area is \" + area</code> followed by <code>output \"The area is \" + area</code> and then Run your code.</div>\n\
-        </ul>"; //operators, concat
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Additional Information</h5>\n\
-        <ul>\n\
-        <li>There are 5 main operators when using numbers: <code>+</code> (addition), <code>-</code> (subtraction), <code>*</code> (multiplication), <code>/</code> division and <code>mod</code> (modulus).</li>\n\
-        <li>The modulus operator is used for finding the remainder of a division operation, for example: <code>15 mod 10</code> will give us a result of 5.</li>\n\
-        <li>One example of how to use the modulus operator is to deterimine if a number is even or odd: <code>evenNum mod 2</code>  equals 0 and <code>oddNum mod 2</code> equals 1.</li>\n\
-        <li>When using <code>say</code> or <code>output</code> statements, you can concatenate (add) things to be output one after another using the <code>+</code> operator, just like in the previous slide.</li>\n\
-        </ul>";
-
-  return slideArray;
-}
-
-function part3Slides() {
-  //slide array
-  var slideArray = [];
-
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Boolean Variables</h5>\n\
-        <ul>\n\
-        <li>A <code>boolean</code> variable is a special type of variable that contains one of two possible values: <code>true</code> or <code>false</code>.</li>\n\
-        <li>By themselves, <code>boolean</code> variables don't seem to do too much, but they are a powerful tool when working with control structures, as we will soon see.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\">\n\
-            <ul>\n\
-            <li>Make a <code>boolean</code> variable and assign it a value of true: <code>boolean sayStatement = false</code>.</li>\n\
-            <li>Create a <code>text</code> variable named \"greeting\" and assign it a string you like in double quotes: <code>text greeting = \"Hello!\"</code></li>\n\
-            <li>We will use these variables in a couple slides.</li>\n\
-            </ul></div>\n\
-        </ul>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: If (Structure)</h5>\n\
-        <ul>\n\
-        <li>One powerful ability of a computer is to evaluate a condition and make a decision about which instructions to execute. These decisions can be made with a simple conditional statement, which in Quorum uses the keyword <code>if</code>.</li>\n\
-        <li>An <code>if</code> statement has three parts: the keyword <code>if</code> followed by a condition, followed by the block of code to execute if the condition is <code>true</code>, followed by <code>end</code>.</li>\n\
-        <li><code>boolean</code> variables are often used to specify the condition.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Create an <code>if</code> statement using the <code>boolean</code> from the last slide: <code>if sayStatement = true</code> and then type <code>end</code> on a new line and then move to the next slide.</p>\n\</div>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: If (Conditional Logic)</h5>\n\
-        <ul>\n\
-        <li>When determining whether to execute the block of code within the <code>if</code> statement the computer checks the condition part of the statement to see whether it is <code>true</code> or <code>false</code>.</li>\n\
-        <li>You can specify the condition using a <code>boolean</code> variable or any other expression that evaluates to <code>true</code> or <code>false</code></li>\n\
-        <li>For example, if you typed <code>if 1 + 1 = 4</code> the condition <code>1 + 1 = 4</code> evaluates to <code>false</code>, so the code is skipped.</li>\n\
-        <li>If code is skipped, the computer jumps to the <code>end</code> keyword for the next instruction.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Inside the previous <code>if</code> block type: <code>say greeting</code> and then Run your code.</p></div>\n\
-        </ul>";
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: If (elseif)</h5>\n\
-        <ul>\n\
-        <li>You can also specify an alternatve condition to evaluate if the condition in the first part of the <code>if</code> statement is <code>false</code> by using the keyword <code>elseif</code> before the <code>end</code>.</li>\n\
-        <li>We can include as many <code>elseif</code> conditions as we want and include code blocks to execute in each case.</li>\n\
-        <li>There is a single <code>end</code> statement at the conclusion.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Continuing the example from the last slide, insert a new condition before the line <code>end</code> and then a line containing the code to execute: <code>elseif sayStatement = false</code><br><code>output greeting</code> and then Run your code.</p></div>\n\
-        </ul>";
-
-  slideArray[4] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: If (else)</h5>\n\
-        <ul>\n\
-        <li>There is one other optional part of an <code>if</code> statement called the default condition, which will execute if no other condition in the statement is <code>true</code>.  In Quorum, this block is designated with the keyword <code>else</code></li>\n\
-        <li>In our example, there are only two states: <code>true</code> and <code>false</code>, so there are no other possible conditions, although the <code>elseif</code> line could be converted to an <code>else</code> without a second condition.</li>\n\
-        <li>In other cases, you might have a list of conditions like: <br> <code>if x = 1</code> {code block}<br>\n\
-        <code>elseif x = 2</code> {code block}<br>\n\
-        <code>else</code> {code block}<br>\n\
-        <code>end</code>\n\
-        &nbsp(You can experiment or move on when ready)</li>\n\
-        </ul>";
-
-  slideArray[5] = "<h5>If Statements: Additional Information</h5>\n\
-        <ul>\n\
-        <li>More documentation on <code>if</code> statements can be found <a href=\"http://quorumlanguage.com/documents/syntax/if.php\">here</a>.</li>\n\
-        </ul>";
-
-  return slideArray;
-}
-
-function part4Slides() {
-  var slideArray = [];
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: Repeat</h5>\n\
-        <ul>\n\
-        <li>If we want the computer to repeat a task multiple times, we can use a loop in our program.  This is usually a lot less work than typing the instruction repeatedly and more flexible because we can have the instructions executed a variable number of times.</li>\n\
-        <li>In Quorum, we create a loop using the keyword <code>repeat</code>.</li>\n\
-        <li>We mark the end of a loop in the same way we marked the end of an <code>if</code> statement, by using the keyword <code>end</code>.</li>\n\
-        <li>In this example, we will explore three different ways to control loops using the statements: <code>repeat {number} times</code>, <code>repeat while {condition}</code> and <code>repeat until {condition}</code>.</li>\n\
-        </ul><p>Move on to the next slide when you are ready.<p>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: Repeat Times</h5>\n\
-        <ul>\n\
-        <li>The most basic type of loop involves just telling the computer how many times to repeat something.</li>\n\
-        <li>In Quorum, if we want to do something 5 times, we can type: <code>repeat 5 times</code> or if we have a numeric variable, we can place that in the \"5\" position like: <code>repeat x times</code>.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Output five even numbers:<br><code>number evenNumber = 2</code><br>\n\
-        <code>repeat 5 times</code><br>\n\
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<code>output evenNumber</code><br>\n\
-        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<code>evenNumber = evenNumber + 2</code><br>\n\
-        <code>end</code>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(Then Run your code)</p>\n\
-        </div>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: Repeat While</h5>\n\
-        <ul>\n\
-        <li>An alternative type of loop is to repeat a block of code while a certain condition is met.</li>\n\
-        <li>In Quorum we do this by using a <code>repeat while</code> statement. After the keyword <code>while</code>, we include a condition, just like we did with an <code>if</code> statement.</li>\n\
-        <li>If we want to mimic the last example, we could just repeat while our variable is less than or equal to 10.</li>\n\
-        <li>Note that the value of the variable will be 12, but the output statement is skipped when the repeat condition is false.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Output the even numbers again by changing line 2 to: <code>repeat while evenNumber <= 10</code>, then hit Run.</p></div>\n\
-        </ul>";
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: Repeat Until</h5>\n\
-        <ul>\n\
-        <li>The final way of representing a loop in Quorum is to use a <code>repeat until</code> statement, which is very similar to the <code>repeat while</code> loop.</li>\n\
-        <li>The difference is that the <code>repeat until</code> loop stops when a specific condition is met instead of repeating while a condition is met.</li>\n\
-        <li>You can represent the same logical control with either format, so it is your choice which one you use, but sometimes one is more natural than the other.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Output the even numbers by changing line 2 to: <code>repeat until evenNumber > 10</code>, then hit Run</p></div>\n\
-        </ul>";
-
-  slideArray[4] = "<h5 class=\"slideHeader\"role=\"heading\">Control Structures: Additional Information</h5>\n\
-        <ul>\n\
-        <li>More documentation on <code>repeat</code> can be found <a href=\"http://quorumlanguage.com/documents/syntax/repeat.php\">here</a>.</li>\n\
-        </ul>";
-
-  return slideArray;
-}
-
-function part5Slides() {
-  //slide array
-  var slideArray = [];
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Putting It All Together</h5>\n\
-        <ul>\n\
-        <li>We've learned quite a bit up to this point and now it's time use all of our new skills to write a program that will detect if a number is even or odd.</li>\n\
-        <li>We are going to test a range of numbers, so we need to loop from a starting number to a stopping number.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>First create a number variable called <code>testNumber</code> and set it to your starting number.<br>Next, set up a repeat loop using <code>repeat until</code> and for the condition specify the number to stop at.<br>Finally, don't forget to include <code>end</code> to mark the end of the loop. Move on to the next slide when you're done.</p></div>\n\
-        </ul>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Implementing the Logic: Part 1</h5>\n\
-        <ul>\n\
-        <li>Now that we have the <code>repeat</code> loop set up, we need to complete the code block to repeat inside the loop.</li>\n\
-        <li>We will use the modulus operator <code>mod</code> to determine if a number is even or odd. Remember that the modulus operator returns the remainder when dividing two numbers, so any even number divided by two will have a remainder of 0 and any odd number will have a remainder of 1.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Create an <code>if</code> statement inside the <code>repeat</code> loop checking the modulus of the variable:<br><code>if testNumber mod 2 = 0</code><br><code>end</code> <code>end</code>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(Then move to the next slide).</div>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Implementing the Logic: Part 2</h5>\n\
-        <ul>\n\
-        <li>Our <code>if</code> statement is now set up for even numbers.  If we want alternative instructions to run if the number is odd, we need some kind of <code>else</code> condition as well.</li>\n\
-        <li>Since there are only two possibilities (even or odd), we can use the simple default <code>else</code> statement here.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Before the <code>end</code> in the <code>if</code> statement, insert a line with <code>else</code> to set up the block for odd numbers.<br>\n\
-Now, to increment our testing variable by one on each pass of the loop, insert a line <code>testNumber = testNumber + 1</code> just after the end of the <code>if</code> block.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(Then move to the next slide)</p></div>\n\
-        </ul>";
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Being Creative</h5>\n\
-        <ul>\n\
-        <li>So now we have a logical code structure set up to execute different instructions if a number is even or if it is odd inside a repeat loop that will test a range of numbers.</li>\n\
-        <li>All we need to do now is write some instructions inside the code blocks!</li>\n\
-        <li>For this example, let's just use an <code>output</code> statement to print a message depending on whether the number is even or odd. You can also try a <code>say</code> statement if you want to hear it. Try something like <code>output testNumber + \" is even.\"</code> in the first block and then Run it.</li>\n\
-        <li>The next slide has the full code for this section...experiment with other ideas yourself.</li>\n\
-        </ul>";
-
-  slideArray[4] = "<h5 class=\"slideHeader\"role=\"heading\">Example Code</h5><p class =\"code\">number testNumber = 0<br>\n\
-        repeat until testNumber = 10<br>\n\
-        &nbsp&nbsp&nbsp&nbsp if testNumber mod 2 = 0<br>\n\
-        &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp output testNumber + \" is even\"<br>\n\
-        &nbsp&nbsp&nbsp&nbsp else<br>\n\
-        &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp output testNumber + \" is odd\"<br>\n\
-        &nbsp&nbsp&nbsp&nbsp end<br>\n\
-        &nbsp&nbsp&nbsp&nbsp testNumber = testNumber + 1<br>\n\
-        end</p><br>\n\
-        <ul><li>Mary's full version of the clothing picker can be found <a href=\"projects/clothing_picker.zip\">here</a>.</li></ul>";
-  return slideArray;
-}
-
-function part6Slides() {
-  var slideArray = [];
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Actions</h5>\n\
-        <ul>\n\
-        <li>Often times inside a program, we want to run the same code sections many times in different places. We usually want to eliminate this duplicate code to save time, reduce errors and make things easier to change.</li>\n\
-        <li>We do this by writing procedures that we call whenever we want code to run.  In Quorum, these are called actions.</li>\n\
-        <li>You didn't realize it, but we have already been using an action called <code>Main</code>. The computer always starts running our program from our <code>Main</code> action.  We haven't had to use it so far, because Quorum automatically puts our code inside a <code>Main</code> action if we don't use any other actions.</li>\n\
-        <li>Now that we are going to use other actions though, we always need to include it.</li>\n\
-</ul>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Creating Actions: Part 1</h5>\n\
-        <ul>\n\
-        <li>In Quorum to create an action, we use the keyword <code>action</code> followed by the name of the action.  We usually capitalize the first letter of an action name, but it is not required. Naming rules for actions are the same as variables, it must start with a letter.</li>\n\
-        <li>Since we are going to have a code block inside the action, we also need to include an <code>end</code> to mark where the action ends.</li>\n\
-        <span class=\"title\">Try it!</span><div class =\"task\"><p>Lets start a new program by creating a Main action:<br>\n\
-        <code>action Main</code><br>\n\
-        <code>end</code> (then move to the next slide)</p>\n\
-        </div>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Creating Actions: Part 2</h5>\n\
-        <ul>\n\
-        <li>You can put any type of code that you've learned so far inside the <code>Main</code> action or call other actions from it.</li>\n\
-        <li>We are going to create another action now that we will call from the <code>Main</code> action.</li>\n\
-        <li>To do this, just create a new action after the <code>end</code> statement of the <code>Main</code> action.</li>\n\
-            <span class=\"title\">Try it!</span><div class =\"task\"><p>Create an action called <code>PrintMsg</code> after the <code>Main</code> action:<br>\n\
-        <code>action PrintMsg</code>.<br>\n\
-        <code>end</code> (then move to the next slide).</p></div>\n\
-        </ul>";
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Creating Actions: Part 3</h5>\n\
-        <ul>\n\
-        <li>At the moment, we have two actions in our program, but no code to run inside the actions.  We'll learn how to call an action in a moment, but first, let's write some code inside the <code>PrintMsg</code> action. </li>\n\
-        <li>To keep our example simple, we are going to write a simple output message to the screen.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Insert an <code>output</code> statement inside the <code>PrintMsg</code> action:<br>\n\
-        <code>output \"Programming in Quorum is fun!\"</code><br>(then move to the next slide)</div></p>\n\
-        </ul>";
-
-  slideArray[4] = "<h5 class=\"slideHeader\"role=\"heading\">Calling Actions</h5>\n\
-        <ul>\n\
-        <li>Now, in order to complete this program we need to call our <code>PrintMsg</code> action from our <code>Main</code> action so that it will execute.</li>\n\
-        <li>In Quorum, this is very easy to do, we just insert a line of code in the <code>Main</code> action that redirects the computer to the other action.  We do this adding the line <code>PrintMsg()</code> to the <code>Main</code> action.</li>\n\
-        <li>The parentheses are necessary after the action name to notify the computer that it should run an action.</li>\n\
-        <span class=\"title\">Try it!</span>\n\
-        <div class =\"task\"><p>Call <code>PrintMsg</code> from <code>Main</code>:<br>\n\
-        <code>PrintMsg()</code> (then Run your code).</p></div>\n\
-        </ul>";
-
-  slideArray[5] = "<h5 class=\"slideHeader\"role=\"heading\">Actions: More Information</h5>\n\
-        <ul>\n\
-        <li>Here is our full example:<br>\n\
-        <p class=\"code\"> action Main<br>\n\
-        &nbsp&nbsp&nbsp&nbsp PrintMsg()<br>\n\
-        end<br><br>\n\
-        action PrintMsg<br>\n\
-        &nbsp&nbsp&nbsp&nbsp output \"Programming in Quorum is Fun!\"<br>\n\
-        end</p>\n\</li>\n\<li>Actions are an important and useful concept in programming, but we've only covered the basics so far. You can also do things like pass variables to an action and return values from an action.</li>\n\
-        <li>For more information on actions, click <a href=\"http://quorumlanguage.com/documents/syntax/actions.php\">here</a></li>\n\
-        <li>Mary's project covering actions can be found <a href=\"projects/actions_and_classes.zip\">here</a>.</li>\n\
-        </ul>";
-  return slideArray;
-}
-
-function part7Slides() {
-  //slide array
-  var slideArray = [];
-  slideArray[0] = "<h5 class=\"slideHeader\"role=\"heading\">Hour of Code Review - Variables</h5>\n\
-        <ul>\n\
-        <li>Variables are containers for information.</li>\n\
-        <li>To create a variable, declare the type of the variable followed by the name.</li>\n\
-        <li>To assign a value into a variable, use the <code>=</code> operator.</li>\n\
-        <li>There are four main types of variables in Quorum, each for specific kinds of data:<br>\n\
-        &nbsp&nbsp&nbsp&nbsp<code>text</code> for any number of characters<br>\n\
-        &nbsp&nbsp&nbsp&nbsp<code>integer</code> for positive and negative whole numbers<br>\n\
-        &nbsp&nbsp&nbsp&nbsp<code>number</code> for values with a demical point<br>\n\
-        &nbsp&nbsp&nbsp&nbsp<code>boolean</code> for true or false values.</li>\n\
-        <li>When creating a variable name, always start it with a letter (usually lower case, but this is not required).</li>\n\
-        <li>More information on variables can be found <a href=\"http://quorumlanguage.com/documents/syntax/types.php\">here</a>.</li>\n\
-        </ul>";
-
-  slideArray[1] = "<h5 class=\"slideHeader\"role=\"heading\">Hour of Code Review - Output/Say Statements</h5>\n\
-        <ul>\n\
-        <li>An <code>output</code> statement will print text on the screen.</li>\n\
-        <li>A <code>say</code> statements will instruct the computer to speak the expression aloud.</li>\n\
-        <li>Note that some browsers do not support the <code>say</code> feature in Quorum's online mode.</li>\n\
-        </ul>";
-
-  slideArray[2] = "<h5 class=\"slideHeader\"role=\"heading\">Hour of Code Review - If Statements</h5>\n\
-        <ul>\n\
-        <li>Use an <code>if</code> statement to have the computer decide whether or not to run certain code.</li>\n\
-        <li>An <code>if</code> statement requires a condition to be evaluated (variable > 5, variable = 5, etc.) and an <code>end</code> statement to mark the end of the code block.</li>\n\
-        <li>An <code>if</code> statement can optionally contain an <code>elseif</code> statement to test another condition or a default <code>else</code> statement (or both) to handle any other possibility not listed.</li>\n\
-        <li>More information on <code>if</code> statements can be found <a href=\"http://quorumlanguage.com/documents/syntax/if.php\">here</a>.</li>\n\
-        </ul>";
-
-  slideArray[3] = "<h5 class=\"slideHeader\"role=\"heading\">Hour of Code Review - Repeat</h5>\n\
-        <ul>\n\
-        <li>When we want to run a section of code repeatedly, we use a <code>repeat</code> statement to create a loop.</li>\n\
-        <li>Like an <code>if</code> statement, a <code>repeat</code> statement requires a condition for stopping and an <code>end</code> statement.</li>\n\
-        <li>We specify the condition for stopping the loop by using one of these formats: <br>\n\
-        <code>repeat {number} times</code>,<br>\n\
-        <code>repeat while {condition}</code> or <br>\n\
-        <code>repeat until {condition}</code>.</li>\n\
-        <li>More information on repeat loops can be found <a href=\"http://quorumlanguage.com/documents/syntax/repeat.php\">here</a>.</li>\n\
-        </ul>";
-
-  slideArray[4] = "<h5 class=\"slideHeader\"role=\"heading\">Hour of Code Review - Actions</h5>\n\
-        <ul>\n\
-        <li>Actions are used to reduce the amount of duplicate code in a program and to make it easier to read.</li>\n\
-        <li>To create an action, use the keyword <code>action</code> followed by the action's name, which usually starts with a capital letter.</li>\n\
-        <li>The computer always starts executing a program at the <code>Main</code> action, but if the program has only one action, Quorum will automatically insert the program code into a <code>Main</code> action.</li>\n\
-        <li>If a program has actions besides <code>Main</code>, the action <code>Main</code> must be defined somewhere in the program.</li>\n\
-        <li>To execute an action at a particular point in the program, type the name of the action followed by parentheses.</li>\n\
-        <li>More information on actions can be found <a href=\"http://quorumlanguage.com/documents/syntax/actions.php\">here</a></li>\n\
-        </ul>";
-  return slideArray;
-}
-
 function trapEscapeKey(obj, evt) {
   // if escape pressed
   if (evt.which == 27) {
@@ -1724,6 +1347,8 @@ function hideModal() {
 }
 
 function successMessageOn(text) {
+  console.log("Brandon Success message on");
+  console.log(new Error().stack);
   let header = 'Success';
   switch (text) {
     case "An email has been sent to this address. Please check your email and follow the instructions to reset your account password.":
@@ -1748,6 +1373,8 @@ function successMessageOff() {
 }
 
 function feedbackMessageOn(text) {
+  console.log("Brandon Feedback message on");
+  console.log(new Error().stack);
   let header = 'Info';
   switch (text) {
     case "An email has been sent to this address. Please check your email and follow the instructions to reset your account password.":
@@ -1770,6 +1397,8 @@ function feedbackMessageOff() {
 }
 
 function alertMessageOn(text) {
+  console.log("Brandon Alert message on");
+  console.log(new Error().stack);
   let header = 'Error';
   //make headers for all the error messages above, they can be the same if similar
   switch (text) {
@@ -1884,14 +1513,19 @@ $email = $_POST['email'];
 $birthday = $_POST['birthday'];
 $confirm_pass = $_POST['confirm_password'];
      */
+    let registerCount = 0;
+    console.log("BRANODN CHECKING REGISTRATION");
 
     $.ajax({
       type: "POST",
       url: "/Register.quorum",
       data: { username: user, password: password, first_name: firstname, last_name: lastname, email: email, birthday: birthday, confirm_password: confirmPassword },
       success: function(result) {
+        console.log('register.quorum success: ' + registerCount++);
+
         // might need change for if condition
         if (result === "success") {
+          alertMessageOff();
           successMessageOn("Your account was successfully created!");
           loginWithParams(user, password, "https://quorumlanguage.com");
         } else {
@@ -1899,10 +1533,28 @@ $confirm_pass = $_POST['confirm_password'];
         }
       },
       error: function(xhr, ajaxOptions, thrownError) {
+        console.log('register.quoruum error: ' + registerCount++);
         alertMessageOn("I could not connect to the server at quorumlanguage.com: " + xhr.status + ", " + xhr.responseText + ", " + thrownError);
       }
     });
   }
+}
+
+function ResetSignInModal() {
+  let signInModal = document.getElementById('signInModal');
+  let registerModal = document.getElementById('signUpModal');
+
+  registerModal.classList.add('hidden');
+  registerModal.classList.remove('flex');
+
+  signInModal.classList.add('hidden');
+  signInModal.classList.remove('flex');
+  //focus on username input
+  document.getElementById('alertMessage').ariaHidden = true;
+  document.getElementById('feedbackMessage').ariaHidden = true;
+  setTimeout(function() {
+    document.getElementById('successMessage').ariaHidden = true;
+  }, 3000);
 }
 
 function checkRegistrationFieldsValidity() {
