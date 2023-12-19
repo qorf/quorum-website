@@ -597,7 +597,7 @@ var showSaveModal = function(id) {
       if (result === "success") {
         hideModals();
         lastModalID = id;
-        document.getElementById(id + 'SaveModal').style.display = 'block';
+        document.getElementById('outerContentModal').style.display = 'block';
         document.getElementById(id + "projectNameInput").focus();
       } else {
         hideModals();
@@ -611,7 +611,8 @@ var showSaveModal = function(id) {
 };
 
 var hideSaveModal = function(id) {
-  document.getElementById(id + 'SaveModal').style.display = 'none';
+  document.getElementById("outerContentModal").classList.add("hidden");
+  document.getElementById("outerContentModal").classList.remove("flex");
 };
 
 var showLoadModal = function(id) {
@@ -1378,7 +1379,7 @@ function feedbackMessageOn(text) {
   let header = 'Info';
   switch (text) {
     case "An email has been sent to this address. Please check your email and follow the instructions to reset your account password.":
-      header = "Missing Fields";
+      header = "Your request has been sent.";
       break;
     default:
       header = "Info";
@@ -1631,7 +1632,7 @@ function resetPasswordClick() {
       success: function(result) {
         // might need change for if condition
         if (result === "Password successfully reset. You may now close this page and log in to the website.") {
-          successMessageOn(result);
+          window.location.href = "/";
         } else {
           alertMessageOn(result);
         }
