@@ -477,9 +477,15 @@ class Lesson is WebPage
         return div
     end
 
+    action GenerateDefaultLink returns Link
+        Link link
+        link:AddClassAttribute("underline text-quorum-blue-150")
+        return link
+    end
 
     action GenerateList(Array<text> list) returns OrderedList
         OrderedList ol
+        ol:AddClassAttribute("list-disc list-outside pl-8")
         integer i = 0
         repeat while i < list:GetSize()
             ol:AddListItem(list:Get(i))
@@ -498,7 +504,7 @@ class Lesson is WebPage
     end
 
     action GetLinkName returns text
-        return ""
+        return GetName()
     end
     
     action GetSectionName returns text
@@ -798,6 +804,26 @@ googleScript2:AddText(
         return rowTextWithTags
     end
 
+    action GetDefaultTable(text title, Array<Array<text>> values) returns WebTable
+        WebTable tableFormat = AddWebTable(title)
+        TableBody tableBodyFormat = AddTableBody()
+
+        //assume it has a header and crash otherwise
+        Array<text> headers = values:Get(0) //header
+        TableHeader theadFormat = AddTableHeaderRow(headers)
+        tableFormat:Add(theadFormat) 
+
+        i = 1
+        repeat while i < values:GetSize()
+            Array<text> row = values:Get(i)
+            tableBodyFormat:Add(AddTableBodyRow(row))
+            i = i + 1
+        end
+
+        tableFormat:Add(tableBodyFormat)
+        return tableFormat
+    end
+
     action AddTableTag(text tableRows, text caption) returns text 
         return "<table style=" + dq +
                  " border: 1px solid black; border-radius: 12px; padding: 5px;" + dq + ";>"  + 
@@ -891,6 +917,17 @@ googleScript2:AddText(
         IDE ide
         ide:Init()
         return ide
+    end
+
+    action AddIDE(Section section, text ideName, text title, text codePath)
+        CodeForIDE code1
+        code1:AddFileUrl("Main.quorum", codePath)
+        IDE ide = AddIDE()
+        ide:SetIdentifier(ideName)
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle(title)
+        section:Add(ide)
     end
 
     action AddIDE(Division div, text ideName, text title, text subtitle)

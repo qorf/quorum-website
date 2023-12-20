@@ -18,6 +18,7 @@ use Libraries.Containers.Array
 use Libraries.Web.Page.Link
 use Libraries.System.File
 use Libraries.System.FileReader
+use Libraries.Web.Page.Section
 
 class SVGExporting is Lesson
     // text version needs cleaning, then do code version
@@ -47,18 +48,21 @@ class SVGExporting is Lesson
         AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
         headDiv:AddHeading("Exporting SVGs", 1)
-        headDiv:AddText("Learn how to export and navigate through SVGs")
-        Add(headDiv)
+        headDiv:AddParagraph("Learn how to export and navigate through SVGs")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
+
         bodyDiv:AddHeading("Exporting SVGs", 1)
         bodyDiv:AddParagraph("Quorum has multiple charts and sometimes it can be confusing to keep track of the features each bar can offer to the user. In this tutorial we will list out the list of features that each of the charts that available in Quorum is capable of.")
 
@@ -85,7 +89,7 @@ class SVGExporting is Lesson
 
         bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
 
-        bodyDiv:AddParagraph("What this does is that our chart object, whether it is a bar chart, line chart, etc. calls an action called Display(). This action uses Quorum’s game engine and opens up a window via a pop-up box inside of Quorum Studio and will display our created chart. By default, the chart will be created catered towards the size of our computer screens, but we can also modify the chart size. What we will need to do is insert parameters inside the Display(integer height, integer width) function as such:")
+        bodyDiv:AddParagraph("What this does is that our chart object, whether it is a bar chart, line chart, etc. calls an action called Display(). This action uses Quorumï¿½s game engine and opens up a window via a pop-up box inside of Quorum Studio and will display our created chart. By default, the chart will be created catered towards the size of our computer screens, but we can also modify the chart size. What we will need to do is insert parameters inside the Display(integer height, integer width) function as such:")
 
         bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display(1080, 720)"))
         
@@ -126,13 +130,12 @@ class SVGExporting is Lesson
         //line chart
 
         
-        bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(introSection)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
