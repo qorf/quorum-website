@@ -15,6 +15,7 @@ use Libraries.Web.Page.OrderedList
 use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Containers.Array
+use Libraries.Web.Page.Section
 
 class TriggerSoundsFromObjects is Lesson
     text dq = ""
@@ -33,31 +34,34 @@ class TriggerSoundsFromObjects is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Trigger Sound from Objects", 1)
-        headDiv:AddText("Why trigger output statements when you can make noise?")
-        Add(headDiv)
+        AddHeading(headDiv, "Trigger Sound from Objects", 1)
+        headDiv:AddParagraph("Why trigger output statements when you can make noise?")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Trigger Sound from Objects", 1)
-        bodyDiv:AddParagraph("To make our game both more fun and accessible, we are now going to add more sound to our game. In the first part of this lesson, we are going to be looking online for sound effects. Once complete, we are going to download an effect and hook it into our game.")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("Learning Objectives")
+        AddHeading(introSection, "Learning Objectives", 2)
+        introSection:AddParagraph("To make our game both more fun and accessible, we are now going to add more sound to our game. In the first part of this lesson, we are going to be looking online for sound effects. Once complete, we are going to download an effect and hook it into our game.")
+
+        introSection:AddParagraph("You will:")
         Array<text> objectives
         objectives:Add("Learn about hooking in sound effects")
         objectives:Add("Learn how to remove items from a game after a collision")
         objectives:Add("Learn about arrays")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        bodyDiv:AddHeading("Find Sound Effects and Hook them In (10 minutes)", 2)
-        Paragraph intro = bodyDiv:AddParagraph("For sound effects, any source is fine, but one that can be used for simple sound effects is ")
+        AddHeading(introSection, "Find Sound Effects and Hook them In (10 minutes)", 2)
+        Paragraph intro = introSection:AddParagraph("For sound effects, any source is fine, but one that can be used for simple sound effects is ")
         intro:AddLink("https://freesound.org/","https://freesound.org/")
         intro:AddText(". This site allows us to create and download a variety of effects in different styles, like coins, explosions, lasers, or other audio. Again like before, we will use ")
         intro:AddLink("Audacity","https://www.audacityteam.org/")
@@ -65,31 +69,32 @@ class TriggerSoundsFromObjects is Lesson
         intro:AddLink("Ogg","https://wiki.audacityteam.org/wiki/OGG")
         intro:AddText(" format for use. We need a free account to use the site.")
     
-        bodyDiv:AddHeading("Play Sounds on Collision and Remove Potions (20 minutes)",2)
-        Paragraph second = bodyDiv:AddParagraph("Instead of outputting text to the console when we collide with an item, we will now convert our output statement to an audio object we will tell to play. We will use the ")
+        AddHeading(introSection, "Play Sounds on Collision and Remove Potions (20 minutes)",2)
+        Paragraph second = introSection:AddParagraph("Instead of outputting text to the console when we collide with an item, we will now convert our output statement to an audio object we will tell to play. We will use the ")
         second:AddLink("sound tutorial","/tutorials/dsp/audiointro.html")
         second:AddText(" to learn how to do that. Finding the objects still may be difficult from an accessibility perspective and we encourage thinking about how we might fix that for users of our game. Finally, when a player collides with a potion, we will remove it from the game.")
 
-        bodyDiv:AddHeading("Introduction to Arrays (20 minutes)",2)
-        Paragraph array = bodyDiv:AddParagraph("While so far we have used variables whenever we had multiple items, like potions or something else, this can be tedious when we have many items. To fix this in a future tutorial, we first need to learn about arrays. In this part of the session, we will go over the ")
+        AddHeading(introSection, "Introduction to Arrays (20 minutes)",2)
+        Paragraph array = introSection:AddParagraph("While so far we have used variables whenever we had multiple items, like potions or something else, this can be tedious when we have many items. To fix this in a future tutorial, we first need to learn about arrays. In this part of the session, we will go over the ")
         array:AddLink("arrays tutorial","/tutorials/language/arrays.html")
         array:AddText(" and practice with the concept.")
 
-        bodyDiv:AddHeading("Wrap-up (10 minutes)",2)
-        bodyDiv:AddParagraph("The concept of arrays can be confusing to people, so in a classroom it makes sense to spend a reasonable amount of time on it. It is also a very important concept in computer science, because storing data is a commonplace thing we want to do. In groups, discuss the difference between the following two ways of writing variables:")
+        AddHeading(introSection, "Wrap-up (10 minutes)",2)
+        introSection:AddParagraph("The concept of arrays can be confusing to people, so in a classroom it makes sense to spend a reasonable amount of time on it. It is also a very important concept in computer science, because storing data is a commonplace thing we want to do. In groups, discuss the difference between the following two ways of writing variables:")
 
         text source = GetTextFromSource("/html/sources/lessons/scenes/VariableVsArray.quorum")
         bodyDiv:Add(preformatter:GeneratePreformattedCode(source))
     
-        Paragraph final = bodyDiv:AddParagraph("Here are two questions each group should consider: 1) the second program is storing the same information as the first, so why even bother to use an array?, 2) What do the funny greater and less than symbols mean? Once your group has answered these two questions, there is one final activity. The ")
+        Paragraph final = introSection:AddParagraph("Here are two questions each group should consider: 1) the second program is storing the same information as the first, so why even bother to use an array?, 2) What do the funny greater and less than symbols mean? Once your group has answered these two questions, there is one final activity. The ")
         final:AddLink("Array class","/Libraries/Containers/Array.html")
         final:AddText(" has many actions available. Choose two actions from the documentation and put what those actions do in your own words.")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(introSection)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
