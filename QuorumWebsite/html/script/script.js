@@ -1,6 +1,7 @@
 var currentIDEInput_$Global_ = '';
 var currentIDEOutput_$Global_ = 'frontPageIdeOutput';
-var currentUIContainer_$Global_ = 'QuorumUIContainer';
+// var currentUIContainer_$Global_ = 'QuorumUIContainer';
+var currentUIContainer_$Global_ = undefined;
 var total_console_length239847239482734 = 0;
 
 var slideNr = 0;
@@ -1632,7 +1633,7 @@ function resetPasswordClick() {
       success: function(result) {
         // might need change for if condition
         if (result === "Password successfully reset. You may now close this page and log in to the website.") {
-          document.location.href = "/"; 
+          document.location.href = "/";
         } else {
           alertMessageOn(result);
         }
