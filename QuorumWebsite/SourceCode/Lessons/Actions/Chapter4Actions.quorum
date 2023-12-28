@@ -1,19 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class Chapter4Actions is Lesson
     text dq = ""
@@ -34,18 +20,23 @@ class Chapter4Actions is Lesson
         AdjustMain(mainRegion)
 
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Quiz for Actions", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Quiz for Actions", 1)
         headDiv:AddText("This is a short quiz about concepts 
             related to control flow and control structures.")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        
-        bodyDiv:AddHeading("Actions Quiz", 2)
+        Section section_quiz
+        section_quiz:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_quiz, "Actions Quiz", 2)
         OrderedList questionList
+        questionList:AddClassAttribute("list-decimal list-outside pl-8")
         questionList:AddListItem("What is an action?")
         questionList:AddListItem("In practice, programmers write many actions.
             What are actions useful for?")
@@ -65,22 +56,28 @@ class Chapter4Actions is Lesson
         questionList:AddListItem("An action can technically have as many parameters as we want. 
             Why might it be reasonable to keep that number low?")
         questionList:AddListItem("What is action overloading?")
-        bodyDiv:Add(questionList)
+        section_quiz:Add(questionList)
 
-        bodyDiv:AddHeading("Essay Questions", 2)
+        Section section_essay
+        section_essay:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_essay, "Essay Questions", 2)
         OrderedList essayList
+        essayList:AddClassAttribute("list-decimal list-outside pl-8")
         essayList:AddListItem("For the game of paper, rock, scissors, write 
             an essay at a high level about how such a program could be broken 
             into actions. Describe the actions, their parameters, and what they 
             would do.")
         essayList:AddListItem("Describe the concept of an action signature. What is it and
             what does it consist of? Why is the concept of a signature important?")
-        bodyDiv:Add(essayList)
+        section_essay:Add(essayList)
 
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_quiz)
+        bodyDiv:Add(section_essay)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -104,6 +101,16 @@ class Chapter4Actions is Lesson
     end
 
     action GetLocation returns text
-        return "lessons/chapter4.html"
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "lessons/chapter4.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Chapter 4"
     end
 end

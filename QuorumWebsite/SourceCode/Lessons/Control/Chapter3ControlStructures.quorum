@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class Chapter3ControlStructures is Lesson
     text dq = ""
@@ -33,17 +20,23 @@ class Chapter3ControlStructures is Lesson
         AdjustMain(mainRegion)
 
         //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
         Header headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("CQuiz on Control Structures", 1)
+        AddHeading(headDiv, "CQuiz on Control Structures", 1)
         headDiv:AddText("This is a short quiz about concepts related to control flow and control structures")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
         
-        bodyDiv:AddHeading("Control Structures Quiz", 2)
+        Section section_quiz
+        section_quiz:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_quiz, "Control Structures Quiz", 2)
         OrderedList questionList
+        questionList:AddClassAttribute("list-decimal list-outside pl-8")
         questionList:AddListItem("What are control structures? List two types 
             of control structures and explain what they do. Give an example for each structure.")
         questionList:AddListItem("What is lexical scoping and why is it important?")
@@ -62,10 +55,13 @@ class Chapter3ControlStructures is Lesson
         questionList:AddListItem("Describe the concept of a nested loop and give an example in code.")
         questionList:AddListItem("Describe how the concept of a conditional 
             statement could be used for a program like a game (audio, visual, or multimedia) or robot?")
-        bodyDiv:Add(questionList)
+        section_quiz:Add(questionList)
 
-        bodyDiv:AddHeading("Essay Questions", 2)
+        Section section_essay
+        section_essay:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_essay, "Essay Questions", 2)
         OrderedList essayList
+        essayList:AddClassAttribute("list-decimal list-outside pl-8")
         essayList:AddListItem("Think about the common errors you have personally 
             while using control structures. Write a short essay describing these errors. 
             Do you personally have compiler errors? Runtime errors? Which has been 
@@ -74,12 +70,15 @@ class Chapter3ControlStructures is Lesson
             can be used to find errors in control structures. In your essay, 
             include the following concepts: 1) the error window, 2) 
             breakpoints, and 3) step over.")
-        bodyDiv:Add(essayList)
+        section_essay:Add(essayList)
 
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_quiz)
+        bodyDiv:Add(section_essay)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -103,6 +102,16 @@ class Chapter3ControlStructures is Lesson
     end
 
     action GetLocation returns text
-        return "lessons/chapter3.html"
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "lessons/chapter3.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Chapter 3"
     end
 end
