@@ -12,6 +12,9 @@ use Libraries.Web.Page.Comment
 use Libraries.Web.Page.Span
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Section
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
 
 
 class Lab3_4 is Lesson
@@ -31,67 +34,76 @@ class Lab3_4 is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page-specific header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Lab 3.4: Control the Audio", 1)
-        Add(headDiv)
+        headDiv:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(headDiv, "Lab 3.4: Control the Audio", 1)
+        headDiv:AddText("Use Conditionals to control audio")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Goals", 2)
-        bodyDiv:AddParagraph("In this lab, we will learn the following computer science concepts:")
+        Section goalsSection
+        goalsSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goalsSection, "Goals", 2)
+        goalsSection:AddParagraph("In this lab, we will learn the following computer science concepts:")
         
         UnorderedList goalsList
+        goalsList:SetClassAttribute(GetDefaultListStyle())
         goalsList:AddListItem("Creating Objects")
         goalsList:AddListItem("Using conditional statements")
-        bodyDiv:Add(goalsList)
+        goalsSection:Add(goalsList)
 
-
-        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+        Section cspCurriculumSection
+        cspCurriculumSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(cspCurriculumSection, "Computer Science Principles Curriculum", 2)
 
         UnorderedList list
+        list:SetClassAttribute(GetDefaultListStyle())
         AddListItemWithBoldAtFront(list, "Big Idea: Algorithms: ", "EK 4.1.1A, EK 4.1.1C, EK 4.1.1D")
-        bodyDiv:Add(list)
+        cspCurriculumSection:Add(list)
 
-        bodyDiv:AddHeading("Common Core Standards", 2)
+        Section cspStandardsSection
+        cspStandardsSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(cspStandardsSection, "Common Core Standards", 2)
         UnorderedList ccList
+        ccList:SetClassAttribute(GetDefaultListStyle())
         AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
         CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.10, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.11-12.4, CCSS.ELA-Literacy.RST.11-12.5, CCSS.ELA-Literacy.RST.11-12.10")
         AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP4, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
         CCSS.Math.Practice.MP8")
-        bodyDiv:Add(ccList) 
+        cspStandardsSection:Add(ccList) 
 
-
-
-        bodyDiv:AddHeading("Vocabulary", 2)
+        Section vocabSection
+        vocabSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(vocabSection, "Vocabulary", 2)
 
         UnorderedList vocabularyList
+        vocabularyList:SetClassAttribute(GetDefaultListStyle())
         vocabularyList:AddListItem(    "Control Structures")
         vocabularyList:AddListItem(    "If statement")
         vocabularyList:AddListItem(    "Loops")
         vocabularyList:AddListItem(    "Input Manager")
-        bodyDiv:Add(vocabularyList)
+        vocabSection:Add(vocabularyList)
 
-
-        bodyDiv:AddHeading("Overview", 2)
+        Section overviewSection
+        overviewSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(overviewSection, "Overview", 2)
 
         Paragraph p0
         p0:AddText("This lab demonstrates how to use key presses on the keyboard to perform some tasks. 
                     The task you will perform is to write a program that changes the balance of a sound file from left to right or right to left upon pressing of the left and right arrow keys. 
                     The program will also increase the volume upon pressing of the up arrow key and decrease the volume upon pressing the down arrow key. 
                     Download this ")
-        p0:AddLink("zip file", "/files/lessons/chapter3/Lab3_4Template.zip")
+        Link link = p0:AddLink("zip file", "/files/lessons/chapter3/Lab3_4Template.zip")
+        link:SetClassAttribute(GetDefaultLinkStyle())
         p0:AddText(" for a template to help you get started.")
-        bodyDiv:Add(p0)
+        overviewSection:Add(p0)
 
-        CodingOnline addStatementIDE
-        addStatementIDE:SetUniqueIdentifier("lab3_4IDE")
-        addStatementIDE:GetIDETitle():AddText("Controlling Audio")
-        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+
+        AddIDE(overviewSection, "lab3_4IDE", "Controlling Audio", "use Libraries.Game.Game
 use Libraries.Game.InputMonitor
 use Libraries.Sound.Audio
 use Libraries.Interface.Events.KeyboardEvent
@@ -138,20 +150,77 @@ class Main is Game
 
     action Update(number seconds)
     end
-end")
-        addStatementIDE:Setup()
-        bodyDiv:Add(addStatementIDE)
+end", true)
 
-        bodyDiv:AddHeading("Understanding the InputMonitor and KeyboardEvent Libraries", 2)
+
+//        CodingOnline addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("lab3_4IDE")
+//        addStatementIDE:GetIDETitle():AddText("Controlling Audio")
+//        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+//use Libraries.Game.InputMonitor
+//use Libraries.Sound.Audio
+//use Libraries.Interface.Events.KeyboardEvent
+//
+///*
+//    This is a default class for creating a game in Quorum. Note that the Main 
+//    action begins by calling StartGame(), which loads a window a game can 
+//    be displayed in. The action CreateGame is where the game should load any 
+//    assets, like images to be displayed, frames of animation, or sounds to be
+//    played. 
+//*/
+//
+//class Main is Game
+//    InputMonitor inputMonitor       // handles user input during program
+//    KeyboardEvent keys              // determines which key is pressed
+//
+//    Audio song                      // song to play during program
+//
+//    /*
+//        This action, Main, starts our computer program. In Quorum, programs always
+//        begin from Main.
+//    */
+//
+//    action Main
+//        StartGame()
+//    end
+//
+//    /*
+//        This action sets up the default values for a game. For example, we might
+//        use the Libraries.Game.Graphics.Drawable class to load up an image or 
+//        a shape. Or, we might add a Libraries.Interface.Button for making something clickable
+//        or a Libraries.Interface.TextBox for gathering user input in a game.
+//    */
+//
+//    action CreateGame
+//    end
+//
+//    /*
+//        The update action is called on every " + dq + "frame" + dq + " of animation in a game. This
+//        action should be used to do operations on items. So, for example, we 
+//        might use this action to change frames of animation, to rotate items, 
+//        or to make creatures jump.
+//    */
+//
+//    action Update(number seconds)
+//    end
+//end")
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+
+        Section eventsSection
+        eventsSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(eventsSection, "Understanding the InputMonitor and KeyboardEvent Libraries", 2)
         Paragraph p1
         Bold mainBold
         mainBold:AddText("main.quorum file")
         p1:AddText("Open the provided template and navigate to the ")
         p1:Add(mainBold)
         p1:AddText(" . Near the top of the file, there are two lines that look like this on lines 15 and 16:")
-        bodyDiv:Add(p1)
+        eventsSection:Add(p1)
 
-        bodyDiv:AddHeading("Goal 1: Creating Objects", 2)
+        Section goal1Section
+        goal1Section:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goal1Section, "Goal 1: Creating Objects", 2)
 
         CodeBlock example1Code
         Span s1
@@ -159,7 +228,7 @@ end")
         s1:SetClassAttribute("comment")
         example1Code:Add(s1)
         example1Code:AddText(    "InputMonitor inputMonitor" + cr )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example1Code))
+        goal1Section:Add(preformatter:GeneratePreformattedCode(example1Code))
 
         Paragraph p2
         CodeBlock inputMonitorCode
@@ -172,7 +241,7 @@ end")
         p2:Add(keyboardEventCode)
         p2:AddText(" object, which you will add in the first activity, can let you know which key is pressed down. 
                     You use these objects to determine when a key is pressed down and which key is pressed down.")
-        bodyDiv:Add(p2)
+        goal1Section:Add(p2)
 
         Paragraph a1
         Bold activity1
@@ -188,7 +257,7 @@ end")
         a1:AddText("Add this new line of code below the ")
         a1:Add(inputMonitorCode)
         a1:AddText(".")
-        bodyDiv:Add(a1)
+        goal1Section:Add(a1)
 
         Paragraph p3
         CodeBlock isKeyPressedCode
@@ -218,7 +287,7 @@ end")
         p3:AddText(" action, telling the ")
         p3:Add(keyboardEventCode)
         p3:AddText(" object which key you want to check is pressed.")
-        bodyDiv:Add(p3)
+        goal1Section:Add(p3)
 
 
         Paragraph a2
@@ -237,9 +306,8 @@ end")
         a2:AddText("Add this new line of code below the ")
         a2:Add(keyboardEventCode)
         a2:AddText(".")
-        bodyDiv:Add(a2)
+        goal1Section:Add(a2)
         
-        bodyDiv:Add(break)
 
         Paragraph p5
         CodeBlock createGameCode
@@ -259,18 +327,7 @@ end")
         p5:AddText(" object, we call the ")
         p5:Add(loadCode)
         p5:AddText(" action, passing the file name of the file we want to load.")
-        bodyDiv:Add(p5)
-
-//        SideBySideIDE loadSongIDE
-//        loadSongIDE:SetUniqueIdentifier("loadSong")
-//        loadSongIDE:GetIDETitle():AddText("Activity: Load a song to your program")
-//        Paragraph p6
-//        p6:AddText("Load a song to your ")
-//        p6:Add(audioCode)
-//        p6:AddText(" object, enable looping on the object, and play it.")
-//        loadSongIDE:SetIDESubtitle(p6)
-//        loadSongIDE:Setup()
-//        bodyDiv:Add(loadSongIDE)
+        goal1Section:Add(p5)
 
 
         Paragraph e2
@@ -284,7 +341,7 @@ end")
         s2:SetClassAttribute("comment")
         example2Code:Add(s2)
         example2Code:AddText(    "song:Load(" + dq + "media/music.wav" + dq + ")" + cr )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example2Code))
+        goal1Section:Add(preformatter:GeneratePreformattedCode(example2Code))
 
         Paragraph a3
         Bold activity3
@@ -311,11 +368,12 @@ end")
         a3:AddText(" object. Now that you have your ")
         a3:Add(audioCode)
         a3:AddText(" loaded and set up, you can begin writing the code to change the volume and balance upon key presses.")
-        bodyDiv:Add(a3)
+        goal1Section:Add(a3)
 
-        bodyDiv:Add(break)
 
-        bodyDiv:AddHeading("Goal 2: Using Conditional Statements", 2)
+        Section goal2Section
+        goal2Section:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goal2Section, "Goal 2: Using Conditional Statements", 2)
 
         Paragraph p8
         Bold updateBold
@@ -325,7 +383,7 @@ end")
         p8:AddText(" around line 49. This action is called on every frame of your game. 
                     This is where you write your code to handle the key presses. 
                     This action should check whether some keys are pressed down and, if they are, begin the appropriate task for those keys.")
-        bodyDiv:Add(p8)
+        goal2Section:Add(p8)
 
 
 
@@ -344,7 +402,7 @@ end")
         p9:AddText(" and ")
         p9:Add(downCode)
         p9:AddText(", respectively.")
-        bodyDiv:Add(p9)
+        goal2Section:Add(p9)
 
         Paragraph p10
         CodeBlock getVolumeCode
@@ -371,14 +429,14 @@ end")
         p10:AddText(" of 0.8 means to play the song at 80% of its normal volume. A ")
         p10:Add(numberCode)
         p10:AddText(" of 0.5 means to play the song at 50% of its normal volume, and so on.")
-        bodyDiv:Add(p10)
+        goal2Section:Add(p10)
 
-        bodyDiv:AddParagraph("Choose a good increment value for the volume to use when the up key is pressed down. 
+        goal2Section:AddParagraph("Choose a good increment value for the volume to use when the up key is pressed down. 
                             A good one is to increase the volume by 10% with each key press.")
 
 
 
-        bodyDiv:AddHeading("Example: Write the code that increases the volume when the Up key is pressed.", 4)
+        AddHeading(goal2Section, "Example: Write the code that increases the volume when the Up key is pressed.", 3)
 
         CodeBlock example3Code
         Span s4
@@ -402,14 +460,8 @@ end")
         example3Code:Add(s7)
         example3Code:AddText(   "   song:SetVolume(newVolume)" + cr 
                             +   "end" )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example3Code))
+        goal2Section:Add(preformatter:GeneratePreformattedCode(example3Code))
 
-//        SideBySideIDE decreaseVolumeIDE
-//        decreaseVolumeIDE:SetUniqueIdentifier("decreaseVolume")
-//        decreaseVolumeIDE:Setup()
-//        decreaseVolumeIDE:GetIDETitle():AddText("Activity: ")
-//        decreaseVolumeIDE:GetIDESubtitle():AddText("Write the code to decrease the volume if the Down key is pressed.")
-//        bodyDiv:Add(decreaseVolumeIDE)
 
         Paragraph p11
         Bold    volumeActivity
@@ -426,9 +478,7 @@ end")
                     Choose a good decrement value for the volume to use when the down key is pressed down. 
                     A good one is to decrease the volume by 10% with each key press. 
                     Write the code to do this.")
-        bodyDiv:Add(p11)
-
-        bodyDiv:Add(break)
+        goal2Section:Add(p11)
 
         Paragraph p12
         CodeBlock leftCode
@@ -444,7 +494,7 @@ end")
         p12:AddText(" and ")
         p12:Add(rightCode)
         p12:AddText(", respectively.")
-        bodyDiv:Add(p12)
+        goal2Section:Add(p12)
 
         Paragraph p13
         CodeBlock getBalanceCode
@@ -469,13 +519,13 @@ end")
         p13:AddText(" of 1 means to play the audio fully in the right ear. A ")
         p13:Add(numberCode)
         p13:AddText(" of 0 means to play the audio equally in both ears, and so on.")
-        bodyDiv:Add(p13)
+        goal2Section:Add(p13)
 
-        bodyDiv:AddParagraph("Choose a good decrement value for the balance to use when the left key is pressed down. 
+        goal2Section:AddParagraph("Choose a good decrement value for the balance to use when the left key is pressed down. 
                             A good one is to decrease the balance by 0.1 with each key press.")
 
 
-        bodyDiv:AddHeading("Example: Write the code to move the balance towards the left when the Left key is pressed.", 4)
+        AddHeading(goal2Section, "Example: Write the code to move the balance towards the left when the Left key is pressed.", 3)
 
         CodeBlock example4Code
         Span s8
@@ -499,15 +549,8 @@ end")
         example4Code:Add(s11)
         example4Code:AddText(   "   song:SetBalance(newBalance)" + cr 
                             +   "end" )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example4Code))
+        goal2Section:Add(preformatter:GeneratePreformattedCode(example4Code))
 
-
-//        SideBySideIDE moveBalanceIDE
-//        moveBalanceIDE:SetUniqueIdentifier("moveBalance")
-//        moveBalanceIDE:Setup()
-//        moveBalanceIDE:GetIDETitle():AddText("Activity: ")
-//        moveBalanceIDE:GetIDESubtitle():AddText("Write the code to move the balance towards the right ear if the Right key is pressed.")
-//        bodyDiv:Add(moveBalanceIDE)
 
         Paragraph p14
         Bold balanceActivity
@@ -523,23 +566,31 @@ end")
                     The new balance should be set to the current balance plus some increment value. 
                     Choose a good increment value for the balance to use when the right arrow key is pressed down. 
                     A good one is to increase the balance by 0.1 with each key press.")
-        bodyDiv:Add(p14)
-
-        bodyDiv:Add(break)
-        bodyDiv:AddParagraph("You may now compile and run your code. There should be no errors. 
+        goal2Section:Add(p14)
+        goal2Section:AddParagraph("You may now compile and run your code. There should be no errors. 
                             If there are errors, fix them and try again. 
                             You should be able to change the volume and balance by pressing the appropriate keys.")
 
-
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
-
-        bodyDiv:AddHeading("Resources", 3)
-        bodyDiv:AddParagraph("The music used for this lab is Beachfront Celebration by Kevin MacLeod (incompetech.com). " 
+        Section resourcesSection
+        resourcesSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(resourcesSection, "Resources", 2)
+        resourcesSection:AddParagraph("The music used for this lab is Beachfront Celebration by Kevin MacLeod (incompetech.com). " 
         + "Licensed under Creative Commons: By Attribution 3.0 License.")
+
+        bodyDiv:Add(goalsSection)
+        bodyDiv:Add(cspCurriculumSection)
+        bodyDiv:Add(cspStandardsSection)
+        bodyDiv:Add(vocabSection)
+        bodyDiv:Add(overviewSection)
+        bodyDiv:Add(eventsSection)
+        bodyDiv:Add(goal1Section)
+        bodyDiv:Add(goal2Section)
+        bodyDiv:Add(resourcesSection)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
