@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.Image
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class TeamsTutorial is Lesson
     text dq = ""
@@ -27,24 +15,34 @@ class TeamsTutorial is Lesson
         SetWebPageTitle("Coding in Teams - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //page header
-        Division headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Coding in Teams", 1)
-        headDiv:AddText("How to start using Git to code in teams.")
-        Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Introduction To Git/Version Control", 2)
-        bodyDiv:AddParagraph(   "Often when working on programming projects, we work in teams and we want to have access to older versions. "
+         Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Coding in Teams", 1)
+        headDiv:AddText("How to start using Git to code in teams.")
+
+        headDiv:AddText("How to store various kinds of items in memory.")
+        bodyDiv:Add(headDiv)
+
+        Section section_teams
+        section_teams:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_teams)
+        AddHeading(section_teams, "Introduction To Git/Version Control", 2)
+
+
+
+        section_teams:AddParagraph(   "Often when working on programming projects, we work in teams and we want to have access to older versions. "
                             +   "Perhaps the most common way to meet both goals in industry is to use a type of program called " + dq + "version control." + dq 
                             +   " In this tutorial, we will discuss one way of collaborating on teams with version control using a system called Git.")
 
 
         //the section on git
-        bodyDiv:AddHeading("What is Git?", 3)
-        bodyDiv:AddParagraph(   "One of the most common methods of collaborating and tracking work is through a version control system, like Git. "
+        section_teams:AddHeading("What is Git?", 3)
+        section_teams:AddParagraph(   "One of the most common methods of collaborating and tracking work is through a version control system, like Git. "
                             +   "Git's purpose is to make continuous backups of code, to provide access to those backups and to coordinate changes made by different people "
                             +   "so that everybody stays synchronized. The general idea is to make it more difficult to lose work that is being completed on a project "
                             +   "and to be able to quickly revert to previous versions. Given that real-world projects are almost always completed on a team, "
@@ -55,7 +53,12 @@ class TeamsTutorial is Lesson
                             +   "Doing this by hand, by emailing files back and forth for example, would be complicated and prone to error. Git handles all of this for us automatically.")
 
         //the section on getting started
-        bodyDiv:AddHeading("Getting Started", 3)
+        Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+
+        AddHeading(section_gettingStarted, "Getting Started", 2)
+
         bodyDiv:AddParagraph(   "Git is supported in Quorum Studio 2.0 and above. To start using Git, "
                             +   "we need to download a copy of the code " + dq + "repository." + dq 
                             +   " A repository is a set of files online that we can pull (download) from and push (upload) to. "
@@ -283,10 +286,11 @@ class TeamsTutorial is Lesson
                                 does out of the box. We suggest that reading through chapter 3 is sufficient for almost all anyone, even up to
                                 professional programmers.")
 
-        WriteNextTutorial(bodyDiv)
-        Add(bodyDiv)
-        PageFooter footer
-        Add(footer)
+   
+     Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -309,15 +313,23 @@ class TeamsTutorial is Lesson
         return "how to work with a team"
     end
 
-    action GetLocation returns text
-        return "tutorials/language/teamsAndVersionControl.html"
-    end
 
     action GetLinkName returns text
         return "Teams and Version Control"
     end
 
+
+    action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "tutorials/language/teamsAndVersionControl.html"
+    end
+
     action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
         return "Teams"
     end
 end
