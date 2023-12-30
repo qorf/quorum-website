@@ -1,21 +1,97 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.Heading
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+
+class RoboticsTrack is Lesson
+    
+        
+    action Setup(Array<Lesson> startingTutorialArray)
+        
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Audio Track - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        ImageHeader header
+        text headerHeading = "Lego Robotics Track"
+        text headerText = "Learning to code robots using Quorum Programming Language and Legos"
+        text headerImage = "/media/userInterface/SVG/LIBRARY.svg"
+        text headerImageAlt = "Quincy the bunny reading books, representing how concepts build on other concepts in computer science"
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        header:AddClassAttribute("!bg-quorum-blue-25")
+        Add(header)
+
+        //main array of items.
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+
+        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
+
+        Section section_csp
+        section_csp:SetClassAttribute("flex flex-col gap-y-3 w-full")
+        Heading h_csp = section_csp:AddHeading("About the Course", 1)
+        h_csp:SetClassAttribute("text-2xl font-bold")
+
+        Division card_div_csp
+        card_div_csp:AddClassAttribute("flex flex-col gap-y-3")
+
+        integer i = 0
+        repeat while i < startingTutorialArray:GetSize()
+            Lesson lesson = startingTutorialArray:Get(i)
+            LongCourseCard card
+            text image_src = lesson:GetImageLocation()
+            text image_alt = ""
+            text description = lesson:GetMetaDescription()
+            text title = lesson:GetSectionName()
+            text url = "/"+lesson:GetLocation()
+            card:Create("", image_alt, description, title, url, true)
+            
+            Division imageDiv = card:GetImageDiv()
+            
+            Span quorumIcon
+            HtmlFileLoader quorumIconFile
+            File file
+            file:SetPath("html/media/userInterface/SVG/WhiteQuorumLogo.svg")
+            quorumIconFile:SetLoaded(file:Read())
+            quorumIcon:AddText(quorumIconFile:ToText())
+            
+            Paragraph p_imageTitle
+            p_imageTitle:AddText(title)
+            imageDiv:Add(quorumIcon)
+            imageDiv:Add(p_imageTitle)
+            
+            imageDiv:AddClassAttribute("bg-quorum-blue-100 flex flex-col items-center justify-center gap-x-2 gap-y-3 px-5")
+            quorumIcon:AddClassAttribute("inline-block w-auto mr-2 h-20")
+            p_imageTitle:AddClassAttribute("font-bold text-neutral-white select-none text-center text-xl")
+            
+            TutorialPreview preview
+            preview:Create(lesson:GetSectionName(), lesson)
+            card_div_csp:Add(preview)
+            
+            card_div_csp:Add(card)
+            i = i + 1
+        end
+
+        section_csp:Add(card_div_csp)
+        bodyDiv:Add(section_csp)
+    end
+
+    action GetMetaDescription returns text
+        return "Sample the libraries and features available out of the box in the Quorum programming language."
+    end
+
+end
+
+
+/*
+
+use Libraries.Web.Page.all
 
 class RoboticsTrack is Lesson
     text dq = ""
@@ -225,4 +301,7 @@ class RoboticsTrack is Lesson
     action GetLocation returns text
         return "lessons/robotics.html"
     end
+    
 end
+
+*/
