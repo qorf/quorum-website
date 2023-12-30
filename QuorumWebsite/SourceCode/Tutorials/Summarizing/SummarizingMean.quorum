@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class SummaryMean is Lesson
     text dq = ""
@@ -30,47 +15,59 @@ class SummaryMean is Lesson
         AddMathHeader()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+       Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Learn About Calculating the Mean", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Learn About Calculating the Mean", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Learn About Calculating the Mean")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial describes how to calculate the mean")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
         
-        bodyDiv:AddHeading("Calculating the Mean",2)
-        
-        bodyDiv:AddParagraph("In data science, the arithmetic mean is known as the average. It is the central value in a finite data set of numbers. We can calculate the mean by finding the sum of all values in a dataset and divide it by the number of values.")
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Calculating the Mean", 2)
 
-        AddMath(bodyDiv, "examples/MathXML/Mean.xml")
-        bodyDiv:AddParagraph("The arithmetic mean can be calculated in Quorum by using the helper action, Mean() within the DataFrame's class. To do this, we will use our 'frame' object and call the function Mean(). In this case we will be calculating the mean of the perimeter and the area of dry bean classifications. Here is a brief description on how Mean() works.")
+        section_intro:AddParagraph("In data science, the arithmetic mean is known as the average. It is the central value in a finite data set of numbers. We can calculate the mean by finding the sum of all values in a dataset and divide it by the number of values.")
+
+        Division mathDiv
+        AddMath(mathDiv, "examples/MathXML/Mean.xml")
+        text equation = mathDiv:ToText()
+
+        section_intro:AddText(equation)
+        section_intro:AddParagraph("The arithmetic mean can be calculated in Quorum by using the helper action, Mean() within the DataFrame's class. To do this, we will use our 'frame' object and call the function Mean(). In this case we will be calculating the mean of the perimeter and the area of dry bean classifications. Here is a brief description on how Mean() works.")
     
+         WebTable table = AddWebTable("Mean Function")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Function")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage") 
+      
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)        
+
         Array<text> rubricText1
         rubricText1:Add("dataFrameObject:Mean()")
         rubricText1:Add("This action calculates the mean of the column selected from the frame. Note that it can only calculate the mean of one column at a time.")
         rubricText1:Add("frame:Mean()")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
-        
-        Array<text> rubricHeader2
-        rubricHeader2:Add(AddTextBoldFront("Function", " "))
-        rubricHeader2:Add(AddTextBoldFront("Description", " "))
-        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
-   
+        table:Add(tableBody)
+        section_intro:Add(table)
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricText1))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Mean Function"))
 
-        bodyDiv:AddParagraph("Here is some code on how to calculate the mean:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        section_intro:AddParagraph("Here is some code on how to calculate the mean:")
+        section_intro:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 
 //Create a DataFrame, which is essentially a table that understands 
@@ -87,11 +84,25 @@ output someText
 output frame:Mean()
 "))
 
-        bodyDiv:AddHeading("Run the Example",2)
+          
+        Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/DataFrames/Mean.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Calculate the Mean")
+    section_try_yourself:Add(ide3)
 
-        AddIDE(bodyDiv,"Mean","Calculate the Mean","Example of calculating the mean","examples/DataFrames/Mean.quorum")
-
-        bodyDiv:AddParagraph("")
 
         Paragraph para
         para:AddText("Congrats! We have just learned how to calulate the mean! To view the whole file, we can click ")
@@ -100,18 +111,17 @@ output frame:Mean()
         link:AddText("here")
         link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Summarizing/SourceCode/BeanMean.quorum")
         link:SetTarget(link:newTab)
+        link:SetClassAttribute("underline text-quorum-blue-150")
         
         para:Add(link)
         para:AddText(".")
-        bodyDiv:Add(para) 
+        section_try_yourself:Add(para) 
 
-        bodyDiv:AddParagraph(" ")
-        
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -140,5 +150,13 @@ output frame:Mean()
 
     action GetLocation returns text
         return "tutorials/Summarizing/mean.html"
+    end
+
+    action GetLinkName returns text
+        return "Mean"
+    end
+
+    action GetSectionName returns text
+        return "Descriptive Statistics"
     end
 end

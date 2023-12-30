@@ -1,6 +1,5 @@
 use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.MetaData
-use Libraries.System.File
 use Libraries.Web.Page.Division
 use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.UnorderedList
@@ -13,6 +12,11 @@ use Libraries.Web.Page.Image
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.Heading
 use Libraries.Web.Page.Link
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Button
+use Libraries.System.File
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.Array
 
 class Learn is Lesson
     text dq = ""
@@ -28,75 +32,189 @@ class Learn is Lesson
         SetWebPageTitle("Learn Quorum - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //Main Region
+        ImageHeader blueSection = makeBlueHeader()
+        Add(blueSection)
 
-        //page header
-        Header headDiv
-        headDiv:AddAttribute("style","background-image: url('/media/robots/roboticsCompetition.jpg'); background-size: cover; height: 25em; background-position: center center;")
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
 
-        Division headTextDiv
-        headTextDiv:SetClassAttribute("pageHeaderText")
-        headTextDiv:AddHeading("Learn ", 1)
-        headTextDiv:AddText("Each track provides curriculum that can be freely used in the classroom.")
-        headDiv:Add(headTextDiv)
-        Add(headDiv)
-
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-
-        AnnouncementHeading announcement
-        announcement:AddAnnouncement("Quick Introduction to Quorum", "Hour of Code", "selection.html")
-
-        bodyDiv:Add(announcement)
-
-        BlockButtonSection blockButtonSection
-        blockButtonSection:AddBlockButton("Core Track", "Learn to code in 
-            Quorum with basic lessons. This track is no frills and 
-            dives straight into basic programming skills.", "/media/control.png", "", "lessons/core.html")
-        blockButtonSection:AddBlockButton("Visual Track","Learn to code in 
-            Quorum with lessons that incorporate visual programming.", 
-            "/media/astro/visualTrack.jpg", "", "lessons/visual.html")
-        blockButtonSection:AddBlockButton("Audio Track", "Learn to code 
-            in Quorum with lessons that incorporate audio programming.", 
-            "/media/dsp/fmWaveSmall.png", "", "lessons/audio.html")
-        blockButtonSection:AddBlockButton("Robotics Track", "Learn to 
-            code in Quorum with lessons that incorporate robotics programming. 
-            This track requires access to a LEGO™ robot kit.", 
-            "/media/robots/legoBlockButton.jpg", "", "lessons/robotics.html")
-        blockButtonSection:AddBlockButton("Computer Science Principles Track", 
-        "In this track, learn using an adaptation of code.org's online curriculum 
-        for the College Board's Computer Science Principles Course.", 
-            "/media/HourofCodeBunnyDark.jpg", "", "lessons/code.html")
-        blockButtonSection:AddBlockButton("Games Professional Development Track", 
-        "In this track, engage in a 1-week professional development workshop (EPIQ)
-        on learning programming using the Scene Editor.", 
-            "/media/TeamsAndVersionControl.png", "", "lessons/epiq.html")
-        blockButtonSection:AddBlockButton("Data Science Professional Development Track", 
-        "In this track, engage in a 1-week professional development workshop (EPIQ)
-        on Data Science, including learning about charts, data frames, and descriptive statistics.", 
-            "/media/dataScience.jpg", "", "lessons/epiqDataScience.html")
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
 
 
-        bodyDiv:Add(blockButtonSection)
+        Section usingQuorumSection = usingQuorumSection()
+        Section coursesSection = makeCoursesSection()
+        Section idePlaygroundSection = makeIdePlaygroundSection()
+        bodyDiv:Add(usingQuorumSection)
+        bodyDiv:Add(coursesSection)
+        bodyDiv:Add(idePlaygroundSection)
+    end
 
-        Division ecsDiv
-        Header ecsHeader
-        ecsHeader:AddHeading("Looking for <a href=" + dq + "http://www.exploringcs.org/" + dq + ">Exploring Computer Science</a> Unit 4?", 1)
-        ecsDiv:Add(ecsHeader)
-        Paragraph ecsParagraph
-        ecsParagraph:AddText("You can also use Quorum to complete unit 4 of the Exploring Computer Science curriculum. ")
-        ecsParagraph:AddLink("You can download the instructional materials here.", "ECS_Unit_4.zip")
-        ecsDiv:Add(ecsParagraph)
-        bodyDiv:Add(ecsDiv)
+    action makeBlueHeader returns ImageHeader
+        ImageHeader header
+        text headerHeading = "Learn Something New in Quorum"
+        text headerText = "Create advanced programs, understand data like a pro, and help make programming easy for everyone, regardless of your age."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        return header
+    end
 
-        mainRegion:Add(bodyDiv)
+    action usingQuorumSection returns Section
+      Section section
 
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+      Heading h2
+      h2:SetScale(2)
+      h2:AddText("Using Quorum")
+      h2:AddClassAttribute("text-2xl font-bold font-sans")
+      section:Add(h2)
+
+      Paragraph p
+      p:AddText("If you want to use Quorum offline, ")
+      Link link
+      link:SetAddress("/download.html")
+      link:AddText("install it first.")
+      link:AddAttribute("aria-label", "Download Quorum")
+      link:AddClassAttribute("underline text-quorum-blue-150")
+
+      p:Add(link)
+      section:Add(p)
+
+      Division newToQuorum
+      newToQuorum:AddClassAttribute("flex flex-col justify-between rounded-xl bg-neutral-grey-15 p-4")
+      Heading h3
+      h3:SetScale(3)
+      h3:AddText("New to Quorum?")
+      h3:AddClassAttribute("text-xl font-bold mb-2")
+      Paragraph p2
+      p2:AddClassAttribute("text-sm mb-4 w-4/5")
+      p2:AddText("Quorum is awesome for beginners and pros. If you're starting out, try this beginner's guide to help you run your very first program using the language.")
+      Link link_getStarted
+      link_getStarted:AddText("Get Started")
+      // move text to the bottom right of the div
+      link_getStarted:AddClassAttribute("self-end font-bold py-2.5 px-4 text-center rounded-3xl w-56 duration-150 block p text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900 md:inline")
+      link_getStarted:SetAddress("/tutorials/language/gettingStarted.html")
+      newToQuorum:Add(h3)
+      newToQuorum:Add(p2)
+      newToQuorum:Add(link_getStarted)
+
+      section:Add(newToQuorum)
+
+      return section
+    end
+
+   action makeCoursesSection returns Section
+        Section section
+        Array<text> courses
+        courses:Add("Quorum Courses")
+        courses:Add("Hour of Code")
+        courses:Add("Legacy Courses")
+
+        Array<text> coursesDescription
+        coursesDescription:Add("Each track provides curriculum that can be freely used in the classroom.")
+        coursesDescription:Add("Hour of code is to provide supplemental courses for learners in a short amount of time.")
+        coursesDescription:Add("These are legacy courses that are no longer maintained and may not be up-to date with the the latest versions of  Quorum. Feel free to use these courses but you may run into possible bugs using these references. ")
+        integer i = 0
+        repeat while i < courses:GetSize()
+            Division courseDiv
+            courseDiv:AddClassAttribute("my-9 space-y-12")
+            Heading courseHeader
+            courseHeader:AddClassAttribute("text-2xl font-semibold tracking-wider text-gray-400")
+            courseHeader:SetScale(2)
+            courseHeader:AddText(courses:Get(i))
+            JavaScriptObjectNotation quorumCourse = GetCourseJson(courses:Get(i))
+            JavaScriptObjectNotation items = quorumCourse:GetObject("courses")
+            JavaScriptObjectNotation itemsArray = items:Get(0)
+   
+            integer j = 0
+            Division courseCards
+            courseCards:AddClassAttribute("grid gap-4 grid-cols-1 auto-rows-auto md:grid-cols-2 lg:grid-cols-3")
+
+            repeat while j < itemsArray:GetSize()
+                //json received from /html/json/courses.json
+                JavaScriptObjectNotation item = itemsArray:Get(j)
+                text title = item:GetValue("title")
+                text courseUrl = item:GetValue("courseUrl")
+
+                JavaScriptObjectNotation cardJson = item:GetObject("courseCard")
+                CourseCard courseCard
+                text imageSrc = cardJson:GetValue("image")
+                text imageAltText = cardJson:GetValue("imageAltText")
+                text description = cardJson:GetValue("description")
+                courseCard:Create(imageSrc, imageAltText, description, title, courseUrl, true)
+                courseCards:Add(courseCard)
+
+                JavaScriptObjectNotation previewJson = item:GetObject("preview")
+                CardPreview cardPreview
+                cardPreview:Create(title, previewJson)
+                courseCards:Add(cardPreview)
+
+                j = j + 1
+            end
+            
+            courseDiv:Add(courseHeader)
+            courseDiv:AddText(coursesDescription:Get(i))
+            courseDiv:Add(courseCards)
+            
+            i = i + 1
+            section:Add(courseDiv)
+        end
+        return section
+    end
+    
+    action GetCourseJson(text courseToGet) returns JavaScriptObjectNotation
+        File file
+        file:SetPath("/html/json/courses.json")
+        text value = file:Read()
+        JavaScriptObjectNotation notate
+        notate:Read(value)
+
+        JavaScriptObjectNotation courses = notate:GetObject("sections")
+        JavaScriptObjectNotation topLevel = courses:Get(0)
+
+        JavaScriptObjectNotation returnCourse = undefined
+        integer i = 0
+        boolean break = false
+        
+        repeat while i < topLevel:GetSize() or not break
+            JavaScriptObjectNotation course = topLevel:Get(i)
+            text courseArray = course:GetValue("name")
+
+            if courseArray = courseToGet
+                 returnCourse = course
+                 break = true
+            end
+            i = i + 1
+        end
+        return returnCourse
+    end
+
+    action makeIdePlaygroundSection returns Section
+        Section section
+        
+        Heading h2
+        h2:SetScale(2)
+        h2:AddText("Not Sure Where to Start?")
+        h2:AddClassAttribute("text-2xl font-bold font-sans")
+        section:Add(h2)
+        
+        Paragraph p
+        p:AddText("Play around with the Quorum IDE and get a feel for the language. Start by typing output " + dq + "Hello World!" + dq + " into the text editor and see what you can do. There is so much that you can learn when using Quorum.")
+        section:Add(p)
+        
+        CodeForIDE code1
+        code1:AddFileText("Main.quorum", "output " + dq + "Hello World" + dq)
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Try Quorum")
+        section:Add(ide)
+        
+        return section
     end
 
     action GetMetaDescription returns text

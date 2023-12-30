@@ -15,6 +15,7 @@ use Libraries.Web.Page.OrderedList
 use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Containers.Array
+use Libraries.Web.Page.Section
 
 class VoiceOvers is Lesson
     text dq = ""
@@ -33,60 +34,64 @@ class VoiceOvers is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Trigger Recorded Voice Over for Quests", 1)
-        headDiv:AddText("Add some flare through voice overs")
-        Add(headDiv)
+        AddHeading(headDiv, "Trigger Recorded Voice Over for Quests", 1)
+        headDiv:AddParagraph("Add some flare through voice overs")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Trigger Recorded Voice Over for Quests", 1)
-        bodyDiv:AddParagraph("We are nearing completion of our game. At this point, we have sounds that are triggering, we have considered issues related to accessibility, and have our first quest nearly complete. We are now going to add some flare by adding a recorded voice over into our game.")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("Learning Objectives")
+        AddHeading(introSection, "Learning Objectives", 2)
+        introSection:AddParagraph("We are nearing completion of our game. At this point, we have sounds that are triggering, we have considered issues related to accessibility, and have our first quest nearly complete. We are now going to add some flare by adding a recorded voice over into our game.")
+
+        introSection:AddParagraph("You will:")
         Array<text> objectives
         objectives:Add("Learn about recording voice overs")
         objectives:Add("Learn more about scope and fields")
         objectives:Add("Practice using the Audio class")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        bodyDiv:AddHeading("Record Your Voice Over (15 minutes)", 2)
-        bodyDiv:AddParagraph("As a first step, use Audacity again, this time to record yourself saying the lines of your non-player character. Feel free to ask friends or family to record other voices, or a back and forth, if it makes sense for your game. ")
+        AddHeading(introSection, "Record Your Voice Over (15 minutes)", 2)
+        introSection:AddParagraph("As a first step, use Audacity again, this time to record yourself saying the lines of your non-player character. Feel free to ask friends or family to record other voices, or a back and forth, if it makes sense for your game. ")
         
 
-        bodyDiv:AddHeading("Trigger the sound for the nonplayer character (15 minutes)",2)
-        bodyDiv:AddParagraph("Once you have recorded your voice over, using the same code we used for sound previously, remove the output statement from the NPC code and replace it with a call to play your voice over. This should provide a sound when you press the key instead, adding a level of immersion for your game. It is not required, but consider adding the spatial audio commands to move the sound for the NPC to one channel or another.")
+        AddHeading(introSection, "Trigger the sound for the nonplayer character (15 minutes)",2)
+        introSection:AddParagraph("Once you have recorded your voice over, using the same code we used for sound previously, remove the output statement from the NPC code and replace it with a call to play your voice over. This should provide a sound when you press the key instead, adding a level of immersion for your game. It is not required, but consider adding the spatial audio commands to move the sound for the NPC to one channel or another.")
 
 
-        bodyDiv:AddHeading("Add a Field (5 minutes)",2)
-        bodyDiv:AddParagraph("In order to keep track of how many items we have collected, we need to use an integer field variable and place it into our game. This field should go write under the line of code for the class, which tells Quorum it is available in all actions. This field might look something like:")
+        AddHeading(introSection, "Add a Field (5 minutes)",2)
+        introSection:AddParagraph("In order to keep track of how many items we have collected, we need to use an integer field variable and place it into our game. This field should go write under the line of code for the class, which tells Quorum it is available in all actions. This field might look something like:")
 
         text source = GetTextFromSource("/html/sources/lessons/scenes/Field.quorum")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(source))
+        introSection:Add(preformatter:GeneratePreformattedCode(source))
 
-        bodyDiv:AddHeading("Increase the Count (10 minutes)",2)
-        bodyDiv:AddParagraph("Whenever an item is collected, we need to increase the value of this variable by one. In our collision listener, we should add code that increases this value. ")
+        AddHeading(introSection, "Increase the Count (10 minutes)",2)
+        introSection:AddParagraph("Whenever an item is collected, we need to increase the value of this variable by one. In our collision listener, we should add code that increases this value. ")
 
-        bodyDiv:AddHeading("Trigger the End of the Quest (15 minutes)", 2)
-        bodyDiv:AddParagraph("Once the count of the variable is equal to the number of items in your scene, the quest is done. Complete the following to finish the basic template for our game:")
+        AddHeading(introSection, "Trigger the End of the Quest (15 minutes)", 2)
+        introSection:AddParagraph("Once the count of the variable is equal to the number of items in your scene, the quest is done. Complete the following to finish the basic template for our game:")
 
         Array<text> quest
         quest:Add("Use a conditional to check if the quest is completed in each collision. ")
         quest:Add("If the quest is completed for the first time, trigger a second voice over and make the monster appear")
         quest:Add("If you wish, have the monster use a second voice over with hideous laughter at the insidious fool that tried to complete the unholy quest of doom. ")
-        bodyDiv:Add(GenerateList(quest))
+        introSection:Add(GenerateList(quest))
         
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(introSection)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     
@@ -109,5 +114,9 @@ class VoiceOvers is Lesson
 
     action GetLocation returns text
         return "lessons/Scenes/voices.html"
+    end
+
+    action GetSectionName returns text
+        return "Experience Programming in Quorum (EPIQ)"
     end
 end

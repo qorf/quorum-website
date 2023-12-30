@@ -18,6 +18,8 @@ use Libraries.Containers.Array
 use Libraries.Web.Page.Link
 use Libraries.System.File
 use Libraries.System.FileReader
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
 
 class MultiChartsColorsOptions is Lesson
     // text version needs cleaning, then do code version
@@ -47,56 +49,58 @@ class MultiChartsColorsOptions is Lesson
         AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Multi-Charts, Colors, and Options", 1)
-        headDiv:AddText("Understanding the charts and their options that are available in Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Multi-Charts, Colors, and Options", 1)
+        headDiv:AddParagraph("Understanding the charts and their options that are available in Quorum")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Multi-Charts, Colors, and Options", 1)
-        bodyDiv:AddParagraph("Quorum has multiple charts and sometimes it can be confusing to keep track of the features each bar can offer to the user. In this tutorial we will list out the list of features that each of the charts that available in Quorum is capable of.")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(introSection, "Learning Objectives", 1)
+        introSection:AddParagraph("Quorum has multiple charts and sometimes it can be confusing to keep track of the features each bar can offer to the user. In this tutorial we will list out the list of features that each of the charts that available in Quorum is capable of.")
 
         
-        bodyDiv:AddParagraph("Learning Objectives:")
+        introSection:AddParagraph("The student will learn:")
         Array<text> objectives
         objectives:Add("Students will be able to change colors within graphics")
         objectives:Add("Students will be able to separate their charts")
         objectives:Add("Students will be able to identify which unique functions they can use with each chart type")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        bodyDiv:AddHeading("Set up Scatter Plot (10 min)", 2)
+        AddHeading(introSection, "Set up Scatter Plot (10 min)", 2)
 
-        Link linkA
+        Link linkA = GenerateDefaultLink()
         linkA:AddText("Dogs dataset")
         linkA:SetAddress("https://github.com/qorf/quorum-website/blob/main/QuorumWebsite/html/data/Dogs.csv")
         linkA:SetTarget(linkA:newTab)
     
-        Link linkB
+        Link linkB = GenerateDefaultLink()
         linkB:AddText("Scatter Plot Tutorial")
         linkB:SetAddress("https://quorumlanguage.com/tutorials/charts/scatterplot.html")
         linkB:SetTarget(linkB:newTab)
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("A lot of what we will talk about goes beyond just scatter plots, but since it would take a while to experiment with every feature on every graph, we'll do the highlights instead. Scatter plots have many interesting features, so we're going to start by getting one set up with the ")
-        bodyDiv:Add(linkA)
-        bodyDiv:AddText(". If you want more information about how to create a scatter plot, look at our ")
-        bodyDiv:Add(linkB)
-        bodyDiv:AddText(". ")
+        Paragraph p1 = introSection:AddParagraph(" ")
+        p1:AddText("A lot of what we will talk about goes beyond just scatter plots, but since it would take a while to experiment with every feature on every graph, we'll do the highlights instead. Scatter plots have many interesting features, so we're going to start by getting one set up with the ")
+        p1:Add(linkA)
+        p1:AddText(". If you want more information about how to create a scatter plot, look at our ")
+        p1:Add(linkB)
+        p1:AddText(". ")
 
-        AddIDE(bodyDiv,"Basic Scatter Plot","Basic Scatter Plot","Making a basic scatter plot","examples/Epiq/BasicScatterPlot.quorum")
-        bodyDiv:AddParagraph(" ")
+        AddIDE(introSection,"Basic Scatter Plot","Basic Scatter Plot","/examples/Epiq/BasicScatterPlot.quorum")
 
-        bodyDiv:AddHeading("Features of the Quorum Charts (10 Minutes)",2)
+        AddHeading(introSection, "Features of the Quorum Charts (10 Minutes)",2)
     
-        bodyDiv:AddParagraph("Below are the various chart features, some of which are universal, and others that are chart specific. Take a few minutes to scan over them briefly, but don't worry about going through everything in close detail.")
-        bodyDiv:AddParagraph("Here are the options that are available for all of the charts that are implemented in Quorum: SetTitle, SetSubtitle, SetXAxisTitle, SetYAxisTitle, SetXAxisMinimum, SetYAxisMinimum, SetXAxisMaximum, SetYAxisMaximum, SetXTickInterval, SetYTickInterval, SetColorPalette, SetLegendLocationToBottom (SetLegendLocationToTop, SetLegendLocationToRight, SetLegendLocationToLeft), SetLegendTitle, SeparateBySeries, SeparateByFactors (Note: Histograms and Line Charts do not have this).")
+        introSection:AddParagraph("Below are the various chart features, some of which are universal, and others that are chart specific. Take a few minutes to scan over them briefly, but don't worry about going through everything in close detail.")
+        introSection:AddParagraph("Here are the options that are available for all of the charts that are implemented in Quorum: SetTitle, SetSubtitle, SetXAxisTitle, SetYAxisTitle, SetXAxisMinimum, SetYAxisMinimum, SetXAxisMaximum, SetYAxisMaximum, SetXTickInterval, SetYTickInterval, SetColorPalette, SetLegendLocationToBottom (SetLegendLocationToTop, SetLegendLocationToRight, SetLegendLocationToLeft), SetLegendTitle, SeparateBySeries, SeparateByFactors (Note: Histograms and Line Charts do not have this).")
 
         Array<text> rubricText1
         rubricText1:Add("StackBars")
@@ -201,31 +205,32 @@ class MultiChartsColorsOptions is Lesson
         
 
         Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Bar Charts", " "))
-        rubricHeader1:Add(AddTextBoldFront("Histograms", " "))
-        rubricHeader1:Add(AddTextBoldFront("Pie Charts", " "))
-        rubricHeader1:Add(AddTextBoldFront("Line Charts", " "))
-        rubricHeader1:Add(AddTextBoldFront("Scatter Plots", " "))
-        rubricHeader1:Add(AddTextBoldFront("Box Plots", " "))
-        rubricHeader1:Add(AddTextBoldFront("Violin Plots", " "))
+        rubricHeader1:Add("Function")
+        rubricHeader1:Add("Bar Charts")
+        rubricHeader1:Add("Histograms")
+        rubricHeader1:Add("Pie Charts")
+        rubricHeader1:Add("Line Charts")
+        rubricHeader1:Add("Scatter Plots")
+        rubricHeader1:Add("Box Plots")
+        rubricHeader1:Add("Violin Plots")
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+        Array<Array<text>> table
+        table:Add(rubricHeader1)
       
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
-        rubricRows1:Add(AddTableDataTag(rubricText5))
-        rubricRows1:Add(AddTableDataTag(rubricText6))
-        rubricRows1:Add(AddTableDataTag(rubricText7))
-        rubricRows1:Add(AddTableDataTag(rubricText8))
-        rubricRows1:Add(AddTableDataTag(rubricText9))
-        rubricRows1:Add(AddTableDataTag(rubricText10))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Function Availability by Chart Type"))
+        table:Add(rubricText1)
+        table:Add(rubricText2)
+        table:Add(rubricText3)
+        table:Add(rubricText4)
+        table:Add(rubricText5)
+        table:Add(rubricText6)
+        table:Add(rubricText7)
+        table:Add(rubricText8)
+        table:Add(rubricText9)
+        table:Add(rubricText10)
 
+        WebTable webTable = GetDefaultTable("Function Availability by Chart Type", table)
+        introSection:Add(webTable)
+        
 
         Array<text> rubricText11
         rubricText11:Add("StackBars")
@@ -269,66 +274,65 @@ class MultiChartsColorsOptions is Lesson
 
 
         Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Function", " "))
-        rubricHeader:Add(AddTextBoldFront("Description", " "))
+        rubricHeader:Add("Function")
+        rubricHeader:Add("Description")
 
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        Array<Array<text>> table2
+        table2:Add(rubricHeader)
       
-        rubricRows:Add(AddTableDataTag(rubricText11))
-        rubricRows:Add(AddTableDataTag(rubricText12))
-        rubricRows:Add(AddTableDataTag(rubricText13))
-        rubricRows:Add(AddTableDataTag(rubricText14))
-        rubricRows:Add(AddTableDataTag(rubricText15))
-        rubricRows:Add(AddTableDataTag(rubricText16))
-        rubricRows:Add(AddTableDataTag(rubricText17))
-        rubricRows:Add(AddTableDataTag(rubricText18))
-        rubricRows:Add(AddTableDataTag(rubricText19))
-        rubricRows:Add(AddTableDataTag(rubricText20))
+        table2:Add(rubricText11)
+        table2:Add(rubricText12)
+        table2:Add(rubricText13)
+        table2:Add(rubricText14)
+        table2:Add(rubricText15)
+        table2:Add(rubricText16)
+        table2:Add(rubricText17)
+        table2:Add(rubricText18)
+        table2:Add(rubricText19)
+        table2:Add(rubricText20)
 
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Description of the Chart Functions"))
+        WebTable webTable2 = GetDefaultTable("Description of the Chart Functions", table2)
+        introSection:Add(webTable2)
  
-        bodyDiv:AddHeading("Adding Features to Scatter Plot (10 minutes)", 2)
+        AddHeading(introSection, "Adding Features to Scatter Plot (10 minutes)", 2)
 
-        Link linkC
+        Link linkC = GenerateDefaultLink()
         linkC:AddText("Color Accessibility")
         linkC:SetAddress("https://quorumlanguage.com/tutorials/charts/coloraccessibility.html")
         linkC:SetTarget(linkC:newTab)
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("Let's now try adding some features to our scatter plot from before. Scatter plots have the ability to change the point size with SetPointDensity(), as well as changing the axis limits, legend location and colors. Try increasing the point size, moving the legend to the top and changing the colors. For a comprehensive list of all the available colors, look at our ")
-        bodyDiv:Add(linkC)
-        bodyDiv:AddText(" page. Besides that, you can play around with any of the numbers to see how it changes the chart.")
+        Paragraph p3 = introSection:AddParagraph(" ")
+        p3:AddText("Let's now try adding some features to our scatter plot from before. Scatter plots have the ability to change the point size with SetPointDensity(), as well as changing the axis limits, legend location and colors. Try increasing the point size, moving the legend to the top and changing the colors. For a comprehensive list of all the available colors, look at our ")
+        p3:Add(linkC)
+        p3:AddText(" page. Besides that, you can play around with any of the numbers to see how it changes the chart.")
 
-        AddIDE(bodyDiv,"Scatter Plot with Features","Scatter Plot with Features","Adding some features to the scatter plot","examples/Epiq/FeaturesScatterPlot.quorum")
-        bodyDiv:AddParagraph(" ")
+        AddIDE(introSection,"Scatter Plot with Features","Scatter Plot with Features","/examples/Epiq/FeaturesScatterPlot.quorum")
 
-        bodyDiv:AddHeading("Separate by Factor and Separate by Series (30 Minutes)",2)
+        AddHeading(introSection, "Separate by Factor and Separate by Series (30 Minutes)",2)
 
-        bodyDiv:AddParagraph("In this part of the tutorial we will be discussing two ways of separating the charts from one another. These functions are SeparateByFactor() and SeparateBySeries(). SeparateByFactor() will separate the chart into a grid of subcharts based on the bar groups. It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid. SeparateBySeries() will separate the chart into a grid of subcharts based on the legend (series). It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid.")
+        introSection:AddParagraph("In this part of the tutorial we will be discussing two ways of separating the charts from one another. These functions are SeparateByFactor() and SeparateBySeries(). SeparateByFactor() will separate the chart into a grid of subcharts based on the bar groups. It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid. SeparateBySeries() will separate the chart into a grid of subcharts based on the legend (series). It takes in an integer as the number of columns in the grid. If empty, it results in a single-column grid.")
            
-        Link linkD
+        Link linkD = GenerateDefaultLink()
         linkD:AddText("Chart Separation tutorial")
         linkD:SetAddress("https://quorumlanguage.com/tutorials/charts/chartSeparation.html")
         linkD:SetTarget(linkD:newTab)
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("To learn more about which inputs can be used for each function, read our ")
-        bodyDiv:Add(linkD)
-        bodyDiv:AddText(".")
+        Paragraph p4 = introSection:AddParagraph(" ")
+        p4:AddText("To learn more about which inputs can be used for each function, read our ")
+        p4:Add(linkD)
+        p4:AddText(".")
 
-        bodyDiv:AddHeading("Series Separation For Scatter Plot (10 Minutes)",2)
+        AddHeading(introSection, "Series Separation For Scatter Plot (10 Minutes)",2)
 
-        bodyDiv:AddParagraph("We have 2 columns (numerical) and 1 factor in this plot. By following the table above, we know that we can use SeparateBySeries. Without SeparateBySeries, the data can be less clear, since the only other way to show it is color coding. ")
-        bodyDiv:AddParagraph("Here we can use SeparateBySeries to present the data clearly, and 10 showcases a separation that is easy to understand and not cluttered. It will split the interval into 10 units, and there will be 10 elements in each row. ")
+        introSection:AddParagraph("We have 2 columns (numerical) and 1 factor in this plot. By following the table above, we know that we can use SeparateBySeries. Without SeparateBySeries, the data can be less clear, since the only other way to show it is color coding. ")
+        introSection:AddParagraph("Here we can use SeparateBySeries to present the data clearly, and 10 showcases a separation that is easy to understand and not cluttered. It will split the interval into 10 units, and there will be 10 elements in each row. ")
 
-        AddIDE(bodyDiv,"Split Scatter Plot","Split Scatter Plot","Splitting the scatter plot for clarity","examples/Epiq/SplitScatterPlot.quorum")
-        bodyDiv:AddParagraph(" ")
+        AddIDE(introSection,"Split Scatter Plot","Split Scatter Plot","/examples/Epiq/SplitScatterPlot.quorum")
 
         File f
         FileReader reader
     
-        bodyDiv:AddHeading("Final Chart", 2)
+        AddHeading(introSection, "Final Chart", 2)
     
         Division chart1
         chart1:SetStyle("min-width: 100px; max-width: 100%;")
@@ -337,45 +341,44 @@ class MultiChartsColorsOptions is Lesson
         chart1:AddText(reader:Read())
         reader:Close()
         
-        bodyDiv:Add(chart1)
+        introSection:Add(chart1)
 
-        bodyDiv:AddHeading("Relevant Common Core Standards",2)
+        AddHeading(introSection, "Relevant Common Core Standards",2)
         
-        Link link15
+        text standardsPath = "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"
+
+        Link link15 = GenerateDefaultLink()
         link15:AddText("website")
-        link15:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/")
+        link15:SetAddress(standardsPath)
         link15:SetTarget(link15:newTab)
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("We use the following ")
-        bodyDiv:Add(link15)
-        bodyDiv:AddText(" for common core standards in relation to histograms and measurements of distribution.")
+        Paragraph p5 = introSection:AddParagraph("")
+        p5:AddText("We use the following ")
+        p5:Add(link15)
+        p5:AddText(" for common core standards in relation to histograms and measurements of distribution.")
 
-        Link link8
+        Link link8 = GenerateDefaultLink()
         link8:AddText("CCSS.MATH.CONTENT.HSS.ID.A.1")
-        link8:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/A/1/")
+        link8:SetAddress(standardsPath)
         link8:SetTarget(link8:newTab)
     
-        Link link9
+        Link link9 = GenerateDefaultLink()
         link9:AddText("CCSS.MATH.CONTENT.HSS.ID.B.6")
-        link9:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/B/6")
+        link9:SetAddress(standardsPath)
         link9:SetTarget(link9:newTab)
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link8)
-        bodyDiv:AddText(": Represent data with plots on the real number line (dot plots, histograms, and box plots).")
+        p5:Add(link8)
+        p5:AddText(": Represent data with plots on the real number line (dot plots, histograms, and box plots).")
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link9)
-        bodyDiv:AddText(": Represent data on two quantitative variables on a scatter plot, and describe how the variables are related.")
+        p5:Add(link9)
+        p5:AddText(": Represent data on two quantitative variables on a scatter plot, and describe how the variables are related.")
         
-        bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(introSection)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -405,5 +408,11 @@ class MultiChartsColorsOptions is Lesson
 
     action GetLocation returns text
         return "lessons/DataScience/multiChartsColorsOptions.html"
+    end
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Data Science"
     end
 end

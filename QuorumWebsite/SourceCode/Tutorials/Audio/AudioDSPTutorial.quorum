@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class AudioDSPTutorial is Lesson
     text dq = ""
@@ -31,40 +19,53 @@ class AudioDSPTutorial is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Digital Signal Processing", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Digital Signal Processing", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Digital Signal Processing")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("Digital Signal Processing")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Understanding Signals and Samples", 2)
+        Section section_signals_and_samples
+        section_signals_and_samples:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_signals_and_samples =  section_signals_and_samples:AddHeading("Understanding Signals and Samples", 2)
+        h_signals_and_samples:AddClassAttribute("text-2xl font-bold")
+        h_signals_and_samples:AddAttribute("data-text", "Understanding Signals and Samples")
+        AddToHeadingArray(h_signals_and_samples)
 
-        bodyDiv:AddParagraph("Digital Signal Processing, or DSP for short, is the process of digitizing signals like audio and video to be analyzed and manipulated. 
+        section_signals_and_samples:AddParagraph("Digital Signal Processing, or DSP for short, is the process of digitizing signals like audio and video to be analyzed and manipulated. 
             Computers interpret sound in a digital format as a series of binary values. 
             For an audio file to be recognized by a computer, an analog signal (which is what we hear) must first be converted to a digital source with an analog-to-digital converter. 
             This signal processing is called sampling and is done by converting a signal into discrete values.")
             
-        bodyDiv:AddParagraph("A sampling rate generates a set amount of samples per second. 
+        section_signals_and_samples:AddParagraph("A sampling rate generates a set amount of samples per second. 
             The higher the sampling rate, the more accurate the samples will be as compared to the analog signal. 
             The standard sampling rate for audio waveforms in CD format is 44.1 kHz (kilohertz). 
             This means that 44,100 samples are generated per second.")
 
-        bodyDiv:AddParagraph("Below is a representation of a sine wave that ranges from 1 to -1. 
+        section_signals_and_samples:AddParagraph("Below is a representation of a sine wave that ranges from 1 to -1. 
             The red line indicates the value of the wave at any specific time. 
             In order to digitize the audio, we “sample” it by capturing the value of the line at short, regular intervals. 
             These samples represent an approximation of the line by breaking it down into a series of points. 
             Setting a higher sampling rate will grab more of these values per second, collecting more points and more closely approximating the actual curve of the line.")
 
-        bodyDiv:AddImage("/media/dsp/sineWave.png", "This is an image of a sine wave.")
+        Image image_sine_wave = section_signals_and_samples:AddImage("/media/dsp/sineWave.png", "This is an image of a sine wave.")
+        image_sine_wave:AddAttribute("data-zoom", "")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_signals_and_samples)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -89,5 +90,13 @@ class AudioDSPTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/dsp/audiodsp.html"
+    end
+
+    action GetLinkName returns text
+        return "Digital Signal Processing"
+    end
+
+    action GetSectionName returns text
+        return "Audio"
     end
 end

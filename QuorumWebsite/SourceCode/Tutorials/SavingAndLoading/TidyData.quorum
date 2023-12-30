@@ -15,6 +15,14 @@ use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Web.Page.WebList
 use Libraries.Containers.Array
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.Web.Page.TableRow
 
 class TidyData is Lesson
     text dq = ""
@@ -28,100 +36,117 @@ class TidyData is Lesson
         SetWebPageTitle("Data Science - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        /*
+            contents of body
+        */
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Tidy Data", 1)
-        headDiv:AddText("This tutorial introduces Tidy Data and why we use it in the Quorum Programming Language.")
-        Add(headDiv)
+        Section headerSection
+        headerSection:SetClassAttribute("pageHeader outermostContainer")
+        Heading h1_head = headerSection:AddHeading("Tidy Data", 1)
+        h1_head:AddClassAttribute("text-2xl font-bold")
+        h1_head:AddAttribute("data-text", "Tidy Data")
+        AddToHeadingArray(h1_head)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headerSection:AddText("This tutorial introduces Tidy Data and why we use it in the Quorum Programming Language.")
+        bodyDiv:Add(headerSection)
         
-        bodyDiv:AddHeading("What is Tidy Data?", 2)
+        Section section_what_is_tidy_data
+        section_what_is_tidy_data:AddClassAttribute("flex flex-col gap-y-4")
+        bodyDiv:Add(section_what_is_tidy_data)
+        Heading h2_what_is = section_what_is_tidy_data:AddHeading("What is Tidy Data?", 2)
+        h2_what_is:AddAttribute("data-text", "What is Tidy Data?")
+        h2_what_is:AddClassAttribute("text-2xl font-bold")  
+        AddToHeadingArray(h2_what_is)
+        
+        Paragraph paragraph
+        paragraph:AddText("There are many ways to create datasets for analysis. In practice, while anything goes, there are advantages to having consistent formats. Notably, keeping our data consistent makes it possible for 1) humans reading the data to know ahead of time how it is structured and 2) computers ahead of time to use that structure to its advantage when running statistical and charting actions. For this reason, Quorum has adopted what ")
+        paragraph:AddLink("Hadley Wickham","https://en.wikipedia.org/wiki/Hadley_Wickham")
+        paragraph:AddText(" calls the ")
+        paragraph:AddLink("tidy data format","https://r4ds.had.co.nz/tidy-data.html")
+        paragraph:AddText(".")
+        section_what_is_tidy_data:Add(paragraph)
+        
+        Division tidy_list
+        tidy_list:AddParagraph("The basic idea behind Tidy is that data must have three properties:")
+        UnorderedList startRemarks
+        startRemarks:AddClassAttribute("list-disc list-inside pl-8")
+        startRemarks:AddListItem("Variables must be in columns")
+        startRemarks:AddListItem("Observations must be in rows")
+        startRemarks:AddListItem("Individual cells must represent only one value")
+        tidy_list:AddNestedTag(startRemarks)
+        section_what_is_tidy_data:Add(tidy_list)
 
-        bodyDiv:AddText("There are many ways to create datasets for analysis. In practice, while anything goes, there are advantages to having consistent formats. Notably, keeping our data consistent makes it possible for 1) humans reading the data to know ahead of time how it is structured and 2) computers ahead of time to use that structure to its advantage when running statistical and charting actions. For this reason, Quorum has adopted what ")
-        bodyDiv:AddLink("Hadley Wickham","https://en.wikipedia.org/wiki/Hadley_Wickham")
-        bodyDiv:AddText(" calls the ")
-        bodyDiv:AddLink("tidy data format","https://r4ds.had.co.nz/tidy-data.html")
-        bodyDiv:AddText(".")
-
-        bodyDiv:AddParagraph("The basic idea behind Tidy is that data must have three properties:")
-        WebList startRemarks
-startRemarks:AddListItem("Variables must be in columns")
-startRemarks:AddListItem("Observations must be in rows")
-startRemarks:AddListItem("Individual cells must represent only one value")
-bodyDiv:AddNestedTag(startRemarks)
-
-        bodyDiv:AddParagraph("In Quorum, all charts, statistical tests, and actions related to data all assume that data are in a tidy format. This means that sometimes some systems must convert data to other formats to conduct tests, or other such operations, but this can be done automatically. Here is an example of data in Tidy Format:
+        section_what_is_tidy_data:AddParagraph("In Quorum, all charts, statistical tests, and actions related to data all assume that data are in a tidy format. This means that sometimes some systems must convert data to other formats to conduct tests, or other such operations, but this can be done automatically. Here is an example of data in Tidy Format:
 ")
-
+        WebTable table = AddWebTable("Tidy Format Example")
+        TableBody tableBody = AddTableBody()
         
-         Array<text> rubricText1
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("y")
+        tableHeaderArray:Add("x1") 
+        tableHeaderArray:Add("x2")
+        tableHeaderArray:Add("x3")
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)
+
+        Array<text> rubricText1
         rubricText1:Add("2")
         rubricText1:Add("4") 
         rubricText1:Add("-9")
         rubricText1:Add("9")
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
-  Array<text> rubricText2
+        Array<text> rubricText2
         rubricText2:Add("6")
         rubricText2:Add("7") 
         rubricText2:Add("-19")
         rubricText2:Add("19")
+        tableBody:Add(AddTableBodyRow(rubricText2))
 
-          Array<text> rubricText3
+        Array<text> rubricText3
         rubricText3:Add("3")
         rubricText3:Add("4") 
         rubricText3:Add("-18")
         rubricText3:Add("18")
+        tableBody:Add(AddTableBodyRow(rubricText3))
 
-          Array<text> rubricText4
+        Array<text> rubricText4
         rubricText4:Add("9")
         rubricText4:Add("8") 
         rubricText4:Add("-16")
         rubricText4:Add("16")
+        tableBody:Add(AddTableBodyRow(rubricText4))
 
-          Array<text> rubricText5
+        Array<text> rubricText5
         rubricText5:Add("15")
         rubricText5:Add("17") 
         rubricText5:Add("-2")
         rubricText5:Add("2")
-
-          Array<text> rubricText6
+        tableBody:Add(AddTableBodyRow(rubricText5))
+          
+        Array<text> rubricText6
         rubricText6:Add("1")
         rubricText6:Add("3") 
         rubricText6:Add("-4")
         rubricText6:Add("4")
+        tableBody:Add(AddTableBodyRow(rubricText6))
 
-           Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("y", " "))
-        rubricHeader1:Add(AddTextBoldFront("x1", " "))
-        rubricHeader1:Add(AddTextBoldFront("x2", " "))
-        rubricHeader1:Add(AddTextBoldFront("x3", " "))
-
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
-    rubricRows1:Add(AddTableDataTag(rubricText5))
-rubricRows1:Add(AddTableDataTag(rubricText6))
+        table:Add(tableBody)
+        section_what_is_tidy_data:Add(table)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Tidy Format Example"))
-        
-
         bodyDiv:AddParagraph("In this example, y, x1, x2, and x3 are all variables and the first row is a header representing the name of those variables. The remaining rows contain all of the data points for each variable. Each cell contains only one value. ")
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action AddKeywords
@@ -150,5 +175,13 @@ rubricRows1:Add(AddTableDataTag(rubricText6))
 
     action GetLocation returns text
         return "tutorials/SavingAndLoading/TidyData.html"
+    end
+    
+    action GetLinkName returns text
+        return "Tidy Data"
+    end
+
+    action GetSectionName returns text
+        return "Data Science"
     end
 end

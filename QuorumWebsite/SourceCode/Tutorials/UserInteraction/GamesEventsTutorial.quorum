@@ -1,0 +1,244 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class GamesEventsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Events - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Input and Events in Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Input and Events in Quorum")
+        AddToHeadingArray(h_heading)
+
+        headDiv:AddText("This tutorial shows how to use input and events in our games.")
+        bodyDiv:Add(headDiv)
+
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        
+        Heading h2_intro = section_intro:AddHeading("Input Polling", 2)
+        h2_intro:AddAttribute("data-text", "Input Polling")
+        
+        h2_intro:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_intro)
+
+
+        section_intro:AddParagraph(   "In this tutorial, we will learn about using player input and the game engine’s event system. "
+                            +   "With these tools, our games will be able to react to mouse and keyboard input, as well as to colliding game objects.")
+
+
+
+        Paragraph pB
+        pB:AddText(    "The first method we will discuss for getting player input is known as ")
+        Bold CSPtitle
+        CSPtitle:AddText("polling")
+        pB:Add(CSPtitle)
+        pB:AddText(    ".Polling is a technique which involves regularly checking the current state of the mouse or keyboard to see if the player is giving us any input. ")
+        
+        section_intro:Add(pB)
+
+        Paragraph p1
+        CodeBlock cb1
+        CodeBlock cb2
+        cb1:AddText(" use Libraries.Game.InputMonitor")
+        cb2:AddText(" use Libraries.Interface.Events.KeyboardEvent")
+        p1:AddText("To do this in the Quorum Game Engine, we must include the InputMonitor library with the statement ")
+        p1:Add(cb1)
+        p1:AddText(". If we want to monitor keyboard input, we will also include the KeyboardEvent library with the statement ")
+        p1:Add(cb2)
+        p1:AddText(".")
+        section_intro:Add(p1)
+
+
+        Paragraph pA
+        pA:AddText(             "To see input polling in action, we will use a sample program which will play a sound when we press the spacebar on the keyboard or when we click inside the screen. "
+                            +   "To download a sample project that includes audio files, click ")
+
+       pA:AddLink( "here" , "/files/games/InputPollingProject.zip" ) 
+        pA:AddText(             ".")
+        section_intro:Add(pA)
+
+
+       section_intro:AddParagraph(   "To begin with this sample, let’s start by looking at the objects we will use in our program.")
+
+
+
+        section_intro:Add(preformatter:GeneratePreformattedCode("InputMonitor monitor" + cr
+                                                        + "KeyboardEvent keys" + cr 
+                                                        + "Audio keySound" + cr 
+                                                        + "Audio mouseSound"))
+
+        UnorderedList goalList1
+
+        ListItem li01
+        li01:AddText(   "The ")
+        Bold inputMonitorTitle
+        inputMonitorTitle:AddText("InputMonitor")
+        li01:Add(inputMonitorTitle)
+        li01:AddText(    " class is what we will use to poll the mouse and keyboard for input. We will see how this is used in the Update action.")
+        goalList1:Add(li01)
+
+        ListItem li02
+        li02:AddText(   "The ")
+        Bold keyboardEventTitle
+        keyboardEventTitle:AddText("KeyboardEvent")
+        li02:Add(keyboardEventTitle)
+        li02:AddText(   " is typically used for getting player input through event handling, which is an alternative approach compared to polling. 
+                        However, in this case we will use it to test if a particular key has been pressed because it also contains descriptive values for all supported keys on the keyboard so we don't have to use numeric codes.")
+        goalList1:Add(li02)
+
+
+        ListItem li03
+        Paragraph p0
+        p0:AddText(     "The ")
+        Bold audioTitle
+        audioTitle:AddText("Audio")
+        p0:Add(audioTitle)
+        p0:AddText(     " class will be used to play our sounds when the user gives us input. For more information on how Audio works, see ")
+        p0:AddLink(     " Playing Audio Files in Quorum" ,  "/tutorials/dsp/audiointro.html")
+        p0:AddText(     ".")    
+        li03:Add(p0)
+        goalList1:Add(li03)
+
+        section_intro:Add(goalList1)
+
+
+
+        bodyDiv:AddParagraph(   "We put our InputMonitor in the Update action because we want to check (poll) the status of the inputs at every frame. "
+                            +   "This is where we test for input, and react accordingly.")
+
+
+        CodeBlock cb3
+        Span s0
+        Span s1
+        cb3:AddText(    "   action Update(number seconds)" + cr )
+        s0:AddText(     "       // If the user is currently clicking the mouse, play a sound." + cr)
+        s0:SetClassAttribute("comment")
+        cb3:Add(s0)
+        cb3:AddText(    "        if monitor:IsClicked()" + cr
+                   +    "            mouseSound:Play()" + cr
+                   +    "        end" + cr + cr )
+        s1:AddText(     "       // If the user is pressing the spacebar, play a sound." + cr)
+        s1:SetClassAttribute("comment")
+        cb3:Add(s1)
+        cb3:AddText(    "        if monitor:IsKeyPressed(keys:SPACE)" + cr
+                   +    "            keySound:Play()" + cr
+                   +    "        end" + cr 
+                   +    "    end" + cr )
+        section_intro:Add(preformatter:GeneratePreformattedCode(cb3))
+
+
+        Paragraph p3
+        CodeBlock cb4
+        CodeBlock cb5
+        cb4:AddText(" if ")
+        cb5:AddText(" if monitor:IsClicked() ")
+        p3:AddText("The two")
+        p3:Add(cb4)
+        p3:AddText(" statements are where we check for input. In ")
+        p3:Add(cb5)
+        p3:AddText(" we ask the InputMonitor to check if any of the mouse buttons are currently being held down. If any of them are, we will enter the code inside the ")
+        p3:Add(cb4)
+        p3:AddText(" block.")
+        section_intro:Add(p3)
+
+        Paragraph p4
+        CodeBlock cb6
+        cb6:AddText(" if monitor:IsKeyPressed(keys:SPACE) ")
+        p4:AddText("Then we reach ")
+        p4:Add(cb6)
+        p4:AddText(" . The InputMonitor action IsKeyPressed will test if a particular key on the keyboard is being held down. Inside the action, we have to tell Quorum which key we want to test, so we give it the value of SPACE from the KeyboardEvent class. To see the names of all the keys refer to the ")
+        p4:AddLink("KeyboardEvent", "/Libraries/Interface/Events/KeyboardEvent.html" )
+        p4:AddText(" documentation.")
+        section_intro:Add(p4)
+
+        Paragraph p5
+        p5:AddText(             "These two actions are enough to test for input from both mouse and keyboard, but the InputMonitor has other actions to poll for other kinds of information, such as the current location of the mouse. "
+                            +   "For full details on what an InputMonitor can do, see its documentation page ")
+        p5:AddLink( "here" , "/Libraries/Game/InputMonitor.html" + dq ) 
+        p5:AddText(             ".")
+        section_intro:Add(p5)
+
+        section_intro:AddParagraph(   "Try it out below:")
+
+        
+          Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("PlaySounds.quorum", "examples/Games/Events/Main.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Play Sounds with Input Polling")
+    section_try_yourself:Add(ide3)
+    
+    
+     Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to capture events from a keyboard, mouse, or touch screen using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Events"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Events.png"
+    end
+
+    action GetName returns text
+        return "Input and Events in Quorum"
+    end
+
+    action GetShortDescription returns text
+        return "How to use input and events in our games."
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/events.html"
+    end
+    
+    action GetLinkName returns text
+        return "Input Polling"
+    end
+
+    action GetSectionName returns text
+        return "User Interaction and Events"
+    end
+end

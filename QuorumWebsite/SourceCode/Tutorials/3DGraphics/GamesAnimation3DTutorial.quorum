@@ -1,0 +1,565 @@
+
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class GamesAnimation3DTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Moving and Animating in 3D - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Moving and Animating in 3D with Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Moving and Animating in 3D with Quorum")
+        AddToHeadingArray(h_heading)
+
+        headDiv:AddText("This tutorial tells you how to move and animate items on a screen in 3 dimensions")
+        bodyDiv:Add(headDiv)
+
+        Section section_animate
+        section_animate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_animate)
+        AddHeading(section_animate, "Moving and Animating Items", 2)
+
+        section_animate:AddParagraph("This tutorial will discuss Quorum's 3D coordinate system, and how to make 3D items move, rotate, and scale in your game.")
+
+        CodeForIDE code1
+        code1:AddFileText("Animate3D.quorum", "")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Try actions")
+        section_animate:Add(ide)
+
+        AddHeading(section_animate, "Quorum's 3D Coordinate System", 3)
+     
+        section_animate:AddParagraph(   "Before we can begin to animate 3D objects in Quorum, we have to understand the 3D space in which our objects will live. "
+                            +   "3D objects are called 3D because they have three dimensions. A 2D object has width and height and a 3D object adds depth. "
+                            +   "In 2D animation, the position and size of an object on the screen can be explained using two measurements: "
+                            +   "one horizontal across the center of the screen (the x-axis) and one vertical across the center of the screen (the y-axis). "
+                            +   "When we add a third measurement for 3D, it runs from the user through the screen, getting farther away (we call this the z-axis). "
+                            +   "All 3D modeling is based on these three axes, but different programs use them differently." )
+        section_animate:AddParagraph(   "In general, there is a right-hand coordinate system and a left-hand coordinate system. In both systems, "
+                            +   "the y-axis is positive in the up direction and the x-axis is positive to the right. The difference between the two is the z-axis. "
+                            +   "In the left-handed system, the z-axis is positive away from the user. In the right-handed system, the z-axis is positive toward the user. "
+                            +   "Quorum uses the left-handed coordinate system. This is important because if we want an object to move closer or farther away, "
+                            +   "we need to know if we should increase or decrease the z coordinate. "
+                            +   "Below is an image that represents the left-handed coordinate system using a computer monitor.")
+        Image image = section_animate:AddImage("/media/games/coordinate_system.png", "This is an image of the coordinate system")
+        image:AddAttribute("data-zoom","")
+
+        //the section on moving objects
+        AddHeading(section_animate, "Moving Objects", 3)
+
+        Paragraph paraA
+        paraA:AddText(         "Before we can learn how to move an object around the screen, we must first create a Model object. Refer to the ")
+        Link linkA = paraA:AddLink("Drawing in 3D", "/tutorials/games/drawing3D.html")
+        linkA:SetClassAttribute("underlime text-quorum-blue-150")
+        paraA:AddText(         " tutorial for a refresher on how Models and drawing in 3D works. Remember to perform the following steps:")
+        section_animate:Add(paraA)
+
+        UnorderedList list
+        list:AddListItem("include your use statement for the Model library, as well as the Color, Camera, AmbientLight, and DirectionalLight libraries")
+        list:AddListItem("instantiate a Model (call it " + dq + "cylinder" + dq + " for this example) and a Color object")
+        list:AddListItem("set color using the RGBA values (0.25, 0.8, 0.25, 1)")
+        list:AddListItem("set up the camera")
+        list:AddListItem("load the cylinder primitive into the Model (use a width, height, and depth of 1.5 and the color object for this example)")
+        list:AddListItem("add the Model object to the game")
+        list:AddListItem("set up the lighting (directional and ambient)")
+        section_animate:Add(list)
+
+        section_animate:AddParagraph(        "Our code should look like this:")
+
+        CodeBlock cb1
+        Span s0
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        Span s5
+        Span s6
+        Span s7
+        Span s8
+        Span s9
+        s0:AddText(     "//these lines include our libraries" + cr)
+        s0:SetClassAttribute("comment")
+        cb1:Add(s0)
+        cb1:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Graphics.Camera" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr + cr
+                    +   "class Main is Game" + cr)
+        s1:AddText(     "    // this line declares our model object" + cr )
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText(    "    Model cylinder" + cr + cr
+                    +   "    action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr
+                    +   "    action CreateGame" + cr)
+        s2:AddText(     "        // these lines declare and set our color object" + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText(    "        Color color" + cr
+                    +   "        color:SetColor(0.25, 0.8, 0.25, 1)" + cr)
+        s3:AddText(     "        // this line creates a camera object" + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText(    "        Camera camera = GetCamera3D()" + cr)
+        s4:AddText(     "        // this line places our camera up and to the right of our box" + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText(    "        camera:SetPosition(0, 2, -4)" + cr)
+        s5:AddText(     "        // this line tells our camera to look at the center of the 3D scene" + cr)
+        s5:SetClassAttribute("comment")
+        cb1:Add(s5)
+        cb1:AddText(    "        camera:LookAt(0, 0, 0)" + cr)
+        s6:AddText(     "        // this line loads a cylinder with our color applied" + cr)
+        s6:SetClassAttribute("comment")
+        cb1:Add(s6)
+        cb1:AddText(    "        cylinder:LoadCylinder(1.5, 1.5, 1.5, color)" + cr + cr)
+        s7:AddText(     "        // this line adds the cylinder to the game" + cr)
+        s7:SetClassAttribute("comment")
+        cb1:Add(s7)
+        cb1:AddText(    "        Add(cylinder)" + cr + cr)
+        s8:AddText(     "        //these lines add a basic directional light" + cr)
+        s8:SetClassAttribute("comment")
+        cb1:Add(s8)
+        cb1:AddText(    "        DirectionalLight light" + cr
+                    +   "        light:SetDirection(-1, -4, 3)" + cr
+                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "        Add(light)" + cr + cr)
+        s9:AddText(     "        //these lines set the scene’s ambient light" + cr)
+        s9:SetClassAttribute("comment")
+        cb1:Add(s9)
+        cb1:AddText(    "        AmbientLight ambient" + cr
+                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "        SetAmbientLight(ambient)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr
+                    +   "    end" + cr
+                    +   "end")
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb1))
+
+
+        section_animate:AddParagraph(   "The code above loads a cylinder in the middle of our screen:")
+        Image image1 = section_animate:AddImage("/media/games/cylinder.png", "This is an image of the cylinder")
+        image:AddAttribute("data-zoom","")
+        section_animate:AddParagraph(   "Now that our initial cylinder is drawn, we can explore how it can move on the screen. "
+                            +   "In order to move the object we need to set its new position on the game screen. Every Model has a set of properties attached to it. "
+                            +   "Three of those properties are its x, y, and z position on the game screen. By default, Models are located at position (0, 0, 0), "
+                            +   "which is the middle the screen. Since we haven't previously set new coordinates, all the objects we've drawn so far have been positioned at the default "
+                            +   "(0,0,0) position. If we want to position an item in a different location, we can use the SetX, SetY, and SetZ actions that are part of the Model class. "
+                            +   "These actions each take a number parameter that represents the new x, y, or z coordinate of the Model. "
+                            +   "In the 2D animation tutorial, we used movement along the x and y axes, so we will focus on movement along the z-axis in this tutorial." )
+        section_animate:AddParagraph(   "Navigate to the CreateGame action and place the following line of code after Add(cylinder):")
+
+        CodeBlock cb2
+        Span s10
+        s10:AddText(    "//this line of code moves our cylinder closer" + cr)
+        s10:SetClassAttribute("comment")
+        cb2:Add(s10)
+        cb2:AddText(    "cylinder:SetZ(-2)")
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        section_animate:AddParagraph(   "In order to move our cylinder farther away, edit that line to read:")
+
+        CodeBlock cb3
+        Span s11
+        s11:AddText(    "//this line of code moves our cylinder farther away" + cr)
+        s11:SetClassAttribute("comment")
+        cb3:Add(s11)
+        cb3:AddText(    "cylinder:SetZ(2)")
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        section_animate:AddParagraph(   "For now, let's set the initial position of our cylinder to be a little farther away and to the lower left of our screen by adding these three lines:")
+        section_animate:Add(preformatter:GeneratePreformattedCode(  "cylinder:SetX(-2)" + cr
+                                                        +   "cylinder:SetY(-2)" + cr
+                                                        +   "cylinder:SetZ(2)"))
+        section_animate:AddParagraph(   "The same animation principles mentioned in the 2D animation tutorial also apply in 3D. To achieve smooth movement across a number of frames, "
+                            +   "we must move the image incrementally over a period of time. To do this, remember that we can take advantage of our Update action, "
+                            +   "which is called by the engine on each frame while game's main loop is active." )
+        section_animate:AddParagraph(   "If we want to insert movement code in the update action, navigate to the Update(number seconds) action. "
+                            +   "This is where we write our code to move the Model through three space on each frame. To do this, "
+                            +   "we need three number parameters that represent the new x position, the new y position, and the new z position calculated during the game's main loop. "
+                            +   "We can calculate the new x, y, and z positions by getting the current x and y positions plus some speed value multiplied by the seconds parameter. "
+                            +   "(Remember that the seconds parameter is the amount of time elapsed since the last time the Update action was called by the engine). "
+                            +   "The speed value represents how many pixels to move in a second. So, if the number chosen is small, the movement will be slow, maybe even too slow to see! "
+                            +   "Likewise, if the number chosen is too large, the movement will not appear smooth; instead, the Model will appear to jump through space. "
+                            +   "Play around with different speed values to see their effect." )
+        section_animate:AddParagraph(   "An example of code that moves a Model across the screen is below:")
+
+        CodeBlock cb4
+        Span s12
+        cb4:AddText(    "   action Update(number seconds)" + cr)
+        s12:AddText(    "        // these statements calculate the new x, y, and z positions by getting the current" + cr
+                    +   "        // positions of the Model and adding a " + dq + "speed" + dq + " factor multiplied by seconds" + cr)
+        s12:SetClassAttribute("comment")
+        cb4:Add(s12)
+        cb4:AddText(    "        number newX = cylinder:GetX() + 2 * seconds" + cr
+                    +   "        number newY = cylinder:GetY() + 2 * seconds" + cr
+                    +   "        number newZ = cylinder:GetZ() - 2 * seconds" + cr
+                    +   "        cylinder:SetPosition(newX, newY, newZ)" + cr
+                    +   "    end")
+        section_animate:Add(preformatter:GeneratePreformattedCode(cb4))
+
+
+        section_animate:AddParagraph(   "If we run our program now (F6), we will see our cylinder move across the screen and closer until it eventually leaves the screen.")
+
+        Section section_rotate
+        section_rotate:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_rotate)
+        AddHeading(section_rotate, "Rotating and Scaling Objects", 2)
+
+        //the section on rotating and scaling objects
+        section_rotate:AddParagraph(   "In addition to moving across the screen, Models can also be rotated and scaled using the Quorum Game Library. "
+                            +   "This section will cover how to rotate and scale your Model during your game." )
+        section_rotate:AddParagraph(   "Models can be rotated or scaled during a game. Internally, Models store information relating to their orientation about a 3D axis, "
+                            +   "including the degree of rotation and whether the Model has been scaled.")
+
+        //the section on rotation
+        AddHeading(section_rotate, "Rotation", 3)
+        section_rotate:AddParagraph(   "Let's start with rotation. Models have actions that allow us to change their rotation in our game. The Rotate action takes 4 numbers: "
+                            +   "one to indicate the direction around each axis (x,y,z) and a number that represents the rotation angle in degrees. "
+                            +   "So, passing the values (1, 0, 0, 90) to this action will rotate our Model 90 degrees clockwise around the x axis. "
+                            +   "Negative values can be passed to this function as well, having the effect of changing the direction of rotation. "
+                            +   "For example, passing a value of (-1, 0, 0, 90) to the Rotate action will rotate the Model 90 degrees in the counter-clockwise direction. "
+                            +   "An example use of the Rotate action is below.")
+
+        CodeBlock cb5
+        Span s13
+        cb5:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Graphics.Camera" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "    Model cylinder" + cr + cr
+                    +   "    action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr
+                    +   "    action CreateGame" + cr
+                    +   "        Color color" + cr
+                    +   "        color:SetColor(0.25, 0.8, 0.25, 1)" + cr
+                    +   "        Camera camera = GetCamera3D()" + cr
+                    +   "        camera:SetPosition(0, 2, -4)" + cr
+                    +   "        camera:LookAt(0, 0, 0)" + cr + cr
+                    +   "        cylinder:LoadCylinder(1.5, 1.5, 1.5, color)" + cr
+                    +   "        Add(cylinder)" + cr + cr)
+        s13:AddText(    "        //This line causes the cylinder to be rotated 90 degrees" + cr
+                    +   "        //around the z-axis" + cr)
+        s13:SetClassAttribute("comment")
+        cb5:Add(s13)
+        cb5:AddText(    "        cylinder:Rotate(0, 0, -1, 90)" + cr + cr
+                    +   "        DirectionalLight light" + cr
+                    +   "        light:SetDirection(-1, -4, 3)" + cr
+                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "        Add(light)" + cr + cr
+                    +   "        AmbientLight ambient" + cr
+                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "        SetAmbientLight(ambient)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr
+                    +   "    end" + cr
+                    +   "end")
+       section_rotate:Add(preformatter:GeneratePreformattedCode(cb5))
+
+
+        section_rotate:AddParagraph(   "These lines of code produce the following effect on our cylinder:")
+        Image image2 = section_rotate:AddImage("/media/games/rotated_cylinder.png", "This is an image of a rotated cyclinder")
+        image2:AddAttribute("data-zoom","")
+        section_rotate:AddParagraph(   "Recall that in 2D drawing, Drawables have two separate rotation actions: SetRotation() and Rotate(). "
+                            +   "The Model action Rotate() is just like the 2D Rotate action: it tells the model to rotate the given number of degrees from its current position." )
+        section_rotate:AddParagraph(   "Rotation can also be performed in the Update loop of our game to have the Model rotate throughout the game. "
+                            +   "Simply place the call to rotate the Model in the Update action instead of the CreateGame action. An example of this is shown below, "
+                            +   "but you can try different values in order to change the direction and the speed of rotation. "
+                            +   "This code will cause our cylinder to rotate clockwise around the z-axis.")
+
+        CodeBlock cb6
+        Span s14
+        cb6:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Graphics.Camera" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "    Model cylinder" + cr + cr
+                    +   "       action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr
+                    +   "    action CreateGame" + cr
+                    +   "        Color color" + cr
+                    +   "        color:SetColor(0.25, 0.8, 0.25, 1)" + cr
+                    +   "        Camera camera = GetCamera3D()" + cr
+                    +   "        camera:SetPosition(0, 2, -4)" + cr
+                    +   "        camera:LookAt(0, 0, 0)" + cr + cr
+                    +   "        cylinder:LoadCylinder(1.5, 1.5, 1.5, color)" + cr
+                    +   "        Add(cylinder)" + cr + cr
+                    +   "        DirectionalLight light" + cr
+                    +   "        light:SetDirection(-1, -4, 3)" + cr
+                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "        Add(light)" + cr + cr
+                    +   "        AmbientLight ambient" + cr
+                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "        SetAmbientLight(ambient)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr)
+        s14:AddText(    "        //This line  causes our cylinder to rotate (clockwise) about the z-axis 1     " + cr
+                    +   "        //degree every frame " + cr)
+        s14:SetClassAttribute("comment")
+        cb6:Add(s14)
+        cb6:AddText(    "        cylinder:Rotate(0, 0, 1, 1)" + cr
+                    +   "    end" + cr
+                    +   "end")
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb6))
+
+
+
+
+        //the section on scaling
+        AddHeading(section_rotate, "Scaling", 3)
+        section_rotate:AddParagraph(   "Sometimes, you may want to make your object appear larger or smaller on the screen. In Quorum (and many other applications), this is known as scaling. "
+                            +   "To scale a Model in Quorum, we can call the Scale() action. "
+                            +   "This action takes three number parameters that represent the factor the image will be scaled by in each direction (x, y, z). "
+                            +   "If we want our object’s proportions to stay the same, we need to put the same number for each direction. "
+                            +   "Remember, scaling in 3D changes each measurement individually: "
+                            +   "For example, giving the Scale action (2, 2, 2) will increase the image's size by 2 in each direction and make our object about 8 times "
+                            +   "the size of the original. Passing the Scale action (0.5, 0.5, 0.5) will decrease the image's size by a factor of 0.5 in each direction, "
+                            +   "making our object’s scale about 12.5% of its original size. An example program that makes use of scaling is below:")
+
+        CodeBlock cb7
+        Span s15
+        Span s16
+        Span s17
+        Span s18
+        Span s19
+        cb7:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Graphics.Camera" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr + cr
+                    +   "class Main is Game" + cr
+                    +   "    Model cylinder" + cr)
+        s15:AddText(    "    //Create a second model object" + cr)
+        s15:SetClassAttribute("comment")
+        cb7:Add(s15)
+        cb7:AddText(    "    Model cylinder2" + cr + cr
+                    +   "    action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr
+                    +   "    action CreateGame" + cr
+                    +   "        Color color" + cr
+                    +   "        color:SetColor(0.25, 0.8, 0.25, 1)" + cr
+                    +   "        Camera camera = GetCamera3D()" + cr
+                    +   "        camera:SetPosition(0, 2, -4)" + cr
+                    +   "        camera:LookAt(0, 0, 0)" + cr + cr)
+        s16:AddText(    "        //Load a second cylinder that is exactly the same as our first" + cr)
+        s16:SetClassAttribute("comment")
+        cb7:Add(s16)
+        cb7:AddText(    "        cylinder2:LoadCylinder(1.5, 1.5, 1.5, color)" + cr)
+        s17:AddText(    "        //Set the positions so that the cylinders don’t overlap" + cr)
+        s17:SetClassAttribute("comment")
+        cb7:Add(s17)
+        cb7:AddText(    "        cylinder:SetPosition(-1, 0, 0.75)" + cr
+                    +   "        cylinder2:SetPosition(1, 0, 0.25)" + cr + cr)
+        s18:AddText(    "        //This line of code scales cylinder2 by 0.5 in each direction" + cr)
+        s18:SetClassAttribute("comment")
+        cb7:Add(s18)
+        cb7:AddText(    "        cylinder2:Scale(0.5, 0.5, 0.5)" + cr
+                    +   "        Add(cylinder)" + cr)
+        s19:AddText(    "        //Don’t forget to add our second cylinder" + cr)
+        s19:SetClassAttribute("comment")
+        cb7:Add(s19)
+        cb7:AddText(    "        Add(cylinder2)" + cr + cr
+                    +   "        DirectionalLight light" + cr
+                    +   "        light:SetDirection(-1, -4, 3)" + cr
+                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "        Add(light)" + cr + cr
+                    +   "        AmbientLight ambient" + cr
+                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "        SetAmbientLight(ambient)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr
+                    +   "    end" + cr
+                    +   "end")
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb7))
+
+
+        section_rotate:AddParagraph(   "The image below shows the result of the above code.")
+        Image image3 = section_rotate:AddImage("/media/games/scaled_cylinder.png", "This is an image of a scaled cylinder")
+        image3:AddAttribute("data-zoom", "")
+        section_rotate:AddParagraph(   "Scaling can be a difficult concept to visualize. The code below is for a game to explore scaling. Copy and run this code. "
+                            +   "In the game, the left and right arrow keys control the width scale (the z-axis), "
+                            +   "the up and down arrow keys control the height scale (the y-axis), shift + the up and down arrow keys controls the depth scale (the z-axis). "
+                            +   "To scale the whole model press the space key (shift + space to decrease size).")
+
+        CodeBlock cb8
+        Span s20
+        Span s21
+        Span s22
+        Span s23
+        cb8:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr
+                    +   "use Libraries.Game.Graphics.Color" + cr
+                    +   "use Libraries.Game.Graphics.Camera" + cr
+                    +   "use Libraries.Game.Graphics.AmbientLight" + cr
+                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr
+                    +   "use Libraries.Interface.Events.KeyboardListener" + cr
+                    +   "use Libraries.Interface.Events.KeyboardEvent" + cr 
+                    +   "use Libraries.Compute.Math" + cr + cr
+                    +   "class Main is Game, KeyboardListener" + cr
+                    +   "    Model cylinder" + cr
+                    +   "    boolean shift = false " )
+        s20:AddText(    "//stores whether shift is being held" + cr)
+        s20:SetClassAttribute("comment")
+        cb8:Add(s20)
+        cb8:AddText(    "    Math math ")
+        s21:AddText(    "//this allows us to round our values for output" + cr + cr)
+        s21:SetClassAttribute("comment")
+        cb8:Add(s21)
+        cb8:AddText(    "    action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr
+                    +   "    action CreateGame" + cr
+                    +   "        Color color" + cr
+                    +   "        color:SetColor(0.25, 0.8, 0.25, 1)" + cr
+                    +   "        Camera camera = GetCamera3D()" + cr
+                    +   "        camera:SetPosition(0, 2, -4)" + cr
+                    +   "        camera:LookAt(0, 0, 0)" + cr + cr
+                    +   "        cylinder:LoadCylinder(1.5, 1.5, 1.5, color)" + cr
+                    +   "        Add(cylinder)" + cr)
+        s22:AddText(    "        //Load a second cylinder that is exactly the same as our first" + cr + cr)
+        s22:SetClassAttribute("comment")
+        cb8:Add(s22)
+        cb8:AddText(    "        AddKeyboardListener(me)" + cr + cr
+                    +   "        DirectionalLight light" + cr
+                    +   "        light:SetDirection(-1, -4, 3)" + cr
+                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
+                    +   "        Add(light)" + cr + cr
+                    +   "        AmbientLight ambient" + cr
+                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
+                    +   "        SetAmbientLight(ambient)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action Update(number seconds)" + cr
+                    +   "    end" + cr + cr
+                    +   "    action PressedKey(KeyboardEvent event)" + cr
+                    +   "        if event:keyCode = event:SHIFT_LEFT or event:keyCode = event:SHIFT_RIGHT" + cr
+                    +   "            shift = true" + cr
+                    +   "        end" + cr
+                    +   "        if event:keyCode = event:RIGHT" + cr
+                    +   "            cylinder:Scale(1.1, 1, 1)" + cr
+                    +   "            printSize()" + cr
+                    +   "        elseif event:keyCode = event:LEFT" + cr
+                    +   "            cylinder:Scale(0.9, 1, 1)" + cr
+                    +   "            printSize()" + cr
+                    +   "        elseif event:keyCode = event:UP" + cr
+                    +   "            if shift" + cr
+                    +   "                cylinder:Scale(1, 1, 1.1)" + cr
+                    +   "            else" + cr
+                    +   "                cylinder:Scale(1, 1.1, 1)" + cr
+                    +   "            end" + cr
+                    +   "            printSize()" + cr
+                    +   "        elseif event:keyCode = event:DOWN" + cr
+                    +   "            if shift" + cr
+                    +   "                cylinder:Scale(1, 1, 0.9)" + cr
+                    +   "            else" + cr
+                    +   "                cylinder:Scale(1, 0.9, 1)" + cr
+                    +   "            end" + cr
+                    +   "            printSize()" + cr
+                    +   "        elseif event:keyCode = event:SPACE" + cr
+                    +   "            if shift" + cr
+                    +   "                cylinder:Scale(0.9, 0.9, 0.9)" + cr
+                    +   "            else" + cr
+                    +   "                cylinder:Scale(1.1, 1.1, 1.1)" + cr
+                    +   "            end" + cr
+                    +   "            printSize()" + cr
+                    +   "        end" + cr
+                    +   "    end" + cr + cr
+                    +   "    action ReleasedKey(KeyboardEvent event)" + cr
+                    +   "        if event:keyCode = event:SHIFT_LEFT or event:keyCode = event:SHIFT_RIGHT" + cr
+                    +   "            shift = false" + cr
+                    +   "        end" + cr
+                    +   "    end" + cr + cr
+                    +   "    action printSize" + cr)
+        s23:AddText(    "        //solves for and prints the width, height, and depth of the cylinder" + cr)
+        s23:SetClassAttribute("comment")
+        cb8:Add(s23)
+        cb8:AddText(    "        output " + dq + "(" + dq + " + math:Round(cylinder:GetWidth() * cylinder:GetTransform():GetScaleX(), 3) + " + dq + ", " + dq + " + " + cr
+                    +   "               math:Round(cylinder:GetHeight() * cylinder:GetTransform():GetScaleY(), 3) + " + dq + ", " + dq + " + " + cr
+                    +   "               math:Round(cylinder:GetWidth() * cylinder:GetTransform():GetScaleZ(), 3) + " + dq + ")" + dq + cr 
+                    +   "        end" + cr
+                    +   "end")
+        section_rotate:Add(preformatter:GeneratePreformattedCode(cb8))
+
+
+
+
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to code 3D animations in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "3D Animation"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Animation3D.png"
+    end
+
+    action GetName returns text
+        return "3D Animation"
+    end
+
+    action GetShortDescription returns text
+        return "how to use animation in 3D"
+    end
+
+    action GetLinkName returns text
+        return "3D Animation"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+            return GetNewLocation()
+        end
+        return "tutorials/games/animation3D.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+            return GetNewSectionName()
+        end
+        return "3D Graphics"
+    end
+end

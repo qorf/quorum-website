@@ -1,0 +1,275 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class ActionsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Controlling behaviors - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Actions", 1)
+
+        headDiv:AddText("How to tell a program to take a behavior.")
+        bodyDiv:Add(headDiv)
+
+        Section section_actions
+        section_actions:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_actions, "Actions in Quorum", 2)
+        section_actions:AddParagraph(   "In the Quorum programming language, actions are behaviors that a program can take. 
+            They are useful for many reasons, including at least that they 1) allow us to reuse code, 2) can sometimes
+            make it easier to separate out functionality in complex software, and they 3) allow us to break 
+            up a program's functionaity between different people on a team."
+            +   "For example, suppose we wrote an action to add numbers together. We might start with a definition:")
+        section_actions:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "end" + cr + cr
+            +   "action Add" + cr
+            +   "end" + cr))
+
+        section_actions:AddParagraph("Notice in this case that there are two copies of the word action, 
+            each with a name (e.g., Main and Add) after the word. Then, in each case, 
+            the word end comes after our name. By default, Quorum requires 
+            that all programs begin at the action Main. Until now, we have not been using 
+            actions and, as such, did not have to write this. Now, in order for our
+            program to execute, we must define both. In terms of what this program does, while it is valid, 
+            note that it has no output.")
+
+        CodeForIDE code_actions
+        code_actions:AddFileText("Main.quorum", "//Try creating a Main action and an Add action")
+        IDE ide_actions = AddIDE()
+        ide_actions:HideDisplay()
+        ide_actions:SetCodeForIDE(code_actions:GetJsonArray())
+        ide_actions:SetIdeTitle("Activity: Try actions")
+        section_actions:Add(ide_actions)
+
+        section_actions:AddParagraph("Notice a few conventions in Quorum. First, action names 
+            start with a capital letter. Second, we often match the word end at the 
+            same indentation level as the word action. Quorum programs will still work 
+            if these conventions are not followed, but the standard library uses them
+            and most programmers using Quorum, to our knowledge, follow them. Next, let us add 
+            an output statement to the Add action and note what happens")
+        section_actions:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "end" + cr + cr
+            +   "action Add" + cr
+            +   "     output " + dq + "Hello, Actions!" + dq + cr
+            +   "end" + cr))
+
+        CodeForIDE code_actions2
+        code_actions2:AddFileText("Main.quorum", "//Try an empty Main action")
+        IDE ide_actions2 = AddIDE()
+        ide_actions2:HideDisplay()
+        ide_actions2:SetCodeForIDE(code_actions2:GetJsonArray())
+        ide_actions2:SetIdeTitle("Activity: Try an empty Main action")
+        section_actions:Add(ide_actions2)
+
+
+        section_actions:AddParagraph("Now, we might assume that this code will execute and 
+            output our little phrase, but it does not. The reason is because all programs start at Main, 
+            but our Main action starts and immediately exits without calling Add. Let's fix that problem:")
+        section_actions:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "     Add()" + cr
+            +   "end" + cr + cr
+            +   "action Add" + cr
+            +   "     output " + dq + "Hello, Actions!" + dq + cr
+            +   "end" + cr))
+
+        CodeForIDE code_actions3
+        code_actions3:AddFileText("Main.quorum", "//Try an empty Main action")
+        IDE ide_actions3 = AddIDE()
+        ide_actions3:HideDisplay()
+        ide_actions3:SetCodeForIDE(code_actions3:GetJsonArray())
+        ide_actions3:SetIdeTitle("Activity: Try an empty Main action")
+        section_actions:Add(ide_actions3)
+
+
+        section_actions:AddParagraph("In this case, Quorum starts our program by calling the 
+            action Main, then immediately notices that we are asking it to call the 
+            action Add. Once the program jumps to this position, it executes the output statement,
+            finishes the Add action, jumps back to Main and terminates the program. 
+            Now our Add action does not actually add anything, but we will fix that next.")
+
+        Section section_parameters
+        section_parameters:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_parameters, "Action Parameters", 2)
+        section_parameters:AddParagraph("We often need to give information to our actions 
+            in order for them to compute information for us. A simple example might be adding two integers. 
+            In this case, we would want to pass information, each integer, and then get information back 
+            on the result (called returning). In this section, we cover passing the information and in the 
+            next we cover returning it. First, let's modify our Add action to take two parameters:")
+
+        section_parameters:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "     Add() //this is an error" + cr
+            +   "end" + cr + cr
+            +   "action Add(integer a, integer b)" + cr
+            +   "     output " + dq + "Hello, Actions!" + dq + cr
+            +   "     output a + b" + cr
+            +   "end" + cr))
+
+
+        CodeForIDE code_actions4
+        code_actions4:AddFileText("Main.quorum", "//This code will give us an error")
+        IDE ide_actions4 = AddIDE()
+        ide_actions4:HideDisplay()
+        ide_actions4:SetCodeForIDE(code_actions4:GetJsonArray())
+        ide_actions4:SetIdeTitle("Activity: Try errors with parameters")
+        section_parameters:Add(ide_actions4)
+
+        section_parameters:AddParagraph("In this case, the above code gives us an error. The reason is that, 
+            while we have modified the Add action with parameters, we have not changed how it is called. It is 
+            sometimes good practice to run code with an error in it, so that we can learn to recognize the 
+            mistake. We fix the error next.")
+
+        section_parameters:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "     Add(1, 2)" + cr
+            +   "end" + cr + cr
+            +   "action Add(integer a, integer b)" + cr
+            +   "     output " + dq + "Hello, Actions!" + dq + cr
+            +   "     output a + b" + cr
+            +   "end" + cr))
+
+        CodeForIDE code_actions5
+        code_actions5:AddFileText("Main.quorum", "//this code now outputs the addition")
+        IDE ide_actions5 = AddIDE()
+        ide_actions5:HideDisplay()
+        ide_actions5:SetCodeForIDE(code_actions5:GetJsonArray())
+        ide_actions5:SetIdeTitle("Activity: Try parameters (again)")
+        section_parameters:Add(ide_actions5)
+
+        section_parameters:AddParagraph("We now have an action that can compute an addition, but this 
+            action is not very general. It outputs the value to the screen, but does not provide 
+            the information back to the part of the program calling it in any useful way. In order to 
+            get information back, we need to return the value.")
+        
+
+        //the section on returning value from actions
+        Section section_return_value
+        section_return_value:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_return_value, "Returning a value from an action", 2)
+        section_return_value:AddParagraph("Actions can take many forms in computer science, from addition, like what we have been writing
+            to very complex ones, like certain mathematical operations. It is common in programming languages for 
+            many of these actions to be written in to a standard library. For us to use them, however, 
+            we might need these actions to give us back information that we can use. ")
+        section_return_value:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "     integer result = Add(1, 2)" + cr
+            +   "     output result" + cr + cr
+            +   "     result = Add(3, 4) //notice we can reuse the code" + cr
+            +   "     output result" + cr
+            +   "end" + cr + cr
+            +   "action Add(integer a, integer b) returns integer" + cr
+            +   "     return a + b " + cr
+            +   "end" + cr))
+        section_return_value:AddParagraph(   "The action Add now has two words at the end of the right paren,
+            labeled returns integer. This code means that the action must send back an integer value 
+            to the action that asked us to do the addition. Next, in order to send back the value
+            we use the word return and then whatever computation we want. In this case, 
+            that is the addition. We can then use these results to print out two values, 3 and 7.")
+
+
+        CodeForIDE code_actions6
+        code_actions6:AddFileText("Main.quorum", "//Try giving information back to the caller of the action")
+        IDE ide_actions6 = AddIDE()
+        ide_actions6:HideDisplay()
+        ide_actions6:SetCodeForIDE(code_actions6:GetJsonArray())
+        ide_actions6:SetIdeTitle("Activity: Try returning a value")
+        section_return_value:Add(ide_actions6)
+
+        section_return_value:AddParagraph("As one final example, it is also possible to exit an action, even 
+            if we do not return a value. This process can only be used if the action returns 
+            nothing. Here is an example with this statement, return now, inside of a loop.")
+
+        section_return_value:Add(preformatter:GeneratePreformattedCode(  
+                "action Main" + cr
+            +   "     RunMe()" + cr
+            +   "     output " + dq + "The End." + dq + cr
+            +   "end" + cr + cr
+            +   "action RunMe" + cr
+            +   "     repeat while true " + cr
+            +   "          //this statement stops the loop " + cr
+            +   "          return now" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+
+        CodeForIDE code_actions7
+        code_actions7:AddFileText("Main.quorum", "//Try returning from an action without sending back a value")
+        IDE ide_actions7 = AddIDE()
+        ide_actions7:HideDisplay()
+        ide_actions7:SetCodeForIDE(code_actions7:GetJsonArray())
+        ide_actions7:SetIdeTitle("Activity: Try return now")
+        section_return_value:Add(ide_actions7)
+
+        bodyDiv:Add(section_actions)
+        bodyDiv:Add(section_parameters)
+        bodyDiv:Add(section_return_value)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to use actions in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Actions"
+    end
+
+    action GetImageLocation returns text
+        return "/media/basics/actions.png"
+    end
+
+    action GetName returns text
+        return "actions"
+    end
+
+    action GetShortDescription returns text
+        return "how to use actions to provide additional behaviors our code can do"
+    end
+
+    action GetLinkName returns text
+        return "Actions"
+    end
+
+    action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "tutorials/language/actions.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Basics"
+    end
+
+end

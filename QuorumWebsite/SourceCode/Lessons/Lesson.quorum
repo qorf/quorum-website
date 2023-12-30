@@ -1,18 +1,6 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.all
 use Libraries.System.File
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.HeaderLink
-use Libraries.Web.Page.WebPageHeader
-use Libraries.Web.Page.MainContent
 use Libraries.Containers.Array
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.Script
-use Libraries.Web.Page.MathML
 
 
 class Lesson is WebPage
@@ -22,7 +10,14 @@ class Lesson is WebPage
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
     Lesson nextLesson = undefined
+    Lesson prevLesson = undefined
+    VersionHelper versions
     text scriptsLocation = "/script/"
+    boolean IdeScriptSet = false
+    boolean AccessChartsScriptSet = false
+    Array<Heading> headingArray
+    text newLocation = ""
+    text newSectionName = ""
 
 
     action Setup
@@ -68,10 +63,445 @@ class Lesson is WebPage
 
     action SetNextLesson(Lesson next)
         nextLesson = next
+        if nextLesson not= undefined
+            nextLesson:SetPreviousLesson(me)
+        end
+    end
+
+    action GetPreviousLesson returns Lesson
+        return prevLesson
+    end
+
+    action SetPreviousLesson(Lesson prev)
+        prevLesson = prev
+    end
+
+    action CreateLinkedArrays() returns Array<Lesson>
+        // Initialize the arrays if not already done
+        Array<Lesson> chronologicalLinks
+    
+        // Collect links of all previous lessons
+        Lesson prevLesson = GetPreviousLesson()
+        Array<Lesson> pastLessons
+        repeat while prevLesson not= undefined
+            pastLessons:Add(prevLesson)
+            prevLesson = prevLesson:GetPreviousLesson()
+        end
+        
+        // Since we collected the previous lessons in reverse order, we need to reverse the array
+        // to put the lessons in chronological order
+        integer i = pastLessons:GetSize() - 1
+        repeat while i >= 0 // Include the first lesson at index 0
+            chronologicalLinks:Add(pastLessons:Get(i))
+            i = i - 1
+        end
+
+    
+        // Add the current lesson
+        chronologicalLinks:Add(me)
+        
+        // Add all next lessons in order
+        Lesson nextLesson = GetNextLesson()
+        repeat while nextLesson not= undefined
+            chronologicalLinks:Add(nextLesson)
+            nextLesson = nextLesson:GetNextLesson()
+        end
+    
+        // Return the single array with all lessons in chronological order
+        return chronologicalLinks
+    end
+
+
+    //used for making the table of contents on the right side of screen
+    action AddToHeadingArray(Heading heading) returns Heading
+        text lowerCase = heading:GetAttribute("data-text"):GetValue():ToLowerCase()
+        text formattedHeadingText = lowerCase:Replace(" ", "_")
+        heading:SetIdentifier(formattedHeadingText)
+        heading:AddAttribute("data-test", formattedHeadingText)
+        heading:AddAttribute("data-onpage-toc", "true")
+        headingArray:Add(heading)
+        return heading
+    end
+
+    action ZoomImages
+        // Outer container for the zoomed image and its description
+        Division div
+            div:SetIdentifier("zoomedImageContainer")
+            // Use 'flex-col' to stack children vertically and 'items-center' to center them horizontally
+            div:AddClassAttribute("hidden flex fixed inset-0 bg-neutral-grey-65 bg-opacity-50 flex-col items-center p-8 z-50")
+        
+        // Container for the image
+        Image image
+            image:SetIdentifier("zoomedImage")
+            // 'mb-8' adds margin at the bottom of the image, creating space for the paragraph below
+            image:AddClassAttribute("h-5/6 object-contain mb-8 bg-neutral-grey-10")
+        
+        // Adding the image to the main container
+        div:Add(image)
+        
+        // Paragraph for the image description
+        Paragraph paragraph
+            paragraph:SetIdentifier("zoomedAltText")
+            // 'text-white' for white text color, 'text-xl' for font size, and 'px-6 py-4' for padding:white
+            // 'bg-neutral-800' for a darker background and 'rounded' for rounded corners to make the text more legible
+            paragraph:AddClassAttribute("h-1/6 text-neutral-white text-2xl px-6 py-4 bg-neutral-800 rounded")
+        
+        // Adding the paragraph to the main container
+        div:Add(paragraph)
+        
+        // Adding the main container to the page
+        Add(div)
+
+
+
+        Script script
+        script:SetCode("
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('getting image')
+                // Function to zoom the image
+                function zoomImage(src, alt) {
+                    const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                    const zoomedImage = document.getElementById('zoomedImage');
+                    const zoomedAltText = document.getElementById('zoomedAltText');
+                    
+                    // Set the source and alt text of the zoomed image
+                    zoomedImage.src = src;
+                    zoomedAltText.textContent = alt;
+                    
+                    // Show the zoomed image container
+                    zoomedImageContainer.classList.remove('hidden');
+                }
+                
+                // Function to hide the zoomed image
+                function unzoomImage() {
+                    const zoomedImageContainer = document.getElementById('zoomedImageContainer');
+                    
+                    // Hide the zoomed image container
+                    zoomedImageContainer.classList.add('hidden');
+                }
+                
+                // Add click event listeners to images with data-zoom attribute
+                document.querySelectorAll('img[data-zoom]').forEach(img => {
+                    console.log(img)
+                    img.addEventListener('click', () => zoomImage(img.src, img.alt));
+                    img.tabIndex = 0;
+                    img.setAttribute('aria-label', 'Click to zoom image');
+                    img.style.cursor = 'pointer';
+                });
+                
+                // Event listener for the zoomed image container to hide it on click
+                let unzoomContainer = document.getElementById('zoomedImageContainer');
+                unzoomContainer.addEventListener('click', unzoomImage);
+        
+                // Keyboard shortcuts
+                document.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        unzoomImage();
+                    }
+        
+                    // Assuming you want to zoom in on an image with Enter if it is focused
+                    if (event.key === 'Enter') {
+                        const activeElement = document.activeElement;
+                        if (activeElement.hasAttribute('data-zoom')) {
+                            zoomImage(activeElement.src, activeElement.alt);
+                        }
+                    }
+                });
+            })
+        ")
+
+        Add(script)
+    end
+
+    action GetHeadingArray returns Array<Heading>
+        return headingArray
+    end
+
+    action CreateHeadingTableOfContents returns Division
+        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Division div
+        div:SetIdentifier("onPageTableOfContentsScrolling")
+        div:AddClassAttribute("h-toc overflow-auto")
+
+        Division innerDiv
+        innerDiv:AddClassAttribute("px-0.5")
+
+        NavigationDivision nav
+        nav:SetIdentifier("onPageTableOfContents")
+        nav:AddClassAttribute("font-sans")
+
+        Division hiddenDivForTailwindCSS
+        hiddenDivForTailwindCSS:AddClassAttribute("ml-2 ml-4 ml-6 ml-8 ml-10 mt-2 py-1 px-2 text-[16px] text-[15px] text-[14px] text-[13px] text-[12px] hidden")
+        Add(hiddenDivForTailwindCSS)
+
+        Script script
+
+  script:SetCode("
+        document.addEventListener('DOMContentLoaded', () => {
+             const toc = document.querySelector('#onPageTableOfContents');
+            if (!toc) return; // Early exit if the TOC container is not found
+            
+            const headings = Array.from(document.querySelectorAll('h1[data-onpage-toc], h2[data-onpage-toc], h3[data-onpage-toc], h4[data-onpage-toc], h5[data-onpage-toc], h6[data-onpage-toc]'));
+            const navStack = [document.createElement('nav')];
+            const ulStack = [document.createElement('ul')];
+            ulStack[0].setAttribute('role', 'tree');
+            navStack[0].appendChild(ulStack[0]);
+            toc.appendChild(navStack[0]);
+            // create an array called links
+            let links = [];
+
+            let isClickScrolling = false; 
+            let headingLinksCount = {};
+            let currentSectionIndex = -1;
+
+            headings.forEach(heading => {
+                const level = parseInt(heading.tagName.substring(1), 10);
+
+                while (ulStack.length > level) {
+                    ulStack.pop(); // Remove the last ul from the stack to match the current heading level
+                    navStack.pop(); // Also pop the last nav
+                }
+
+                while (ulStack.length < level) {
+                    let newNav = document.createElement('nav');
+                    if (level > 1) {
+                        // Set aria-label for inner navs
+                        let lastLi = ulStack[ulStack.length - 1].lastElementChild;
+                        let ariaLabel = lastLi ? lastLi.querySelector('a').textContent : '';
+                        newNav.setAttribute('aria-label', ariaLabel);
+                        newNav.classList.add(`ml-${(level - 1) * 2}`); // Adjust the multiplier as needed for greater indentation
+                        if(level > 2){
+                          newNav.classList.add(`text-[${16 - (level - 1)}px]`); // Adjust the multiplier as needed for smaller font size
+                        }else{
+                          newNav.classList.add(`text-[${16}px]`); // Adjust the multiplier as needed for smaller font size
+                        }
+                    }
+                    let newUl = document.createElement('ul');
+                    newUl.setAttribute('role', 'group');
+                    newNav.appendChild(newUl);
+                    ulStack[ulStack.length - 1].lastElementChild.appendChild(newNav);
+                    navStack.push(newNav); // Push the new nav onto the stack
+                    ulStack.push(newUl); // Push the new ul onto the stack
+                }
+                
+                let li = document.createElement('li');
+                li.setAttribute('role', 'treeitem');
+                li.setAttribute('aria-level', level.toString());
+                if(level == 2){
+                    li.classList.add('mt-2'); // Add margin-top for level 2 headings
+                }
+
+                let link = document.createElement('a');
+                link.classList.add('hover:bg-quorum-blue-25', 'block', 'w-full', 'rounded-xl', 'py-1', 'px-2');
+                link.textContent = heading.textContent;
+                link.href = '#' + heading.id;
+                links.push(link);
+                li.appendChild(link);
+
+                ulStack[ulStack.length - 1].appendChild(li);
+            });
+
+
+            function clearActiveStates() {
+                links.forEach(link => {
+                    link.classList.remove('font-bold', 'text-quorum-blue-150');
+                });
+            }
+
+            function updateActiveLinkOnScroll() {
+                if (isClickScrolling) return;
+                
+                let newSectionIndex = -1;
+                headings.forEach((heading, index) => {
+                    //change the fraction to change when the active link changes
+                    if (heading.getBoundingClientRect().top <= window.innerHeight / 5) {
+                        newSectionIndex = index;
+                    }
+                });
+
+                if (newSectionIndex !== currentSectionIndex && newSectionIndex >= 0) {
+                    clearActiveStates();
+                    const activeLink = links[newSectionIndex];
+                    activeLink.classList.add('font-bold', 'text-quorum-blue-150');
+                    
+                    // Get the bounding rectangle of the active link
+                    const linkRect = activeLink.getBoundingClientRect();
+                    const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+                    const tocRect = tocScrollingDiv.getBoundingClientRect();
+
+                    // Calculate the position to scroll to in the TOC
+                    // so the active link is in the middle of the TOC div.
+                    // This checks if the next link is up or down from the current.
+                    let scrollPosition = activeLink.offsetTop - tocScrollingDiv.offsetTop - (tocRect.height / 2) + (linkRect.height / 2);
+                    
+                    // If we're going up, we subtract, if we're going down, we add
+                    scrollPosition += (newSectionIndex > currentSectionIndex ? 1 : -1) * linkRect.height;
+                    
+                    // Scroll the TOC div to the new position
+                    tocScrollingDiv.scrollTop = scrollPosition;
+
+                    currentSectionIndex = newSectionIndex;
+                }
+            }
+
+           links.forEach((link, index) => {
+                link.addEventListener('click', (event) => {
+                    const sectionId = link.getAttribute('href').substring(1);
+                    const section = document.getElementById(sectionId);
+
+                    isClickScrolling = true;
+                    currentSectionIndex = index;
+                    clearActiveStates();
+                    link.classList.add('font-bold', 'text-quorum-blue-150');
+
+                    setTimeout(() => {
+                        isClickScrolling = false;
+                    }, 200);
+                });
+            });
+
+            updateActiveLinkOnScroll();
+            window.addEventListener('scroll', function(){
+              console.log('scrolling')
+              updateActiveLinkOnScroll();
+            });
+        });
+        ")
+
+        Add(script)
+        innerDiv:Add(nav)
+        div:Add(innerDiv)
+
+        return div
+    end
+
+    action CreateTableOfContents returns Division
+        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Division div
+        div:AddClassAttribute("h-toc overflow-auto")
+        Division innerDiv
+        innerDiv:AddClassAttribute("px-0.5")
+        NavigationDivision nav
+        nav:AddClassAttribute("font-sans")
+        UnorderedList ul
+        ul:AddClassAttribute("space-y-2")
+        integer i = 0
+        repeat while i < lessonArray:GetSize()
+            Lesson LessonIndex = lessonArray:Get(i)
+            
+            ListItem li
+            li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
+            
+            Link lessonLink
+            lessonLink:AddClassAttribute("block w-full py-1 px-2 capitalize")
+            lessonLink:SetAddress("/" + LessonIndex:GetLocation())
+            lessonLink:AddText(LessonIndex:GetLinkName())
+            
+            if LessonIndex:GetLocation() = GetLocation()
+                lessonLink:AddClassAttribute("bg-quorum-blue-50 font-bold rounded-xl")
+            end
+            li:Add(lessonLink)
+            ul:Add(li)
+            i = i + 1
+        end   
+        nav:Add(ul)
+
+        Script script
+   script:SetCode("
+
+        function isScrolledToBottom(container) {
+            // Check if the scroll position is at the bottom taking into account the scrollHeight, scrollTop, and clientHeight
+            return container.scrollHeight - container.scrollTop <= container.clientHeight;
+        }
+
+        // Define a helper function to scroll the container to the bottom
+        function scrollToBottom(container) {
+            // Scroll to the bottom of the container
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+        }
+
+        // Define the function outside the event listener
+        function updateViewableHeight(main) {
+            const rect = main.getBoundingClientRect();
+            let visibleHeight;
+        
+            // Calculate the visible height of the element
+            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+                visibleHeight = rect.height; // Fully visible
+            } else if (rect.top < 0 && rect.bottom > window.innerHeight) {
+                visibleHeight = window.innerHeight; // Larger than the window, take full window height
+            } else if (rect.top < 0) {
+                visibleHeight = rect.bottom; // Partly visible, top is out of view
+            } else if (rect.bottom > window.innerHeight) {
+                visibleHeight = window.innerHeight - rect.top; // Partly visible, bottom is out of view
+            } else {
+                visibleHeight = 0; // Not visible
+            }
+
+            visibleHeight = Math.min(visibleHeight, window.innerHeight);
+        
+            // Get the onPageTableOfContentsScrolling div
+            const tocScrollingDiv = document.getElementById('onPageTableOfContentsScrolling');
+            if(tocScrollingDiv){
+              // Check if we are at the bottom before the change
+              const atBottom = isScrolledToBottom(tocScrollingDiv);
+
+              // Update the CSS variable
+              document.documentElement.style.setProperty('--main-viewable-height', `${visibleHeight}px`);
+
+              // If we are at the bottom, after the update, scroll to the bottom
+              if (atBottom) {
+                  scrollToBottom(tocScrollingDiv);
+              }
+            }
+        }
+        
+        // Event listener for DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Call the function on initial load
+            const main = document.getElementById('mainDiv');
+            updateViewableHeight(main);
+        
+            // Set up the event listener for scrolling
+            window.addEventListener('scroll', () => {
+                updateViewableHeight(main);
+            });
+
+            // Also update when the window is resized
+            window.addEventListener('resize', () => {
+                updateViewableHeight(main);
+            });
+        });
+        ") 
+
+        Add(script)
+        innerDiv:Add(nav)
+        div:Add(innerDiv)
+
+        return div
+    end
+
+    action GetDefaultListStyle returns text
+        return "list-disc list-outside pl-8"
+    end
+
+    action GetDefaultSectionStyle returns text
+        return "flex flex-col gap-y-3"
+    end
+
+    action GetDefaultLinkStyle returns text
+        return "underline text-quorum-blue-150"
+    end
+
+    action GenerateDefaultLink returns Link
+        Link link
+        link:AddClassAttribute(GetDefaultLinkStyle())
+        return link
     end
 
     action GenerateList(Array<text> list) returns OrderedList
         OrderedList ol
+        ol:AddClassAttribute("list-disc list-outside pl-8")
         integer i = 0
         repeat while i < list:GetSize()
             ol:AddListItem(list:Get(i))
@@ -87,6 +517,36 @@ class Lesson is WebPage
 
     action GetShortDescription returns text
         return ""
+    end
+
+    action GetLinkName returns text
+        return GetName()
+    end
+
+    action GetSectionName returns text
+        return ""
+    end
+
+    action GetNewSectionName returns text
+        return newSectionName
+    end
+
+    action SetNewSectionName(text newSecName)
+        newSectionName = newSecName
+    end
+    
+    action AddIDEScript
+        if IdeScriptSet not= true
+            AddScript("/script/widgets/widget-js/IDE-"+ versions:GetWidgetVersion() +".js")
+            IdeScriptSet = true
+        end
+    end
+
+    action AddAccessChartsScript
+        if AccessChartsScriptSet not= true
+            AddScript("/script/widgets/widget-js/AccessCharts-"+ versions:GetWidgetVersion() +".js")
+            AccessChartsScriptSet = true
+        end
     end
 
     action AddDefaultHeaders
@@ -114,12 +574,23 @@ class Lesson is WebPage
 
         // The VersionHelper has up-to-date query strings for the source files.
         // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
-        VersionHelper versions
 
         AddKeywords()
+        //Add debug code
+        Script script
+        script:SetCode("
+            document.addEventListener('DOMContentLoaded', () => {
+              if (window.location.href.startsWith('https://127.0.0.1')) {
+                document.body.classList.add('debug-screens');
+              }
+            });
+        ")
+        Add(script)
+
         AddScript("/script/jquery-1.8.3.min.js")
         AddScript("/script/QuorumStandardLibrary.js" + versions:GetLanguageVersionQuery())
-        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+//        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+        AddScript("/script/script.js")
         AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
         Script moduleLocateFile
         moduleLocateFile:SetCode("        var Module = {
@@ -132,16 +603,13 @@ class Lesson is WebPage
         AddScript("/script/load.js" + versions:GetLoadVersionQuery())
 
         //add style sheet tags
-        AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
-        AddStylesheet("/style/style.css")
+        //AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
         AddStylesheet("/style/google.css")
+        AddStylesheet("/style/output.css")
         AddIcon("/media/favicon.ico")
 
         //Add Responsive Stylesheets
         WebPageHeader webHeader = me:GetWebPageHeader()
-        webHeader:Add(GetMediaStyleSheet("/style/style-small.css" + versions:GetCSSVersionQuery(), "(max-width: 500px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css" + versions:GetCSSVersionQuery(), "(min-width: 501px) and (max-width: 1000px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-large.css" + versions:GetCSSVersionQuery(), "(min-width: 1001px)"))
 
         Script googleScript
         googleScript:SetGenerateType(false)
@@ -163,6 +631,9 @@ googleScript2:AddText(
         Add(googleScript2)
         //Add the navigation bar
         NavigationBar navigation
+        LoginForm login
+        ZoomImages()
+        Add(login)
         Add(navigation)
     end
 
@@ -266,6 +737,61 @@ googleScript2:AddText(
     // general format is add tags to text, then add text to array (for both rows and columns) 
     // then the "rows" array 
 
+    action AddTableHeaderRow(Array<text> tableHeaderArray) returns TableHeader
+        integer i = 0
+        TableHeader tableHeader
+        tableHeader:AddClassAttribute("bg-neutral-black text-neutral-white overflow-hidden")
+        TableRow rowHeader
+
+        repeat while i < tableHeaderArray:GetSize()
+            TableHeaderCell th
+            th:AddClassAttribute("text-left py-3 px-4 font-semibold break-words text-sm first:rounded-tl-lg last:rounded-tr-lg")
+            th:AddClassAttribute("w-1/"+tableHeaderArray:GetSize())
+            th:AddText(tableHeaderArray:Get(i))
+            rowHeader:Add(th)
+            i = i + 1
+        end
+
+        tableHeader:Add(rowHeader)
+        return tableHeader
+    end
+
+    action AddTableBody returns TableBody
+        TableBody tableBody
+        tableBody:AddClassAttribute("bg-neutral-grey-25")
+        return tableBody
+    end
+
+    action AddTableBodyRow(Array<text> rowEntries) returns TableRow
+        TableRow row
+        row:AddClassAttribute("border-y border-neutral-grey-40 last:border-t last:border-y-0")
+
+        integer i = 0
+        repeat while i < rowEntries:GetSize()
+            TableData cell
+            cell:AddText(rowEntries:Get(i))
+            cell:AddClassAttribute("text-left py-3 px-4 break-words")
+            if i = 0
+                cell:AddClassAttribute("font-bold")
+            end
+            row:Add(cell)
+            i = i + 1
+        end
+        
+        return row
+    end
+
+
+    action AddWebTable(text captionText) returns WebTable 
+         WebTable table
+         table:AddClassAttribute("rounded-lg shadow overflow-hidden border-collapse table-fixed w-full")
+         TableCaption caption
+         caption:AddClassAttribute("text-xl font-bold p-4 bg-[transparent]")
+         caption:AddText(captionText)
+         table:Add(caption)
+         return table
+    end
+
     action AddTableHeaderTag(Array<text> headerText) returns text
         text columnTextWithTags = ""
         integer iterator = 0
@@ -307,6 +833,26 @@ googleScript2:AddText(
         return rowTextWithTags
     end
 
+    action GetDefaultTable(text title, Array<Array<text>> values) returns WebTable
+        WebTable tableFormat = AddWebTable(title)
+        TableBody tableBodyFormat = AddTableBody()
+
+        //assume it has a header and crash otherwise
+        Array<text> headers = values:Get(0) //header
+        TableHeader theadFormat = AddTableHeaderRow(headers)
+        tableFormat:Add(theadFormat) 
+
+        i = 1
+        repeat while i < values:GetSize()
+            Array<text> row = values:Get(i)
+            tableBodyFormat:Add(AddTableBodyRow(row))
+            i = i + 1
+        end
+
+        tableFormat:Add(tableBodyFormat)
+        return tableFormat
+    end
+
     action AddTableTag(text tableRows, text caption) returns text 
         return "<table style=" + dq +
                  " border: 1px solid black; border-radius: 12px; padding: 5px;" + dq + ";>"  + 
@@ -325,6 +871,23 @@ googleScript2:AddText(
     action GetLocation returns text
         return ""
     end
+
+    action GetNewLocation returns text
+        return newLocation
+    end
+
+    action SetNewLocation(text newLoc)
+        newLocation = newLoc
+    end
+
+    action GetCardImage returns text
+        return ""
+    end
+
+    action GetCardDescription returns text
+        return ""
+    end
+
 
    /*
         This is a helper action for creating an IDE on a page and potentially including source code in it.
@@ -353,7 +916,6 @@ googleScript2:AddText(
             end
         end
     end
-
    
     action AddMath(Division div, text fileName)
        MathML math
@@ -361,6 +923,12 @@ googleScript2:AddText(
        div:AddNestedTag(math)
     end
 
+       
+    action AddMath(Section section, text fileName)
+       MathML math
+       math:AddSource(fileName)
+       section:AddNestedTag(math)
+    end
 
     action AddCodeSample(Division div, text codePath)
         if codePath not= undefined
@@ -374,6 +942,60 @@ googleScript2:AddText(
             end
         end
         
+    end
+
+    action AddCodeSample(Section section, text codePath)
+        if codePath not= undefined
+            File file
+            file:SetPath(codePath)
+            if file:Exists() and file:GetFileSize() > 0
+                text result = file:Read()
+                if result not= undefined
+                    section:Add(preformatter:GeneratePreformattedCode(result))
+                end
+            end
+        end
+        
+    end
+
+    action AddIDE() returns IDE
+        AddIDEScript()
+        IDE ide
+        ide:Init()
+        return ide
+    end
+
+    action AddAccessCharts() returns AccessCharts
+        AddAccessChartsScript()
+        AccessCharts accessCharts
+        accessCharts:Init()
+        return accessCharts
+    end
+
+    action AddIDE(Section section, text ideName, text title, text codePath)
+        CodeForIDE code1
+        code1:AddFileUrl("Main.quorum", codePath)
+        IDE ide = AddIDE()
+        ide:SetIdentifier(ideName)
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle(title)
+        section:Add(ide)
+    end
+
+    action AddIDE(Section section, text ideName, text title, text codePath, boolean isText)
+        CodeForIDE code1
+        if isText
+            code1:AddFileText("Main.quorum", codePath)
+        else
+            code1:AddFileUrl("Main.quorum", codePath)
+        end
+        IDE ide = AddIDE()
+        ide:SetIdentifier(ideName)
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle(title)
+        section:Add(ide)
     end
 
     action AddIDE(Division div, text ideName, text title, text subtitle)
@@ -414,13 +1036,224 @@ googleScript2:AddText(
     end
 
     action WriteNextTutorial(Division div)
-        //Link to the next tutorial
+        // Link to the next tutorial
         Lesson lesson = GetNextLesson()
         if lesson not= undefined
             div:AddHeading("Next Tutorial", 2)
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-            next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            Link nextLink = next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            
             next:AddText(", which describes " + lesson:GetShortDescription() + ".")
         end
     end
+
+      action WriteNextTutorial(Section div)
+        // Link to the next tutorial
+        div:SetClassAttribute("flex flex-col gap-y-2")
+        if GetPreviousLesson() not= undefined or GetNextLesson() not= undefined 
+            text HeaderText = ""
+            if GetNextLesson() not= undefined
+                HeaderText = "Next Tutorial"
+            else
+                HeaderText = "End of Lesson"
+            end
+            Heading nextTutorial = div:AddHeading(HeaderText, 2)
+            nextTutorial:AddAttribute("data-text", HeaderText)
+            AddToHeadingArray(nextTutorial)
+            nextTutorial:AddClassAttribute("text-2xl font-bold")
+            if GetNextLesson() not= undefined
+              Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
+              next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation()):AddClassAttribute("underline text-quorum-blue-150")
+              next:AddText(", which describes " + GetNextLesson():GetShortDescription() + ".")
+            else
+              Paragraph backToReference = div:AddParagraph("You have reached the end of the lesson for " + GetSectionName() + ". To view more tutorials, press the button below or you can go back to the previous lesson pages.")
+            end
+            Division button_div
+            button_div:AddClassAttribute("flex flex-col md:flex-row justify-end")
+            if GetPreviousLesson() not= undefined
+                Link previousLesson
+                previousLesson:AddClassAttribute("py-2 px-5 bg-neutral-grey-25 font-bold captitalize rounded-2xl")
+                previousLesson:SetAddress("/" + GetPreviousLesson():GetLocation())
+                previousLesson:AddText("Go Back")
+                button_div:Add(previousLesson)
+            end
+            
+            if GetNextLesson() not= undefined
+                Link nextLesson
+                nextLesson:AddClassAttribute("py-2 px-10 w-fit bg-quorum-blue-100 ml-4 font-bold captitalize rounded-2xl")
+                nextLesson:SetAddress("/" + GetNextLesson():GetLocation())
+                nextLesson:AddText("Next Tutorial")
+                button_div:Add(nextLesson)
+            else
+                Link backToReferenceLink
+                backToReferenceLink:AddClassAttribute("py-2 px-10 w-fit bg-quorum-blue-100 ml-4 font-bold captitalize rounded-2xl")
+                backToReferenceLink:SetAddress("/reference.html")
+                backToReferenceLink:AddText("Back to Tutorials")
+                button_div:Add(backToReferenceLink)
+            end
+            div:Add(button_div)
+        end
+        
+    end
+
+    /*
+    * returns array of Divisions 
+    * div 0 is the left table of contents
+    * div 1 is the body
+    * div 2 is the on page table of contents
+    * div 3 is the "mainDiv"
+    * div 4 is the outer div
+    * div 5 is the Main Content region
+    */
+    action InitializeTutorialPage returns Array<Division>
+        Division outerDiv
+        outerDiv:AddClassAttribute("flex flex-col h-full-body box-border")
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        mainRegion:AddClassAttribute("my-8 mx-16 box-border flex-grow")
+        AdjustMain(mainRegion)
+        
+
+        Division innerDiv
+        innerDiv:SetIdentifier("mainDiv")
+        innerDiv:AddClassAttribute("flex flex-row box-border h-full")
+                
+        /*
+            lesson table of contents
+        */
+        Division tocDiv
+        //on hover show the full heading and make it lay on top of the other content
+        Heading tocHeading = tocDiv:AddHeading(GetSectionName(), 2)
+        tocHeading:AddClassAttribute("font-bold uppercase whitespace-nowrap h-[2ch] overflow-hidden text-ellipsis")
+        tocHeading:AddAttribute("title", GetSectionName())
+        tocDiv:Add(CreateTableOfContents())
+        tocDiv:AddClassAttribute("hidden sm:block w-1/5 sticky top-8 h-0")
+
+        /*
+            content body
+        */
+        Division bodyDiv
+        bodyDiv:SetIdentifier("content")
+        bodyDiv:AddClassAttribute("flex flex-col w-5/5 sm:w-4/5 md:w-3/5 mx-4 overflow-auto gap-y-4")
+
+        /*
+            On this page table of contents
+        */
+        Division onPageDiv
+        onPageDiv:AddClassAttribute("hidden md:block w-1/5 sticky top-8 h-0")
+
+        innerDiv:Add(tocDiv)
+        innerDiv:Add(bodyDiv)
+        innerDiv:Add(onPageDiv)
+
+        PageFooter footer
+        mainRegion:Add(innerDiv)
+        outerDiv:Add(mainRegion)
+        outerDiv:Add(footer)
+        Add(outerDiv)
+
+        Array<WebTag> divs
+        divs:Add(tocDiv)
+        divs:Add(bodyDiv)
+        divs:Add(onPageDiv)
+        divs:Add(innerDiv)
+        divs:Add(outerDiv)
+        divs:Add(mainRegion)
+        onPageDiv:AddHeading("On this page", 2):AddClassAttribute("font-bold uppercase")
+        return divs
+    end
+
+    //used to give json code prism highlighting
+    //add language-json to the code tag
+    action AddJsonPrism
+      AddScript("https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js")
+      AddScript("https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js")
+    end
+
+    action AddHeading(Section section, text headingText, integer headingLevel) returns Heading
+            Heading heading = section:AddHeading(headingText, headingLevel)
+            AddHeadingAttributes(heading, headingText)
+            return heading
+    end
+
+    action AddHeading(Header section, text headingText, integer headingLevel)returns Heading
+            Heading heading = section:AddHeading(headingText, headingLevel)
+            AddHeadingAttributes(heading, headingText)
+            return heading
+    end
+
+    action AddHeading(Division section, text headingText, integer headingLevel)returns Heading
+            Heading heading = section:AddHeading(headingText, headingLevel)
+            AddHeadingAttributes(heading, headingText)
+            return heading
+    end
+
+    private action AddHeadingAttributes(Heading heading, text headingText)
+            integer headingLevel = heading:GetScale()
+            if headingLevel = 1
+                heading:AddClassAttribute("text-3xl font-bold")
+            elseif headingLevel = 2
+                heading:AddClassAttribute("text-2xl font-bold")
+            elseif headingLevel = 3
+                heading:AddClassAttribute("text-xl font-bold")
+            elseif headingLevel = 4
+                heading:AddClassAttribute("text-lg font-bold")
+            elseif headingLevel = 5
+                heading:AddClassAttribute("text-base font-bold")
+            elseif headingLevel = 6
+                heading:AddClassAttribute("text-sm font-bold")
+            end
+            heading:AddAttribute("data-text", headingText)
+            AddToHeadingArray(heading)
+    end
+
+    action AddDisscussionGoal(Section section) returns Division
+        Division outerDiv
+        Division headingDiv
+        Division bodyDiv
+        headingDiv:AddHeading("Discussion Goal")
+        headingDiv:AddClassAttribute("overflow-hidden rounded-t-lg bg-secondary-green px-6 py-2 font-bold text-neutral-white")
+        bodyDiv:AddClassAttribute("rounded-b-lg bg-neutral-white px-6 py-2")
+        outerDiv:Add(headingDiv)
+        outerDiv:Add(bodyDiv)
+        section:Add(outerDiv)
+        return bodyDiv
+    end
+
+    action AddTeachingTip(Section section) returns Division
+        Division outerDiv
+        Division headingDiv
+        Division bodyDiv
+        headingDiv:AddHeading("Teaching Tip")
+        headingDiv:AddClassAttribute("overflow-hidden rounded-t-lg bg-quorum-blue-150 px-6 py-2 font-bold text-neutral-white")
+        bodyDiv:AddClassAttribute("rounded-b-lg bg-neutral-white px-6 py-2")
+        outerDiv:Add(headingDiv)
+        outerDiv:Add(bodyDiv)
+        section:Add(outerDiv)
+        return bodyDiv
+    end
+
+
+    action AddVideo(Section section, text url)
+         Division videoContainer
+        videoContainer:SetIdentifier("video-container")
+
+        Division videoHeader
+        videoHeader:SetIdentifier("video-header")
+
+        InlineFrame videoIFrame
+        videoIFrame:SetIdentifier("youtubeiframe")
+        videoIFrame:SetAddress(url)
+        videoIFrame:SetWidth("100%")
+        videoIFrame:SetHeight("450")
+        videoIFrame:AddAttribute("frameborder", "0")
+        videoIFrame:AddAttribute("allowfullscreen", "")
+
+        videoContainer:Add(videoHeader)
+        videoContainer:Add(videoIFrame)
+
+        section:Add(videoContainer) 
+  
+    end    
 end

@@ -1,0 +1,117 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.System.DateTime
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Containers.Array
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.Update
+use Libraries.Network.NetworkRequest
+use Libraries.Network.NetworkConnection
+use Libraries.Network.NetworkRequestListener
+use Libraries.Network.NetworkResponseEvent
+use Libraries.Data.Database.Insert
+use Libraries.System.Properties
+use Libraries.System.File
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+class RetrieveAssignments is ResponsePage
+    constant text COMPILER_VERSION = "11.1.2"
+    constant text CONTENT_TYPE = "Content-Type"
+    constant text TEXT_PLAIN = "text/plain"
+
+    NetworkExchange returnExchange
+    Redis redis
+    
+    text codeHash = ""
+
+    action ResponseReceived(NetworkExchange exchange)
+        HashTable<text, text> params = exchange:GetParameters()
+        text path = ""
+
+        // Iterating through the key-value pairs
+        Iterator<text> valueIterator = params:GetValueIterator()
+        Iterator<text> valueKeys = params:GetKeyIterator()
+        
+        repeat while valueKeys:HasNext()
+            text key = valueKeys:Next()
+            text value = valueIterator:Next()
+
+            if key = "path"
+                userType = value
+            end
+        end
+
+        // Constructing path
+        me:returnExchange = exchange
+        redis:Connect("redis")
+        codeHash = exchange:HashString("SHA-1", path)
+
+        check
+            if redis:Exists(codeHash)
+                response = redis:Get(codeHash)
+                returnExchange:SendResponseHeaders(200, response)
+                returnExchange:SendResponse(response)
+                return now
+            end
+        detect e
+            e:OutputStackTrace()
+        end
+
+        File file
+        file:SetPath(path)
+        file:GetDirectoryListing()
+
+        Array<File> files = file:GetDirectoryListing()
+
+        Iterator<File> iterator = files:GetIterator()
+        HashTable<text, text> table
+        JavaScriptObjectNotation notate
+
+        HashTable<text, List<text>> headers
+
+        // Iterating through the files
+        integer keyCount = 0
+        repeat while iterator:HasNext()
+            
+            JavaScriptObjectNotation inner
+            File next = iterator:Next()
+            text extension = next:GetFileExtension()
+
+            if extension = "quorum"
+                text value = next:Read()
+                inner:SetKey("" + keyCount)
+                keyCount = keyCount + 1
+                inner:Add("file", next:GetFileName())
+                text lf = value:GetLineFeed()
+                text dq = value:GetDoubleQuote()
+
+                text result = value:Replace(lf, "\n")
+                result = result:Replace(dq, "\" + dq)
+                inner:Add("data", result)
+
+                notate:Add(inner)
+            end
+        end
+
+        check
+            text responseJson = notate:ToText()
+            returnExchange:SendResponseHeaders(200, responseJson)
+            returnExchange:SendResponse(responseJson)
+            redis:Set(codeHash, responseJson)
+        detect e 
+            output "project not found"
+            output path
+                Failure(returnExchange, "Failed to connect")
+            return now
+        end
+    end
+
+    action GetPath returns text
+        return "/RetrieveCode.quorum"
+    end
+end

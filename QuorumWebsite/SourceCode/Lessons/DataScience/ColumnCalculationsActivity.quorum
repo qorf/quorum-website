@@ -16,6 +16,8 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Containers.Array
 use Libraries.Web.Page.Link
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
 
 class ColumnCalculationsActivity is Lesson
     text dq = ""
@@ -34,71 +36,74 @@ class ColumnCalculationsActivity is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Column Calculations Activity", 1)
-        headDiv:AddText("Understanding how to filter, split and create columns")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Column Calculations Activity", 1)
+        headDiv:AddParagraph("Understanding how to filter, split and create columns")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Column Calculations Activity", 1)
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(introSection, "Learning Objectives", 1)
         
-        bodyDiv:AddParagraph("Learning Objectives:")
+        introSection:AddParagraph("The student will learn:")
         Array<text> objectives
         objectives:Add("Students will be able to independently filter their datasets by sub-groups.")
         objectives:Add("Students will be able to learn how to create new columns ")
         objectives:Add("Student will be able to separate columns and add them as a new heading")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        Link link1
+        Link link1 = GenerateDefaultLink()
         link1:AddText("numerical dataset")
         link1:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/random.csv")
         link1:SetTarget(link1:newTab)
 
-        Link link2
+        Link link2 = GenerateDefaultLink()
         link2:AddText("'real world' dataset")
         link2:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Culture%20and%20Entertainment/league.csv")
         link2:SetTarget(link2:newTab)
 
-        bodyDiv:AddHeading("Obtain and Examining Our Datasets (5 Minutes)",2)
-        Paragraph body1 = bodyDiv:AddParagraph("For this lesson, we will be using two different datasets, one is a ")
+        AddHeading(introSection, "Obtain and Examining Our Datasets (5 Minutes)",2)
+        Paragraph body1 = introSection:AddParagraph("For this lesson, we will be using two different datasets, one is a ")
         body1:Add(link1)
         body1:AddText(" filled with arbitrary values and one is more a ")
         body1:Add(link2)
         body1:AddText(" with numerical and nonnumerical values. The significance of this dataset is to show how well users perform in a game.")
 
-        bodyDiv:AddParagraph("Our numerical dataset will be used on calculating columns because for those functions, it requires us to form equations, making numerical data much easier to work with. Our 'real world' dataset will be used to split up columns.")
+        introSection:AddParagraph("Our numerical dataset will be used on calculating columns because for those functions, it requires us to form equations, making numerical data much easier to work with. Our 'real world' dataset will be used to split up columns.")
         
-        bodyDiv:AddHeading("Calculating Columns (25 Minutes)",2)
+        AddHeading(introSection, "Calculating Columns (25 Minutes)",2)
 
-        bodyDiv:AddParagraph("Let us say we have two or more columns of numerical data in which we want to calculate something such as the sum. We are able to do that by forming equations by adding up our desired headers and our calculations would modify the DataFrame and insert a new column with the new values. ")   
-        bodyDiv:AddParagraph("Firstly, let us load the file and create a copy of the original frame. Next, we add the columns  on the frame, and the heading title, 'total games' and insert the equation we have (Wins + Losses) as the second parameter. Finally, we will output both the original frame (copy) and the newly modified frame (frame). Now we have created a new column with a name 'total games' that is essential in a gamer world.")
+        introSection:AddParagraph("Let us say we have two or more columns of numerical data in which we want to calculate something such as the sum. We are able to do that by forming equations by adding up our desired headers and our calculations would modify the DataFrame and insert a new column with the new values. ")   
+        introSection:AddParagraph("Firstly, let us load the file and create a copy of the original frame. Next, we add the columns  on the frame, and the heading title, 'total games' and insert the equation we have (Wins + Losses) as the second parameter. Finally, we will output both the original frame (copy) and the newly modified frame (frame). Now we have created a new column with a name 'total games' that is essential in a gamer world.")
 
-        Link link3
+        Link link3 = GenerateDefaultLink()
         link3:AddText("'random.csv'")
         link3:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/random.csv")
         link3:SetTarget(link3:newTab)
 
-        Link link4
+        Link link4 = GenerateDefaultLink()
         link4:AddText("the column calculation tutorial")
         link4:SetAddress("https://quorumlanguage.com/tutorials/Transformations/CalcColumns.html")
         link4:SetTarget(link4:newTab)
 
-        Paragraph body2 = bodyDiv:AddParagraph("If you would like more detailed steps, we have ")
+        Paragraph body2 = introSection:AddParagraph("If you would like more detailed steps, we have ")
         body2:Add(link4)
         body2:AddText(" with the ")
         body2:Add(link3)
         body2:AddText(" dataset on our website. As a reminder, these values are arbitrary and for learning purposes to construct our equations in a simple manner.")
         
-        bodyDiv:AddHeading("Column Splitting (25 Minutes)",2)
+        AddHeading(introSection, "Column Splitting (25 Minutes)",2)
 
-        bodyDiv:AddParagraph("Column splitting occurs when we have data that needs to be separated. As an example, let us view an example column:")
+        introSection:AddParagraph("Column splitting occurs when we have data that needs to be separated. As an example, let us view an example column:")
 
         Array<text> rubricText1
         rubricText1:Add("Vanilla-$5")
@@ -114,19 +119,20 @@ class ColumnCalculationsActivity is Lesson
 
         
         Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Ice Cream", " "))
+        rubricHeader1:Add("Ice Cream")
         
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+        Array<Array<text>> table
+        table:Add(rubricHeader1)
       
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
+        table:Add(rubricText1)
+        table:Add(rubricText2)
+        table:Add(rubricText3)
+        table:Add(rubricText4)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Ice Cream CSV"))
+        WebTable webTable = GetDefaultTable("Ice Cream CSV", table)
+        introSection:Add(webTable)
 
-        bodyDiv:AddParagraph("We see that there are ice cream flavors listed and immediately following, we have their prices listed. In a sense, we could say we are trying to make our data Tidy. Suppose we wanted to Tidy up our data automatically by making new columns for 'Ice Cream' and 'Price.'")
+        introSection:AddParagraph("We see that there are ice cream flavors listed and immediately following, we have their prices listed. In a sense, we could say we are trying to make our data Tidy. Suppose we wanted to Tidy up our data automatically by making new columns for 'Ice Cream' and 'Price.'")
 
         Array<text> rubricTextA
         rubricTextA:Add("Vanilla")
@@ -148,52 +154,53 @@ class ColumnCalculationsActivity is Lesson
         rubricHeaderA:Add(AddTextBoldFront("Ice Cream", " "))
         rubricHeaderA:Add(AddTextBoldFront("Price", " "))
         
-        Array<text> rubricRowsA
-        rubricRowsA:Add(AddTableHeaderTag(rubricHeaderA))
+        Array<Array<text>> table2
+        table2:Add(rubricHeaderA)
       
-        rubricRowsA:Add(AddTableDataTag(rubricTextA))
-        rubricRowsA:Add(AddTableDataTag(rubricTextB))
-        rubricRowsA:Add(AddTableDataTag(rubricTextC))
-        rubricRowsA:Add(AddTableDataTag(rubricTextD))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRowsA), "Formmated Ice Cream CSV"))
+        table2:Add(rubricTextA)
+        table2:Add(rubricTextB)
+        table2:Add(rubricTextC)
+        table2:Add(rubricTextD)
 
-        Link link5
+        WebTable webTable2 = GetDefaultTable("Formmated Ice Cream CSV", table2)
+        introSection:Add(webTable2)
+        
+
+        Link link5 = GenerateDefaultLink()
         link5:AddText("'League.csv' dataset")
         link5:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Culture%20and%20Entertainment/league.csv")
         link5:SetTarget(link5:newTab)
 
-        Link link6
+        Link link6 = GenerateDefaultLink()
         link6:AddText("this tutorial on column splitting")
         link6:SetAddress("https://quorumlanguage.com/tutorials/Transformations/ColumnSplit.html")
         link6:SetTarget(link5:newTab)
 
-        Paragraph body3 = bodyDiv:AddParagraph("We can achieve this separation by column splitting. For this section, we will be modifying our ")
+        Paragraph body3 = introSection:AddParagraph("We can achieve this separation by column splitting. For this section, we will be modifying our ")
         body3:Add(link5)
         body3:AddText(" dataset and we will be working on separating various factors. For this, we will be following ")
         body3:Add(link6)
         body3:AddText(". Notice how there are two major sections on, where the second section is a more complicated way to column split using Inheritance. In computer science, inheritance is when we create a new object that is based on another class.")
 
-        bodyDiv:AddHeading("Wrap-up with Data Transformations (5 Minutes)",2)
+        AddHeading(introSection, "Wrap-up with Data Transformations (5 Minutes)",2)
 
-        Link link7
+        Link link7 = GenerateDefaultLink()
         link7:AddText("original AskAManager dataset")
         link7:SetAddress("https://github.com/qorf/quorum-website/blob/main/QuorumWebsite/html/data/AskAManager.csv")
         link7:SetTarget(link7:newTab)
 
-        Paragraph body4 = bodyDiv:AddParagraph("Let us recall the two previous sections with cleaning up our data and focus on why data transformations are important. Again, let us refer back to our ")
+        Paragraph body4 = introSection:AddParagraph("Let us recall the two previous sections with cleaning up our data and focus on why data transformations are important. Again, let us refer back to our ")
         body4:Add(link7)
         body4:AddText(" and talk about what can be modified or removed to make this a Tidy dataset.")
 
         //no applicable common core
         
-        bodyDiv:AddParagraph(" ")
+        bodyDiv:Add(introSection)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -224,5 +231,11 @@ class ColumnCalculationsActivity is Lesson
 
     action GetLocation returns text
         return "lessons/DataScience/columnCalculationsActivity.html"
+    end
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Data Science"
     end
 end

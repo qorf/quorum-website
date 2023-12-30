@@ -19,6 +19,8 @@ use Libraries.Web.Page.Link
 use Libraries.Web.Page.Image
 use Libraries.System.FileReader
 use Libraries.System.File
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
 
 class PieCharts is Lesson
     // text version needs cleaning, then do code version
@@ -38,57 +40,60 @@ class PieCharts is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Pie Charts vs. Stacked BarCharts", 1)
-        headDiv:AddText("Understanding statistics and how to calculate important values using Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Pie Charts vs. Stacked BarCharts", 1)
+        headDiv:AddParagraph("Understanding statistics and how to calculate important values using Quorum")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Pie Charts vs. Stacked BarCharts", 1)
-        bodyDiv:AddParagraph(" Pie charts are a common graphic used to show parts-to-whole relationships of data. As the name suggests, the graphic is a circle divided into 'pieces of the pie' based upon the categories of the data. These types of charts are best when visually comparing categories to the whole and between categories. ")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(introSection, "Learning Objectives", 1)
+        introSection:AddParagraph(" Pie charts are a common graphic used to show parts-to-whole relationships of data. As the name suggests, the graphic is a circle divided into 'pieces of the pie' based upon the categories of the data. These types of charts are best when visually comparing categories to the whole and between categories. ")
         
-        bodyDiv:AddParagraph("Learning Objectives:")
+        introSection:AddParagraph("The student will learn:")
         Array<text> objectives
         objectives:Add("Students will be able to create and customize pie charts from a dataset.")
         objectives:Add("Students will be able to access the information from the pie charts using assistive technology. ")
         objectives:Add("Students will understand the differences between pie charts and stacked bar charts, especially in terms of accessibility.")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        bodyDiv:AddHeading("Creating a Pie Chart using Quorum Studio (10 minutes)",2)
+        AddHeading(introSection, "Creating a Pie Chart using Quorum Studio (10 minutes)",2)
 
-        Link link1
+        Link link1 = GenerateDefaultLink()
         link1:AddText("Pie Charts")
         link1:SetAddress("https://quorumlanguage.com/tutorials/charts/piechart.html")
         link1:SetTarget(link1:newTab)
 
-        Paragraph body1 = bodyDiv:AddParagraph("To create a pie chart, we'll be following the ")
+        Paragraph body1 = introSection:AddParagraph("To create a pie chart, we'll be following the ")
         body1:Add(link1)
         body1:AddText(" tutorial. The creation of pie charts closely resembles other Quorum charts you might have seen in previous sessions.")
         
-        Link link2
+        Link link2 = GenerateDefaultLink()
         link2:AddText("Wine Reviews")
         link2:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/wineReviews.csv")
         link2:SetTarget(link2:newTab)
 
-        Link link3
+        Link link3 = GenerateDefaultLink()
         link3:AddText("Downloading CSVs for Our Charts")
         link3:SetAddress("https://quorumlanguage.com/tutorials/charts/downloading.html")
         link3:SetTarget(link3:newTab)
         
-        Paragraph body2 = bodyDiv:AddParagraph("First, we need to download the data we're going to use for our pie chart. In this lesson, we'll be using the ")
+        Paragraph body2 = introSection:AddParagraph("First, we need to download the data we're going to use for our pie chart. In this lesson, we'll be using the ")
         body2:Add(link2)
         body2:AddText(" dataset (as a CSV file). If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")
         body2:Add(link3)
         body2:AddText(".")
 
-        bodyDiv:AddParagraph("The Wine Reviews dataset describes the wine itself, as well as its country, province, region, price and variety. It has 9 columns and 60 entries/rows of wines. We will be focusing on the 'Variety' column for this lesson, but in general any columns with recurring phrases or numbers would work. Here's a snippet of the dataset:")
+        introSection:AddParagraph("The Wine Reviews dataset describes the wine itself, as well as its country, province, region, price and variety. It has 9 columns and 60 entries/rows of wines. We will be focusing on the 'Variety' column for this lesson, but in general any columns with recurring phrases or numbers would work. Here's a snippet of the dataset:")
 
         Array<text> rubricText1
         rubricText1:Add("California")
@@ -112,167 +117,164 @@ class PieCharts is Lesson
         
 
         Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Province", " "))
-        rubricHeader1:Add(AddTextBoldFront("Region 1", " "))
-        rubricHeader1:Add(AddTextBoldFront("Variety", " "))
+        rubricHeader1:Add("Province")
+        rubricHeader1:Add("Region 1")
+        rubricHeader1:Add("Variety")
         
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+        Array<Array<text>> table
+        table:Add(rubricHeader1)
       
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-        rubricRows1:Add(AddTableDataTag(rubricText4))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Wine Reviews"))
+        table:Add(rubricText1)
+        table:Add(rubricText2)
+        table:Add(rubricText3)
+        table:Add(rubricText4)
 
-        Link link4
+        WebTable webTable = GetDefaultTable("Wine Reviews", table)
+        introSection:Add(webTable)
+
+        Link link4 = GenerateDefaultLink()
         link4:AddText("DataFrame")
         link4:SetAddress("https://quorumlanguage.com/Libraries/Compute/Statistics/DataFrame.html")
         link4:SetTarget(link2:newTab)
 
-        Link link5
+        Link link5 = GenerateDefaultLink()
         link5:AddText("Pie Chart")
         link5:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/PieChart.html")
         link5:SetTarget(link3:newTab)
 
-        Paragraph body3 = bodyDiv:AddParagraph("To start creating a Pie Chart, we need to import two libraries. ")
+        Paragraph body3 = introSection:AddParagraph("To start creating a Pie Chart, we need to import two libraries. ")
         body3:Add(link4)
         body3:AddText(", which is a frame where our chart will be drawn, and ")
         body3:Add(link5)
         body3:AddText(", which allows us to create a pie chart. Next, we will initialize a DataFrame and load a comma separated values file to the frame.")
         
-        bodyDiv:AddParagraph("Currently, we have only loaded the comma separated value file into the dataframe, and we are not reading anything from it. The first thing that we need to do is to load the columns and factors to be read by our bar chart. Specifically, we will add the one factor that we will be using in this tutorial: 'Variety.' After we have loaded the factor, we need to create a pie chart object using the frame that we have filled. Finally, we can display the content of that pie chart. Next, we will be labeling and customizing our pie chart.")
+        introSection:AddParagraph("Currently, we have only loaded the comma separated value file into the dataframe, and we are not reading anything from it. The first thing that we need to do is to load the columns and factors to be read by our bar chart. Specifically, we will add the one factor that we will be using in this tutorial: 'Variety.' After we have loaded the factor, we need to create a pie chart object using the frame that we have filled. Finally, we can display the content of that pie chart. Next, we will be labeling and customizing our pie chart.")
 
-        bodyDiv:AddHeading("Labeling the Pie Chart (10 minutes)",2)
+        AddHeading(introSection, "Labeling the Pie Chart (10 minutes)",2)
 
-        Link link6
+        Link link6 = GenerateDefaultLink()
         link6:AddText("Pie Chart")
         link6:SetAddress("https://quorumlanguage.com/tutorials/charts/piechart.html")
         link6:SetTarget(link6:newTab)
 
-        Paragraph body4 = bodyDiv:AddParagraph("The steps that we describe in this task can be followed in the 'Labeling the Pie Chart' section that is available in our ")
+        Paragraph body4 = introSection:AddParagraph("The steps that we describe in this task can be followed in the 'Labeling the Pie Chart' section that is available in our ")
         body4:Add(link6)
         body4:AddText(" tutorial. Labeling pie charts is similar to how you label our other types of graphs. Now we need to add labels to the pie chart. Add in a 'Title', a 'Legend Title', and 'Subtitle' text. We also can set the location of the legend 'bottom, right, left, top'.")
 
-        bodyDiv:AddParagraph("First we will add a title and subtitle describing the graph. The title should be a brief summary of what the chart is, with the subtitle allowing you to go into slightly more detail. We can then add a legend title and set its location. The legend allows us to clearly label the information, without adding too much text to the graph itself. We chose the text 'Top Wine Reviews Based on Type' for the title, 'Praised wine categorized by type' for the subtitle and 'Variety' for the legend, but you can choose different text if you feel it describes the chart better. We set the legend location to 'bottom,' but this can be changed based on what you think looks best for your graph. ")
+        introSection:AddParagraph("First we will add a title and subtitle describing the graph. The title should be a brief summary of what the chart is, with the subtitle allowing you to go into slightly more detail. We can then add a legend title and set its location. The legend allows us to clearly label the information, without adding too much text to the graph itself. We chose the text 'Top Wine Reviews Based on Type' for the title, 'Praised wine categorized by type' for the subtitle and 'Variety' for the legend, but you can choose different text if you feel it describes the chart better. We set the legend location to 'bottom,' but this can be changed based on what you think looks best for your graph. ")
 
-        bodyDiv:AddHeading("Customizing the Pie Chart (5 minutes)",2)
+        AddHeading(introSection, "Customizing the Pie Chart (5 minutes)",2)
 
-        Link link7
+        Link link7 = GenerateDefaultLink()
         link7:AddText("Pie Chart")
         link7:SetAddress("https://quorumlanguage.com/tutorials/charts/piechart.html")
         link7:SetTarget(link7:newTab)
 
-        Paragraph body5 = bodyDiv:AddParagraph("The steps that we describe in this task can be followed in the 'Customizing The Data Chart' section that is available in our ")
+        Paragraph body5 = introSection:AddParagraph("The steps that we describe in this task can be followed in the 'Customizing The Data Chart' section that is available in our ")
         body5:Add(link6)
         body5:AddText(" tutorial. While most of this is similar to other graphs, pie charts have a hole customization that's specific to them. Pie charts have unique aspects that allow for unique customization, such as the 'hole' in the middle of the pie chart, color palette, and font size.")
 
-        bodyDiv:AddParagraph("We made a hole that's 10% of the chart, but you can choose a different percentage. Next, we can choose a color palette for the pie chart. Finally, you can set the font size. We chose to set it to 20, although this can be changed if you want. Make sure to set the font large enough, however, or else the text may become difficult to read. Also, note that the font size is based on an integer value but the 'hole' is based on a percentage.")
+        introSection:AddParagraph("We made a hole that's 10% of the chart, but you can choose a different percentage. Next, we can choose a color palette for the pie chart. Finally, you can set the font size. We chose to set it to 20, although this can be changed if you want. Make sure to set the font large enough, however, or else the text may become difficult to read. Also, note that the font size is based on an integer value but the 'hole' is based on a percentage.")
 
-        bodyDiv:AddHeading("Accessing the Pie Chart (5 minutes)",2)
+        AddHeading(introSection, "Accessing the Pie Chart (5 minutes)",2)
 
-        Link link8
+        Link link8 = GenerateDefaultLink()
         link8:AddText("tutorial on keyboard navigation")
         link8:SetAddress("https://quorumlanguage.com/tutorials/charts/charttextnavigation.html")
         link8:SetTarget(link8:newTab)
 
-        Paragraph body6 = bodyDiv:AddParagraph("Now let's explore the graphic using the accessibility tools on your device. When the pie chart has been created, we should see our chart pop up in a separate window. From there, we can reference ")
+        Paragraph body6 = introSection:AddParagraph("Now let's explore the graphic using the accessibility tools on your device. When the pie chart has been created, we should see our chart pop up in a separate window. From there, we can reference ")
         body6:Add(link8)
         body6:AddText(" using the arrow keys for accessibility. One note is that when a pie chart is saved onto our computer devices, they save as an SVG (scalable vector graphic) which maintains not only resizability but accessibility to read these charts using a screen reader.")
 
-        bodyDiv:AddHeading("Pie Charts and Accessibility (10 minutes)",2)
+        AddHeading(introSection, "Pie Charts and Accessibility (10 minutes)",2)
 
-        bodyDiv:AddParagraph("In 'Understanding Data Accessibility for People with Intellectual and Developmental Disabilities,' [1] they researched how accessible different types of graphs are for people with intellectual and developmental disabilities, with a focus on autistic people. ")
-        bodyDiv:AddParagraph("While they didn't exclusively focus on pie charts, half of the paper does look into whether pie charts are the most effective way to communicate data. In this case, 'effective' graphs would be ones that communicated the data quickly and correctly, so a graph that someone could see and be able to judge the rough proportions of each segment with relative ease.")
-        bodyDiv:AddParagraph("To see which graph styles were most effective, the study looked into 3 areas: chart type (pie chart vs stacked bar chart vs tree map), continuity (whether the pie chart segments were separated or more done in a blended style), and embellishment (how much extra detail was added onto the chart). ")
+        introSection:AddParagraph("In 'Understanding Data Accessibility for People with Intellectual and Developmental Disabilities,' [1] they researched how accessible different types of graphs are for people with intellectual and developmental disabilities, with a focus on autistic people. ")
+        introSection:AddParagraph("While they didn't exclusively focus on pie charts, half of the paper does look into whether pie charts are the most effective way to communicate data. In this case, 'effective' graphs would be ones that communicated the data quickly and correctly, so a graph that someone could see and be able to judge the rough proportions of each segment with relative ease.")
+        introSection:AddParagraph("To see which graph styles were most effective, the study looked into 3 areas: chart type (pie chart vs stacked bar chart vs tree map), continuity (whether the pie chart segments were separated or more done in a blended style), and embellishment (how much extra detail was added onto the chart). ")
         
-        bodyDiv:AddParagraph("The study then showed the charts to both people with IDD, autism, and neither in a random order, and asked them to judge value estimation (roughly what percentage a subset is) and value comparison (whether one subset is bigger or smaller than another). ")
-        bodyDiv:AddParagraph("They found that pie charts caused more inaccuracy in terms of value estimation, and that charts like stacked bar charts (like a bar chart, but with each bar split into parts) or tree maps (more like a pie chart, but using rectangles inside an overall rectangle instead of pie slices) helped people with both IDD and autism understand data more. For this reason, let us now consider a similar chart as a stacked bar chart instead.")
+        introSection:AddParagraph("The study then showed the charts to both people with IDD, autism, and neither in a random order, and asked them to judge value estimation (roughly what percentage a subset is) and value comparison (whether one subset is bigger or smaller than another). ")
+        introSection:AddParagraph("They found that pie charts caused more inaccuracy in terms of value estimation, and that charts like stacked bar charts (like a bar chart, but with each bar split into parts) or tree maps (more like a pie chart, but using rectangles inside an overall rectangle instead of pie slices) helped people with both IDD and autism understand data more. For this reason, let us now consider a similar chart as a stacked bar chart instead.")
 
-        bodyDiv:AddParagraph("This is a small disclaimer that there are minor bug layout issues for pie charts. Some titles and labels may overlap but do not completely hinder the use of the chart!")
+        introSection:AddParagraph("This is a small disclaimer that there are minor bug layout issues for pie charts. Some titles and labels may overlap but do not completely hinder the use of the chart!")
         
-        bodyDiv:AddHeading("Converting to Stacked Bar Charts (10 minutes)",2)
+        AddHeading(introSection, "Converting to Stacked Bar Charts (10 minutes)",2)
 
-        bodyDiv:AddParagraph("To convert to a stacked bar chart, we have to feed in more data to the chart. A stacked bar chart needs 2 category variables (for the different stacks and subsets within the stacks), and then another variable it measures. For this example, we're going to look at the total prices of different wine variants in each country.")
+        introSection:AddParagraph("To convert to a stacked bar chart, we have to feed in more data to the chart. A stacked bar chart needs 2 category variables (for the different stacks and subsets within the stacks), and then another variable it measures. For this example, we're going to look at the total prices of different wine variants in each country.")
         
-        Link link9
+        Link link9 = GenerateDefaultLink()
         link9:AddText("BarChart")
         link9:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/BarChart.html")
         link9:SetTarget(link9:newTab)
 
-        Paragraph body7 = bodyDiv:AddParagraph("First, we need to add the ")
+        Paragraph body7 = introSection:AddParagraph("First, we need to add the ")
         body7:Add(link9)
         body7:AddText(" library, and change the chart initiation to be a bar chart instead of a pie chart. Next, we need to add 'country' as a factor, and 'price' as a column. The first factor is used for the main grouping, and so we want to add country as a factor before the line where we add variety, just to make sure country is our main subgroup. ")
 
-        bodyDiv:AddParagraph("Finally, you want to add the stack bars declaration before the display call (chart:StackBars(true)). This will turn it into a stacked bar chart instead of a regular bar chart. Stacked bar charts do show slightly different information compared to pie charts. If you did data manipulation beforehand, such as counting the number of each variety in each county, you could then use that data to reflect a more pie chart-like version of the data. ")
+        introSection:AddParagraph("Finally, you want to add the stack bars declaration before the display call (chart:StackBars(true)). This will turn it into a stacked bar chart instead of a regular bar chart. Stacked bar charts do show slightly different information compared to pie charts. If you did data manipulation beforehand, such as counting the number of each variety in each county, you could then use that data to reflect a more pie chart-like version of the data. ")
         
-        bodyDiv:AddHeading("Breakout Rooms (5 minutes)", 2)
+        AddHeading(introSection, "Breakout Rooms (5 minutes)", 2)
 
-        bodyDiv:AddParagraph("Breakout Discussion of the differences in the context of people with disabilities.")
-        bodyDiv:AddParagraph("Question to consider: What are other potential considerations should we keep in mind when trying to make charts more accessible?")
+        introSection:AddParagraph("Breakout Discussion of the differences in the context of people with disabilities.")
+        introSection:AddParagraph("Question to consider: What are other potential considerations should we keep in mind when trying to make charts more accessible?")
         
-        bodyDiv:AddHeading("Talk through Breakout Rooms (5 minutes)", 2)
+        AddHeading(introSection, "Talk through Breakout Rooms (5 minutes)", 2)
 
-        bodyDiv:AddParagraph("Just go around the groups and do a quick share out.")
+        introSection:AddParagraph("Just go around the groups and do a quick share out.")
 
-        bodyDiv:AddHeading("Relevant Common Core Standards", 2)
+        AddHeading(introSection, "Relevant Common Core Standards", 2)
 
-        Link link15
+        Link link15 = GenerateDefaultLink()
         link15:AddText("website")
         link15:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/")
         link15:SetTarget(link15:newTab)
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("We use the following ")
-        bodyDiv:Add(link15)
-        bodyDiv:AddText(" for common core standards in relation to histograms and measurements of distribution.")
+        Paragraph p1 = introSection:AddParagraph("")
+        p1:AddText("We use the following ")
+        p1:Add(link15)
+        p1:AddText(" for common core standards in relation to histograms and measurements of distribution.")
         
-        Link link16
+        Link link16 = GenerateDefaultLink()
         link16:AddText("CCSS.MATH.CONTENT.HSS.ID.A.1")
         link16:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/A/1")
         link16:SetTarget(link16:newTab)
         
-        Link link17
+        Link link17 = GenerateDefaultLink()
         link17:AddText("CCSS.MATH.CONTENT.HSS.ID.A.1")
         link17:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/A/2")
         link17:SetTarget(link17:newTab)
 
-        Link link18
+        Link link18 = GenerateDefaultLink()
         link18:AddText("CCSS.MATH.CONTENT.HSS.ID.B.5")
         link18:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/B/5")
         link18:SetTarget(link18:newTab)
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link16)
-        bodyDiv:AddText(": Represent data with plots on the real number line (dot plots, histograms, and box plots).")
+        p1:Add(link16)
+        p1:AddText(": Represent data with plots on the real number line (dot plots, histograms, and box plots).")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link17)
-        bodyDiv:AddText(": Use statistics appropriate to the shape of the data distribution to compare center (median, mean) and spread (interquartile range, standard deviation) of two or more different data sets.")
+        p1:Add(link17)
+        p1:AddText(": Use statistics appropriate to the shape of the data distribution to compare center (median, mean) and spread (interquartile range, standard deviation) of two or more different data sets.")
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link18)
-        bodyDiv:AddText(": Summarize categorical data for two categories in two-way frequency tables. Interpret relative frequencies in the context of the data (including joint, marginal, and conditional relative frequencies). Recognize possible associations and trends in the data.")
+        p1:Add(link18)
+        p1:AddText(": Summarize categorical data for two categories in two-way frequency tables. Interpret relative frequencies in the context of the data (including joint, marginal, and conditional relative frequencies). Recognize possible associations and trends in the data.")
 
-        bodyDiv:AddHeading("References", 2)
+        AddHeading(introSection, "References", 2)
 
-        Link link19
+        Link link19 = GenerateDefaultLink()
         link19:AddText("http://cu-visualab.org/IDD/idd/assets/idd.pdf")
         link19:SetAddress("http://cu-visualab.org/IDD/idd/assets/idd.pdf ")
         link19:SetTarget(link18:newTab)
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("[1] K. Wu, E. Petersen, T. Ahmad, D. Burlinson, E. S. Tanis, & D. Albers Szafir. 2021. Understanding Data Accessibility for People with Intellectual and Developmental Disabilities. In Proceedings of the 2021 Conference on Human Factors in Computing Systems (CHI '21). ")
-        bodyDiv:Add(link19)
+        Paragraph p2 = introSection:AddParagraph(" ")
+        p2:AddText("[1] K. Wu, E. Petersen, T. Ahmad, D. Burlinson, E. S. Tanis, & D. Albers Szafir. 2021. Understanding Data Accessibility for People with Intellectual and Developmental Disabilities. In Proceedings of the 2021 Conference on Human Factors in Computing Systems (CHI '21). ")
+        p2:Add(link19)
 
-        bodyDiv:AddParagraph("  ")
+        bodyDiv:Add(introSection)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -303,5 +305,11 @@ class PieCharts is Lesson
 
     action GetLocation returns text
         return "lessons/DataScience/pieCharts.html"
+    end
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Data Science"
     end
 end

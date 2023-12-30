@@ -1,34 +1,17 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.HeaderLink
-use Libraries.Web.Page.WebPageHeader
-use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.Script
-use Libraries.Web.Page.WebTable
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.DataFrameColumn
-use Libraries.Web.Page.TableRow
-use Libraries.Web.Page.TableData
-use Libraries.Web.Page.Input
-use Libraries.Web.Page.Form
-use Libraries.Web.Page.Button
-use Libraries.Web.Page.TableHeaderCell
 use Libraries.System.File
 
 
-class ProjectPage is WebPage
+class ProjectPage is Lesson
     text dq = ""
     dq = dq:GetDoubleQuote()
     text cr = ""
     cr = cr:GetCarriageReturn()
     text scriptsLocation = "/script/"
+    boolean IdeScriptSet = false
 
 
     text username = ""
@@ -58,42 +41,51 @@ class ProjectPage is WebPage
 
     action Setup
         //html header stuff
+        ContentModal modal
+        modal:GetContentModal():Add(AddSaveDialog())
+        Add(modal)
+
         SetWebPageTitle("Quorum Project Page - Quorum Programming Language")
         AddDefaultHeaders()
 
         //page header
         Division headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        text header = "Run Quorum Online"
+        headDiv:SetClassAttribute("flex w-full h-fit p-10 flex-col gap-4")
+        text header = "Run Quorum Online test"
         if projectName not= ""
-            header = dq+SanitizeForHTML(projectName)+dq + " by " + username
+        header = dq+SanitizeForHTML(projectName)+dq + " by " + username
         end
-        headDiv:AddHeading(header, 1)
+        Heading h1 = headDiv:AddHeading(header, 1)
+        h1:AddClassAttribute("text-3xl font-bold")
+
         text subheading = "This is a page for running Quorum online."
         if isPublic and projectName not= ""
-            subheading = PUBLIC_PROJECT
+        subheading = PUBLIC_PROJECT
         elseif not isPublic and projectName not= ""
-            subheading = PRIVATE_PROJECT
+        subheading = PRIVATE_PROJECT
         end
-        headDiv:AddText(subheading)
+        Paragraph para_head = headDiv:AddParagraph(subheading)
+        para_head:AddClassAttribute("text-xl")
+
         Add(headDiv)
 
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        leftDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full mx-4 overflow-auto gap-y-4")
+        rightDiv:SetClassAttribute("hidden")
+
 
         text ideName = "Quorum Online"
         if projectName not= undefined and projectName not= ""
             ideName = projectName
         end
-        AddIDE(bodyDiv, "writeCodeIde", ideName, code)
 
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        AddIDE(bodyDiv, "writeCodeIde", ideName, code)
     end
 
     action GetName returns text
@@ -114,12 +106,37 @@ class ProjectPage is WebPage
     end
 
     action AddIDE(Division div, text ideName, text title, text code)
-        CodingOnline ide
-        ide:SetDevelopmentLabel(title)
-        ide:SetUniqueIdentifier(ideName)
-        ide:Setup()
+        CodeForIDE code_files
+        code_files:AddFileText("Main.quorum", code)
+        IDE ide = AddIDE()
+        ide:SetIdentifier("writeCodeIde")
+        ide:HideDisplay()
+        ide:SetCodeForIDE(code_files:GetJsonArray())
+        ide:SetIdeTitle(title)
         div:Add(ide)
-        ide:GetIDEInputArea():AddText(code)
+
+        Script saveProject
+        saveProject:SetCode("
+            document.addEventListener(`DOMContentLoaded`, function() {
+              //get the data-test with topSidebar and add button to it that says save Project
+              let topSidebar = document.querySelector(`[data-test='topSidebar']`)
+              //get the data-test exportButton and get the style attribute value from it
+              let exportButton = document.querySelector(`[data-test='exportButton']`)
+              let exportButtonStyle = exportButton.getAttribute(`style`)
+              let saveProjectButton = document.createElement(`button`)
+              saveProjectButton.setAttribute(`style`, exportButtonStyle)
+              saveProjectButton.setAttribute(`data-test`, `saveProjectButton`)
+              saveProjectButton.innerHTML = `Save Project`
+              saveProjectButton.id = `writeCodeIdesaveProjectButton`
+              saveProjectButton.addEventListener(`click`, function() {
+                let outerContentModal = document.getElementById(`outerContentModal`)
+                outerContentModal.classList.add(`flex`)
+                outerContentModal.classList.remove(`hidden`)
+              })
+              topSidebar.appendChild(saveProjectButton)
+            })
+        ")
+        Add(saveProject)
     end
 
     action AddDefaultHeaders
@@ -151,6 +168,7 @@ class ProjectPage is WebPage
 
         AddKeywords()
         AddScript("/script/jquery-1.8.3.min.js")
+        AddScript("/script/QuorumStandardLibrary.js" + versions:GetLanguageVersionQuery())
         AddScript("/script/script.js" + versions:GetScriptVersionQuery())
         AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
         Script moduleLocateFile
@@ -164,16 +182,14 @@ class ProjectPage is WebPage
         AddScript("/script/load.js" + versions:GetLoadVersionQuery())
 
         //add style sheet tags
-        AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
-        AddStylesheet("/style/style.css")
+        //AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
+        //AddStylesheet("/style/style.css")
         AddStylesheet("/style/google.css")
+        AddStylesheet("/style/output.css")
         AddIcon("/media/favicon.ico")
 
         //Add Responsive Stylesheets
         WebPageHeader webHeader = me:GetWebPageHeader()
-        webHeader:Add(GetMediaStyleSheet("/style/style-small.css" + versions:GetCSSVersionQuery(), "(max-width: 500px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-medium.css" + versions:GetCSSVersionQuery(), "(min-width: 501px) and (max-width: 1000px)"))
-        webHeader:Add(GetMediaStyleSheet("/style/style-large.css" + versions:GetCSSVersionQuery(), "(min-width: 1001px)"))
 
         //Add the navigation bar
         NavigationBar navigation
@@ -208,6 +224,123 @@ class ProjectPage is WebPage
 
     action GetMetaDescription returns text
         return "Create, edit, share, and delete projects."
+    end
+
+    action AddIDEScript
+        if IdeScriptSet not= true
+            VersionHelper versions
+            AddScript("/script/widgets/widget-js/IDE-"+ versions:GetWidgetVersion() +".js")
+            IdeScriptSet = true
+        end
+    end
+
+    action AddIDE() returns IDE
+        AddIDEScript()
+        IDE ide
+        ide:Init()
+        return ide
+    end
+
+    private action AddSaveDialog returns Division
+        Division saveDiv
+        text id = "writeCodeIde"
+
+        saveDiv:SetClassAttribute("flex z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex-col gap-6")
+        saveDiv:SetIdentifier(id + "SaveModal")
+        saveDiv:AddAttribute("role", "dialog")
+        saveDiv:AddAttribute("aria-labelledby", id + "SaveTitleDiv")
+
+        Division modalDialog
+        modalDialog:SetClassAttribute("modal-dialog modal-content animate")
+
+        Division saveTitleDiv
+        saveTitleDiv:SetClassAttribute("text-3xl font-bold")
+        saveTitleDiv:SetIdentifier(id + "SaveTitleDiv")
+        saveTitleDiv:AddText("Save this Project")
+        modalDialog:Add(saveTitleDiv)
+
+        Form saveForm
+        saveForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        
+        Division projectNameDiv
+        projectNameDiv:AddClassAttribute("flex flex-col gap-2")
+
+        Label projectNameLabel
+        projectNameLabel:AddText("Project Name: ")
+        projectNameLabel:AddAttribute("for", id + "projectNameInput")
+        projectNameDiv:Add(projectNameLabel)
+        
+        Input projectNameInput
+        projectNameInput:SetType("text")
+        projectNameInput:SetName("projectname")
+        projectNameInput:SetIdentifier(id + "projectNameInput")
+        projectNameInput:AddAttribute("data-prefix", id)
+        projectNameInput:AddClassAttribute("p-2 rounded-md border border-neutral-grey-50 mt-1")
+        //input is required
+        projectNameInput:AddAttribute("required", "true")
+        projectNameInput:SetRequired(true)
+        //make the submitButton disabled until the input has text
+        projectNameInput:AddAttribute("oninput", "
+           (function(){
+            let submitButton = document.getElementById('"+id+"saveProjectButton');
+            let input = document.getElementById('"+id+"projectNameInput');
+            console.log(this)
+            console.log(input.value)
+            if (input.value.length > 0) {
+                submitButton.removeAttribute('disabled');
+                submitButton.classList.remove('disabled:opacity-50');
+                submitButton.classList.remove('disabled:cursor-not-allowed');
+            } else {
+                submitButton.setAttribute('disabled', 'true');
+                submitButton.classList.add('disabled:opacity-50');
+                submitButton.classList.add('disabled:cursor-not-allowed');
+            }
+        })(); ")
+        
+        projectNameDiv:Add(projectNameInput)
+
+        fieldContainerDiv:Add(projectNameDiv)
+
+        Division footbar
+        footbar:SetClassAttribute("footbar")
+
+        
+        Button submitButton
+        submitButton:SetType("button")
+        submitButton:SetClassAttribute("px-16 py-2 rounded-xl bg-quorum-blue-100 w-fit text-neutral-black font-bold text-xl mt-4 cursor-pointer hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed")
+        submitButton:AddText("Save Project")
+        submitButton:AddAttribute("disabled", "true")
+        submitButton:SetIdentifier(id + "saveProjectButton")
+        submitButton:SetTabIndex("0")
+        submitButton:SetOnClick("(function(){
+          // Get data-test of IdeInput and get the ide and the value without the IdeInput
+          let ideInput = document.querySelector('[data-test=\'IdeInput\']');
+          let id = ideInput.getAttribute('id');
+          let ide = id.replace('IdeInput', '');
+
+          saveProject(ide, ide + 'IdeInput', ide + 'consoleSection', '"+id+"'+ 'projectNameInput', 'false');
+          })();
+        ")
+
+        saveForm:Add(fieldContainerDiv)
+
+        Division buttonContainerDiv
+
+
+        buttonContainerDiv:Add(submitButton)
+
+        footbar:Add(buttonContainerDiv)
+
+        saveForm:Add(footbar)
+
+        modalDialog:Add(saveForm)
+         // Add Close or Exit Button
+
+        saveDiv:Add(modalDialog)
+
+        return saveDiv
     end
 
 end

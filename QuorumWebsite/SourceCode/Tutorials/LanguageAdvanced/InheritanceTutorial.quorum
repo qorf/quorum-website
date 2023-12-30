@@ -1,0 +1,306 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class InheritanceTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Inheritance - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Inheritance in Quorum", 1)
+
+        headDiv:AddText("Quorum uses inheritance for establishing relationships between classes.")
+        bodyDiv:Add(headDiv)
+
+        Section section_inheritance
+        section_inheritance:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_inheritance, "On Inheritance", 2)
+        section_inheritance:AddParagraph(   "We start our exploration of inheritance, a 
+            method for reusing code commonly seen in many programming languages, 
+            with an example on inheriting from Quorum’s math class. Imagine, for 
+            example, there were certain mathematical operators that we wanted to 
+            use. One way we could access the actions in Math would be to 
+            instantiate a Math object and use it. Another would be to inherit 
+            from it. There are good reasons we might want to do either one, but 
+            first, we examine what we type:")
+
+        section_inheritance:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Math" + cr 
+            +   "class Main is Math" + cr
+            +   "     action Main" + cr
+            +   "          output " + dq + "I am inheriting from Math!" + dq + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+        CodeForIDE code_inheritance
+        code_inheritance:AddFileText("Main.quorum", "//Try inheriting from Math")
+        IDE ide_inheritance = AddIDE()
+        ide_inheritance:HideDisplay()
+        ide_inheritance:SetCodeForIDE(code_inheritance:GetJsonArray())
+        ide_inheritance:SetIdeTitle("Activity: Try Inheritance")
+        section_inheritance:Add(ide_inheritance)
+
+        section_inheritance:AddParagraph("Notice that we accomplish this by first putting 
+            in a use statement for the Math class, indicating where it lives. 
+            Second, after the definition of our class, Main, we use the keyword 
+            is and then the name of the class we want to inherit from. Next, 
+            we define our Main action normally and, just so something appears 
+            in our console for this example, an output statement.")
+
+        section_inheritance:AddParagraph("Now that we have inherited from the Math class, 
+            we can access all of its actions. Here is a list of the actions 
+            Math provides by default:")
+
+        Link link1 = section_inheritance:AddLink("Quorum's Math Class","https://quorumlanguage.com/Libraries/Compute/Math.html")
+        link1:AddClassAttribute("underline w-fit text-quorum-blue-150")
+
+        section_inheritance:AddParagraph("Since we have inherited from Math we can call 
+            one of the Math actions even though we did not define them. For 
+            example, the following example returns 4.0:")
+
+        section_inheritance:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Math" + cr 
+            +   "class Main is Math" + cr
+            +   "     action Main" + cr
+            +   "          number value = RaiseToPower(2, 2)" + cr
+            +   "          output value" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+        CodeForIDE code_inheritance2
+        code_inheritance2:AddFileText("Main.quorum", "//Try inheriting the Raise to Power action from Math")
+        IDE ide_inheritance2 = AddIDE()
+        ide_inheritance2:HideDisplay()
+        ide_inheritance2:SetCodeForIDE(code_inheritance2:GetJsonArray())
+        ide_inheritance2:SetIdeTitle("Activity: Try using a Parent Action")
+        section_inheritance:Add(ide_inheritance2)
+
+        section_inheritance:AddParagraph("The key here is to realize that the RaiseToPower 
+            action, the parameters here making its meaning 2-squared, can be 
+            called because the Math class has such an action. By inheriting, 
+            we are asking the Math class for permission to use it. Because this 
+            action is public, Math gives permission.")
+
+        //the section on inheriting a single class
+        Section section_overriding
+        section_overriding:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overriding, "Overriding Actions", 2)
+        section_overriding:AddParagraph("In addition to using actions from the Math class, 
+            we can also add our own and even change the meaning of some of the 
+            parent actions. This is a common thing to do. If we are using the 
+            Game class to write games in Quorum, we might override the Update 
+            action in order to change what happens on each frame of animation 
+            in our game. Or, if we were overriding the Array class, we might 
+            change the way arrays are sorted if we have a faster or better 
+            approach. Here is an example of inheriting and calling an action 
+            from the Random class:")
+
+        section_overriding:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr 
+            +   "class Main is Random" + cr
+            +   "     action Main" + cr
+            +   "          integer value = RandomInteger()" + cr
+            +   "          output value" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+        CodeForIDE code_inheritance3
+        code_inheritance3:AddFileText("Main.quorum", "//Try inheriting the RandomInteger action from Random")
+        IDE ide_inheritance3 = AddIDE()
+        ide_inheritance3:HideDisplay()
+        ide_inheritance3:SetCodeForIDE(code_inheritance3:GetJsonArray())
+        ide_inheritance3:SetIdeTitle("Activity: Try Inheriting from Random")
+        section_overriding:Add(ide_inheritance3)
+
+        section_overriding:AddParagraph("By default, the RandomInteger action returns a 
+            number between 0 and the maximum integer on the system, which is 
+            2,147,483,646. Suppose, however, that we needed this action to 
+            return a different maximum number. Normally, this would not be 
+            desirable, as people using our class like the Random class might 
+            not expect it. Point being: inheritance involves design and there 
+            are good ones and bad ones. Being able to spot the difference, in 
+            this case a relatively weak design, takes practice and iteration. 
+            Here is our example, now with action overriding:")
+
+        section_overriding:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr 
+            +   "class Main is Random" + cr
+            +   "     action Main" + cr
+            +   "          integer value = RandomInteger()" + cr
+            +   "          output value" + cr
+            +   "     end" + cr
+            +   "     action RandomInteger returns integer" + cr
+            +   "          return RandomInteger(1000)" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+
+        CodeForIDE code_inheritance4
+        code_inheritance4:AddFileText("Main.quorum", "//Try overriding the RandomInteger action")
+        IDE ide_inheritance4 = AddIDE()
+        ide_inheritance4:HideDisplay()
+        ide_inheritance4:SetCodeForIDE(code_inheritance4:GetJsonArray())
+        ide_inheritance4:SetIdeTitle("Activity: Try Inheriting from Random")
+        section_overriding:Add(ide_inheritance4)
+
+        section_overriding:AddParagraph("In this case, the RandomInteger returns integer 
+            action now provides numbers between 0 and 1000. Even though we have 
+            inherited from Random, users of our class will receive our 
+            functionality, not that of the parent class.")
+        
+        Section section_inherit_multiple
+        section_inherit_multiple:SetClassAttribute("flex flex-col gap-y-2") 
+        section_inherit_multiple:AddHeading("Inheriting from Multiple Classes", 2)
+
+        section_inherit_multiple:AddParagraph("Programming languages differ significantly in 
+            how inheritance works. Some programming languages, like Java, have 
+            different styles of inheritance as compared to C++ or other 
+            languages. Unfortunately, how this impacts programmers in 
+            practice is poorly understood in the academic 
+            literature (e.g., which systems are easier to use, by whom, and 
+            under what replicable conditions?). Quorum’s system is called 
+            multiple inheritance, although it differs significantly from 
+            well-known systems of multiple inheritance in languages like C++.")
+
+        section_inherit_multiple:AddParagraph("If we wanted to inherit from two classes in 
+            Quorum, we create a comma separated list of the names in the class 
+            definition, like so:")
+
+        section_inherit_multiple:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr 
+            +   "use Libraries.Compute.Math" + cr
+            +   "class Main is Math, Random" + cr
+            +   "     action Main" + cr
+            +   "          integer value = RandomInteger()" + cr
+            +   "          output value" + cr
+            +   "" + cr
+            +   "          value = AbsoluteValue(-5)" + cr
+            +   "          output value" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+        CodeForIDE code_inheritance5
+        code_inheritance5:AddFileText("Main.quorum", "//Try inheriting from Math and Random")
+        IDE ide_inheritance5 = AddIDE()
+        ide_inheritance5:HideDisplay()
+        ide_inheritance5:SetCodeForIDE(code_inheritance5:GetJsonArray())
+        ide_inheritance5:SetIdeTitle("Activity: Try Inheriting from two classes")
+        section_inherit_multiple:Add(ide_inheritance5)
+
+        section_inherit_multiple:AddParagraph("In this case, notice that we can now call 
+            actions from the Random class, like RandomInteger, and from the 
+            Math class, like AbsoluteValue. This process works in a similar 
+            way conceptually to how many programming languages, like Java, 
+            C#, or C++, use inheritance. The difference is in how we access 
+            variables from the parents (Math and Random).")
+
+        Section section_accessing_parent_variables
+        AddHeading(section_accessing_parent_variables, "Accessing Parent Variables", 2)
+
+        section_accessing_parent_variables:AddParagraph("The Math class in Quorum has variables inside of 
+            it, including some common constants like pi. To access them, we 
+            need to tell Quorum where the variable comes from. So, if we wanted 
+            to output the value of pi to the screen, we could do it like so:")
+
+        section_accessing_parent_variables:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr 
+            +   "use Libraries.Compute.Math" + cr
+            +   "class Main is Math, Random" + cr
+            +   "     action Main" + cr
+            +   "          number pi = parent:Math:pi" + cr
+            +   "          output pi" + cr
+            +   "     end" + cr
+            +   "end" + cr))
+
+
+        CodeForIDE code_inheritance6
+        code_inheritance6:AddFileText("Main.quorum", "//Try using variables stored in the Math parent")
+        IDE ide_inheritance6 = AddIDE()
+        ide_inheritance6:HideDisplay()
+        ide_inheritance6:SetCodeForIDE(code_inheritance6:GetJsonArray())
+        ide_inheritance6:SetIdeTitle("Activity: Try Inheriting Parent Variables")
+        section_accessing_parent_variables:Add(ide_inheritance6)
+
+
+        section_accessing_parent_variables:AddParagraph("The crucial point here is that we first use a 
+            special keyword, called parent, and then provide which class we 
+            want to obtain a variable from. In this case, that is Math. Then, 
+            we say which variable we would like to obtain, in this case pi, 
+            and then return and output it. This process works the same 
+            regardless of the parent and the type. Only public variables 
+            from the parent can be accessed.")
+
+        section_accessing_parent_variables:AddParagraph("Inheritance can be a complicated topic and 
+            students in college level courses may spend a few weeks or more 
+            going over the various details, depending on the language and its 
+            quirks. Even once the mechanics are understood, there are many 
+            ways in which we can use inheritance for advanced designs 
+            (e.g., design patterns). While the tutorial here can get us 
+            started using the feature in Quorum, it can be used for far more 
+            advanced functionality than hinted at here and is an important 
+            part of the game engine.")
+
+        bodyDiv:Add(section_inheritance)
+        bodyDiv:Add(section_overriding)
+        bodyDiv:Add(section_inherit_multiple)
+        bodyDiv:Add(section_accessing_parent_variables)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about the inheritance system in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Inheritance"
+    end
+
+    action GetImageLocation returns text
+        return "/media/basics/inheritance.png"
+    end
+
+    action GetName returns text
+        return "inheritance"
+    end
+
+    action GetShortDescription returns text
+        return "how to use the inheritance and polymorphism"
+    end
+
+    action GetLocation returns text
+        return "tutorials/language/inheritance.html"
+    end
+
+    action GetLinkName returns text
+        return "Inheritance"
+    end
+
+    action GetSectionName returns text
+        return "Libraries and Structures"
+    end
+end

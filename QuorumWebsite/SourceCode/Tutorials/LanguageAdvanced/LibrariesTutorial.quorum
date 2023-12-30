@@ -1,0 +1,150 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class LibrariesTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Use Statements - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Use Statements", 1)
+
+        headDiv:AddText("How to load and interact with library classes.")
+        bodyDiv:Add(headDiv)
+
+        Section section_format_and_finding_libraries
+        section_format_and_finding_libraries:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_format_and_finding_libraries, "Format and Finding Libraries", 2)
+        section_format_and_finding_libraries:AddParagraph("In many fields, it is impossible to understand the nuances of every aspect of a discipline. Mathematicians can be experts, but not know how every equation works. Carpenters can be master builders, but not know how to build everything. Computer scientists, similarly, may be excellent programmers, but that does not mean they know everything. As such, programmers make use of what are called libraries. Libraries are code, typically written by other people, that solve a particular kind of problem for us.")
+        section_format_and_finding_libraries:AddParagraph("An example of a library might be for math. We may not know, and it is understandable why, how to solve all possible math equations. Solving some of them might require a doctorate to even understand the question. Further, once one person solves the problem, if it can be written into a library, no one else must. Thus, we use libraries to save ourselves time and if we did not, programming would be incredibly tedious. Programming languages vary in how we access libraries. In Quorum, the word ‘use’ tells the system to go find a library. The names of the libraries look similar to web addresses. Here is an example:")
+
+        section_format_and_finding_libraries:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Random"))
+
+        Paragraph p_libraries
+        p_libraries:AddText(         "One important thing to remember about the use statement is that it must be placed at the top of file. "
+                            +   "A class definition and action must always come after the list of use statements. "
+                            +   "In order to find a library in the Quorum standard library we can use code completion if we are offline "
+                            +   "If we are using Windows or OSX the shortcut is CTRL + SPACE, to find any available library classes. "
+                            +   "In addition to code completion there is a ")
+        Link link1 = p_libraries:AddLink("Quorum Standard Library Reference", "/libraries.html")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
+        p_libraries:AddText(        " available.")
+        section_format_and_finding_libraries:Add(p_libraries)
+
+
+        //the section on random number example
+        Section section_random_number
+        AddHeading(section_random_number, "Random Number Example", 2)
+        section_random_number:AddParagraph(   "A complete solution to the above problem is as follows:")
+        section_random_number:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.Random" + cr
+            +   "class Main" + cr
+            +   "     action Main" + cr
+            +   "          Random random" + cr
+            +   "          output random:RandomIntegerBetween(1, 100)" + cr
+            +   "     end" + cr
+            +   "end"))
+ 
+        CodeForIDE code_random_number
+        code_random_number:AddFileText("Main.quorum", "//Try making a random number")
+        IDE ide_random_number = AddIDE()
+        ide_random_number:HideDisplay()
+        ide_random_number:SetCodeForIDE(code_random_number:GetJsonArray())
+        ide_random_number:SetIdeTitle("Activity: Try the random number example")
+        section_random_number:Add(ide_random_number)
+
+        //the section on the .all command
+        Section section_all_command
+        section_all_command:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_all_command, "The .all Command", 2)
+        section_all_command:AddParagraph(   "Sometimes we may want to use all of the classes under a given file. For example, "
+                            +   "suppose we wanted to include all of the classes in " + dq + "Libraries.Compute" + dq + ", this includes the Random class and other Math related class. "
+                            +   "We can add all to the end of the use statement to include all of the classes within a file:")
+        section_all_command:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Compute.all" + cr
+            +   "class Main" + cr
+            +   "     action Main" + cr
+            +   "          Random random" + cr
+            +   "          Math math" + cr
+            +   "          output random:RandomIntegerBetween(1, 100)" + cr
+            +   "          output math:SquareRoot(6)" + cr
+            +   "     end" + cr
+            +   "end"))
+     
+        CodeForIDE code_all_command
+        code_all_command:AddFileText("Main.quorum", "//Try using all libraries in a package")
+        IDE ide_all_command = AddIDE()
+        ide_all_command:HideDisplay()
+        ide_all_command:SetCodeForIDE(code_all_command:GetJsonArray())
+        ide_all_command:SetIdeTitle("Activity: Try the .all command")
+        section_all_command:Add(ide_all_command)
+
+        bodyDiv:Add(section_format_and_finding_libraries)
+        bodyDiv:Add(section_random_number)
+        bodyDiv:Add(section_all_command)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Practice with 'use' statements for loading new libraries in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Using Libraries"
+    end
+
+    action GetImageLocation returns text
+        return "/media/UsingLibraries.png"
+    end
+
+    action GetName returns text
+        return "Using Libraries"
+    end
+
+    action GetShortDescription returns text
+        return "how to use classes built into Quorum."
+    end
+
+    action GetLinkName returns text
+        return "Using Libraries"
+    end
+
+    action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "tutorials/language/usingLibraries.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Libraries and Structures"
+    end
+end

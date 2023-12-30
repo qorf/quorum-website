@@ -1,19 +1,6 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.System.File
+use Libraries.Containers.Array
 
 class Challenge4_1 is Lesson
     text dq = ""
@@ -32,23 +19,34 @@ class Challenge4_1 is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+         Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Challenge 4.1: Line Following", 1)
-        headDiv:AddText("An introduction to line following with robots")
-        Add(headDiv)
+         Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Challenge 4.1: Line Following", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Challenge 4.1: Line Following")
+        headDiv:AddText("Using Actions with Robots")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Line Following", 2)
+        
 
-        bodyDiv:AddHeading("Goals", 2)
-        bodyDiv:AddParagraph("In this lab, we will learn the following computer science concepts:")
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("In this challenge you will practice the following computer science concepts in a team or small group environment:")
+        
+
         UnorderedList unorderedList0
-        bodyDiv:Add(unorderedList0)
+        unorderedList0:AddClassAttribute("list-disc list-outside pl-8")
+        section_intro:Add(unorderedList0)
         ListItem listItem1
         unorderedList0:Add(listItem1)
         listItem1:AddText("Creating Objects")
@@ -58,25 +56,28 @@ class Challenge4_1 is Lesson
         ListItem listItem3
         unorderedList0:Add(listItem3)
 
-        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+        AddHeading(section_intro, "Computer Science Principles Curriculum", 3)
         UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
         AddListItemWithBoldAtFront(list, "Big Idea: Creativity: ", "EU 1.2, LO 1.2.3, EK 1.2.3A, EU 1.3, LO 1.3.1, EK 1.3.1A")
         AddListItemWithBoldAtFront(list, "Big Idea: Algorithms: ", "EU 4.1, LO 4.1.1, EK 4.1.1B")
         AddListItemWithBoldAtFront(list, "Big Idea: Programming: ", "EU 5.1, LO 5.1.1, EK 5.1.1B, EU 5.2, LO 5.2.1, EK 5.2.1C, EK 5.2.1D")
-        bodyDiv:Add(list)
+        section_intro:Add(list)
 
-        bodyDiv:AddHeading("Common Core Standards", 2)
+       AddHeading(section_intro, "Common Core Standards", 3)
         UnorderedList ccList
+        ccList:AddClassAttribute("list-disc list-outside pl-8")
         AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
         CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.6, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.9-10.1, CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.8, CCSS.ELA-Literacy.RST.9-10.9")
         AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
         CCSS.Math.Practice.MP8, CCSS.Math.Content.HSF.IF.A.1  ")
-        bodyDiv:Add(ccList)
+        section_intro:Add(ccList)
 
         listItem3:AddText("Creating and Using variables")
-        bodyDiv:AddHeading("Vocabulary", 2)
+        AddHeading(section_intro, "Vocabulary", 3)
         UnorderedList unorderedList4
-        bodyDiv:Add(unorderedList4)
+        unorderedList4:AddClassAttribute("list-disc list-outside pl-8")
+        section_intro:Add(unorderedList4)
         ListItem listItem5
         unorderedList4:Add(listItem5)
         listItem5:AddText("Variables")
@@ -99,47 +100,59 @@ class Challenge4_1 is Lesson
         
 
 
-        bodyDiv:AddHeading("Overview", 2)
-        bodyDiv:AddParagraph("This challenge will use several libraries such as the Motor, ColorSensor, Utility, Screen and Sound library. You will use different conditions with the Color Sensor for the purpose of following the line. There are multiple ways to approach this task, so feel free to try some other ways once you finish this lab!")
-        Paragraph value = bodyDiv:AddParagraph("This project requires you to download this")
-        value:AddLink(" program template", "/files/lessons/chapter4/Challenge4_1Template.zip")
+                Section section_overview
+        section_overview:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_overview)
+        AddHeading(section_overview, "Overview", 2)
+        section_overview:AddParagraph("This challenge will use several libraries such as the Motor, ColorSensor, Utility, Screen and Sound library. You will use different conditions with the Color Sensor for the purpose of following the line. There are multiple ways to approach this task, so feel free to try some other ways once you finish this lab!")
+        Paragraph value = section_overview:AddParagraph("This project requires you to download this")
+        Link link = value:AddLink(" program template", "/files/lessons/chapter4/Challenge4_1Template.zip")
+        link:SetClassAttribute("underline text-quorum-blue-150")
         value:AddText(", which will be completed in this assignment.")
 
-        bodyDiv:AddHeading("Goal 1 : Creating objects", 2)
-        bodyDiv:AddParagraph("First you will need to unzip your template and open the project in Sodbeans. Open the main.quorum file. In the top of the file you should have the appropriate code for using the Quorum ColorSensor and the Motor libraries inside the Lego library.")
+        AddHeading(section_overview, "Goal 1: Creating objects", 3)
+
+        section_overview:AddParagraph("First you will need to unzip your template and open the project in Sodbeans. Open the main.quorum file. In the top of the file you should have the appropriate code for using the Quorum ColorSensor and the Motor libraries inside the Lego library.")
         
-        bodyDiv:AddHeading("Activity : Instantiate the Motor and the ColorSensor objects.", 3)
-        bodyDiv:AddParagraph("Call the Motor object motor and the ColorSensor object colorSensor.")
-        bodyDiv:AddParagraph("Now you must set the port to work with. This will be the port that the Color Sensor is connected to on the robot. You will do that using the SetPort statement.")
-        bodyDiv:AddHeading("Example : Tell the port your Color Sensor is connected.", 3)
+         AddHeading(section_overview, "Activity : Instantiate the Motor and the ColorSensor objects", 3)
+        
+        section_overview:AddParagraph("Call the Motor object motor and the ColorSensor object colorSensor.")
+        section_overview:AddParagraph("Now you must set the port to work with. This will be the port that the Color Sensor is connected to on the robot. You will do that using the SetPort statement.")
+         AddHeading(section_overview, "Example : Tell the port your Color Sensor is connected", 4)
+        
         PreformattedText pre11
-        bodyDiv:Add(pre11)
+        section_overview:Add(pre11)
         pre11:AddAttribute("class", "code")
         CodeBlock code12
         code12:AddText(
 "//This line of code will set the port to work with in parenthesis
 colorSensor:SetPort(1)")
         pre11:Add(code12)
-        bodyDiv:AddParagraph("You can change the port at any time. If you add other sensors you may want to rearrange to get the best fit.")
-        bodyDiv:AddParagraph("Just remember to double check that the ports you are connected to are the ones you have set in your code!")
-        //bodyDiv:AddParagraph("Suggestion: You can put screen:OutputCenter(" + dq + "white " + dq + ", 0) to check if you enter good in a loop. In this way you can understand better.")
-        bodyDiv:AddHeading("Goal 2 : Using conditional and looping statements", 2)
-        bodyDiv:AddParagraph("Your code should work like this: the robot will go forward if the color sensor detects the colored line. If the sensor does not detect the colored line, it will first turn to the right in search of that color. If it does not detect that color after turning a certain number of degrees to the right, it will turn to the left. You will have to consider how much the robot turned to the right, so when it turns back left it will check far enough in that direction.")
-        bodyDiv:AddParagraph("Let’s start with the conditions now. In order to get the color of the line, you will use the GetColor() command. You may have to experiment to find the setting that the color sensor will respond to best.")
-        bodyDiv:AddHeading("Activity : Write the proper code to set the condition of the motors A and D to move forward.", 3)
+        section_overview:AddParagraph("You can change the port at any time. If you add other sensors you may want to rearrange to get the best fit.")
+        section_overview:AddParagraph("Just remember to double check that the ports you are connected to are the ones you have set in your code!")
+        //section_overview:AddParagraph("Suggestion: You can put screen:OutputCenter(" + dq + "white " + dq + ", 0) to check if you enter good in a loop. In this way you can understand better.")
+        
+         AddHeading(section_overview, "Goal 2: Using conditional and looping statements", 3)
+    
+        section_overview:AddParagraph("Your code should work like this: the robot will go forward if the color sensor detects the colored line. If the sensor does not detect the colored line, it will first turn to the right in search of that color. If it does not detect that color after turning a certain number of degrees to the right, it will turn to the left. You will have to consider how much the robot turned to the right, so when it turns back left it will check far enough in that direction.")
+        section_overview:AddParagraph("Let’s start with the conditions now. In order to get the color of the line, you will use the GetColor() command. You may have to experiment to find the setting that the color sensor will respond to best.")
+        
+        AddHeading(section_overview, "Activity : Write the proper code to set the condition of the motors A and D to move forward", 3)
+        
         PreformattedText pre13
-        bodyDiv:Add(pre13)
+        section_overview:Add(pre13)
         pre13:AddAttribute("class", "code")
         CodeBlock code14
         code14:AddText(
 "//This line is the looping condition; once the condition doesn’t match anymore the program stops
 repeat until")
         pre13:Add(code14)
-        bodyDiv:AddParagraph("Try experimenting with the Color Sensor. Let's move the Lego Robot forward when it finds the color blue (we suggest using blue tape). Then, if the Lego Robot finds another color (it goes off the tape), it will stop immediatly.")
-        bodyDiv:AddParagraph("Don't forget to set the speed of the motors. Look back at earlier robot lessons if you don't remember how to do this.")
-        bodyDiv:AddHeading("Example : Conditions in case the color line isn’t forward.", 3)
+        section_overview:AddParagraph("Try experimenting with the Color Sensor. Let's move the Lego Robot forward when it finds the color blue (we suggest using blue tape). Then, if the Lego Robot finds another color (it goes off the tape), it will stop immediatly.")
+        section_overview:AddParagraph("Don't forget to set the speed of the motors. Look back at earlier robot lessons if you don't remember how to do this.")
+        AddHeading(section_overview, "Example : Conditions in case the color line isn’t forward", 4)
+
         PreformattedText pre15
-        bodyDiv:Add(pre15)
+        section_overview:Add(pre15)
         pre15:AddAttribute("class", "code")
         CodeBlock code16
         code16:AddText(
@@ -157,14 +170,17 @@ color = colorSensor:GetColor()
     end
  end")
         pre15:Add(code16)
-        bodyDiv:AddParagraph("If the robot finds the blue line again, you will want it to go back to moving forward, starting the whole process again. A condition should move your program back to the beginning again in this case.")
+        section_overview:AddParagraph("If the robot finds the blue line again, you will want it to go back to moving forward, starting the whole process again. A condition should move your program back to the beginning again in this case.")
        
-        bodyDiv:AddHeading("Activity : Creating and changing variables in many loops.", 3)
-        bodyDiv:AddParagraph("To achieve this, you will have four loops. The robot will take each step in an effort to find the blue line and then start moving forward again.")
-        bodyDiv:AddParagraph("You will need to add one more loop between the two in the previoius example. You will also need one before the end.")
-        bodyDiv:AddHeading("Example : Moving from one state to another.", 3)
+        AddHeading(section_overview, "Activity : Creating and changing variables in many loops", 3)
+     
+        section_overview:AddParagraph("To achieve this, you will have four loops. The robot will take each step in an effort to find the blue line and then start moving forward again.")
+        section_overview:AddParagraph("You will need to add one more loop between the two in the previoius example. You will also need one before the end.")
+        
+        AddHeading(section_overview, "Example : Conditions in case the color line isn’t forward", 4)
+     
         PreformattedText pre17
-        bodyDiv:Add(pre17)
+        section_overview:Add(pre17)
         pre17:AddAttribute("class", "code")
         CodeBlock code18
         code18:AddText(
@@ -185,11 +201,12 @@ elseif condition = condition4
    condition = condition1
 end")
         pre17:Add(code18)
-        bodyDiv:AddParagraph("Don't forget to write the conditions after the objects have been created.")
-        bodyDiv:AddHeading("Activity : Call the actions.", 4)
-        bodyDiv:AddParagraph("Your program should work just fine now, but to make it better let’s add this line after the end in order to tell the program to wait 250 milliseconds before it stops.")
+        section_overview:AddParagraph("Don't forget to write the conditions after the objects have been created.")
+         AddHeading(section_overview, "Activity : Call the actions", 3)
+     
+        section_overview:AddParagraph("Your program should work just fine now, but to make it better let’s add this line after the end in order to tell the program to wait 250 milliseconds before it stops.")
         PreformattedText pre19
-        bodyDiv:Add(pre19)
+        section_overview:Add(pre19)
         pre19:AddAttribute("class", "code")
         CodeBlock code20
         code20:AddText("utility:DelayMilliseconds(250)")
@@ -197,11 +214,10 @@ end")
 
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+     Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -217,7 +233,18 @@ end")
     action GetShortDescription returns text
         return "an introduction to line following with robots."
     end
-    action GetLocation returns text
-        return "lessons/chapter4/challenge4_1.html"
+
+     action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "lessons/chapter4/challenge4_1.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Actions"
     end
 end

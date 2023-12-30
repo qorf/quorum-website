@@ -1,0 +1,606 @@
+use Libraries.Web.Page.all
+use Libraries.System.File
+
+class LoginForm is Division
+    Division loginDiv = undefined
+    Division innerDiv = undefined
+    Division SignInModal = undefined
+    Division forgotPasswordModal = undefined
+    Division signUpModal = undefined
+
+    Button exitButton = undefined
+
+    on create
+        SetupModalPortion()
+        SetupSignInModal()
+        ForgotPasswordModal()
+        SignUpModal()
+        CreateMessages()
+    end
+
+    action SetupModalPortion
+      Division loginDiv
+
+      loginDiv:SetIdentifier("loginModal")
+      loginDiv:AddAttribute("role", "dialog")
+      loginDiv:AddAttribute("aria-labelledby", "loginTitleDiv")
+      loginDiv:SetClassAttribute("z-10 hidden fixed  w-screen h-screen bg-modal-black-50")
+
+
+
+      Division innerDiv
+      innerDiv:SetClassAttribute("flex flex-col h-full w-full bg-transparent items-center justify-center")
+      innerDiv:SetIdentifier("innerLoginDiv")
+      loginDiv:Add(innerDiv)
+
+      me:loginDiv = loginDiv
+      me:innerDiv = innerDiv
+
+      Add(loginDiv)
+    end
+
+    action addExitButton() returns Button
+      Button exitButton
+      exitButton:SetClassAttribute("flex items-center justify-center absolute top-0 right-0 m-4 text-3xl font-bold text-quorum-blue-100 hover:text-quorum-blue-150")
+
+      //cross icon start
+      HtmlFileLoader crossIconFile
+      File file
+      file:SetPath("html/media/userInterface/SVG/exit-cross.svg")
+      crossIconFile:SetLoaded(file:Read())
+      exitButton:AddText(crossIconFile:ToText())
+      //cross icon end
+
+      exitButton:SetOnClick("
+        let signInModal = document.getElementById('signInModal');
+        let forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        let registerModal = document.getElementById('signUpModal');
+
+        signInModal.classList.add('flex');
+        signInModal.classList.remove('hidden');
+
+        forgotPasswordModal.classList.add('hidden');
+        forgotPasswordModal.classList.remove('flex');
+
+        registerModal.classList.add('hidden');
+        registerModal.classList.remove('flex');
+
+
+        hideLoginModal() 
+      ")
+      me:exitButton = exitButton
+      return exitButton
+    end
+
+    action SetupSignInModal()
+        Division SignInModal
+        me:SignInModal = SignInModal
+        SignInModal:SetIdentifier("signInModal")
+        SignInModal:SetClassAttribute(" z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex flex-col gap-6")
+        SignInModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeSignInModal")
+        SignInModal:Add(closeButton)
+
+        Division modalContent
+
+        Division loginTitleDiv
+        loginTitleDiv:SetClassAttribute("text-3xl font-bold")
+        loginTitleDiv:SetIdentifier("loginTitleDiv")
+        loginTitleDiv:AddText("Login to Quorum")
+        SignInModal:Add(loginTitleDiv)
+
+        Form loginForm
+
+        loginForm:SetClassAttribute("loginform")
+        loginForm:SetIdentifier("loginmodalform")
+        loginForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        fieldContainerDiv:SetClassAttribute("flex flex-col space-y-2 w-full sm:w-3/5")
+        
+        Division usernameDiv
+        usernameDiv:SetClassAttribute("flex flex-col")
+
+        Label usernameLabel
+        usernameLabel:AddText("Username")
+        usernameLabel:SetClassAttribute("capitalize")
+        usernameLabel:AddAttribute("for", "usernameInput")
+        usernameLabel:SetIdentifier("usernameLabel")
+        usernameDiv:Add(usernameLabel)
+
+        Input userNameInput
+        userNameInput:SetType("text")
+        //creat tailwindcss for a username input
+        userNameInput:SetClassAttribute("p-2 rounded-md border border-neutral-grey-50")
+        userNameInput:SetPlaceHolder("Username")
+        userNameInput:SetName("username")
+        userNameInput:SetIdentifier("usernameInput")
+        userNameInput:SetRequired(true)
+        usernameDiv:Add(userNameInput)
+        fieldContainerDiv:Add(usernameDiv)
+
+        Division passwordDiv
+        passwordDiv:SetClassAttribute("flex flex-col")
+
+
+        Label passwordLabel
+        passwordLabel:AddText("Password")
+        passwordLabel:AddAttribute("for", "passwordInput")
+        passwordLabel:SetClassAttribute("capitalize")
+        passwordDiv:Add(passwordLabel)
+        
+        Input passwordInput
+        passwordInput:SetType("password")
+        passwordInput:SetClassAttribute("p-2 rounded-md border border-neutral-grey-50")
+        passwordInput:SetPlaceHolder("Password")
+        passwordInput:SetName("password")
+        passwordInput:SetIdentifier("passwordInput")
+        passwordInput:SetRequired(true)
+        
+        passwordDiv:Add(passwordInput)
+
+        
+        fieldContainerDiv:Add(passwordDiv)
+
+        Span forgotPasswordSpan
+        forgotPasswordSpan:SetClassAttribute("underline text-quorum-blue-100 text-sm font-bold mt-0")
+        Button forgotButton
+        forgotButton:SetOnClick("
+         let signInModal = document.getElementById('signInModal'); 
+         let forgotPasswordModal = document.getElementById('forgotPasswordModal');
+
+         signInModal.classList.add('hidden');
+         signInModal.classList.remove('flex');
+
+         forgotPasswordModal.classList.add('flex');
+         forgotPasswordModal.classList.remove('hidden');
+
+         //focus on email input
+         document.getElementById('emailForgotInput').focus();
+          document.getElementById('alertMessage').ariaHidden = true;
+          document.getElementById('feedbackMessage').ariaHidden = true;
+          document.getElementById('successMessage').ariaHidden = true;
+        ")
+        forgotButton:AddAttribute("target", "_blank")
+        forgotButton:AddAttribute("rel", "noopener noreferrer")
+        forgotButton:AddText("Forgot password?")
+        forgotButton:SetIdentifier("forgotPassword")
+        forgotPasswordSpan:Add(forgotButton)
+
+        fieldContainerDiv:Add(forgotPasswordSpan)
+
+        SignInModal:Add(fieldContainerDiv)
+
+
+        Division footbar
+        footbar:SetClassAttribute("flex flex-row justify-end items-center space-x-4")
+
+        Division buttonContainerDiv
+
+        Span registerAccountSpan
+        registerAccountSpan:SetClassAttribute("text-quorum-blue-100 text-xl w-fit font-bold mt-0 hover:underline")
+        Button registerButton
+        registerButton:SetOnClick("
+         let signInModal = document.getElementById('signInModal'); 
+         let registerModal = document.getElementById('signUpModal');
+
+         signInModal.classList.add('hidden');
+         signInModal.classList.remove('flex');
+
+         registerModal.classList.add('flex');
+         registerModal.classList.remove('hidden');
+
+         //focus on username input
+         document.getElementById('userNameInput').focus();
+          document.getElementById('alertMessage').ariaHidden = true;
+          document.getElementById('feedbackMessage').ariaHidden = true;
+          document.getElementById('successMessage').ariaHidden = true;
+         ")
+        registerButton:AddAttribute("target", "_blank")
+        registerButton:AddAttribute("rel", "noopener noreferrer")
+        registerButton:AddText("Create an Account")
+        registerButton:SetIdentifier("registerAccountLink")
+        registerAccountSpan:Add(registerButton)
+        footbar:Add(registerAccountSpan)
+
+        Button submitButton
+        submitButton:SetClassAttribute("px-8 py-2 rounded-xl bg-quorum-blue-100 text-neutral-black font-bold text-xl hover:shadow-lg")
+        submitButton:SetIdentifier("submitSignInForm")
+        submitButton:SetType("submit")
+        submitButton:AddText("Login")
+        submitButton:SetOnClick("login()")
+        footbar:Add(submitButton)
+
+        SignInModal:Add(footbar)
+
+        SignInModal:Add(loginForm)
+        me:innerDiv:Add(SignInModal)
+    end
+
+    action ForgotPasswordModal
+        Division forgotPasswordModal
+        me:forgotPasswordModal = forgotPasswordModal
+        forgotPasswordModal:SetIdentifier("forgotPasswordModal")
+        forgotPasswordModal:SetClassAttribute("flex hidden  z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex-col gap-6")
+        forgotPasswordModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeForgotPasswordModal")
+        forgotPasswordModal:Add(closeButton)
+
+        Heading forgotPasswordTitle
+        forgotPasswordTitle:SetClassAttribute("text-3xl font-bold")
+        forgotPasswordTitle:AddText("Forgot Password?")
+        forgotPasswordModal:Add(forgotPasswordTitle)
+
+
+        Form form
+        form:SetClassAttribute("accountupdateForm")
+        form:AddAttribute("method", "post")
+        form:AddAttribute("action", "javascript:forgotPasswordClick()")
+
+
+        form:SetIdentifier("resetPasswordForm")
+        form:SetPost(true)
+
+        Division usernameDiv
+        usernameDiv:SetClassAttribute("flex flex-col space-y-2 w-full sm:w-3/5")
+
+        Label emailLabel
+        emailLabel:AddText("Email")
+        emailLabel:SetClassAttribute("capitalize")
+        emailLabel:AddAttribute("for", "emailForgotInput")
+        emailLabel:SetIdentifier("emailLabel")
+        usernameDiv:Add(emailLabel)
+
+        Paragraph emailErrorParagraph
+        emailErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/username:block text-attention-red-100 text-sm mt-0")
+        emailErrorParagraph:AddText("Email required")
+
+        Input email
+        email:SetTitle("Email")
+        email:SetIdentifier("emailForgotInput")
+        email:SetPlaceHolder("Please enter your email")
+        email:SetType("text")
+        email:SetName("email")
+        email:SetClassAttribute("peer/forgotEmail p-2 rounded-md border border-neutral-grey-50")
+        email:AddAttribute("onblur", "checkValidityExists.call(this);")
+
+        usernameDiv:Add(email)
+        
+        form:Add(usernameDiv)
+
+        Division haveAccount
+        haveAccount:SetClassAttribute("mt-4")
+        Paragraph haveAccountParagraph = haveAccount:AddParagraph("Back to ")
+        Button signInButton
+        signInButton:SetIdentifier("backToLoginButtonForgot")
+        signInButton:SetClassAttribute("underline text-quorum-blue-100 font-bold")
+        signInButton:AddText("Sign in")
+        signInButton:AddAttribute("onclick", "
+          let signInModal = document.getElementById('signInModal'); 
+          let forgotModal = document.getElementById('forgotPasswordModal');
+
+          forgotModal.classList.add('hidden');
+          forgotModal.classList.remove('flex');
+
+          signInModal.classList.add('flex');
+          signInModal.classList.remove('hidden');
+          //focus on username input
+          document.getElementById('usernameInput').focus();
+          document.getElementById('alertMessage').ariaHidden = true;
+          document.getElementById('feedbackMessage').ariaHidden = true;
+          document.getElementById('successMessage').ariaHidden = true;
+        ")
+
+        haveAccountParagraph:Add(signInButton)
+
+        Division submitDiv
+        submitDiv:SetClassAttribute("flex flex-row justify-end items-center")
+
+        Input submitButton
+        submitButton:SetIdentifier("submitForgotPasswordForm")
+        submitButton:SetDefaultValue("Request Reset")
+        submitButton:SetType("submit")
+        submitButton:SetTitle("Request Reset")
+        submitButton:SetClassAttribute("px-8 py-2 rounded-xl bg-quorum-blue-100 text-neutral-black font-bold text-xl mt-4 cursor-pointer hover:shadow-lg")
+
+        submitDiv:Add(submitButton)
+        
+        form:Add(haveAccount)
+        form:Add(submitDiv)
+        
+        forgotPasswordModal:Add(form)
+        me:innerDiv:Add(forgotPasswordModal)
+    end
+
+    action SignUpModal
+        Division signUpModal
+        me:signUpModal = signUpModal
+        signUpModal:SetIdentifier("signUpModal")
+        signUpModal:SetClassAttribute("flex hidden z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg  flex-col gap-6")
+        signUpModal:AddAttribute("onclick", "event.stopPropagation()")
+
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeSignUpModal")
+        signUpModal:Add(closeButton)
+
+        Heading signUpTitle
+        signUpTitle:SetClassAttribute("text-3xl font-bold")
+        signUpTitle:AddText("Sign up for Quorum")
+        signUpModal:Add(signUpTitle)
+
+        Form form
+        form:SetIdentifier("registrationForm")
+        form:SetClassAttribute("flex flex-col  w-full sm:w-3/5")
+        form:AddAttribute("method", "post")
+        form:AddAttribute("action", "javascript:registrationSubmit()")
+
+        form:SetIdentifier("registrationForm")
+        form:SetPost(true)
+
+        Label userNameLabel
+        userNameLabel:AddText("User Name: ")
+        userNameLabel:SetClassAttribute("captailize mt-2")
+        userNameLabel:AddAttribute("for", "userNameInput")
+        userNameLabel:SetIdentifier("userNameLabel")
+
+        Input userName
+        userName:SetTitle("User Name")
+        userName:SetIdentifier("userNameInput")
+        userName:SetPlaceHolder("User Name")
+        userName:SetType("text")
+        userName:SetName("username")
+        userName:AddAttribute("onblur", "checkValidityExists.call(this);")
+        userName:AddClassAttribute("peer/username p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph userNameErrorParagraph
+        userNameErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/username:block text-attention-red-100 text-sm mt-0")
+        userNameErrorParagraph:AddText("Username required")
+
+        Label firstnameLabel
+        firstnameLabel:AddText("First Name: ")
+        firstnameLabel:SetClassAttribute("captailize mt-2")
+        firstnameLabel:AddAttribute("for", "firstNameInput")
+        firstnameLabel:SetIdentifier("firstNameLabel")
+
+        Input firstName
+        firstName:SetTitle("First Name")
+        firstName:SetIdentifier("firstNameInput")
+        firstName:SetPlaceHolder("First Name")
+        firstName:SetType("text")
+        firstName:SetName("first_name")
+        firstName:AddAttribute("onblur", "checkValidityExists.call(this);")
+        firstName:AddClassAttribute("peer/firstName p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph firstNameErrorParagraph
+        firstNameErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/firstName:block mt-0 text-attention-red-100 text-sm")
+        firstNameErrorParagraph:AddText("First Name required")
+
+
+        Label lastnameLabel
+        lastnameLabel:AddText("Last Name: ")
+        lastnameLabel:SetClassAttribute("captailize mt-2")
+        lastnameLabel:AddAttribute("for", "lastNameInput")
+        lastnameLabel:SetIdentifier("lastNameLabel")
+
+
+        Input lastName
+        lastName:SetTitle("Last Name")
+        lastName:SetIdentifier("lastNameInput")
+        lastName:SetPlaceHolder("Last Name")
+        lastName:SetType("text")
+        lastName:SetName("last_name")
+        lastName:AddAttribute("onblur", "checkValidityExists.call(this);")
+        lastName:AddClassAttribute("peer/lastName p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph lastNameErrorParagraph
+        lastNameErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/lastName:block text-attention-red-100 text-sm mt-0")
+        lastNameErrorParagraph:AddText("Last Name required")
+
+        Label emailLabel
+        emailLabel:AddText("Email: ")
+        emailLabel:SetClassAttribute("captailize mt-2")
+        emailLabel:AddAttribute("for", "emailRegistrationInput")
+        emailLabel:SetIdentifier("emailLabel")
+
+        Input email
+        email:SetTitle("Email")
+        email:SetIdentifier("emailRegistrationInput")
+        email:SetPlaceHolder("Email")
+        email:SetType("text")
+        email:SetName("email")  
+        email:AddAttribute("onblur", "checkValidityEmail.call(this);")
+        email:AddClassAttribute("peer/email p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph emailErrorParagraph
+        emailErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/email:block text-attention-red-100 text-sm mt-0")
+        emailErrorParagraph:AddText("Email address required")
+
+
+        Label birthdayLabel
+        birthdayLabel:AddText("Birthday: ")
+        birthdayLabel:SetClassAttribute("captailize mt-2")
+        birthdayLabel:AddAttribute("for", "birthdayInput")
+        birthdayLabel:SetIdentifier("birthdayLabel")
+
+        Input birthday
+        birthday:SetTitle("Birthday")
+        birthday:SetIdentifier("birthdayInput")
+        birthday:SetPlaceHolder("Date of Birth: 12/31/1970")
+        birthday:SetType("Text")
+        birthday:SetName("birthday")
+        birthday:AddAttribute("onblur", "checkValidityDate.call(this);")
+        birthday:AddClassAttribute("peer/birthday p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph birthdayErrorParagraph
+        birthdayErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/birthday:block text-attention-red-100 text-sm mt-0")
+        birthdayErrorParagraph:AddText("Birthday missing or wrong format")
+
+        Label passwordLabel
+        passwordLabel:AddText("Password: ")
+        passwordLabel:SetClassAttribute("captailize mt-2")
+        passwordLabel:AddAttribute("for", "passwordEnterInput")
+        passwordLabel:SetIdentifier("passwordLabel")
+
+        Input password
+        password:SetTitle("Password")
+        password:SetIdentifier("passwordEnterInput")
+        password:SetPlaceHolder("Password")
+        password:SetType("password")
+        password:SetName("password")
+        password:AddAttribute("onblur", "checkValidityExists.call(this); checkConfirmPassword();")
+        password:AddClassAttribute("peer/password p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph passwordErrorParagraph
+        passwordErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/password:block text-attention-red-100 text-sm mt-0")
+        passwordErrorParagraph:AddText("Password required")
+
+        Label confirmpasswordLabel
+        confirmpasswordLabel:AddText("Confirm password: ")
+        confirmpasswordLabel:SetClassAttribute("captailize mt-2")
+        confirmpasswordLabel:AddAttribute("for", "confirmPasswordInput")
+        confirmpasswordLabel:SetIdentifier("confirmPasswordLabel")
+
+        Input confirmPassword
+        confirmPassword:SetTitle("Confirm Password")
+        confirmPassword:SetIdentifier("confirmPasswordInput")
+        confirmPassword:SetPlaceHolder("Confirm Password")
+        confirmPassword:SetType("password")
+        confirmPassword:AddAttribute("onblur", "checkValidityExists.call(this); checkConfirmPassword();")
+        confirmPassword:SetName("confirm_password")
+        confirmPassword:AddClassAttribute("peer/confirmPassword p-2 rounded-md border border-neutral-grey-50 mt-1 aria-[invalid='true']:border-attention-red-100")
+
+        Paragraph confirmPasswordErrorParagraph
+        confirmPasswordErrorParagraph:SetClassAttribute("hidden peer-[[aria-invalid='true']]/confirmPassword:block text-attention-red-100 text-sm mt-0")
+        confirmPasswordErrorParagraph:AddText("Passwords do not match")
+
+        form:Add(userNameLabel)
+        form:Add(userName)
+        form:Add(userNameErrorParagraph)
+        form:Add(firstnameLabel)
+        form:Add(firstName)
+        form:Add(firstNameErrorParagraph)
+        form:Add(lastnameLabel)
+        form:Add(lastName)
+        form:Add(lastNameErrorParagraph)
+        form:Add(emailLabel)
+        form:Add(email)
+        form:Add(emailErrorParagraph)
+        form:Add(birthdayLabel)
+        form:Add(birthday)
+        form:Add(birthdayErrorParagraph)
+        form:Add(passwordLabel)
+        form:Add(password)
+        form:Add(passwordErrorParagraph)
+        form:Add(confirmpasswordLabel)
+        form:Add(confirmPassword)
+        form:Add(confirmPasswordErrorParagraph)
+
+        //Already have an account? Sign in
+
+        Division haveAccount
+        haveAccount:SetClassAttribute("haveAccount")
+        Paragraph haveAccountParagraph = haveAccount:AddParagraph("Already have an account? ")
+        Button signInButton
+        signInButton:SetIdentifier("backToLoginButton")
+        signInButton:SetClassAttribute("underline text-quorum-blue-100 font-bold")
+        signInButton:AddText("Sign in")
+        signInButton:AddAttribute("onclick", "
+          let signInModal = document.getElementById('signInModal'); 
+          let registerModal = document.getElementById('signUpModal');
+
+          registerModal.classList.add('hidden');
+          registerModal.classList.remove('flex');
+
+          signInModal.classList.add('flex');
+          signInModal.classList.remove('hidden');
+          //focus on username input
+          document.getElementById('usernameInput').focus();
+          document.getElementById('alertMessage').ariaHidden = true;
+          document.getElementById('feedbackMessage').ariaHidden = true;
+          document.getElementById('successMessage').ariaHidden = true;
+        ")
+
+        haveAccountParagraph:Add(signInButton)
+
+        Division submitDiv
+        submitDiv:SetClassAttribute("flex flex-row justify-end items-center")
+        Button submitButton
+        submitButton:SetClassAttribute("px-16 py-2 rounded-xl bg-quorum-blue-100 w-fit text-neutral-black font-bold text-xl mt-4 cursor-pointer hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed")
+        submitButton:SetType("submit")
+        submitButton:AddText("Sign Up")
+
+        submitButton:SetIdentifier("submitRegistrationForm")
+        submitButton:AddAttribute("form", "registrationForm")
+        submitDiv:Add(submitButton)
+
+        signUpModal:Add(form)
+        signUpModal:Add(haveAccount)
+        signUpModal:Add(submitDiv)
+
+
+        me:innerDiv:Add(signUpModal)
+    end
+
+
+    action CreateMessages()
+        // Call the action for a success message
+        AddMessage(me:innerDiv, "success", "html/media/userInterface/SVG/success-check.svg", "bg-[#D2E8DE]","successMessage", "successMessageHeader", "successMessageText")
+
+        // Call the action for an error message
+        AddMessage(me:innerDiv, "alert", "html/media/userInterface/SVG/error-cross.svg", "bg-[#E7B3B0]", "alertMessage",  "alertMessageHeader", "alertMessageText")
+
+        // Call the action for an alert message
+        AddMessage(me:innerDiv, "feedback", "html/media/userInterface/SVG/info-icon.svg", "bg-quorum-blue-25", "feedbackMessage","feedbackMessageHeader", "feedbackMessageText")
+    end
+
+
+    action AddMessage(Division container, text type, text iconPath, text bgClass,text mainIdentifier, text headingIdentifier, text paragraphIdentifier)
+        Division messageDiv
+        messageDiv:SetIdentifier(mainIdentifier)
+        messageDiv:AddClassAttribute("aria-[hidden='true']:hidden aria-[hidden='false']:flex z-20 justify-center items-center w-3/4 h-fit p-4 box-border text-neutral-black rounded-xl mt-3")
+        messageDiv:AddClassAttribute(bgClass)
+        
+        
+        Division innerMessageDiv
+        innerMessageDiv:SetClassAttribute("flex flex-row justify-start items-center gap-4")
+        
+        Span iconSpan
+        HtmlFileLoader iconFileLoader
+
+        File iconFile
+        iconFile:SetPath(iconPath)
+        iconFileLoader:SetLoaded(iconFile:Read())
+        iconSpan:AddText(iconFileLoader:ToText())
+        
+        Division divIcon
+        divIcon:Add(iconSpan)
+        
+        Division divText
+        divText:AddAttribute("aria-live", "polite")
+        
+        Heading messageHeading
+        messageHeading:SetIdentifier(headingIdentifier)
+        messageHeading:AddClassAttribute("text-xl font-bold")
+        
+        Paragraph messageParagraph
+        messageParagraph:SetIdentifier(paragraphIdentifier)
+        messageParagraph:AddClassAttribute("text-sm")
+        
+        divText:Add(messageHeading)
+        divText:Add(messageParagraph)
+        
+        messageDiv:AddAttribute("aria-hidden","true")
+        
+        innerMessageDiv:Add(divIcon)
+        innerMessageDiv:Add(divText)
+        messageDiv:Add(innerMessageDiv)
+        
+        container:Add(messageDiv)
+    end
+
+end
+

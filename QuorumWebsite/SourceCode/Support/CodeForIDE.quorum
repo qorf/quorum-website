@@ -1,0 +1,57 @@
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.System.File
+
+class CodeForIDE
+   JavaScriptObjectNotation outerJson
+
+   action AddFileText(text fileName, text code)
+        JavaScriptObjectNotation json
+        json:Add("file", fileName)
+        json:Add("data", formatCode(code))
+        outerJson:Add(json)
+   end
+
+   action AddFileUrl(text fileName, text url)
+        JavaScriptObjectNotation json
+        json:Add("file", fileName)
+        HtmlFileLoader codeFileLoader
+
+        File codeFile
+        codeFile:SetPath(url)
+        codeFileLoader:SetLoaded(codeFile:Read())
+
+        text code = codeFileLoader:ToText()
+        json:Add("data", formatCode(code))
+        outerJson:Add(json)
+    end
+
+   action GetJsonArray returns text
+            text fakeArray = "["
+            integer i = 0
+            repeat while i < outerJson:GetSize()
+                JavaScriptObjectNotation innerJson
+                innerJson = outerJson:Get(i)
+                fakeArray = fakeArray + innerJson:ToText()
+                i = i + 1
+                if i < outerJson:GetSize()
+                    fakeArray = fakeArray + ","
+                end
+            end
+            fakeArray = fakeArray + "]"
+
+            text lf = fakeArray:GetLineFeed()
+            text dq = fakeArray:GetDoubleQuote()
+
+            text result = fakeArray:Replace(lf, "\n")
+            result = result:Replace(dq, "&quot;" )
+            return result
+       end
+
+      private action formatCode(text unformattedCode) returns text
+        text lf = unformattedCode:GetLineFeed()
+        text dq = unformattedCode:GetDoubleQuote()
+        unformattedCode = unformattedCode:Replace(lf, "\n")
+        text formattedCode = unformattedCode:Replace(dq, "\" + dq)
+        return formattedCode
+    end
+end

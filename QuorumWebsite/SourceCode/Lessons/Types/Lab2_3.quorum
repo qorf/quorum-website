@@ -1,17 +1,6 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.all
+use Libraries.System.File
+use Libraries.Containers.Array
 
 class Lab2_3 is Lesson
     text dq = ""
@@ -30,40 +19,52 @@ class Lab2_3 is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+          Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        //page-specific header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Lab 2.3: Music ", 1)
-        Add(headDiv)
+        //page header
+         Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Lab 2.3: Music", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Lab 2.3: Music")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Goals", 2)
-        bodyDiv:AddParagraph("The goal of this lab is to learn the following:")
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Types", 2)
+        
+
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("The goal of this lab is to learn the following:")
         
         UnorderedList goalList
         goalList:AddListItem("Understanding the Music Library")
         goalList:AddListItem("Using the Music Library")
-        bodyDiv:Add(goalList)
+        section_intro:Add(goalList)
 
-        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+       AddHeading(section_intro, "Computer Science Principles Curriculum", 3)
         UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
         AddListItemWithBoldAtFront(list, "Big Idea: Programming: ", " EK 5.1.2B, EK 5.1.2E, EK 5.2.1F, EK 5.1.2J, EK 5.2.1C, EK 5.3.1D, EK 5.3.1I, EK 5.4.1")
-        bodyDiv:Add(list)
+        section_intro:Add(list)
 
-        bodyDiv:AddHeading("Common Core Standards", 2)
+         AddHeading(section_intro, "Common Core Standards", 3)
         UnorderedList ccList
+        ccList:AddClassAttribute("list-disc list-outside pl-8")
         AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
         CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.6, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.9-10.1, CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.8, CCSS.ELA-Literacy.RST.9-10.9")
         AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
         CCSS.Math.Practice.MP8,")
-        bodyDiv:Add(ccList) 
+        section_intro:Add(ccList) 
 
-        bodyDiv:AddHeading("Vocabulary", 2)
+        AddHeading(section_intro, "Vocabulary", 3)
         UnorderedList vocabularyList
+        vocabularyList:AddClassAttribute("list-disc list-outside pl-8")
         vocabularyList:AddListItem("Code completion")
         vocabularyList:AddListItem("Library")
         vocabularyList:AddListItem("Class")
@@ -71,14 +72,21 @@ class Lab2_3 is Lesson
         vocabularyList:AddListItem("Objects")
         vocabularyList:AddListItem("Actions")
         vocabularyList:AddListItem("Parameters")
-        bodyDiv:Add(vocabularyList)
+        section_intro:Add(vocabularyList)
         
-        bodyDiv:AddHeading("HotKey:", 2)        
-        bodyDiv:AddText("A list of Hotkeys can be found on the ")
-        bodyDiv:AddLink("Getting Started with Quorum Studio", "/tutorials/language/gettingStarted.html")
-        bodyDiv:AddText(" page.")
+        AddHeading(section_intro, "Hotkeys", 3)     
+        Paragraph para1
+        para1:AddText("A list of Hotkeys can be found on the ")
+        Link link2 = para1:AddLink("Getting Started with Quorum Studio", "/tutorials/language/gettingStarted.html")
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        para1:AddText(" page.")
 
-        bodyDiv:AddHeading("Overview", 2)
+        section_intro:Add(para1)
+
+        Section section_overview
+        section_overview:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_overview)
+        AddHeading(section_overview, "Overview", 2)
 
 
         Paragraph p1 
@@ -92,11 +100,12 @@ class Lab2_3 is Lesson
                     You will write a program that plays a song of your own composition, and you will share this song with your classmates. 
                     While building your musical piece, you will also take advantage of a feature of Quorum Studio known as code completion. 
 This lesson must be completed in the offline environment of Quorum Studio.")
-        bodyDiv:Add(p1)
+        section_overview:Add(p1)
 
 
-        bodyDiv:AddHeading("Goal 1: Understanding the Music Library ", 2)
-        bodyDiv:AddParagraph("You will start by creating a new blank Quorum project in Quorum Studio. Name this project Lab2_3. Open the main.quorum file in the Sodbeans editor. ")
+        AddHeading(section_overview, "Goal 1: Understanding the Music Library", 3)
+  
+        section_overview:AddParagraph("You will start by creating a new blank Quorum project in Quorum Studio. Name this project Lab2_3. Open the main.quorum file in the Sodbeans editor. ")
         Paragraph p2  
         CodeBlock c22
         p2:AddText("Before you can begin using the ")
@@ -106,7 +115,7 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         c22:AddText("use")
         p2:Add(c22)
         p2:AddText(" statement. ")
-        bodyDiv:Add(p2)
+        section_overview:Add(p2)
  
         Paragraph p3
         CodeBlock c31   
@@ -129,7 +138,7 @@ This lesson must be completed in the offline environment of Quorum Studio.")
                     You should see the library you are looking for, called ")
         p3:Add(musicCode)
         p3:AddText(".")
-        bodyDiv:Add(p3)
+        section_overview:Add(p3)
         
         Paragraph p4
         CodeBlock c41
@@ -137,9 +146,9 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         c41:AddText("Libraries.Sound.Music")
         p4:Add(c41)
         p4:AddText(" you can type the code directly as in the line below. ")
-        bodyDiv:Add(p4)
+        section_overview:Add(p4)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("Use Libraries.Sound.Music "))
+        section_overview:Add(preformatter:GeneratePreformattedCode("Use Libraries.Sound.Music "))
 
         Paragraph p5
         p5:AddText("Quorum now knows that you want to use the ")
@@ -150,8 +159,7 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         p5:Add(musicCode)
         p5:AddText(" object. In object-oriented programming languages, like Quorum, you have the option of creating multiple objects from the same class. 
                     The action of creating new objects of a given class (like the Music class) is called instantiating. ")
-        bodyDiv:Add(p5)
-        bodyDiv:Add(break)
+        section_overview:Add(p5)
 
         Paragraph example1Paragraph
         Bold example1bold
@@ -163,11 +171,11 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         example1bold:Add(museCode)
         example1bold:AddText(".")
         example1Paragraph:Add(example1bold)
-        bodyDiv:Add(example1Paragraph)
+        section_overview:Add(example1Paragraph)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("Music muse"))
+        section_overview:Add(preformatter:GeneratePreformattedCode("Music muse"))
 
-        bodyDiv:AddParagraph("You can choose any name for your object, just remember that the class cannot be renamed. 
+        section_overview:AddParagraph("You can choose any name for your object, just remember that the class cannot be renamed. 
                             Now erase your example and do the activity.")
 
 
@@ -182,13 +190,12 @@ This lesson must be completed in the offline environment of Quorum Studio.")
 //        instantiatesObjectIDE:Setup()
 //        bodyDiv:Add(instantiatesObjectIDE)
 
-        bodyDiv:AddHeading("Activity: Add a line of code that instantiates a music object.", 4)
-        bodyDiv:AddParagraph("You can choose the name you want for your object. 
+        AddHeading(section_overview, "Activity: Add a line of code that instantiates a music object", 3)
+        section_overview:AddParagraph("You can choose the name you want for your object. 
                             The name rules for declaring the variables also apply to objects.")
 
 
-
-        bodyDiv:AddHeading("Goal 2: Using the music Library ", 2)
+        AddHeading(section_overview, "Goal 2: Using the music Library", 3)
 
         Paragraph p6
         CodeBlock c61
@@ -203,7 +210,7 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         p6:Add(c61)
         p6:AddText(". This action will allow us to play a given note for a specified length of time, in seconds. 
                     Press enter to accept this option.")
-        bodyDiv:Add(p6)
+        section_overview:Add(p6)
 
 
         Paragraph p7
@@ -213,14 +220,17 @@ This lesson must be completed in the offline environment of Quorum Studio.")
         p7:Add(c71)
         p7:AddText(" action what notes you wish to hear, you must pass it this information in the form of parameter. 
                     In programming, parameters are values (or variable names) that are passed to an action.")
-        bodyDiv:Add(p7)
+        section_overview:Add(p7)
 
 
+        Section section_lesson
+        section_lesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_lesson)
+        AddHeading(section_lesson, "Example: Use the play action to play a middle C for one second", 2)
 
-        bodyDiv:AddHeading("Example: Use the play action to play a middle C for one second.", 4)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("muse:Play(60, 1)"))
+        section_lesson:Add(preformatter:GeneratePreformattedCode("muse:Play(60, 1)"))
 
-        bodyDiv:AddParagraph("Instead of muse remember to use your object name to test the example. 
+        section_lesson:AddParagraph("Instead of muse remember to use your object name to test the example. 
                             Notice that because it is more than one parameter inside the parenthesis, we use a comma to separate them. 
                             Sound should be heard from the computer speakers (make sure the volume is turned up)!")
 
@@ -231,28 +241,31 @@ This lesson must be completed in the offline environment of Quorum Studio.")
 //        actionChangingIDE:GetIDESubtitle():AddText(" In two different lines use the play action changing the note and the duration.")
 //        bodyDiv:Add(actionChangingIDE)
 
-        bodyDiv:AddHeading("Activity: In two different lines use the play action, changing the note and duration.", 4)
+         AddHeading(section_lesson, "Activity: In two different lines use the play action, changing the note and duration.", 3)
+
 
         Paragraph p8
         p8:AddText("Choose any number between 0 and 127 to change your note and any amount of seconds you want to change the duration. 
                     To see a list with the notes and their respective numbers, click ")
-        p8:AddLink( "here" , "http://computermusicresource.com/midikeys.html")
+        Link link = p8:AddLink( "here" , "http://computermusicresource.com/midikeys.html")
+        link:SetClassAttribute("underline text-quorum-blue-150")
         p8:AddText(". The note will sound on a piano, if you want to change the instrument you will have to use another library, the code below it is an example of changing the instrument.")
-        bodyDiv:Add(p8)
+         section_lesson:Add(p8)
 
-        bodyDiv:AddHeading("Example: Change the instrument.", 4)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Sound.Music" + cr 
+        section_lesson:AddHeading("Example: Change the instrument.", 4)
+        section_lesson:Add(preformatter:GeneratePreformattedCode("use Libraries.Sound.Music" + cr 
                                                          +  "use Libraries.Sound.Instrument" + cr + cr
                                                          +  "Music muse" + cr 
                                                          +  "Instrument i = muse:GetInstrument(10)" + cr + cr
                                                          +  "muse:SetInstrument(i)" + cr 
-                                                         +  "muse:Play(60, 1"))
+                                                         +  "muse:Play(60, 1)"))
         Paragraph p9
         p9:AddText("You can choose instruments between 0 and 127. 
                     To go to the list with all of the options and theirs respective number, click ")
-        p9:AddLink( "here" , "http://computermusicresource.com/GM.Programs.html")
+        Link link1 = p9:AddLink( "here" , "http://computermusicresource.com/GM.Programs.html")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
         p9:AddText(".")
-        bodyDiv:Add(p9)
+         section_lesson:Add(p9)
 
 //        SideBySideIDE createSongIDE
 //        createSongIDE:SetUniqueIdentifier("createSong")
@@ -262,19 +275,18 @@ This lesson must be completed in the offline environment of Quorum Studio.")
 //        bodyDiv:Add(createSongIDE)
 
 
-        bodyDiv:AddHeading("Activity: It's time to create a custom song!", 4)
-        bodyDiv:AddParagraph("Take time in creating a song and keep testing the program to ensure that the program plays a melody. 
+        AddHeading(section_lesson, "Activity: It's time to create a custom song!", 3)
+        section_lesson:AddParagraph("Take time in creating a song and keep testing the program to ensure that the program plays a melody. 
                                 If you are confident enough, attempt to re-create the melody of a song you know.")
 
-        bodyDiv:AddParagraph("When the song is finished and ready to show off, play the song for the instructor, some friends, or the class.")
+       section_lesson:AddParagraph("When the song is finished and ready to show off, play the song for the instructor, some friends, or the class.")
 
 
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -290,7 +302,18 @@ This lesson must be completed in the offline environment of Quorum Studio.")
     action GetShortDescription returns text
         return "how work music in Quorum."
     end
-    action GetLocation returns text
-        return "lessons/chapter2/lab2_3.html"
+
+        action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "lessons/chapter2/lab2_3.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Types"
     end
 end

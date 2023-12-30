@@ -1,4 +1,3 @@
-
 use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.LineBreak
 use Libraries.Web.Page.MetaData
@@ -11,6 +10,10 @@ use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.PreformattedText
 use Libraries.Web.Page.Comment
 use Libraries.Web.Page.Span
+use Libraries.Containers.Array
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Heading
 
 class AudioPlayLongerAudioTutorial is Lesson
     text dq = ""
@@ -26,20 +29,31 @@ class AudioPlayLongerAudioTutorial is Lesson
         //html header stuff
         SetWebPageTitle("Playing Longer Audio - Quorum Programming Language")
         AddDefaultHeaders()
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Division headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Playing Longer Audio", 1)
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Playing Longer Audio", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Playing Longer Audio")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial teaches you how to stream large audio files in Quorum.")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Playing Longer Audio: Streaming", 2)
+        Section section_streaming
+        section_streaming:SetClassAttribute("flex flex-col gap-y-2")
 
+        Heading h_streaming = section_streaming:AddHeading("Playing Longer Audio: Streaming", 2)
+        h_streaming:AddClassAttribute("text-2xl font-bold")
+        h_streaming:AddAttribute("data-text", "Playing Longer Audio: Streaming")
+        AddToHeadingArray(h_streaming)
 
-        bodyDiv:AddParagraph(   "If we have a longer audio file, like one that contains a full-length song, we may want to load our file via the LoadToStream action. "
+        section_streaming:AddParagraph(   "If we have a longer audio file, like one that contains a full-length song, we may want to load our file via the LoadToStream action. "
                             +   "The LoadToStream action allows our audio file to be loaded in " + dq + "chunks," + dq + "as they are needed instead of all at once. "
                             +   "This is more efficient and allows the file to start playing more quickly than if it must wait for the entire audio file to be loaded, especially for longer sounds, like songs. In order to stream our Audio object, we will need a loop that keeps the Audio object streaming as long as it is playing. "
                             +   "An example of this follows: ")
@@ -78,13 +92,13 @@ class AudioPlayLongerAudioTutorial is Lesson
         cb11:AddText(   "   streamingAudio:Stream()" + cr
                     +   "end"  + cr )
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb11))
+        section_streaming:Add(preformatter:GeneratePreformattedCode(cb11))
 
 
 
 
-        bodyDiv:AddParagraph(   "A Quorum File object can also be used instead of a text file path when calling the LoadToStream action. " + cr )
-        bodyDiv:AddParagraph(   "If we are playing sound as part of a game using the Quorum Game Engine, the proper place to put the Stream() call is inside the Update action, which is called every frame in the Main Game Loop. "
+        section_streaming:AddParagraph(   "A Quorum File object can also be used instead of a text file path when calling the LoadToStream action. " + cr )
+        section_streaming:AddParagraph(   "If we are playing sound as part of a game using the Quorum Game Engine, the proper place to put the Stream() call is inside the Update action, which is called every frame in the Main Game Loop. "
                             +   "This will ensure that the next " + dq + "chunk" + dq + "of sound will be loaded at every opportunity. An example of streaming in the game engine follows: ")
 
         CodeBlock cb12
@@ -113,14 +127,22 @@ class AudioPlayLongerAudioTutorial is Lesson
                     +   "   end" + cr
                     +   "end" + cr )
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb12))
+        section_streaming:Add(preformatter:GeneratePreformattedCode(cb12))
 
-        AddIDE(bodyDiv, "playingLongerAudio", "Activity: Playing Longer Audio", "The same thing but with a longer audio file")
+        CodeForIDE code1
+        code1:AddFileText("Main.quorum", "//the same thing but with a longer audio file")
+        IDE ide1 = AddIDE()
+        ide1:SetLightTheme()
+        ide1:SetCodeForIDE(code1:GetJsonArray())
+        ide1:SetIdeTitle("Activity: Playing Longer Audio")
+        section_streaming:Add(ide1)
 
-        WriteNextTutorial(bodyDiv)
-        Add(bodyDiv)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_streaming)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -145,5 +167,13 @@ class AudioPlayLongerAudioTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/dsp/audioplaylongeraudiotutorial.html"
+    end
+
+    action GetLinkName returns text
+        return "Playing Longer Audio"
+    end
+
+    action GetSectionName returns text
+        return "Data Science"
     end
 end

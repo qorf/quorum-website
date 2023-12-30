@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class AudioWaveGeneratorTutorial is Lesson
     text dq = ""
@@ -28,28 +15,38 @@ class AudioWaveGeneratorTutorial is Lesson
         SetWebPageTitle("Wave Generators - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Wave Generators", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Wave Generators", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Wave Generators")
+        AddToHeadingArray(h_heading)
+        
         headDiv:AddText("Generate sounds with different wave forms")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Wave Generators", 2)
+        Section section_wave_generators
+        section_wave_generators:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("In this tutorial, we will cover the four main waveforms, how to generate them, and how to convert them to something we can actually hear. 
+        Heading h_wave_generators = section_wave_generators:AddHeading("Wave Generators", 2)
+        h_wave_generators:AddClassAttribute("text-2xl font-bold")
+        h_wave_generators:AddAttribute("data-text", "Wave Generators")
+        AddToHeadingArray(h_wave_generators)
+
+        section_wave_generators:AddParagraph("In this tutorial, we will cover the four main waveforms, how to generate them, and how to convert them to something we can actually hear. 
             It is important that we know about these waveforms because they are fundamental to creating sounds (synthesizing). 
             These four waves are: Sine waves, Square waves, Sawtooth waves, and Triangle waves.")
         
-        bodyDiv:AddImage("/media/dsp/waveforms.png", "This is a picture of the four waveforms.")
+        Image image_wave_generators = section_wave_generators:AddImage("/media/dsp/waveforms.png", "This is a picture of the four waveforms.")
+        image_wave_generators:AddAttribute("data-zoom", "")
         
-        bodyDiv:AddParagraph("A waveform is a shape that repeats itself in a medium. 
+        section_wave_generators:AddParagraph("A waveform is a shape that repeats itself in a medium. 
             These repeating shapes and values are determined by a wave’s attributes. 
             These attributes include: wavelength, frequency, period, and amplitude. 
             Together they allow us to hear different sounds with different pitches, harmonics, and timbres. 
@@ -57,7 +54,7 @@ class AudioWaveGeneratorTutorial is Lesson
             Typically, the higher the frequency, the higher the pitch sound you get. 
             Harmonics are integer multiples of the frequency. ")
 
-        bodyDiv:AddParagraph("These are the equations we will be using to create our waveforms:")
+        section_wave_generators:AddParagraph("These are the equations we will be using to create our waveforms:")
         
         CodeBlock cb1
         Span s1
@@ -88,10 +85,10 @@ class AudioWaveGeneratorTutorial is Lesson
         cb1:AddText("-2 / math:pi * math:InverseTangent(1 / math:Tangent(frequency * math:pi* counter/sampleSize))")
 
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_wave_generators:Add(preformatter:GeneratePreformattedCode(cb1))
 
-        bodyDiv:AddHeading("Example Program", 3)
-        bodyDiv:AddParagraph("Below is an example program implementing all four waveforms. 
+        section_wave_generators:AddHeading("Example Program", 3):AddClassAttribute("text-xl font-bold")
+        section_wave_generators:AddParagraph("Below is an example program implementing all four waveforms. 
             Each waveform is played for a set amount of seconds (which we set to 4) one after another.")
         
         CodeBlock cb2
@@ -218,20 +215,27 @@ class AudioWaveGeneratorTutorial is Lesson
             "audio4:Load(sawtooth)" + cr)
         cb2:Add(s22)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
+        section_wave_generators:Add(preformatter:GeneratePreformattedCode(cb2))
 
-        bodyDiv:AddHeading("Getting Started: Including the proper libraries", 2)
-        bodyDiv:AddParagraph("To begin, we will be using three libraries that must be included at the beginning of our project. 
+        Section section_libraries
+        section_libraries:AddClassAttribute("flex flex-col gap-y-2")
+
+        Heading h_libraries = section_libraries:AddHeading("Getting Started: Including the proper libraries", 2)
+        h_libraries:AddClassAttribute("text-2xl font-bold")
+        h_libraries:AddAttribute("data-text", "Getting Started: Including the proper libraries")
+        AddToHeadingArray(h_libraries)
+
+        section_libraries:AddParagraph("To begin, we will be using three libraries that must be included at the beginning of our project. 
             Make sure to include the following at the top of your code: ")
         CodeBlock cb3
         cb3:AddText("use Libraries.Sound.Audio" + cr +
             "use Libraries.Sound.AudioSamples" + cr +
             "use Libraries.Compute.Math")
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb3))
+        section_libraries:Add(preformatter:GeneratePreformattedCode(cb3))
         
-        bodyDiv:AddHeading("Setting up the AudioSamples", 3)
-        bodyDiv:AddParagraph("We learned from a previous tutorial what the AudioSamples object was and how it is used to create sound. 
+        section_libraries:AddHeading("Setting up the AudioSamples", 3):AddClassAttribute("text-xl font-bold")
+        section_libraries:AddParagraph("We learned from a previous tutorial what the AudioSamples object was and how it is used to create sound. 
             To implement the wave values, we must use the AudioSamples object. 
             First, we create the object and then set how many channels we want and how long we would like the sound to play for. 
             Let’s set it to one channel to produce a mono sound that will play for four seconds. 
@@ -246,11 +250,17 @@ class AudioWaveGeneratorTutorial is Lesson
         cb4:AddText("sine:SetChannels(1)" + cr +
             "sine:SetSizeInSeconds(4)")
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb4))
+        section_libraries:Add(preformatter:GeneratePreformattedCode(cb4))
 
         
-        bodyDiv:AddHeading("Sine Waves", 2)
-        bodyDiv:AddParagraph("Sine waves are the most basic of the sound waves. 
+        Section section_waveforms
+        section_waveforms:AddClassAttribute("flex flex-col gap-y-2")
+        Heading h_waveforms = section_waveforms:AddHeading("Sine Waves", 2)
+        h_waveforms:AddClassAttribute("text-2xl font-bold")
+        h_waveforms:AddAttribute("data-text", "Sine Waves")
+        AddToHeadingArray(h_waveforms)
+
+        section_waveforms:AddParagraph("Sine waves are the most basic of the sound waves. 
             It produces an isolated sound without additional harmonics. 
             Let’s take a look into the sine wave code from the above example program.")
         CodeBlock cb5
@@ -263,22 +273,28 @@ class AudioWaveGeneratorTutorial is Lesson
             "   counter = counter + 1" + cr +
             "end" + cr )
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb5))
+        section_waveforms:Add(preformatter:GeneratePreformattedCode(cb5))
         
-        bodyDiv:AddParagraph("Notice that the code is very similar to the white noise generator program we previously created. 
+        section_waveforms:AddParagraph("Notice that the code is very similar to the white noise generator program we previously created. 
             The only difference here is that instead of setting a sample with a random value, we set the sample to the value of our equation. 
             In fact, the only thing that differs from each of our waveforms’ code is the equation. 
             Sine waves look exactly like you would expect a “wave” to look like. 
             It’s shape comes from the standard sine equation. " + cr +
             "The line: number s = math:Sine(frequency * (twoPI * (counter/sampleSize))) ")
-        bodyDiv:AddText("is what gives this wave its shape.
+        section_waveforms:AddText("is what gives this wave its shape.
             We plot these values into our sine AudioSamples object to set them. 
             As these samples are taken, you should hear an elongated beep sound. 
             Compared to the other waveforms, the sine wave’s sound may seem dull and basic.")
 
-        bodyDiv:AddHeading("Square Waves, Triangle Waves, and Sawtooth Waves", 2)
+        Section section_square_triangle_sawtooth
+        section_square_triangle_sawtooth:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("Square waves, unlike sine waves, include odd [numbered] harmonics. 
+        Heading h_square_triangle_sawtooth = section_square_triangle_sawtooth:AddHeading("Square Waves, Triangle Waves, and Sawtooth Waves", 2)
+        h_square_triangle_sawtooth:AddClassAttribute("text-2xl font-bold")
+        h_square_triangle_sawtooth:AddAttribute("data-text", "Square Waves, Triangle Waves, and Sawtooth Waves")
+        AddToHeadingArray(h_square_triangle_sawtooth)
+
+        section_square_triangle_sawtooth:AddParagraph("Square waves, unlike sine waves, include odd [numbered] harmonics. 
             The square wave should sound a bit louder and more rich because of these harmonics. 
             There are only two possible values for square waves, a high level and a low level. 
             Here is our code:")
@@ -307,13 +323,13 @@ class AudioWaveGeneratorTutorial is Lesson
             "   counter = counter + 1" + cr +
             "end")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb6))
+        section_square_triangle_sawtooth:Add(preformatter:GeneratePreformattedCode(cb6))
 
-        bodyDiv:AddParagraph("Notice that we set our high value to 1 and our low value to 1. 
+        section_square_triangle_sawtooth:AddParagraph("Notice that we set our high value to 1 and our low value to 1. 
             The high value is the wave’s amplitude. 
             We also use the same equation as the sine wave but map these values to our high and low levels based on if they are positive or negative.")
         
-        bodyDiv:AddParagraph("Triangle Waves are more like square waves in the sense that they also include odd harmonics. 
+        section_square_triangle_sawtooth:AddParagraph("Triangle Waves are more like square waves in the sense that they also include odd harmonics. 
             The difference is that the harmonics of a triangle wave jump much quicker than a square wave.")
 
         CodeBlock cb7
@@ -326,10 +342,10 @@ class AudioWaveGeneratorTutorial is Lesson
             "   counter = counter + 1" + cr + 
             "end" + cr + cr)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb7))
+        section_square_triangle_sawtooth:Add(preformatter:GeneratePreformattedCode(cb7))
         
-        bodyDiv:AddText("Again the code looks idential but with a different mathematical equation")
-        bodyDiv:AddParagraph("Lastly, sawtooth waves contain all harmonics (even and odd) which create a fuller sound. 
+        section_square_triangle_sawtooth:AddText("Again the code looks idential but with a different mathematical equation")
+        section_square_triangle_sawtooth:AddParagraph("Lastly, sawtooth waves contain all harmonics (even and odd) which create a fuller sound. 
             They are shaped the way they are because they rise steadily then drop to their lowest level.")
 
         CodeBlock cb8
@@ -342,19 +358,29 @@ class AudioWaveGeneratorTutorial is Lesson
             "   counter = counter + 1" + cr + 
             "end")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb8))
+        section_square_triangle_sawtooth:Add(preformatter:GeneratePreformattedCode(cb8))
         
-        bodyDiv:AddText("The sound of a single sawtooth wave should sound more like a buzz rather than a beep.")
-        bodyDiv:AddParagraph("If you listen closely to all these sound waves, you should be able to hear a sine wave as well. 
+        section_square_triangle_sawtooth:AddText("The sound of a single sawtooth wave should sound more like a buzz rather than a beep.")
+        section_square_triangle_sawtooth:AddParagraph("If you listen closely to all these sound waves, you should be able to hear a sine wave as well. 
             This is because each waveform can be described as an infinite set of sine waves.")
 
-        AddIDE(bodyDiv, "WaveGenerator", "Generate Different Waveforms", "")
+        CodeForIDE code1
+        code1:AddFileText("Main.quorum", "//Try generating some different waveforms below")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Generate Different Waveforms")
+        section_square_triangle_sawtooth:Add(ide)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_wave_generators)
+        bodyDiv:Add(section_libraries)
+        bodyDiv:Add(section_waveforms)
+        bodyDiv:Add(section_square_triangle_sawtooth)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
 
@@ -380,5 +406,13 @@ class AudioWaveGeneratorTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/dsp/audiowavegenerator.html"
+    end
+
+    action GetLinkName returns text
+        return "Wave Generators"
+    end
+
+    action GetSectionName returns text
+        return "Audio"
     end
 end

@@ -1,18 +1,4 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
 
 class ChartsSaving is Lesson
@@ -28,51 +14,69 @@ class ChartsSaving is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Charts", 1)
-        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Saving a Chart", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Saving a Chart")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial introduces how to save charts in Quorum")
+        bodyDiv:Add(headDiv)
+
+        Section section_save
+        section_save:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_save)
         
-        bodyDiv:AddHeading("Saving Our Charts", 2)
+        Heading h2_save = section_save:AddHeading("Saving Our Charts", 2)
+        h2_save:AddAttribute("data-text", "Saving Our Charts")
+        
+        h2_save:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_save)
+        
 
-        bodyDiv:AddParagraph("Now that we have learned how to construct all these charts, we can also save them onto our computer for easier access. All charts should be saved as an SVG (Scalable Vector Graphic), meaning the chart should contain its resolution when zoomed in or out. The importance of using an svg is that the image would not be rasterized, meaning a loss of pixels, and they are still accessible and can be parsed through a screen reader.")
+        section_save:AddParagraph("Now that we have learned how to construct all these charts, we can also save them onto our computer for easier access. All charts should be saved as an SVG (Scalable Vector Graphic), meaning the chart should contain its resolution when zoomed in or out. The importance of using an svg is that the image would not be rasterized, meaning a loss of pixels, and they are still accessible and can be parsed through a screen reader.")
 
-        bodyDiv:AddParagraph("The first task we should do before being able to save our charts, we also would need to display them. We can do this simply by calling the Display() function with the chart object we have been using as follows:")
+        section_save:AddParagraph("The first task we should do before being able to save our charts, we also would need to display them. We can do this simply by calling the Display() function with the chart object we have been using as follows:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+        section_save:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
 
-        bodyDiv:AddParagraph("To save our charts we will need to call the Save(text fileName) function and it will save onto our project's parent folder. Here is a brief explanation of the Save() function.")
+        section_save:AddParagraph("To save our charts we will need to call the Save(text fileName) function and it will save onto our project's parent folder. Here is a brief explanation of the Save() function.")
+
+        WebTable table = AddWebTable("Using the Save() function")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Function")
+        tableHeaderArray:Add("Description") 
+        tableHeaderArray:Add("Usage")
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)    
 
         Array<text> rubricText1
         rubricText1:Add("chart:Save(text fileName)")
         rubricText1:Add("Save() takes in a string as a parameter which saves our charts as actual images on our computer. The file name should always have the .svg extension included in order to have a successful save.")
         rubricText1:Add("chart:Save("+dq+"chart1.svg"+dq+")
 ")
-         Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Function", " "))
-        rubricHeader:Add(AddTextBoldFront("Description", " "))
-        rubricHeader:Add(AddTextBoldFront("Usage", " "))
+        tableBody:Add(AddTableBodyRow(rubricText1))
 
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
-      
-        rubricRows:Add(AddTableDataTag(rubricText1))
-      
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Using the Save() function"))
+        table:Add(tableBody)
+        section_save:Add(table)
 
-        bodyDiv:AddParagraph("This will create a file called 'chart1.svg' inside the parent folder. Now we can save any of the charts we have created!")
 
-        bodyDiv:AddParagraph("Below is a snippet of code to use to save a chart using the Save() function:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        section_save:AddParagraph("This will create a file called 'chart1.svg' inside the parent folder. Now we can save any of the charts we have created!")
+
+        section_save:AddParagraph("Below is a snippet of code to use to save a chart using the Save() function:")
+        section_save:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Interface.Controls.Charts.LineChart
 
 // create the data frame to read in data
@@ -98,55 +102,62 @@ chart:Display(1500, 750)
 // save chart image
 chart:Save("+dq+"linechart1.svg"+dq+")"))
 
-        bodyDiv:AddParagraph("Alternatively, we can also display our chart's data onto the Quorum Studio terminal in which we would call the function ConvertToScalableVectorGraphics() and also use the 'output' function in order to translate our data into text form. Here is a brief explanation on the ConvertToScalableVectorGraphics() function.")
+        section_save:AddParagraph("Alternatively, we can also display our chart's data onto the Quorum Studio terminal in which we would call the function ConvertToScalableVectorGraphics() and also use the 'output' function in order to translate our data into text form. Here is a brief explanation on the ConvertToScalableVectorGraphics() function.")
+
+        
+        WebTable tableScale = AddWebTable("Displaying charts on the terminal")
+        TableBody tableBodyScale = AddTableBody()
+        
+        Array<text> tableHeaderArrayScale
+        tableHeaderArrayScale:Add("Function")
+        tableHeaderArrayScale:Add("Description") 
+        tableHeaderArrayScale:Add("Usage")
+
+        TableHeader theadScale = AddTableHeaderRow(tableHeaderArrayScale)
+        tableScale:Add(theadScale)   
 
         Array<text> rubricText2
         rubricText2:Add("chart:ConvertToScalableVectorGraphics()")
         rubricText2:Add("chart:ConvertToScalableVectorGraphics() takes in no parameters and will convert the chart we have created (after calling the Display() function) as an SVG.")
         rubricText2:Add("chart:ConvertToScalableVectorGraphics()")
-   
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Description", " "))
-        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+        tableBodyScale:Add(AddTableBodyRow(rubricText2))
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-      
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-      
+        tableScale:Add(tableBodyScale)
+        section_save:Add(tableScale)
+           
+        section_save:AddParagraph("Below is a snippet of code to use to display onto the terminal:")
+        section_save:Add(preformatter:GeneratePreformattedCode("output chart:ConvertToScalableVectorGraphics()"))
+
+        section_save:AddParagraph("The SVG file relies on web hosted files to be navigated accessibly. The SVG file can be added inline to a webpage which imports the Javascript (used to handle the keystrokes necessary for navigation) and Cascading Stylesheet (used to show which element is focused on the image).")
+
+       section_save:AddParagraph("To more easily share our charts, we can call the Share(text fileName) function instead of the Save() function and it will save a Hypertext Markup Language (HTML) file onto our project's parent folder. Here is a brief explanation of the Share() function.")
+
+         WebTable tableShare = AddWebTable("Using the Share() function")
+        TableBody tableBodyShare = AddTableBody()
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Displaying charts on the terminal"))
-        
-        bodyDiv:AddParagraph("Below is a snippet of code to use to display onto the terminal:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("output chart:ConvertToScalableVectorGraphics()"))
+        Array<text> tableHeaderArrayShare
+        tableHeaderArrayShare:Add("Function")
+        tableHeaderArrayShare:Add("Description") 
+        tableHeaderArrayShare:Add("Usage")
 
-        bodyDiv:AddParagraph("The SVG file relies on web hosted files to be navigated accessibly. The SVG file can be added inline to a webpage which imports the Javascript (used to handle the keystrokes necessary for navigation) and Cascading Stylesheet (used to show which element is focused on the image).")
+        TableHeader theadShare = AddTableHeaderRow(tableHeaderArrayShare)
+        tableShare:Add(theadShare)   
 
-        bodyDiv:AddParagraph("To more easily share our charts, we can call the Share(text fileName) function instead of the Save() function and it will save a Hypertext Markup Language (HTML) file onto our project's parent folder. Here is a brief explanation of the Share() function.")
 
         Array<text> rubricText3
         rubricText3:Add("chart:Share(text fileName)")
         rubricText3:Add("Share() takes in a string as a parameter which saves our charts as a page with the image on our computer. The file name should always have the .html extension included in order to have a successful save.")
         rubricText3:Add("chart:Share("+dq+"chart1.html"+dq+")
 ")
-         Array<text> rubricHeader3
-        rubricHeader3:Add(AddTextBoldFront("Function", " "))
-        rubricHeader3:Add(AddTextBoldFront("Description", " "))
-        rubricHeader3:Add(AddTextBoldFront("Usage", " "))
+        tableBodyShare:Add(AddTableBodyRow(rubricText3))
 
-        Array<text> rubricRows3
-        rubricRows3:Add(AddTableHeaderTag(rubricHeader3))
-      
-        rubricRows3:Add(AddTableDataTag(rubricText3))
-      
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows3), "Using the Share() function"))
+        tableShare:Add(tableBodyShare)
+        section_save:Add(tableShare)
 
-        bodyDiv:AddParagraph("This will create a file called 'chart1.html' inside the parent folder. This file can be opened in the browser and navigated accessibly. Now we can save and share any of the charts we have created!")
+        section_save:AddParagraph("This will create a file called 'chart1.html' inside the parent folder. This file can be opened in the browser and navigated accessibly. Now we can save and share any of the charts we have created!")
 
-        bodyDiv:AddParagraph("Below is a snippet of code to use to save a chart using the Share() function:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        section_save:AddParagraph("Below is a snippet of code to use to save a chart using the Share() function:")
+        section_save:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Interface.Controls.Charts.LineChart
 
 // create the data frame to read in data
@@ -172,11 +183,12 @@ chart:Display(1500, 750)
 // save chart image
 chart:Share("+dq+"linechart1.html"+dq+")"))
         
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -208,5 +220,13 @@ chart:Share("+dq+"linechart1.html"+dq+")"))
 
     action GetLocation returns text
         return "tutorials/charts/saving.html"
+    end
+    
+    action GetLinkName returns text
+        return "Saving the Charts"
+    end
+
+    action GetSectionName returns text
+        return "Charts"
     end
 end

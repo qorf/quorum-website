@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class Physics3DGravityTutorial is Lesson
     text dq = ""
@@ -27,101 +15,129 @@ class Physics3DGravityTutorial is Lesson
         SetWebPageTitle("Physics Gravity In 3D - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)        
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Physics Gravity In 3D", 1)
-        headDiv:AddText("Understanding and making your first 3D physics enabled Quorum game")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Physics Gravity In 3D", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Physics Gravity In 3D")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("Understanding and making your first 3D physics enabled Quorum game")
+        bodyDiv:Add(headDiv)
+
+
 
         //the section on general information
-        bodyDiv:AddHeading("Overview", 2)
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText(    "The Quorum 3D Physics Engine is meant to make basic forces and the interaction of objects in our games simpler to implement. "
+        Section section_overview
+        section_overview:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_overview)
+        AddHeading(section_overview, "Overview", 2)
+
+        Paragraph para
+
+        para:AddText(    "The Quorum 3D Physics Engine is meant to make basic forces and the interaction of objects in our games simpler to implement. "
                             +   "In this tutorial, we will learn how to turn on physics and apply gravity. "
                             +   "Note that this tutorial is quite similar to the ")
-        bodyDiv:AddLink(    "Gravity In 2D", "/tutorials/physics/gravity2D.html")                    
-        bodyDiv:AddText(" tutorial. "    
+        Link link1 = para:AddLink(    "Gravity In 2D", "/tutorials/physics/gravity2D.html")                    
+        link1:AddClassAttribute("underline text-quorum-blue-150")
+        para:AddText(" tutorial. "    
                             +   "If you need a refresher on making 3D games, be sure to review the other Games and Media tutorials on the ") 
-        bodyDiv:AddLink("Reference page", "/reference.html")
-        bodyDiv:AddText(" before beginning this tutorial. "
+        para:AddLink("Reference page", "/reference.html")
+        para:AddText(" before beginning this tutorial. "
                             +   "The code provided at the end of this tutorial will load a blue box onto the game screen which will be in the air above a green box representing the ground. "
                             +   "Then the blue box will fall, increasing in speed as it approaches the ground. "
                             +   "A lot of this code will be familiar to the ")
-        bodyDiv:AddLink(    "3D Drawing", "/tutorials/games/drawing3D.html")
-        bodyDiv:AddText(    " tutorial, because we still need to create shapes and add them to the screen. ")
+        para:AddLink(    "3D Drawing", "/tutorials/games/drawing3D.html")
+        para:AddText(    " tutorial, because we still need to create shapes and add them to the screen. ")
+        section_overview:Add(para)
 
         //the section on setting the necessary flags
-        bodyDiv:AddHeading("Physics Flags", 2)
-        bodyDiv:AddParagraph(   "Our first step in using physics is to turn it on. "
+            Section section_flags
+        section_flags:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_flags)
+        AddHeading(section_flags, "Physics Flags", 2)
+
+
+        section_flags:AddParagraph(   "Our first step in using physics is to turn it on. "
                             +   "We do this by setting the global physics flag in the CreateGame action. ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "EnablePhysics3D(true)"))
-        bodyDiv:AddParagraph(   "With the physics engine, there are additional properties that can be set for each item we add to the screen. "
+        section_flags:Add(preformatter:GeneratePreformattedCode(  "EnablePhysics3D(true)"))
+        section_flags:AddParagraph(   "With the physics engine, there are additional properties that can be set for each item we add to the screen. "
                             +   "Most importantly, when we want to use the Physics engine for an object, there is a flag that needs to be set to true: EnablePhysics. "
                             +   "This is set in the same way that position or color is set, for example: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "itemName:EnablePhysics(true)"))
-        bodyDiv:AddParagraph(   "After we turn physics on, we need to tell the engine more information about the item. "
+        section_flags:Add(preformatter:GeneratePreformattedCode(  "itemName:EnablePhysics(true)"))
+        section_flags:AddParagraph(   "After we turn physics on, we need to tell the engine more information about the item. "
                             +   "There are two ways to do this part, but we will focus on only one for this tutorial. "
                             +   "All Item3D objects now have physics properties stored in a PhysicsProperties3D object. "
                             +   "We can access most of these properties through new actions in the Item3D class. "
                             +   "The properties include friction, linear velocity, and others. "
                             +   "We will cover more of these properties in further tutorials, but for this gravity game, we need responsiveness. ")
         //the section on responsiveness
-        bodyDiv:AddHeading("Responsiveness", 2)
+             Section section_responsiveness
+        section_responsiveness:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_responsiveness)
+        AddHeading(section_responsiveness, "Responsiveness", 2)
 
-        bodyDiv:AddParagraph(   "Responsiveness describes how this item interacts with other items on the screen. "
+        section_responsiveness:AddParagraph(   "Responsiveness describes how this item interacts with other items on the screen. "
                             +   "There are three levels of responsiveness: Responsive, NonResponsive, and Unmovable. ")
-        bodyDiv:AddHeading( "Responsive", 4)
-        bodyDiv:AddParagraph("An object set to be responsive can be affected by forces like gravity or forces resulting from a collision. "
+        AddHeading(section_responsiveness, "Responsive", 3)
+        section_responsiveness:AddParagraph("An object set to be responsive can be affected by forces like gravity or forces resulting from a collision. "
                             +   "A player controlled character, for example, might be responsive. "
                             +   "We can set an item to be responsive like this:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode( "itemName:SetResponsive()"))
-        bodyDiv:AddHeading( "NonResponsive", 4)
-        bodyDiv:AddParagraph("A nonresponsive object will not respond to forces, but can be moved programmatically. "
+        section_responsiveness:Add(preformatter:GeneratePreformattedCode( "itemName:SetResponsive()"))
+        AddHeading(section_responsiveness, "NonResponsive", 3)
+        section_responsiveness:AddParagraph("A nonresponsive object will not respond to forces, but can be moved programmatically. "
                             +   "A moving platform might be nonresponsive so that it can be moved in the program without responding to gravity or collisions. "
                             +   "We can move the platform using "+ dq +"itemName:Move()"+ dq 
                             +   ", for example. "
                             +   "Note that using Move() with responsive items will bypass collisions and gravity for them as well. "
                             +   "We can set an item to be nonresponsive like this:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "itemName:SetNonResponsive()"))
-        bodyDiv:AddHeading("Unmovable", 4)
-        bodyDiv:AddParagraph("An unmovable object will not respond to forces and cannot be moved. "
+        section_responsiveness:Add(preformatter:GeneratePreformattedCode(  "itemName:SetNonResponsive()"))
+          AddHeading(section_responsiveness, "Unmovable", 3)
+        section_responsiveness:AddParagraph("An unmovable object will not respond to forces and cannot be moved. "
                             +   "This is the perfect option for the ground, as it should not fall from gravity, be pushed by collisions, or be moved in the program after being set in place. "
                             +   "Note that if the position of an Unmovable object is changed in Update() or anytime after being set initially, the object will move on screen, but the physics will act as if the object remains in its original position. "
                             +   "Unmovable is a physics property, so it only affects the physics of the object and not how it appears on screen. "
                             +   "We can set an item to be unmovable like this:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("itemName:SetUnmovable()"))
-        bodyDiv:AddParagraph("In this tutorial, we will use two of these levels of responsiveness: Unmovable and Responsive. "
+        section_responsiveness:Add(preformatter:GeneratePreformattedCode("itemName:SetUnmovable()"))
+        section_responsiveness:AddParagraph("In this tutorial, we will use two of these levels of responsiveness: Unmovable and Responsive. "
                             +   "The ground will be Unmovable. "
                             +   "The box on the other hand, should be Responsive because we want gravity and collision forces to act on it: "
                             +   "stopping it when it hits the ground. "
                             +   "Finally, we need to tell the computer the impact of gravity. ")
         
-        bodyDiv:AddHeading("Gravity", 2)
+        Section section_gravity
+        section_gravity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gravity)
+        AddHeading(section_gravity, "Gravity", 2)
 
-        bodyDiv:AddParagraph("Like the global physics flag, we need to set gravity in the CreateGame() action. There are two ways to set gravity, both with the same handy action. "
+        section_gravity:AddParagraph("Like the global physics flag, we need to set gravity in the CreateGame() action. There are two ways to set gravity, both with the same handy action. "
                             +   "Here, we will focus one of these ways. The next tutorial about forces will cover the other. The action to set gravity is: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
+        section_gravity:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
                             +   "number Y = -10" + cr
                             +   "number Z = 0" + cr
                             +   "SetGravity3D( X , Y , Z )"))
-        bodyDiv:AddParagraph("When we set gravity, the X, Y, and Z coordinates will correspond to the direction and amount of change per second. "
+        section_gravity:AddParagraph("When we set gravity, the X, Y, and Z coordinates will correspond to the direction and amount of change per second. "
                             +   "For gravity, we want a force pulling down vertically (set Y to a negative number), no pull horizontally (set X to 0) and no pull closer or farther from us (set Z to 0.) "
                             +   "Because the engine has to convert pixels to metric measurements, sometimes we may need to try a few different force values for gravity to make sure it looks right. ")
 
-        bodyDiv:AddHeading("Code", 2)                    
-        bodyDiv:AddText(    "Here is a ")
-        bodyDiv:AddLink(    "zip file" , "/files/games/Gravity3D.zip" )
-        bodyDiv:AddText(    " containing a Quorum project using the code below. "
+       Section section_code
+        section_code:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_code)
+        AddHeading(section_code, "Code", 2)
+
+        Paragraph para2    
+
+        para2:AddText(    "Here is a ")
+        Link linkA = para2:AddLink(    "zip file" , "/files/games/Gravity3D.zip" )
+        linkA:SetClassAttribute("underline text-quorum-blue-150")
+        para2:AddText(    " containing a Quorum project using the code below. "
                             +   "Read through, then use the following code to discover gravity. ")
-        bodyDiv:AddParagraph("")
+        section_code:Add(para2)
 
         CodeBlock cb1
         Span s1
@@ -211,25 +227,37 @@ class Physics3DGravityTutorial is Lesson
                     +   "       boomSound:Play()" + cr
                     +   "   end" + cr
                     +   "end" + cr + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_code:Add(preformatter:GeneratePreformattedCode(cb1))
 
-        //the section on running the program
-        bodyDiv:AddHeading("Run the Program", 2)
-        bodyDiv:AddParagraph(   "If we run this gravity game, we should have a box load on the screen which falls to the ground like so:")
-        AddIDE(bodyDiv, "gravity3D", "Activity: Gravity in 3D", "Try the above code block", "examples/Physics/Gravity/Gravity3D.quorum")
-//        SideBySideIDE addStatementIDE
-//        addStatementIDE:SetUniqueIdentifier("physics3DGravity")
-//        addStatementIDE:GetIDETitle():AddText("Gravity In 3D")
-//        addStatementIDE:SetGameEnvironment(true)
-//        addStatementIDE:Setup()
-//        bodyDiv:Add(addStatementIDE)
-//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+ //the section on running the program
+        Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+      section_try_yourself:AddParagraph(   "If we run this gravity game, we should have a box load on the screen which falls to the ground like so:")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+    CodeForIDE code4
+    code4:AddFileUrl("Main.quorum", "examples/Physics/Gravity/Gravity3D.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Gravity in 3D")
+    section_try_yourself:Add(ide3)
+
+
+     Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
+
+  
     end
 
     action GetMetaDescription returns text
@@ -254,5 +282,13 @@ class Physics3DGravityTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/physics/gravity3D.html"
+    end
+
+     action GetLinkName returns text
+        return "Gravity in 3D"
+    end
+
+    action GetSectionName returns text
+        return "Game Physics"
     end
 end

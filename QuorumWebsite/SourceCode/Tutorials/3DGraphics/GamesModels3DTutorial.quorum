@@ -1,0 +1,245 @@
+
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class GamesModels3DTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("3D Models - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("3D Models in Quorum", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "3D Models in Quorum")
+        AddToHeadingArray(h_heading)
+
+        headDiv:AddText("This tutorial explains loading 3D models in Quorum")
+        bodyDiv:Add(headDiv)
+
+        Section section_models
+        section_models:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_models)
+        AddHeading(section_models, "An Introduction to Using 3D Models in Quorum", 2)
+
+        section_models:AddParagraph(   "This tutorial will cover how to load 3D Models from a file, where 3D models can be found, "
+                            +   "and it will discuss the potential problems with loading models created by someone else." )
+        section_models:AddParagraph(   "In Quorum, we can load 3D models into our games from files. There are many file formats used for these models, "
+                            +   "but Quorum needs models that are in either .obj file format or .g3db file format. "
+                            +   "We will discuss where we can find models in these formats and how to solve potential problems later in the tutorial, "
+                            +   "but first let’s learn how to add these objects to our game.")
+
+        //the section on loading 3D models
+        Section section_models_file
+        section_models_file:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_models_file)
+        AddHeading(section_models_file, "Loading 3D Models from a File", 2)
+
+        Paragraph paraA
+        paraA:AddText(             "The first model we load will be a doorframe. Download ")
+        Link link = paraA:AddLink("this file", "/files/games/door.obj")
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        paraA:AddText(             " and let’s place it in the directory of a new Quorum Game project.")
+        section_models_file:Add(paraA)
+
+        section_models_file:AddParagraph(   "Loading a model from a file is no different from loading a primitive shape. If we need a refresher on loading primitives, "
+                            +   "we can go check the Drawing in 3D tutorial. Instead of calling the Model action LoadBox() or LoadCylinder(), we will call the Model action Load(). "
+                            +   "This action requires the name of our file in quotation marks. In order to load our door into our project, our code should look like:")
+
+
+        CodeBlock cb1
+        Span s1
+        Span s2
+        Span s3
+        Span s4
+        cb1:AddText(    "use Libraries.Game.Game" + cr
+                    +   "use Libraries.Game.Graphics.Model" + cr + cr)
+        s1:AddText(     "    /*" + cr
+                    +   "    This is a default class for creating a game in Quorum. Note that the Main " + cr
+                    +   "    action begins by calling StartGame(), which loads a window a game can " + cr
+                    +   "    be displayed in. The action CreateGame is where the game should load any " + cr
+                    +   "    assets, like images to be displayed, frames of animation, or sounds to be" + cr
+                    +   "    played. " + cr
+                    +   "    */" + cr)
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText(    "class Main is Game" + cr
+                    +   "    Model door" + cr)
+        s2:AddText(     "    /*" + cr
+                    +   "    This action, Main, starts our computer program. In Quorum, programs always" + cr
+                    +   "    begin from Main." + cr
+                    +   "    */" + cr)
+        s2:SetClassAttribute("comment")
+        cb1:Add(s2)
+        cb1:AddText(    "    action Main" + cr
+                    +   "        StartGame()" + cr
+                    +   "    end" + cr + cr)
+        s3:AddText(     "    /*" + cr
+                    +   "    This action sets up the default values for a game. For example, we might" + cr
+                    +   "    use the Libraries.Game.Graphics.Drawable class to load up an image or " + cr
+                    +   "    a shape, or we might add a Libraries.Interface.Button for making something clickable, " + cr
+                    +   "    or a Libraries.Interface.TextBox for gathering user input in a game." + cr
+                    +   "    */ " + cr)
+        s3:SetClassAttribute("comment")
+        cb1:Add(s3)
+        cb1:AddText(    "    action CreateGame" + cr
+                    +   "        door:Load(" + dq + "door.obj" + dq + ")" + cr
+                    +   "        Add(door)" + cr
+                    +   "    end" + cr + cr)
+        s4:AddText(     "    /*" + cr
+                    +   "    The update action is called on every " + dq + "frame" + dq + " of animation in a game. This" + cr
+                    +   "    action should be used to do operations on items. So, for example, we " + cr
+                    +   "    might use this action to change frames of animation, to rotate items, " + cr
+                    +   "    or to make creatures jump." + cr
+                    +   "    */ " + cr)
+        s4:SetClassAttribute("comment")
+        cb1:Add(s4)
+        cb1:AddText(    "    action Update(number seconds)" + cr
+                    +   "    end" + cr
+                    +   "end")
+        section_models_file:Add(preformatter:GeneratePreformattedCode(cb1))
+
+
+        section_models_file:AddParagraph(   "One thing to remember when we load a model from a file is that we may not know the size of the model. "
+                            +   "For this reason, when we load models, it can be useful to have our program print the dimensions of the model. "
+                            +   "In order to do this, we can call the output action and tell it to print the x, y, and z dimensions of our door. "
+                            +   "Let’s navigate to the CreateGame action and write these three lines of code after we load our model:")
+        section_models_file:Add(preformatter:GeneratePreformattedCode(  "    output door:GetWidth() " + cr
+                                                        +   "    output door:GetHeight() " + cr
+                                                        +   "    output door:GetDepth()"))
+        section_models_file:AddParagraph(   "Now, let’s run our program. The door is not visible in the game screen, but the program will output 3 numbers. In our case, it prints:" )
+        section_models_file:AddParagraph(   "159.4470977783203" )
+        section_models_file:AddParagraph(   "303.8571243286133" )
+        section_models_file:AddParagraph(   "60.58085823059082" )
+        section_models_file:AddParagraph(   "Now we know why our door was not visible: it is huge! This is when the scale action we learned in the Animation in 3D tutorial comes in handy. "
+                            +   "We need to shrink our door by a lot, so let’s add this line of code to our CreateGame action:")
+        section_models_file:Add(preformatter:GeneratePreformattedCode(  "    door:Scale(0.01, 0.01, 0.01)"))
+        section_models_file:AddParagraph(   "Let’s run our program once again (F6). Now our door is visible. Below is an image of our game screen with the door in place:")
+        section_models_file:AddImage("/media/games/models_door.png", "This is an image of the models door")
+
+        Paragraph linkParagraph
+        linkParagraph:AddText("We can now do any of the things we learned in our ")
+        Link link3d = linkParagraph:AddLink("3D Animation", "/tutorials/games/animation3D.html")
+        link3d:SetClassAttribute("underline text-quorum-blue-150")
+        linkParagraph:AddText(" tutorial (move, scale or rotate) our door.")
+        section_models_file:Add(linkParagraph)
+
+
+        //the section on models location
+        Section section_find
+        section_find:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_find)
+        AddHeading(section_find, "Where to Find Models", 2)
+
+        section_find:AddParagraph(   "There are many web sites dedicated to providing 3D Models for download (for free or to purchase). Some popular web sites are:")
+        UnorderedList list
+        list:AddListItemLink("Turbosquid.com", "http://www.turbosquid.com")
+        list:AddListItemLink("TF3DM.com", "http://tf3dm.com")
+        list:AddListItemLink("WireCASE.com", "http://www.wirecase.com/gallery-free-3d-models_s-2_v-20-1_f-fc-0-321_f-fpx-_f-fpn-_f-oid-.html")
+        section_find:Add(list)
+        section_find:AddParagraph(   "but there are many web sites out there that offer free 3D models. "
+                            +   "When looking for models, we need to keep in mind that Quorum can only load .obj or .g3db files. "
+                            +   "One more important thing to consider when downloading models is the license on a model. A license tells us who can use a model, and for what purpose. "
+                            +   "Just like we need permission to use someone else’s words or images, use of models also requires permission. Many models are free for personal use, "
+                            +   "but they cannot be shared or used in anything that will be published. "
+                            +   "Some models are available for commercial use or are in the public domain and we can use them however we want. "
+                            +   "Whatever the license is on a particular model, we need to understand the restrictions so that we can respect the license." )
+        section_find:AddParagraph(   "Licensing and file formats are not our only considerations when using models we did not create ourselves. "
+                            +   "There are many problems that can happen when we download models from the Internet.")
+
+        //the section on potential problems
+        AddHeading(section_find, "Potential Problems Loading Models", 3)
+        section_find:AddParagraph(   "There are hundreds of thousands of models that can be downloaded for free, "
+                            +   "but we will be unable to load a large portion of these models in a Quorum project. "
+                            +   "This is a consequence of using something that someone else made. One of the most common errors we will see when loading models involves a missing file. "
+                            +   "Most .obj files also require a .mtl file that creates a material library. Our door was pink because it did not use any materials, "
+                            +   "but if the .obj file required a material library, our program would not have been able to load the door without that .mtl file. "
+                            +   "If a model has a .mtl file, be sure to also place that in the project directory." )
+        section_find:AddParagraph(   "So a model could be missing a .mtl file, but even if there is a .mtl file, we could still get an error for a missing file. "
+                            +   "A material library file will often reference images as textures to put on the model. "
+                            +   "If the .mtl file uses an image that was not included in the file we downloaded, we will get an error. "
+                            +   "Sometimes, the author of a model uses images on their own computer to texture their model. "
+                            +   "If they do not include these images when they upload a model, we will not be able to load the model in our project." )
+        section_find:AddParagraph(   "Another thing to consider when we download models is their size. Many models are huge, made up of hundreds of thousands of vertices. "
+                            +   "Very large models will take a very long time to load in our game, so we need to be conscious of how large a model is." )
+        section_find:AddParagraph(   "It can take a long time to find models that have been put together properly, and are not too large. "
+                            +   "An alternative to downloading models is making our own.")
+
+        //the section on making our own models
+        Section section_make
+        section_make:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_make)
+        AddHeading(section_make, "Making our own models", 2)
+
+        Paragraph paraB
+        paraB:AddText(             "We can also make our own models using tools like ")
+        paraB:AddLink("Blender", "https://www.blender.org")
+        paraB:AddText(             " or ")
+        paraB:AddLink("Maya", "http://www.autodesk.com/products/maya/overview-dts?s_tnt=69290:1:0")
+        paraB:AddText(             ". However, note that model making programs are generally not accessible to people with disabilities, which means we sometimes have to be creative. "
+                            +   "We can also try experimenting with the primitive shapes in Quorum. "
+                            +   "For an example of using only primitive shapes in Quorum, check out the next tutorials, on ")
+        paraB:AddLink("Cameras", "/tutorials/games/cameras.html")
+        paraB:AddText(             " and ")
+        paraB:AddLink("Lighting", "/tutorials/games/lighting.html")
+        paraB:AddText(             ", which only use primitives." + cr + cr
+                            +   "In this tutorial, we have learned how to load 3D models, where we can find such models, and some potential problems with downloaded models.")
+        section_make:Add(paraB)
+
+         Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to load custom 3D models in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Model 3D"
+    end
+
+    action GetImageLocation returns text
+        return "/media/games/Model3D.png"
+    end
+
+    action GetName returns text
+        return "Model3D"
+    end
+
+    action GetShortDescription returns text
+        return "how to use 3D Model"
+    end
+
+    action GetLocation returns text
+        return "tutorials/games/models3D.html"
+    end
+
+    action GetLinkName returns text
+        return "3D Models"
+    end
+
+    action GetSectionName returns text
+        return "3D Graphics"
+    end
+end

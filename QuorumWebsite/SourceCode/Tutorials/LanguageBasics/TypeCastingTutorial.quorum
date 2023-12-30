@@ -1,0 +1,215 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class TypeCastingTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Converting between types - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Type Casting", 1)
+
+        headDiv:AddText("How to try and convert one type to another.")
+        bodyDiv:Add(headDiv)
+
+        Section section_casting
+        section_casting:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_casting, "Converting one type to another", 2)
+        section_casting:AddParagraph(   "A common task in programming is to convert one kind of thing into another."
+                            +   " For example, we might have typed some text, but need the computer to understand it as a number (or the opposite)."
+                            +   " Consider the following code snippet:")
+
+        section_casting:Add(preformatter:GeneratePreformattedCode("text someText = "+ dq +"4.2"+ dq + cr + "output someText"))
+        section_casting:AddParagraph( "This text has the value of 4.2, but suppose we 
+            wanted the computer to use the actual numeric value, not the text. 
+            In Quorum, we do this using a special word named " + dq + "cast." + dq + 
+            " We can use casting by passing what kind of thing we would like to convert to and then the item we want to convert. Here is an example:")
+        section_casting:Add(preformatter:GeneratePreformattedCode("number value = cast(number, " + dq + "4.2" + dq +")" + cr + "output value"))
+        
+        section_casting:AddParagraph(   "While Quorum does its best to conduct casts for us, 
+            it sometimes prevents us from doing a conversion. 
+            For example, suppose we asked Quorum convert to 'bob' into an integer.
+            The value of 'bob' is not a number, it is a name, so Quorum gives us an error 
+            while our programming is executing. This is called a cast error. Here is an example where we intentionally cause this problem:")
+
+        CodeBlock cb1
+        Span s1
+        cb1:AddText("number value = cast(number, " + dq + "bob" + dq +")" + cr )
+        s1:AddText("//This will throw a Casting Error when the program is executed." + cr )
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("output value"  )
+        section_casting:Add(preformatter:GeneratePreformattedCode(cb1))
+
+
+        section_casting:AddParagraph("The important point here is that the above code is not
+            a compiler error. The code compiles and runs correctly, but what we are
+            asking Quorum to do, a conversion from the word 'bob' into a number, does not 
+            make sense and as such it is an error. Try some of these operations in the development
+            environment below.")
+
+        CodeForIDE code_casting
+        code_casting:AddFileText("Main.quorum", "//Try the above code blocks.")
+        IDE ide_casting = AddIDE()
+        ide_casting:HideDisplay()
+        ide_casting:SetLightTheme()
+        ide_casting:SetCodeForIDE(code_casting:GetJsonArray())
+        ide_casting:SetIdeTitle("Activity: Try casting")
+        section_casting:Add(ide_casting)
+
+        //the section on casting object
+        Section section_casting_objects
+        section_casting_objects:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_casting_objects, "Casting Objects", 2)
+        section_casting_objects:AddParagraph("It is also possible to cast object in Quorum. 
+            Suppose we were using the Math class from the Libraries.Compute package. 
+            This class computes various operations from math for us. It includes 
+            actions like rounding, sine, cosine, or other computations. In Quorum, 
+            our Math class is what we call an object. All this really means for the context 
+            of this tutorial is that we can create a copy of one and cast it. We do this like so:")
+
+        section_casting_objects:Add(preformatter:GeneratePreformattedCode(
+            "use Libraries.Compute.Math" + cr +
+            "Math computer" + cr +
+            "Object o = cast(Object, computer)" + cr +
+            "Math bob = cast(Math, o)" + cr +
+            "output " + dq + "I have cast an object back and forth from Math" + dq + cr
+            ))
+        section_casting_objects:AddParagraph("Casting is a complicated topic with objects and the example here 
+            , while intended to provide information on how to cast, does not really explain 
+            why we would want to. For this, we must understand inheritance, which will not be covered 
+            until later. For now, this is a reference.")
+
+
+        CodeForIDE code_casting_objects
+        code_casting_objects:AddFileText("Main.quorum", "//Try the above code blocks.")
+        IDE ide_casting_objects = AddIDE()
+        ide_casting_objects:HideDisplay()
+        ide_casting_objects:SetLightTheme()
+        ide_casting_objects:SetCodeForIDE(code_casting_objects:GetJsonArray())
+        ide_casting_objects:SetIdeTitle("Activity: Try casting an object")
+        section_casting_objects:Add(ide_casting_objects)
+
+        //the section on errors casting
+        Section section_errors
+        section_errors:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_errors, "Cast Errors", 2)
+        bodyDiv:AddParagraph("As previously described, we can sometimes try to cast 
+            a value this is incorrect, like the characters 'bob' into a number. In Quorum, 
+            there is a mechanism to detect when these errors happen. To do this, we have 
+            to inform Quorum that we want to 'check' for errors, and then what to do 
+            if we 'detect' one. Let's take our previous example one more time:")
+
+        CodeBlock cb2
+        Span s2
+        cb2:AddText("number value = cast(number, " + dq + "bob" + dq +")" + cr)
+        s2:AddText("//This will throw a Casting Error when the program is executed." + cr )
+        s2:SetClassAttribute("comment")
+        cb2:Add(s2)
+        cb2:AddText("output value" )
+        section_errors:Add(preformatter:GeneratePreformattedCode(cb2))
+
+
+        section_errors:AddParagraph("If we surround our cast with check and detect, a mechanism 
+            that will be described in more detail in later tutorials, we can determine 
+            when an error occurs and take action. As an example, consider what happens when we output 
+            a value when the computer detects an incorrect cast:")
+        
+        CodeBlock cb3
+        Span s3
+        cb3:AddText("check" + cr +
+                    "   number value = cast(number, " + dq + "bob" + dq + ")" + cr )
+        s3:AddText("    //This will throw a Casting Error when the program is executed." + cr )
+        s3:SetClassAttribute("comment")
+        cb3:Add(s3)
+        cb3:AddText("   output value" + cr +
+                    "detect e" + cr +
+                    "   output " + dq + "The cast failed, please enter new input." + dq + cr +
+                    "end" )
+        section_errors:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        section_errors:AddParagraph("There is more to handling errors in Quorum than outputting 
+            error messages to the screen (e.g., what is e? what are stack traces?). This tutorial 
+            has just scratched the surface.")
+
+
+        CodeForIDE code_errors
+        code_errors:AddFileText("Main.quorum", "//Try the above code blocks.")
+        IDE ide_errors = AddIDE()
+        ide_errors:HideDisplay()
+        ide_errors:SetLightTheme()
+        ide_errors:SetCodeForIDE(code_errors:GetJsonArray())
+        ide_errors:SetIdeTitle("Activity: Try detecting errors")
+        section_errors:Add(ide_errors)
+        
+
+        bodyDiv:Add(section_casting)
+        bodyDiv:Add(section_casting_objects)
+        bodyDiv:Add(section_errors)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn more about how to convert between types using the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Type Casting"
+    end
+
+    action GetImageLocation returns text
+        return "/media/basics/casting.png"
+    end
+
+    action GetName returns text
+        return "type casting"
+    end
+
+    action GetShortDescription returns text
+        return "how to convert one type of thing into another"
+    end
+
+    action GetLinkName returns text
+        return "Type Casting"
+    end
+
+    action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "tutorials/language/casting.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Basics"
+    end
+end

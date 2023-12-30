@@ -1,20 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Link
 
 class DatabasesDataframe is Lesson
     text dq = ""
@@ -28,46 +13,55 @@ class DatabasesDataframe is Lesson
         SetWebPageTitle("Converting a Database Table into a DataFrame - Quorum Programming Lanugage")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        //page header
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Databases", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Tutorial: Databases", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Tutorial: Databases")
+        AddToHeadingArray(h_heading)
+
         headDiv:AddText("This tutorial shows us how to convert a database table into a DataFrame")
-        Add(headDiv)
-
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:Add(headDiv)
         
-        bodyDiv:AddHeading("Converting Tables into a DataFrame", 2)
+        Section section_converting_tables_to_dataframe
+        section_converting_tables_to_dataframe:SetClassAttribute("flex flex-col gap-y-2")
+
+        Heading h_converting_tables_to_dataframe = section_converting_tables_to_dataframe:AddHeading("Converting Tables into a DataFrame", 2)
+        h_converting_tables_to_dataframe:SetClassAttribute("text-2xl font-bold")
+        h_converting_tables_to_dataframe:AddAttribute("data-text", "Converting Tables into a DataFrame")
+        AddToHeadingArray(h_converting_tables_to_dataframe)
         
-        bodyDiv:AddParagraph("Let's start off with defining what a DataFrame is in Quorum. A DataFrame is essentially a container of a series of rows and columns that are read from a dataset. We can visualize this as a spreadsheet or our tables inside our database. DataFrames are useful in numerous ways in Quorum as they serve as the foundation for topics around Data Science. With a DataFrame, we can manipulate datasets, use descriptive statistics, and even create charts from datasets or in our case, our database tables.")
+        section_converting_tables_to_dataframe:AddParagraph("Let's start off with defining what a DataFrame is in Quorum. A DataFrame is essentially a container of a series of rows and columns that are read from a dataset. We can visualize this as a spreadsheet or our tables inside our database. DataFrames are useful in numerous ways in Quorum as they serve as the foundation for topics around Data Science. With a DataFrame, we can manipulate datasets, use descriptive statistics, and even create charts from datasets or in our case, our database tables.")
 
-        bodyDiv:AddParagraph("For this tutorial, we will be using three different methods on how to convert a database table into a dataframe as well as preview our data in a chart. While all these methods to convert to a DataFrame are similar, it is important to know the many different methods to convert a database table into a DataFrame for the ease of the programmer. ")
+        section_converting_tables_to_dataframe:AddParagraph("For this tutorial, we will be using three different methods on how to convert a database table into a dataframe as well as preview our data in a chart. While all these methods to convert to a DataFrame are similar, it is important to know the many different methods to convert a database table into a DataFrame for the ease of the programmer. ")
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("We will want to connect our database once again as well as create a DataFrame object. To do this, we would create a new object called DataFrame, that allows us to use ")
+        Paragraph p_converting_tables_to_dataframe
+        p_converting_tables_to_dataframe:AddText("We will want to connect our database once again as well as create a DataFrame object. To do this, we would create a new object called DataFrame, that allows us to use ")
+        Link link
+        link:AddClassAttribute("underline text-quorum-blue-150")
+        link:AddText("helper actions")
+        link:SetAddress("https://quorumlanguage.com/Libraries/Compute/Statistics/DataFrame.html")
+        link:SetTarget(link:newTab)
+        p_converting_tables_to_dataframe:Add(link)
+        p_converting_tables_to_dataframe:AddText(" that give us more ways to organize and modify our datasets. As mentioned previously, we can use a DataFrame to be used with other libraries such as our ")
+
         Link link2
-        link2:AddText("helper actions")
-        link2:SetAddress("https://quorumlanguage.com/Libraries/Compute/Statistics/DataFrame.html")
+        link2:AddText("Charts library")
+        link2:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/Chart.html")
         link2:SetTarget(link2:newTab)
-        bodyDiv:Add(link2)
-        bodyDiv:AddText(" that give us more ways to organize and modify our datasets. As mentioned previously, we can use a DataFrame to be used with other libraries such as our ")
-
-        Link link3
-        link3:AddText("Charts library")
-        link3:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/Chart.html")
-        link3:SetTarget(link3:newTab)
-        bodyDiv:Add(link3)
-        bodyDiv:AddText(". We will go ahead and create our object and name it "+dq+"frame."+dq+"
+        p_converting_tables_to_dataframe:Add(link2)
+        p_converting_tables_to_dataframe:AddText(". We will go ahead and create our object and name it "+dq+"frame."+dq+"
 ")
 
-        bodyDiv:AddParagraph(" ")
+        section_converting_tables_to_dataframe:Add(p_converting_tables_to_dataframe)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Data.Database.Database
+
+        section_converting_tables_to_dataframe:Add(preformatter:GeneratePreformattedCode("use Libraries.Data.Database.Database
 use Libraries.Compute.Statistics.DataFrame
 
 Database database
@@ -78,80 +72,93 @@ output database:IsConnected()
 DataFrame frame
 "))
 
-        bodyDiv:AddParagraph("Saving onto our DataFrame object, we will be using the actions: FindAsDataFrame(text tableName), FindAsDataFrame(text tableName, text expressionFilter), and FindAsDataFrame(Find objectName) with the Database object.")
-        
-        Array<text> rubricText1
-        rubricText1:Add("databaseName:FindAsDataFrame(text tableName)")
-        rubricText1:Add("This action runs a find based on the given parameter and returns the result as a DataFrame. This action will return all columns and rows from a database table.") 
-        rubricText1:Add("database:FindAsDataFrame("+dq+"MovieData"+dq+")") 
+        section_converting_tables_to_dataframe:AddParagraph("Saving onto our DataFrame object, we will be using the actions: FindAsDataFrame(text tableName), FindAsDataFrame(text tableName, text expressionFilter), and FindAsDataFrame(Find objectName) with the Database object.")
 
-        Array<text> rubricText2
-        rubricText2:Add("databaseName:FindAsDataFrame(text tableName, text filterExpression)")
-        rubricText2:Add("This action runs a find based on the given parameters and returns the result as a DataFrame. This action will return all columns and rows from a database table where the filter expression is true.") 
-        rubricText2:Add("database:FindAsDataFrame("+dq+"MovieData"+dq+", "+dq+"TicketPrice > 12"+dq+")") 
-
-        Array<text> rubricText3
-        rubricText3:Add("databaseName:FindAsDataFrame(Find objectName)")
-        rubricText3:Add("This action runs a find query and returns the result as a DataFrame.") 
-        rubricText3:Add("database:FindAsDataFrame(find)") 
+        WebTable table = AddWebTable("Find Actions")
+        TableBody tableBody = AddTableBody()
 
         Array<text> rubricHeader1
         rubricHeader1:Add(AddTextBoldFront("Action", " "))
         rubricHeader1:Add(AddTextBoldFront("Description", " "))
         rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+        TableHeader tableHeader = AddTableHeaderRow(rubricHeader1)
+        table:Add(tableHeader)
 
-
-
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
-
-        rubricRows1:Add(AddTableDataTag(rubricText1))
-        rubricRows1:Add(AddTableDataTag(rubricText2))
-        rubricRows1:Add(AddTableDataTag(rubricText3))
-
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Find Actions"))
-
-        bodyDiv:AddHeading("Method 1", 3)
-
-        bodyDiv:AddParagraph("For this method we will be using FindAsDataFrame(text tableName) action onto our database and save it onto a DataFrame. Once again, let's work with the grocerylist table and what we will want to do is pass in the string "+dq+"grocerylist"+dq+" as a parameter for FindAsDataFrame(). This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. ")
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame = database:FindAsDataFrame("+dq+"grocerylist"+dq+")"))
+        Array<text> rubricText1
+        rubricText1:Add("databaseName:FindAsDataFrame(text tableName)")
+        rubricText1:Add("This action runs a find based on the given parameter and returns the result as a DataFrame. This action will return all columns and rows from a database table.") 
+        rubricText1:Add("database:FindAsDataFrame("+dq+"MovieData"+dq+")") 
+        tableBody:Add(AddTableBodyRow(rubricText1))
 
-        bodyDiv:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame! ")
+        Array<text> rubricText2
+        rubricText2:Add("databaseName:FindAsDataFrame(text tableName, text filterExpression)")
+        rubricText2:Add("This action runs a find based on the given parameters and returns the result as a DataFrame. This action will return all columns and rows from a database table where the filter expression is true.") 
+        rubricText2:Add("database:FindAsDataFrame("+dq+"MovieData"+dq+", "+dq+"TicketPrice > 12"+dq+")") 
+        tableBody:Add(AddTableBodyRow(rubricText2))
 
-        AddCodeSample(bodyDiv,"examples/Databases/DBDatabase1.quorum")
+        Array<text> rubricText3
+        rubricText3:Add("databaseName:FindAsDataFrame(Find objectName)")
+        rubricText3:Add("This action runs a find query and returns the result as a DataFrame.") 
+        rubricText3:Add("database:FindAsDataFrame(find)") 
+        tableBody:Add(AddTableBodyRow(rubricText3))
 
-        bodyDiv:AddHeading("Method 2", 3)
+        table:Add(tableBody)
+        section_converting_tables_to_dataframe:Add(table)
 
-        bodyDiv:AddParagraph("For this method we will be using FindAsDataFrame(Find objectName) action onto our database and save it onto a DataFrame. What we need to do first is create a Find object which we will name it "+dq+"find."+dq+" To learn more about Finds we can click this link that shows us how to properly use the Find object. Using our Find object, we will be using the action SetTable(text tableName) and pass in our "+dq+"grocerylist"+dq+" table. This will help us connect our database onto Quorum. Now, similar to our first method, we will be calling the action, FindAsDataFrame(Find objectName) with our database object and passing in the 'find' object. This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. ")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("Find find
+        //I put this in the toc but not a new section
+        Heading h_method_one = section_converting_tables_to_dataframe:AddHeading("Method 1", 3)
+        h_method_one:AddClassAttribute("text-xl font-bold")
+        h_method_one:AddAttribute("data-text", "Method 1")
+        AddToHeadingArray(h_method_one)
+
+        section_converting_tables_to_dataframe:AddParagraph("For this method we will be using FindAsDataFrame(text tableName) action onto our database and save it onto a DataFrame. Once again, let's work with the grocerylist table and what we will want to do is pass in the string "+dq+"grocerylist"+dq+" as a parameter for FindAsDataFrame(). This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. ")
+        
+        section_converting_tables_to_dataframe:Add(preformatter:GeneratePreformattedCode("frame = database:FindAsDataFrame("+dq+"grocerylist"+dq+")"))
+
+        section_converting_tables_to_dataframe:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame! ")
+
+        AddCodeSample(section_converting_tables_to_dataframe,"examples/Databases/DBDatabase1.quorum")
+
+        Heading h_method_two = section_converting_tables_to_dataframe:AddHeading("Method 2", 3)
+        h_method_two:AddClassAttribute("text-xl font-bold")
+        h_method_two:AddAttribute("data-text", "Method 2")
+        AddToHeadingArray(h_method_two)
+
+        section_converting_tables_to_dataframe:AddParagraph("For this method we will be using FindAsDataFrame(Find objectName) action onto our database and save it onto a DataFrame. What we need to do first is create a Find object which we will name it "+dq+"find."+dq+" To learn more about Finds we can click this link that shows us how to properly use the Find object. Using our Find object, we will be using the action SetTable(text tableName) and pass in our "+dq+"grocerylist"+dq+" table. This will help us connect our database onto Quorum. Now, similar to our first method, we will be calling the action, FindAsDataFrame(Find objectName) with our database object and passing in the 'find' object. This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. ")
+
+        section_converting_tables_to_dataframe:Add(preformatter:GeneratePreformattedCode("Find find
 find:SetTable("+dq+"grocerylist"+dq+")
 
 DataFrame frame
 
 frame = database:FindAsDataFrame(find)
 "))
-        bodyDiv:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame!  ")
+        section_converting_tables_to_dataframe:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame!  ")
 
-        AddCodeSample(bodyDiv,"examples/Databases/DBDatabase2.quorum")
+        AddCodeSample(section_converting_tables_to_dataframe,"examples/Databases/DBDatabase2.quorum")
 
-        bodyDiv:AddHeading("Method 3", 3)
-        bodyDiv:AddParagraph("For this method we will be using FindAsDataFrame(text tableName, text expressionFilter) action onto our database and save it onto a DataFrame. Once again, let's work with the grocerylist table and what we will want to do is pass in the string "+dq+"grocerylist"+dq+" as a parameter for FindAsDataFrame(). Now that we are also adding a filter, for the second parameter, we will want to insert a string expression, so let's pass in "+dq+"foodCalories = 50"+dq+" into our action. This will only put in any records where foodCalories = 50 onto our DataFrame. This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. 
+        Heading h_method_three = section_converting_tables_to_dataframe:AddHeading("Method 3", 3)
+        h_method_three:AddClassAttribute("text-xl font-bold")
+        h_method_three:AddAttribute("data-text", "Method 3")
+        AddToHeadingArray(h_method_three)
+
+        section_converting_tables_to_dataframe:AddParagraph("For this method we will be using FindAsDataFrame(text tableName, text expressionFilter) action onto our database and save it onto a DataFrame. Once again, let's work with the grocerylist table and what we will want to do is pass in the string "+dq+"grocerylist"+dq+" as a parameter for FindAsDataFrame(). Now that we are also adding a filter, for the second parameter, we will want to insert a string expression, so let's pass in "+dq+"foodCalories = 50"+dq+" into our action. This will only put in any records where foodCalories = 50 onto our DataFrame. This action returns the database table to run the query on and will be saved onto our DataFrame object, frame. 
 
 ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("frame = database:FindAsDataFrame("+dq+"grocery_list"+dq+", "+dq+"foodCalories = 50"+dq+")"))
+        section_converting_tables_to_dataframe:Add(preformatter:GeneratePreformattedCode("frame = database:FindAsDataFrame("+dq+"grocery_list"+dq+", "+dq+"foodCalories = 50"+dq+")"))
 
-        bodyDiv:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame!  ")
+        section_converting_tables_to_dataframe:AddParagraph("Below is the entire code for our first method of saving our database as a DataFrame!  ")
 
-        AddCodeSample(bodyDiv,"examples/Databases/DBDatabase3.quorum")
+        AddCodeSample(section_converting_tables_to_dataframe,"examples/Databases/DBDatabase3.quorum")
 
+        bodyDiv:Add(section_converting_tables_to_dataframe)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -180,5 +187,13 @@ frame = database:FindAsDataFrame(find)
 
     action GetLocation returns text
         return "tutorials/databases/DataFrameDatabase.html"
+    end
+
+    action GetLinkName returns text
+        return "Converting a Database Table into a DataFrame"
+    end
+
+    action GetSectionName returns text
+        return "Databases"
     end
 end

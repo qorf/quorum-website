@@ -1,0 +1,68 @@
+use Libraries.Web.Page.all
+use Libraries.System.File
+
+class ContentModal is Division
+    Division outerDiv = undefined
+    Division innerDiv = undefined
+    Division contentModal = undefined
+
+    Button exitButton = undefined
+
+    on create
+        SetupModalPortion()
+        SetupContentModal()
+    end
+
+    action SetupModalPortion
+      Division outerDiv
+
+      outerDiv:SetIdentifier("outerContentModal")
+      outerDiv:AddAttribute("role", "dialog")
+      outerDiv:SetClassAttribute("z-10 hidden fixed  w-screen h-screen bg-modal-black-50")
+
+      Division innerDiv
+      innerDiv:SetClassAttribute("flex flex-col h-full w-full bg-transparent items-center justify-center")
+      innerDiv:SetIdentifier("innerModalDiv")
+      outerDiv:Add(innerDiv)
+
+      me:outerDiv = outerDiv
+      me:innerDiv = innerDiv
+
+      Add(outerDiv)
+    end
+
+    action addExitButton() returns Button
+      Button exitButton
+      exitButton:SetClassAttribute("flex items-center justify-center absolute top-0 right-0 m-4 text-3xl font-bold text-quorum-blue-100 hover:text-quorum-blue-150")
+      exitButton:AddAttribute("style", "z-index: 30;")
+
+      //cross icon start
+      HtmlFileLoader crossIconFile
+      File file
+      file:SetPath("html/media/userInterface/SVG/exit-cross.svg")
+      crossIconFile:SetLoaded(file:Read())
+      exitButton:AddText(crossIconFile:ToText())
+      //cross icon end
+
+      exitButton:SetOnClick("
+        let outerContentModal = document.getElementById('outerContentModal');
+        outerContentModal.classList.add('hidden');
+        outerContentModal.classList.remove('flex');
+        outerContentModal.setAttribute('aria-hidden', 'true');
+      ")
+      me:exitButton = exitButton
+      return exitButton
+    end
+
+    action SetupContentModal
+      Division contentModal
+      contentModal:Add(addExitButton())
+      contentModal:SetClassAttribute("flex flex-col bg-white rounded-lg shadow-lg overflow-y-auto relative")
+      me:contentModal = contentModal
+      me:innerDiv:Add(contentModal)
+    end
+
+    action GetContentModal returns Division
+      return me:contentModal
+    end
+end

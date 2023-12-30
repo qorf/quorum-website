@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class SceneItems is Lesson
     text dq = ""
@@ -22,75 +9,153 @@ class SceneItems is Lesson
     Preformatter preformatter //helper
 
     action Setup
+
         //html header stuff
-        SetWebPageTitle("Manipulating a Running Scene - Quorum Programming Language")
+        SetWebPageTitle("Adding and Removing from Scenes - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Manipulating a Running Scene", 1)
-        headDiv:AddText("This tutorial shows how to change a scene after running it")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Add and Remove Items in a Scene", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Add and Remove Items in a Scene")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        
-        bodyDiv:AddHeading("Manipulating a Running Scene", 2)
-        bodyDiv:AddParagraph("Loading a scene created in the visual editor creates a visual overlay graphically, but intentionally does nothing else. The objects in view match the scene editor's camera region and the graphics loaded match as well. 
-            However, to actually adjust and manipulate a game, add logic, and other ideas require computer code.")
-        bodyDiv:AddParagraph("Because making an application do what is wanted in code is a complicated topic, this tutorial does not go into detail here how everything works and instead will focus on the features that are related to getting items from a scene, to be used for movement or other actions. 
-            Users who want more instruction on coding parts of an application should reference the various tutorials on the topic on the Quorum site. Here is a template for moving a character in a 2D game:")
-        
-        text source = GetTextFromSource("/html/sources/tutorials/scenes/ManipulateScene.quorum")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(source))
-        bodyDiv:AddParagraph("The most crucial point to notice is that when items are given a name, they can be located in a game using the following action:")
-        
-        source = GetTextFromSource("/html/sources/tutorials/scenes/FindGirl.quorum")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(source))
+        headDiv:AddText("This tutorial teaches adding and removing items from a scene in Quorum Studio")
+        bodyDiv:Add(headDiv)
 
-        bodyDiv:AddParagraph("Here is a template for moving a character in a 3D game:")
+        Section section_new
+        section_new:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_new)
+        AddHeading(section_new, "Adding and Removing Items from a 2D Scene", 2)
+
+        section_new:AddParagraph("One of the most common operations of Scene Editor is adding and removing items. This tutorial discusses how to add 2D or 3D items from the Palette to the Grid Editor, and then how to delete them. 
+            The next tutorial will discuss how to change an item's properties. ")
+
+        Section section_add
+        section_add:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_add)
+        AddHeading(section_add, "Adding 2D Items with the Keyboard", 2)
+
+        section_add:AddParagraph("The first step to adding an item is selecting the Palette tab. By default, the Palette contains a series of tiles, like water, stone, or transitions between these. 
+            When creating an application or game, regardless of whether it is a roleplaying game, a first-person combat game, a side-scrolling jumping game, or something else, this layout process is the same. 
+            Using the arrow keys, choose an item to add to the scene; select the item using ENTER. The example below shows a water tile in the bottom left corner of the grid as a review of the item.")
+        Image image = section_add:AddImage("/media/scenes/AddRemoveItems/GridCursor.png", "This image is a grid with a single water tile. By default, the tile is placed in the camera's visible plane, which is (0, 0).")
+        image:AddAttribute("data-zoom", "")
+
+        section_add:AddParagraph("Now that the item has been selected, use the arrow keys to place it in the appropriate space, and Enter to place it.")
+        section_add:AddParagraph("Remember, tiles are automatically made according to the size of the grid. So, if a tileset uses a 16 x16 pixel size, it is automatically placed into the grid with the correct default sizing. 
+            Similarly, other sizes have the same values. Using the arrow keys, a set of tiles can be added like the example below:")
+        Image image1 = section_add:AddImage("/media/scenes/AddRemoveItems/WaterTiles.png", "This image contains a 6 x 2 water tile from the (0, 0) point up 6 and two over. At each point, tiles can be selected and modified.")
+        image1:AddAttribute("data-zoom", "")
+
+       section_add:AddParagraph("Other items can be placed in a tile, such as a character or monster. Use COMMAND +1 or CONTROL+1 to navigate back to the project window. It should return focus to the Palette tab where it left off. 
+            Again use the arrow keys to choose a new tile, or character. Select it with Enter, and place it on the grid where needed. Here is an example with a character and " + dq + "red mouth" + dq +":")
         
-        text source2 = GetTextFromSource("/html/sources/tutorials/scenes/Manipulate3DScene.quorum")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(source2))
-        bodyDiv:AddParagraph("The most crucial point to notice is that when items are given a name, they can be located in a game using the following action:")
+        Image image2 = section_add:AddImage("/media/scenes/AddRemoveItems/Characters.png", "This new map contains the existing water tiles as discussed previously, in addition to two characters, a boy and red mouth. They are about a quarter of the way through the camera's view. ")
+        image2:AddAttribute("data-zoom", "")
+
+        Section section_add_3d
+        section_add_3d:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_add_3d)
+        AddHeading(section_add_3d, "Adding 3D Items with the Keyboard", 2)
+
+        section_add_3d:AddParagraph("The first step to adding an item is selecting the Palette tab. By default, the Palette contains a collection of primitives such as cubes, cylinders, or spheres between these. When creating an application or game, 
+            regardless of whether it is a roleplaying game, a first-person combat game, a side-scrolling jumping game, or something else, this layout process is the same. Using the arrow keys, choose an item to add to the scene; select the item using ENTER. 
+            The example below shows a cylinder in the middle of the grid as a review of the item.")
+        Image image3 = section_add_3d:AddImage("/media/scenes/AddRemoveItems/3DGridCursor.png", "This image is a grid with a single cylinder. By default, the tile is placed in the camera's visible plane, which is (0, 1, 0).")
+        image3:AddAttribute("data-zoom", "")
+
+        section_add_3d:AddParagraph("Now that the item has been selected, use the arrow keys to place it in the appropriate space, COMMAND+UP or CONTROL+UP moves the 3D cursor up in space and COMMANDS+DOWN or CONTROL+DOWN move the cursor down in 3D space, and Enter to place it.")
+
+        Image image4 = section_add_3d:AddImage("/media/scenes/AddRemoveItems/CylinderAndCube.png", "This image contains cylinder at (0, 1, 0) and a cube at (3, 1, 0). For each shape, shapes can be selected and modified.")
+        image4:AddAttribute("data-zoom", "")
+
+        section_add_3d:AddParagraph("Other items can be placed in gridspace, such as a character or monster. Use COMMAND +1 or CONTROL+1 to navigate back to the project window. 
+            It should return focus to the Palette tab where it left off. Again use the arrow keys to choose a new shape, or character. Select it with Enter, and place it on the grid where needed. Here is an example with a sphere and cube:")
         
-        source2 = GetTextFromSource("/html/sources/tutorials/scenes/Find3DGirl.quorum")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(source2))
+        Image image5 = section_add_3d:AddImage("/media/scenes/AddRemoveItems/SphereAndCube.png", "This  features a Sphere shape in the middle of the camera's perspective
+            and a Cube shape to the right of the sphere")
+        image5:AddAttribute("data-zoom", "")
 
-        bodyDiv:AddParagraph("This action provides access to items created and loaded in a scene, allowing manipulations by keyboard, mouse, or however else makes sense for the product we are creating. In the above example, the Boy object is found and manipulated with keypresses. 
-            Note that potentially, all objects in the scene could have the same name. In such a case, this action would return the first object it finds with the given name, but not all of them. In such a case, other actions in the Game class can be used.")
+        Section section_rm_3d
+        section_rm_3d:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_rm_3d)
+        AddHeading(section_rm_3d, "Removing 3D Items with the Keyboard", 2)
 
-           
+        section_rm_3d:AddParagraph("There are two ways to remove Items from the Scene. One in the Grid Editor and one in the Scene tab.")
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section section_rm_2d
+        section_rm_2d:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_rm_2d)
+        AddHeading(section_rm_2d, "Removing Items", 2)
+
+        AddHeading(section_rm_2d, "Removing Items from the 2D Grid Editor", 3)
+
+        section_rm_2d:AddParagraph("To remove items using the grid editor, navigate to that screen using COMMAND+2 or CONTROL+2. Then use the arrow key to navigate to the tile or item to be deleted. If there are multiple items in the same spot, TAB to find the correct object. 
+            Once found, use DELETE to delete the object. Use ESCAPE to exit from an object, and resume use of the arrow keys to select another item. When an item is selected, the properties window will open for that object, navigate to this window with COMMAND+P or CONTROL+P. 
+            This will be useful in later lessons on setting properties to items. The screenshot below shows what the scene editor looks like visually when the monster is highlighted before deleting it.")
+        Image image6 = section_rm_2d:AddImage("/media/scenes/AddRemoveItems/DeleteMonster.png", "This image is a grid with a water tile and a red mouth monster at (0, 0), both from the perspective of the grid and raw pixels.")
+        image6:AddAttribute("data-zoom", "")
+
+        AddHeading(section_rm_2d, "Removing Items from the 3D Grid Editor", 3)
+
+        section_rm_2d:AddParagraph("To remove items using the grid editor, navigate to that screen using COMMAND+2 or CONTROL+2. Then use the arrow key to navigate to the tile or item to be deleted. If there are multiple items in the same spot, TAB to find the correct object. Once found, use DELETE to delete the object. Use ESCAPE to exit from an object, and resume use of the arrow keys to select another item. When an item is selected, the properties window will open for that object, 
+navigate to this window with COMMAND+P or CONTROL+P. This will be useful in later lessons on setting properties to items. The screenshot below shows what the scene editor looks like visually when the monster is highlighted before deleting it.")
+        section_rm_2d:AddImage("/media/scenes/AddRemoveItems/Cube.png", "This is an image of just a Cube shape, set slightly to the right of middle of the screen")
+
+        AddHeading(section_rm_2d, "Removing Items from the 2D Scene Tab", 3)
+        section_rm_2d:AddParagraph("To remove an item, whether a background tile or character, use COMMAND+1 CONTROL+1 to navigate back to the project window, then to the Scene tab. In the Scene tab, there are two main options, 3D and 2D scenes. 
+            Open the 2D scene tree, and arrow down to the item to be deleted and use the DELETE key. This may be easier for deleting characters, or unique items in a scene, but harder for background tiles. Background tiles are labeled numerically, and may be hard to find the correct cell to delete by name.")
+
+        AddHeading(section_rm_2d, "Adding and Deleting Items with the Mouse", 3)
+        section_rm_2d:AddParagraph("There are several ways to add and delete items with a mouse. To add an item with the mouse, click the item in the Palette tree, and drag it to the desired location. Double-clicking an item on the grid editor will enable a paint feature. The item will be copied to all areas it is dragged over. 
+            Items can be moved by clicking them and dragging them to a new location. If there are two items in the space, use TAB to choose the correct object.")
+    
+           AddHeading(section_rm_2d, "Removing Items from the 3D Scene Tab", 3)
+        section_rm_2d:AddParagraph("To remove an item, whether a background tile or character, use COMMAND+1 or CONTROL+1 to navigate back to the project window, then to the Scene tab. In the Scene tab, there are two main options, 3D and 2D scenes. Open the 3D scene tree, and arrow down to the item to be deleted and use the DELETE key. This may be easier for deleting characters,
+ or unique items in a scene, but harder for background shapes. Background shapes are labeled numerically, and may be hard to find the correct cell to delete by name.")
+
+        section_rm_2d:AddParagraph("To delete an object, click it and hit DELETE. Again, if there are two objects in the same spot, use TAB to choose the correct one, then DELETE.")
+
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
+
     end
 
     action GetMetaDescription returns text
-        return "Learn to manipulate running scenes in Quorum Studio"
+        return "Learn to Add and Remove Items in scenes in Quorum Studio"
     end
 
     action GetSummaryName returns text
-        return "Manipulating Running Scenes"
+        return "Add and Remove Items in Scenes"
     end
 
     action GetName returns text
-        return "Manipulating a Running Scene"
+        return "Add and Remove Items in Scenes"
     end
 
     action GetShortDescription returns text
-        return "manipulating running scenes in Quorum Studio"
+        return "adding and removing items in scenes in Quorum Studio"
     end
 
     action GetLocation returns text
         return "tutorials/Scenes/items.html"
+    end
+
+           action GetLinkName returns text
+        return "Add and Remove Items"
+    end
+
+    action GetSectionName returns text
+        return "Scene Editing"
     end
 end

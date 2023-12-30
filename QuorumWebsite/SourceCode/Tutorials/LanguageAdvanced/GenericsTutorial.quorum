@@ -1,0 +1,245 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class GenericsTutorial is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Using Generics - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Using Generics", 1)
+
+        headDiv:AddText("Generics allow us to specify what type is in a container.")
+        bodyDiv:Add(headDiv)
+
+        Section section_generics
+        section_generics:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_generics, "What are Generics?", 2)
+        section_generics:AddParagraph(   "In computer programming, we often want to create a class that generically specifies an algorithm. "
+                            +   "For example, we may want to create a list of objects, like a list of people in a phone book. "
+                            +   "Or, we may want to create a list of numbers, integers, or anything else. There are at least two ways we could accomplish this: "
+                            +   "1) we could create separate implementations of our list for each data type (e.g., one for numbers, one for integers), or 2) "
+                            +   "we could create a " + dq + "generic" + dq + " class." + cr
+                            +   "Let us take the first case, a list of numbers or integers.")
+
+        CodeBlock cb1
+        Span s1
+        cb1:AddText("class List" + cr
+                +   "     action Add(integer item)" + cr)
+        s1:AddText("          //add our list item" + cr )
+        s1:SetClassAttribute("comment")
+        cb1:Add(s1)
+        cb1:AddText("     end" + cr
+                +   "" + cr
+                +   "     action Main" + cr
+                +   "          output " + dq + "I made a non-generic list class with integers" + dq + cr
+                +   "     end" + cr
+                +   "end" + cr)
+        section_generics:Add(preformatter:GeneratePreformattedCode(cb1))
+
+        CodeForIDE code_generic1
+        code_generic1:AddFileText("Main.quorum", "//Try making our own generic class")
+        IDE ide_generics1 = AddIDE()
+        ide_generics1:HideDisplay()
+        ide_generics1:SetCodeForIDE(code_generic1:GetJsonArray())
+        ide_generics1:SetIdeTitle("Activity: Try Making a List class")
+        section_generics:Add(ide_generics1)
+
+
+        section_generics:AddParagraph("Our implementation would be identical for numbers, except that the type changes, like so:")
+
+        CodeBlock cb2
+        Span s2
+        cb2:AddText("class List" + cr
+                +   "     action Add(number item)" + cr)
+        s2:AddText("          //add our list item" + cr )
+        s2:SetClassAttribute("comment")
+        cb2:Add(s2)
+        cb2:AddText("     end" + cr
+                +   "" + cr
+                +   "     action Main" + cr
+                +   "          output " + dq + "I made a non-generic list class with numbers" + dq + cr
+                +   "     end" + cr
+                +   "end" + cr)
+        section_generics:Add(preformatter:GeneratePreformattedCode(cb2))
+
+        CodeForIDE code_generic2
+        code_generic2:AddFileText("Main.quorum", "//Try using numbers instead of integers for the list")
+        IDE ide_generics2 = AddIDE()
+        ide_generics2:HideDisplay()
+        ide_generics2:SetCodeForIDE(code_generic2:GetJsonArray())
+        ide_generics2:SetIdeTitle("Activity: Try Making a List with numbers")
+        section_generics:Add(ide_generics2)
+
+
+        section_generics:AddParagraph(   "Quorum provides a mechanism to do this generically, without needing separate implementations. "
+                            +   "Then, our list could compute whatever it needs, without worrying about what kind of object is placed into it. "
+                            +   "To do this, we must first declare our new generic list class as so:")
+
+        CodeBlock cb3
+        Span s3
+        cb3:AddText("class List<<Type>Type>" + cr
+                +   "     action Add(Type item)" + cr)
+        s3:AddText("          //add our list item" + cr )
+        s3:SetClassAttribute("comment")
+        cb3:Add(s3)
+        cb3:AddText("     end" + cr
+                +   "" + cr
+                +   "     action RemoveFromFront returns Type" + cr
+                +   "          //do remove operation" + cr
+                +   "          //we need to say " + dq + "return val" + dq + " where val is of our generic Type" + cr
+                +   "          return undefined" + cr
+                +   "     end" + cr
+                +   "" + cr
+                +   "     action Main" + cr
+                +   "          output " + dq + "This is a Generic List" + dq + cr
+                +   "     end" + cr
+                +   "end")
+        section_generics:Add(preformatter:GeneratePreformattedCode(cb3))
+
+        CodeForIDE code_generic3
+        code_generic3:AddFileText("Main.quorum", "//Try making our List class more generic")
+        IDE ide_generics3 = AddIDE()
+        ide_generics3:HideDisplay()
+        ide_generics3:SetCodeForIDE(code_generic3:GetJsonArray())
+        ide_generics3:SetIdeTitle("Activity: Try Making a Generic List")
+        section_generics:Add(ide_generics3)
+
+        section_generics:AddParagraph(   "The syntax here is complicated and requires some explanation.
+            Notably, we define our class here normally, first with the word class and 
+            then with the word List. This is followed by angle brackets and an arbitrary word, 
+            in this case Type. Now, Type here could be any word, similar to a 
+            variable, except that this word is used as a flag by Quorum for how we can later use our list. 
+            Specifically, when our code is compiled, Quorum keeps track of how 
+            a particular generic is used (e.g., an integer, number) and adapts accordingly. 
+            In our Add and Remove actions, notice that instead of returning an individual number or 
+            integer, we now return Type. To speed along the implementation of the list, 
+            we will now use the finished and built in List class in Quorum. To use it, 
+            our code looks like this:")
+
+        section_generics:Add(preformatter:GeneratePreformattedCode(  
+                "use Libraries.Containers.List" + cr
+            +   "List<<integer>integer> list" + cr
+            +   "list:Add(1)" + cr
+            +   "list:Add(2)" + cr
+            +   "list:Add(3)" + cr
+            +   "integer a = list:RemoveFromFront()" + cr
+            +   "integer b = list:RemoveFromFront()" + cr
+            +   "integer c = list:RemoveFromFront()" + cr
+            +   "output a" + cr
+            +   "output b" + cr
+            +   "output c" + cr
+        ))
+
+        CodeForIDE code_generic4
+        code_generic4:AddFileText("Main.quorum", "//Try using a List built using generics")
+        IDE ide_generics4 = AddIDE()
+        ide_generics4:HideDisplay()
+        ide_generics4:SetCodeForIDE(code_generic4:GetJsonArray())
+        ide_generics4:SetIdeTitle("Activity: Try using a Generic List")
+        section_generics:Add(ide_generics4)
+
+        section_generics:AddParagraph(   "Like before, using angle brackets tells our list 
+            what kind it is. In this case, we are using integers. Next, we are then 
+            adding and then removing items from the list, outputting each in turn.
+            No doubt, generics are an advanced topic in programming. They might seem esoteric, 
+            but there is some evidence in the scholarly literature that they can 
+            be helpful to programmers. For those that would like to see the completed list, 
+            the source for Quorum can be found here:")
+
+        Link link1 = section_generics:AddLink("The List class in Quorum","https://github.com/qorf/quorum-language/blob/main/Quorum/Library/Standard/Libraries/Containers/List.quorum")
+        link1:AddClassAttribute("underline text-quorum-blue-150")
+        
+        section_generics:AddParagraph("For those that want more information on the impact 
+            of generics on programmers, here are two references that contain evidence:")
+
+        OrderedList ordered
+        ordered:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem li_ref1
+        Link link_ref1
+        link_ref1:AddText("Michael Hoppe and Stefan Hanenberg. 2013. Do developers 
+            benefit from generic types?: an empirical comparison of generic and 
+            raw types in java. SIGPLAN Not. 48, 10 (October 2013), 457-474. 
+            DOI=http://dx.doi.org/10.1145/2544173.2509528")
+        link_ref1:SetAddress("http://dl.acm.org/citation.cfm?id=2509528&CFID=851762518&CFTOKEN=15553070")
+        link_ref1:AddClassAttribute("underline text-quorum-blue-150")
+        li_ref1:Add(link_ref1)
+
+        ListItem li_ref2
+        Link link_ref2
+        link_ref2:AddText("Parnin, C., Bird, C. & Murphy-Hill, E. Empir Software 
+            Eng (2013) 18: 1047. doi:10.1007/s10664-012-9236-6")
+        link_ref2:SetAddress("http://dl.acm.org/citation.cfm?id=2589717&CFID=851762518&CFTOKEN=15553070")
+        link_ref2:AddClassAttribute("underline text-quorum-blue-150")
+        li_ref2:Add(link_ref2)
+
+        ordered:Add(li_ref1)
+        ordered:Add(li_ref2)
+        section_generics:Add(ordered)
+
+        bodyDiv:Add(section_generics)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn about how to use generics and templating for storing data in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Generics"
+    end
+
+    action GetImageLocation returns text
+        return "/media/basics/generics.png"
+    end
+
+    action GetName returns text
+        return "generics"
+    end
+
+    action GetShortDescription returns text
+        return "how to use this concept for collections of data"
+    end
+
+    action GetLinkName returns text
+        return "Generics"
+    end
+
+    action GetLocation returns text
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "tutorials/language/generics.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Libraries and Structures"
+    end
+end

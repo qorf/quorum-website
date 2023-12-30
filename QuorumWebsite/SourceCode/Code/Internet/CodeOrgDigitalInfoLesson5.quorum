@@ -1,0 +1,264 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class CodeOrgDigitalInfoLesson5 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 2 Lesson 5: Packets")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("The Internet - Lesson 5: Packets", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "The Internet - Lesson 5: Packets")
+        AddToHeadingArray(h_heading)
+
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Overview", 2)
+
+        section_intro:AddParagraph("Students learn that large messages sent over the Internet are actually divided into individual packets and explore the challenges this creates. Students begin in a simulation similar to the one in the previous lesson, except long messages will now need to be split into smaller parts -- and these parts may be lost or delivered out of order. They then design their own protocol that addresses these challenges. At the end of the lesson students watch a video and learn and the User Datagram Protocol (UDP) and The Transmission Control Protocol (TCP), two different protocols for sending messages broken into packets.")
+
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("Students will be able to:")
+        UnorderedList goals
+        goals:AddClassAttribute("list-disc list-outside pl-8")
+        goals:AddListItem("Describe how information flows through the Internet as a datastream of packets")
+        goals:AddListItem("Explain how packet numbering and re-ordering can allow for large messages to reliably be sent even if packets are dropped or arrive out of order")
+        goals:AddListItem("Explain the differences between the Transmission Control Protocol (TCP) and User Datagram Protocol (UDP)")
+        section_intro:Add(goals)
+
+        AddHeading(section_intro, "Purpose", 3)
+        section_intro:AddParagraph("Information on the Internet is not sent all at once, but is instead broken into smaller chunks of data called packets. Each packet is sent through the Internet individually and may actually take different paths or arrive at different times than others. Once they arrive the receiver will use the packets to recreate the original file.")
+        section_intro:AddParagraph("Two protocols used to send data as packets are UDP and TCP. The User Datagram Protocol (UDP) simply sends all the packets. If some arrive out of order or are entirely missing there's no system to fix the errors. The Transmission Control Protocol (TCP) numbers packets before sending them so that the receiver can correctly reorder the packets and request missing packets be resent.")
+        section_intro:AddParagraph("Only one of these two protocols will be used, depending on the situation. TCP takes longer than UDP because of the error-checking done to guarantee every packet was received. TCP is used to send information like emails, images, websites, and more where saving fractions of a second is less important than accuracy. In instances like live-streaming television or online gaming where speed is most important, UDP will be used since it is faster and there's less benefit to correcting errors.")
+        section_intro:AddParagraph("This lesson gives students a hands-on experience with the ideas behind both protocols and helps them understand the implications of splitting large files into packets when sending them online.")
+        section_intro:AddParagraph("Note: UDP is not covered in the video at the end of the lesson.")
+
+        AddHeading(section_intro, "Resources", 3)
+        UnorderedList resources
+        resources:AddClassAttribute("list-disc list-outside pl-8 underline text-quorum-blue-150")
+        resources:AddListItemLink("The Internet: Packets, Routing, and Reliability - Video", "https://youtu.be/AYdF7b3nMto")
+        section_intro:Add(resources)
+
+        
+        Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
+
+        section_gettingStarted:AddParagraph(AddStrongTag("Prompt:") + " Suppose our school library is moving to a new building on campus and the librarian has asked for your help.")
+        UnorderedList a
+        a:AddClassAttribute("list-disc list-outside pl-8")
+        a:AddListItem("What approach would you take if you just needed to clear out the space by the end of the day?")
+        a:AddListItem("How would your approach change if you had more time and wanted to check that every book made it safely and was on the same shelf it was on before the move?")
+        section_gettingStarted:Add(a)
+
+        Division warmUpGoal = AddDisscussionGoal(section_gettingStarted)
+        warmUpGoal:AddParagraph("This prompt foreshadows the challenge students will see in today's lesson and also the core difference between the two protocols they'll look at, TCP, and UDP. You don't need to cover either of those at this point in the lesson. Some key points to draw out:")
+        UnorderedList warmUpList
+        warmUpList:AddClassAttribute("list-disc list-outside pl-8")
+        warmUpList:AddListItem("In the first instance you would probably just load them into boxes and carry them over. You might even be ok if some were lost or the order got messed up. What matters is speed.")
+        warmUpList:AddListItem("In the second case there'd need to be some kind of record keeping to make sure that every book was recorded as well as the order it was placed in.")
+        warmUpList:AddListItem("In both cases you wouldn't move the entire library at once, you would move boxes or chunks of books at a time.")    
+        warmUpGoal:Add(warmUpList)
+        warmUpGoal:AddParagraph("Note this is a tight lesson with a significant wrap up. Aim to keep this warm up short and move to the main activity quickly.")
+       
+        AddHeading(section_gettingStarted, "Remarks", 3)
+        UnorderedList warmUpRemarks
+        warmUpRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        warmUpRemarks:AddListItem("In the last lesson we learned that messages can take different paths to get to the same place on the Internet. Sometimes, we need to send really large messages over the internet, like movies or large pictures. Just like moving your entire school library, there are problems that arise when we want to send large messages on the internet. Today we're going to learn about two different protocols for sending information online, one that's used when all we care about is speed, and one that's used when accuracy is more important.")
+        section_gettingStarted:Add(warmUpRemarks)
+
+        Section section_activity
+        section_activity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_activity)
+        AddHeading(section_activity, "Activity (30 minutes)", 2)
+        section_activity:AddParagraph(AddStrongTag("Group") + ": Place students into groups of 3-4. Assign each group a number, and then assign each individual student an " + dq + "IP Address" + dq + " using the same rules as in the previous lesson. (You may reuse the same numbers or give students new ones.)")
+        section_activity:AddParagraph(AddStrongTag("Do This") + ": Similar to last lesson, students will use index cards or other available methods to send messages to each other, with the teacher acting as the " + dq + "router" + dq + ", delivering the messages (packets) to their final destination. Give your students these extra rules to follow during the simulation:")
+        UnorderedList ruleList
+        ruleList:AddClassAttribute("list-disc list-outside pl-8")
+        ruleList:AddListItem("Students will only be allowed to send packets containing 8 characters of text! (If you notice more than 8 characters coming through in the packets, delete anything past the 8 allowed characters).")
+        ruleList:AddListItem("However, they may construct multiple packets prior to sending them, by using separate index cards, text messages, or email messages. Each message should be sent and distributed through the teacher for this simulation.")
+        ruleList:AddListItem("The Internet isn't perfectly stable -- there's a chance the receiver won't get your message in the exact way you sent it!")
+        section_activity:Add(ruleList)
+
+        Division ruleTip = AddTeachingTip(section_activity)
+        ruleTip:AddParagraph("Here are a few key ways to simulate the instability of the Internet during this simulation:")
+        UnorderedList tipList
+        tipList:AddClassAttribute("list-disc list-outside pl-8")
+        tipList:AddListItem("<i>Dropped packets.</i> Occasionally discard some of the packets before they reach their destination.")
+        tipList:AddListItem("<i>Different routes.</i> When delivering a message made up of many packets, they don't have to go through the same routers to arrive at their destination. You can split up packets and have them take separate routes.")
+        tipList:AddListItem("<i>Packets out of order.</i> Packets aren't guaranteed to arrive in the same order they were sent. You can achieve this by having them take different routes, but you can also shuffle up some of the messages before you deliver them to simulate this.")
+        ruleTip:Add(tipList)
+
+        AddHeading(section_activity, "Challenge #1: Send a Message", 3)
+        section_activity:AddParagraph(AddStrongTag("Do This:") + " Have students send a multi-packet message to another classmate. They should aim for roughly 5 - 10 packets to increase the likelihood of some packets dropping or arriving out of order.")
+
+        Division challenge1Tip = AddTeachingTip(section_activity)
+        challenge1Tip:AddParagraph("The goal of the first challenge is to let students see some of the issues that can arise due to packets being dropped, rerouted, or received in the wrong order. Once students have noticed these, you can move on. Most of the activity will be spent in the second half.")
+
+        AddHeading(section_activity, "Remarks", 4)
+        UnorderedList challenge1Remarks
+        challenge1Remarks:AddListItem("As we've just seen, there are some issues with simply sending all of the packets. Packets can arrive out of order or totally get lost and there's no way for the computer to tell what happened. That said, it's a really simple protocol, and it's fast. In the real world, this is known as <b>UDP</b> or <b>User Datagram Protocol</b>.")
+        challenge1Remarks:AddListItem("Just like clearing out the library as fast as you can in the warm up, the goal of UDP is to send information quickly without worrying about accuracy. It's useful when split seconds matter more than correcting errors, like video-conferencing, live streaming, or online gaming.")
+        challenge1Remarks:AddListItem("Now let's see if we can develop a protocol that gives us better accuracy if we're ok taking some more time.")
+        section_activity:Add(challenge1Remarks)
+
+        AddHeading(section_activity, "Challenge #2: Develop a Protocol", 3)
+        section_activity:AddParagraph(AddStrongTag("Do This: ") + " With their groups or with a partner, have students develop a protocol for reliably sending a message across an unreliable network. In particular, students should try to solve these problems with their protocol:")
+        UnorderedList criteria
+        criteria:AddClassAttribute("list-disc list-outside pl-8")
+        criteria:AddListItem("How will the receiver know the order of the packets or if any are missing?")
+        criteria:AddListItem("How will the receiver request missing packets and what will the sender do in response?")
+        criteria:AddListItem("How will both sender and receiver know the full message arrived successfully?")
+        section_activity:Add(criteria)
+
+        Division protocolTips = AddTeachingTip(section_activity)
+        protocolTips:AddParagraphBoldFront("Encouraging Good Protocols:"," If students are unsure of how to write their protocols, try asking some of these questions:")
+        UnorderedList protocolList
+        protocolList:AddClassAttribute("list-disc list-outside pl-8")
+        protocolList:AddListItem("Think back to the warm up. How would you label the moving boxes for the library?")
+        protocolList:AddListItem("Could you use a similar labeling system for the parts of your message?")
+        protocolList:AddListItem("Since we have limited space to work with for each message, what short codes could you use to label them? (Numbers, letters)")
+        protocolList:AddListItem("What signal can we send to let the receiver know how many messages to expect in total?")
+        protocolList:AddListItem("What signal can we send to let the sender know to resend a particular message?")
+        protocolList:AddListItem("What signal can we send to let the sender know we received all the messages?")
+        protocolTips:Add(protocolList)
+        protocolTips:AddParagraphBoldFront("More Than One Solution:"," There's lots of ways to solve this problem! Emphasize to students that while their protocol needs to solve the problem, there's not just one right answer and their solution doesn't need to look like their classmates.")
+  
+
+        section_activity:AddParagraph(AddStrongTag("Do This:") + " Once students have developed their protocols, give two or three groups a chance to share their solutions with the class, either by describing it out loud or showing it on a projector at the front of the room. As a class discuss some of the shared features in their protocols. If short on time you may just ask students to raise their hands if their protocols included one of the features below.")
+        UnorderedList featureList
+        featureList:AddClassAttribute("list-disc list-outside pl-8")
+        featureList:AddListItem("Each packet is numbered or otherwise indicates which order it should go in")
+        featureList:AddListItem("Each packet includes the total number of packets, again perhaps with a number, so the receiver knows how many packets to expect")
+        featureList:AddListItem("The receiver requests missing packets or confirms received packets so the sender knows which to resend")
+        featureList:AddListItem("The sender and receiver both know when the message has been successfully received")
+       section_activity:Add(featureList)
+
+        AddHeading(section_activity, "Remarks", 3)
+        UnorderedList tcpRemarks
+        tcpRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        tcpRemarks:AddListItem("We just developed a protocol that in the real world is known as <b>TCP</b> or <b>Transmission Control Protocol</b>. Thinking back to the warm-up again, TCP is like  numbering every book in the library. It's slower but more accurate.")
+        tcpRemarks:AddListItem("With TCP, we number packets so they can be re-ordered, confirm all were received, and resend any missing packets. There are multiple back and forth confirmations between the sender and receiver. TCP is useful when accuracy matters more than saving a split second, like sending emails, photos, or just browsing websites.")
+        section_activity:Add(tcpRemarks)
+
+               Section section_wrap
+        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_wrap)
+        AddHeading(section_wrap, "Wrap up (10 Minutes)", 2)
+        AddHeading(section_wrap, "Remarks", 3)
+
+        UnorderedList wrapUpRemarks
+        wrapUpRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpRemarks:AddListItem("The first protocol we looked (UDP) at was simple, but it had some problems. The second protocol we just invented (TCP) is much more accurate, but it takes longer. Depending on the situation, websites will choose the protocol that makes sense. Let's watch a video that teaches us more about how packets really work on the Internet with TCP.")
+        section_wrap:Add(wrapUpRemarks)
+
+        Paragraph videoParagraph
+        videoParagraph:AddText(AddStrongTag("Display:") + " Watch ")
+        Link link = videoParagraph:AddLink("The Internet: Packets, Routing, and Reliability - Video", "https://youtu.be/AYdF7b3nMto")
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        section_wrap:Add(videoParagraph)
+
+        AddVideo(section_wrap,"https://www.youtube.com/embed/AYdF7b3nMto?si=v4Pt5kMFTAiHEt_8")
+
+        Division wrapUpTip = AddTeachingTip(section_wrap)
+        wrapUpTip:AddParagraph("The video includes a lot of information about how packets move through the Internet. The most important points for students to understand are that:")
+        UnorderedList wrapUpList
+        wrapUpList:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpList:AddListItem("Large files are split into packets to be sent")
+        wrapUpList:AddListItem("Packets may take different routes through the network and arrive out of order")
+        wrapUpList:AddListItem("TCP ensures that packets that arrive out of order or are lost are re-ordered")
+        wrapUpList:AddListItem("Packets include metadata like their IP address or a packet number to help move them through the network or reorganize them when they arrive")
+        wrapUpList:AddListItem("Collectively this system makes the Internet more reliable")
+        wrapUpTip:Add(wrapUpList)
+        wrapUpTip:AddParagraphBoldFront("Covering UDP:"," UDP is not covered in the video and students do not need to understand it in great detail. The depth of explanation in the activity is sufficient to explain the differences between them and why each would be used.")
+
+
+        Section section_assessment
+        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_assessment)
+        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
+
+        AddHeading(section_assessment, "For Students", 3)
+        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the following question.")
+
+        AddHeading(section_assessment, "Question", 3)
+        section_assessment:AddParagraph("Which of the following is true regarding the way information is transmitted on the Internet?")
+        UnorderedList questionList
+        questionList:AddClassAttribute("list-disc list-outside pl-8")
+        questionList:AddListItem("Information flows on a dedicated direct connection from the sender's device to the receiver's device using binary electrical signals.")
+        questionList:AddListItem("If a single packet is dropped, the entire file must be resent.")
+        questionList:AddListItem("Because of the reliability of the Internet, packets always arrive in the same order they were sent.")
+        questionList:AddListItem("Information does not travel in one piece, but rather as a datastream of packets.")
+        section_assessment:Add(questionList)
+
+       Section section_standards
+        section_standards:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_standards)
+        AddHeading(section_standards, "Standards Alignment", 2)
+
+        UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): ", "2-NI-04, 3A-NI-04, 3B-NI-03")
+        AddListItemWithBoldAtFront(list, "CSP2021: ", "CSN-1.B.5, CSN-1.B.6, CSN-1.C.1, CSN-1.C.2, CSN-1.C.3, CSN-1.C.4")
+        section_standards:Add(list)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+
+    action GetMetaDescription returns text
+        return "A lesson looking at packets and how they work"
+    end
+
+    action GetSummaryName returns text
+        return "CSP The Internet Lesson 5 Packets"
+    end
+
+    action GetName returns text
+        return "The Internet Lesson 5"
+    end
+
+    action GetShortDescription returns text
+        return "Learn about how large messages are sent through the Internet"
+    end
+
+    action GetLocation returns text
+        return "lessons/code/Digital-Information/Lesson5.html"
+    end
+
+
+        action GetLinkName returns text
+        return "Packets"
+    end
+
+    action GetSectionName returns text
+        return "The Internet"
+    end
+end

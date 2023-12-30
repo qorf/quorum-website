@@ -1,0 +1,92 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+
+class Tutorials is Lesson
+    action Setup(Array<Lesson> startingTutorialArray)
+        //html header stuff
+        SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        ImageHeader header
+        text headerHeading = "Quorum Reference Page"
+        text headerText = "Access free and easy to follow tutorials in Quorum Language to learn how to use actions and objects in the Standard Library."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Reference Page"
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        Add(header)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        //center everything
+        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
+
+
+        Section section_tutorials
+        section_tutorials:SetClassAttribute("flex flex-col gap-y-3")
+        Heading h_tutorials = section_tutorials:AddHeading("Tutorials", 1)
+        h_tutorials:SetClassAttribute("text-2xl font-bold")
+
+        Paragraph p_tutorials
+        p_tutorials:AddText("These tutorials are provided for prospective learners looking to program in Quorum Language. These tutorials will teach you the basic concepts about a topic, but are not meant to be treated as a full learning course. To view the current courses, you can refer to the following ")
+        Link link = p_tutorials:AddLink("Learn", "/learn.html")
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        p_tutorials:AddText(" page.")
+        section_tutorials:Add(p_tutorials)
+        
+
+
+        Division card_div_tutorials
+        card_div_tutorials:AddClassAttribute("flex flex-col gap-y-3")
+
+        integer i = 0
+        repeat while i < startingTutorialArray:GetSize()
+          Lesson lesson = startingTutorialArray:Get(i)
+          LongCourseCard card
+            text image_src = lesson:GetImageLocation()
+            text image_alt = ""
+            text description = lesson:GetMetaDescription()
+            text title = lesson:GetSectionName()
+            text url = lesson:GetLocation()
+          card:Create("", image_alt, description, title, url, true)
+
+          Division imageDiv = card:GetImageDiv()
+
+        Span quorumIcon
+        HtmlFileLoader quorumIconFile
+        File file
+        file:SetPath("html/media/userInterface/SVG/WhiteQuorumLogo.svg")
+        quorumIconFile:SetLoaded(file:Read())
+        quorumIcon:AddText(quorumIconFile:ToText())
+
+        Paragraph p_imageTitle
+        p_imageTitle:AddText(title)
+        imageDiv:Add(quorumIcon)
+        imageDiv:Add(p_imageTitle)
+
+        imageDiv:AddClassAttribute("bg-quorum-blue-100 flex flex-col items-center justify-center gap-x-2 gap-y-3 px-5")
+        quorumIcon:AddClassAttribute("inline-block w-auto mr-2 h-20")
+        p_imageTitle:AddClassAttribute("font-bold text-neutral-white select-none text-center text-xl")
+
+          TutorialPreview preview
+          preview:Create(lesson:GetSectionName(), lesson)
+          card_div_tutorials:Add(preview)
+
+          card_div_tutorials:Add(card)
+          i = i + 1
+        end
+
+        section_tutorials:Add(card_div_tutorials)
+        bodyDiv:Add(section_tutorials)
+    end
+
+    action GetMetaDescription returns text
+        return "Sample the libraries and features available out of the box in the Quorum programming language."
+    end
+end

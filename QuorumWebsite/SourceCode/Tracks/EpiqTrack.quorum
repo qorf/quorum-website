@@ -16,6 +16,9 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.Link
 use Libraries.Web.Page.Heading
+use Libraries.Containers.Array
+use Libraries.Web.Page.Section
+use Libraries.System.File
 
 class EpiqTrack is Lesson
     text dq = ""
@@ -26,80 +29,121 @@ class EpiqTrack is Lesson
     Preformatter preformatter //helper
 
 
-    action Setup
+    action Setup(Array<Lesson> startingTutorialArray)
         LineBreak break //will be used multiple times
         
         //html header stuff
-        SetWebPageTitle("Teacher Track - Quorum Programming Language")
+        SetWebPageTitle("Quick Gaming Track - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
-
         //page header
-        Header headDiv
-        headDiv:AddAttribute("style","background-image: url('/media/basics/coreBanner.jpg'); background-size: cover; height: 25em; background-position: center center;")
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
+        ImageHeader header
+        text headerHeading = "Quick Gaming Track"
+        text headerText = "A short gaming tutorial in Quorum"
+        text headerImage = "/media/userInterface/quorumAssets/gameDev.png"
+        text headerImageAlt = "A Game controller and a potion. What could the potion do?"
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        header:AddClassAttribute("!bg-neutral-white")
+        Add(header)
 
-        Division headTextDiv
-        headTextDiv:SetClassAttribute("pageHeaderText")
-        headTextDiv:AddHeading("Lessons: Teacher Track", 1)
-        headTextDiv:AddText("A 1-week professional development training for teachers")
-        headDiv:Add(headTextDiv)
-        Add(headDiv)
+        //main array of items.
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        //bodyDiv:AddHeading("Goals", 2)
-        //bodyDiv:AddParagraph("")
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+
+        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
+
+        Section section_csp
+        section_csp:SetClassAttribute("flex flex-col gap-y-3 w-full")
+        Heading h_csp = section_csp:AddHeading("About the Course", 1)
+        h_csp:SetClassAttribute("text-2xl font-bold")
+
+        Division card_div_csp
+        card_div_csp:AddClassAttribute("flex flex-col gap-y-3")
         
+        integer i = 0
+        repeat while i < startingTutorialArray:GetSize()
+            Lesson lesson = startingTutorialArray:Get(i)
+            LongCourseCard card
+            text image_src = lesson:GetImageLocation()
+            text image_alt = ""
+            text description = lesson:GetMetaDescription()
+            text title = lesson:GetSectionName()
+            text url = "/"+lesson:GetLocation()
+            card:Create("", image_alt, description, title, url, true)
+            
+            Division imageDiv = card:GetImageDiv()
+            
+            Span quorumIcon
+            HtmlFileLoader quorumIconFile
+            File file
+            file:SetPath("html/media/userInterface/SVG/WhiteQuorumLogo.svg")
+            quorumIconFile:SetLoaded(file:Read())
+            quorumIcon:AddText(quorumIconFile:ToText())
+            
+            Paragraph p_imageTitle
+            p_imageTitle:AddText(title)
+            imageDiv:Add(quorumIcon)
+            imageDiv:Add(p_imageTitle)
+            
+            imageDiv:AddClassAttribute("bg-quorum-blue-100 flex flex-col items-center justify-center gap-x-2 gap-y-3 px-5")
+            quorumIcon:AddClassAttribute("inline-block w-auto mr-2 h-20")
+            p_imageTitle:AddClassAttribute("font-bold text-neutral-white select-none text-center text-xl")
+            
+            TutorialPreview preview
+            preview:Create(lesson:GetSectionName(), lesson)
+            card_div_csp:Add(preview)
+            
+            card_div_csp:Add(card)
+            i = i + 1
+        end
         //types and variables
-        TrackTable tableDiv
-        tableDiv:SetTableID("Experience Programming in Quorum (EPIQ)")
-        tableDiv:SetTableHeading("Experience Programming in Quorum (EPIQ)")
-        tableDiv:SetTableHeadingParagraph("Learn how to create a Role-Playing game in Quorum
-        using the Scene Editor.")
-        
-        tableDiv:AddLesson("Hands on with Quorum Studio", "/lessons/Scenes/intro.html")
-        tableDiv:AddLesson("Build a Role-Playing Game", "/lessons/Scenes/roleplaying.html")
-        tableDiv:AddLesson("Placing Characters on a Map", "/lessons/Scenes/characters.html")
-        tableDiv:AddLesson("Setting Physics Properties on Tiles", "/lessons/Scenes/properties.html")
-        tableDiv:AddLesson("Learning about Input", "/lessons/Scenes/input.html")
-        tableDiv:AddLesson("Moving My Character", "/lessons/Scenes/moving.html")
-        tableDiv:AddLesson("Placing Objects", "/lessons/Scenes/objects.html")
-        tableDiv:AddLesson("Making Objects Good and Evil", "/lessons/Scenes/evil.html")
-        tableDiv:AddLesson("Add Background Music", "/lessons/Scenes/music.html")
-        tableDiv:AddLesson("Trigger the Objects", "/lessons/Scenes/trigger.html")
-        tableDiv:AddLesson("Trigger Sound from Objects", "/lessons/Scenes/sounds.html")
-        tableDiv:AddLesson("Spatial Sounds", "/lessons/Scenes/spatial.html")
-        tableDiv:AddLesson("Trigger Recorded Voice Over for Quests", "/lessons/Scenes/voices.html")
-        tableDiv:AddLesson("Complete Quest Behaviors", "/lessons/Scenes/quests.html")
+//        TrackTable tableDiv
+//        tableDiv:SetTableID("Experience Programming in Quorum (EPIQ)")
+//        tableDiv:SetTableHeading("Experience Programming in Quorum (EPIQ)")
+//        tableDiv:SetTableHeadingParagraph("Learn how to create a Role-Playing game in Quorum
+//        using the Scene Editor.")
+//        
+//        tableDiv:AddLesson("Hands on with Quorum Studio", "/lessons/Scenes/intro.html")
+//        tableDiv:AddLesson("Build a Role-Playing Game", "/lessons/Scenes/roleplaying.html")
+//        tableDiv:AddLesson("Placing Characters on a Map", "/lessons/Scenes/characters.html")
+//        tableDiv:AddLesson("Setting Physics Properties on Tiles", "/lessons/Scenes/properties.html")
+//        tableDiv:AddLesson("Learning about Input", "/lessons/Scenes/input.html")
+//        tableDiv:AddLesson("Moving My Character", "/lessons/Scenes/moving.html")
+//        tableDiv:AddLesson("Placing Objects", "/lessons/Scenes/objects.html")
+//        tableDiv:AddLesson("Making Objects Good and Evil", "/lessons/Scenes/evil.html")
+//        tableDiv:AddLesson("Add Background Music", "/lessons/Scenes/music.html")
+//        tableDiv:AddLesson("Trigger the Objects", "/lessons/Scenes/trigger.html")
+//        tableDiv:AddLesson("Trigger Sound from Objects", "/lessons/Scenes/sounds.html")
+//        tableDiv:AddLesson("Spatial Sounds", "/lessons/Scenes/spatial.html")
+//        tableDiv:AddLesson("Trigger Recorded Voice Over for Quests", "/lessons/Scenes/voices.html")
+//        tableDiv:AddLesson("Complete Quest Behaviors", "/lessons/Scenes/quests.html")
+//
+//        tableDiv:AddGuide("Quick Reference","/lessons/guides/IntroductionToQuorum.pdf")
+//        tableDiv:AddGuide("Quick Reference - Braille","/lessons/guides/IntroductionToQuorumBraille.brf")
+//
+//        tableDiv:SetStandardsTitle("Goals")
+//        tableDiv:AddStandard("Learn about Gaming")
+//        tableDiv:AddStandard("Learn about Quorum Studio")
+//        tableDiv:AddStandard("Learn about Scenes")
+//        tableDiv:AddStandard("Learn about Programming in Quorum")
+//        tableDiv:AddStandard("Learn about Accessibility")
+//        tableDiv:AddStandard("Be EPIQ!")
+//        
+//        tableDiv:AddOptionalLesson("Add Art to the Palette","/tutorials/Scenes/palette.html")
+//        tableDiv:AddOptionalLesson("Use Version Control","/tutorials/language/teamsAndVersionControl.html")
+//        tableDiv:AddOptionalLesson("EPIQ Repository","https://github.com/qorf/epiq")
+//
+//        tableDiv:GenerateTrackTable()
+//
+//        bodyDiv:Add(tableDiv)
 
-        tableDiv:AddGuide("Quick Reference","/lessons/guides/IntroductionToQuorum.pdf")
-        tableDiv:AddGuide("Quick Reference - Braille","/lessons/guides/IntroductionToQuorumBraille.brf")
-
-        tableDiv:SetStandardsTitle("Goals")
-        tableDiv:AddStandard("Learn about Gaming")
-        tableDiv:AddStandard("Learn about Quorum Studio")
-        tableDiv:AddStandard("Learn about Scenes")
-        tableDiv:AddStandard("Learn about Programming in Quorum")
-        tableDiv:AddStandard("Learn about Accessibility")
-        tableDiv:AddStandard("Be EPIQ!")
-        
-        tableDiv:AddOptionalLesson("Add Art to the Palette","/tutorials/Scenes/palette.html")
-        tableDiv:AddOptionalLesson("Use Version Control","/tutorials/language/teamsAndVersionControl.html")
-        tableDiv:AddOptionalLesson("EPIQ Repository","https://github.com/qorf/epiq")
-
-        tableDiv:GenerateTrackTable()
-
-        bodyDiv:Add(tableDiv)
-
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        section_csp:Add(card_div_csp)
+        bodyDiv:Add(section_csp)
     end
 
     action GetMetaDescription returns text

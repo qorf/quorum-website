@@ -1,0 +1,283 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class CodeOrgUnit1L05 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 1 Lesson 5: Overflow and Rounding")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+    Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Digital Information - Lesson 5: Overflow and Rounding", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Digital Information - Lesson 5: Overflow and Rounding")
+        AddToHeadingArray(h_heading)
+
+       bodyDiv:Add(headDiv)
+
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Overview", 2)
+
+
+            Paragraph overview
+            overview:AddText("Students extend their understanding of the binary number system by exploring errors that result from overflow and rounding. They make a " + dq + "flippy do pro" + dq + " to practice binary-to-decimal number conversions which include fractional place values. ")
+            section_intro:Add(overview)
+
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("Students will be able to:")
+        
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Describe how to include fractions in the binary number system.")
+        goalList:AddListItem("Understand that overflow and roundoff errors result from real-world limitations in representing place value.")
+        section_intro:Add(goalList)
+
+       AddHeading(section_intro, "Purpose", 3)
+            Paragraph purpose
+            purpose:AddText("This lesson introduces students to the practical aspects of using a binary system to represent numbers in a computing device. Students discover the limitations of creating numbers that are " + dq + "too big" + dq + " or " + dq + "too small" + dq + " to count. They learn that, while a number system is infinite, the physical representation of numbers requires place values -- which are finite, and limit the ability to represent numbers.")
+            purpose:AddText("When using this binary representation of numbers, certain values (1, 2, 4, 8, 16, etc.) are seen repeatedly. When written in binary, these values are 1, 10, 100, 1000, 10000, and so on, and so are the incremental place values in this binary number system.")
+            section_intro:Add(purpose)
+
+            AddHeading(section_intro, "Resources", 3)
+            AddHeading(section_intro, "Supplemental Code.org material", 4)
+                UnorderedList resources
+                resources:AddClassAttribute("list-disc list-outside pl-8 underline text-quorum-blue-150")
+                resources:AddListItemLink("Flippy Do Pro worksheet in print", "https://drive.google.com/a/code.org/file/d/1VpZH4E2c5fR-g2fBMggd4-pz8GNRxxwZ/view?usp=sharing")
+                resources:AddListItemLink("Flippy Do Pro worksheet in braille, Duxbury file", "/files/code/Unit1/U1L05_FlippyDoPro.dxb")
+                resources:AddListItemLink("Flippy Do Pro worksheet in braille, .brf", "/files/code/Unit1/U1L05_FlippyDoPro.brf")
+                section_intro:Add(resources)
+
+                        Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
+
+        section_gettingStarted:AddParagraphBoldFront("Discuss:"," Imagine you work at a local store. In the register all you have are nine $10 bills, nine $1 bills, and nine dimes.")
+        UnorderedList warmupList
+        warmupList:AddClassAttribute("list-disc list-outside pl-8")
+        warmupList:AddListItem("What's the largest amount of change that you can give someone?")
+        warmupList:AddListItem("What's the least?")
+        warmupList:AddListItem("What would you do if someone needed 7 cents in change?")
+        section_gettingStarted:Add(warmupList)
+
+        section_gettingStarted:AddParagraphBoldFront("Discussion Goal:"," Today we're going to explore what happens when you don't have the right " + dq + "places" + dq + " to store information. This can happen when you try to store very large numbers, very small ones, and everything in-between! The goal of the prompt is to understand the very real problem of making sure that enough place values are available to represent numbers. ")
+        UnorderedList discussionList
+        discussionList:AddClassAttribute("list-disc list-outside pl-8")
+        discussionList:AddListItem("The largest amount of change you can give someone is $99.90.")
+        discussionList:AddListItem("The least change you can give is $0.10.")
+        discussionList:AddListItem("You can't give someone $0.07. You also can't give someone $1.25 in change (because you have no nickels!)")
+        section_gettingStarted:Add(discussionList)
+        section_gettingStarted:AddParagraph("At both extremes of the number range, large and small -- and in between numbers -- you are unable to build some numbers because you don't have the place values to do so.")
+        
+        
+        Section section_activity
+        section_activity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_activity)
+        AddHeading(section_activity, "Activity (35 mins)", 2)
+        section_activity:AddParagraph("Place students in groups of two. Groups will need one computer per group.")
+
+        Division activityTip = AddTeachingTip(section_activity)
+        activityTip:AddParagraph("Students will tackle the problem of " + dq + "running out of place values" + dq + " when counting to bigger and bigger numbers. They will consider an odometer to explore what happens when you add one to the largest number you can represent in a number system.")
+        section_activity:AddParagraphBoldFront("Prompt:"," Suppose we have a car odometer. The number in the odometer keeps going up as we drive. What about when the odometer reaches the max value? What happens if we keep driving?")
+
+        AddHeading(section_activity, "Flippy Do Pro", 3)
+        UnorderedList flippyList
+        flippyList:AddClassAttribute("list-disc list-outside pl-8")
+        flippyList:AddListItem("Now that you have started thinking about place value and overflow, we are going to work on a different problem. What happens when there aren't enough place values to represent a number? You will explore this with a new version of the Flippy Do, the Flippy Do Pro!")
+        section_activity:Add(flippyList)
+
+        section_activity:AddParagraph("Provide each group with a copy of the Flippy Do Pro Template and scissors.")
+        section_activity:AddParagraphBoldFront("Do This:"," Cut and fold your Flippy Do Pro following the guidance on the slide. Fill out all the numbers if they are not already done.")
+        AddHeading(section_activity, "Remarks", 4)
+        
+        UnorderedList flippyList2
+        flippyList2:AddClassAttribute("list-disc list-outside pl-8")
+        flippyList2:AddListItem("The Flippy Do Pro is similar to the one you made before. But this time, the Flippy Do Pro is already filled with binary place values assigned in a different way -- they include fractions. ")
+        flippyList2:AddListItem("When using the Flippy Do Pro, the numbers on the left-hand side of the line are whole numbers and those on the right-hand side of the line are fractional numbers.")
+        section_activity:Add(flippyList2)
+
+        AddHeading(section_activity, "Teaching Tip", 4)
+        UnorderedList flippyTips
+        flippyTips:AddClassAttribute("list-disc list-outside pl-8")
+        flippyTips:AddListItem("The Flippy Do Pro is still using 8 bits to represent a number. But this time, the place value of each bit has been assigned in a different way than in the previous Flippy Do. The bits have been " + dq + "shifted" + dq + " to the right two times. The value 1 (2^0) is no longer the smallest place value. The value of a bit just to the right of 1 (2^0) is 0.5, which is 2^-1. The value to the right again is 0.25 which is 2^-2.")                
+        flippyTips:AddListItem("Students may struggle with negative exponents. What's more important than emphasizing the math is emphasizing the pattern of place values in the Flippy Do Pro. As you move left, the place value doubles. As you move right, the place value halves. ")
+        flippyTips:AddListItem("Help students see that using the Flippy Do Pro is similar to using the Flippy Do. To form a value, flip the flaps up or down at the bottom of the device to create a sequence of zeros and ones. Note that the range of place values is limited by the largest bit value, 2^5 which is 32, and the smallest bit value, 2^-2 which is 0.25. As with the Flippy Do, adding together all the values for each place value containing a " + dq + "1" + dq + " produces the total value represented on the Flippy Do Pro.")
+        section_activity:Add(flippyTips)
+
+        AddHeading(section_activity, "Flippy Do Pro Challenges", 3)
+        section_activity:AddParagraphBoldFront("Challenge #1 - Smallest Number:"," Produce the smallest binary number possible with the Flippy Do Pro.")
+        UnorderedList flippyChallenge1
+        flippyChallenge1:AddClassAttribute("list-disc list-outside pl-8")
+        flippyChallenge1:AddListItem("The smallest binary number students produce is <code>000000.01</code> and this number has a decimal value of <code>0.25</code>.")
+        section_activity:Add(flippyChallenge1)
+        section_activity:AddParagraphBoldFront("Challenge #2 - Next Value:"," Increase the number made in Challenge #1 to the next possible value. ")
+        UnorderedList flippyChallenge2
+        flippyChallenge2:AddClassAttribute("list-disc list-outside pl-8")
+        flippyChallenge2:AddListItem("The binary number students produce is <code>000000.10</code> and this number has a decimal value of <code>0.50</code>.")
+        section_activity:Add(flippyChallenge2)
+        section_activity:AddParagraphBoldFront("Challenge #3 - Got Quarters?"," Make the values 0.25, 0.50, and 0.75 one after another. ")
+        UnorderedList flippyChallenge3
+        flippyChallenge3:AddClassAttribute("list-disc list-outside pl-8")
+        flippyChallenge3:AddListItem("The binary numbers students produce are <code>000000.01</code>, <code>000000.10</code>, <code>000000.11</code>. Note the pattern of changing a place value from 1 to 0 and then " + dq + "carrying" + dq + " the one. ")
+        section_activity:Add(flippyChallenge3)
+        section_activity:AddParagraphBoldFront("Challenge #4 - Can't Make Change:"," Make all the fractional possible in binary using the Flippy Do Pro. ")
+        UnorderedList flippyChallenge4
+        flippyChallenge4:AddClassAttribute("list-disc list-outside pl-8")
+        flippyChallenge4:AddListItem("There are no new values besides those made in Challenge #3 because there are no place values for representing other fractions.")
+        flippyChallenge4:AddListItem("Note, if students need a concrete example for Challenge #4, have them try to make 39 cents in binary. It can't be done with the values they have available in the Flippy Do Pro.")
+        section_activity:Add(flippyChallenge4)
+        section_activity:AddParagraphBoldFront("Challenge #5 - Largest Number:"," What is the largest number (in decimal) you can make with the Flippy Do Pro?")
+        UnorderedList flippyChallenge5
+        flippyChallenge5:AddClassAttribute("list-disc list-outside pl-8")
+        flippyChallenge5:AddListItem("With all of the bits flipped to 1, the largest number you can make is 63.75. Note that this is smaller than the largest you can make with a traditional Flippy Do, which is 255. This is because we have shifted two bits to represent smaller numbers (0.5 & 0.25). ")
+        section_activity:Add(flippyChallenge5)
+        section_activity:AddParagraphBoldFront("Challenge #6 - How Much Pie:"," Challenge 6 contains a number of pie charts. Each chart has a single colored slice, representing a piece of pie. Students use a Flippy Do Pro to determine how much pie is left at the end of dessert. With each slide, allow time for students to decide how to represent the amount of pie left as a binary number, then convert that to decimal and write it down in the journal. In this challenge it is expected that students will estimate and do some rounding when determining how much pie is left. ")
+        section_activity:AddParagraphBoldFront("Do This: For each pie chart, students should:","")
+        OrderedList challengeList
+        challengeList:AddClassAttribute("list-decimal list-outside pl-8")
+        challengeList:AddListItem("Estimate how big the colored slice is.")
+        challengeList:AddListItem("Use your Flippy Do Pro to represent how big the slice is. You may need to round up or down.")
+        challengeList:AddListItem("Convert your binary number to a decimal number.")
+        challengeList:AddListItem("Write down the number in your journal.")
+        section_activity:Add(challengeList)
+
+        AddHeading(section_activity, "Pie #1: Pumpkin", 4)
+        Image image = section_activity:AddImage("/media/lessons/csp/unit1/Unit1-5_Challenge6_Chart1.png", "A pie chart with a single orange slice that takes approximately two-tenths of the chart.")
+        image:AddAttribute("data-zoom","")
+
+        AddHeading(section_activity, "Pie #2: Cherry", 4)
+        Image image1 = section_activity:AddImage("/media/lessons/csp/unit1/Unit1-5_Challenge6_Chart2.png", "A pie chart with a single orange slice that takes approximately three-tenths of the chart.")
+        image1:AddAttribute("data-zoom","")
+
+        AddHeading(section_activity, "Pie #3: Lemon", 4)
+        Image image2 = section_activity:AddImage("/media/lessons/csp/unit1/Unit1-5_Challenge6_Chart3.png", "A pie chart with a single orange slice that takes approximately one-tenth of the chart.")
+        image2:AddAttribute("data-zoom","")
+
+        AddHeading(section_activity, "Pie #4: Chocolate", 4)
+        Image image3 = section_activity:AddImage("/media/lessons/csp/unit1/Unit1-5_Challenge6_Chart4.png", "A pie chart with a single orange slice that takes approximately four-tenths of the chart.")
+        image3:AddAttribute("data-zoom","")
+
+        section_activity:AddParagraphBoldFront("Do This:"," Add all the decimal numbers together. Compare with a partner and discuss.")
+
+        AddHeading(section_activity, "Final Task", 3)
+        UnorderedList activityFinalRemarks
+        activityFinalRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        activityFinalRemarks:AddListItem("In our final challenge, your answer may be different than your classmates. It comes down to how you rounded - did you decide to round up or round down with the various amounts of pie. If we did not have to round, the answer would be exactly one pie left over. You may have come to the same conclusion by rounding - or not!")
+        section_activity:Add(activityFinalRemarks)
+
+        section_activity:AddParagraphBoldFront("Prompt:"," Why is it a problem for a computer if your answers are different than others? ")
+        section_activity:AddParagraphBoldFront("Discussion Goal:"," Computers rely on precision. Think of a calculator. We depend on 1+1 always equaling 2. Rounding is necessary because of the limits of bits, but can lead to errors. ")
+
+                        Section section_wrap
+        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_wrap)
+        AddHeading(section_wrap, "Wrap up (5 Minutes)", 2)
+        section_wrap:AddParagraph("Review the information on the first wrapup slide showing how binary can be used to precisely represent some fractional values from the decimal number system. Students do not need to understand how to convert fractional amounts from decimal to binary.")
+
+        Division wrapupTip = AddTeachingTip(section_wrap)
+        wrapupTip:AddParagraph("For your own personal knowledge, you can read more about " + dq + "decimal points " + dq + "and" + dq + " binary points on Wikipedia.")
+
+        AddHeading(section_wrap, "Remarks", 3)
+        UnorderedList wrapUpRemarks
+        wrapUpRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpRemarks:AddListItem("The most important takeaway from this lesson is to understand that bits can represent a limited amount of information.")
+        section_wrap:Add(wrapUpRemarks)
+
+        AddHeading(section_wrap, "Discuss", 3)
+        UnorderedList wrapUpPrompt
+        wrapUpPrompt:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpPrompt:AddListItem("What does an odometer show us about representing large numbers?")
+        wrapUpPrompt:AddListItem("What does the Flippy Do Pro show about representing very small numbers?")
+        wrapUpPrompt:AddListItem("If we had a big enough odometer or Flippy Do Pro, could we represent every possible number? ")
+        section_wrap:Add(wrapUpPrompt)
+
+        AddHeading(section_wrap, "Discussion Goal", 4)
+        section_wrap:AddParagraph("As students have seen, you can make " + dq + "any number" + dq + " in your head, but the tool you use to represent a number has limitations. It has a fixed number of place values it can show. An odometer keeps running after you move beyond its upper limit, but the largest place values cannot be displayed due to overflow error. ")
+        section_wrap:AddParagraph("In the Flippy Do Pro, you assigned some of the bits to fractions, but you saw that you still couldn't represent certain " + dq + "small" + dq + " numbers -- you could only show a number that was " + dq + "close to" + dq + " your target number. This is roundoff error, an error that occurs when bit arrangements can't represent numbers as intended.")
+        section_wrap:AddParagraph("Ultimately, regardless of the size of our odometer or Flippy Do Pro, and how many bits we add to them, there's going to be numbers that are too large, too small, or " + dq + "in-between" + dq + " the values we want to represent.")
+
+        AddHeading(section_wrap, "Journal", 3)
+        section_wrap:AddParagraph(" Students add to their journals the definitions for: Overflow Error and Round-off Error. ")
+        UnorderedList vocabulary
+        vocabulary:AddClassAttribute("list-disc list-outside pl-8")
+        vocabulary:AddListItem(AddItalicFront("Overflow Error:"," Error from attempting to represent a number that is too large."))
+        vocabulary:AddListItem(AddItalicFront("Round-off Error:"," Error from attempting to represent a number that is too precise. The value is rounded."))
+        section_wrap:Add(vocabulary)
+
+                            Section section_assessment
+        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_assessment)
+        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
+
+         AddHeading(section_assessment, "For Students", 3)
+        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the 3 following question.")
+
+        AddHeading(section_assessment, "Question 1", 3)
+        section_assessment:AddParagraph(" Modern car odometers record up to a million miles driven. What happens to the odometer reading when a car drives beyond its maximum reading?")
+        AddHeading(section_assessment, "Question 2", 3)
+        section_assessment:AddParagraph(" When using bits to represent fractions of a number, can you create all possible fractions? Why or why not?")
+
+        Section section_standards
+        section_standards:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_standards)
+        AddHeading(section_standards, "Standards Alignment", 2)
+
+        UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): DA", " - Data & Analysis: 3A-DA-09 - Translate between different bit representations of real-world phenomena, such as characters, numbers, and images.")
+        AddListItemWithBoldAtFront(list, "CSP2021: ", "DAT-1.B.1, DAT-1.B.2, DAT-1.B.3")
+        section_standards:Add(list)
+
+         Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+
+    action GetMetaDescription returns text
+        return "Unplugged lesson that reinforces concepts already learned about binary numbers."
+    end
+
+    action GetSummaryName returns text
+        return "CSP Digital Information Lesson 5 Overflow and Rounding"
+    end
+    action GetName returns text
+        return "CSP Digital Information Lesson 5"
+    end
+    action GetShortDescription returns text
+        return "learn about limitations of binary number systems"
+    end
+    action GetLocation returns text
+        return "lessons/code/internet/InternetLesson5.html"
+    end
+
+    action GetLinkName returns text
+        return "Overflow and Rounding"
+    end
+
+    action GetSectionName returns text
+        return "Digital Information"
+    end
+end

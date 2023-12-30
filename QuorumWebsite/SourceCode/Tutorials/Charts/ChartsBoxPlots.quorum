@@ -1,22 +1,7 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
 use Libraries.System.FileReader
 use Libraries.System.File
-use Libraries.Web.Page.Link
 
 class ChartsBoxPlots is Lesson
     text dq = ""
@@ -41,24 +26,38 @@ class ChartsBoxPlots is Lesson
         AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
+
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Charts", 1)
-        headDiv:AddText("This tutorial introduces how to make Charts in Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Box Plot", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Box Plots")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("This tutorial introduces how to make Box Plots in Quorum")
+        bodyDiv:Add(headDiv)
+
+        Section section_box
+        section_box:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_box)
         
-        bodyDiv:AddHeading("Making a Box Plot", 2)
+        Heading h2_box = section_box:AddHeading("Making a Box Plot", 2)
+        h2_box:AddAttribute("data-text", "Making a Box Plot")
+        
+        h2_box:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_box)
+        
+        section_box:AddParagraph("The next chart to learn about is the box plot. For data scientists, box charts are useful to display data distribution separated by quartiles, meaning highlighting upper, lower, and middle ranged values. Box plots also show viewers data outliers in relation to the upper and lower extremes so we can examine what is different from the norm. Box plots are a great resource for data analytics in order to see the distribution of numerical data, similar to a Histogram.")
 
-        bodyDiv:AddParagraph("The next chart to learn about is the box plot. For data scientists, box charts are useful to display data distribution separated by quartiles, meaning highlighting upper, lower, and middle ranged values. Box plots also show viewers data outliers in relation to the upper and lower extremes so we can examine what is different from the norm. Box plots are a great resource for data analytics in order to see the distribution of numerical data, similar to a Histogram.")
-
-        bodyDiv:AddParagraph("In this dataset, we will compare the height of males and females in the world. It will compare the height between the sexes based on the data from 199 countries collected in 2022.")
+        section_box:AddParagraph("In this dataset, we will compare the height of males and females in the world. It will compare the height between the sexes based on the data from 199 countries collected in 2022.")
 
         Paragraph para
         para:AddText("To follow along, we can download the Height of Male and Female by Country 2022 dataset ")
@@ -67,64 +66,71 @@ class ChartsBoxPlots is Lesson
         link:AddText("here")
         link:SetAddress("https://github.com/qorf/curriculum/blob/4846bad77582e8d1da8325669b4de932b659e965/Reference/DataScience/Charts%20(New)/Data/Population/Height%20of%20Male%20and%20Female%20by%20Country%202022.csv")
         link:SetTarget(link:newTab)
+        link:SetClassAttribute("underline text-quorum-blue-150")
         
         para:Add(link)
         para:AddText(".")
-        bodyDiv:Add(para)
+        section_box:Add(para)
 
-        bodyDiv:AddParagraph("Here is a snippet of what the dataset should look like:")
+        section_box:AddParagraph("Here is a snippet of what the dataset should look like:")
+
+        WebTable table = AddWebTable("Height of Male and Female by Country 2022 CSV")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Country Name")
+        tableHeaderArray:Add("Male Height in Cm") 
+        tableHeaderArray:Add("Female Height in Cm")
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)    
 
         Array<text> rubricText1
         rubricText1:Add("Netherlands")
         rubricText1:Add("183.78") 
         rubricText1:Add("170.36")
-        
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
         Array<text> rubricText2
         rubricText2:Add("Montenegro")
         rubricText2:Add("183.30") 
         rubricText2:Add("169.96")
-
+        tableBody:Add(AddTableBodyRow(rubricText2))
 
         Array<text> rubricText3
         rubricText3:Add("Estonia")
         rubricText3:Add("182.79") 
         rubricText3:Add("168.66")
-
+        tableBody:Add(AddTableBodyRow(rubricText3))
         
         Array<text> rubricText4
         rubricText4:Add("Bosnia and Herzegovina")
         rubricText4:Add("182.47") 
         rubricText4:Add("167.47")
+        tableBody:Add(AddTableBodyRow(rubricText4))
 
-        
         Array<text> rubricText5
         rubricText5:Add("Iceland")
         rubricText5:Add("182.10") 
         rubricText5:Add("168.91")
-
+        tableBody:Add(AddTableBodyRow(rubricText5))
         
-        Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Country Name", " "))
-        rubricHeader:Add(AddTextBoldFront("Male Height in Cm", " "))
-        rubricHeader:Add(AddTextBoldFront("Female Height in Cm", " "))
-
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
-      
-        rubricRows:Add(AddTableDataTag(rubricText1))
-        rubricRows:Add(AddTableDataTag(rubricText2))
-        rubricRows:Add(AddTableDataTag(rubricText3))
-        rubricRows:Add(AddTableDataTag(rubricText4))
-        rubricRows:Add(AddTableDataTag(rubricText5))
+        table:Add(tableBody)
+        section_box:Add(table)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Height of Male and Female by Country 2022 CSV"))
+        Section section_formatting
+        section_formatting:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_formatting)
+        
+        Heading h2_formatting = section_formatting:AddHeading("Loading and Formatting", 2)
+        h2_formatting:AddAttribute("data-text", "Loading and Formatting")
+        
+        h2_formatting:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_formatting)
 
-        bodyDiv:AddHeading("Loading and Formatting", 2)
+        section_formatting:AddParagraph("As mentioned previously, to load and read in the dataset, we will need to create a DataFrame component named 'frame'. Using the frame, we must use the Load function and type in the file path of the insurance CSV. Recall that a CSV is a comma separated text file that holds in data.")
 
-        bodyDiv:AddParagraph("As mentioned previously, to load and read in the dataset, we will need to create a DataFrame component named 'frame'. Using the frame, we must use the Load function and type in the file path of the insurance CSV. Recall that a CSV is a comma separated text file that holds in data.")
-
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+        section_formatting:Add(preformatter:GeneratePreformattedCode("
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Interface.Controls.Charts.BoxPlot
 
@@ -138,97 +144,118 @@ DataFrame frame
 frame:Load("+dq+"../Data/Population/Height of Male and Female by Country 2022.csv"+dq+")
 "))
 
-        bodyDiv:AddParagraph("Note that, we stored this dataset in a Data folder, and contained in that folder is an inner folder named Population.")
+        section_formatting:AddParagraph("Note that, we stored this dataset in a Data folder, and contained in that folder is an inner folder named Population.")
 
-        bodyDiv:AddParagraph("Once the data has been loaded in, we will now extract this data to use in the data chart. We will be using two functions from our frame component, AddSelectedColumns(text header), and AddSelectedFactors(text header) where the columns will be used to label our x-axis, signifying the groups we are observing and the factor will be used to label our y-axis, signifying the change over time. AddSelectedColumn(text header) and AddSelectedFactor(text header) take in a parameter of either the column number or the column label in the CSV file. We will be using the column number to demonstrate. ")
+        section_formatting:AddParagraph("Once the data has been loaded in, we will now extract this data to use in the data chart. We will be using two functions from our frame component, AddSelectedColumns(text header), and AddSelectedFactors(text header) where the columns will be used to label our x-axis, signifying the groups we are observing and the factor will be used to label our y-axis, signifying the change over time. AddSelectedColumn(text header) and AddSelectedFactor(text header) take in a parameter of either the column number or the column label in the CSV file. We will be using the column number to demonstrate. ")
 
-        bodyDiv:AddParagraph("Please note that for a BoxPlot, we will only be using the AddSelectedColumns(text header) because of the simplicity of the dataset and this type of chart. This goes for other datasets as well, in which we will not be modifying the y axis. AddSelectedColumns(text header) will take a string as the parameter which represents the text header in the data file.")
+        section_formatting:AddParagraph("Please note that for a BoxPlot, we will only be using the AddSelectedColumns(text header) because of the simplicity of the dataset and this type of chart. This goes for other datasets as well, in which we will not be modifying the y axis. AddSelectedColumns(text header) will take a string as the parameter which represents the text header in the data file.")
+
+         WebTable tableFormat = AddWebTable("Adding CSV columns onto Charts")
+        TableBody tableBodyFormat = AddTableBody()
+
+        Array<text> tableHeaderArrayFormat
+        tableHeaderArrayFormat:Add("Function")
+        tableHeaderArrayFormat:Add("Description") 
+        tableHeaderArrayFormat:Add("Usage")
+    
+        TableHeader theadFormat = AddTableHeaderRow(tableHeaderArrayFormat)
+        tableFormat:Add(theadFormat) 
 
         Array<text> rubricText6
         rubricText6:Add("frame:AddSelectedColumns(text heading)")
         rubricText6:Add("AddSelectedColumns() takes in a string that matches a column heading from our dataset. This function is used to format our axises. For this tutorial, we will be calling this function twice and extract "+dq+"Male Height in Cm"+dq+" and "+dq+"Female Height in Cm."+dq+"") 
         rubricText6:Add("frame:AddSelectedColumns("+dq+"heading"+dq+")")     
-
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Description", " "))
-        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
-
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+        tableBodyFormat:Add(AddTableBodyRow(rubricText6))
       
-        rubricRows1:Add(AddTableDataTag(rubricText6))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Adding CSV columns onto Charts"))
+        tableFormat:Add(tableBodyFormat)
+        section_formatting:Add(tableFormat)
 
-        bodyDiv:AddParagraph("We should have the following code:")
+        section_formatting:AddParagraph("We should have the following code:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+        section_formatting:Add(preformatter:GeneratePreformattedCode("
 // pull out selected data, for this we will be categorizing by Male and Female Height
 frame:AddSelectedColumns("+dq+"Male Height in Cm"+dq+")
 frame:AddSelectedColumns("+dq+"Female Height in Cm"+dq+")
 "))
 
-        bodyDiv:AddParagraph("
+        section_formatting:AddParagraph("
 Now it is time to create the Box Plot which can be done with the following code. This creates a chart object from our DataFrame component, frame. For the rest of this lesson, we will be using the chart object we have created to change and format the rest of our line chart. 
 ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+        section_formatting:Add(preformatter:GeneratePreformattedCode("
 // using the data frame, format data by creating a box plot chart component
 BoxPlot chart = frame:BoxPlot()
 chart:Display()
 "))
 
-        AddIDE(bodyDiv,"BP1","Box Plots: Reading in Data and Displaying","Example of loading our data and creating box plot object","examples/Charts/BP1.quorum")
+        CodeForIDE code1
+        code1:AddFileUrl("BoxPlot.quorum", "examples/Charts/BP1.quorum")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Reading in and Displaying")
+        section_formatting:Add(ide)
 
-        bodyDiv:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
-        bodyDiv:AddHeading("Labeling the Box Plot",2)
+        section_formatting:AddParagraph("Calling the Display() function will give us a pop-up of our formatted data so far. We still need to give meaning to our data, therefore, the following steps will show us how to label and customize our chart.")
+        
+        Section section_labeling
+        section_labeling:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_labeling)
+        
+        Heading h2_labeling = section_labeling:AddHeading("Labeling the Box Plot", 2)
+        h2_labeling:AddAttribute("data-text", "Labeling the Box Plot")
+        
+        h2_labeling:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_labeling)
 
-        bodyDiv:AddParagraph("In order for viewers to understand our data, labels give a clear comprehension of what is being presented. This means that we will be labeling the x axis, y axis, legend, and giving our chart a title that describes the dataset. To do so, we will call the following functions with our chart object: SetTitle(), SetXAxisTitle(), SetYAxisTitle(), SetLegendTitle(), and SetSubtitle(). Here is a brief description on what each function does and what it takes in.")
+        section_labeling:AddParagraph("In order for viewers to understand our data, labels give a clear comprehension of what is being presented. This means that we will be labeling the x axis, y axis, legend, and giving our chart a title that describes the dataset. To do so, we will call the following functions with our chart object: SetTitle(), SetXAxisTitle(), SetYAxisTitle(), SetLegendTitle(), and SetSubtitle(). Here is a brief description on what each function does and what it takes in.")
        
+        WebTable tableLabel = AddWebTable("Box Plot Labeling Functions")
+        TableBody tableBodyLabel = AddTableBody()
+        
+        Array<text> tableHeaderArrayLabel
+        tableHeaderArrayLabel:Add("Function")
+        tableHeaderArrayLabel:Add("Description") 
+        tableHeaderArrayLabel:Add("Usage")
+    
+        TableHeader theadLabel = AddTableHeaderRow(tableHeaderArrayLabel)
+        tableLabel:Add(theadLabel)
+
         Array<text> rubricText7
         rubricText7:Add("SetTitle(text name)")
         rubricText7:Add("SetTitle() takes in a string as a parameter, which would be the title of the chart. For this example, we will name the chart "+dq+"Height of Male and Female in the World"+dq+"")
-        rubricText7:Add("chart:SetTitle("+dq+"Height of Male and Female in the World"+dq+")")        
+        rubricText7:Add("chart:SetTitle("+dq+"Height of Male and Female in the World"+dq+")")   
+        tableBodyLabel:Add(AddTableBodyRow(rubricText7))     
 
         Array<text> rubricText8
         rubricText8:Add("SetXAxisTitle(text name)")
         rubricText8:Add("SetXAxisTitle() takes in a string as a parameter, which would be the label of the x axis. For this example, we will label this section "+dq+"Sex"+dq+"")
         rubricText8:Add("chart:SetXAxisTitle("+dq+"Sex"+dq+"")
+        tableBodyLabel:Add(AddTableBodyRow(rubricText8))
         
         Array<text> rubricText9
         rubricText9:Add("SetYAxisTitle(text name)")
         rubricText9:Add("SetYAxisTitle() takes in a string as a parameter, which would be the label of the y axis. For this example, we will label this section "+dq+"Height (cm)."+dq+"
 ")
         rubricText9:Add("chart:SetYAxisTitle("+dq+"Height (cm)"+dq+")")
+        tableBodyLabel:Add(AddTableBodyRow(rubricText9))
 
         Array<text> rubricText10
         rubricText10:Add("SetLegendTitle(text name)")
         rubricText10:Add("SetLegendTitle() takes in a string as a parameter, which would label the legend of the chart. The legend identifies the separate ages for the dots. For this example, we will label the legend "+dq+"Average Height of a Human"+dq+"
 ")
         rubricText10:Add("chart:SetLegendTitle("+dq+"Average Height of a Human"+dq+")")
+        tableBodyLabel:Add(AddTableBodyRow(rubricText10))
 
         Array<text> rubricText11
         rubricText11:Add("SetSubtitle(text title)")
         rubricText11:Add("SetSubtitle() takes in a string as a parameter which would set a subtitle under the title. This can be any short description or any other necessary information for our chart. For this example, we will label the subtitle "+dq+"What is the average height of the population by sex?"+dq+"")
         rubricText11:Add("chart:SetSubtitle("+dq+"What is the average height of the population by sex?"+dq+")")
+        tableBodyLabel:Add(AddTableBodyRow(rubricText11))
 
-        Array<text> rubricHeader2
-        rubricHeader2:Add(AddTextBoldFront("Function", " "))
-        rubricHeader2:Add(AddTextBoldFront("Description", " "))
-        rubricHeader2:Add(AddTextBoldFront("Usage", " "))
+        tableLabel:Add(tableBodyLabel)
+        section_labeling:Add(tableLabel)
 
-        Array<text> rubricRows2
-        rubricRows2:Add(AddTableHeaderTag(rubricHeader2))
-      
-        rubricRows2:Add(AddTableDataTag(rubricText7))
-        rubricRows2:Add(AddTableDataTag(rubricText8))
-        rubricRows2:Add(AddTableDataTag(rubricText9))
-        rubricRows2:Add(AddTableDataTag(rubricText10))
-        rubricRows2:Add(AddTableDataTag(rubricText11))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows2), "Labeling Charts"))        
-
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+        section_labeling:Add(preformatter:GeneratePreformattedCode("
 // label your box plot
 chart:SetXAxisTitle"+dq+"Sex"+dq+")
 chart:SetYAxisTitle("+dq+"Height (cm)"+dq+")
@@ -236,52 +263,72 @@ chart:SetLegendTitle("+dq+"Average Height of a Human"+dq+")
 chart:SetSubtitle("+dq+"What is the average height of the population by sex?"+dq+")
 chart:SetTitle("+dq+"Height of Male and Female in the World"+dq+")
 "))
-        bodyDiv:AddParagraph("Note, if we would like to see the data chart so far, we can type "+dq+"chart:Display()"+dq+" to view it with the labels we created.
+        section_labeling:AddParagraph("Note, if we would like to see the data chart so far, we can type "+dq+"chart:Display()"+dq+" to view it with the labels we created.
 ")
-        
-        AddIDE(bodyDiv,"BP2","Box Plots: Labeling","Example of labeling our box plot","examples/Charts/BP2.quorum")
+        CodeForIDE code2
+        code2:AddFileUrl("BoxPlot.quorum", "examples/Charts/BP2.quorum")
+        IDE ide1 = AddIDE()
+        ide1:SetLightTheme()
+        ide1:SetCodeForIDE(code2:GetJsonArray())
+        ide1:SetIdeTitle("Labeling the Chart")
+        section_labeling:Add(ide1)
 
-        bodyDiv:AddHeading("Customizing the Data Chart", 2)
+       Section section_customizing
+        section_customizing:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_customizing)
         
-        bodyDiv:AddParagraph("Now that we have our data labeled, we can customize our data to our liking, such as adjusting the intervals, changing starting values, and changing the color. We will be playing around with all these features and to do so, we will be again, using our chart object to call these functions. The functions we will be using for this would be: SetLegendLocationToBottom(), SetColorPaletteToDisurbing(), SetFontSize(integer size), and FlipOrientation(). Here are brief descriptions on what each function does and how to use it.")
+        Heading h2_customizing = section_customizing:AddHeading("Customizing the Box Plot", 2)
+        h2_customizing:AddAttribute("data-text", "Customizing the Box Plot")
+        
+        h2_customizing:AddClassAttribute("text-2xl font-bold")
+        AddToHeadingArray(h2_customizing)
+        
+        section_customizing:AddParagraph("Now that we have our data labeled, we can customize our data to our liking, such as adjusting the intervals, changing starting values, and changing the color. We will be playing around with all these features and to do so, we will be again, using our chart object to call these functions. The functions we will be using for this would be: SetLegendLocationToBottom(), SetColorPaletteToDisurbing(), SetFontSize(integer size), and FlipOrientation(). Here are brief descriptions on what each function does and how to use it.")
+
+         WebTable tableCustomize = AddWebTable("Other Useful Box Plot Functions")
+        TableBody tableBodyCustomize = AddTableBody()
+        
+        Array<text> tableHeaderArrayCustomize
+        tableHeaderArrayCustomize:Add("Function")
+        tableHeaderArrayCustomize:Add("Description") 
+        tableHeaderArrayCustomize:Add("Usage")
+
+        TableHeader theadCustomize = AddTableHeaderRow(tableHeaderArrayCustomize)
+        tableCustomize:Add(theadCustomize) 
 
         Array<text> rubricText12
         rubricText12:Add("SetLegendLocationToBottom()")
         rubricText12:Add("SetLegendLocationToBottom() takes in no parameters, which would be the directions, but will place the legend in a specificed place. For this example, we will place the legend on the bottom. Alternatively, you could also use SetLegendLocationToTop(), SetLegendLocationToLeft() or SetLegendLocationToRight().")
         rubricText12:Add("chart:SetLegendLocationToBottom()")
+        tableBodyCustomize:Add(AddTableBodyRow(rubricText12))
 
         Array<text> rubricText13
         rubricText13:Add("SetFontSize(integer size)")
         rubricText13:Add("SetFontSize() takes in an integer as a parameter and will set the font size on all text based on the desired input. For this tutorial, we will insert 30 as the font size.")
         rubricText13:Add("chart:SetFontSize(20)")
+        tableBodyCustomize:Add(AddTableBodyRow(rubricText13))
 
         Array<text> rubricText14
         rubricText14:Add("SetColorPaletteToDisurbing()") 
         rubricText14:Add("SetColorPaletteToDisurbing() takes in no parameters, but will adjust the color palette based off of yellows, browns, oranges, and greens")
         rubricText14:Add("chart:SetColorPaletteToDisturbing()")  
+        tableBodyCustomize:Add(AddTableBodyRow(rubricText14))
 
         Array<text> rubricText15
         rubricText15:Add("FlipOrientation()")
         rubricText15:Add("FlipOrientation() takes in no parameters, and this function will swap the places of the x and y axis.")
         rubricText15:Add("chart:FlipOrientation()")    
+        tableBodyCustomize:Add(AddTableBodyRow(rubricText15))
 
         Array<text> rubricHeader3
         rubricHeader3:Add(AddTextBoldFront("Function", " "))
         rubricHeader3:Add(AddTextBoldFront("Description", " "))
         rubricHeader3:Add(AddTextBoldFront("Usage", " "))
 
-        Array<text> rubricRows3
-        rubricRows3:Add(AddTableHeaderTag(rubricHeader3))
-      
-        rubricRows3:Add(AddTableDataTag(rubricText12))
-        rubricRows3:Add(AddTableDataTag(rubricText13))
-        rubricRows3:Add(AddTableDataTag(rubricText14))
-        rubricRows3:Add(AddTableDataTag(rubricText15))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows3), "Customizing Charts")) 
+        tableCustomize:Add(tableBodyCustomize)
+        section_customizing:Add(tableCustomize)
 
-
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("
+        section_customizing:Add(preformatter:GeneratePreformattedCode("
 // set the legend location, choices are left, right, top and bottom
 chart:SetLegendLocationToBottom()
 
@@ -295,13 +342,27 @@ chart:SetFontSize(20)
 chart:FlipOrientation()
 "))
 
-        AddIDE(bodyDiv,"BP3","Box Plots: Customization","Example of customizing our box plot","examples/Charts/BP3.quorum")
+     CodeForIDE code3
+    code3:AddFileUrl("BoxPlot.quorum", "examples/Charts/BP3.quorum")
+    IDE ide2 = AddIDE()
+    ide2:SetLightTheme()
+    ide2:SetCodeForIDE(code3:GetJsonArray())
+    ide2:SetIdeTitle("Customizing Box Plot")
+    section_customizing:Add(ide2)
 
-        bodyDiv:AddParagraph("Congratulations, our Box Chart is constructed! Now we can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display(1000, 750)"))      
-
-         bodyDiv:AddParagraph(" ")
+    Section section_display
+    section_display:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_display)
     
+    Heading h2_display = section_display:AddHeading("Displaying The Chart", 2)
+    h2_display:AddAttribute("data-text", "Displaying The Chart")
+    
+    h2_display:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_display)
+
+    section_display:AddParagraph("Congratulations, our Box Chart is constructed! Now we can display our chart with the Display() function. There are two ways to do this, letting it automatically display and specifying a specific window size. By doing chart:Display() it will display in a size equal to the screen size. By doing chart:Display(num, num), it will display the chart in a respected constraint window size. We will be using the default display.")
+    section_display:Add(preformatter:GeneratePreformattedCode("chart:Display(1000, 750)"))      
+
     Paragraph para1
     para1:AddText("Now, feel free to clean, build, and run our program and we shortly should see a Game window pop-up. This is our Box Chart! To view the entire code, click ")
     
@@ -309,19 +370,42 @@ chart:FlipOrientation()
     link1:AddText("here")
     link1:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode/BoxExample1.quorum")
     link1:SetTarget(link1:newTab)
+    link1:SetClassAttribute("underline text-quorum-blue-150")
 
     para1:Add(link1)
     para1:AddText(" to view the file.")
-    bodyDiv:Add(para1)
+    section_display:Add(para1)
 
-    AddIDE(bodyDiv,"BoxPlot","Creating a Box Plot","Full Example of the Box Plot","examples/Charts/BoxPlot.quorum")
+     Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileUrl("BoxPlot.quorum", "examples/Charts/BoxPlot.quorum")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Full Box Plot Example")
+    section_try_yourself:Add(ide3)
 
-    bodyDiv:AddParagraph(" ")
+    Section section_final
+    section_final:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_final)
+    
+    Heading h2_final = section_final:AddHeading("Final Chart", 2)
+    h2_final:AddAttribute("data-text", "Final Chart")
+    
+    h2_final:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_final)
 
     File f
     FileReader reader
-
-    bodyDiv:AddHeading("Final Chart", 2)
 
     Division chart1
     chart1:SetStyle("min-width: 100px; max-width: 100%;")
@@ -330,28 +414,36 @@ chart:FlipOrientation()
     chart1:AddText(reader:Read())
     reader:Close()
     
-    bodyDiv:Add(chart1)
+    section_final:Add(chart1)
 
-        bodyDiv:AddHeading("Further Useful Box Plot Functions",2)
+      Section section_additional
+    section_additional:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_additional)
+    
+    Heading h2_additional = section_additional:AddHeading("Further Useful Box Plot Functions", 2)
+    h2_additional:AddAttribute("data-text", "Further Useful Box Plot Functions")
+    
+    h2_additional:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_additional)
+
+   
+    WebTable tableActions = AddWebTable("Other Useful Box Plot Actions")
+    TableBody tableBodyActions = AddTableBody()
+
+        Array<text> tableHeaderArrayActions 
+        tableHeaderArrayActions:Add("Function")
+        tableHeaderArrayActions:Add("Description") 
+        tableHeaderArrayActions:Add("Usage")
+
+
+        TableHeader theadActions = AddTableHeaderRow(tableHeaderArrayActions)
+        tableActions:Add(theadActions) 
 
         Array<text> rubricText16
         rubricText16:Add("HideOutliers()")
         rubricText16:Add("This function does not take any parameters and it will hide the outliers from the chart.")
         rubricText16:Add("chart:HideOutliers()")
-  
-        Array<text> rubricHeader4
-        rubricHeader4:Add(AddTextBoldFront("Function", " "))
-        rubricHeader4:Add(AddTextBoldFront("Description", " "))
-        rubricHeader4:Add(AddTextBoldFront("Usage", " "))
-
-        Array<text> rubricRows4
-        rubricRows4:Add(AddTableHeaderTag(rubricHeader4))
-      
-        rubricRows4:Add(AddTableDataTag(rubricText16))
-        
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows4), "Extra Functions")) 
-
-        bodyDiv:AddParagraph("")
+        tableBodyActions:Add(AddTableBodyRow(rubricText16))
 
         Paragraph para2
         para2:AddText("To view more examples with charts, we can reference the Quorum Curriculum Repository for ")      
@@ -360,18 +452,20 @@ chart:FlipOrientation()
         link2:AddText("charts")
         link2:SetAddress("https://github.com/qorf/curriculum/tree/main/Reference/DataScience/Charts%20(New)/DataScienceCurric/SourceCode")
         link2:SetTarget(link2:newTab)
+        link2:SetClassAttribute("underline text-quorum-blue-150")
         
         para2:Add(link2)
         para2:AddText(".")
-        bodyDiv:Add(para2)        
+        section_additional:Add(para2)        
 
-        bodyDiv:AddParagraph(" ")
-        
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        tableActions:Add(tableBodyActions)
+        section_additional:Add(tableActions)
+
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -404,5 +498,13 @@ chart:FlipOrientation()
 
     action GetLocation returns text
         return "tutorials/charts/boxplot.html"
+    end
+
+    action GetLinkName returns text
+        return "Box Plots"
+    end
+
+    action GetSectionName returns text
+        return "Charts"
     end
 end

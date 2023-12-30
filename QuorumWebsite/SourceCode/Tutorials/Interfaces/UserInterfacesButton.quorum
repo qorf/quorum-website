@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class UserInterfacesButton is Lesson
     text dq = ""
@@ -31,53 +19,64 @@ class UserInterfacesButton is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Button", 1)
-        headDiv:AddText("This tutorial tells you how to use Buttons in Quorum")
-        Add(headDiv)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("An Introduction to Buttons in Quorum", 2)
-        bodyDiv:AddParagraph("In this tutorial, we will learn how to use Buttons in the Quorum Game Engine. A Button is"
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: Button", 1)
+
+        headDiv:AddText("This tutorial tells you how to use Buttons in Quorum")
+        bodyDiv:Add(headDiv)
+        Section section_intro_buttons
+        section_intro_buttons:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_intro_buttons, "An Introduction to Buttons in Quorum", 2)
+
+        section_intro_buttons:AddParagraph("In this tutorial, we will learn how to use Buttons in the Quorum Game Engine. A Button is"
                             + " a simple interface tool which executes a Behavior when clicked.")
 
-        bodyDiv:AddParagraph("For this tutorial, we will create a Button that says " + dq + "Hello world!" + dq
+        section_intro_buttons:AddParagraph("For this tutorial, we will create a Button that says " + dq + "Hello world!" + dq
                             + " aloud and outputs it as text each time it is pressed. To start, create a new Game "
                             + "Application project.")
 
         //the section on creating a simple button
-        bodyDiv:AddHeading("Standard Buttons", 2)
+        Section section_standard_buttons
+        section_standard_buttons:AddClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("In order to use a Button, we must include the Button library with the following use statement:")
+        AddHeading(section_standard_buttons, "Standard Buttons", 2)
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Button"))
+        section_standard_buttons:AddParagraph("In order to use a Button, we must include the Button library with the following use statement:")
+
+        section_standard_buttons:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Button"))
         
 
-        bodyDiv:AddParagraph("Since we want the Button to be usable as soon as the game begins, we'll create it in the "
+        section_standard_buttons:AddParagraph("Since we want the Button to be usable as soon as the game begins, we'll create it in the "
                             + "CreateGame action. After we create the Button, we can set its position like we would a Drawable, using the "
                             + "SetPosition action. We can also set a name which will be the text the Button "
                             + "displays on the screen. Then we can add it to the game, giving us the following lines of code:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("Button button" + cr
+        section_standard_buttons:Add(preformatter:GeneratePreformattedCode("Button button" + cr
                                                          + "button:SetName(" + dq + "Click me!" + dq + ")" + cr
                                                          + "button:SetPosition(300, 300)" + cr
                                                          + "SetFocus(button)" + cr
                                                          + "Add(button)"))
 
-        bodyDiv:AddParagraph("We also added a SetFocus call with the Button as a parameter. We do this so that the Button is <b>accessible,</b> 
+        section_standard_buttons:AddParagraph("We also added a SetFocus call with the Button as a parameter. We do this so that the Button is <b>accessible,</b> 
                             which means we can activate it using only the keyboard. When the Button is focused, you can either click it or press the Spacebar to activate.")
 
-        bodyDiv:AddParagraph("So far, the Main class is as follows:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
-                                                        + "use Libraries.Interface.Controls.Button" + cr + cr
+        section_standard_buttons:AddParagraph("So far, the Main class is as follows:")
+        section_standard_buttons:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+                                                        + "use Libraries.Interface.Controls.Button" + cr
+                                                        + "use Libraries.Interface.Layouts.ManualLayout" + cr + cr
                                                         + "class Main is Game" + cr
                                                         + "    action Main" + cr
                                                         + "        StartGame()" + cr
                                                         + "    end" + cr + cr
                                                         + "    action CreateGame" + cr
+                                                        + "        ManualLayout layout" + cr
+                                                        + "        SetLayout(layout)" + cr
                                                         + "        Button button" + cr
                                                         + "        button:SetName(" + dq + "Click me!" + dq + ")" + cr
                                                         + "        button:SetPosition(300, 300)" + cr
@@ -86,26 +85,30 @@ class UserInterfacesButton is Lesson
                                                         + "    end" + cr
                                                         + "end"))
 
-        bodyDiv:AddParagraph("When we run the program, the Button appears in the Game window as shown below:")
+        section_standard_buttons:AddParagraph("When we run the program, the Button appears in the Game window as shown below:")
 
-        bodyDiv:AddImage("/media/userInterface/ButtonSmall.png", "This image shows the Button's appearance in the game window.")
+        Image image1 = section_standard_buttons:AddImage("/media/userInterface/ButtonSmall.png", "This image shows the Button's appearance in the game window.")
+        image1:AddAttribute("data-zoom", "")
 
-        bodyDiv:AddParagraph("You might notice that the Button seems small for the screen and might be wondering how we could "
+        section_standard_buttons:AddParagraph("You might notice that the Button seems small for the screen and might be wondering how we could "
                             + "resize it. Right now the Button is sized according the text it displays, and to resize we need to alter the Button's LayoutProperties. "
                             + "However, this is not necessary for the purposes of this tutorial, so for now we'll simply say that Buttons use  "
                             + "a Layout to organize their contents. The specifics on how to resize and alter a Button's Layout will be covered later in the Layout tutorial.")
 
-        bodyDiv:AddHeading("Adding Behavior to a Button", 2)
+        Section section_button_behavior
+        section_button_behavior:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_button_behavior, "Adding Behavior to a Button", 2)
         
-        bodyDiv:AddParagraph("Right now, nothing happens when the Button is clicked. To have an action activate when we click the button, we must add a "
+        section_button_behavior:AddParagraph("Right now, nothing happens when the Button is clicked. To have an action activate when we click the button, we must add a "
                             + "Behavior to the Button.")
 
-        bodyDiv:AddParagraph("To begin, create a new Quorum Class, which we will name " + dq + "OutputBehavior.quorum." + dq
+        section_button_behavior:AddParagraph("To begin, create a new Quorum Class, which we will name " + dq + "OutputBehavior.quorum." + dq
                             + " This class will use the libraries for Behavior, BehaviorEvent, and Speech. "
                             + "The class itself will inherit the Behavior class, and we will override the Run action to "
                             + "say and output the desired text. This gives the following OutputBehavior class:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
+        section_button_behavior:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
                                                         + "use Libraries.Interface.Events.BehaviorEvent" + cr
                                                         + "use Libraries.Sound.Speech" + cr + cr
                                                         + "class OutputBehavior is Behavior" + cr + cr
@@ -116,16 +119,16 @@ class UserInterfacesButton is Lesson
                                                         + "    end" + cr
                                                         + "end"))
         
-        bodyDiv:AddParagraph("Now that we have our completed OutputBehavior class, we can add it to the Button in our Main "
+        section_button_behavior:AddParagraph("Now that we have our completed OutputBehavior class, we can add it to the Button in our Main "
                             + "class using the Button's SetBehavior action. To do so, return to the CreateGame action, and "
                             + "add the following lines:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("OutputBehavior behavior" + cr
+        section_button_behavior:Add(preformatter:GeneratePreformattedCode("OutputBehavior behavior" + cr
                                                         + "button:SetBehavior(behavior)"))
 
-        bodyDiv:AddParagraph("This complete Main class is as follows:")
+        section_button_behavior:AddParagraph("This complete Main class is as follows:")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
+        section_button_behavior:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
                                                         + "use Libraries.Interface.Controls.Button" + cr + cr
                                                         + "class Main is Game" + cr + cr
                                                         + "    action Main" + cr
@@ -133,6 +136,8 @@ class UserInterfacesButton is Lesson
                                                         + "    end" + cr + cr
                                                         + "    action CreateGame" + cr
                                                         + "        OutputBehavior behavior" + cr + cr
+                                                        + "        ManualLayout layout" + cr
+                                                        + "        SetLayout(layout)" + cr
                                                         + "        Button button" + cr
                                                         + "        button:SetName(" + dq + "Click me!" + dq + ")" + cr
                                                         + "        button:SetPosition(300, 300)" + cr
@@ -142,10 +147,11 @@ class UserInterfacesButton is Lesson
                                                         + "    end" + cr
                                                         + "end" + cr))
 
-        bodyDiv:AddParagraph("Now, when we run the program, clicking the Button or pressing the Spacebar will say and output the " + dq
+        section_button_behavior:AddParagraph("Now, when we run the program, clicking the Button or pressing the Spacebar will say and output the " + dq
                             + "Hello world!" + dq + " message.")
 
-        bodyDiv:AddHeading("Accessibility", 3)
+        AddHeading(section_button_behavior, "Accessibility", 3)
+
         Paragraph access
         access:AddText("In our example, we used an action named <b>SetFocus</b>, this action allowed for the Button 
                             to be used with only the keyboard. The <b>Focus</b> is covered in a later ")
@@ -155,15 +161,30 @@ class UserInterfacesButton is Lesson
                             why the language Screen Reader is friendly and why Quorum can easily be used to make 
                             accessible applications. Focus is what allows the use of a keyboard to interact with the User Interface, and it tells Screen Readers 
                             which object's information to read, so use of Focus will be found in most of the User Interface tutorials. ")
-        bodyDiv:Add(access)
-        bodyDiv:AddParagraph("Games made in the Quorum Game engine are made to be compatible with a Screen Reader, and when making accessible 
+        section_button_behavior:Add(access)
+        section_button_behavior:AddParagraph("Games made in the Quorum Game engine are made to be compatible with a Screen Reader, and when making accessible 
                             applications it is important to understand how a Screen Reader will interact with your application. A Screen 
                             Reader will read the name and any text that the Focused object displays. In our Button example, we used the 
                             <b>SetName</b> action call, which changes both the display text of the Button and what a Screen Reader will read when 
                             the Button has Focus. Using <b>SetName</b> and <b>Focus Cycles</b> allows the creation of accessible applications  
                             for users with Screen Readers, or for users that cannot use a mouse.")
-        bodyDiv:AddHeading("Run the Program", 2)
-        AddIDE(bodyDiv, "buttonTutorial","Activity: Button", "Try making a User Interface", "examples/UserInterface/Button/Main.quorum")
+        Section section_run_program
+        section_run_program:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_run_program, "Run the Program", 2)
+
+        CodeForIDE code1
+        code1:AddFileUrl("Button.quorum", "/examples/UserInterface/Button/Main.quorum")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code1:GetJsonArray())
+        ide:SetIdeTitle("Activity: Button")
+        section_run_program:Add(ide)
+
+        bodyDiv:Add(section_intro_buttons)
+        bodyDiv:Add(section_standard_buttons)
+        bodyDiv:Add(section_button_behavior)
+        bodyDiv:Add(section_run_program)
 
 /* 
         //the section on using Icons as Buttons
@@ -234,11 +255,10 @@ class UserInterfacesButton is Lesson
 
         bodyDiv:AddImage("/media/userInterface/ButtonEnd.png", "This is an image of the end product window appearance.")
 */
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -259,5 +279,12 @@ class UserInterfacesButton is Lesson
 
     action GetLocation returns text
         return "tutorials/ui/button.html"
+    end
+    action GetLinkName returns text
+        return "Button"
+    end
+
+    action GetSectionName returns text
+        return "User Interfaces"
     end
 end

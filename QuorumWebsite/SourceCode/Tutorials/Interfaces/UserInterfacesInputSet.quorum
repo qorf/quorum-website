@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class UserInterfacesInputSet is Lesson
     text dq = ""
@@ -27,21 +15,22 @@ class UserInterfacesInputSet is Lesson
         SetWebPageTitle("InputSet Tutorial - Quorum Programming Language")
         AddDefaultHeaders()
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
-        //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: InputSet", 1)
-        headDiv:AddText("This tutorial tells you how to use InputSets in Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Tutorial: InputSet", 1)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("An Introduction to InputSets and InputTables", 2)
-        bodyDiv:AddParagraph("In this tutorial, we will learn how to use 
+        headDiv:AddText("This tutorial tells you how to use InputSets in Quorum")
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro_inputset
+        section_intro_inputset:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_intro_inputset, "An Introduction to InputSets and InputTables", 2)
+        section_intro_inputset:AddParagraph("In this tutorial, we will learn how to use 
             InputSets and InputTables in Quorum. InputSets are used to uniquely identify 
             input, such as keyboard or mouse, and expand existing functionality in the 
             language. These are used in conjunction with InputTables, which associate 
@@ -49,31 +38,38 @@ class UserInterfacesInputSet is Lesson
             example, we could use an InputSet to trigger when the user clicks the 
             mouse on a creature in a game, and then use an InputTable to tell it 
             how to respond to that input.")
-        bodyDiv:AddParagraph("InputSets have several advantages compared to 
+        section_intro_inputset:AddParagraph("InputSets have several advantages compared to 
             event listeners, but they do not replace them. Notably, unlike listeners, 
             they can be used to make input act consistently across groups of similar 
             Items by default. For example, buttons in a user interface should have 
             default behaviors, like slightly changing colors when clicked to visually 
             show that it happened.")
-        bodyDiv:AddParagraph("InputTables have similar advantages. With 
+        section_intro_inputset:AddParagraph("InputTables have similar advantages. With 
             listeners and the event system, the programmer could make whatever they 
             wished, but input tables make it easier to remap those commands in 
             different ways. For example, they can be used to set multiple inputs to 
             trigger the same Behaviors or as a way to remap keyboard or mouse input 
             across an entire system.")
 
-        bodyDiv:AddHeading("Using the Default InputTable", 2)
+        Section section_default_input_table
+        section_default_input_table:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section_default_input_table, "Using the Default InputTable", 2)
 
-        Paragraph defaultTableParagraph = bodyDiv:AddParagraph("Let's make a program which will perform a 
+        Paragraph defaultTableParagraph
+        defaultTableParagraph:AddText("Let's make a program which will perform a 
             task by default when given a particular kind of input. We could choose 
             any input, but for example, we will create a Behavior that outputs the 
             name of the currently focused Item when the spacebar is pressed. The 
             Behavior we will use is shown in the code block below. We can review 
             how Behaviors work in the ")
-            defaultTableParagraph:AddLink("Behavior tutorial","/tutorials/ui/behavior.html")
-            defaultTableParagraph:AddText(". We can also review the ")
-            defaultTableParagraph:AddLink("Focus tutorial","/tutorials/ui/focus.html")
-            defaultTableParagraph:AddText(".")
+        Link link1 = defaultTableParagraph:AddLink("Behavior tutorial","/tutorials/ui/behavior.html")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
+        defaultTableParagraph:AddText(". We can also review the ")
+        Link link2 = defaultTableParagraph:AddLink("Focus tutorial","/tutorials/ui/focus.html")
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        defaultTableParagraph:AddText(".")
+
+        section_default_input_table:Add(defaultTableParagraph)
 
         CodeBlock codeBlock1
         Span codeBlock1Comment1
@@ -98,7 +94,7 @@ class UserInterfacesInputSet is Lesson
         codeBlock1:AddText("    end"+ cr)
         codeBlock1:AddText("end"+ cr)
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock1))
+        section_default_input_table:Add(preformatter:GeneratePreformattedCode(codeBlock1))
 
         bodyDiv:AddParagraph("Now we'll create our main class. Inside it, 
             we'll make an InputSet that triggers this Behavior. We'll also 
@@ -109,30 +105,30 @@ class UserInterfacesInputSet is Lesson
         CodeBlock codeBlock2
         codeBlock2:AddText("InputSet spaceSet" + cr)
         codeBlock2:AddText("KeyboardEvent keys" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock2))
+        section_default_input_table:Add(preformatter:GeneratePreformattedCode(codeBlock2))
 
-        bodyDiv:AddParagraph("Inside our CreateGame action, we need to tell 
+        section_default_input_table:AddParagraph("Inside our CreateGame action, we need to tell 
             Quorum that we want to use these input sets. To do this, we set our 
             InputSet to accept a particular input from the keyboard using the 
             SetKeyboardInput action. We'll use our keys
             variable to provide the SPACE constant from the 
             KeyboardEvent class.")
 
-        bodyDiv:AddParagraph("After we've set up our InputSet, we need 
+        section_default_input_table:AddParagraph("After we've set up our InputSet, we need 
             to get the default InputTable from the system. We can retrieve this table 
             using the Game's GetDefaultInputTable action. The default 
             InputTable applies Behaviors whenever input is received in a structured 
             and organized way.")
 
-        bodyDiv:AddParagraph("Now that we have our InputTable, we can set it 
+        section_default_input_table:AddParagraph("Now that we have our InputTable, we can set it 
             to trigger our Behavior when the spacebar is pressed: ")
 
         CodeBlock codeBlock3
         codeBlock3:AddText("OutputBehavior outputBehavior" + cr)
         codeBlock3:AddText("defaultTable:Add(spaceSet, outputBehavior)" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock3))
+        section_default_input_table:Add(preformatter:GeneratePreformattedCode(codeBlock3))
 
-        bodyDiv:AddParagraph("The default InputTable will now trigger 
+        section_default_input_table:AddParagraph("The default InputTable will now trigger 
             when the spacebar is pressed. In the provided code sample, we've 
             included some Drawables and set them up to allow for Focus 
             in our Game.")
@@ -197,16 +193,19 @@ class UserInterfacesInputSet is Lesson
         codeBlock4:AddText("       SetFocus(square)" + cr)
         codeBlock4:AddText("    end" + cr)
         codeBlock4:AddText("end" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock4))
+        section_default_input_table:Add(preformatter:GeneratePreformattedCode(codeBlock4))
 
-        bodyDiv:AddHeading("InputTables and Input Groups", 2)
-        bodyDiv:AddParagraph("The default InputTable can be useful for 
+        Section section_input_tables
+        section_input_tables:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_input_tables, "InputTables and Input Groups", 2)
+        section_input_tables:AddParagraph("The default InputTable can be useful for 
             default behaviors as a whole and, perhaps, even more so for assigning 
             Behaviors to specific kinds of items. The reason this is the case is 
             because different kinds of user interface components, like textboxes 
             or buttons, act in unique ways and therefore might use unique 
             default behaviors. ")
-        bodyDiv:AddParagraph("In this code, we've added a circle and a 
+        section_input_tables:AddParagraph("In this code, we've added a circle and a 
             square, and they're set to cycle the focus between them. Now let's set 
             them to use special input. To start, let's make new Behaviors that 
             we'll use for these Drawables. The first Behavior is listed below. 
@@ -272,10 +271,10 @@ class UserInterfacesInputSet is Lesson
         codeBlock5:AddText("        end" + cr)
         codeBlock5:AddText("    end" + cr)
         codeBlock5:AddText("end" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock5))
+        section_input_tables:Add(preformatter:GeneratePreformattedCode(codeBlock5))
 
 
-        bodyDiv:AddParagraph("Our second Behavior is a sort of toggle. Each 
+        section_input_tables:AddParagraph("Our second Behavior is a sort of toggle. Each 
             time it's activated, it will alternate between making the object smaller or 
             larger by using the Scale action. We'll use this one for our circle. The 
             code for this Behavior is listed below:")
@@ -355,9 +354,9 @@ class UserInterfacesInputSet is Lesson
         codeBlock6:AddText("        end" + cr)
         codeBlock6:AddText("    end" + cr)
         codeBlock6:AddText("end" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock6))
+        section_input_tables:Add(preformatter:GeneratePreformattedCode(codeBlock6))
 
-        bodyDiv:AddParagraph("Using these two Behaviors, we can specific 
+        section_input_tables:AddParagraph("Using these two Behaviors, we can specific 
             functionality to specific kinds of items in our user interface. For 
             example, suppose we would like to apply the RotationBehavior only 
             to the square and the ScaleBehavior only to the circle. If this was 
@@ -369,9 +368,9 @@ class UserInterfacesInputSet is Lesson
         CodeBlock codeBlock8
         codeBlock8:AddText("square:SetInputGroup(" + dq + "Square" + dq + ")" + cr)
         codeBlock8:AddText("circle:SetInputGroup(" + dq + "Circle" + dq + ")" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock8))
+        section_input_tables:Add(preformatter:GeneratePreformattedCode(codeBlock8))
 
-        bodyDiv:AddParagraph("Now that we have set the input groups, we can 
+        section_input_tables:AddParagraph("Now that we have set the input groups, we can 
             make InputTables that correspond to them. When we create these tables, 
             we'll use the SetIdentifier action in the InputTable. The 
             important part is that we need to match these identifiers to the input 
@@ -382,9 +381,9 @@ class UserInterfacesInputSet is Lesson
         codeBlock9:AddText("squareTable:SetIdentifier("+dq+"Square"+dq+")" + cr)
         codeBlock9:AddText("InputTable circleTable" + cr)
         codeBlock9:AddText("circleTable:SetIdentifier("+dq+"Circle"+dq+")" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock9))
+        section_input_tables:Add(preformatter:GeneratePreformattedCode(codeBlock9))
 
-        bodyDiv:AddParagraph("Once our tables are created and their 
+        section_input_tables:AddParagraph("Once our tables are created and their 
             identifiers are set, we can add our InputSets and Behaviors to them. 
             To do this, we use the Game's AddInputTable action to add 
             the tables to the Game. Note that we didn't need to do this for the 
@@ -562,32 +561,35 @@ class UserInterfacesInputSet is Lesson
         codeBlock7:AddText("        AddInputTable(circleTable)" + cr)
         codeBlock7:AddText("    end" + cr)
         codeBlock7:AddText("end" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock7))
+        section_input_tables:Add(preformatter:GeneratePreformattedCode(codeBlock7))
 
-        bodyDiv:AddParagraph("In our example, we use the same InputSet that 
+        section_input_tables:AddParagraph("In our example, we use the same InputSet that 
             we used previously for our OutputBehavior to trigger our RotationBehavior, 
             while we use a new InputSet using the Enter key to trigger our Scale 
             behavior.")
 
-        bodyDiv:AddParagraph("Notice, however, that when our square is 
+        section_input_tables:AddParagraph("Notice, however, that when our square is 
             focused, the spacebar no longer triggers the OutputBehavior. This is 
             because the square's related InputTable has its own Behavior it 
             triggers on spacebar presses, which takes priority over the default 
             InputTable. For the circle, however, the spacebar still triggers the 
             InputTable, because the circle's table does not intercept the spacebar.")
 
-        bodyDiv:AddHeading("Input Triggers", 2)
+        Section section_input_triggers
+        section_input_triggers:SetClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("When using InputTables, we may want to our 
+        AddHeading(section_input_triggers, "Input Triggers", 2)
+
+        section_input_triggers:AddParagraph("When using InputTables, we may want to our 
 Behaviors on different conditions. When using InputSets, we have three 
 different " + dq + "triggers" + dq + " that we can use to respond to input:")
         UnorderedList triggerList
         triggerList:AddListItem("<b>BEGIN</b>: The Behavior triggers as soon as the input is received, such as when a key is first pressed for keyboard events, or when the mouse begins to mouse over an Item for mouse movement events. This is the default trigger, and will be used if no other trigger is set.")
         triggerList:AddListItem("<b>FINISH</b>: The Behavior triggers when the input ends, such as when a key is released for keyboard events, or when the mouse moves off of an Item for mouse movement events.")
         triggerList:AddListItem("<b>CONTINUE</b>: The Behavior triggers as the input continues. For example, this will trigger on each frame of animation while a key is pressed for keyboard input, or trigger on each frame that the mouse is moving for a mouse movement event.")
-        bodyDiv:Add(triggerList)
+        section_input_triggers:Add(triggerList)
 
-        bodyDiv:AddParagraph("To set an InputSet to trigger on one of these 
+        section_input_triggers:AddParagraph("To set an InputSet to trigger on one of these 
             conditions, we use the SetInputTrigger action, providing it 
             one of the above constants within the class, as shown here:")
 
@@ -595,26 +597,30 @@ different " + dq + "triggers" + dq + " that we can use to respond to input:")
         codeBlock11:AddText("InputSet enterSet" + cr)
         codeBlock11:AddText("enterSet:SetKeyboardInput(keys:ENTER)" + cr)
         codeBlock11:AddText("enterSet:SetInputTrigger(enterSet:CONTINUE)" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock11))
+        section_input_triggers:Add(preformatter:GeneratePreformattedCode(codeBlock11))
 
-        bodyDiv:AddHeading("Keyboard Modifiers", 2)
+        Section section_keyboard_modifiers
+        section_keyboard_modifiers:SetClassAttribute("flex flex-col gap-y-2")
 
-        bodyDiv:AddParagraph("When using InputSets on desktop platforms, 
+        AddHeading(section_keyboard_modifiers, "Keyboard Modifiers", 2)
+
+        section_keyboard_modifiers:AddParagraph("When using InputSets on desktop platforms, 
             we may also want to trigger Behaviors only if certain keyboard modifiers 
             are being held down. For example, we may want to do something different 
             if the user presses " + dq + "space" + dq + " or  " + dq + "control-space," 
             + dq + " or if the user is holding down the shift key while clicking 
             on something.")
 
-        bodyDiv:AddParagraph("The following keyboard modifiers may be used:")
+        section_keyboard_modifiers:AddParagraph("The following keyboard modifiers may be used:")
         UnorderedList modifierList
+        modifierList:AddClassAttribute("list-disc list-outside pl-8")
         modifierList:AddListItem("SHIFT")
         modifierList:AddListItem("ALT")
         modifierList:AddListItem("CONTROL")
         modifierList:AddListItem("META (Command on Mac, Windows key on Windows - Note that the Windows key is typically not allowed for user applications, as it is reserved for the operating system.)")
-        bodyDiv:Add(modifierList)
+        section_keyboard_modifiers:Add(modifierList)
 
-        bodyDiv:AddParagraph("We can add modifiers to an InputSet using the 
+        section_keyboard_modifiers:AddParagraph("We can add modifiers to an InputSet using the 
 AddModifier action, and remove modifiers with the RemoveModifier
  action. For example, the below code shows an example of how to 
 set an InputSet to trigger on a control-left-click.")
@@ -624,14 +630,17 @@ set an InputSet to trigger on a control-left-click.")
         codeBlock12:AddText("InputSet controlClick" + cr)
         codeBlock12:AddText("controlClick:SetMouseInput(mouse:LEFT)" + cr)
         codeBlock12:AddText("controlClick:AddModifier(controlClick:CONTROL)" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock12))
+        section_keyboard_modifiers:Add(preformatter:GeneratePreformattedCode(codeBlock12))
 
-        bodyDiv:AddHeading("Double-Click and EventCounts", 2)
-        bodyDiv:AddParagraph("While using InputSets, we often trigger 
+        Section section_double_clicks
+        section_double_clicks:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_double_clicks, "Double-Click and EventCounts", 2)
+        section_double_clicks:AddParagraph("While using InputSets, we often trigger 
 Behaviors only when an input occurs multiple times in short succession. 
 This occurs most often with double-clicks, but can appear in other forms 
 of input as well (e.g., double-taps on keyboard keys or a touch screen).")
-        bodyDiv:AddParagraph("By default, InputSets trigger on the first 
+        section_double_clicks:AddParagraph("By default, InputSets trigger on the first 
 input, but we can adjust this using the SetEventCount action. 
 For example, the below code can be used to create an InputSet that triggers 
 on a double-left-click:")
@@ -641,13 +650,19 @@ on a double-left-click:")
         codeBlock13:AddText("InputSet doubleClick" + cr)
         codeBlock13:AddText("doubleClick:SetMouseInput(mouse:LEFT)" + cr)
         codeBlock13:AddText("doubleClick:SetEventCount(2)" + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(codeBlock13))
+        section_double_clicks:Add(preformatter:GeneratePreformattedCode(codeBlock13))
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_intro_inputset)
+        bodyDiv:Add(section_default_input_table)
+        bodyDiv:Add(section_input_tables)
+        bodyDiv:Add(section_input_triggers)
+        bodyDiv:Add(section_keyboard_modifiers)
+        bodyDiv:Add(section_double_clicks)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -668,5 +683,12 @@ on a double-left-click:")
 
     action GetLocation returns text
         return "tutorials/ui/inputSet.html"
+    end
+    action GetLinkName returns text
+        return "InputSet"
+    end
+
+    action GetSectionName returns text
+        return "User Interfaces"
     end
 end

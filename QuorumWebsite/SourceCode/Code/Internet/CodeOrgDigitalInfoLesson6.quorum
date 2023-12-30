@@ -1,0 +1,381 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class CodeOrgDigitalInfoLesson6 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+
+        SetWebPageTitle("Unit 2 Lesson 6: HTTP and DNS")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("The Internet - Lesson 6: HTTP and DNS", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "The Internet - Lesson 6: HTTP and DNS")
+        AddToHeadingArray(h_heading)
+
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Overview", 2)
+
+
+        section_intro:AddParagraph("Students conclude their study of the layers of the Internet by learning about two top-level protocols, HTTP and DNS. The lesson begins with a review of the layers students have already learned, namely the physical Internet, IP, and TCP / UDP. The lesson then dives into the core of the unit which is " + dq +"What happens when I type an address into my browser?" + dq + " Students will complete a brief activity to explore how the DNS works. Students then watch videos explaining how both DNS and HTTP work, taking notes and using a provided activity guide. The lesson concludes with a review of how the different layers of the Internet work.")
+
+       AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("Students will be able to:")
+        UnorderedList goals
+        goals:AddClassAttribute("list-disc list-outside pl-8")
+        goals:AddListItem("Describe how HTTP is used for sharing the files and pages that make up the World Wide Web")
+        goals:AddListItem("Describe how the Domain Name System helps the Internet scale by allowing devices to find the IP addresses associated with a domain name")
+        goals:AddListItem("Explain how different layers of protocols on the Internet build upon and rely on one another")
+        section_intro:Add(goals)
+
+       AddHeading(section_intro, "Purpose", 3)
+        section_intro:AddParagraph("This lesson is designed to wrap up the series on how the Internet works and highlight the main design philosophies of openness, reliability, and scalability. However, actions taken by governments and organizations challenge some of these design philosophies and may hinder the ability of the World Wide Web to be truly worldwide. Students will begin thinking about some of the dilemmas caused by these conflicts, which they will explore further after this lesson.")
+
+        AddHeading(section_intro, "Resources", 3)
+        UnorderedList resources
+        resources:AddClassAttribute("list-disc list-outside pl-8 underline text-quorum-blue-150")
+        resources:AddListItemLink("CSP-Widgets repository", "https://github.com/qorf/CSP-Widgets")
+        resources:AddListItemLink("IP Address Labels - Teacher Resource", "https://docs.google.com/document/d/1IcnID2dhXrhagkJCUULO8g240NflvofUs3q23yEnUu4/edit?usp=sharing")
+        resources:AddListItemLink("The Internet: IP Addresses and DNS - Video (timestamped to the second half)", "https://youtu.be/5o8CwafCxnU?t=249")
+        resources:AddListItemLink("The Internet: HTTP and HTML - Video", "https://youtu.be/kBXQZMmiA4s")
+        section_intro:Add(resources)
+        AddHeading(section_intro, "Supplemental Code.org material", 4)
+        section_intro:AddParagraph("For the students")
+        UnorderedList supplemental
+        supplemental:AddClassAttribute("list-disc list-outside pl-8")
+        supplemental:AddListItemLink("Layers of the Internet - Activity Guide", "https://docs.google.com/document/d/1EB_y099r7Qwb3SxFhHK9wSaikoHixL85O4_YdsUBJSY/edit")
+        section_intro:Add(supplemental)
+
+        Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
+
+        Paragraph ipParagraph
+        ipParagraph:AddText(AddStrongTag("Distribute:") + " As students enter class, hand each of them a single IP address. You cut these out ahead of time from ")
+        ipParagraph:AddLink("IP Address Labels - Teacher Resource", "https://docs.google.com/document/d/1WqLbzqZEXHb7x2i9PmJF1-knDbxoZzeJu9ywJwcv4ow/edit")
+        ipParagraph:AddText(". You could also use handwritten notes or any other medium that's convenient for you and your students.")
+        section_gettingStarted:Add(ipParagraph)
+
+        Division distributeTip = AddTeachingTip(section_gettingStarted)
+        distributeTip:AddParagraphBoldFront("Showing the Need for DNS:"," This quick unplugged activity helps students understand why the DNS exists in the first place. With devices joining the internet all the time it's impossible for each device to keep track of each other device's IP address. ")
+        distributeTip:AddParagraphBoldFront("Keep it Short:"," This activity can be done very quickly, typically in about 3 minutes, before students start to see the core challenge. If students start running away from you that's a good sign they've seen what makes this activity tricky!")
+
+        AddHeading(section_gettingStarted, "Do This", 3)
+        section_gettingStarted:AddParagraph("Your goal is to create a list in your journals of every one of your classmates IP addresses. The only rules:")
+        UnorderedList a
+        a:AddClassAttribute("list-disc list-outside pl-8")
+        a:AddListItem("You may walk around the room")
+        a:AddListItem("You may share information with classmates")
+        a:AddListItem("You may talk / share information with only ONE classmate at a time")
+        section_gettingStarted:Add(a)
+        section_gettingStarted:AddParagraph(AddStrongTag("Circulate:") + " As students are working, circulate quietly through the room.")
+        UnorderedList b
+        b:AddClassAttribute("list-disc list-outside pl-8")
+        b:AddListItem("Approach a student and silently take their IP address slip away from them.")
+        b:AddListItem("Give that person a new IP address slip (or a re-used IP address).")
+        b:AddListItem("Repeat the above two steps as many times as you can, as you circulate the room.")
+        section_gettingStarted:Add(b)
+       section_gettingStarted:AddParagraph(AddStrongTag("Prompt:") +" Discuss with your classmates the following prompts:")
+        UnorderedList c
+        c:AddClassAttribute("list-disc list-outside pl-8")
+        c:AddListItem("Why do you think I was switching IP addresses?")
+        c:AddListItem("If IP addresses can change, is there a better way for everyone to know everyone else's IP address?")
+        section_gettingStarted:Add(c)
+       section_gettingStarted:AddParagraph(AddStrongTag("Prompt:") +" Discuss responses to these questions with students, using the discussion goal to guide the conversation.")
+        
+        Division warmUpGoal = AddDisscussionGoal(section_gettingStarted)
+        warmUpGoal:AddParagraph(" Main takeaways should include:")
+        UnorderedList warmUpList 
+        warmUpList:AddClassAttribute("list-disc list-outside pl-8")
+        warmUpList:AddListItem("Devices are joining and leaving the Internet all the time. IP addresses don't stay constant. If you go to a coffee shop or restart your browser your device might be assigned a new IP address.")
+        warmUpList:AddListItem("If IP addresses are switching, it's very hard for each computer to keep an accurate list.")
+        warmUpList:AddListItem("It would make more sense if there were one system that kept track of all that information.")
+
+
+        AddHeading(section_gettingStarted, "Remarks", 3)
+        UnorderedList transitionRemarks
+        transitionRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        transitionRemarks:AddListItem("If we want the Internet to scale up to billions of devices, then we need a better way to figure out one another's IP addresses!")
+        section_gettingStarted:Add(transitionRemarks)
+
+        Section section_activity
+        section_activity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_activity)
+        AddHeading(section_activity, "Activity (30 minutes)", 2)
+
+        AddHeading(section_activity, "Video #1: DNS", 3)
+        section_activity:AddParagraph(AddStrongTag("Prompt:") + " As we watch the following video take notes on:")
+        UnorderedList d
+        d:AddClassAttribute("list-disc list-outside pl-8")
+        d:AddListItem("How does the DNS solve the problem of translating domain names like example.com into IP addresses?")
+        d:AddListItem("How does the DNS help the Internet scale?")
+        section_activity:Add(d)
+
+        Paragraph dnsVideo
+        dnsVideo:AddText(AddStrongTag("Display:") + " Show ")
+        Link link = dnsVideo:AddLink("The Internet: IP Addresses and DNS - Video", "https://youtu.be/5o8CwafCxnU?t=249")
+        link:AddClassAttribute("underline text-quorum-blue-150")
+        dnsVideo:AddText(" on DNS, which explains how it works. Video will automatically start playing at the introduction of DNS.")
+        section_activity:Add(dnsVideo)
+
+        AddVideo(section_activity,"https://www.youtube.com/embed/5o8CwafCxnU?si=ezhtLQ4E5-UMixJo")
+
+        section_activity:AddParagraph(AddStrongTag("Prompt:") +" Discuss the following prompts with a partner:")
+        UnorderedList e
+        e:AddClassAttribute("list-disc list-outside pl-8")
+        e:AddListItem("How does the DNS solve the problem of translating domain names like example.com into IP addresses?")
+        e:AddListItem("How does the DNS help the Internet scale?")
+        section_activity:Add(e)
+       section_activity:AddParagraph(AddStrongTag("Discuss:") +" Have students discuss responses with their partners, then share out with the class. Focus on the main takeaways in the discussion goal.")
+
+        Division dnsGoal = AddDisscussionGoal(section_activity)
+        dnsGoal:AddParagraph(" The main takeaways from this video should be:")
+        UnorderedList dnsList
+        dnsList:AddClassAttribute("list-disc list-outside pl-8")
+        dnsList:AddListItem("The DNS is a network of servers that track the IP addresses of different domain names like example.com")
+        dnsList:AddListItem("When you visit a website you first ask the DNS for the IP address of the domain you want to visit. The first server to ask may have to ask other servers for this information.")
+        dnsList:AddListItem("This system allows billions of devices to get added to the network without putting pressure on any one computer or server to know all the IP addresses in the world.")
+        dnsGoal:Add(dnsList)
+
+        AddHeading(section_activity, "Video #2: HTTP and the World Wide Web", 3)
+        AddHeading(section_activity, "Remarks", 4)
+        UnorderedList htmlRemarks
+        htmlRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        htmlRemarks:AddListItem("We've got our heads wrapped around how DNS works. Let's learn about the last piece of the puzzle here, a protocol called HTTP. In this video we'll learn what happens when you actually visit a website and the language used to send those files around.")
+        section_activity:Add(htmlRemarks)
+
+        section_activity:AddParagraph(AddStrongTag("Do This:") +" As we watch this video take notes on the HTTP protocol.")
+        UnorderedList g
+        g:AddClassAttribute("list-disc list-outside pl-8")
+        g:AddListItem("What problem is HTTP solving?")
+        g:AddListItem("What is a GET request and what are your requesting?")
+        g:AddListItem("How does HTTP rely on the other layers of the Internet?")
+        g:AddListItem("Why are SSL/TLS, and HTTPS necessary?")
+        g:AddListItem("What do certificate authorities do and why are they necessary?")
+        section_activity:Add(g)
+
+        Paragraph htmlVideo
+        htmlVideo:AddText(AddStrongTag("Display:") + " Watch ")
+        Link link3 = htmlVideo:AddLink("The Internet: HTTP and HTML - Video", "https://youtu.be/kBXQZMmiA4s")
+        link3:SetClassAttribute("underline text-quorum-blue-150")
+        section_activity:Add(htmlVideo)
+
+        AddVideo(section_activity,"https://www.youtube.com/embed/kBXQZMmiA4s?si=Vfa4mBpBBWRQKBhs")
+
+        section_activity:AddParagraph(AddStrongTag("Prompt:") + " Review these questions with a partner about HTTP")
+        UnorderedList h
+        h:AddClassAttribute("list-disc list-outside pl-8")
+        h:AddListItem("What problem is HTTP solving?")
+        h:AddListItem("What is a GET request and what are your requesting?")
+        h:AddListItem("How does HTTP rely on the other layers of the Internet?")
+        h:AddListItem("Why are SSL/TLS, and HTTPS necessary?")
+        h:AddListItem("What do certificate authorities do and why are they necessary?")
+        section_activity:Add(h)
+
+        section_activity:AddParagraph(AddStrongTag("Discuss: ") + "Have students share out their responses with the class to make sure students understand the key takeaways about HTTP.")
+
+        Division htmlGoals = AddDisscussionGoal(section_activity)
+        htmlGoals:AddParagraph("Here are the most important points for students to take away about HTTP and the way it works")
+        UnorderedList htmlList
+        htmlList:AddClassAttribute("list-disc list-outside pl-8")
+        htmlList:AddListItem("When you visit a website you're actually getting sent a file by a server. HTTP is solving the problem of how to ask for that file.")
+        htmlList:AddListItem("Your computer and that server communicate using a protocol called HTTP. ")
+        htmlList:AddListItem("HTTP is plain-text, so it literally includes the ASCII word " + dq + "GET ..." + dq + " and the file name requested.")
+        htmlList:AddListItem("All of your communications are being sent over the Internet so these requests are being sent inside TCP/IP packets and over the physical wires of the Internet.")
+        htmlList:AddListItem("There are other secure ways of sending information online because using HTTP, all our information would otherwise be sent as plain text.")
+        htmlList:AddListItem("Certificate authorities ensure that when you start a secure connection you're talking to the website you think you're talking to.")
+        htmlGoals:Add(htmlList)
+
+        Section section_wrap
+        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_wrap)
+        AddHeading(section_wrap, "Wrap up (10 Minutes)", 2)
+
+        Paragraph distributeParagraph
+        distributeParagraph:AddText(AddStrongTag("(Optional) Distribute:") + " Give students a copy of the ")
+        Link link1 = distributeParagraph:AddLink("Layers of the Internet - Activity Guide", "https://docs.google.com/document/d/1EB_y099r7Qwb3SxFhHK9wSaikoHixL85O4_YdsUBJSY/edit")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
+        section_wrap:Add(distributeParagraph)
+
+        AddHeading(section_wrap, "Prompt", 3)
+        section_wrap:AddParagraph("Using your Layers of the Internet activity guide to help you, explain how each of the different layers is involved when you go to a link like example.com?")
+        AddHeading(section_wrap, "Discuss", 3)
+        section_wrap:AddParagraph("Use this final prompt as a review of everything covered in both today's lesson and those that came before. You'll actually probably want to start with the bottom of your review guide.")
+
+        Division wrapUpGoal = AddDisscussionGoal(section_wrap)
+        wrapUpGoal:AddParagraph("Use this final discussion to review not just this lesson but every protocol / layer of the Internet students have learned so far. You'd aim to see responses like the following:")
+        
+         WebTable table = AddWebTable("A table of protocol/layers of the internet that students have studied in this lesson")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Protocol/Layer")
+        tableHeaderArray:Add("What Problems Does It Solve") 
+        tableHeaderArray:Add("How Does It Work")
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)    
+
+
+        Array<text> columnText1
+        columnText1:Add(AddTextBoldFront("Physical Network",""))
+        columnText1:Add("Physically connecting devices to one another so that information can move through the network.")
+        columnText1:Add("Fiber optic cables, wifi signals, or copper wires physically connect the computers, smart phones, servers, etc. that make up the Internet. Computers don't need to be directly connected to each other, just a single point on the network.")
+        tableBody:Add(AddTableBodyRow(columnText1))
+
+        Array<text> columnText2
+        columnText2:Add(AddTextBoldFront("IP: Internet Protocol",""))
+        columnText2:Add("Uniquely identifying people on the internet and routing messages between them.")
+        columnText2:Add("Each device on the internet is given a unique IP address. Packets sent on the internet include to and from IP addresses. Routers along the way use this information to move data along a path of direct connections. Routing happens dynamically, meaning the path is unpredictable and changes based on network conditions.")
+        tableBody:Add(AddTableBodyRow(columnText2))
+
+        Array<text> columnText3
+        columnText3:Add(AddTextBoldFront("TCP: Transmission Control Protocol",""))
+        columnText3:Add("Send large messages over the Internet when accuracy is most important. You would either use TCP or UDP.")
+        columnText3:Add("Messages are divided into packets and sent all at once. Packets are numbered so that they can be re-ordered and missing packets can be requested by the receiver. TCP is slower than UDP because error checking like this takes more time, but it is much more reliable.")
+        tableBody:Add(AddTableBodyRow(columnText3))
+
+        Array<text> columnText4
+        columnText4:Add(AddTextBoldFront("UDP: User Datagram Protocol",""))
+        columnText4:Add("Send large messages over the Internet when speed is most important. You would either use TCP or UDP.")
+        columnText4:Add("Messages are divided into packets and sent all at once. There is no error-checking to ensure all packets arrive or that they're in order. UDP is faster than TCP but more errors are possible. This is useful for streaming video or online gaming because having the picture displayed quickly is more important than it being displayed with a perfectly clear picture.  ")
+        tableBody:Add(AddTableBodyRow(columnText4))
+
+        Array<text> columnText5
+        columnText5:Add(AddTextBoldFront("DNS: Domain Name System",""))
+        columnText5:Add("Translate human-readable domains like code.org or example.com into IP addresses that can be used by the Internet.")
+        columnText5:Add("When you try to go to a domain like example.com, you computer first contacts a system of servers collectively called the DNS which keeps track of the IP addresses associated with each domain name. Communication with DNS servers happens over the Internet, meaning the request to and from servers are sent as TCP/ IP packets. ")
+        tableBody:Add(AddTableBodyRow(columnText5))
+
+        Array<text> columnText6
+        columnText6:Add(AddTextBoldFront("HTTP: HyperText Transfer Protocol",""))
+        columnText6:Add("Allow computers to request and share webpages, audio, images, videos, and other file types on the Internet, collectively known as the world wide web.")
+        columnText6:Add("Computers communicate in plain text like GET to request files or send data. The server that receives the request responds with the files requested which are displayed by your browser. HTTP requests are sent between computers over the internet as part of TCP/IP packets. The world wide web is just files that are requested using HTTP and sent over the Internet.")
+        tableBody:Add(AddTableBodyRow(columnText6))
+
+        table:Add(tableBody)
+        section_wrap:Add(table)
+
+     
+        UnorderedList wrapUpList
+        wrapUpList:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpList:AddListItem("When you type in example.com, your browser will contact the DNS to find example.com's IP address")
+        wrapUpList:AddListItem("When you receive the address you'll send an HTTP GET request to example.com to send you its homepage")
+        wrapUpList:AddListItem("example.com's server will respond with the HTML code that makes up its web page")
+        wrapUpList:AddListItem("All of the communications above happen on the Internet which means TCP or UDP will break the message into packets and then send them. If TCP is used, error checking will occur.")
+        wrapUpList:AddListItem("IP will route the packets back and forth between your computer and the server")
+        wrapUpList:AddListItem("All of this information is sent over the physical wires, cable, wifi networks, and routers that make up the physical network of the internet.")
+        wrapUpGoal:Add(wrapUpList)
+        
+
+
+        AddHeading(section_wrap, "Remarks", 3)
+        UnorderedList closingRemarks
+        closingRemarks:AddClassAttribute("list-disc list-outside pl-8")
+        closingRemarks:AddListItem("At this point you all know a LOT more about the Internet then the average person. Tomorrow we're going to turn our attention to thinking through how we can use this knowledge to make good decisions about the Internet's impact on our everyday lives.")
+        section_wrap:Add(closingRemarks)
+
+        AddHeading(section_wrap, "Journal", 3)
+        section_wrap:AddParagraph(" Review the key takeaways of the lesson and have students add new vocabulary to their journals: scalability, DNS, World Wide Web, HTTP")
+        UnorderedList vocabulary
+        vocabulary:AddClassAttribute("list-disc list-outside pl-8")
+        vocabulary:AddListItem(AddItalicFront("Scalability:"," the capacity for the system to change in size and scale to meet new demands"))
+        vocabulary:AddListItem(AddItalicFront("The Domain Name System (DNS):"," the system responsible for translating domain names like example.com into IP addresses"))
+        vocabulary:AddListItem(AddItalicFront("World Wide Web:"," a system of linked pages, programs, and files"))
+        vocabulary:AddListItem(AddItalicFront("Hypertext Transfer Protocol (HTTP):"," a protocol for computers to request and share the pages that make up the world wide web on the Internet"))        
+        section_wrap:Add(vocabulary) 
+
+        Section section_assessment
+        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_assessment)
+        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
+
+        AddHeading(section_assessment, "For Students", 3)
+        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the following 2 questions.")
+
+        AddHeading(section_assessment, "Question 1", 3)
+        section_assessment:AddParagraph(" Choose the two statements from the following list that best describe the relationship between HTTP and the World Wide Web:")
+        UnorderedList questionList
+        questionList:AddClassAttribute("list-disc list-outside pl-8")
+        questionList:AddListItem("The World Wide Web is a protocol used for sharing HTTP messages")
+        questionList:AddListItem("The World Wide Web is a collection of pages and files that is shared between computers using HTTP")
+        questionList:AddListItem("Computers will send information using either HTTP or the World Wide Web, but not both.")
+        questionList:AddListItem("HTTP and the World Wide Web both rely on other layers of protocols for sending information on the Internet")
+        section_assessment:Add(questionList)
+
+         AddHeading(section_assessment, "Question 2", 3)
+        section_assessment:AddParagraph(" In your own words explain the following 2 questions about the Domain Name System:")
+        UnorderedList question2List
+        question2List:AddClassAttribute("list-disc list-outside pl-8")
+        question2List:AddListItem("What problem does the DNS solve?")
+        question2List:AddListItem("How does the DNS help the world wide web scale so that billions of users can access billions of web pages?")
+        section_assessment:Add(question2List)
+
+        
+       Section section_standards
+        section_standards:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_standards)
+        AddHeading(section_standards, "Standards Alignment", 2)
+        UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): ", "2-NI-04, 3A-NI-04, 3B-NI-03")
+        AddListItemWithBoldAtFront(list, "CSP2021: ", "CSN-1.B.7, CSN-1.D.1, CSN-1.D.2, CSN-1.D.3, IOC-2.B.6")
+       section_standards:Add(list)
+
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "A lesson exploring how HTTP and DNS are used on the Internet"
+    end
+
+    action GetSummaryName returns text
+        return "CSP The Internet Lesson 6 HTTP and DNS"
+    end
+
+    action GetName returns text
+        return "The Internet Lesson 6"
+    end
+
+    action GetShortDescription returns text
+        return "Learn how the different protocols of the Internet interact"
+    end
+
+    action GetLocation returns text
+        return "lessons/code/Digital-Information/Lesson6.html"
+    end
+
+
+        action GetLinkName returns text
+        return "HTTP and DNS"
+    end
+
+    action GetSectionName returns text
+        return "The Internet"
+    end
+end

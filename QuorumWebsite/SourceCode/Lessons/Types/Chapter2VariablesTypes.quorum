@@ -1,18 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class Chapter2VariablesTypes is Lesson
     text dq = ""
@@ -32,18 +19,21 @@ class Chapter2VariablesTypes is Lesson
         MainContent mainRegion
         AdjustMain(mainRegion)
 
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         //page header
         Header headDiv
         headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Quiz for Variables and Types", 1)
+        AddHeading(headDiv, "Quiz for Variables and Types", 1)
         headDiv:AddText("This is a short quiz about concepts with variables and types")
-        Add(headDiv)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-
-        bodyDiv:AddHeading(     "Variables and Types Quiz", 2)
+        Section section_quiz
+        AddHeading(section_quiz, "Variables and Types Quiz", 2)
         OrderedList questionList
+        questionList:AddClassAttribute("list-decimal list-outside pl-8")
         questionList:AddListItem("What is the difference between a primitive type and an object?")
         questionList:AddListItem("What is an integer and what are its legal values?")
         questionList:AddListItem("What is a number and what are its legal values?")
@@ -61,10 +51,12 @@ class Chapter2VariablesTypes is Lesson
         questionList:AddListItem("What is a debugger and what do we use it for?")
         questionList:AddListItem("What is the difference between a runtime error
             and a compile time error?")
-        bodyDiv:Add(questionList)
+        section_quiz:Add(questionList)
 
-        bodyDiv:AddHeading("Essay Questions", 2)
+        Section section_essay
+        AddHeading(section_essay, "Essay Questions", 2)
         OrderedList essayList
+        essayList:AddClassAttribute("list-decimal list-outside pl-8")
         essayList:AddListItem("Discuss each data type and explain when they 
             should be used. Be sure to include all primitive types and several 
             different kinds of objects.")
@@ -72,12 +64,15 @@ class Chapter2VariablesTypes is Lesson
         essayList:AddListItem("Write a paragraph explaining why the concept of variables is important
             in computer science. Write a second paragraph explaining the broader 
             concept of types.")
-        bodyDiv:Add(essayList)
+        section_essay:Add(essayList)
 
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(section_quiz)
+        bodyDiv:Add(section_essay)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -101,6 +96,16 @@ class Chapter2VariablesTypes is Lesson
     end
 
     action GetLocation returns text
-        return "lessons/chapter2.html"
+      if GetNewLocation() not= ""
+        return GetNewLocation()
+      end
+      return "lessons/chapter2.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Chapter 2"
     end
 end

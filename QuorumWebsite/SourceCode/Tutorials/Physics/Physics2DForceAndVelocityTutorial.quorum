@@ -1,17 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class Physics2DForceAndVelocityTutorial is Lesson
     text dq = ""
@@ -28,174 +16,223 @@ class Physics2DForceAndVelocityTutorial is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        //MainContent mainRegion
+        //AdjustMain(mainRegion)
 
-        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Physics Force and Velocity In 2D", 1)
-        headDiv:AddText("Understanding force and velocity in a 2D physics enabled Quorum game")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Physics Force and Velocity In 2D", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Physics Force and Velocity In 2D")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        headDiv:AddText("Understanding force and velocity in a 2D physics enabled Quorum game")
+        bodyDiv:Add(headDiv)
 
         //the section on general information
-        bodyDiv:AddHeading("Overview", 2)
-        bodyDiv:AddParagraph( "")
-        bodyDiv:AddText     ("In this tutorial, we will discover new physics concepts by making a platformer game. "
+        Section section_overview
+        section_overview:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_overview)
+        AddHeading(section_overview, "Overview", 2)
+
+        Paragraph para1
+
+        para1:AddText     ("In this tutorial, we will discover new physics concepts by making a platformer game. "
                             +   "Our goal is to propel a character represented by a ball forward through a series of platforms. "
                             +   "We will do this using the concept of ")
-        bodyDiv:AddLink(    "force", "https://en.wikipedia.org/wiki/Force")
-        bodyDiv:AddText(    " which we can control in various ways. "
+        Link link = para1:AddLink(    "force", "https://en.wikipedia.org/wiki/Force")
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        para1:AddText(    " which we can control in various ways. "
                             +   "We will also need linear ")
-        bodyDiv:AddLink(    "velocity", "https://en.wikipedia.org/wiki/Velocity")
-        bodyDiv:AddText(    ". "
+        Link link1 = para1:AddLink(    "velocity", "https://en.wikipedia.org/wiki/Velocity")
+        link1:SetClassAttribute("underline text-quorum-blue-150")
+        para1:AddText(    ". "
                             +   "Linear velocity propels our character forward and forces can be used for jumping. "
                             +   "To make platforms, we will use a concept that we call NonResponsiveness, which was mentioned in the ")
-        bodyDiv:AddLink(    "gravity tutorial", "/tutorials/physics/gravity2D.html")
-        bodyDiv:AddText(    ". To use these ideas, we need a special concept from math: ")
-        bodyDiv:AddLink("vectors", "https://en.wikipedia.org/wiki/Euclidean_vector")
-        bodyDiv:AddText(". ")
+        Link link2 = para1:AddLink(    "gravity tutorial", "/tutorials/physics/gravity2D.html")
+        link2:SetClassAttribute("underline text-quorum-blue-150")
+        para1:AddText(    ". To use these ideas, we need a special concept from math: ")
+        Link link3 = para1:AddLink("vectors", "https://en.wikipedia.org/wiki/Euclidean_vector")
+        link3:SetClassAttribute("underline text-quorum-blue-150")
+        para1:AddText(". ")
+        section_overview:Add(para1)
 
         //the section on Vectors
-        bodyDiv:AddHeading("Vectors", 2)
-        bodyDiv:AddParagraph("In math, a vector is like a line starting at a point and continuing out in one direction. "
+        Section section_vectors
+        section_vectors:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_vectors)
+        AddHeading(section_vectors, "Vectors", 2)
+
+        section_vectors:AddParagraph("In math, a vector is like a line starting at a point and continuing out in one direction. "
                             +   "It has a magnitude (length) and a direction. "
                             +   "When we are using these for forces, we can look at the direction as being the direction we want the force to push towards and the magnitude as how strong the force is. "
                             +   "When we are using these for linear velocity, we can look at the direction as being the direction the object will move in and the magnitude as how fast it will move. "
                             +   "In Quorum for 2-dimensional games, we handle all of the details of vectors for you using a special class called Vector2. "
                             +   "First we need to add a use statement to the top of the program: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Vector2"))                    
-        bodyDiv:AddParagraph(   "We can then set a Vector2 object like this: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
+        section_vectors:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Compute.Vector2"))                    
+        section_vectors:AddParagraph(   "We can then set a Vector2 object like this: ")
+        section_vectors:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
                                                             + "number Y = -10" + cr
                                                             + "myVector:Set(X , Y)"))
-        bodyDiv:AddParagraph(   "This might look familiar to how we set gravity. In fact, gravity is represented in the system using a Vector2. "
+        section_vectors:AddParagraph(   "This might look familiar to how we set gravity. In fact, gravity is represented in the system using a Vector2. "
                             +   "The X value represents the direction and amount of force applied horizontally per second. "
                             +   "The Y is the same for vertical force. An example of how to think about this is gravity. "
                             +   "Gravity pushes objects down, so we set the Y value to be a negative number. "
                             +   "It does not push objects horizontally, so the X was set to 0. Gravity can be set using a Vector2 object as well: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector2 gravity" + cr + "gravity:Set(0 , -10)" + cr + "SetGravity2D(gravity)"))
+        section_vectors:Add(preformatter:GeneratePreformattedCode(  "Vector2 gravity" + cr + "gravity:Set(0 , -10)" + cr + "SetGravity2D(gravity)"))
         
         //the section on linear velocity
-        bodyDiv:AddHeading("Linear Velocity", 2)
+        Section section_linear
+        section_linear:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_linear)
+        AddHeading(section_linear, "Linear Velocity", 2)
 
-        bodyDiv:AddParagraph("To give the character a continuous push forward, we need to set their linear velocity, and to do this, we need to create and set a Vector2 object. "
+        section_linear:AddParagraph("To give the character a continuous push forward, we need to set their linear velocity, and to do this, we need to create and set a Vector2 object. "
                             +   "In the example code here, we want the character to move horizontally across the screen from left to right, so the X is set to a positive number. "
                             +   "We don’t want them to have vertical movement unless it’s from the force of a jump or gravity. "
                             +   "The Y is set to 0. "
                             +   "Once we have the Vector2 setup, we can set the linear velocity of the character: ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector2 linearVelocity" + cr
+        section_linear:Add(preformatter:GeneratePreformattedCode(  "Vector2 linearVelocity" + cr
                                                             +   "number X = 5" + cr
                                                             +   "number Y = 0" + cr
                                                             +   "linearVelocity:Set(X, Y)" + cr
                                                             +   "character:SetLinearVelocity(linearVelocity)" + cr))
-        bodyDiv:AddParagraph(   "Now the linear velocity will be applied to the character. "
+        section_linear:AddParagraph(   "Now the linear velocity will be applied to the character. "
                             +   "We can think of this as how much the character will move each second. "
                             +   "Note that the linear velocity is affected by forces, friction, gravity, and other physics properties. ")
         
         //the section on angular velocity
-        bodyDiv:AddHeading("Angular Velocity", 2)
+        Section section_angular
+        section_angular:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_angular)
+        AddHeading(section_angular, "Angular Velocity", 2)
 
-        bodyDiv:AddParagraph( "")
-        bodyDiv:AddText(    "If we want an item to rotate, we can do this with ")
-        bodyDiv:AddLink(    "angular velocity", "https://en.wikipedia.org/wiki/Angular_velocity")
-        bodyDiv:AddText(    ". We can set it using:")
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number angularVelocity = 20" + cr
+        Paragraph para2
+
+        para2:AddText(    "If we want an item to rotate, we can do this with ")
+        Link link5 =  para2:AddLink(    "angular velocity", "https://en.wikipedia.org/wiki/Angular_velocity")
+        para2:AddText(    ". We can set it using:")
+        section_angular:Add(para2)
+        
+        section_angular:Add(preformatter:GeneratePreformattedCode(  "number angularVelocity = 20" + cr
                                                             +   "character:SetAngularVelocity(angularVelocity)"))
-        bodyDiv:AddParagraph(   "angularVelocity is a number representing the amount of rotation per second. "
+        section_angular:AddParagraph(   "angularVelocity is a number representing the amount of rotation per second. "
                             +   "Like linear velocity, it is applied to the character continuously, but can be affected by torque, friction, and other physics properties. "
                             +   "If angularVelocity is a positive number, the spin will be counterclockwise, and if it is a negative number, the spin will be clockwise. "
                             +   "Note that the rotations are about the item’s center. ")
 
         //the section on Force
-        bodyDiv:AddHeading("Force", 2)
+        Section section_force
+        section_force:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_force)
+        AddHeading(section_force, "Force", 2)
 
-        bodyDiv:AddParagraph( "We used force previously when we added gravity, but forces can be used for much more than gravity. "
+        section_force:AddParagraph( "We used force previously when we added gravity, but forces can be used for much more than gravity. "
                             +   "Forces can be made to push responsive objects in any direction with varying degrees of strength by setting the Vector2 appropriately. "
                             +   "After we have a Vector2 object created and set, we can apply force in two ways. "
                             +   "The first way to apply a force to an object is using the ApplyForceToCenter action. "
                             +   "This action applies all of the force to the center of the object. ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector2 force" + cr
+        section_force:Add(preformatter:GeneratePreformattedCode(  "Vector2 force" + cr
                                                             +   "force:Set(200, 5100)" + cr
                                                             +   "itemName:ApplyForceToCenter(force)"))
-        bodyDiv:AddParagraph(   "The second way is to use the ApplyForce action which takes two Vector2 objects instead of one. "
+        section_force:AddParagraph(   "The second way is to use the ApplyForce action which takes two Vector2 objects instead of one. "
                             +   "The first is the force vector, and the second is the point the force will be applied to (represented by a Vector2 object.) "
                             +   "The point should be a position on the screen that we want to apply the force from. "
                             +   "For example, if we want to use this action to apply force to the center of the object we need to set the x and y variables of the point to be the same as the position of the center of the object. "
                             +   "Note that this is different in 3D physics where the point represents displacement from the center of the object.")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "Vector2 point" + cr
+        section_force:Add(preformatter:GeneratePreformattedCode(  "Vector2 point" + cr
                                                             + "point:Set(0, 0)" + cr
                                                             + "itemName:ApplyForce(force, point)"))
-        bodyDiv:AddParagraph("This action is useful when the force needs to hit the object at a particular spot. "
+        section_force:AddParagraph("This action is useful when the force needs to hit the object at a particular spot. "
                             +   "Additionally, if a force is not applied to the center of the object, a torque will be introduced, causing the object to rotate. ")
         
          //the section on Force
-        bodyDiv:AddHeading("Torque", 2)
+        Section section_torque
+        section_torque:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_torque)
+        AddHeading(section_torque, "Torque", 2)
 
-        bodyDiv:AddParagraph( "") 
-        bodyDiv:AddLink(    "Torque", "https://en.wikipedia.org/wiki/Torque")
-        bodyDiv:AddText(    " is the angular component of a force, which means applying it will make the item spin. "
+        Paragraph para3
+        Link link6 = para3:AddLink(    "Torque", "https://en.wikipedia.org/wiki/Torque")
+        link6:AddClassAttribute("underline text-quorum-blue-150")
+        para3:AddText(    " is the angular component of a force, which means applying it will make the item spin. "
                             +   "We can apply torque manually using: ")
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "number torque = 2000" + cr
+        section_torque:Add(para3)
+        section_torque:Add(preformatter:GeneratePreformattedCode(  "number torque = 2000" + cr
                                                             + "itemName:ApplyTorque(torque)"))
-        bodyDiv:AddParagraph(   "torque is a number representing how much spin we want to apply to an item. "
+         section_torque:AddParagraph(   "torque is a number representing how much spin we want to apply to an item. "
                             +   "The difference between torque and angular velocity is the same as the difference between force and linear velocity. "
                             +   "Force is a one time push, while linear velocity is the current speed. "
                             +   "Applying torque is like giving the item a one time push to start it spinning, while angular velocity is the current amount of rotations per second applied continuously. "
                             +   "If torque is a positive number, the item will spin counterclockwise, and if torque is a negative number, the item will spin clockwise. ")
  
         //the section on other method of movement
-        bodyDiv:AddHeading("Movement Outside of Physics", 2)
+        Section section_movement
+        section_movement:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_movement)
+        AddHeading(section_movement, "Movement Outside of Physics", 2)
 
-        bodyDiv:AddParagraph( "")
-        bodyDiv:AddText("If we want to move an item without using physics, and without affecting the physics system, we can use Move(), SetRotation(), or SetPosition(). "
+        Paragraph para4
+        para4:AddText("If we want to move an item without using physics, and without affecting the physics system, we can use Move(), SetRotation(), or SetPosition(). "
                             +   "These actions are described in more detail in the ") 
-        bodyDiv:AddLink(    "Animation in 2D", "/tutorials/games/animation2D.html")
-        bodyDiv:AddText(    " tutorial. "
+        Link link7 = para4:AddLink(    "Animation in 2D", "/tutorials/games/animation2D.html")
+        link7:SetClassAttribute("underline text-quorum-blue-150")
+        para4:AddText(    " tutorial. "
                             +   "Using these will leave velocities and forces intact upon arrival at the designated spot, but will also bypass the collision detection system and forces like gravity on the way.")
-        bodyDiv:AddParagraph("")
+        section_movement:Add(para4)
                             
          //the section on Orthographic Camera
-        bodyDiv:AddHeading("Orthographic Camera", 2)
+        Section section_camera
+        section_camera:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_camera)
+        AddHeading(section_camera, "Orthographic Camera", 2)
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("The orthographic camera is a 2D camera that may be helpful with physics. "
+        Paragraph para5
+  
+        para5:AddText("The orthographic camera is a 2D camera that may be helpful with physics. "
                             +   "In 3D, this camera would take a 3D space and convert it to 2D, but it is not necessary to worry about this aspect in 2D. "
                             +   "So far we have done everything using pixels to determine distance. "
                             +   "With the orthographic camera, we can zoom the screen into however many pixels we want, with these pixels spread over the size of the game window. "
                             +   "It might be helpful to go over the ")
-        bodyDiv:AddLink(    "Camera Tutorial", "/tutorials/games/cameras.html")
-        bodyDiv:AddText(    " before trying this. "
+        Link link8 = para5:AddLink(    "Camera Tutorial", "/tutorials/games/cameras.html")
+        link8:SetClassAttribute("underline text-quorum-blue-150")
+
+        para5:AddText(    " before trying this. "
                             +   "First, we need to add a use statement for the proper library. ")
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.OrthographicCamera"))
-        bodyDiv:AddParagraph(   "Now in the CreateGame() action, we need to: create an OrthographicCamera object, set the camera to put the screen in X and Y number of pixels, then use SetCamera2D to set the camera to the one we made. ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "OrthographicCamera camera" + cr 
+        section_camera:Add(para5)
+
+        section_camera:Add(preformatter:GeneratePreformattedCode(  "use Libraries.Game.Graphics.OrthographicCamera"))
+        section_camera:AddParagraph(   "Now in the CreateGame() action, we need to: create an OrthographicCamera object, set the camera to put the screen in X and Y number of pixels, then use SetCamera2D to set the camera to the one we made. ")
+        section_camera:Add(preformatter:GeneratePreformattedCode(  "OrthographicCamera camera" + cr 
                                                             + "number X = 30" + cr
                                                             + "number Y = 30" + cr
                                                             + "camera:SetToOrthographic(X , Y)" + cr 
                                                             + "SetCamera2D(camera)"))
-        bodyDiv:AddParagraph(   "Since the orthographic camera works by zooming in the screen to the number of pixels (X and Y) that we set, this will affect our vectors and shapes, because they will be zoomed in. "
+        section_camera:AddParagraph(   "Since the orthographic camera works by zooming in the screen to the number of pixels (X and Y) that we set, this will affect our vectors and shapes, because they will be zoomed in. "
                             +   "Notably, circles will need to be scaled down from a larger size to a size that makes sense on the screen to maintain the same resolution or picture quality. ")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(  "character:LoadFilledCircle(30, color:Blue())" + cr + "character:Scale(1.5/30)"))
-        bodyDiv:AddParagraph(   "Using the orthographic camera can help make the numbers a little more intuitive. "
+        section_camera:Add(preformatter:GeneratePreformattedCode(  "character:LoadFilledCircle(30, color:Blue())" + cr + "character:Scale(1.5/30)"))
+        section_camera:AddParagraph(   "Using the orthographic camera can help make the numbers a little more intuitive. "
                                 +   "For example with a 30 by 30 pixel orthographic camera, we can think of these 30 pixels (expanded to fit the typical game screen) as each representing one meter. "
                                 +   "The point of this is to make the numbers we set for things like shapes and force a little easier to think about. ")                   
 
         //the section containing the platformer game code
-        bodyDiv:AddHeading("Code", 2)
+        Section section_code
+        section_code:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_code)
+        AddHeading(section_code, "Code", 2)
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText(    "Here is a ")
-        bodyDiv:AddLink(    "zip file" , "/files/games/Force2D.zip" )
-        bodyDiv:AddText(    " with a Quorum project using this code. "
+        Paragraph para6
+   
+        para6:AddText(    "Here is a ")
+        Link link9 = para6:AddLink(    "zip file" , "/files/games/Force2D.zip" )
+        link9:SetClassAttribute("underline text-quorum-blue-150")
+        para6:AddText(    " with a Quorum project using this code. "
                             +   "Read through, then use the following code to discover forces and linear velocity. ")
-        bodyDiv:AddParagraph("")
+        section_code:Add(para6)
 
         CodeBlock cb1
         Span s1 
@@ -357,27 +394,39 @@ class Physics2DForceAndVelocityTutorial is Lesson
                     +   "       impactSound:Play()" + cr
                     +   "   end" + cr
                     +   "end" + cr + cr)
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb1))
+        section_code:Add(preformatter:GeneratePreformattedCode(cb1))
 
         //the section on running the program
-        bodyDiv:AddHeading("Run the Program", 2)
-        bodyDiv:AddParagraph(   "If we run this game, we should have a ball on a platform on the left side of the screen with a moving platform on the right. "
+
+              Section section_try_yourself
+    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
+    bodyDiv:Add(section_try_yourself)
+    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+    
+    CodeForIDE code4
+    code4:AddFileText("ForceVelocity2D.quorum", "")
+    IDE ide3 = AddIDE()
+    ide3:SetLightTheme()
+    ide3:SetCodeForIDE(code4:GetJsonArray())
+    ide3:SetIdeTitle("Gravity in 2D")
+    section_try_yourself:Add(ide3)
+
+  
+        section_try_yourself:AddParagraph(   "If we run this game, we should have a ball on a platform on the left side of the screen with a moving platform on the right. "
                                 +   "The ball will be moving towards the right side of the screen at a constant pace. "
                                 +   "The space bar can be used to jump to make sure the ball makes it to the right platform. ")
-        AddIDE(bodyDiv, "forceVelocity2D","Activity: Force and Velocity 2D", "Try the above code block", "examples/Games/Physics/ForceVelocity2D.quorum")        
-//        SideBySideIDE addStatementIDE
-//        addStatementIDE:SetUniqueIdentifier("physics2DForce")
-//        addStatementIDE:GetIDETitle():AddText("Force and Velocity In 2D")
-//        addStatementIDE:SetGameEnvironment(true)
-//        addStatementIDE:Setup()
-//        bodyDiv:Add(addStatementIDE)
-//        bodyDiv:Add(addStatementIDE:GetGameCanvas())
+        
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)    
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -402,5 +451,13 @@ class Physics2DForceAndVelocityTutorial is Lesson
 
     action GetLocation returns text
         return "tutorials/physics/forceandvelocity2D.html"
+    end
+
+    action GetLinkName returns text
+        return "Force and Velocity in 2D"
+    end
+
+    action GetSectionName returns text
+        return "Game Physics"
     end
 end

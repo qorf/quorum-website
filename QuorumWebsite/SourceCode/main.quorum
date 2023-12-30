@@ -1,4 +1,4 @@
-  use Libraries.System.File
+use Libraries.System.File
 use Libraries.Web.Page.Body
 use Libraries.Containers.Array
 
@@ -14,7 +14,6 @@ class Main
 
     action Main
         output "Writing index pages"
-
 
         File file
         Index index
@@ -70,17 +69,8 @@ class Main
         file:SetPath(WRITE_PATH + downloadStudioBeta:GetLocation())
         file:Write(value)
 
-        Reference reference
-        reference:Setup()
-        value = reference:Generate()
-        file:SetPath(WRITE_PATH + "reference.html")
-        file:Write(value)
 
-        CoreTrack coreTrack
-        coreTrack:Setup()
-        value = coreTrack:Generate()
-        file:SetPath(WRITE_PATH + "lessons/core.html")
-        file:Write(value)
+
 
         Bugs bugs
         bugs:Setup()
@@ -88,29 +78,14 @@ class Main
         file:SetPath(WRITE_PATH + "bugs.html")
         file:Write(value)
 
-        VisualTrack visualTrack
-        visualTrack:Setup()
-        value = visualTrack:Generate()
-        file:SetPath(WRITE_PATH + "lessons/visual.html")
-        file:Write(value)
 
+        Array<Lesson> audioTrackArray = WriteAudioTrack()
         AudioTrack audioTrack
-        audioTrack:Setup()
+        audioTrack:Setup(audioTrackArray)
         value = audioTrack:Generate()
         file:SetPath(WRITE_PATH + "lessons/audio.html")
         file:Write(value)
 
-        RoboticsTrack roboticsTrack
-        roboticsTrack:Setup()
-        value = roboticsTrack:Generate()
-        file:SetPath(WRITE_PATH + "lessons/robotics.html")
-        file:Write(value)
-
-        CodeOrgTrack codeOrgTrack
-        codeOrgTrack:Setup()
-        value = codeOrgTrack:Generate()
-        file:SetPath(WRITE_PATH + "lessons/code.html")
-        file:Write(value)
 
         CodeOrgWidgetTutorial codeOrgWidgetTutorial
         codeOrgWidgetTutorial:Setup()
@@ -123,14 +98,16 @@ class Main
     
         file:Write(value)
         
+        Array<Lesson> gamingTeacherLessons = WriteGamingTeacherTrackLessons()
         EpiqTrack epiqTrack
-        epiqTrack:Setup()
+        epiqTrack:Setup(gamingTeacherLessons)
         value = epiqTrack:Generate()
         file:SetPath(WRITE_PATH + "lessons/epiq.html")
         file:Write(value)
 
+        Array<Lesson> dataTeacherLessons = WriteDataScienceTeacherTrack()
         EpiqDataScienceTrack epiqDataScienceTrack
-        epiqDataScienceTrack:Setup()
+        epiqDataScienceTrack:Setup(dataTeacherLessons)
         value = epiqDataScienceTrack:Generate()
         file:SetPath(WRITE_PATH + "lessons/epiqDataScience.html")
         file:Write(value)
@@ -178,22 +155,28 @@ class Main
         file:Write(value1)
 
         Epiq epiq
+        EpiqCommittees committees
+        EpiqAward awards
+        epiq:SetNextLesson(committees)
+        committees:SetNextLesson(awards)
+
         epiq:Setup()
+        committees:Setup()
+        awards:Setup()
+
         value1 = epiq:Generate()
         file:SetPath(WRITE_PATH + "epiq.html")
         file:Write(value1)
-
-        EpiqCommittees committees
-        committees:Setup()
+        
         value1 = committees:Generate()
         file:SetPath(WRITE_PATH + "committees.html")
         file:Write(value1)
 
-        EpiqAward awards
-        awards:Setup()
         value1 = awards:Generate()
         file:SetPath(WRITE_PATH + "awards.html")
         file:Write(value1)
+
+        
 
         Learn learn
         learn:Setup()
@@ -207,17 +190,17 @@ class Main
         file:SetPath(WRITE_PATH + "selection.html")
         file:Write(value4)
 
-        Registration registration
-        registration:Setup()
-        value1 = registration:Generate()
-        file:SetPath(WRITE_PATH + registration:GetLocation())
-        file:Write(value1)
-
-        ResetPasswordRequest resetPasswordRequest
-        resetPasswordRequest:Setup()
-        value1 = resetPasswordRequest:Generate()
-        file:SetPath(WRITE_PATH + resetPasswordRequest:GetLocation())
-        file:Write(value1)
+//        Registration registration
+//        registration:Setup()
+//        value1 = registration:Generate()
+//        file:SetPath(WRITE_PATH + registration:GetLocation())
+//        file:Write(value1)
+//
+//        ResetPasswordRequest resetPasswordRequest
+//        resetPasswordRequest:Setup()
+//        value1 = resetPasswordRequest:Generate()
+//        file:SetPath(WRITE_PATH + resetPasswordRequest:GetLocation())
+//        file:Write(value1)
 
         ResetPassword resetPassword
         resetPassword:Setup()
@@ -254,13 +237,48 @@ class Main
         compilerErrorChallenge:Write(WRITE_PATH)
 
         output "Writing Tutorials"
-        WriteTutorials()
+        Array<Lesson> startingLessonArray = WriteTutorials()
+        Reference reference
+        reference:Setup(startingLessonArray)
+        reference:Write(WRITE_PATH + "reference.html")
+
+        //Tutorials tutorials
+        //tutorials:Setup(startingLessonArray)
+        //tutorials:Write(WRITE_PATH + "tutorials.html")
+
+        Array<Lesson> coreTrackArray = WriteCoreTrack()
+        CoreTrack coreTrack
+        coreTrack:Setup(coreTrackArray)
+        coreTrack:Write(WRITE_PATH + "lessons/core.html")
+
+        Array<Lesson> visualTrackArray = WriteVisualTrack()
+        VisualTrack visualTrack
+        visualTrack:Setup(visualTrackArray)
+        visualTrack:Write(WRITE_PATH + "lessons/visual.html")
+
+        Array<Lesson> roboticsTrackArray = WriteRoboticsTrack()
+        RoboticsTrack roboticsTrack
+        roboticsTrack:Setup(roboticsTrackArray)
+        roboticsTrack:Write(WRITE_PATH + "lessons/robotics.html")
+      
+
+        AccessChartsPage accessChartsPage
+        accessChartsPage:Setup()
+        accessChartsPage:Write(WRITE_PATH + "widgets/accessCharts.html")
+
+        Array<Lesson> codeOrgArray = WriteCodeOrgLessons()
+        CodeOrgTrack codeOrgTrack
+        codeOrgTrack:Setup(codeOrgArray)
+        value = codeOrgTrack:Generate()
+        file:SetPath(WRITE_PATH + "lessons/code.html")
+        file:Write(value)
 
         output "Writing Lessons"
         WriteLessons()
         output "Website finished."
 
         BuildSiteMap()
+
         output "Sitemap created"
     end
 
@@ -318,7 +336,7 @@ class Main
         return result
     end
 
-    action WriteCodeOrgLessons
+    action WriteCodeOrgLessons returns Array<Lesson>
 
     //Unit 1  The Internet
         CodeOrgUnit1Overview u1O
@@ -463,6 +481,144 @@ class Main
         CodeOrgUnit10Lesson11 unit10lesson11
         CodeOrgUnit10Lesson12 unit10lesson12
         CodeOrgUnit10Lesson13 unit10lesson13
+    Array<Lesson> codeOrgArray
+    // setting lessons
+    //u1O:SetNextLesson(u1L01)
+    u1L01:SetNextLesson(u1L02)
+    u1L02:SetNextLesson(u1L03)
+    u1L03:SetNextLesson(u1L04)
+    u1L04:SetNextLesson(u1L05)
+    u1L05:SetNextLesson(u1L06)
+    u1L06:SetNextLesson(u1L07)
+    u1L07:SetNextLesson(u1L08)
+    u1L08:SetNextLesson(u1L09)
+    u1L09:SetNextLesson(u1L10)
+    u1L10:SetNextLesson(u1L11)
+    u1L11:SetNextLesson(u1L12)
+    u1L12:SetNextLesson(u1L13)
+    u1L13:SetNextLesson(undefined)
+
+    // the internet
+    dil1:SetNextLesson(dil2)
+    dil2:SetNextLesson(dil3)
+    dil3:SetNextLesson(dil4)
+    dil4:SetNextLesson(dil5)
+    dil5:SetNextLesson(dil6)
+    dil6:SetNextLesson(dil7)
+    dil7:SetNextLesson(dil8)
+    dil8:SetNextLesson(undefined)
+
+    // intro to app design
+   // unit3Overview:SetNextLesson(unit3lesson1)
+    unit3lesson1:SetNextLesson(unit3lesson2)
+    unit3lesson2:SetNextLesson(unit3lesson3)
+    unit3lesson3:SetNextLesson(unit3lesson4)
+    unit3lesson4:SetNextLesson(unit3lesson5)
+    unit3lesson5:SetNextLesson(unit3lesson6)
+    unit3lesson6:SetNextLesson(unit3lesson7)
+    unit3lesson7:SetNextLesson(unit3lesson8)
+    unit3lesson8:SetNextLesson(unit3lesson9)
+    unit3lesson9:SetNextLesson(unit3lesson10)
+    unit3lesson10:SetNextLesson(undefined)
+
+    // variables conitionals and functions
+    //u4O:SetNextLesson(bdl1)
+    bdl1:SetNextLesson(bdl2)
+    bdl2:SetNextLesson(bdl3)
+    bdl3:SetNextLesson(bdl4)
+    bdl4:SetNextLesson(bdl5)
+    bdl5:SetNextLesson(bdl6)
+    bdl6:SetNextLesson(bdl7)
+    bdl7:SetNextLesson(bdl8)
+    bdl8:SetNextLesson(bdl9)
+    bdl9:SetNextLesson(bdl10)
+    bdl10:SetNextLesson(bdl11)
+    bdl11:SetNextLesson(bdl12)
+    bdl12:SetNextLesson(bdl13) 
+    bdl13:SetNextLesson(bdl14) 
+    bdl14:SetNextLesson(undefined)
+
+    // list loops traversals
+    //u5O:SetNextLesson(unit5Lesson1)
+    unit5Lesson1:SetNextLesson(unit5Lesson2)
+    unit5Lesson2:SetNextLesson(unit5Lesson3)
+    unit5Lesson3:SetNextLesson(unit5Lesson4)
+    unit5Lesson4:SetNextLesson(unit5Lesson5)
+    unit5Lesson5:SetNextLesson(unit5Lesson6)
+    unit5Lesson6:SetNextLesson(unit5Lesson7)
+    unit5Lesson7:SetNextLesson(unit5Lesson8)
+    unit5Lesson8:SetNextLesson(unit5Lesson9)
+    unit5Lesson9:SetNextLesson(unit5Lesson10)
+    unit5Lesson10:SetNextLesson(unit5Lesson11)
+    unit5Lesson11:SetNextLesson(unit5Lesson12)
+    unit5Lesson12:SetNextLesson(unit5Lesson13)
+    unit5Lesson13:SetNextLesson(unit5Lesson14)
+    unit5Lesson14:SetNextLesson(unit5Lesson15)
+    unit5Lesson15:SetNextLesson(unit5Lesson16)
+    unit5Lesson16:SetNextLesson(unit5Lesson17)
+    unit5Lesson17:SetNextLesson(undefined)
+
+    //codeOrgArray:Add(u6L01)
+    //u6O:SetNextLesson(u6L01)
+    u6L01:SetNextLesson(u6L02)
+    u6L02:SetNextLesson(u6L03)
+    u6L03:SetNextLesson(undefined)
+
+    unit6lesson1:SetNextLesson(unit6lesson2)
+    unit6lesson2:SetNextLesson(unit6lesson3)
+    unit6lesson3:SetNextLesson(unit6lesson4)
+    unit6lesson4:SetNextLesson(unit6lesson5)
+    unit6lesson5:SetNextLesson(undefined)
+
+    unit7lesson1:SetNextLesson(unit7lesson2)
+    unit7lesson2:SetNextLesson(unit7lesson3)
+    unit7lesson3:SetNextLesson(unit7lesson4)
+    unit7lesson4:SetNextLesson(unit7lesson5)
+    unit7lesson5:SetNextLesson(unit7lesson6)
+    unit7lesson6:SetNextLesson(unit7lesson7)
+    unit7lesson7:SetNextLesson(unit7lesson8)
+    unit7lesson8:SetNextLesson(unit7lesson9)
+    unit7lesson9:SetNextLesson(unit7lesson10)
+    unit7lesson10:SetNextLesson(undefined)
+
+    unit8lesson1:SetNextLesson(unit8lesson2)
+    unit8lesson2:SetNextLesson(unit8lesson3)
+    unit8lesson3:SetNextLesson(unit8lesson4)
+    unit8lesson4:SetNextLesson(undefined)
+
+    unit9Lesson1:SetNextLesson(unit9Lesson2)
+    unit9Lesson2:SetNextLesson(unit9Lesson3)
+    unit9Lesson3:SetNextLesson(unit9Lesson4)
+    unit9Lesson4:SetNextLesson(unit9Lesson5)
+    unit9Lesson5:SetNextLesson(unit9Lesson6)
+    unit9Lesson6:SetNextLesson(unit9Lesson7)
+    unit9Lesson7:SetNextLesson(unit9Lesson8)
+    unit9Lesson8:SetNextLesson(undefined)
+
+    unit10lesson1:SetNextLesson(unit10lesson2)
+    unit10lesson2:SetNextLesson(unit10lesson3)
+    unit10lesson3:SetNextLesson(unit10lesson4)
+    unit10lesson4:SetNextLesson(unit10lesson5)
+    unit10lesson5:SetNextLesson(unit10lesson6)
+    unit10lesson6:SetNextLesson(unit10lesson7)
+    unit10lesson7:SetNextLesson(unit10lesson8)
+    unit10lesson8:SetNextLesson(unit10lesson9)
+    unit10lesson9:SetNextLesson(unit10lesson10)
+    unit10lesson10:SetNextLesson(unit10lesson11)
+    unit10lesson11:SetNextLesson(unit10lesson12)
+    unit10lesson12:SetNextLesson(unit10lesson13)
+    unit10lesson13:SetNextLesson(undefined)
+
+    codeOrgArray:Add(u1L01)//digital information
+    codeOrgArray:Add(dil1)//internet
+    codeOrgArray:Add(unit3lesson1)//intro to app design
+    codeOrgArray:Add(bdl1)//variables conditionals and functions
+    codeOrgArray:Add(unit9Lesson1)//Data
+    codeOrgArray:Add(unit5Lesson1)//List Loops Traversals 
+    codeOrgArray:Add(unit7lesson1)//Parameters
+    codeOrgArray:Add(unit10lesson1)//Cybersecurity
+    codeOrgArray:Add(unit8lesson1)//Create PT Prep
+    codeOrgArray:Add(unit6lesson1)//algorithms
 
     //Widgets Page
         CodeOrgWidgets widgets
@@ -740,24 +896,11 @@ class Main
         widgets:Setup()
         widgets:Write(WRITE_PATH)
 
+        return codeOrgArray
     end
 
-    action WriteTeacherTrackLessons
-        HandsOnWithQuorumStudio handsOnWithQuorumStudio
-        BuildRoleplaying buildRoleplaying
-        PlacingCharacters placingCharacters
-        PhysicsProperties physicsProperties
-        SceneInput sceneInput
-        SceneMoveCharacter sceneMoveCharacter
-        PlaceObjects placeObjects
-        ObjectsGoodEvil objectsGoodEvil
-        ScenesBackgroundMusic scenesBackgroundMusic
-        TriggerObjects triggerObjects
-        TriggerSoundsFromObjects triggerSoundsFromObjects
-        SpatialSounds spatialSounds
-        VoiceOvers voiceOvers
-        CompleteQuest completeQuest
-
+    action WriteDataScienceTeacherTrack returns Array<Lesson>
+        Array<Lesson> lessons
 
         // data science track
         SpreadSheetsAndQuorumStudio spreadSheetsAndQuorumStudio 
@@ -776,6 +919,9 @@ class Main
         Regression regression
         SVGExportingEPIQ svgExporting
 
+        //add to the array
+        lessons:Add(spreadSheetsAndQuorumStudio)
+
         spreadSheetsAndQuorumStudio:SetNextLesson(introProgramming)
         introProgramming:SetNextLesson(tidyDataFrames)
         tidyDataFrames:SetNextLesson(overviewOfChartTypesAndExamples)
@@ -792,8 +938,62 @@ class Main
         boxViolinDispersion:SetNextLesson(regression)
         regression:SetNextLesson(svgExporting)   
         svgExporting:SetNextLesson(undefined) 
-        
 
+        spreadSheetsAndQuorumStudio:Setup()
+        introProgramming:Setup()
+        tidyDataFrames:Setup()
+        descriptiveStatisticsEPIQ:Setup()
+        filteringDataEPIQ:Setup()
+        columnCalculationsActivity:Setup()
+        overviewOfChartTypesAndExamples:Setup()
+        barCharts:Setup()
+        pieCharts:Setup()
+        histograms:Setup()
+        boxViolinDispersion:Setup()
+        scatterPlotsR2:Setup()
+        multiChartsColorsOptions:Setup()
+        regression:Setup()
+        svgExporting:Setup()
+
+        spreadSheetsAndQuorumStudio:Write(WRITE_PATH)
+        introProgramming:Write(WRITE_PATH)
+        tidyDataFrames:Write(WRITE_PATH)
+        descriptiveStatisticsEPIQ:Write(WRITE_PATH)
+        filteringDataEPIQ:Write(WRITE_PATH)
+        columnCalculationsActivity:Write(WRITE_PATH)
+        overviewOfChartTypesAndExamples:Write(WRITE_PATH)
+        barCharts:Write(WRITE_PATH)
+        pieCharts:Write(WRITE_PATH)
+        histograms:Write(WRITE_PATH)
+        boxViolinDispersion:Write(WRITE_PATH)
+        scatterPlotsR2:Write(WRITE_PATH)
+        multiChartsColorsOptions:Write(WRITE_PATH)
+        regression:Write(WRITE_PATH)
+        svgExporting:Write(WRITE_PATH)
+
+        return lessons
+    end
+
+    action WriteGamingTeacherTrackLessons returns Array<Lesson>
+        Array<Lesson> lessons
+        HandsOnWithQuorumStudio handsOnWithQuorumStudio
+        BuildRoleplaying buildRoleplaying
+        PlacingCharacters placingCharacters
+        PhysicsProperties physicsProperties
+        SceneInput sceneInput
+        SceneMoveCharacter sceneMoveCharacter
+        PlaceObjects placeObjects
+        ObjectsGoodEvil objectsGoodEvil
+        ScenesBackgroundMusic scenesBackgroundMusic
+        TriggerObjects triggerObjects
+        TriggerSoundsFromObjects triggerSoundsFromObjects
+        SpatialSounds spatialSounds
+        VoiceOvers voiceOvers
+        CompleteQuest completeQuest
+        
+        lessons:Add(handsOnWithQuorumStudio)
+   
+        
         handsOnWithQuorumStudio:SetNextLesson(buildRoleplaying)
         buildRoleplaying:SetNextLesson(placingCharacters)
         placingCharacters:SetNextLesson(physicsProperties)
@@ -824,21 +1024,7 @@ class Main
         voiceOvers:Setup()
         completeQuest:Setup()
 
-        spreadSheetsAndQuorumStudio:Setup()
-        introProgramming:Setup()
-        tidyDataFrames:Setup()
-        descriptiveStatisticsEPIQ:Setup()
-        filteringDataEPIQ:Setup()
-        columnCalculationsActivity:Setup()
-        overviewOfChartTypesAndExamples:Setup()
-        barCharts:Setup()
-        pieCharts:Setup()
-        histograms:Setup()
-        boxViolinDispersion:Setup()
-        scatterPlotsR2:Setup()
-        multiChartsColorsOptions:Setup()
-        regression:Setup()
-        svgExporting:Setup()
+        
         
 
         handsOnWithQuorumStudio:Write(WRITE_PATH)
@@ -856,26 +1042,11 @@ class Main
         voiceOvers:Write(WRITE_PATH)
         completeQuest:Write(WRITE_PATH)
 
-        spreadSheetsAndQuorumStudio:Write(WRITE_PATH)
-        introProgramming:Write(WRITE_PATH)
-        tidyDataFrames:Write(WRITE_PATH)
-        descriptiveStatisticsEPIQ:Write(WRITE_PATH)
-        filteringDataEPIQ:Write(WRITE_PATH)
-        columnCalculationsActivity:Write(WRITE_PATH)
-        overviewOfChartTypesAndExamples:Write(WRITE_PATH)
-        barCharts:Write(WRITE_PATH)
-        pieCharts:Write(WRITE_PATH)
-        histograms:Write(WRITE_PATH)
-        boxViolinDispersion:Write(WRITE_PATH)
-        scatterPlotsR2:Write(WRITE_PATH)
-        multiChartsColorsOptions:Write(WRITE_PATH)
-        regression:Write(WRITE_PATH)
-        svgExporting:Write(WRITE_PATH)
+        
+        return lessons
     end
 
     action WriteLessons
-        WriteCodeOrgLessons()
-        WriteTeacherTrackLessons()
 
         Chapter2VariablesTypes chapter2VariablesTypes
         Chapter3ControlStructures chapter3ControlStructures
@@ -1185,93 +1356,1282 @@ class Main
         part7:Write(WRITE_PATH)
 
         WriteAstronomyHourOfCode()
+        WriteCodeWithMary()
     end
 
+    action WriteAudioTrack returns Array<Lesson>
+        //A. Types and Variables
+        text track = "audio"
+        text section = "Types and Variables"
+        TypesTutorial u1l1 
+        u1l1:SetNewLocation(track + "/types.html")
+        u1l1:SetNewSectionName(section)
+        OperatorsTutorial u1l2
+        u1l2:SetNewLocation(track + "/operators.html")
+        u1l2:SetNewSectionName(section)
+        Lab2_4 u1l3
+        u1l3:SetNewLocation(track + "/lab2_4.html")
+        u1l3:SetNewSectionName(section)
+
+        //Deleted one
+        GettingStartedTutorial u1l4
+        u1l4:SetNewLocation(track + "/gettingStarted.html")
+        u1l4:SetNewSectionName(section)
+        TypeCastingTutorial u1l5
+        u1l5:SetNewLocation(track + "/typeCasting.html")
+        u1l5:SetNewSectionName(section)
+        Assignment2_1 u1l6
+        u1l6:SetNewLocation(track + "/assignment2_1.html")
+        u1l6:SetNewSectionName(section)
+        CommentsTutorial u1l7
+        u1l7:SetNewLocation(track + "/comments.html")
+        u1l7:SetNewSectionName(section)
+        Assignment2_3 u1l8
+        u1l8:SetNewLocation(track + "/assignment2_3.html")
+        u1l8:SetNewSectionName(section)
+        Assignment2_6 u1l9
+        u1l9:SetNewLocation(track + "/assignment2_6.html")
+        u1l9:SetNewSectionName(section)
+        Chapter2VariablesTypes u1l10
+        u1l10:SetNewLocation(track + "/chapter2.html")
+        u1l10:SetNewSectionName(section)
+        
+        
+        //B. Control Structures
+        section = "Control Structures"
+        IfTutorial u2l1
+        u2l1:SetNewLocation(track + "/if.html")
+        u2l1:SetNewSectionName(section)
+        Lab3_1 u2l2
+        u2l2:SetNewLocation(track + "/lab3_1.html")
+        u2l2:SetNewSectionName(section)
+        Lab3_4 u2l3
+        u2l3:SetNewLocation(track + "/lab3_4.html")
+        u2l3:SetNewSectionName(section)
+        RepeatTutorial u2l4
+        u2l4:SetNewLocation(track + "/repeat.html")
+        u2l4:SetNewSectionName(section)
+        Lab3_2 u2l5
+        u2l5:SetNewLocation(track + "/lab3_2.html")
+        u2l5:SetNewSectionName(section)
+        Assignment3_3 u2l6
+        u2l6:SetNewLocation(track + "/assignment3_3.html")
+        u2l6:SetNewSectionName(section)
+        LibrariesTutorial u2l7
+        u2l7:SetNewLocation(track + "/libraries.html")
+        u2l7:SetNewSectionName(section)
+        Chapter3ControlStructures u2l8
+        u2l8:SetNewLocation(track + "/chapter3.html")
+        u2l8:SetNewSectionName(section)
+        
+        //C. Actions
+        section = "Actions"
+        ActionsTutorial u3l1
+        u3l1:SetNewLocation(track + "/actions.html")
+        u3l1:SetNewSectionName(section)
+        Lab4_1 u3l2
+        u3l2:SetNewLocation(track + "/lab4_1.html")
+        u3l2:SetNewSectionName(section)
+        Lab4_4 u3l3
+        u3l3:SetNewLocation(track + "/lab4_4.html")
+        u3l3:SetNewSectionName(section)
+        Lab4_2 u3l4
+        u3l4:SetNewLocation(track + "/lab4_2.html")
+        u3l4:SetNewSectionName(section)
+        Lab4_5 u3l5
+        u3l5:SetNewLocation(track + "/lab4_5.html")
+        u3l5:SetNewSectionName(section)
+        GamesDrawing3DTutorial u3l6
+        u3l6:SetNewLocation(track + "/drawing3D.html")
+        u3l6:SetNewSectionName(section)
+        GamesAnimation3DTutorial u3l7
+        u3l7:SetNewLocation(track + "/animation3D.html")
+        u3l7:SetNewSectionName(section)
+        Assignment4_1 u3l8
+        u3l8:SetNewLocation(track + "/assignment4_1.html")
+        u3l8:SetNewSectionName(section)
+        Assignment4_2 u3l9
+        u3l9:SetNewLocation(track + "/assignment4_2.html")
+        u3l9:SetNewSectionName(section)
+        Chapter4Actions u3l10
+        u3l10:SetNewLocation(track + "/chapter4.html")
+        u3l10:SetNewSectionName(section)
+        
+        //D. Classes
+        section = "Classes"
+        ClassesTutorial u4l1
+        u4l1:SetNewLocation(track + "/classes.html")
+        u4l1:SetNewSectionName(section)
+        Lab5_1 u4l2
+        u4l2:SetNewLocation(track + "/lab5_1.html")
+        u4l2:SetNewSectionName(section)
+        Lab5_2 u4l3
+        u4l3:SetNewLocation(track + "/lab5_2.html")
+        u4l3:SetNewSectionName(section)
+        GenericsTutorial u4l4
+        u4l4:SetNewLocation(track + "/generics.html")
+        u4l4:SetNewSectionName(section)
+        ArraysTutorial u4l5
+        u4l5:SetNewLocation(track + "/arrays.html")
+        u4l5:SetNewSectionName(section)
+        Lab5_3 u4l6
+        u4l6:SetNewLocation(track + "/lab5_3.html")
+        u4l6:SetNewSectionName(section)
+
+        AutoboxingTutorial u4l7  
+        u4l7:SetNewLocation(track + "/autoboxing.html")
+        u4l7:SetNewSectionName(section)
+        Assignment5_1 u4l8
+        u4l8:SetNewLocation(track + "/assignment5_1.html")
+        u4l8:SetNewSectionName(section)
+        Assignment5_2 u4l9
+        u4l9:SetNewLocation(track + "/assignment5_2.html")
+        u4l9:SetNewSectionName(section)
+        Assignment5_3 u4l10
+        u4l10:SetNewLocation(track + "/assignment5_3.html")
+        u4l10:SetNewSectionName(section)
+        Chapter5Classes u4l11
+        u4l11:SetNewLocation(track + "/chapter5.html")
+        u4l11:SetNewSectionName(section)
+        
+        Array<Lesson> coreTrackArray
+        
+        
+        coreTrackArray:Add(u1l1)
+        u1l1:SetNextLesson(u1l2)  
+        u1l2:SetNextLesson(u1l3)
+        u1l3:SetNextLesson(u1l4)
+        u1l4:SetNextLesson(u1l5)
+        u1l5:SetNextLesson(u1l6)
+        u1l6:SetNextLesson(u1l7)
+        u1l7:SetNextLesson(u1l8)
+        u1l8:SetNextLesson(u1l9)
+        u1l9:SetNextLesson(u1l10)
+        u1l10:SetNextLesson(undefined)
+        
+        coreTrackArray:Add(u2l1)
+        u2l1:SetNextLesson(u2l2)
+        u2l2:SetNextLesson(u2l3)
+        u2l3:SetNextLesson(u2l4)
+        u2l4:SetNextLesson(u2l5)
+        u2l5:SetNextLesson(u2l6)
+        u2l6:SetNextLesson(u2l7)
+        u2l7:SetNextLesson(u2l8)
+        u2l8:SetNextLesson(undefined)
+        
+        coreTrackArray:Add(u3l1)
+        u3l1:SetNextLesson(u3l2)
+        u3l2:SetNextLesson(u3l3)
+        u3l3:SetNextLesson(u3l4)
+        u3l4:SetNextLesson(u3l5)
+        u3l5:SetNextLesson(u3l6)
+        u3l6:SetNextLesson(u3l7)
+        u3l7:SetNextLesson(u3l8)
+        u3l8:SetNextLesson(u3l9)
+        u3l9:SetNextLesson(u3l10)
+        u3l10:SetNextLesson(undefined)
+        
+        coreTrackArray:Add(u4l1)
+        u4l1:SetNextLesson(u4l2)
+        u4l2:SetNextLesson(u4l3)
+        u4l3:SetNextLesson(u4l4)
+        u4l4:SetNextLesson(u4l5)
+        u4l5:SetNextLesson(u4l6)
+        u4l6:SetNextLesson(u4l7)
+        u4l7:SetNextLesson(u4l8)
+        u4l8:SetNextLesson(u4l9)
+        u4l9:SetNextLesson(u4l10)
+        u4l10:SetNextLesson(u4l11)
+        u4l11:SetNextLesson(undefined)
+
+        u1l1:Setup()
+        u1l2:Setup()
+        u1l3:Setup()
+        u1l4:Setup()
+        u1l5:Setup()
+        u1l6:Setup()
+        u1l7:Setup()
+        u1l8:Setup()
+        u1l9:Setup()
+        u1l10:Setup()
+        
+        u2l1:Setup()
+        u2l2:Setup()
+        u2l3:Setup()
+        u2l4:Setup()
+        u2l5:Setup()
+        u2l6:Setup()
+        u2l7:Setup()
+        u2l8:Setup()
+        
+        u3l1:Setup()
+        u3l2:Setup()
+        u3l3:Setup()
+        u3l4:Setup()
+        u3l5:Setup()
+        u3l6:Setup()
+        u3l7:Setup()
+        u3l8:Setup()
+        u3l9:Setup()
+        u3l10:Setup()
+        
+        u4l1:Setup()
+        u4l2:Setup()
+        u4l3:Setup()
+        u4l4:Setup()
+        u4l5:Setup()
+        u4l6:Setup()
+        u4l7:Setup()
+        u4l8:Setup()
+        u4l9:Setup()
+        u4l10:Setup()
+        u4l11:Setup()
+        
+        u1l1:Write(WRITE_PATH)
+        u1l2:Write(WRITE_PATH)
+        u1l3:Write(WRITE_PATH)
+        u1l4:Write(WRITE_PATH)
+        u1l5:Write(WRITE_PATH)
+        u1l6:Write(WRITE_PATH)
+        u1l7:Write(WRITE_PATH)
+        u1l8:Write(WRITE_PATH)
+        u1l9:Write(WRITE_PATH)
+        u1l10:Write(WRITE_PATH)
+        
+        u2l1:Write(WRITE_PATH)
+        u2l2:Write(WRITE_PATH)
+        u2l3:Write(WRITE_PATH)
+        u2l4:Write(WRITE_PATH)
+        u2l5:Write(WRITE_PATH)
+        u2l6:Write(WRITE_PATH)
+        u2l7:Write(WRITE_PATH)
+        u2l8:Write(WRITE_PATH)
+        
+        u3l1:Write(WRITE_PATH)
+        u3l2:Write(WRITE_PATH)
+        u3l3:Write(WRITE_PATH)
+        u3l4:Write(WRITE_PATH)
+        u3l5:Write(WRITE_PATH)
+        u3l6:Write(WRITE_PATH)
+        u3l7:Write(WRITE_PATH)
+        u3l8:Write(WRITE_PATH)
+        u3l9:Write(WRITE_PATH)
+        u3l10:Write(WRITE_PATH)
+        
+        u4l1:Write(WRITE_PATH)
+        u4l2:Write(WRITE_PATH)
+        u4l3:Write(WRITE_PATH)
+        u4l4:Write(WRITE_PATH)
+        u4l5:Write(WRITE_PATH)
+        u4l6:Write(WRITE_PATH)
+        u4l7:Write(WRITE_PATH)
+        u4l8:Write(WRITE_PATH)
+        u4l9:Write(WRITE_PATH)
+        u4l10:Write(WRITE_PATH)
+        u4l11:Write(WRITE_PATH)
+
+        return coreTrackArray
+    end
+
+    action WriteCoreTrack returns Array<Lesson>
+    //A. Types and Variables
+    text track = "core"
+    text section = "Types and Variables"
+     TypesTutorial u1l1 
+     u1l1:SetNewLocation(track + "/types.html")
+     u1l1:SetNewSectionName(section)
+     OperatorsTutorial u1l2
+     u1l2:SetNewLocation(track + "/operators.html")
+     u1l2:SetNewSectionName(section)
+     Lab2_2 u1l3
+     u1l3:SetNewLocation(track + "/lab2_2.html")
+     u1l3:SetNewSectionName(section)
+     Assignment2_2 u1l4
+     u1l4:SetNewLocation(track + "/assignment2_2.html")
+     u1l4:SetNewSectionName(section)
+     GettingStartedTutorial u1l5
+     u1l5:SetNewLocation(track + "/gettingStarted.html")
+     u1l5:SetNewSectionName(section)
+     TypeCastingTutorial u1l6
+     u1l6:SetNewLocation(track + "/typeCasting.html")
+     u1l6:SetNewSectionName(section)
+     Assignment2_1 u1l7
+     u1l7:SetNewLocation(track + "/assignment2_1.html")
+     u1l7:SetNewSectionName(section)
+     CommentsTutorial u1l8
+     u1l8:SetNewLocation(track + "/comments.html")
+     u1l8:SetNewSectionName(section)
+     Assignment2_6 u1l9
+     u1l9:SetNewLocation(track + "/assignment2_6.html")
+     u1l9:SetNewSectionName(section)
+     Chapter2VariablesTypes u1l10
+     u1l10:SetNewLocation(track + "/chapter2.html")
+     u1l10:SetNewSectionName(section)
+
+
+     //B. Control Structures
+     section = "Control Structures"
+     IfTutorial u2l1
+     u2l1:SetNewLocation(track + "/if.html")
+     u2l1:SetNewSectionName(section)
+     Lab3_1 u2l2
+     u2l2:SetNewLocation(track + "/lab3_1.html")
+     u2l2:SetNewSectionName(section)
+     Assignment3_1 u2l3
+     u2l3:SetNewLocation(track + "/assignment3_1.html")
+     u2l3:SetNewSectionName(section)
+     RepeatTutorial u2l4
+     u2l4:SetNewLocation(track + "/repeat.html")
+     u2l4:SetNewSectionName(section)
+     Lab3_2 u2l5
+     u2l5:SetNewLocation(track + "/lab3_2.html")
+     u2l5:SetNewSectionName(section)
+     Assignment3_2 u2l6
+     u2l6:SetNewLocation(track + "/assignment3_2.html")
+     u2l6:SetNewSectionName(section)
+     LibrariesTutorial u2l7
+     u2l7:SetNewLocation(track + "/libraries.html")
+     u2l7:SetNewSectionName(section)
+     Chapter3ControlStructures u2l8
+     u2l8:SetNewLocation(track + "/chapter3.html")
+     u2l8:SetNewSectionName(section)
+
+     //C. Actions
+     section = "Actions"
+     ActionsTutorial u3l1
+     u3l1:SetNewLocation(track + "/actions.html")
+     u3l1:SetNewSectionName(section)
+     Lab4_1 u3l2
+     u3l2:SetNewLocation(track + "/lab4_1.html")
+     u3l2:SetNewSectionName(section)
+     Lab4_4 u3l3
+     u3l3:SetNewLocation(track + "/lab4_4.html")
+     u3l3:SetNewSectionName(section)
+     Lab4_2 u3l4
+     u3l4:SetNewLocation(track + "/lab4_2.html")
+     u3l4:SetNewSectionName(section)
+     Assignment4_2 u3l5
+     u3l5:SetNewLocation(track + "/assignment4_2.html")
+     u3l5:SetNewSectionName(section)
+     Chapter4Actions u3l6
+     u3l6:SetNewLocation(track + "/chapter4.html")
+     u3l6:SetNewSectionName(section)
+
+     //D. Classes
+     section = "Classes"
+     ClassesTutorial u4l1
+     u4l1:SetNewLocation(track + "/classes.html")
+     u4l1:SetNewSectionName(section)
+     Lab5_1 u4l2
+     u4l2:SetNewLocation(track + "/lab5_1.html")
+     u4l2:SetNewSectionName(section)
+     Lab5_2 u4l3
+     u4l3:SetNewLocation(track + "/lab5_2.html")
+     u4l3:SetNewSectionName(section)
+     GenericsTutorial u4l4
+     u4l4:SetNewLocation(track + "/generics.html")
+     u4l4:SetNewSectionName(section)
+     ArraysTutorial u4l5
+     u4l5:SetNewLocation(track + "/arrays.html")
+     u4l5:SetNewSectionName(section)
+     AutoboxingTutorial u4l6  
+     u4l6:SetNewLocation(track + "/autoboxing.html")
+     u4l6:SetNewSectionName(section)
+     Assignment5_1 u4l7
+     u4l7:SetNewLocation(track + "/assignment5_1.html")
+     u4l7:SetNewSectionName(section)
+     Assignment5_2 u4l8
+     u4l8:SetNewLocation(track + "/assignment5_2.html")
+     u4l8:SetNewSectionName(section)
+     Assignment5_3 u4l9
+     u4l9:SetNewLocation(track + "/assignment5_3.html")
+     u4l9:SetNewSectionName(section)
+     Chapter5Classes u4l10
+     u4l10:SetNewLocation(track + "/chapter5.html")
+     u4l10:SetNewSectionName(section)
+
+     Array<Lesson> coreTrackArray
+
+
+     coreTrackArray:Add(u1l1)
+     u1l1:SetNextLesson(u1l2)  
+     u1l2:SetNextLesson(u1l3)
+     u1l3:SetNextLesson(u1l4)
+     u1l4:SetNextLesson(u1l5)
+     u1l5:SetNextLesson(u1l6)
+     u1l6:SetNextLesson(u1l7)
+     u1l7:SetNextLesson(u1l8)
+     u1l8:SetNextLesson(u1l9)
+     u1l9:SetNextLesson(u1l10)
+     u1l10:SetNextLesson(undefined)
+
+
+
+     coreTrackArray:Add(u2l1)
+     u2l1:SetNextLesson(u2l2)
+     u2l2:SetNextLesson(u2l3)
+     u2l3:SetNextLesson(u2l4)
+     u2l4:SetNextLesson(u2l5)
+     u2l5:SetNextLesson(u2l6)
+     u2l6:SetNextLesson(u2l7)
+     u2l7:SetNextLesson(u2l8)
+     u2l8:SetNextLesson(undefined)
+
+     coreTrackArray:Add(u3l1)
+     u3l1:SetNextLesson(u3l2)
+     u3l2:SetNextLesson(u3l3)
+     u3l3:SetNextLesson(u3l4)
+     u3l4:SetNextLesson(u3l5)
+     u3l5:SetNextLesson(u3l6)
+     u3l6:SetNextLesson(undefined)
+
+     coreTrackArray:Add(u4l1)
+     u4l1:SetNextLesson(u4l2)
+     u4l2:SetNextLesson(u4l3)
+     u4l3:SetNextLesson(u4l4)
+     u4l4:SetNextLesson(u4l5)
+     u4l5:SetNextLesson(u4l6)
+     u4l6:SetNextLesson(u4l7)
+     u4l7:SetNextLesson(u4l8)
+     u4l8:SetNextLesson(u4l9)
+     u4l9:SetNextLesson(u4l10)
+     u4l10:SetNextLesson(undefined)
+
+     u1l1:Setup()
+     u1l2:Setup()
+     u1l3:Setup()
+     u1l4:Setup()
+     u1l5:Setup()
+     u1l6:Setup()
+     u1l7:Setup()
+     u1l8:Setup()
+     u1l9:Setup()
+     u1l10:Setup()
+
+     u2l1:Setup()
+     u2l2:Setup()
+     u2l3:Setup()
+     u2l4:Setup()
+     u2l5:Setup()
+     u2l6:Setup()
+     u2l7:Setup()
+     u2l8:Setup()
+
+     u3l1:Setup()
+     u3l2:Setup()
+     u3l3:Setup()
+     u3l4:Setup()
+     u3l5:Setup()
+     u3l6:Setup()
+
+     u4l1:Setup()
+     u4l2:Setup()
+     u4l3:Setup()
+     u4l4:Setup()
+     u4l5:Setup()
+     u4l6:Setup()
+     u4l7:Setup()
+     u4l8:Setup()
+     u4l9:Setup()
+     u4l10:Setup()
+
+     u1l1:Write(WRITE_PATH)
+     u1l2:Write(WRITE_PATH)
+     u1l3:Write(WRITE_PATH)
+     u1l4:Write(WRITE_PATH)
+     u1l5:Write(WRITE_PATH)
+     u1l6:Write(WRITE_PATH)
+     u1l7:Write(WRITE_PATH)
+     u1l8:Write(WRITE_PATH)
+     u1l9:Write(WRITE_PATH)
+     u1l10:Write(WRITE_PATH)
+
+     u2l1:Write(WRITE_PATH)
+     u2l2:Write(WRITE_PATH)
+     u2l3:Write(WRITE_PATH)
+     u2l4:Write(WRITE_PATH)
+     u2l5:Write(WRITE_PATH)
+     u2l6:Write(WRITE_PATH)
+     u2l7:Write(WRITE_PATH)
+     u2l8:Write(WRITE_PATH)
+
+     u3l1:Write(WRITE_PATH)
+     u3l2:Write(WRITE_PATH)
+     u3l3:Write(WRITE_PATH)
+     u3l4:Write(WRITE_PATH)
+     u3l5:Write(WRITE_PATH)
+     u3l6:Write(WRITE_PATH)
+
+     u4l1:Write(WRITE_PATH)
+     u4l2:Write(WRITE_PATH)
+     u4l3:Write(WRITE_PATH)
+     u4l4:Write(WRITE_PATH)
+     u4l5:Write(WRITE_PATH)
+     u4l6:Write(WRITE_PATH)
+     u4l7:Write(WRITE_PATH)
+     u4l8:Write(WRITE_PATH)
+     u4l9:Write(WRITE_PATH)
+     u4l10:Write(WRITE_PATH)
+
+     return coreTrackArray
+    end
+
+    action WriteRoboticsTrack returns Array<Lesson>
+
+    //A. Types and Variables
+    text track = "robotics"
+    text section = "Types and Variables"
+     TypesTutorial u1l1 
+     u1l1:SetNewLocation(track + "/types.html")
+     u1l1:SetNewSectionName(section)
+     OperatorsTutorial u1l2
+     u1l2:SetNewLocation(track + "/operators.html")
+     u1l2:SetNewSectionName(section)
+     Lab2_2 u1l3
+     u1l3:SetNewLocation(track + "/lab2_2.html")
+     u1l3:SetNewSectionName(section)
+     GettingStartedTutorial u1l4
+     u1l4:SetNewLocation(track + "/gettingStarted.html")
+     u1l4:SetNewSectionName(section)
+     Assignment2_1 u1l5
+     u1l5:SetNewLocation(track + "/assignment2_1.html")
+     u1l5:SetNewSectionName(section)
+     CommentsTutorial u1l6
+     u1l6:SetNewLocation(track + "/comments.html")
+     u1l6:SetNewSectionName(section)
+     LegoGettingStartedTutorial u1l7
+     u1l7:SetNewLocation(track + "/legoGettingStarted.html")
+     u1l7:SetNewSectionName(section)
+     LegoMotorsTutorial u1l8
+     u1l8:SetNewLocation(track + "/legoMotors.html")
+     u1l8:SetNewSectionName(section)
+     Lab2_6 u1l9
+     u1l9:SetNewLocation(track + "/lab2_6.html")
+     u1l9:SetNewSectionName(section)
+
+     Assignment2_5 u1l10
+     u1l10:SetNewLocation(track + "/assignment2_5.html")
+     u1l10:SetNewSectionName(section)
+
+       Assignment2_6 u1l11
+     u1l11:SetNewLocation(track + "/assignment2_6.html")
+     u1l11:SetNewSectionName(section)
+
+      Lab2_1 u1l12
+     u1l12:SetNewLocation(track + "/lab2_1.html")
+     u1l12:SetNewSectionName(section)
+
+    Lab2_3 u1l13
+     u1l13:SetNewLocation(track + "/lab2_3.html")
+     u1l13:SetNewSectionName(section)
+
+    Challenge2_4 u1l14
+     u1l14:SetNewLocation(track + "/challenge2_4.html")
+     u1l14:SetNewSectionName(section)
+
+    Chapter2VariablesTypes u1l15
+     u1l15:SetNewLocation(track + "/chapter2.html")
+     u1l15:SetNewSectionName(section)
+
+     //B. Control Structures
+     section = "Control Structures"
+     IfTutorial u2l1
+     u2l1:SetNewLocation(track + "/if.html")
+     u2l1:SetNewSectionName(section)
+     Lab3_1 u2l2
+     u2l2:SetNewLocation(track + "/lab3_1.html")
+     u2l2:SetNewSectionName(section)
+     RepeatTutorial u2l3
+     u2l3:SetNewLocation(track + "/repeat.html")
+     u2l3:SetNewSectionName(section)
+    
+    Lab3_2 u2l4
+     u2l4:SetNewLocation(track + "/lab3_2.html")
+     u2l4:SetNewSectionName(section)
+
+    Lab3_6 u2l5
+     u2l5:SetNewLocation(track + "/lab3_6.html")
+     u2l5:SetNewSectionName(section)
+  
+   
+     Assignment3_5 u2l6
+     u2l6:SetNewLocation(track + "/assignment3_5.html")
+     u2l6:SetNewSectionName(section)
+
+     LibrariesTutorial u2l7
+     u2l7:SetNewLocation(track + "/libraries.html")
+     u2l7:SetNewSectionName(section)
+
+     Chapter3ControlStructures u2l8
+     u2l8:SetNewLocation(track + "/chapter3.html")
+     u2l8:SetNewSectionName(section)
+
+     //C. Actions
+     section = "Actions"
+     ActionsTutorial u3l1
+     u3l1:SetNewLocation(track + "/actions.html")
+     u3l1:SetNewSectionName(section)
+     Lab4_1 u3l2
+     u3l2:SetNewLocation(track + "/lab4_1.html")
+     u3l2:SetNewSectionName(section)
+     Lab4_4 u3l3
+     u3l3:SetNewLocation(track + "/lab4_4.html")
+     u3l3:SetNewSectionName(section)
+     Lab4_2 u3l4
+     u3l4:SetNewLocation(track + "/lab4_2.html")
+     u3l4:SetNewSectionName(section)
+
+     Lab4_3 u3l5
+     u3l5:SetNewLocation(track + "/lab4_3.html")
+     u3l5:SetNewSectionName(section)
+
+     Assignment4_2 u3l6
+     u3l6:SetNewLocation(track + "/assignment4_2.html")
+     u3l6:SetNewSectionName(section)
+
+     Challenge4_1 u3l7
+     u3l7:SetNewLocation(track + "/challenge4_1.html")
+     u3l7:SetNewSectionName(section)
+
+     Chapter4Actions u3l8
+     u3l8:SetNewLocation(track + "/chapter4.html")
+     u3l8:SetNewSectionName(section)
+
+     //D. Classes
+     section = "Classes"
+     ClassesTutorial u4l1
+     u4l1:SetNewLocation(track + "/classes.html")
+     u4l1:SetNewSectionName(section)
+     Lab5_1 u4l2
+     u4l2:SetNewLocation(track + "/lab5_1.html")
+     u4l2:SetNewSectionName(section)
+     Lab5_2 u4l3
+     u4l3:SetNewLocation(track + "/lab5_2.html")
+     u4l3:SetNewSectionName(section)
+     GenericsTutorial u4l4
+     u4l4:SetNewLocation(track + "/generics.html")
+     u4l4:SetNewSectionName(section)
+     ArraysTutorial u4l5
+     u4l5:SetNewLocation(track + "/arrays.html")
+     u4l5:SetNewSectionName(section)
+     AutoboxingTutorial u4l6  
+     u4l6:SetNewLocation(track + "/autoboxing.html")
+     u4l6:SetNewSectionName(section)
+     Assignment5_1 u4l7
+     u4l7:SetNewLocation(track + "/assignment5_1.html")
+     u4l7:SetNewSectionName(section)
+     Assignment5_2 u4l8
+     u4l8:SetNewLocation(track + "/assignment5_2.html")
+     u4l8:SetNewSectionName(section)
+     Assignment5_3 u4l9
+     u4l9:SetNewLocation(track + "/assignment5_3.html")
+     u4l9:SetNewSectionName(section)
+     Chapter5Classes u4l10
+     u4l10:SetNewLocation(track + "/chapter5.html")
+     u4l10:SetNewSectionName(section)
+
+     // E. Optional
+     section = "Optional Lessons"
+     DevelopmentTutorial u5l1
+     u5l1:SetNewLocation(track + "/codingGuidelines.html")
+     u5l1:SetNewSectionName(section)
+
+     LegoSoundTutorial u5l2
+     u5l2:SetNewLocation(track + "/legoSound.html")
+     u5l2:SetNewSectionName(section)
+
+     LegoScreenTutorial u5l3
+     u5l3:SetNewLocation(track + "/legoScreen.html")
+     u5l3:SetNewSectionName(section)
+
+     TeamsTutorial u5l4
+     u5l4:SetNewLocation(track + "/teamsAndVersionControl.html")
+     u5l4:SetNewSectionName(section)
+
+
+
+     Array<Lesson> robotTrackArray
+
+
+     robotTrackArray:Add(u1l1)
+     u1l1:SetNextLesson(u1l2)  
+     u1l2:SetNextLesson(u1l3)
+     u1l3:SetNextLesson(u1l4)
+     u1l4:SetNextLesson(u1l5)
+     u1l5:SetNextLesson(u1l6)
+     u1l6:SetNextLesson(u1l7)
+     u1l7:SetNextLesson(u1l8)
+     u1l8:SetNextLesson(u1l9)
+     u1l9:SetNextLesson(u1l10)
+     u1l10:SetNextLesson(u1l11)
+     u1l11:SetNextLesson(u1l12)
+     u1l12:SetNextLesson(u1l13)
+     u1l13:SetNextLesson(u1l14)
+     u1l14:SetNextLesson(u1l15)
+     u1l15:SetNextLesson(undefined)
+
+
+
+     robotTrackArray:Add(u2l1)
+     u2l1:SetNextLesson(u2l2)
+     u2l2:SetNextLesson(u2l3)
+     u2l3:SetNextLesson(u2l4)
+     u2l4:SetNextLesson(u2l5)
+     u2l5:SetNextLesson(u2l6)
+     u2l6:SetNextLesson(u2l7)
+     u2l7:SetNextLesson(u2l8)
+     u2l8:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u3l1)
+     u3l1:SetNextLesson(u3l2)
+     u3l2:SetNextLesson(u3l3)
+     u3l3:SetNextLesson(u3l4)
+     u3l4:SetNextLesson(u3l5)
+     u3l5:SetNextLesson(u3l6)
+     u3l6:SetNextLesson(u3l7)
+     u3l7:SetNextLesson(u3l8)
+     u3l8:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u4l1)
+     u4l1:SetNextLesson(u4l2)
+     u4l2:SetNextLesson(u4l3)
+     u4l3:SetNextLesson(u4l4)
+     u4l4:SetNextLesson(u4l5)
+     u4l5:SetNextLesson(u4l6)
+     u4l6:SetNextLesson(u4l7)
+     u4l7:SetNextLesson(u4l8)
+     u4l8:SetNextLesson(u4l9)
+     u4l9:SetNextLesson(u4l10)
+     u4l10:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u5l1)
+     u5l1:SetNextLesson(u5l2)
+     u5l2:SetNextLesson(u5l3)
+     u5l3:SetNextLesson(u5l4)
+     u5l4:SetNextLesson(undefined)
+
+     u1l1:Setup()
+     u1l2:Setup()
+     u1l3:Setup()
+     u1l4:Setup()
+     u1l5:Setup()
+     u1l6:Setup()
+     u1l7:Setup()
+     u1l8:Setup()
+     u1l9:Setup()
+     u1l10:Setup()
+     u1l11:Setup()
+     u1l12:Setup()
+     u1l13:Setup()
+     u1l14:Setup()
+     u1l15:Setup()
+
+     u2l1:Setup()
+     u2l2:Setup()
+     u2l3:Setup()
+     u2l4:Setup()
+     u2l5:Setup()
+     u2l6:Setup()
+     u2l7:Setup()
+     u2l8:Setup()
+
+     u3l1:Setup()
+     u3l2:Setup()
+     u3l3:Setup()
+     u3l4:Setup()
+     u3l5:Setup()
+     u3l6:Setup()
+     u3l7:Setup()
+     u3l8:Setup()
+
+     u4l1:Setup()
+     u4l2:Setup()
+     u4l3:Setup()
+     u4l4:Setup()
+     u4l5:Setup()
+     u4l6:Setup()
+     u4l7:Setup()
+     u4l8:Setup()
+     u4l9:Setup()
+     u4l10:Setup()
+
+     u5l1:Setup()
+     u5l2:Setup()
+     u5l3:Setup()
+     u5l4:Setup()
+
+     u1l1:Write(WRITE_PATH)
+     u1l2:Write(WRITE_PATH)
+     u1l3:Write(WRITE_PATH)
+     u1l4:Write(WRITE_PATH)
+     u1l5:Write(WRITE_PATH)
+     u1l6:Write(WRITE_PATH)
+     u1l7:Write(WRITE_PATH)
+     u1l8:Write(WRITE_PATH)
+     u1l9:Write(WRITE_PATH)
+     u1l10:Write(WRITE_PATH)
+     u1l11:Write(WRITE_PATH)
+     u1l12:Write(WRITE_PATH)
+     u1l13:Write(WRITE_PATH)
+     u1l14:Write(WRITE_PATH)
+     u1l15:Write(WRITE_PATH)
+
+     u2l1:Write(WRITE_PATH)
+     u2l2:Write(WRITE_PATH)
+     u2l3:Write(WRITE_PATH)
+     u2l4:Write(WRITE_PATH)
+     u2l5:Write(WRITE_PATH)
+     u2l6:Write(WRITE_PATH)
+     u2l7:Write(WRITE_PATH)
+     u2l8:Write(WRITE_PATH)
+
+     u3l1:Write(WRITE_PATH)
+     u3l2:Write(WRITE_PATH)
+     u3l3:Write(WRITE_PATH)
+     u3l4:Write(WRITE_PATH)
+     u3l5:Write(WRITE_PATH)
+     u3l6:Write(WRITE_PATH)
+     u3l7:Write(WRITE_PATH)
+     u3l8:Write(WRITE_PATH)
+
+     u4l1:Write(WRITE_PATH)
+     u4l2:Write(WRITE_PATH)
+     u4l3:Write(WRITE_PATH)
+     u4l4:Write(WRITE_PATH)
+     u4l5:Write(WRITE_PATH)
+     u4l6:Write(WRITE_PATH)
+     u4l7:Write(WRITE_PATH)
+     u4l8:Write(WRITE_PATH)
+     u4l9:Write(WRITE_PATH)
+     u4l10:Write(WRITE_PATH)
+
+     u5l1:Write(WRITE_PATH)
+     u5l2:Write(WRITE_PATH)
+     u5l3:Write(WRITE_PATH)
+     u5l4:Write(WRITE_PATH)
+
+     return robotTrackArray
+    end
+
+    action WriteVisualTrack returns Array<Lesson>
+        
+    //       tableDiv:SetTableHeading("A. Types and Variables")
+        text track = "visual"
+        text section = "Types and Variables"
+        TypesTutorial u1l1
+        u1l1:SetNewLocation(track + "/types.html")
+        u1l1:SetNewSectionName(section)
+        OperatorsTutorial u1l2
+        u1l2:SetNewLocation(track + "/operators.html")
+        u1l2:SetNewSectionName(section)
+        Lab2_2 u1l3
+        u1l3:SetNewLocation(track + "/lab2_2.html")
+        u1l3:SetNewSectionName(section)
+        GamesStartedTutorial u1l4
+        u1l4:SetNewLocation(track + "/gamesGettingStarted.html")
+        u1l4:SetNewSectionName(section)
+        Lab2_5 u1l5
+        u1l5:SetNewLocation(track + "/lab2_5.html")
+        u1l5:SetNewSectionName(section)
+        GettingStartedTutorial u1l6
+        u1l6:SetNewLocation(track + "/gettingStarted.html")
+        u1l6:SetNewSectionName(section)
+        TypeCastingTutorial u1l7
+        u1l7:SetNewLocation(track + "/typeCasting.html")
+        u1l7:SetNewSectionName(section)
+        Assignment2_1 u1l8
+        u1l8:SetNewLocation(track + "/assignment2_1.html")
+        u1l8:SetNewSectionName(section)
+        CommentsTutorial u1l9
+        u1l9:SetNewLocation(track + "/comments.html")
+        u1l9:SetNewSectionName(section)
+        Assignment2_4 u1l10
+        u1l10:SetNewLocation(track + "/assignment2_4.html")
+        u1l10:SetNewSectionName(section)
+        Assignment2_6 u1l11
+        u1l11:SetNewLocation(track + "/assignment2_6.html")
+        u1l11:SetNewSectionName(section)
+        Chapter2VariablesTypes u1l12
+        u1l12:SetNewLocation(track + "/chapter2.html")
+        u1l12:SetNewSectionName(section)
+
+//        tableDiv2:SetTableHeading("B. Control Structures")
+        
+        section = "Control Structures"
+        IfTutorial u2l1
+        u2l1:SetNewLocation(track + "/if.html")
+        u2l1:SetNewSectionName(section)
+        Lab3_1 u2l2
+        u2l2:SetNewLocation(track + "/lab3_1.html")
+        u2l2:SetNewSectionName(section)
+        RepeatTutorial u2l3
+        u2l3:SetNewLocation(track + "/repeat.html")
+        u2l3:SetNewSectionName(section)
+        Lab3_2 u2l4
+        u2l4:SetNewLocation(track + "/lab3_2.html")
+        u2l4:SetNewSectionName(section)
+        Lab3_5 u2l5
+        u2l5:SetNewLocation(track + "/lab3_5.html")
+        u2l5:SetNewSectionName(section)
+        Assignment3_4 u2l6  
+        u2l6:SetNewLocation(track + "/assignment3_4.html")
+        u2l6:SetNewSectionName(section)
+        Assignment3_5 u2l7
+        u2l7:SetNewLocation(track + "/assignment3_5.html")
+        u2l7:SetNewSectionName(section)
+        Chapter3ControlStructures u2l8
+        u2l8:SetNewLocation(track + "/chapter3.html")
+        u2l8:SetNewSectionName(section)
+
+       // tableDiv3:SetTableHeading("C. Actions")
+        
+        section = "Actions"
+        ActionsTutorial u3l1
+        u3l1:SetNewLocation(track + "/actions.html")
+        u3l1:SetNewSectionName(section)
+        Lab4_1 u3l2
+        u3l2:SetNewLocation(track + "/lab4_1.html")
+        u3l2:SetNewSectionName(section)
+        Lab4_4 u3l3
+        u3l3:SetNewLocation(track + "/lab4_4.html")
+        u3l3:SetNewSectionName(section)
+        Lab4_2 u3l4
+        u3l4:SetNewLocation(track + "/lab4_2.html")
+        u3l4:SetNewSectionName(section)
+        GamesDrawing3DTutorial u3l5
+        u3l5:SetNewLocation(track + "/drawing3D.html")
+        u3l5:SetNewSectionName(section)
+        GamesAnimation3DTutorial u3l6
+        u3l6:SetNewLocation(track + "/animation3D.html")
+        u3l6:SetNewSectionName(section)
+        Assignment4_1 u3l7
+        u3l7:SetNewLocation(track + "/assignment4_1.html")
+        u3l7:SetNewSectionName(section)
+        Assignment4_2 u3l8
+        u3l8:SetNewLocation(track + "/assignment4_2.html")
+        u3l8:SetNewSectionName(section)
+        Chapter4Actions u3l9
+        u3l9:SetNewLocation(track + "/chapter4.html")
+        u3l9:SetNewSectionName(section)
+
+      //  tableDiv4:SetTableHeading("D. Classes")
+        
+        section = "Classes"
+        ClassesTutorial u4l1
+        u4l1:SetNewLocation(track + "/classes.html")
+        u4l1:SetNewSectionName(section)
+        Lab5_1 u4l2
+        u4l2:SetNewLocation(track + "/lab5_1.html")
+        u4l2:SetNewSectionName(section)
+        Lab5_2 u4l3
+        u4l3:SetNewLocation(track + "/lab5_2.html")
+        u4l3:SetNewSectionName(section)
+        GamesCamerasTutorial u4l4
+        u4l4:SetNewLocation(track + "/cameras.html")
+        u4l4:SetNewSectionName(section)
+        GamesLightingTutorial u4l5
+        u4l5:SetNewLocation(track + "/lighting.html")
+        u4l5:SetNewSectionName(section)
+        GenericsTutorial u4l6
+        u4l6:SetNewLocation(track + "/generics.html")
+        u4l6:SetNewSectionName(section)
+        ArraysTutorial u4l7
+        u4l7:SetNewLocation(track + "/arrays.html")
+        u4l7:SetNewSectionName(section)
+        Lab5_3 u4l8
+        u4l8:SetNewLocation(track + "/lab5_3.html")
+        u4l8:SetNewSectionName(section)
+        AutoboxingTutorial u4l9
+        u4l9:SetNewLocation(track + "/autoboxing.html")
+        u4l9:SetNewSectionName(section)
+        Assignment5_1 u4l10
+        u4l10:SetNewLocation(track + "/assignment5_1.html")
+        u4l10:SetNewSectionName(section)
+        Assignment5_2 u4l11
+        u4l11:SetNewLocation(track + "/assignment5_2.html")
+        u4l11:SetNewSectionName(section)
+        Assignment5_3 u4l12
+        u4l12:SetNewLocation(track + "/assignment5_3.html")
+        u4l12:SetNewSectionName(section)
+        Chapter5Classes u4l13
+        u4l13:SetNewLocation(track + "/chapter5.html")
+        u4l13:SetNewSectionName(section)
+
+             // Initialize the visualTrackArray
+        Array<Lesson> visualTrackArray
+
+        // Add lessons to visualTrackArray and link them
+        visualTrackArray:Add(u1l1)
+        u1l1:SetNextLesson(u1l2)  
+        u1l2:SetNextLesson(u1l3)
+        u1l3:SetNextLesson(u1l4)
+        u1l4:SetNextLesson(u1l5)
+        u1l5:SetNextLesson(u1l6)
+        u1l6:SetNextLesson(u1l7)
+        u1l7:SetNextLesson(u1l8)
+        u1l8:SetNextLesson(u1l9)
+        u1l9:SetNextLesson(u1l10)
+        u1l10:SetNextLesson(u1l11)
+        u1l11:SetNextLesson(u1l12)
+        u1l12:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u2l1)
+        u2l1:SetNextLesson(u2l2)
+        u2l2:SetNextLesson(u2l3)
+        u2l3:SetNextLesson(u2l4)
+        u2l4:SetNextLesson(u2l5)
+        u2l5:SetNextLesson(u2l6)
+        u2l6:SetNextLesson(u2l7)
+        u2l7:SetNextLesson(u2l8)
+        u2l8:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u3l1)
+        u3l1:SetNextLesson(u3l2)
+        u3l2:SetNextLesson(u3l3)
+        u3l3:SetNextLesson(u3l4)
+        u3l4:SetNextLesson(u3l5)
+        u3l5:SetNextLesson(u3l6)
+        u3l6:SetNextLesson(u3l7)
+        u3l7:SetNextLesson(u3l8)
+        u3l8:SetNextLesson(u3l9)
+        u3l9:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u4l1)
+        u4l1:SetNextLesson(u4l2)
+        u4l2:SetNextLesson(u4l3)
+        u4l3:SetNextLesson(u4l4)
+        u4l4:SetNextLesson(u4l5)
+        u4l5:SetNextLesson(u4l6)
+        u4l6:SetNextLesson(u4l7)
+        u4l7:SetNextLesson(u4l8)
+        u4l8:SetNextLesson(u4l9)
+        u4l9:SetNextLesson(u4l10)
+        u4l10:SetNextLesson(u4l11)
+        u4l11:SetNextLesson(u4l12)
+        u4l12:SetNextLesson(u4l13)
+        u4l13:SetNextLesson(undefined)
+
+        // Setup each lesson
+        u1l1:Setup()
+        u1l2:Setup()
+        u1l3:Setup()
+        u1l4:Setup()
+        u1l5:Setup()
+        u1l6:Setup()
+        u1l7:Setup()
+        u1l8:Setup()
+        u1l9:Setup()
+        u1l10:Setup()
+        u1l11:Setup()
+        u1l12:Setup()
+
+        u2l1:Setup()
+        u2l2:Setup()
+        u2l3:Setup()
+        u2l4:Setup()
+        u2l5:Setup()
+        u2l6:Setup()
+        u2l7:Setup()
+        u2l8:Setup()
+
+        u3l1:Setup()
+        u3l2:Setup()
+        u3l3:Setup()
+        u3l4:Setup()
+        u3l5:Setup()
+        u3l6:Setup()
+        u3l7:Setup()
+        u3l8:Setup()
+        u3l9:Setup()
+
+        u4l1:Setup()
+        u4l2:Setup()
+        u4l3:Setup()
+        u4l4:Setup()
+        u4l5:Setup()
+        u4l6:Setup()
+        u4l7:Setup()
+        u4l8:Setup()
+        u4l9:Setup()
+        u4l10:Setup()
+        u4l11:Setup()
+        u4l12:Setup()
+        u4l13:Setup()
+
+
+        // Write each lesson
+        u1l1:Write(WRITE_PATH)
+        u1l2:Write(WRITE_PATH)
+        u1l3:Write(WRITE_PATH)
+        u1l4:Write(WRITE_PATH)
+        u1l5:Write(WRITE_PATH)
+        u1l6:Write(WRITE_PATH)
+        u1l7:Write(WRITE_PATH)
+        u1l8:Write(WRITE_PATH)
+        u1l9:Write(WRITE_PATH)
+        u1l10:Write(WRITE_PATH)
+        u1l11:Write(WRITE_PATH)
+        u1l12:Write(WRITE_PATH)
+
+        u2l1:Write(WRITE_PATH)
+        u2l2:Write(WRITE_PATH)
+        u2l3:Write(WRITE_PATH)
+        u2l4:Write(WRITE_PATH)
+        u2l5:Write(WRITE_PATH)
+        u2l6:Write(WRITE_PATH)
+        u2l7:Write(WRITE_PATH)
+        u2l8:Write(WRITE_PATH)
+
+        u3l1:Write(WRITE_PATH)
+        u3l2:Write(WRITE_PATH)
+        u3l3:Write(WRITE_PATH)
+        u3l4:Write(WRITE_PATH)
+        u3l5:Write(WRITE_PATH)
+        u3l6:Write(WRITE_PATH)
+        u3l7:Write(WRITE_PATH)
+        u3l8:Write(WRITE_PATH)
+        u3l9:Write(WRITE_PATH)
+
+        u4l1:Write(WRITE_PATH)
+        u4l2:Write(WRITE_PATH)
+        u4l3:Write(WRITE_PATH)
+        u4l4:Write(WRITE_PATH)
+        u4l5:Write(WRITE_PATH)
+        u4l6:Write(WRITE_PATH)
+        u4l7:Write(WRITE_PATH)
+        u4l8:Write(WRITE_PATH)
+        u4l9:Write(WRITE_PATH)
+        u4l10:Write(WRITE_PATH)
+        u4l11:Write(WRITE_PATH)
+        u4l12:Write(WRITE_PATH)
+        u4l13:Write(WRITE_PATH)
+
+        // Return the visualTrackArray
+        return visualTrackArray
+    end
 
     action WriteAstronomyHourOfCode
         HoCAstro1 astro1
-        astro1:Setup()
-        astro1:Write(WRITE_PATH)
-
         HoCAstro2 astro2
-        astro2:Setup()
-        astro2:Write(WRITE_PATH)
-
         HoCAstro3 astro3
-        astro3:Setup()
-        astro3:Write(WRITE_PATH)
-
         HoCAstro4 astro4
-        astro4:Setup()
-        astro4:Write(WRITE_PATH)
-
         HoCAstro5 astro5
-        astro5:Setup()
-        astro5:Write(WRITE_PATH)
-
         HoCAstro6 astro6
-        astro6:Setup()
-        astro6:Write(WRITE_PATH)
-
         HoCAstro7 astro7
-        astro7:Setup()
-        astro7:Write(WRITE_PATH)
-
         HoCAstro8 astro8
-        astro8:Setup()
-        astro8:Write(WRITE_PATH)
-
         HoCAstro9 astro9
-        astro9:Setup()
-        astro9:Write(WRITE_PATH)
-
         HoCAstro10 astro10
-        astro10:Setup()
-        astro10:Write(WRITE_PATH)
-
         HoCAstro11 astro11
-        astro11:Setup()
-        astro11:Write(WRITE_PATH)
-
         HoCAstro12 astro12
-        astro12:Setup()
-        astro12:Write(WRITE_PATH)
-
         HoCAstro13 astro13
-        astro13:Setup()
-        astro13:Write(WRITE_PATH)
-
         HoCAstro14 astro14
-        astro14:Setup()
-        astro14:Write(WRITE_PATH)
-
         HoCAstro15 astro15
-        astro15:Setup()
-        astro15:Write(WRITE_PATH)
-
         HoCAstro16 astro16
-        astro16:Setup()
-        astro16:Write(WRITE_PATH)
-
         HoCAstro17 astro17
-        astro17:Setup()
-        astro17:Write(WRITE_PATH)
-
         HoCAstro18 astro18
-        astro18:Setup()
-        astro18:Write(WRITE_PATH)
-
         HoCAstro19 astro19
-        astro19:Setup()
-        astro19:Write(WRITE_PATH)
-
         HoCAstro20 astro20
+        
+        astro1:SetNextLesson(astro2)
+        astro2:SetNextLesson(astro3)
+        astro3:SetNextLesson(astro4)
+        astro4:SetNextLesson(astro5)
+        astro5:SetNextLesson(astro6)
+        astro6:SetNextLesson(astro7)
+        astro7:SetNextLesson(astro8)
+        astro8:SetNextLesson(astro9)
+        astro9:SetNextLesson(astro10)
+        astro10:SetNextLesson(astro11)
+        astro11:SetNextLesson(astro12)
+        astro12:SetNextLesson(astro13)
+        astro13:SetNextLesson(astro14)
+        astro14:SetNextLesson(astro15)
+        astro15:SetNextLesson(astro16)
+        astro16:SetNextLesson(astro17)
+        astro17:SetNextLesson(astro18)
+        astro18:SetNextLesson(astro19)
+        astro19:SetNextLesson(astro20)
+        astro20:SetNextLesson(undefined)
+
+        astro1:Setup()
+        astro2:Setup()
+        astro3:Setup()
+        astro4:Setup()
+        astro5:Setup()
+        astro6:Setup()
+        astro7:Setup()
+        astro8:Setup()
+        astro9:Setup()
+        astro10:Setup()
+        astro11:Setup()
+        astro12:Setup()
+        astro13:Setup()
+        astro14:Setup()
+        astro15:Setup()
+        astro16:Setup()
+        astro17:Setup()
+        astro18:Setup()
+        astro19:Setup()
         astro20:Setup()
+
+        astro1:Write(WRITE_PATH)
+        astro2:Write(WRITE_PATH)
+        astro3:Write(WRITE_PATH)
+        astro4:Write(WRITE_PATH)
+        astro5:Write(WRITE_PATH)
+        astro6:Write(WRITE_PATH)
+        astro7:Write(WRITE_PATH)
+        astro8:Write(WRITE_PATH)
+        astro9:Write(WRITE_PATH)
+        astro10:Write(WRITE_PATH)
+        astro11:Write(WRITE_PATH)
+        astro12:Write(WRITE_PATH)
+        astro13:Write(WRITE_PATH)
+        astro14:Write(WRITE_PATH)
+        astro15:Write(WRITE_PATH)
+        astro16:Write(WRITE_PATH)
+        astro17:Write(WRITE_PATH)
+        astro18:Write(WRITE_PATH)
+        astro19:Write(WRITE_PATH)
         astro20:Write(WRITE_PATH)
     end
 
+    action WriteCodeWithMary
+        HoCPart1 cwm1
+        HoCPart2 cwm2
+        HoCPart3 cwm3
+        HoCPart4 cwm4
+        HoCPart5 cwm5
+        HoCPart6 cwm6
+        HoCPart7 cwm7
 
-    action WriteTutorials
+        cwm1:SetNextLesson(cwm2)
+        cwm2:SetNextLesson(cwm3)
+        cwm3:SetNextLesson(cwm4)
+        cwm4:SetNextLesson(cwm5)
+        cwm5:SetNextLesson(cwm6)
+        cwm6:SetNextLesson(cwm7)
+        cwm7:SetNextLesson(undefined)
+
+        cwm1:Setup()
+        cwm2:Setup()
+        cwm3:Setup()
+        cwm4:Setup()
+        cwm5:Setup()
+        cwm6:Setup()
+        cwm7:Setup()
+
+        cwm1:Write(WRITE_PATH)
+        cwm2:Write(WRITE_PATH)
+        cwm3:Write(WRITE_PATH)
+        cwm4:Write(WRITE_PATH)
+        cwm5:Write(WRITE_PATH)
+        cwm6:Write(WRITE_PATH)
+        cwm7:Write(WRITE_PATH)
+    end
+
+
+    action WriteTutorials returns Array<Lesson>
         GettingStartedTutorial gettingStarted
         Hotkeys hotkeys
         TypesTutorial types
@@ -1423,6 +2783,20 @@ class Main
         ChartSeparation     chartSeparation
         ChartsDownloading   chartsDownloading
 
+        // add stats here
+        StatisticalTestsOverview statisticalTestsOverview
+        CompareGroupsTests compareGroupsTests
+        CompareDistributeTests compareDistributeTests
+        CompareVarianceTest compareVarianceTests
+        CompareCountsTests  compareCountsTests
+        PostHocTests        postHocTests
+        CorrelateTests      correlateTests
+        ReducibilityTest    reducibilityTest
+        ReducibilityStrengthTest  reducibilityStrengthTest
+        PCA pca
+        RegressionTest regression
+       
+
         DatabaseOverview databaseOverview
         SQLSetup    sqlSetup
         CreateDatabase createDatabase
@@ -1462,7 +2836,10 @@ class Main
         SceneItems sceneItems
         ScenePalette scenePalette
 
+        Array<Lesson> startingLessonArray
+
         //set the next flags
+        startingLessonArray:Add(gettingStarted)
         gettingStarted:SetNextLesson(hotkeys)
         hotkeys:SetNextLesson(types)
         types:SetNextLesson(ops)
@@ -1473,9 +2850,10 @@ class Main
         conditionals:SetNextLesson(actions)
         actions:SetNextLesson(classes)
         classes:SetNextLesson(codingGuidelines)
-        codingGuidelines:SetNextLesson(libraries)
+        codingGuidelines:SetNextLesson(undefined)
 
 
+        startingLessonArray:Add(libraries)
         libraries:SetNextLesson(inheritance)
         inheritance:SetNextLesson(generics)
         generics:SetNextLesson(autobox)
@@ -1483,46 +2861,61 @@ class Main
         arrays:SetNextLesson(containers)
         containers:SetNextLesson(errors)
         errors:SetNextLesson(plugins)
-        plugins:SetNextLesson(gamesStarted)
+        plugins:SetNextLesson(undefined)
         
         
 
-
+        // 2d graphics
+        startingLessonArray:Add(gamesStarted)
         gamesStarted:SetNextLesson(gamesDrawing2D)
         gamesDrawing2D:SetNextLesson(gamesDrawing2DImages)
         gamesDrawing2DImages:SetNextLesson(gamesImageSheets)
         gamesImageSheets:SetNextLesson(gamesAnimation2D)
-        gamesAnimation2D:SetNextLesson(gamesEvents)
+        gamesAnimation2D:SetNextLesson(undefined)
+
+        // user interaction and events
+        startingLessonArray:Add(gamesEvents)
         gamesEvents:SetNextLesson(keyboardEventsTutorial)
         keyboardEventsTutorial:SetNextLesson(mouseEventsTutorial)
         mouseEventsTutorial:SetNextLesson(collisionEventsTutorial)
-        collisionEventsTutorial:SetNextLesson(gamesDrawing3D)
+        collisionEventsTutorial:SetNextLesson(undefined)
+
+        // 3d graphics
+        startingLessonArray:Add(gamesDrawing3D)
         gamesDrawing3D:SetNextLesson(gamesAnimation3D)
         gamesAnimation3D:SetNextLesson(gamesModels3D)
         gamesModels3D:SetNextLesson(gamesCameras)
         gamesCameras:SetNextLesson(gamesLighting)
-        gamesLighting:SetNextLesson(physicsGravity2D)
+        gamesLighting:SetNextLesson(undefined)
         
 
+        // physics
+        startingLessonArray:Add(physicsGravity2D)
         physicsGravity2D:SetNextLesson(physicsForce2D)
         physicsForce2D:SetNextLesson(physicsMass2D)
         physicsMass2D:SetNextLesson(physicsJoints2D)
         physicsJoints2D:SetNextLesson(physicsGravity3D)        
         physicsGravity3D:SetNextLesson(physicsForce3D)
         physicsForce3D:SetNextLesson(physicsMass3D)
-        physicsMass3D:SetNextLesson(sceneIntroduction)
+        physicsMass3D:SetNextLesson(undefined)
 
+        // games
+        startingLessonArray:Add(gamesLayers)
         gamesLayers:SetNextLesson(gamesResolution)
         gamesResolution:SetNextLesson(gamesTutorials)
-        gamesTutorials:SetNextLesson(legoGettingStarted)
+        gamesTutorials:SetNextLesson(undefined)
 
+        // lego
+        startingLessonArray:Add(legoGettingStarted)
         legoGettingStarted:SetNextLesson(legoMotors)
         legoMotors:SetNextLesson(legoSensors)
         legoSensors:SetNextLesson(legoButtons)
         legoButtons:SetNextLesson(legoSound)
         legoSound:SetNextLesson(legoScreen)
-        legoScreen:SetNextLesson(audioIntro)
+        legoScreen:SetNextLesson(undefined)
 
+        // audio
+        startingLessonArray:Add(audioIntro)
         audioIntro:SetNextLesson(audioChange)
         audioChange:SetNextLesson(audioChangeWhere)
         audioChangeWhere:SetNextLesson(audioPositional)
@@ -1532,8 +2925,11 @@ class Main
         audioWhiteNoise:SetNextLesson(audioWaveGenerator)
         audioWaveGenerator:SetNextLesson(audioSynthesis)
         audioSynthesis:SetNextLesson(audioMixer)
-        audioMixer:SetNextLesson(teams)
+        audioMixer:SetNextLesson(undefined)
+//      audioMixer:SetNextLesson(teams)
 
+        // user interface
+        startingLessonArray:Add(userInterfacesOverview)
         userInterfacesOverview:SetNextLesson(userInterfacesBehavior)
         userInterfacesBehavior:SetNextLesson(userInterfacesButton)
         userInterfacesButton:SetNextLesson(userInterfacesLayout)
@@ -1550,10 +2946,12 @@ class Main
         userInterfacesDialog:SetNextLesson(userInterfacesFileChooser)
         userInterfacesFileChooser:SetNextLesson(userInterfacesSpreadsheet)
         userInterfacesSpreadsheet:SetNextLesson(userInterfacesInputSet)
-        userInterfacesTreeTable:SetNextLesson(undefined)
+        userInterfacesTreeTable:SetNextLesson(undefined)//TODO
         userInterfacesInputSet:SetNextLesson(undefined)
-        userInterfacesAccessibility:SetNextLesson(undefined)
+        userInterfacesAccessibility:SetNextLesson(undefined)//TODO
         
+        // data
+        startingLessonArray:Add(dataOverview)
         dataOverview:SetNextLesson(dataPrimitives)
         dataPrimitives:SetNextLesson(dataNesting)
         dataNesting:SetNextLesson(dataArrays)
@@ -1563,6 +2961,8 @@ class Main
         dataNamesAndValues:SetNextLesson(undefined)
   
 
+        // data science
+        startingLessonArray:Add(introToDataScience)
         introToDataScience:SetNextLesson(introDataFrames)
         introDataFrames:SetNextLesson(tidyData)
         tidyData:SetNextLesson(exportCSV)
@@ -1571,9 +2971,8 @@ class Main
         loadFileByHand:SetNextLesson(savingData)
         savingData:SetNextLesson(undefined)
 
-
-  
-        
+        // data transformation
+        startingLessonArray:Add(transformationOverview)
         transformationOverview:SetNextLesson(removeUndefined)
         removeUndefined:SetNextLesson(replaceUndefined)
         replaceUndefined:SetNextLesson(filterRows)  
@@ -1583,8 +2982,12 @@ class Main
         columnSplitting:SetNextLesson(undefined)
         
 
+        // data filtering
+        startingLessonArray:Add(filteringData)
         filteringData:SetNextLesson(undefined)
     
+        // data summary
+        startingLessonArray:Add(summaryDataOverview)
         summaryDataOverview:SetNextLesson(summaryLoading)        
         summaryLoading:SetNextLesson(descriptiveStatistics)      
         descriptiveStatistics:SetNextLesson(summaryMean)
@@ -1597,6 +3000,8 @@ class Main
         summarySkew:SetNextLesson(summaryKurtosis)
         summaryKurtosis:SetNextLesson(undefined)
 
+        // charts
+        startingLessonArray:Add(chartsOverview)
         chartsOverview:SetNextLesson(chartsAccessibilityColor)
         chartsAccessibilityColor:SetNextLesson(chartsAccessibilityText)
         chartsAccessibilityText:SetNextLesson(chartsGoodCharts)
@@ -1613,6 +3018,22 @@ class Main
         chartSeparation:SetNextLesson(chartsAdditionalFunctions)
         chartsAdditionalFunctions:SetNextLesson(undefined)
 
+        // add stats next lesson here
+        startingLessonArray:Add(statisticalTestsOverview)
+        statisticalTestsOverview:SetNextLesson(compareGroupsTests)
+        compareGroupsTests:SetNextLesson(compareDistributeTests)
+        compareDistributeTests:SetNextLesson(compareVarianceTests)
+        compareVarianceTests:SetNextLesson(compareCountsTests)
+        compareCountsTests:SetNextLesson(postHocTests)
+        postHocTests:SetNextLesson(correlateTests)
+        correlateTests:SetNextLesson(reducibilityTest)
+        reducibilityTest:SetNextLesson(reducibilityStrengthTest)
+        reducibilityStrengthTest:SetNextLesson(pca)
+        pca:SetNextLesson(regression)
+        regression:SetNextLesson(undefined)
+
+        // database
+        startingLessonArray:Add(databaseOverview)
         databaseOverview:SetNextLesson(sqlSetup)
         sqlSetup:SetNextLesson(createDatabase)
         createDatabase:SetNextLesson(connectDatabase)
@@ -1637,6 +3058,8 @@ class Main
 
 
 
+        // network
+        startingLessonArray:Add(networkOverview)
         networkOverview:SetNextLesson(networkGetMethod)
         networkGetMethod:SetNextLesson(networkPostMethod)
         networkPostMethod:SetNextLesson(networkRequestMessage)
@@ -1644,14 +3067,20 @@ class Main
         networkAuthentication:SetNextLesson(networkSkynet)
         networkSkynet:SetNextLesson(undefined)
 
-        mobileAndroidTutorial:SetNextLesson(mobileAndroidVibrationTutorial)
+        // mobile
+        startingLessonArray:Add(mobileAndroidTutorial)
+        mobileAndroidTutorial:SetNextLesson(mobileAppleTutorial)
+        mobileAppleTutorial:SetNextLesson(mobileAndroidVibrationTutorial)
         mobileAndroidVibrationTutorial:SetNextLesson(undefined)
 
+        //teams
+        startingLessonArray:Add(teams)
         teams:SetNextLesson(development)
-        teams:SetNextLesson(mobileAppleTutorial)
-        teams:SetNextLesson(mobileAndroidTutorial)
+        //teams:SetNextLesson(mobileAppleTutorial)
+        teams:SetNextLesson(undefined)
 
         //call setup on allParagraph value =  of the tutorials
+        startingLessonArray:Add(sceneIntroduction)
         sceneIntroduction:SetNextLesson(sceneComponents)
         sceneComponents:SetNextLesson(sceneCreation)
         sceneCreation:SetNextLesson(sceneManipulation)
@@ -1661,7 +3090,7 @@ class Main
         sceneNavigation:SetNextLesson(sceneRunning)
         sceneRunning:SetNextLesson(sceneItems)
         sceneItems:SetNextLesson(scenePalette)
-        scenePalette:SetNextLesson(gamesLayers)
+        scenePalette:SetNextLesson(undefined)
 
         sceneIntroduction:Setup()
 
@@ -1793,7 +3222,7 @@ class Main
         columnSplitting:Setup()
 
         filteringData:Setup()
-        
+       
 
         summaryDataOverview:Setup()
         summaryLoading:Setup()
@@ -1823,6 +3252,19 @@ class Main
         chartsBoxPlots:Setup()
         chartsSaving:Setup()
         chartSeparation:Setup()
+
+        // add stats here
+        statisticalTestsOverview:Setup()
+        compareGroupsTests:Setup()
+        compareDistributeTests:Setup()
+        compareVarianceTests:Setup()
+        compareCountsTests:Setup()
+        postHocTests:Setup()
+        correlateTests:Setup()
+        reducibilityTest:Setup()
+        reducibilityStrengthTest:Setup()
+        pca:Setup()
+        regression:Setup()
 
         databaseOverview:Setup()
         sqlSetup:Setup()
@@ -2015,6 +3457,20 @@ class Main
         chartsSaving:Write(WRITE_PATH)
         chartSeparation:Write(WRITE_PATH)
 
+        // add stats here
+        statisticalTestsOverview:Write(WRITE_PATH)
+        compareGroupsTests:Write(WRITE_PATH)
+        compareDistributeTests:Write(WRITE_PATH)
+        compareDistributeTests:Write(WRITE_PATH)
+        compareVarianceTests:Write(WRITE_PATH)
+        compareCountsTests:Write(WRITE_PATH)
+        postHocTests:Write(WRITE_PATH)
+        correlateTests:Write(WRITE_PATH)
+        reducibilityTest:Write(WRITE_PATH)
+        reducibilityStrengthTest:Write(WRITE_PATH)
+        pca:Write(WRITE_PATH)
+        regression:Write(WRITE_PATH)
+
         databaseOverview:Write(WRITE_PATH)
         sqlSetup:Write(WRITE_PATH)
         createDatabase:Write(WRITE_PATH)
@@ -2044,5 +3500,6 @@ class Main
         networkAuthentication:Write(WRITE_PATH)
         networkSkynet:Write(WRITE_PATH)
 
+        return startingLessonArray
     end
 end

@@ -1,25 +1,5 @@
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.WebTable
-use Libraries.Web.Page.TableCaption
-use Libraries.Web.Page.TableRow
-use Libraries.Web.Page.InlineFrame
-use Libraries.Web.Page.BoxTip
-use Libraries.Web.Page.TableHeader
-use Libraries.Web.Page.TableData
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
 
 class CodeOrgUnit6Lesson4 is Lesson
     text dq = ""
@@ -37,334 +17,320 @@ class CodeOrgUnit6Lesson4 is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
-        Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Algorithms - Lesson 4: The Limits of Algorithms", 1)
-        Add(headDiv)
+         Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Algorithms - Lesson 4: The Limits of Algorithms", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Algorithms - Lesson 4: The Limits of Algorithms")
+        AddToHeadingArray(h_heading)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Overview", 2)
+       
 
-        bodyDiv:AddHeading("Overview", 2)
-        bodyDiv:AddParagraph("Students explore the limits of what algorithms are able to compute. First they use a widget that exposes students to the Traveling Salesman Problem. After recognizing this problem can only be solved using an unreasonable time algorithm the develop their own good enough solutions that run more efficiently. Later in the lesson students watch a video about undecidable problems for which no algorithm can ever be developed to solve them.")
+        section_intro:AddParagraph("Students explore the limits of what algorithms are able to compute. First they use a widget that exposes students to the Traveling Salesman Problem. After recognizing this problem can only be solved using an unreasonable time algorithm the develop their own good enough solutions that run more efficiently. Later in the lesson students watch a video about undecidable problems for which no algorithm can ever be developed to solve them.")
             
-        bodyDiv:AddHeading("Goals", 2)
-        bodyDiv:AddParagraph("Students will be able to:")
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("Students will be able to:")
         UnorderedList goalList
         goalList:AddListItem("Determine if an algorithm runs in unreasonable time.")
         goalList:AddListItem("Develop a heuristic to solve a problem.")
         goalList:AddListItem("Distinguish between decision problems and optimization problems.")
         goalList:AddListItem("Explain the existence of undecidable problems")
-        bodyDiv:Add(goalList)
+        section_intro:Add(goalList)
 
-        bodyDiv:AddHeading("Purpose", 2)
-        bodyDiv:AddParagraph("Prior to this lesson students have learned about the efficiencies of different algorithms and have considered the difference between reasonable and unreasonable algorithms. In this lesson they explore what happens when you reach that limit. In one instance the response is to accept good enough solutions that run more reasonably. In the other case the problem simply can't be solved at all.")
+       AddHeading(section_intro, "Purpose", 3)
+        section_intro:AddParagraph("Prior to this lesson students have learned about the efficiencies of different algorithms and have considered the difference between reasonable and unreasonable algorithms. In this lesson they explore what happens when you reach that limit. In one instance the response is to accept good enough solutions that run more reasonably. In the other case the problem simply can't be solved at all.")
 
-        bodyDiv:AddHeading("Resources", 2)
+       AddHeading(section_intro, "Resources", 3)
         UnorderedList resources
+        resources:AddClassAttribute("list-disc list-outside pl-8 underline text-quorum-blue-150")
         resources:AddListItemLink("CSP-Widgets repository", "https://github.com/qorf/CSP-Widgets")
-        bodyDiv:Add(resources)
+        section_intro:Add(resources)
 
-        bodyDiv:AddHeading("Getting Started (5 mins)", 2)
-        bodyDiv:AddParagraphBoldFront("Prompt:", " What is the difference between a reasonable and unreasonable time algorithm?")
-        bodyDiv:AddParagraphBoldFront("Discuss:", " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
+        Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
 
-        BoxTip startGoal
-        startGoal:AddHeading("Discussion Goal", 3)
+        section_gettingStarted:AddParagraph(AddStrongTag("Prompt: ") + " What is the difference between a reasonable and unreasonable time algorithm?")
+        section_gettingStarted:AddParagraph(AddStrongTag("Discuss: ") + " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
+
+        Division startGoal = AddDisscussionGoal(section_gettingStarted)
         startGoal:AddParagraph("Use this discussion to quickly review topics brought up in the previous lesson.")
         UnorderedList startList
+        startList:AddClassAttribute("list-disc list-outside pl-8")
         startList:AddListItem("Reasonable algorithms grow at a polynomial rate or slower. Unreasonable algorithms grow exponentially.")
         startList:AddListItem("The time to solve an unreasonable algorithm grows very quickly even for relatively small problem sizes.")
         startGoal:Add(startList)
-        bodyDiv:Add(startGoal)
 
-        bodyDiv:AddParagraphBoldFront("Remarks", "")
+         AddHeading(section_gettingStarted, "Remarks", 3)
         UnorderedList startRemarks
+        startRemarks:AddClassAttribute("list-disc list-outside pl-8")
         startRemarks:AddListItem("This was a good reminder of what we learned last time. Unreasonable time algorithms just don't make sense to run. Today we're going to be thinking more about what happens when we reach the limits of algorithms, and how sometimes we can make compromises.")
         bodyDiv:Add(startRemarks)
 
 
-        bodyDiv:AddHeading("Activity (30 mins)", 2)
+        Section section_activity
+        section_activity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_activity)
+        AddHeading(section_activity, "Activity (30 minutes)", 2)
         
-        bodyDiv:AddParagraphBoldFront("Set Up:"," Each student needs to have their journal and a pen or pencil.")
+        section_activity:AddParagraph(AddStrongTag("Set Up: ") + " Each student needs to have their journal and a pen or pencil.")
 
-        bodyDiv:AddParagraphBoldFront("Guided Activity:", " Today's activity introduces students to The Traveling Salesman Problem.")
+        section_activity:AddParagraph(AddStrongTag("Activity: ") +  " Today's activity introduces students to The Traveling Salesman Problem.")
 
         //Paragraph guidedActivity
         //guidedActivity:AddText("<b>Guided Activity:</b> Today's activity introduces students to The Traveling Salesman Problem. ")
         //guidedActivity:AddLink("Code.org's presentation slides for Unit 6, Lesson 4: ", "https://docs.google.com/presentation/d/1pIuUH3QAxdGkEUBmG0YOduf1Xb16UHKCTC7-EmVMJ2Y/copy")
-        //bodyDiv:Add(guidedActivity)
+        //section_activity:Add(guidedActivity)
 
-        Division runningActivity
-        runningActivity:AddClassAttribute("cool-box")
-        runningActivity:AddHeading("Teaching Tip", 3)
+        Division runningActivity = AddDisscussionGoal(section_activity)
         runningActivity:AddParagraph("<b>Running the Activity:</b> This activity asks students to follow along as a core concept for programming is introduced. The model is typically that a term or concept is introduced and modeled and then afterwards students are encouraged to try it out on their own. Trying it out typically means they are writing information on a sticky note and sharing it with another group before discussing the results with the whole class.") 
         runningActivity:AddParagraph("To help you more easily prepare the activity and keep track of your instructions, detailed instructions have been included as speaker notes in the presentation. Here are some tips to help you throughout the presentation. ")
         UnorderedList activityList
+        activityList:AddClassAttribute("list-disc list-outside pl-8")
         activityList:AddListItem("There are opportunities throughout the presentation for students to actively engage. At these moments students should be making things with their manipulatives or using them to answer questions. Use these opportunities to check progress. ")
         activityList:AddListItem("The most important goal here is building a mental model. It is ok if students have some open questions that will get resolved over the subsequent algorithm lessons.")
         activityList:AddListItem("Both you and students can use the " + dq + "Key Takeaways" + dq + " to check your understanding at the end.")
         runningActivity:Add(activityList)
-        bodyDiv:Add(runningActivity)
-        bodyDiv:Add(break)
 
-        bodyDiv:AddHeading("Guided Activity",3)
-        bodyDiv:AddParagraphBoldFront("Slide:"," Traveling Salesman")
-        bodyDiv:AddParagraphBoldFront("Say:"," Today we are going to explore the Traveling Salesman Problem. ")
+         AddHeading(section_activity, "Guided Activity", 3)
+        section_activity:AddParagraph(AddStrongTag("Slide: ") +" Traveling Salesman")
+        section_activity:AddParagraph(AddStrongTag("Say: ") +" Today we are going to explore the Traveling Salesman Problem. ")
 
-        bodyDiv:AddParagraphBoldFront("Slide:"," Presenting the problem")
-        bodyDiv:AddParagraphBoldFront("Prompt:"," How many different paths can you find to visit all of your friends' houses? ")
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson1.png", " A graphic of four houses that form a square. Each house is at a corner and your house is in the lower left. ")
-        bodyDiv:AddParagraphBoldFront("Do This:"," Students should sketch out different paths in their journals. Read through the rules together as a class. ")
-        bodyDiv:AddParagraph("<b>Rules:</b>")
+        section_activity:AddParagraph(AddStrongTag("Slide: ")+" Presenting the problem")
+        section_activity:AddParagraph(AddStrongTag("Prompt: ") +" How many different paths can you find to visit all of your friends' houses? ")
+        Image image = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson1.png", " A graphic of four houses that form a square. Each house is at a corner and your house is in the lower left. ")
+        image:AddAttribute("data-zoom","")
+        section_activity:AddParagraph(AddStrongTag("Do This: ") +" Students should sketch out different paths in their journals. Read through the rules together as a class. ")
+        section_activity:AddParagraph("<b>Rules:</b>")
         UnorderedList travelingSalespersonRules
         travelingSalespersonRules:AddListItem(" You must start and end at your own house. ")
         travelingSalespersonRules:AddListItem(" You can only visit each house once. ")
-        bodyDiv:Add(travelingSalespersonRules)
-        bodyDiv:AddParagraphBoldFront("Discuss:"," Students share their paths with a partner before discussing as a class. ") 
-        bodyDiv:Add(break)
+        section_activity:Add(travelingSalespersonRules)
+        section_activity:AddParagraphBoldFront("Discuss:"," Students share their paths with a partner before discussing as a class. ") 
         
-        bodyDiv:AddParagraphBoldFront("Slide:"," Possible Paths ")
-        bodyDiv:AddParagraphBoldFront("Say:"," Take a look at some of these paths on the screen. You may have similar ones in your journal. ")
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson2.png", " A graphic that has three possible paths. The first goes up, right, down, and left, the second goes right, diagonal up, right, diagonal down, and  the third goes up, diagonal down, up, diagonal down. ")
-        bodyDiv:AddParagraphBoldFront("Prompt:"," What do you need to know to determine the best path? ")
-        bodyDiv:AddParagraphBoldFront("Do This:"," Students should sketch out different paths in their journals. Read through the rules together as a class. ")
-        bodyDiv:Add(break)
+        section_activity:AddParagraph(AddStrongTag("Slide: ") +" Possible Paths ")
+        section_activity:AddParagraph(AddStrongTag("Say: ") +" Take a look at some of these paths on the screen. You may have similar ones in your journal. ")
+        Image image5 = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson2.png", " A graphic that has three possible paths. The first goes up, right, down, and left, the second goes right, diagonal up, right, diagonal down, and  the third goes up, diagonal down, up, diagonal down. ")
+        image5:AddAttribute("data-zoom","")
+        section_activity:AddParagraph(AddStrongTag("Prompt: ") +" What do you need to know to determine the best path? ")
+        section_activity:AddParagraph(AddStrongTag("Do This: ") +" Students should sketch out different paths in their journals. Read through the rules together as a class. ")
+        section_activity:Add(break)
 
-        bodyDiv:AddParagraphBoldFront("Slide:"," Same Possible Paths with Distances")
-        bodyDiv:AddParagraphBoldFront("Say:"," Distance! If we know the distance between each house, we can make a better decision about which path to take. In this example, the first option is shortest, so that's the path we would choose. ")
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson3.png", " A graphic that is the same as the last graphic but each edge now has a distance and a total. The first goes up (distance 1), right (distance 1), down (distance 1), and left (distance 1, for a total of 4), the second goes right (distance 1), diagonal up (distance 2), right (distance 1), diagonal down (distance 1, for a total of 6), and the third goes up (distance 1), diagonal down (distance 2), up (distance 2), diagonal down(distance 1, for a total of 6). ")
-        bodyDiv:Add(break)
+        section_activity:AddParagraph(AddStrongTag("Slide: ") + " Same Possible Paths with Distances")
+        section_activity:AddParagraph(AddStrongTag("Say: ") +" Distance! If we know the distance between each house, we can make a better decision about which path to take. In this example, the first option is shortest, so that's the path we would choose. ")
+        Image image6 = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson3.png", " A graphic that is the same as the last graphic but each edge now has a distance and a total. The first goes up (distance 1), right (distance 1), down (distance 1), and left (distance 1, for a total of 4), the second goes right (distance 1), diagonal up (distance 2), right (distance 1), diagonal down (distance 1, for a total of 6), and the third goes up (distance 1), diagonal down (distance 2), up (distance 2), diagonal down(distance 1, for a total of 6). ")
+        image6:AddAttribute("data-zoom","")
+        section_activity:Add(break)
 
-        bodyDiv:AddParagraphBoldFront("Slide:"," Many More Places to Visit")
-        bodyDiv:AddParagraphBoldFront("Prompt:"," What if we had a lot more places to visit? How would we determine the best path? ")
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson4.png", " A graphic that has many more houses, the starting house is in the lower left.")
-        bodyDiv:AddParagraphBoldFront("Discussion Goal:"," The goal here is for students to come to the realization that they would need to explore all possible paths in order to determine which one is the best. ")
-        bodyDiv:Add(break)
+        section_activity:AddParagraph(AddStrongTag("Slide: ") +" Many More Places to Visit")
+        section_activity:AddParagraph(AddStrongTag("Prompt: ") + " What if we had a lot more places to visit? How would we determine the best path? ")
+        Image image4 = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson4.png", " A graphic that has many more houses, the starting house is in the lower left.")
+        image4:AddAttribute("data-zoom","")
+        section_activity:AddParagraph(AddStrongTag("Discussion Goal: ") +" The goal here is for students to come to the realization that they would need to explore all possible paths in order to determine which one is the best. ")
+        section_activity:Add(break)
 
-        bodyDiv:AddParagraphBoldFront("Slide:"," The Traveling Salesperson Problem")
-        bodyDiv:AddParagraphBoldFront("Say:"," This is known as the Traveling Salesman Problem. For each new place to visit, the number of options for possible paths increases factorialy. ")
+        section_activity:AddParagraph(AddStrongTag("Slide: ") + " The Traveling Salesperson Problem")
+        section_activity:AddParagraph(AddStrongTag("Say: ") +" This is known as the Traveling Salesman Problem. For each new place to visit, the number of options for possible paths increases factorialy. ")
         
-        WebTable travelingSalespersonTable
-
-        TableHeader header
-        TableRow headRow
-        TableData head1
-        head1:AddText("<strong>Number of Houses to Visit</strong>")
-        TableData head2
-        head2:AddText("<strong>Number of Steps to Check for the " + dq + "Best" + dq + " Path</strong>")
-        headRow:Add(head1)
-        headRow:Add(head2)
-        header:Add(headRow)
-        travelingSalespersonTable:Add(header)
-
-        TableRow row1
-        TableData cellA1
-        cellA1:AddText("1")
-        TableData cellA2
-        cellA2:AddText("1")
-        row1:Add(cellA1)
-        row1:Add(cellA2)
-        travelingSalespersonTable:Add(row1)
-
-        TableRow row2
-        TableData cellB1
-        cellB1:AddText("2")
-        TableData cellB2
-        cellB2:AddText("2")
-        row2:Add(cellB1)
-        row2:Add(cellB2)
-        travelingSalespersonTable:Add(row2)
-
-        TableRow row3
-        TableData cellC1
-        cellC1:AddText("3")
-        TableData cellC2
-        cellC2:AddText("6")
-        row3:Add(cellC1)
-        row3:Add(cellC2)
-        travelingSalespersonTable:Add(row3)
-
-        TableRow row4
-        TableData cellD1
-        cellD1:AddText("4")
-        TableData cellD2
-        cellD2:AddText("24")
-        row4:Add(cellD1)
-        row4:Add(cellD2)
-        travelingSalespersonTable:Add(row4)
-
-        TableRow row5
-        TableData cellE1
-        cellE1:AddText("5")
-        TableData cellE2
-        cellE2:AddText("120")
-        row5:Add(cellE1)
-        row5:Add(cellE2)
-        travelingSalespersonTable:Add(row5)
-
-        TableRow row6
-        TableData cellF1
-        cellF1:AddText("6")
-        TableData cellF2
-        cellF2:AddText("720")
-        row6:Add(cellF1)
-        row6:Add(cellF2)
-        travelingSalespersonTable:Add(row6)
-
-        TableRow row7
-        TableData cellG1
-        cellG1:AddText("7")
-        TableData cellG2
-        cellG2:AddText("5,040")
-        row7:Add(cellG1)
-        row7:Add(cellG2)
-        travelingSalespersonTable:Add(row7)
-
-        TableRow row8
-        TableData cellH1
-        cellH1:AddText("8")
-        TableData cellH2
-        cellH2:AddText("40,320")
-        row8:Add(cellH1)
-        row8:Add(cellH2)
-        travelingSalespersonTable:Add(row8)
-
-        TableRow row9
-        TableData cellI1
-        cellI1:AddText("9")
-        TableData cellI2
-        cellI2:AddText("362,880")
-        row9:Add(cellI1)
-        row9:Add(cellI2)
-        travelingSalespersonTable:Add(row9)
-
-        TableRow row10
-        TableData cellJ1
-        cellJ1:AddText("10")
-        TableData cellJ2
-        cellJ2:AddText("3,628,800")
-        row10:Add(cellJ1)
-        row10:Add(cellJ2)
-        travelingSalespersonTable:Add(row10)
-
-        bodyDiv:Add(travelingSalespersonTable)
-        bodyDiv:Add(break)
-
-        bodyDiv:AddParagraphBoldFront("Slide:"," <b>Factorial Fun:</b> n!")
-        bodyDiv:AddParagraphBoldFront("Say:"," A factorial function is written with the letter " + dq + "n" + dq + " followed by an explanation point. Here's how n! works: Multiply all whole numbers from the given number down to the number 1. ")
-        bodyDiv:AddParagraphBoldFront("Note:"," Talk through the examples and the previous table. The goal here isn't for students to memorize the math, but to understand that with each new house added, the number of potential paths that have to be checked expands very quickly. ")
-        bodyDiv:AddParagraphBoldFront("Here's how n! works:","")
-        bodyDiv:AddParagraph(" Multiply all whole numbers from the given number down to the number 1. ")
-        bodyDiv:AddParagraphBoldFront("For example:","")
-        bodyDiv:AddParagraph(" Instance: 4 houses to visit. ")
-        bodyDiv:AddParagraph(" 4 times 3 times 2 times 1 = 24 ")
-        bodyDiv:AddParagraph(" Instance: 7 houses to visit. ")
-        bodyDiv:AddParagraph(" 7 times 6 times 5 times 4 times 3 times 2 times 1 = 5,040 ")
-        bodyDiv:AddParagraph("For 10 houses you need to check 3,628,800 possible paths! That's a lot!")
-
-        bodyDiv:AddParagraphBoldFront("Slide:"," Problems")
-        bodyDiv:AddParagraphBoldFront("Say:"," The Traveling Salesman is an Optimization Problem. It's not a Decision Problem. We know there is a path. Now we must determine which is the shortest or most efficient path. ")
-        bodyDiv:AddParagraphBoldFront("Problems:"," Any task that may (or may not) be solved with an algorithm. Sorting a list is a problem. Sorting the list (2, 3, 1, 7) is an instance of that problem. ")
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson5.png", " A graphic that has two panes. The left is titled Decision Problems and asks 'Is there A path through the maze?'. The right is titled Optimization Problems and asks 'Of all the possible paths, what's the shortest path?'. ")
+         WebTable table = AddWebTable("Raffle Tickets")
+        TableBody tableBody = AddTableBody()
         
-        bodyDiv:AddParagraphBoldFront("Slide:"," Traveling Salesperson Solution")
-        bodyDiv:AddParagraphBoldFront("Say:"," The Traveling Salesman Problem can be solved with an algorithm, which checks each possible option. ")
-        bodyDiv:AddParagraph(" BUT, it would take massive amounts of computing power to compare every single option, especially as the number of homes to visit (otherwise known as nodes) increases.")
-        bodyDiv:AddParagraph(" Therefore, it would take an <b>unreasonable</b> amount of time for the solution to be calculated for most instances of the problem.")
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Number of Houses to Visit")
+        tableHeaderArray:Add("Number of Steps to Check for the " + dq + "Best" + dq + " Path") 
 
-        bodyDiv:AddParagraphBoldFront("Slide:"," Welcome to heuristics")
-        bodyDiv:AddParagraphBoldFront("Say:"," Welcome to <b>heuristics</b>! Heuristics provide a good enough solution to a problem when an actual solution is impractical or impossible. ")
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)    
+
+        Array<text> rubricText1
+        rubricText1:Add("1")
+        rubricText1:Add("1") 
+        tableBody:Add(AddTableBodyRow(rubricText1))
+
+        Array<text> rubricText2
+        rubricText2:Add("2")
+        rubricText2:Add("2") 
+        tableBody:Add(AddTableBodyRow(rubricText2))
+
+        Array<text> rubricText3
+        rubricText3:Add("3")
+        rubricText3:Add("6") 
+        tableBody:Add(AddTableBodyRow(rubricText3))
+
+         Array<text> rubricText4
+        rubricText4:Add("4")
+        rubricText4:Add("24") 
+        tableBody:Add(AddTableBodyRow(rubricText4))
+
+        Array<text> rubricText5
+        rubricText5:Add("5")
+        rubricText5:Add("120") 
+        tableBody:Add(AddTableBodyRow(rubricText5))
+
+        Array<text> rubricText6
+        rubricText6:Add("6")
+        rubricText6:Add("720") 
+        tableBody:Add(AddTableBodyRow(rubricText6))
+
+        Array<text> rubricText7
+        rubricText7:Add("7")
+        rubricText7:Add("5,040") 
+        tableBody:Add(AddTableBodyRow(rubricText7))
+
+        Array<text> rubricText8
+        rubricText8:Add("8")
+        rubricText8:Add("40,320") 
+        tableBody:Add(AddTableBodyRow(rubricText8))
+
+        Array<text> rubricText9
+        rubricText9:Add("9")
+        rubricText9:Add("362,880") 
+        tableBody:Add(AddTableBodyRow(rubricText9))
+
+        Array<text> rubricText10
+        rubricText10:Add("10")
+        rubricText10:Add("3,628,800") 
+        tableBody:Add(AddTableBodyRow(rubricText10))
+
+        table:Add(tableBody)
+        section_activity:Add(table)
+
+        section_activity:AddParagraph(AddStrongTag("Slide: ") + " <b>Factorial Fun:</b> n!")
+        section_activity:AddParagraph(AddStrongTag("Say: ") + " A factorial function is written with the letter " + dq + "n" + dq + " followed by an explanation point. Here's how n! works: Multiply all whole numbers from the given number down to the number 1. ")
+        section_activity:AddParagraph(AddStrongTag("Note: ") +" Talk through the examples and the previous table. The goal here isn't for students to memorize the math, but to understand that with each new house added, the number of potential paths that have to be checked expands very quickly. ")
+        section_activity:AddParagraphBoldFront("Here's how n! works:","")
+        section_activity:AddParagraph(" Multiply all whole numbers from the given number down to the number 1. ")
+        section_activity:AddParagraphBoldFront("For example:","")
+        section_activity:AddParagraph(" Instance: 4 houses to visit. ")
+        section_activity:AddParagraph(" 4 times 3 times 2 times 1 = 24 ")
+        section_activity:AddParagraph(" Instance: 7 houses to visit. ")
+        section_activity:AddParagraph(" 7 times 6 times 5 times 4 times 3 times 2 times 1 = 5,040 ")
+        section_activity:AddParagraph("For 10 houses you need to check 3,628,800 possible paths! That's a lot!")
+
+        section_activity:AddParagraphBoldFront("Slide:", " Problems")
+        section_activity:AddParagraphBoldFront("Say:", "The Traveling Salesman is an Optimization Problem. It's not a Decision Problem. We know there is a path. Now we must determine which is the shortest or most efficient path. ")
+        section_activity:AddParagraphBoldFront("Problems:","Any task that may (or may not) be solved with an algorithm. Sorting a list is a problem. Sorting the list (2, 3, 1, 7) is an instance of that problem. ")
+        Image image2 = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson5.png", " A graphic that has two panes. The left is titled Decision Problems and asks 'Is there A path through the maze?'. The right is titled Optimization Problems and asks 'Of all the possible paths, what's the shortest path?'. ")
+        image2:AddAttribute("data-zoom", "")
+
+        section_activity:AddParagraph(AddStrongTag("Slide: ") +" Traveling Salesperson Solution")
+        section_activity:AddParagraphBoldFront("Say:"," The Traveling Salesman Problem can be solved with an algorithm, which checks each possible option. ")
+        section_activity:AddParagraph(" BUT, it would take massive amounts of computing power to compare every single option, especially as the number of homes to visit (otherwise known as nodes) increases.")
+        section_activity:AddParagraph(" Therefore, it would take an <b>unreasonable</b> amount of time for the solution to be calculated for most instances of the problem.")
+
+        section_activity:AddParagraphBoldFront("Slide:"," Welcome to heuristics")
+        section_activity:AddParagraphBoldFront("Say:"," Welcome to <b>heuristics</b>! Heuristics provide a good enough solution to a problem when an actual solution is impractical or impossible. ")
         
-        bodyDiv:AddParagraphBoldFront("Open a Project:", " Students now open the <b>Lesson4_TravelingSalespersonWidget</b> project in the Unit 6 folder of the CSP-Widgets repository. They will use the Traveling Salesman Widget to find the " + dq + "best" + dq + " path to visit all nodes.")
-        bodyDiv:AddParagraph("In their journal, students should write down a plan or heuristic for choosing a good path.")
-        bodyDiv:AddParagraphBoldFront("Discuss:"," In pairs, students should share their heuristics and make adjustments to their own as needed.")
+        section_activity:AddParagraphBoldFront("Open a Project:", " Students now open the <b>Lesson4_TravelingSalespersonWidget</b> project in the Unit 6 folder of the CSP-Widgets repository. They will use the Traveling Salesman Widget to find the " + dq + "best" + dq + " path to visit all nodes.")
+        section_activity:AddParagraph("In their journal, students should write down a plan or heuristic for choosing a good path.")
+        section_activity:AddParagraphBoldFront("Discuss:"," In pairs, students should share their heuristics and make adjustments to their own as needed.")
         
-        bodyDiv:AddParagraphBoldFront("Open a Project:", " Now students navigate to Level 3 and use the <b>Lesson4_TravelingSalespersonWidget</b> project in the Unit 6 folder of the CSP-Widgets repository. Students test their heuristic on this widget, keeping a log in their journal of the distance for the path their heuristic finds and the best distance the student finds not using the stated heuristic (i.e. clicking around, or " + dq + "brute force" + dq + ").")
-        bodyDiv:AddParagraph("Note: Click reset to try different paths on the same level. Click " + dq + "New Level" + dq + " to generate at new random assortment of nodes.")
-        bodyDiv:AddParagraphBoldFront("Prompt:"," How did you create your heuristic? Did you change your heuristic after testing it out? ")
+        section_activity:AddParagraphBoldFront("Open a Project:", " Now students navigate to Level 3 and use the <b>Lesson4_TravelingSalespersonWidget</b> project in the Unit 6 folder of the CSP-Widgets repository. Students test their heuristic on this widget, keeping a log in their journal of the distance for the path their heuristic finds and the best distance the student finds not using the stated heuristic (i.e. clicking around, or " + dq + "brute force" + dq + ").")
+        section_activity:AddParagraph("Note: Click reset to try different paths on the same level. Click " + dq + "New Level" + dq + " to generate at new random assortment of nodes.")
+        section_activity:AddParagraphBoldFront("Prompt:"," How did you create your heuristic? Did you change your heuristic after testing it out? ")
         
-        BoxTip heuristicGoal1
-        heuristicGoal1:AddHeading("Discussion Goal", 3)
+        Division heuristicGoal1 = AddDisscussionGoal(section_activity)
         heuristicGoal1:AddParagraph(" Tease out what factors students used to create their heuristics.")
-        bodyDiv:Add(heuristicGoal1)
-        bodyDiv:AddParagraphBoldFront("Discuss:"," Call on several students to share their heuristics. As a class, discuss which heuristic we think is best, and will give us a " + dq + "good enough" + dq + " result for most cases. ")
+        section_activity:AddParagraphBoldFront("Discuss:"," Call on several students to share their heuristics. As a class, discuss which heuristic we think is best, and will give us a " + dq + "good enough" + dq + " result for most cases. ")
 
-        bodyDiv:AddImage("/media/lessons/csp/unit6/TravelingSalesperson6.png", " An image of a sample heuristic path that always picks the next closest node. Displays a total distance of 1259. ")
-        bodyDiv:AddParagraphBoldFront("Discuss:"," Discuss whether or not this heuristic is " + dq + "good enough" + dq + ". ")
+        Image image3 = section_activity:AddImage("/media/lessons/csp/unit6/TravelingSalesperson6.png", " An image of a sample heuristic path that always picks the next closest node. Displays a total distance of 1259. ")
+        image3:AddAttribute("data-zoom", "")
+        section_activity:AddParagraphBoldFront("Discuss:"," Discuss whether or not this heuristic is " + dq + "good enough" + dq + ". ")
         
-        BoxTip heuristicGoal2
-        heuristicGoal2:AddHeading("Discussion Goal", 3)
+        Division heuristicGoal2 = AddDisscussionGoal(section_activity)
         heuristicGoal2:AddParagraph(" There are times when the Next-Closest heuristic will not provide the best option, but on average it's a good option. ")
         UnorderedList heuristicList
+        heuristicList:AddClassAttribute("list-disc list-outside pl-8")
         heuristicList:AddListItem(" Students can reflect back on the paper route problem from earlier in the class. This may have been the option they first suggested. ")
         heuristicGoal2:Add(heuristicList)
-        bodyDiv:Add(heuristicGoal2)
 
-        bodyDiv:AddParagraphBoldFront("Discuss:"," Call on several students to share their heuristics. As a class, discuss which heuristic we think is best, and will give us a " + dq + "good enough" + dq + " result for most cases. ")
+        section_activity:AddParagraphBoldFront("Discuss:"," Call on several students to share their heuristics. As a class, discuss which heuristic we think is best, and will give us a " + dq + "good enough" + dq + " result for most cases. ")
 
-        bodyDiv:AddParagraphBoldFront("Remarks:"," The Traveling Salesman Problem is an optimization problem. We are attempting to find the best path. ")
-        bodyDiv:AddParagraph(" It's also unreasonable because there is not an algorithm that can solve the problem in a reasonable amount of time.")
-        bodyDiv:AddParagraph(" We need to use a heuristic to come up wtih a solution that is " + dq + "good enough" +  dq  + " for most instances of the problem. ")        
+        section_activity:AddParagraphBoldFront("Remarks:"," The Traveling Salesman Problem is an optimization problem. We are attempting to find the best path. ")
+        section_activity:AddParagraph(" It's also unreasonable because there is not an algorithm that can solve the problem in a reasonable amount of time.")
+        section_activity:AddParagraph(" We need to use a heuristic to come up wtih a solution that is " + dq + "good enough" +  dq  + " for most instances of the problem. ")        
 
-        bodyDiv:AddHeading("Undecidable Problems",3)
-        bodyDiv:AddParagraphBoldFront("Remarks:"," We've learned how we address unreasonable problems. Before we finish our study of problems let's learn about one more type, problems that no algorithm will ever be able to solve. This video is a little tricky, but it gives you a good sense for the way this problem shows up. ")
+        AddHeading(section_activity, "Undecidable Problems", 3)
+        section_activity:AddParagraphBoldFront("Remarks:"," We've learned how we address unreasonable problems. Before we finish our study of problems let's learn about one more type, problems that no algorithm will ever be able to solve. This video is a little tricky, but it gives you a good sense for the way this problem shows up. ")
         
-        BoxTip teachingTip
-        teachingTip:AddHeading("Teaching Tip", 3)
+        Division teachingTip = AddTeachingTip(section_activity)
         teachingTip:AddParagraphBoldFront("Do I Need to Understand the Halting Problem:"," Students don't actually need to understand the Halting Problem or the proof in this video. The main ideas are covered in the takeaways and are fairly simple. There are a few problems, most notably " + dq + "will this code run?" + dq + " that we've proven there is no algorithm that will ever be able to determine the correct answer in every case. The proof is interesting but if you are short on time you may opt to skip the video. ")
-        bodyDiv:Add(teachingTip)    
+        section_activity:Add(teachingTip)    
         
         Paragraph haltingProblem
         haltingProblem:AddText(" Click on the following link to learn about ")
-        haltingProblem:AddLink("the Halting Problem", " https://youtu.be/92WHN-pAFCs ")
+        Link link = haltingProblem:AddLink("the Halting Problem", " https://youtu.be/92WHN-pAFCs ")
+        link:SetClassAttribute("underline text-quorum-blue-150")
         haltingProblem:AddText(" (Supplemental)")
-        bodyDiv:Add(haltingProblem) 
+        section_activity:Add(haltingProblem) 
 
-        bodyDiv:AddHeading("Takeaways:",2)
-        bodyDiv:AddParagraph(" There are some problems we’ve proven that no computer will ever be able to solve. The Halting Problem is a very famous example and in general we call these problems <b>undecidable</b>. ")    
+        AddVideo(section_activity, "https://www.youtube.com/embed/92WHN-pAFCs?si=HEArAobxvbelJGm7")
 
-        bodyDiv:AddHeading("Wrap Up (10 mins)", 2)
-        bodyDiv:AddParagraphBoldFront("Prompt:", " Why is a heuristic acceptable when it doesn't always produce the " + dq + "best" + dq + " result? ")
-        bodyDiv:AddParagraphBoldFront("Discuss:", " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room. ")
+        AddHeading(section_activity, "Takeaways", 3)
+        section_activity:AddParagraph(" There are some problems we’ve proven that no computer will ever be able to solve. The Halting Problem is a very famous example and in general we call these problems <b>undecidable</b>. ")    
 
-        BoxTip closingGoal
-        closingGoal:AddHeading("Discussion Goal", 3)
+        Section section_wrap
+        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_wrap)
+        AddHeading(section_wrap, "Wrap up (10 Minutes)", 2)
+
+        section_wrap:AddParagraphBoldFront("Prompt:", " Why is a heuristic acceptable when it doesn't always produce the " + dq + "best" + dq + " result? ")
+        section_wrap:AddParagraphBoldFront("Discuss:", " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room. ")
+
+        Division closingGoal = AddDisscussionGoal(section_wrap)
         closingGoal:AddParagraphBoldFront("Answer:"," A heuristic is used when it's impossible or impractical to use an algorithm to solve a problem. Therefore, we need something that is good enough on average for most instances. This is where a heuristic shines. ")         
-        bodyDiv:Add(closingGoal)
 
-        bodyDiv:AddParagraphBoldFront("Remarks", "")
-        bodyDiv:AddParagraph(" Great! Heuristics are handy in every day life. Think about using mapping software to find the best route to a destination! ")
+         AddHeading(section_wrap, "Remarks", 3)
+        section_wrap:AddParagraph(" Great! Heuristics are handy in every day life. Think about using mapping software to find the best route to a destination! ")
 
-        bodyDiv:AddHeading("Assessment: Check for Understanding", 2)
+         Section section_assessment
+        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_assessment)
+        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
 
-        bodyDiv:AddParagraphBoldFront("For Students:"," Open a word doc or google doc and copy/paste the following questions.")
+                  AddHeading(section_assessment, "For Students", 3)
+        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the 2 following questions.")
 
-        bodyDiv:AddParagraphBoldFront("Question:", " In which of the following situations is it most appropriate to use a heuristic solution? ")
-        bodyDiv:AddParagraph("<ol type="+ dq +"a" + dq + ">
-                            <li>The only algorithms that provide exact solutions run in linear time.</li>
-                            <li>The problem has been identified as undecidable.</li>
-                            <li>The only algorithms that provide exact solutions run in unreasonable time but exact solutions are not necesssary.</li>
-                            <li>Two diffferent algorithms have been identified that solve the problem in reasonable time.</li>
+        AddHeading(section_assessment, "Question 1", 3)
+
+        section_assessment:AddParagraph("In which of the following situations is it most appropriate to use a heuristic solution? ")
+        section_assessment:AddParagraph("<ol type="+ dq +"a" + dq + ">
+                            <li>a. The only algorithms that provide exact solutions run in linear time.</li>
+                            <li>b. The problem has been identified as undecidable.</li>
+                            <li>c. The only algorithms that provide exact solutions run in unreasonable time but exact solutions are not necesssary.</li>
+                            <li>d. Two diffferent algorithms have been identified that solve the problem in reasonable time.</li>
                             </ol>")
-        bodyDiv:AddParagraphBoldFront("Question:", " Problems that are undecidable and algorithms that are unreasonable both touch on the limits of the kinds of computing that a computer can accomplish. <b>In your own words, explain the difference between undecidable problems and unreasonable time algorithms.</b> ")
 
-        bodyDiv:AddHeading("Standards Alignment", 2)
+        AddHeading(section_assessment, "Question 2", 3)
+        section_assessment:AddParagraph(" Problems that are undecidable and algorithms that are unreasonable both touch on the limits of the kinds of computing that a computer can accomplish. <b>In your own words, explain the difference between undecidable problems and unreasonable time algorithms.</b> ")
+
+        Section section_standards
+        section_standards:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_standards)
+        AddHeading(section_standards, "Standards Alignment", 2)
         UnorderedList list
         AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): ","3B-AP-11")
         AddListItemWithBoldAtFront(list, "CSP2021: ","AAP-4.A.2, AAP-4.A.8, AAP-4.A.9")
         AddListItemWithBoldAtFront(list, "CSP2021: ","AAP-4.B.1, AAP-4.B.2, AAP-4.B.3")
-        bodyDiv:Add(list)
+        section_standards:Add(list)
 
 
-        WriteNextTutorial(bodyDiv)
-        Add(bodyDiv)
-        PageFooter footer
-        Add(footer)
+       Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -387,4 +353,13 @@ class CodeOrgUnit6Lesson4 is Lesson
         return "lessons/code/Algorithms/Lesson4.html"
     end
 
+          action GetLinkName returns text
+        return "The Limits of Algorithms"
+    end
+
+    action GetSectionName returns text
+        return "Algorithms"
+    end
+
+    
 end

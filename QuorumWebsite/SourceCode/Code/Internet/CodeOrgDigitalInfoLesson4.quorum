@@ -1,0 +1,234 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+class CodeOrgDigitalInfoLesson4 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Unit 2 Lesson 4: Routers and Redundancy")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        //page header
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("The Internet - Lesson 4: Routers and Redundancy", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "The Internet - Lesson 4: Routers and Redundancy")
+        AddToHeadingArray(h_heading)
+
+        bodyDiv:Add(headDiv)
+        
+        Section section_intro
+        section_intro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_intro)
+        AddHeading(section_intro, "Overview", 2)
+
+       section_intro:AddParagraph("In this lesson you will explore the benefits (and potential security concerns) 
+                    associated with routing traffic across the Internet. Building on the introduction to IP 
+                    addresses in the previous lesson, you will simulate the Internet in groups that 
+                    allow messages to be sent only to an intended recipient, as indicated by an IP address. 
+                    This simulation will also allow you to examine the traffic that goes through all of the 
+                    (simulated) routers on the network. You will notice that messages go through many different 
+                    routers, may not always take the same path to reach the final destinaton, and that the routers 
+                    (and their owners) can see all of this traffic!")
+
+        AddHeading(section_intro, "Goals", 3)
+        section_intro:AddParagraph("Students will be able to:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Explain how data is routed through the Internet")
+        goalList:AddListItem("Describe how the redundant nature of networks can lead to dynamic, fault tolerant routes")
+        section_intro:Add(goalList)
+
+         AddHeading(section_intro, "Purpose", 3)
+            Paragraph purpose
+            purpose:AddText("After yesterday's lesson that motivated the need for some kind of addressing system, today's lesson has students use IP Addresses to send messages to specific people. Today's focus is on how routers help manage the paths that different messages take. 
+                    Simulating the router traffic provides a tool for students to discover the extra work that routers are doing to send messages - they can see that messages are passed between routers and that messages take different paths along the way.
+                    Importantly, students should make a connection between these observations about multiple pathways and the concept of fault-tolerance - because there are multiple pathways, the internet can continue to function even when there may be an issue that the routers need to address.")
+            section_intro:Add(purpose)
+
+
+                Section section_gettingStarted
+        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_gettingStarted)
+        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
+
+            Paragraph start
+                start:AddText(AddStrongTag("Prompt:") + " At the end of class yesterday, we saw that the Internet uses the Internet Protocol and IP Addresses to communicate across the shared Internet. How is this system similar to how we send letters in the mail? How is it different?")
+            section_gettingStarted:Add(start)
+
+        Division warmUpGoal = AddDisscussionGoal(section_gettingStarted)
+        warmUpGoal:AddParagraph("Students will probably identify that both systems involve a numerical address that helps identify where the letter should go, and that both a 'to' and 'from' address are needed. ")
+        warmUpGoal:AddParagraph("However, something that may be less obvious is that our postal system has several intermediary steps before it reaches the destination - it is picked up by a postal worker, sorted in a postal center, and eventually directed to the recipient. This point is helpful in foreshadowing how today's lesson builds on yesterday's activity and the introduction of routers. ")
+       
+        
+        AddHeading(section_gettingStarted, "Remarks", 3)
+        UnorderedList warmUpRemarks
+        warmUpRemarks:AddListItem("Today we will investigate how the Internet Protocol helps us communicate on the internet, and we will use new devices called routers to help manage how we communicate.")
+        section_gettingStarted:Add(warmUpRemarks)
+
+        Section section_activity
+        section_activity:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_activity)
+        AddHeading(section_activity, "Activity (35 minutes)", 2)
+        section_activity:AddParagraph(AddStrongTag("Group") + ": Place students into groups of 3-4. Assign each group a number.")
+        section_activity:AddParagraph(AddStrongTag("Do This") + ": Assign each student a unique 8-bit " + dq + "IP address" + dq + " with two numbers, where the first number is the student's group. For example, three students in Group 1 might have the addresses " + dq + "1.1 (0001 0001)" + dq + ", " + dq + "1.2 (0001 0010)" + dq + ", and " + dq + "1.3 (0001 0011)" + dq + ". Each student should have several index cards or another way of communicating separate messages. Each message should include a " + dq + "To" + dq + " and " + dq + "From" + dq + " address field which will allow for messages to be sent to a single intended recipient. This simulation will ask the teacher to route messages across a network, with messages possibly being routed across multiple routers (groups) in unpredictable sequences before finally being delivered to the intended " + dq + "IP address" + dq + ". This is done to simulate the way traffic travelling across the Internet is constantly rebalanced in response to over-usage or under-usage of some channels. A message will usually make it to its destination, but we can't know for sure how it will get there.")                                    
+
+        Division simulationTip = AddTeachingTip(section_activity)
+            simulationTip:AddParagraph("Alternatively, students could send emails or text messages to the teacher to be 
+            " + dq + "routed" + dq + " (forwarded) to its final destination.")
+
+        AddHeading(section_activity, "Challenge #1: Send a Message", 3)
+        section_activity:AddParagraph(AddStrongTag("Do This:") + " Have students send a simple " + dq + "hello" 
+        + dq + " to a classmate who is connected to the same router.")
+        UnorderedList list1
+        list1:AddClassAttribute("list-disc list-outside pl-8")
+            list1:AddListItem("Find your classmate's (small) IP address")
+            list1:AddListItem("Use that IP address in the " + dq + "To" + dq + " field on your message.")
+            list1:AddListItem("Write your IP address in the " + dq + "From" + dq + " field.")
+            list1:AddListItem("Write " + dq + "hello" + dq + " as your message.")
+            list1:AddListItem("Place the message in the center of the group to be picked up 
+            by your teacher and " + dq + "routed" + dq + " to its destination.")
+        section_activity:Add(list1)
+
+        Division challenge1Tip = AddTeachingTip(section_activity)
+            challenge1Tip:AddText("As you are routing messages to their 
+            final destination, take different paths to get there and read some messages 
+            aloud to enforce the notion that messages may take different paths to the same location, and 
+            routers can theoretically read <i>all</i> traffic moving across them.")
+       
+
+        AddHeading(section_activity, "Challenge #2: Have a Conversation", 3)
+        section_activity:AddParagraph(AddStrongTag("Do This:") + "Ask students to conduct a short conversation
+        (e.g. a simple greeting or a question and answer) with two classmates on their " + dq + "router" 
+        + dq + ". They should verbally confirm that both sides are receiving their messages. Provide
+        students a few minutes to practice. Help students construct their messages. If their " + dq + 
+        "To" + dq + " address is not constructed properly the message will be dropped (not delivered).")
+        AddHeading(section_activity, "Remarks", 4)
+        UnorderedList list2
+            list2:AddClassAttribute("list-disc list-outside pl-8")
+            list2:AddListItem("Routing messages functions very differently from broadcasting.")
+            list2:AddListItem("The messages are only sent to the user they are intended for.")
+            list2:AddListItem("This is just like when you write a letter to a friend, where an 
+            address on the outside of the letter tells the mail service how to properly route your letter.")
+            list2:AddListItem("A router needs to read the header of a message to route it correctly, but the contents
+            of the message are right there too, and if it wanted, a router could read all the messages going across it,
+            just like I did with some of the messages today.")
+            list2:AddListItem("This should raise some questions about privacy and security -- we will talk more about this later.")
+        section_activity:Add(list2)
+
+        AddHeading(section_activity, "Challenge #3: Find a Classmate on a Different Router", 3)
+        section_activity:AddParagraph(AddStrongTag("Do This:") +  " Ask students to find two classmates on a different router
+        and ask for their IP address (they will need to actually talk in order to do this). Again students should conduct a short
+        conversation with their two partners, confirming verbally that the messages are being received.")
+        section_activity:AddParagraph(AddStrongTag("Prompt:") +  "What did you notice about the messages you sent in the router logs? Did they always take the same path from your router to the other router?")
+        
+        Division challengeGoal = AddDisscussionGoal(section_activity)
+        challengeGoal:AddParagraph("Students should notice that their messages are taking different paths between routers to get to their destination - one message may take a certain path, while the next message takes a different path. Once this observation is made, the discussion can move to the wrap-up prompt.")       
+
+               Section section_wrap
+        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_wrap)
+        AddHeading(section_wrap, "Wrap up (5 Minutes)", 2)
+        AddHeading(section_wrap, "Journal", 3)
+    
+       section_wrap:AddParagraph("Have students record the vocabulary definitions for the following words:")
+        UnorderedList vocabulary
+        vocabulary:AddClassAttribute("list-disc list-outside pl-8")
+        AddListItemWithBoldAtFront(vocabulary, "Router:", " A type of computer that forwards data across a network")
+        AddListItemWithBoldAtFront(vocabulary, "Redundancy:"," The inclusion of extra components so that a system can continue to work even if individual components fail, for example by  having more than one path between any two connected devices in a network.")
+        AddListItemWithBoldAtFront(vocabulary, "Fault Tolerance:"," Can continue to function even in the event of individual component failures. This is important because elements of complex systems like a computer network fail at unexpected times, often in groups.")
+        section_wrap:Add(vocabulary)
+        
+        section_wrap:AddParagraph(AddStrongTag("Prompt:") + " Thinking about these terms, how can we describe what we've observed in our router simulation? What are some practical reasons that you think messages might take different paths from one router to the other?")
+        
+        Division wrapUpGoal = AddDisscussionGoal(section_wrap)
+        wrapUpGoal:AddParagraph("Students may brainstorm several reasons why the messages are taking different paths, such as:")
+        UnorderedList wrapUpList
+        wrapUpList:AddClassAttribute("list-disc list-outside pl-8")
+        wrapUpList:AddListItem("Some paths have lots of traffic, which can slow down the message. Instead, the router sends the message long a different path.")
+        wrapUpList:AddListItem("One of the paths may have been " + dq + "cut" + dq + " like in the activity from Unit 2-Lesson 2, requiring the message to take a different path.")
+        wrapUpGoal:Add(wrapUpList)
+        wrapUpGoal:AddParagraph("Students should use these new vocabulary words to describe these reasons, especially how the different paths can help make the network fault-tolerant. Students may see these words as having a cause & effect relationship: the redundancy in the network is what helps make it fault-tolerant.")
+
+
+        Section section_assessment
+        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_assessment)
+        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
+
+       AddHeading(section_assessment, "For Students", 3)
+        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the following 2 questions.")
+
+        AddHeading(section_assessment, "Question 1", 3)
+        section_assessment:AddParagraph("If the post office delivered mail exactly like the routers deliver messages on the Internet, which of the following statements would be true? (Pick Two from the following list)")
+        UnorderedList answers
+        answers:AddClassAttribute("list-disc list-outside pl-8")
+        answers:AddListItem("One mailman would be responsible for delivering a letter from sender to receiver ")
+        answers:AddListItem("The mailman would sometimes take a different path to deliver each letter to your home")
+        answers:AddListItem("Letters would be written on the outside of the envelope for all to read instead of letters put inside envelopes")
+        answers:AddListItem("Your mail could not be delivered if a road your mailman was planning to take were under construction.")
+        section_assessment:Add(answers)
+
+        AddHeading(section_assessment, "Question 2", 3)
+        section_assessment:AddParagraph(" What are the benefits of building redundancy into a network? What are the potential issues with building redundancy? ")
+       
+        Section section_standards
+        section_standards:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_standards)
+        AddHeading(section_standards, "Standards Alignment", 2)
+
+        UnorderedList list
+        list:AddClassAttribute("flex flex-col gap-y-2")
+        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): ", "2-NI-04, 3A-NI-04, 3B-NI-03")
+        AddListItemWithBoldAtFront(list, "CSP2021: ", "CSN-1.B.5, CSN-1.E.1, CSN-1.E.2, CSN-1.E.3, CSN-1.E.4, CSN-1.E.5, CSN-1.E.6, CSN-1.E.7")
+        section_standards:Add(list)
+
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "A lesson exploring how data is routed through the Internet"
+    end
+
+    action GetSummaryName returns text
+        return "CSP The Internet Lesson 4 Routers and Redundancy"
+    end
+
+    action GetName returns text
+        return "The Internet Lesson 4"
+    end
+
+    action GetShortDescription returns text
+        return "Learn how data is routed through the Internet"
+    end
+
+    action GetLocation returns text
+        return "lessons/code/Digital-Information/Lesson4.html"
+    end
+
+        action GetLinkName returns text
+        return "Routers and Redundancy"
+    end
+
+    action GetSectionName returns text
+        return "The Internet"
+    end
+end

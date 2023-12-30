@@ -1,0 +1,216 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.Data.Formats.JavaScriptObjectNotation
+
+class CourseCard is Division
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Image image = undefined
+    Division imageDiv = undefined
+    Heading heading_card = undefined
+    Button previewButton = undefined
+    Link link_course = undefined
+    Paragraph p_description = undefined
+    text buttonText = "View Course"
+
+    action Create(text imageSrc, text imageAltText, text description,  text title, text courseLink, boolean isPreviewButton) returns Array<WebTag>
+ 
+        AddClassAttribute("bg-neutral-white rounded-lg flex flex-col items-center justify-center col-span-1 box-border overflow-hidden")
+        
+        SetIdentifier("courseCard" + title)
+        
+        Division imageDiv
+        me:imageDiv = imageDiv
+        imageDiv:AddClassAttribute("w-full h-auto min-h-[192px] relative flex-grow-0 flex-shrink-0")
+        if imageSrc not=""
+          Image image
+          image:SetAddress(imageSrc)
+          image:SetAlternate(imageAltText)
+          image:AddClassAttribute("w-full h-full object-fill mx-auto my-0 block")
+          me:image = image
+          imageDiv:Add(image)
+        end
+        Add(imageDiv)
+
+        Division contentDiv
+        contentDiv:AddClassAttribute("bg-neutral-grey-25 w-full p-4 flex-grow flex flex-col justify-between")
+
+        Heading heading_card
+        heading_card:SetScale(3)
+        heading_card:AddClassAttribute("text-xl font-semibold mb-2")
+        heading_card:AddText(title)
+        me:heading_card = heading_card
+        contentDiv:Add(heading_card)
+
+        Paragraph p_description
+        p_description:AddClassAttribute("text-sm mb-4")
+        p_description:AddText(description)
+        me:p_description = p_description
+        contentDiv:Add(p_description)
+        
+        Division buttonDiv
+        buttonDiv:AddClassAttribute("flex justify-end w-full gap-2 mt-4")
+
+        if isPreviewButton 
+          Button previewButton
+          previewButton:AddClassAttribute("text-quorum-blue-100 font-bold px-4 py-2")
+          previewButton:SetIdentifier("previewButton" + title)
+          previewButton:AddText("Preview")
+          previewButton:AddAttribute("data-test", "previewButton" + "_" + title)
+          me:previewButton = previewButton
+          buttonDiv:Add(previewButton)
+
+          previewButton:SetOnClick("
+            function adjustPreviewBar(title, resizing) {
+              const previewBar = document.getElementById('previewBar' + title);
+
+              // Determine if we are hiding or showing the previewBar
+              const isHidden = previewBar.classList.contains('hidden');
+
+              // Hide all other previewBars first
+              const previewBars = document.querySelectorAll('[id^=previewBar]');
+              previewBars.forEach(bar => {
+                if (previewBar !== bar) {
+                  bar.classList.add('hidden');
+                }
+              });
+
+              // Get the grid container and its classes
+              const grid = previewBar.parentElement;
+              const gridClasses = grid.className;
+
+              // Use regex to match Tailwind's grid-cols classes
+              const regex = /grid-cols-(\d+)/g;
+              let match;
+              let cardsPerRow = 1; // Default to 1 if no matching class is found
+
+              // Extract the number of columns for each breakpoint
+              const breakpoints = {
+                'sm': 640,
+                'md': 768,
+                'lg': 1024,
+                'xl': 1280,
+                '2xl': 1536
+              };
+
+              // Check which grid-cols class applies based on the current viewport width
+              while ((match = regex.exec(gridClasses)) !== null) {
+                for (const [breakpoint, width] of Object.entries(breakpoints)) {
+                  if (window.innerWidth >= width && gridClasses.includes(`${breakpoint}:grid-cols-${match[1]}`)) {
+                    cardsPerRow = parseInt(match[1], 10);
+                  }
+                }
+              }
+
+              // Get all the cards in the grid
+              const cards = grid.querySelectorAll('[id^=courseCard]');
+              const clickedCard = event.target.closest('[id^=courseCard]');
+              const cardIndex = Array.from(cards).indexOf(clickedCard);
+
+              const rowIndexStart = cardIndex - (cardIndex % cardsPerRow);
+              const targetIndex = rowIndexStart + cardsPerRow;
+
+              // Position the preview bar after the entire row
+              if (cards.length > targetIndex) {
+                grid.insertBefore(previewBar, cards[targetIndex]);
+              } else {
+                grid.appendChild(previewBar);
+              }
+
+              // Show or hide the preview bar based on its previous state
+              if (isHidden) {
+                previewBar.classList.remove('hidden');
+              } else if(!resizing) {
+                previewBar.classList.add('hidden');
+              }
+              }
+
+              // Call the function when button is clicked
+              adjustPreviewBar('" + title + "', false);
+
+              // Adjust position on window resize
+              window.onresize = function() {
+                adjustPreviewBar('" + title + "', true);
+              };
+              ")
+        end
+
+        if courseLink not= ""
+          Link link_course
+          link_course:AddClassAttribute("py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-10 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed")
+          link_course:AddAttribute("aria-disabled", "true")
+          link_course:AddAttribute("role", "link")
+          link_course:SetIdentifier("courseLink" + title)
+          link_course:AddAttribute("data-href", courseLink)
+
+          link_course:AddText("Coming Soon")
+          me:link_course = link_course
+          buttonDiv:Add(link_course)
+
+          Script script
+          script:SetCode("
+                document.addEventListener('DOMContentLoaded', function() {
+                    var links = document.querySelectorAll('a[id^=courseLink]'); // Selects all links with IDs starting with 'courseLink'
+                    links.forEach(function(link) { // Iterates over each link
+                        var http = new XMLHttpRequest();
+                        var courseLink = link.getAttribute('data-href');
+                        http.open('HEAD', courseLink, true); // true for asynchronous request
+                        http.onreadystatechange = function() { // Event listener for when the request state changes
+                            if (http.readyState === XMLHttpRequest.DONE) { // When the request is complete
+                                if (http.status !== 404) {
+                                    let linkText = link.textContent;
+                                    let previewLink = document.getElementById('previewButton' + linkText);
+                                    if(previewLink != undefined) {
+                                      previewLink.classList.add('hidden');
+                                    }
+                                    link.textContent = " + dq + me:buttonText + dq + ";
+                                    //give it the correct aria labels
+                                    link.setAttribute('aria-label', 'View Course');
+                                    link.setAttribute('aria-disabled', 'false');
+                                    link.classList.add('bg-quorum-blue-100');
+                                    link.href = courseLink;
+                                }
+                            }
+                        };
+                        http.send(); // Sends the request
+                    });
+                });
+          ")
+          Add(script)
+        end
+
+        contentDiv:Add(buttonDiv)
+        Add(contentDiv)
+
+        Array<WebTag> tags
+        tags:Add(me)
+        tags:Add(imageDiv)
+        tags:Add(contentDiv)
+        return tags
+    end
+
+    action GetImage returns Image
+        return me:image
+    end
+
+    action GetImageDiv returns Division
+        return me:imageDiv
+    end
+
+    action GetPreviewButton returns Button
+        return me:previewButton
+    end
+
+    action GetMainButton returns Link
+        return me:link_course
+    end
+
+    action SetButtonText(text buttonText)
+        me:buttonText = buttonText
+    end
+end
+
+ 

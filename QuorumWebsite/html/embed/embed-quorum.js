@@ -34,7 +34,7 @@ var hightlightCode = function() {
 
 LoadPrism();
 LoadScript("https://quorumlanguage.com/script/load.js");
-LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js?version=10.6.0");
+LoadScript("https://quorumlanguage.com/script/QuorumStandardLibrary.js?version=11.1.1");
 
 
 
@@ -255,18 +255,8 @@ function resetVisualSize(codeInput, ideName) {
   }
 }
 
-var InjectQuorumEnvironment = function(element, name, code) {
-    InjectQuorumEnvironment(element, name, "Embed Quorum!","Enter Quorum code below and press \"Run Program\"", code );
-}
 
-var InjectQuorumEnvironment = function(element, name, code, title, subtitle, extraBuildFiles) {
-    if(code === undefined) {
-        code = "output \"Hello, World!\"";
-    }
-
-    if(name === undefined) {
-        name = "DefaultQuorumEnvironment";
-    }
+var InjectQuorumEnvironment = function(element, name = "DefaultQuorumEnvironment", code = "output \"Hello, World!\"", title = "Embed Quorum!", subtitle = "Enter Quorum code below and press \"Run Program\"", extraBuildFiles = []) {
     extraBuildFiles_$Global_[name] = extraBuildFiles || [];
     var result = GenerateQuorumEnvironment(name, title, subtitle);
     var div = document.createElement("div");
@@ -288,7 +278,7 @@ var InjectQuorumEnvironment = function(element, name, code, title, subtitle, ext
 }
 
 var GenerateQuorumEnvironment = function(name, title, subtitle) {
-    var environment =
+    const environment =
         "<div id= \""+name+"Ide\" class= \"ideTotal\" >" +
             "<h2 class= \"allInOneIdeTitle\" ><label for= \""+name+"IdeInput\" >" + title + "</label></h2>" +
             "<p class= \"allInOneIdeSubtitle\" >"+subtitle+"</p>" +
@@ -316,3 +306,4 @@ var GenerateQuorumEnvironment = function(name, title, subtitle) {
 
     return environment;
 }
+

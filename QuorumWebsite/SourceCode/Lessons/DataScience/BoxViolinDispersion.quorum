@@ -18,6 +18,8 @@ use Libraries.Containers.Array
 use Libraries.Web.Page.Link
 use Libraries.System.FileReader
 use Libraries.System.File
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
 
 class BoxViolinDispersion is Lesson
     // text version needs cleaning, then do code version
@@ -47,133 +49,121 @@ class BoxViolinDispersion is Lesson
         AddStylesheet("/style/quorumCharts.css" + versions:GetChartsStyleVersionQuery())
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Box Plots, Violin Plots, and Understanding Dispersion", 1)
-        headDiv:AddText("Understanding statistics and how to calculate important values using Quorum")
-        Add(headDiv)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Box Plots, Violin Plots, and Understanding Dispersion", 1)
+        headDiv:AddParagraph("Understanding statistics and how to calculate important values using Quorum")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Box Plots, Violin Plots, and Understanding Dispersion", 1)
-        bodyDiv:AddParagraph("A box plot (also known as box and whisker plot) is a type of chart used to visually show the distribution of numerical data and skewness through displaying the data quartiles (or percentiles) and averages. Similar to box plots, violin plots also depict percentiles, however we can see how dense our data is. Overall, we often use chart types like these to better understand dispersion, or how and where our data varies.")
+        Section introSection
+        introSection:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(introSection, "Learning Objectives", 1)
+        introSection:AddParagraph("A box plot (also known as box and whisker plot) is a type of chart used to visually show the distribution of numerical data and skewness through displaying the data quartiles (or percentiles) and averages. Similar to box plots, violin plots also depict percentiles, however we can see how dense our data is. Overall, we often use chart types like these to better understand dispersion, or how and where our data varies.")
         
-        bodyDiv:AddParagraph("Learning Objectives:")
+        introSection:AddParagraph("The student will learn:")
         Array<text> objectives
         objectives:Add("Students will be able to create a box plot and violin from a dataset.")
         objectives:Add("Students will be able to label information displayed on the box plot, customize it, and use assistive technology with a box plot.")
         objectives:Add("Students will be able to label information displayed on the violin plot, customize it, and use assistive technology with a violin plot.")
         objectives:Add("Students will be able to understand the dispersion in relation to these two plots.")
         OrderedList ol = GenerateList(objectives)
-        bodyDiv:Add(ol)
+        introSection:Add(ol)
 
-        Link link1
+        Link link1 = GenerateDefaultLink()
         link1:AddText("following tutorial")
         link1:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/varAndSD.html")
         link1:SetTarget(link1:newTab)
 
-        Link link2
+        Link link2 = GenerateDefaultLink()
         link2:AddText("following tutorial")
         link2:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/iqr.html")
         link2:SetTarget(link2:newTab)
 
-        Link link3
+        Link link3 = GenerateDefaultLink()
         link3:AddText("Box plots")
         link3:SetAddress("https://chartio.com/learn/charts/box-plot-complete-guide/")
         link3:SetTarget(link3:newTab)
 
-        Link link4
+        Link link4 = GenerateDefaultLink()
         link4:AddText("violin plots")
         link4:SetAddress("https://mode.com/blog/violin-plot-examples/")
         link4:SetTarget(link4:newTab)
 
-         Link link5
+         Link link5 = GenerateDefaultLink()
         link5:AddText("exam score CSV")
         link5:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/exams.csv")
         link5:SetTarget(link5:newTab)
 
-        bodyDiv:AddHeading("Understanding Dispersion through Box Plots and Violin Plots (15 Minutes)",2)
-        bodyDiv:AddParagraph("Dispersion, also known as the variability, scatter, or spread, measures how data is either squeezed or stretched. Measures of dispersion would be variance, standard deviation, and interquartile range. Variance is defined as how far the data set is spread out while standard deviation tells us how far the data is spread out.")
+        AddHeading(introSection, "Understanding Dispersion through Box Plots and Violin Plots (15 Minutes)",2)
+        introSection:AddParagraph("Dispersion, also known as the variability, scatter, or spread, measures how data is either squeezed or stretched. Measures of dispersion would be variance, standard deviation, and interquartile range. Variance is defined as how far the data set is spread out while standard deviation tells us how far the data is spread out.")
 
-        Bold b2
-        b2:AddText("Standard Deviation: ")
-        bodyDiv:Add(b2)
-        AddMath(bodyDiv, "examples/MathXML/StandardDeviation.xml")
-        Bold b1
-        b1:AddText("Variance: ")
-        bodyDiv:Add(b1)
-        AddMath(bodyDiv, "examples/MathXML/Variance.xml")
+        AddHeading(introSection, "Standard Deviation", 2)
+        AddMath(introSection, "examples/MathXML/StandardDeviation.xml")
+        AddHeading(introSection, "Variance", 2)
+        AddMath(introSection, "examples/MathXML/Variance.xml")
 
         
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("With high dispersion, this means that the data values are more spread out / scattered, but if there is a low dispersion, this means that the data values are more clustered. We can learn more about how to calculate standard deviation and variance using the ")
-        bodyDiv:Add(link1)
-        bodyDiv:AddText(".")
-        bodyDiv:AddParagraph(" ")
+        Paragraph p1 = introSection:AddParagraph(" ")
+        p1:AddText("With high dispersion, this means that the data values are more spread out / scattered, but if there is a low dispersion, this means that the data values are more clustered. We can learn more about how to calculate standard deviation and variance using the ")
+        p1:Add(link1)
+        p1:AddText(".")
 
         File f
-    FileReader reader
-
-    bodyDiv:AddHeading("Probability Density", 2)
-    bodyDiv:AddParagraph("We have a violin plot showcasing high and low dispersion. We can notice an obviously low dispersion in the last column of repeating violin plots meaning lower density. The violin plot is separated by what conditions the weather is in and we examine different factors according to the weather. A violin plot works great to see the changes in temperature since it displays the density.")
-
-    Division chart1
-    chart1:SetStyle("min-width: 100px; max-width: 100%;")
-    f:SetPath("html/media/epiq/datascience/ViolinPlotEpiq.svg")
-    //f:SetPath("html/media/epiq/datascience/2.svg")
-    reader:OpenForRead(f)
-    chart1:AddText(reader:Read())
-    reader:Close()
-    bodyDiv:Add(chart1)
-
+        FileReader reader
     
-
-
-
+        AddHeading(introSection, "Probability Density", 2)
+        introSection:AddParagraph("We have a violin plot showcasing high and low dispersion. We can notice an obviously low dispersion in the last column of repeating violin plots meaning lower density. The violin plot is separated by what conditions the weather is in and we examine different factors according to the weather. A violin plot works great to see the changes in temperature since it displays the density.")
+    
+        Division chart1
+        chart1:SetStyle("min-width: 100px; max-width: 100%;")
+        f:SetPath("html/media/epiq/datascience/ViolinPlotEpiq.svg")
+        //f:SetPath("html/media/epiq/datascience/2.svg")
+        reader:OpenForRead(f)
+        chart1:AddText(reader:Read())
+        reader:Close()
+        introSection:Add(chart1)
         
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("Interquartile range (IQR) is another measure of dispersion that fits well using a box plot. IQR measures the spread of the middle half of our data, meaning it takes the upper quartile of our data and subtracts it from the lower quartile of our data to get the middle (50%). The IQR will give us a measurement of how spread out our entire dataset is. We can learn more about how to calculate the IQR with the ")
-        bodyDiv:Add(link2)
-        bodyDiv:AddText(".")
-        bodyDiv:AddParagraph(" ")
+        Paragraph p2 = introSection:AddParagraph(" ")
+        p2:AddText("Interquartile range (IQR) is another measure of dispersion that fits well using a box plot. IQR measures the spread of the middle half of our data, meaning it takes the upper quartile of our data and subtracts it from the lower quartile of our data to get the middle (50%). The IQR will give us a measurement of how spread out our entire dataset is. We can learn more about how to calculate the IQR with the ")
+        p2:Add(link2)
+        p2:AddText(".")
 
         File f1
-    FileReader reader1
-
-    bodyDiv:AddHeading("IQR on a Box Plot", 2)
-    bodyDiv:AddParagraph("Here we have a box plot to examine the IQR. Note that the IQR is equal to subtracting the upper quartile from the lower quartile.  Box plot separates itself into four sections of 25% where we can see the upper and lower quartles, as well as the median.")
-
-    Division chart2
-    chart2:SetStyle("min-width: 100px; max-width: 100%;")
-    f1:SetPath("html/media/epiq/datascience/BoxEpiq.svg")
-    reader1:OpenForRead(f1)
-    chart2:AddText(reader1:Read())
-    reader1:Close()
+        FileReader reader1
     
-    bodyDiv:Add(chart2)
-
-
-        bodyDiv:AddParagraph(" ")
-
-        bodyDiv:AddText("Similar to histograms, box plots and violin plots also help describe the shape to determine dispersion within our datasets. ")
-        bodyDiv:Add(link3)
-        bodyDiv:AddText(" are great tools for basic summary statistics such as finding IQR, skew, outliers, etc. However, we do not actually see the dispersion in the data. On the other hand, ")
-        bodyDiv:Add(link4)
-        bodyDiv:AddText(" provide visual dispersion through its display of peaks. This is important because we depict summary statistics and the density of each variable.
-")
-        bodyDiv:AddParagraph(" ")
-
-        bodyDiv:AddText("Now, let us view some violin plots and box plots with high and low dispersion. We will be using a dataset involving exam scores for both plots, and we can view this dataset by clicking on the following link: ")
-        bodyDiv:Add(link5)
-        bodyDiv:AddText(".")
-
-        bodyDiv:AddParagraph("This is an example of a box plot with low dispersion and high dispersion regarding test scores. Notice how values are closer together / compact versus being spread out for subjects such as reading. We can also see that math does have a higher dispersion compared to the reading and writing scores. We can assume that there is more variation of lower scores for math due to difficulty in understanding such topics compared to English and writing.")
+        AddHeading(introSection, "IQR on a Box Plot", 2)
+        introSection:AddParagraph("Here we have a box plot to examine the IQR. Note that the IQR is equal to subtracting the upper quartile from the lower quartile.  Box plot separates itself into four sections of 25% where we can see the upper and lower quartles, as well as the median.")
+    
+        Division chart2
+        chart2:SetStyle("min-width: 100px; max-width: 100%;")
+        f1:SetPath("html/media/epiq/datascience/BoxEpiq.svg")
+        reader1:OpenForRead(f1)
+        chart2:AddText(reader1:Read())
+        reader1:Close()
         
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
+        introSection:Add(chart2)
+
+        Paragraph p3 = introSection:AddParagraph("Similar to histograms, box plots and violin plots also help describe the shape to determine dispersion within our datasets. ")
+        p3:Add(link3)
+        p3:AddText(" are great tools for basic summary statistics such as finding IQR, skew, outliers, etc. However, we do not actually see the dispersion in the data. On the other hand, ")
+        p3:Add(link4)
+        p3:AddText(" provide visual dispersion through its display of peaks. This is important because we depict summary statistics and the density of each variable.
+")
+        Paragraph p4 = introSection:AddParagraph(" ")
+        p4:AddText("Now, let us view some violin plots and box plots with high and low dispersion. We will be using a dataset involving exam scores for both plots, and we can view this dataset by clicking on the following link: ")
+        p4:Add(link5)
+        p4:AddText(".")
+
+        introSection:AddParagraph("This is an example of a box plot with low dispersion and high dispersion regarding test scores. Notice how values are closer together / compact versus being spread out for subjects such as reading. We can also see that math does have a higher dispersion compared to the reading and writing scores. We can assume that there is more variation of lower scores for math due to difficulty in understanding such topics compared to English and writing.")
+        
+        introSection:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
 use Libraries.Interface.Controls.Charts.BoxPlot
 
 // create frame component
@@ -211,59 +201,57 @@ chart:FlipOrientation()
 chart:Display()
 "))
 
- AddIDE(bodyDiv,"BoxPlot","Example of a Box Plot with high and low dispersion","How we can graphically see high and low dispersion","examples/Epiq/BoxPlot.quorum")
-bodyDiv:AddParagraph(" ")
-
-bodyDiv:AddParagraph("Now, this is the same dataset but in the form of a violin plot. Let us notice the peaks of dispersion compared to sole values in a box plot. We can see the density of the dataset and visualize the distribution of test scores. Here we can easily see how many students have scored in the range between the upper and lower quartiles. We can still make the same assumption from the box plot on this data, but now we see exactly student performance more holistically.")
-bodyDiv:AddParagraph("Since violin plots are fairly similar to box plots, we only have to change the following 2 lines of code:")
-bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Charts.BoxPlot"))
-bodyDiv:AddParagraph("changes to")
-bodyDiv:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Charts.ViolinPlot"))
-bodyDiv:AddParagraph("and")
-bodyDiv:Add(preformatter:GeneratePreformattedCode("BoxPlot chart = frame:BoxPlot()"))
-bodyDiv:AddParagraph("changes to")
-bodyDiv:Add(preformatter:GeneratePreformattedCode("ViolinPlot chart = frame:ViolinPlot()"))
-
- AddIDE(bodyDiv,"ViolinPlot","Example of a Violin Plot with high and low dispersion","How we can graphically see low and high dispersion","examples/Epiq/ViolinPlot.quorum")
-bodyDiv:AddParagraph(" ")
-
-bodyDiv:AddParagraph("Notice with each test score, it exhibits both a high and low dispersion. Many of the lower scores acculumated as the higher dispersion (ranges 320 to 340) while the higher scores are shown in the tails which shows a low dispersion (ranges 590 to 740).")
-
-bodyDiv:AddHeading("Creating a Box Plot using Quorum Studio (10 minutes)",2)
-     
- Link link6
-link6:AddText("gender height dataset")
- link6:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/4846bad77582e8d1da8325669b4de932b659e965/Reference/DataScience/Charts%20(New)/Data/Population/Height%20of%20Male%20and%20Female%20by%20Country%202022.csv")
- link6:SetTarget(link6:newTab)
-
- Link link7
-link7:AddText("box plots")
- link7:SetAddress("https://quorumlanguage.com/tutorials/charts/boxplot.html")
- link7:SetTarget(link7:newTab)
-
-Link link8
-link8:AddText("downloading CSVs for our charts")
- link8:SetAddress("https://quorumlanguage.com/tutorials/charts/downloading.html")
- link8:SetTarget(link8:newTab)
-
-bodyDiv:AddParagraph("")
-bodyDiv:AddText("To create a box plot, we will begin by creating a DataFrame. In order to do this, we will need to first download the ")  
-bodyDiv:Add(link6)
-bodyDiv:AddText(" (as a CSV file). We will then need to add the Factors and Columns before running the program to display the histogram. In this lesson we can follow the tutorial available on our website: ")
-bodyDiv:Add(link7)
-bodyDiv:AddText(".")
-
-bodyDiv:AddParagraph(" ")
-bodyDiv:AddText("To start us off we will download the dataset, so that we can have the means to create a box plot. We can follow the link to download the ")
-bodyDiv:Add(link6)
-bodyDiv:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")    
-bodyDiv:Add(link8)
-bodyDiv:AddText(".")
-
-bodyDiv:AddParagraph("The gender dataset describes the average height of males and females in different countries. It contains six columns and 200 entries (rows) of data. We will be using two columns within this dataset: 'Male Height in Cm' and 'Female Height in Cm.'")
+        AddIDE(introSection,"BoxPlot","Example of a Box Plot with high and low dispersion","/examples/Epiq/BoxPlot.quorum")
+    
+        introSection:AddParagraph("Now, this is the same dataset but in the form of a violin plot. Let us notice the peaks of dispersion compared to sole values in a box plot. We can see the density of the dataset and visualize the distribution of test scores. Here we can easily see how many students have scored in the range between the upper and lower quartiles. We can still make the same assumption from the box plot on this data, but now we see exactly student performance more holistically.")
+        introSection:AddParagraph("Since violin plots are fairly similar to box plots, we only have to change the following 2 lines of code:")
+        introSection:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Charts.BoxPlot"))
+        introSection:AddParagraph("changes to")
+        introSection:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Charts.ViolinPlot"))
+        introSection:AddParagraph("and")
+        introSection:Add(preformatter:GeneratePreformattedCode("BoxPlot chart = frame:BoxPlot()"))
+        introSection:AddParagraph("changes to")
+        introSection:Add(preformatter:GeneratePreformattedCode("ViolinPlot chart = frame:ViolinPlot()"))
+        
+        AddIDE(introSection,"ViolinPlot","Example of a Violin Plot with high and low dispersion","/examples/Epiq/ViolinPlot.quorum")
+        
+        introSection:AddParagraph("Notice with each test score, it exhibits both a high and low dispersion. Many of the lower scores acculumated as the higher dispersion (ranges 320 to 340) while the higher scores are shown in the tails which shows a low dispersion (ranges 590 to 740).")
+        
+        AddHeading(introSection, "Creating a Box Plot using Quorum Studio (10 minutes)",2)
+            
+        Link link6 = GenerateDefaultLink()
+        link6:AddText("gender height dataset")
+        link6:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/4846bad77582e8d1da8325669b4de932b659e965/Reference/DataScience/Charts%20(New)/Data/Population/Height%20of%20Male%20and%20Female%20by%20Country%202022.csv")
+        link6:SetTarget(link6:newTab)
+        
+        Link link7 = GenerateDefaultLink()
+        link7:AddText("box plots")
+        link7:SetAddress("https://quorumlanguage.com/tutorials/charts/boxplot.html")
+        link7:SetTarget(link7:newTab)
+        
+        Link link8 = GenerateDefaultLink()
+        link8:AddText("downloading CSVs for our charts")
+        link8:SetAddress("https://quorumlanguage.com/tutorials/charts/downloading.html")
+        link8:SetTarget(link8:newTab)
+    
+        Paragraph p5 = introSection:AddParagraph("")
+        p5:AddText("To create a box plot, we will begin by creating a DataFrame. In order to do this, we will need to first download the ")  
+        p5:Add(link6)
+        p5:AddText(" (as a CSV file). We will then need to add the Factors and Columns before running the program to display the histogram. In this lesson we can follow the tutorial available on our website: ")
+        p5:Add(link7)
+        p5:AddText(".")
+    
+        Paragraph p6 = introSection:AddParagraph(" ")
+        p6:AddText("To start us off we will download the dataset, so that we can have the means to create a box plot. We can follow the link to download the ")
+        p6:Add(link6)
+        p6:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")    
+        p6:Add(link8)
+        p6:AddText(".")
+    
+        introSection:AddParagraph("The gender dataset describes the average height of males and females in different countries. It contains six columns and 200 entries (rows) of data. We will be using two columns within this dataset: 'Male Height in Cm' and 'Female Height in Cm.'")
 
 
-Array<text> rubricText1
+        Array<text> rubricText1
         rubricText1:Add("Netherlands")
         rubricText1:Add("183.78") 
         rubricText1:Add("170.36")
@@ -294,109 +282,109 @@ Array<text> rubricText1
 
  
         Array<text> rubricHeader
-        rubricHeader:Add(AddTextBoldFront("Country Name", " "))
-        rubricHeader:Add(AddTextBoldFront("Male Height in Cm", " "))
-        rubricHeader:Add(AddTextBoldFront("Female Height in Cm", " "))
+        rubricHeader:Add("Country Name")
+        rubricHeader:Add("Male Height in Cm")
+        rubricHeader:Add("Female Height in Cm")
 
-        Array<text> rubricRows
-        rubricRows:Add(AddTableHeaderTag(rubricHeader))
+        Array<Array<text>> table
+        table:Add(rubricHeader)
       
-        rubricRows:Add(AddTableDataTag(rubricText1))
-        rubricRows:Add(AddTableDataTag(rubricText2))
-        rubricRows:Add(AddTableDataTag(rubricText3))
-        rubricRows:Add(AddTableDataTag(rubricText4))
-        rubricRows:Add(AddTableDataTag(rubricText5))
+        table:Add(rubricText1)
+        table:Add(rubricText2)
+        table:Add(rubricText3)
+        table:Add(rubricText4)
+        table:Add(rubricText5)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows), "Height of Male and Female by Country 2022 CSV"))
+        WebTable webTable = GetDefaultTable("Height of Male and Female by Country 2022 CSV", table)
+        introSection:Add(webTable)
+
         
-        Link link9
+        Link link9 = GenerateDefaultLink()
         link9:AddText("DataFrame")
         link9:SetAddress("https://quorumlanguage.com/Libraries/Compute/Statistics/DataFrame.html")
         link9:SetTarget(link9:newTab)
         
-        Link link10
+        Link link10 = GenerateDefaultLink()
         link10:AddText("Box Plot")
         link10:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/BoxPlot.html")
         link10:SetTarget(link10:newTab)
 
-        Link link11
+        Link link11 = GenerateDefaultLink()
         link11:AddText("tutorial on keyboard navigation")
         link11:SetAddress("https://quorumlanguage.com/tutorials/charts/charttextnavigation.html")
         link11:SetTarget(link11:newTab)
 
-        bodyDiv:AddText("To start creating a Box plot, we need to import two libraries: ")
-        bodyDiv:Add(link9)
-        bodyDiv:AddText(", which is a frame where our chart will be drawn, and ")
-        bodyDiv:Add(link10)
-        bodyDiv:AddText(", which allows us to create a box plot. Then we will initialize a DataFrame and load a comma separated values to the frame.")
+        Paragraph p7 = introSection:AddParagraph("To start creating a Box plot, we need to import two libraries: ")
+        p7:Add(link9)
+        p7:AddText(", which is a frame where our chart will be drawn, and ")
+        p7:Add(link10)
+        p7:AddText(", which allows us to create a box plot. Then we will initialize a DataFrame and load a comma separated values to the frame.")
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("In order to read our dataset properly into Quorum, we will be using the action, Load(text location) which is found within our DataFrame class. Notice that inside the action's parameters, we will be inserting the file location of our ")
-        bodyDiv:Add(link6)  
-        bodyDiv:AddText(".")
+        Paragraph p8 = introSection:AddParagraph(" ")
+        p8:AddText("In order to read our dataset properly into Quorum, we will be using the action, Load(text location) which is found within our DataFrame class. Notice that inside the action's parameters, we will be inserting the file location of our ")
+        p8:Add(link6)  
+        p8:AddText(".")
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("Now that we have read in our data, we can select our desired columns: male and female height in centimeters. For this, we will be using the action, AddSelectedColumns(text heading) which is found within our DataFrame class. Inside the parameters, we will want to type the heading from our dataset which will find and insert the selected heading into our DataFrame. We can reference the 'Loading and Formatting' Section in our ")
-        bodyDiv:Add(link7)
-        bodyDiv:AddText(" tutorial regarding these steps.")        
+        Paragraph p9 = introSection:AddParagraph(" ")
+        p9:AddText("Now that we have read in our data, we can select our desired columns: male and female height in centimeters. For this, we will be using the action, AddSelectedColumns(text heading) which is found within our DataFrame class. Inside the parameters, we will want to type the heading from our dataset which will find and insert the selected heading into our DataFrame. We can reference the 'Loading and Formatting' Section in our ")
+        p9:Add(link7)
+        p9:AddText(" tutorial regarding these steps.")        
 
-        bodyDiv:AddParagraph("Finally, we can create our box plot object using our frame with the following line of code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("BoxPlot chart = frame:BoxPlot()"))
+        introSection:AddParagraph("Finally, we can create our box plot object using our frame with the following line of code:")
+        introSection:Add(preformatter:GeneratePreformattedCode("BoxPlot chart = frame:BoxPlot()"))
         
-        bodyDiv:AddParagraph("Right now, we have a simple box plot, but there is not much to it. We will proceed on organizing our box plot with labels and further customization methods in the next section.")
+        introSection:AddParagraph("Right now, we have a simple box plot, but there is not much to it. We will proceed on organizing our box plot with labels and further customization methods in the next section.")
 
-        bodyDiv:AddHeading("Labeling and Customizing the Box Plots (5 minutes)",2)
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("The steps that we describe in this task can be followed in the 'Labeling the Box Plot' section that is available in our ")
-        bodyDiv:Add(link7)
-        bodyDiv:AddText(" tutorial.")
+        AddHeading(introSection, "Labeling and Customizing the Box Plots (5 minutes)",2)
+        Paragraph p10 = introSection:AddParagraph("")
+        p10:AddText("The steps that we describe in this task can be followed in the 'Labeling the Box Plot' section that is available in our ")
+        p10:Add(link7)
+        p10:AddText(" tutorial.")
 
-        bodyDiv:AddParagraph("First, we will add labels for our chart, x-axis, and y-axis. This allows the reader to distinguish between the information and to understand what data they are looking at. For our chart we can label it the following way: title - 'Height of Males and Females in the World'; x-axis - 'Sex'; y-axis - 'Height (cm).' If we feel like those labels are not enough, we can add a subtitle to the histogram. For example, for this histogram the subtitle can be 'What is the average height of the population by sex?'")
+        introSection:AddParagraph("First, we will add labels for our chart, x-axis, and y-axis. This allows the reader to distinguish between the information and to understand what data they are looking at. For our chart we can label it the following way: title - 'Height of Males and Females in the World'; x-axis - 'Sex'; y-axis - 'Height (cm).' If we feel like those labels are not enough, we can add a subtitle to the histogram. For example, for this histogram the subtitle can be 'What is the average height of the population by sex?'")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("Other features we can add to further customize our box plot is that we can modify the font size, the location of our legend, the color palette, and even change the orientation of the box plot. Many of these features are available across all charts in Quorum. One unique function in regards to box plots is that we have access to HideOutliers() which will ignore any outlier data. We can reference the section 'Customizing the Data Chart' for more information in the ")
-        bodyDiv:Add(link7)
-        bodyDiv:AddText(" tutorial.")
+        Paragraph p11 = introSection:AddParagraph("")
+        p11:AddText("Other features we can add to further customize our box plot is that we can modify the font size, the location of our legend, the color palette, and even change the orientation of the box plot. Many of these features are available across all charts in Quorum. One unique function in regards to box plots is that we have access to HideOutliers() which will ignore any outlier data. We can reference the section 'Customizing the Data Chart' for more information in the ")
+        p11:Add(link7)
+        p11:AddText(" tutorial.")
 
-        bodyDiv:AddHeading("Accessing the Box Plot (5 minutes)",2)
-        bodyDiv:AddParagraph("To view our actual plot we can type the following line of code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("This displays our chart via pop-up box inside of Quorum or on the side view of the Quorum online editor! Now let us explore the graphic using the accessibility tools on our devices. When the box plot has been created, we should see our chart pop up in a separate window. From there, we can reference this ")
-        bodyDiv:Add(link11)
-        bodyDiv:AddText(" using the arrow keys for accessibility. One note is that when a bar chart is saved onto our computer devices, they save as an SVG (scalable vector graphic) which maintains not only resizability but accessibility to read these charts using a screen reader.
+        AddHeading(introSection, "Accessing the Box Plot (5 minutes)",2)
+        introSection:AddParagraph("To view our actual plot we can type the following line of code:")
+        introSection:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+        Paragraph p12 = introSection:AddParagraph("")
+        p12:AddText("This displays our chart via pop-up box inside of Quorum or on the side view of the Quorum online editor! Now let us explore the graphic using the accessibility tools on our devices. When the box plot has been created, we should see our chart pop up in a separate window. From there, we can reference this ")
+        p12:Add(link11)
+        p12:AddText(" using the arrow keys for accessibility. One note is that when a bar chart is saved onto our computer devices, they save as an SVG (scalable vector graphic) which maintains not only resizability but accessibility to read these charts using a screen reader.
 ")
-        bodyDiv:AddParagraph(" ")
-
         
-        bodyDiv:AddHeading("Creating a Violin Plot using Quorum Studio (10 minutes)",2)
-        bodyDiv:AddParagraph("A violin plot is a hybrid of a box plot and a kernel density plot (which shows peaks in the data). It is used to visualize the distribution of numerical data. Unlike a box plot (that shows summary statistics), violin plots show summary statistics and the density of each variable.
+        AddHeading(introSection, "Creating a Violin Plot using Quorum Studio (10 minutes)",2)
+        introSection:AddParagraph("A violin plot is a hybrid of a box plot and a kernel density plot (which shows peaks in the data). It is used to visualize the distribution of numerical data. Unlike a box plot (that shows summary statistics), violin plots show summary statistics and the density of each variable.
 ")
 
-        Link link12
+        Link link12 = GenerateDefaultLink()
         link12:AddText("cats dataset")
         link12:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Animals/Cats.csv")
         link12:SetTarget(link12:newTab)
         
-        Link link13
+        Link link13 = GenerateDefaultLink()
         link13:AddText("violin plots")
         link13:SetAddress("https://quorumlanguage.com/tutorials/charts/violinplot.html")
         link13:SetTarget(link13:newTab)
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("To create a violin plot, we will begin by creating a DataFrame. In order to do this, we will need to first download the ")
-        bodyDiv:Add(link12)
-        bodyDiv:AddText(" (as a CSV file). We will then need to add the Factors and Columns before running the program to display the pie chart. In this lesson we can follow the tutorial available on our website: ")
-        bodyDiv:Add(link13)
+        Paragraph p13 = introSection:AddParagraph("")
+        p13:AddText("To create a violin plot, we will begin by creating a DataFrame. In order to do this, we will need to first download the ")
+        p13:Add(link12)
+        p13:AddText(" (as a CSV file). We will then need to add the Factors and Columns before running the program to display the pie chart. In this lesson we can follow the tutorial available on our website: ")
+        p13:Add(link13)
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("To start us off we will download the dataset, so that we can have the means to create a pie chart. You can follow the link to download ")
-        bodyDiv:Add(link12)
-        bodyDiv:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")
-        bodyDiv:Add(link8)
-        bodyDiv:AddText(".")
+        Paragraph p14 = introSection:AddParagraph(" ")
+        p14:AddText("To start us off we will download the dataset, so that we can have the means to create a pie chart. You can follow the link to download ")
+        p14:Add(link12)
+        p14:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")
+        p14:Add(link8)
+        p14:AddText(".")
 
-        bodyDiv:AddParagraph("The Cats dataset includes information like each cat's name, weight and temperament. It has 9 columns and 68 entries/rows of cats. We will be focusing on the 'Life Span' column for this lesson, but in general any columns with a range would work (eg, weight, but not temperament). Here's a snippet of the dataset:")
+        introSection:AddParagraph("The Cats dataset includes information like each cat's name, weight and temperament. It has 9 columns and 68 entries/rows of cats. We will be focusing on the 'Life Span' column for this lesson, but in general any columns with a range would work (eg, weight, but not temperament). Here's a snippet of the dataset:")
 
          Array<text> rubricText6
         rubricText6:Add("Abyssinian")
@@ -428,159 +416,152 @@ Array<text> rubricText1
         rubricText10:Add("17.0")
 
          Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Name", " "))
-        rubricHeader1:Add(AddTextBoldFront("Minimum Life Span", " "))
-        rubricHeader1:Add(AddTextBoldFront("Maximum Life Span", " "))
+        rubricHeader1:Add("Name")
+        rubricHeader1:Add("Minimum Life Span")
+        rubricHeader1:Add("Maximum Life Span")
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
+        Array<Array<text>> table2
+        table2:Add(rubricHeader1)
       
-        rubricRows1:Add(AddTableDataTag(rubricText6))
-        rubricRows1:Add(AddTableDataTag(rubricText7))
-        rubricRows1:Add(AddTableDataTag(rubricText8))
-        rubricRows1:Add(AddTableDataTag(rubricText9))
-        rubricRows1:Add(AddTableDataTag(rubricText10))
+        table2:Add(rubricText6)
+        table2:Add(rubricText7)
+        table2:Add(rubricText8)
+        table2:Add(rubricText9)
+        table2:Add(rubricText10)
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Cats CSV"))
+        WebTable webTable2 = GetDefaultTable("Cats CSV", table2)
+        introSection:Add(webTable)
 
-        Link link14
+
+        Link link14 = GenerateDefaultLink()
         link14:AddText("Violin Plot")
         link14:SetAddress("https://quorumlanguage.com/Libraries/Interface/Controls/Charts/ViolinPlot.html")
         link14:SetTarget(link14:newTab)        
         
-        bodyDiv:AddText("To start creating a violin plot, we need to import two libraries: ")
-        bodyDiv:Add(link9)
-        bodyDiv:AddText(", which is a frame where our chart will be drawn, and ")
-        bodyDiv:Add(link14)
-        bodyDiv:AddText(", which allows us to create a violin plot. Then we will initialize a DataFrame and load a comma separated values to the frame.")
+        Paragraph p15 = introSection:AddParagraph("To start creating a violin plot, we need to import two libraries: ")
+        p15:Add(link9)
+        p15:AddText(", which is a frame where our chart will be drawn, and ")
+        p15:Add(link14)
+        p15:AddText(", which allows us to create a violin plot. Then we will initialize a DataFrame and load a comma separated values to the frame.")
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("Now that we have the violin plot created, let us load the data from the ")
-        bodyDiv:Add(link12)
-        bodyDiv:AddText(" and display it.")
+        p15:AddText(" Now that we have the violin plot created, let us load the data from the ")
+        p15:Add(link12)
+        p15:AddText(" and display it.")
 
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("The steps that we describe in this task can be followed in the 'Loading and Formatting' section that is available in our ")
-        bodyDiv:Add(link13)
-        bodyDiv:AddText(" tutorial.")
+        Paragraph p16 = introSection:AddParagraph(" ")
+        p16:AddText("The steps that we describe in this task can be followed in the 'Loading and Formatting' section that is available in our ")
+        p16:Add(link13)
+        p16:AddText(" tutorial.")
 
-        bodyDiv:AddParagraph("Currently, we have only loaded the comma separated value file into the dataframe, and we are not reading anything from it. The first thing that we need to do is to load the columns to be read by our bar chart to create the x-axis. In this example, we added 'Minimum Life Span' and 'Maximum Life Span.' We don't need to add anything for the y-axis, since it's just the associated values for maximum and minimum life span.")
+        introSection:AddParagraph("Currently, we have only loaded the comma separated value file into the dataframe, and we are not reading anything from it. The first thing that we need to do is to load the columns to be read by our bar chart to create the x-axis. In this example, we added 'Minimum Life Span' and 'Maximum Life Span.' We don't need to add anything for the y-axis, since it's just the associated values for maximum and minimum life span.")
 
-        bodyDiv:AddParagraph("Finally, we can create our violin plot object using our frame with the following line of code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("ViolinPlot chart = frame:ViolinPlot()"))
+        introSection:AddParagraph("Finally, we can create our violin plot object using our frame with the following line of code:")
+        introSection:Add(preformatter:GeneratePreformattedCode("ViolinPlot chart = frame:ViolinPlot()"))
 
-        bodyDiv:AddParagraph("Right now, we have a simple violin plot, but there is not much to it. We will proceed on organizing our box plot with labels and further customization methods in the next section.")
+        introSection:AddParagraph("Right now, we have a simple violin plot, but there is not much to it. We will proceed on organizing our box plot with labels and further customization methods in the next section.")
 
-        bodyDiv:AddHeading("Labeling and Customizing the Violin Plots (5 minutes)",2)
+        AddHeading(introSection, "Labeling and Customizing the Violin Plots (5 minutes)",2)
 
-        bodyDiv:AddParagraph("The next step is to be able to add specific labels to the entire violin plot, both axes, adding subtitles, and changing the font size of the print. Adding these features will allow us to present our data in a clearer way.")
-        bodyDiv:AddParagraph(" ")
-
-        bodyDiv:AddText("The steps that we describe in this task can be followed in the 'Labeling the Violin Plot' section that is available in our ")
-        bodyDiv:Add(link13)
-        bodyDiv:AddText(" tutorial.")
-
-        bodyDiv:AddParagraph("First, we will add labels for our chart, x-axis, and y-axis. This allows the reader to distinguish between the information and to understand what data they are looking at. For our chart we can label it the following way: title - 'Minimum and Maximum Life Expectancy for Various Cat Breeds'; x-axis - 'Min/Max Lifespan'; y-axis - 'Type of Extrema.' If we feel like those labels are not enough, we can add a subtitle to the histogram. For example, for this histogram the subtitle can be 'How long do cats live?'")
+        introSection:AddParagraph("The next step is to be able to add specific labels to the entire violin plot, both axes, adding subtitles, and changing the font size of the print. Adding these features will allow us to present our data in a clearer way.")
         
-        bodyDiv:AddParagraph(" ")
-        bodyDiv:AddText("Like box plots, violin plots have some unique parts that may be customized due to their uniqueness as a chart. One of the unique features that we can explore here is 'flipping' the orientation of the data. Other features we can add to further customize our violin plot is that we can modify the font size, the location of our legend, and the color palette. Many of these features are available across all charts in Quorum. We can reference the section 'Customizing the Data Chart' for more information in the ")
-        bodyDiv:Add(link13)
-        bodyDiv:AddText(" tutorial.")
+        Paragraph p17 = introSection:AddParagraph(" ")
+        p17:AddText("The steps that we describe in this task can be followed in the 'Labeling the Violin Plot' section that is available in our ")
+        p17:Add(link13)
+        p17:AddText(" tutorial.")
 
-        bodyDiv:AddHeading("Accessing the Violin Plots (5 minutes)",2)
+        introSection:AddParagraph("First, we will add labels for our chart, x-axis, and y-axis. This allows the reader to distinguish between the information and to understand what data they are looking at. For our chart we can label it the following way: title - 'Minimum and Maximum Life Expectancy for Various Cat Breeds'; x-axis - 'Min/Max Lifespan'; y-axis - 'Type of Extrema.' If we feel like those labels are not enough, we can add a subtitle to the histogram. For example, for this histogram the subtitle can be 'How long do cats live?'")
+        
+        Paragraph p18 = introSection:AddParagraph(" ")
+        p18:AddText("Like box plots, violin plots have some unique parts that may be customized due to their uniqueness as a chart. One of the unique features that we can explore here is 'flipping' the orientation of the data. Other features we can add to further customize our violin plot is that we can modify the font size, the location of our legend, and the color palette. Many of these features are available across all charts in Quorum. We can reference the section 'Customizing the Data Chart' for more information in the ")
+        p18:Add(link13)
+        p18:AddText(" tutorial.")
+
+        AddHeading(introSection, "Accessing the Violin Plots (5 minutes)",2)
         
         
-        bodyDiv:AddParagraph("To view our actual plot we can type the following line of code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("This displays our chart via pop-up box inside of Quorum or on the side view of the Quorum online editor! Now let us explore the graphic using the accessibility tools on our devices. When the violin plot has been created, we should see our chart pop up in a separate window. From there, we can reference this ")
-        bodyDiv:Add(link11)
-        bodyDiv:AddText(" using the arrow keys for accessibility. One note is that when a bar chart is saved onto our computer devices, they save as an SVG (scalable vector graphic) which maintains not only resizability but accessibility to read these charts using a screen reader.
+        introSection:AddParagraph("To view our actual plot we can type the following line of code:")
+        introSection:Add(preformatter:GeneratePreformattedCode("chart:Display()"))
+        Paragraph p19 = introSection:AddParagraph("")
+        p19:AddText("This displays our chart via pop-up box inside of Quorum or on the side view of the Quorum online editor! Now let us explore the graphic using the accessibility tools on our devices. When the violin plot has been created, we should see our chart pop up in a separate window. From there, we can reference this ")
+        p19:Add(link11)
+        p19:AddText(" using the arrow keys for accessibility. One note is that when a bar chart is saved onto our computer devices, they save as an SVG (scalable vector graphic) which maintains not only resizability but accessibility to read these charts using a screen reader.
 ")
-        bodyDiv:AddParagraph(" ")
 
-        bodyDiv:AddHeading("Break-Out Group Discussion (5 Minutes)",2)
-        bodyDiv:AddParagraph("We can use this time to find datasets that would be a best fit for using a box plot and violin plot, or simply talk about real-world uses for each chart. Since violin plots are more uncommon, we can discuss why they are but also note the benefits of using a violin plot versus a box plot.")
+        AddHeading(introSection, "Break-Out Group Discussion (5 Minutes)",2)
+        introSection:AddParagraph("We can use this time to find datasets that would be a best fit for using a box plot and violin plot, or simply talk about real-world uses for each chart. Since violin plots are more uncommon, we can discuss why they are but also note the benefits of using a violin plot versus a box plot.")
 
-        
+        AddHeading(introSection, "Relevant Common Core Standards",2)
+        text standardsPath = "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"
 
-        bodyDiv:AddHeading("Relevant Common Core Standards",2)
-        
-        Link link15
+        Link link15 = GenerateDefaultLink()
         link15:AddText("website")
-        link15:SetAddress("http://www.corestandards.org/Math/Content/HSS/ID/")
+        link15:SetAddress(standardsPath)
         link15:SetTarget(link15:newTab)
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:AddText("We use the following ")
-        bodyDiv:Add(link15)
-        bodyDiv:AddText(" for common core standards in relation to histograms and measurements of distribution.")
+        Paragraph p20 = introSection:AddParagraph("")
+        p20:AddText("We use the following ")
+        p20:Add(link15)
+        p20:AddText(" for common core standards in relation to histograms and measurements of distribution.")
         
-        Link link16
+        Link link16 = GenerateDefaultLink()
         link16:AddText("CCSS.MATH.CONTENT.6.SP.B.4")
-        link16:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/4/")
+        link16:SetAddress(standardsPath)
         link16:SetTarget(link16:newTab)
         
-          Link link17
+          Link link17 = GenerateDefaultLink()
         link17:AddText("CCSS.MATH.CONTENT.6.SP.B.5")
-        link17:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/")
+        link17:SetAddress(standardsPath)
         link17:SetTarget(link17:newTab)
         
-         Link link18
+         Link link18 = GenerateDefaultLink()
         link18:AddText("CCSS.MATH.CONTENT.6.SP.B.5.A")
-        link18:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/a/")
+        link18:SetAddress(standardsPath)
         link18:SetTarget(link18:newTab)
         
-         Link link19
+         Link link19 = GenerateDefaultLink()
         link19:AddText("CCSS.MATH.CONTENT.6.SP.B.5.B")
-        link19:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/b/")
+        link19:SetAddress(standardsPath)
         link19:SetTarget(link19:newTab)
         
-         Link link20
+         Link link20 = GenerateDefaultLink()
         link20:AddText("CCSS.MATH.CONTENT.6.SP.B.5.C")
-        link20:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/c/")
+        link20:SetAddress(standardsPath)
         link20:SetTarget(link20:newTab)
         
-         Link link21
+         Link link21 = GenerateDefaultLink()
         link21:AddText("CCSS.MATH.CONTENT.6.SP.B.5.D")
-        link21:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/d/")
+        link21:SetAddress(standardsPath)
         link21:SetTarget(link21:newTab)
         
-        Link link22
+        Link link22 = GenerateDefaultLink()
         link22:AddText("CCSS.MATH.CONTENT.6.SP.B.5.E")
-        link22:SetAddress("http://www.corestandards.org/Math/Content/6/SP/B/5/e/")
+        link22:SetAddress(standardsPath)
         link22:SetTarget(link22:newTab)
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link16)
-        bodyDiv:AddText(": Display numerical data in plots on a number line, including dot plots, histograms, and box plots.")
+        p20:Add(link16)
+        p20:AddText(": Display numerical data in plots on a number line, including dot plots, histograms, and box plots.")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link17)
-        bodyDiv:AddText(": Summarize numerical data sets in relation to their context, such as by:")
+        p20:Add(link17)
+        p20:AddText(": Summarize numerical data sets in relation to their context, such as by:")
 
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link18)
-        bodyDiv:AddText(": Reporting the number of observations.")
+        p20:Add(link18)
+        p20:AddText(": Reporting the number of observations.")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link19)
-        bodyDiv:AddText(": Describing the nature of the attribute under investigation, including how it was measured and its units of measurement.")
+        p20:Add(link19)
+        p20:AddText(": Describing the nature of the attribute under investigation, including how it was measured and its units of measurement.")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link20)
-        bodyDiv:AddText(": Giving quantitative measures of center (median and/or mean) and variability (interquartile range and/or mean absolute deviation), as well as describing any overall pattern and any striking deviations from the overall pattern with reference to the context in which the data were gathered.")
+        p20:Add(link20)
+        p20:AddText(": Giving quantitative measures of center (median and/or mean) and variability (interquartile range and/or mean absolute deviation), as well as describing any overall pattern and any striking deviations from the overall pattern with reference to the context in which the data were gathered.")
         
-        bodyDiv:AddParagraph("")
-        bodyDiv:Add(link21)
-        bodyDiv:AddText(": Relating the choice of measures of center and variability to the shape of the data distribution and the context in which the data were gathered.")
+        p20:Add(link21)
+        p20:AddText(": Relating the choice of measures of center and variability to the shape of the data distribution and the context in which the data were gathered.")
         
+        bodyDiv:Add(introSection)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
@@ -612,5 +593,11 @@ Array<text> rubricText1
 
     action GetLocation returns text
         return "lessons/DataScience/boxViolinDispersion.html"
+    end
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Data Science"
     end
 end
