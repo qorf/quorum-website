@@ -12,6 +12,9 @@ use Libraries.Web.Page.Comment
 use Libraries.Web.Page.Span
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.MainContent
+use Libraries.Containers.Array
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.Link
 
 
 class Lab3_5 is Lesson
@@ -31,65 +34,74 @@ class Lab3_5 is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page-specific header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Lab 3.5: Control the Quorum Bunny", 1)
-        Add(headDiv)
+        headDiv:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(headDiv, "Lab 3.5: Control Quincy: the Quorum Bunny", 1)
+        headDiv:AddText("Controlling items on the screen")
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
-        bodyDiv:SetClassAttribute("bodyContainer")
-        bodyDiv:AddHeading("Objectives", 2)
-        bodyDiv:AddParagraph("In this lab, we will learn the following computer science concepts:")
+        Section goalsSection
+        goalsSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goalsSection, "Goals", 2)
+        goalsSection:AddParagraph("In this lab, we will learn the following computer science concepts:")
         
         UnorderedList objectivesList
+        objectivesList:SetClassAttribute(GetDefaultListStyle())
         objectivesList:AddListItem("Creating Objects")
         objectivesList:AddListItem("Using conditional statements")
         bodyDiv:Add(objectivesList)
 
-
-        bodyDiv:AddHeading("Computer Science Principles Curriculum", 2)
+        Section cspCurriculumSection
+        cspCurriculumSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(cspCurriculumSection, "Computer Science Principles Curriculum", 2)
 
         UnorderedList list
+        list:SetClassAttribute(GetDefaultListStyle())
         AddListItemWithBoldAtFront(list, "Big Idea: Algorithms: ", "EU 4.1, LO 4.1.1, EK 4.1.1A, EK 4.1.1C, EK 4.1.1D")
-        bodyDiv:Add(list)
+        cspCurriculumSection:Add(list)
 
-        bodyDiv:AddHeading("Common Core Standards", 2)
+        Section cspStandardsSection
+        cspStandardsSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(cspStandardsSection, "Common Core Standards", 2)
         UnorderedList ccList
+        ccList:SetClassAttribute(GetDefaultListStyle())
         AddListItemWithBoldAtFront(ccList, "English Language Arts Standards » Science & Technical Subjects: ", "
         CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.3, CCSS.ELA-Literacy.RST.9-10.4, CCSS.ELA-Literacy.RST.9-10.5, CCSS.ELA-Literacy.RST.9-10.6, CCSS.ELA-Literacy.RST.11-12.2, CCSS.ELA-Literacy.RST.11-12.3, CCSS.ELA-Literacy.RST.9-10.1, CCSS.ELA-Literacy.RST.9-10.2, CCSS.ELA-Literacy.RST.9-10.7, CCSS.ELA-Literacy.RST.9-10.8, CCSS.ELA-Literacy.RST.9-10.9")
         AddListItemWithBoldAtFront(ccList, "Standards For Mathmatical Practice: ", "CCSS.Math.Practice.MP1, CCSS.Math.Practice.MP2, CCSS.Math.Practice.MP5, CCSS.Math.Practice.MP6, CCSS.Math.Practice.MP7, 
         CCSS.Math.Practice.MP8,")
-        bodyDiv:Add(ccList) 
+        cspStandardsSection:Add(ccList) 
 
-
-        bodyDiv:AddHeading("Vocabulary", 2)
+        Section vocabSection
+        vocabSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(vocabSection, "Vocabulary", 2)
 
         UnorderedList vocabularyList
+        vocabularyList:SetClassAttribute(GetDefaultListStyle())
         vocabularyList:AddListItem(    "Control Structures")
         vocabularyList:AddListItem(    "If Statement")
         vocabularyList:AddListItem(    "Looping")
         vocabularyList:AddListItem(    "Input Manager")
-        bodyDiv:Add(vocabularyList)
+        vocabSection:Add(vocabularyList)
 
-
-        bodyDiv:AddHeading("Overview", 2)
+        Section overviewSection
+        overviewSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(overviewSection, "Overview", 2)
 
         Paragraph p0
         p0:AddText("This lab demonstrates how to use key presses on the keyboard to perform some tasks. 
                     The task you will perform is to write a program that moves an image of a bunny around the screen upon pressing of the up, down, left, and right arrow keys. 
                     Download this ")
-        p0:AddLink("zip file", "/files/lessons/chapter3/Lab3_5Template.zip")
+        Link link = p0:AddLink("zip file", "/files/lessons/chapter3/Lab3_5Template.zip")
+        link:SetClassAttribute(GetDefaultListStyle())
         p0:AddText(" for a template to help you get started, or use the IDE below.")
-        bodyDiv:Add(p0)
+        overviewSection:Add(p0)
 
-        CodingOnline addStatementIDE
-        addStatementIDE:SetUniqueIdentifier("lab3_5IDE")
-        addStatementIDE:GetIDETitle():AddText("Controlling your Game")
-        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+        AddIDE(overviewSection, "lab3_5IDE", "Controlling your Game", "use Libraries.Game.Game
 use Libraries.Game.Graphics.Drawable
 use Libraries.Game.InputMonitor
 use Libraries.Interface.Events.KeyboardEvent
@@ -136,18 +148,72 @@ class Main is Game
 
     action Update(number seconds)
     end
-end")
-        addStatementIDE:Setup()
-        bodyDiv:Add(addStatementIDE)
+end", true)
 
-        bodyDiv:AddHeading("Understanding the InputMonitor and KeyboardEvent Libraries", 2)
+//        CodingOnline addStatementIDE
+//        addStatementIDE:SetUniqueIdentifier("lab3_5IDE")
+//        addStatementIDE:GetIDETitle():AddText("Controlling your Game")
+//        addStatementIDE:GetIDEInputArea():AddText("use Libraries.Game.Game
+//use Libraries.Game.Graphics.Drawable
+//use Libraries.Game.InputMonitor
+//use Libraries.Interface.Events.KeyboardEvent
+///*
+//    This is a default class for creating a game in Quorum. Note that the Main 
+//    action begins by calling StartGame(), which loads a window a game can 
+//    be displayed in. The action CreateGame is where the game should load any 
+//    assets, like images to be displayed, frames of animation, or sounds to be
+//    played. 
+//*/
+//
+//class Main is Game
+//    InputMonitor inputMonitor       // handles user input during game
+//    KeyboardEvent keys              // helps determine which key is pressed
+//
+//    Drawable bunny                  // bunny image
+//    number speed = 100
+//
+//    /*
+//        This action, Main, starts our computer program. In Quorum, programs always
+//        begin from Main.
+//    */
+//
+//    action Main
+//        StartGame()
+//    end
+//
+//    /*
+//        This action sets up the default values for a game. For example, we might
+//        use the Libraries.Game.Graphics.Drawable class to load up an image or 
+//        a shape. Or, we might add a Libraries.Interface.Button for making something clickable
+//        or a Libraries.Interface.TextBox for gathering user input in a game.
+//    */
+//
+//    action CreateGame
+//    end
+//
+//    /*
+//        The update action is called on every " + dq + "frame" + dq + " of animation in a game. This
+//        action should be used to do operations on items. So, for example, we 
+//        might use this action to change frames of animation, to rotate items, 
+//        or to make creatures jump.
+//    */
+//
+//    action Update(number seconds)
+//    end
+//end")
+//        addStatementIDE:Setup()
+//        bodyDiv:Add(addStatementIDE)
+
+        Section understandingSection
+        understandingSection:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(understandingSection, "Understanding the InputMonitor and KeyboardEvent Libraries", 2)
         Paragraph p1
         Bold mainBold
         mainBold:AddText("Main.quorum file")
         p1:AddText("Open the provided template and navigate to the ")
         p1:Add(mainBold)
         p1:AddText(" . Near the top of the file, there are two lines that look like this:")
-        bodyDiv:Add(p1)
+        understandingSection:Add(p1)
 
 
         CodeBlock example1Code
@@ -161,7 +227,7 @@ end")
         s2:SetClassAttribute("comment")
         example1Code:Add(s2)
         example1Code:AddText(    "KeyboardEvent keys" )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example1Code))
+        understandingSection:Add(preformatter:GeneratePreformattedCode(example1Code))
 
         Paragraph p2
         CodeBlock inputMonitorCode
@@ -174,7 +240,7 @@ end")
         p2:Add(keyboardEventCode)
         p2:AddText(" object knows which key is pressed down. 
                     You use these objects to determine when a key is pressed down and which key is pressed down.")
-        bodyDiv:Add(p2)
+        understandingSection:Add(p2)
 
         Paragraph p3
         CodeBlock isKeyPressedCode
@@ -204,10 +270,7 @@ end")
         p3:AddText(" action, telling the ")
         p3:Add(keyboardEventCode)
         p3:AddText(" object which key you want to check is pressed. This is done with the following code:")
-        bodyDiv:Add(p3)
-
-
-        bodyDiv:Add(break)
+        understandingSection:Add(p3)
 
         Paragraph example1Paragraph
         Bold example1bold
@@ -217,7 +280,7 @@ end")
         example1bold:Add(keyboardEventCode)
         example1bold:AddText(" object to execute code when a key is pressed.")
         example1Paragraph:Add(example1bold)
-        bodyDiv:Add(example1Paragraph)
+        understandingSection:Add(example1Paragraph)
 
         CodeBlock example2Code
         Span s3
@@ -228,7 +291,7 @@ end")
         example2Code:AddText(   "if inputMonitor:IsKeyPressed(keys:A)" + cr 
                             +   "   output " + dq + "The 'A' Key was pressed!" + dq + "" + cr 
                             +   "end" + cr )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example2Code))
+        understandingSection:Add(preformatter:GeneratePreformattedCode(example2Code))
 
 
         Paragraph p4
@@ -253,10 +316,11 @@ end")
         p4:AddText(" statement to execute code only when that action returns ")
         p4:Add(trueCode)
         p4:AddText("—i.e., when the key in question is pressed down.")
-        bodyDiv:Add(p4)
+        understandingSection:Add(p4)
 
-
-        bodyDiv:AddHeading("Goal 1: Creating Objects", 2)
+        Section goal1Section
+        goal1Section:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goal1Section, "Goal 1: Creating Objects", 2)
 
 
         Paragraph p5
@@ -277,18 +341,8 @@ end")
         p5:AddText(". Load the image called " + dq + "media/bunny.png" + dq + " to the")
         p5:Add(drawableCode)
         p5:AddText(" object.")
-        bodyDiv:Add(p5)
+        goal1Section:Add(p5)
 
-//        SideBySideIDE loadImageIDE
-//        loadImageIDE:SetUniqueIdentifier("loadImage")
-//        loadImageIDE:GetIDETitle():AddText("Activity: ")
-//        Paragraph p6
-//        p6:AddText("Load an image to your ")
-//        p6:Add(drawableCode)
-//        p6:AddText(" object and add it to the screen.")
-//        loadImageIDE:SetIDESubtitle(p6)
-//        loadImageIDE:Setup()
-//        bodyDiv:Add(loadImageIDE)
 
         Paragraph activity1Paragraph
         Bold activity1Bold
@@ -296,7 +350,7 @@ end")
         activity1Bold:Add(drawableCode)
         activity1Bold:AddText(" object and add it to the screen.")
         activity1Paragraph:Add(activity1Bold)
-        bodyDiv:Add(activity1Paragraph)
+        goal1Section:Add(activity1Paragraph)
 
 
         Paragraph p7
@@ -319,7 +373,7 @@ end")
         p7:AddText(" as the parameter. Now that you have your ")
         p7:Add(drawableCode)
         p7:AddText(" loaded and added to the game, you can begin writing the code to move the image around the screen upon key presses.")
-        bodyDiv:Add(p7)
+        goal1Section:Add(p7)
 
 
         Paragraph p8
@@ -330,10 +384,11 @@ end")
         p8:AddText(" on line 46 through line 47. This action is called on every frame of your game. 
                     This is where you write your code to handle the key presses. 
                     This action should check whether some keys are pressed down and, if they are, begin the appropriate task for those keys.")
-        bodyDiv:Add(p8)
+        goal1Section:Add(p8)
 
-
-        bodyDiv:AddHeading("Goal 2: Using Conditional Statements", 2)
+        Section goal2Section
+        goal2Section:SetClassAttribute(GetDefaultSectionStyle())
+        AddHeading(goal2Section, "Goal 2: Using Conditional Statements", 2)
 
         Paragraph p9
         CodeBlock upCode
@@ -349,7 +404,7 @@ end")
         p9:AddText(" and ")
         p9:Add(downCode)
         p9:AddText(", respectively.")
-        bodyDiv:Add(p9)
+        goal2Section:Add(p9)
 
         Paragraph p10
         CodeBlock getYCode
@@ -364,11 +419,9 @@ end")
         p10:AddText(" (declared and set earlier in the program) multiplied by the time between frames (the parameter of the ")
         p10:Add(updateCode)
         p10:AddText(" action in which you are currently writing your code).")
-        bodyDiv:Add(p10)
+        goal2Section:Add(p10)
 
-        bodyDiv:Add(break)
-
-        bodyDiv:AddHeading("Example: Write the code that moves the bunny up when the Up key is pressed.", 4)
+        AddHeading(goal2Section, "Example: Write the code that moves the bunny up when the Up key is pressed.", 3)
 
         CodeBlock example3Code
         Span s4
@@ -392,14 +445,8 @@ end")
         example3Code:Add(s7)
         example3Code:AddText(   "   bunny:SetY(newY)" + cr 
                             +   "end" + cr )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example3Code))
+        goal2Section:Add(preformatter:GeneratePreformattedCode(example3Code))
 
-//        SideBySideIDE moveBunnyIDE
-//        moveBunnyIDE:SetUniqueIdentifier("moveBunny")
-//        moveBunnyIDE:Setup()
-//        moveBunnyIDE:GetIDETitle():AddText("Activity: ")
-//        moveBunnyIDE:GetIDESubtitle():AddText("Write the code to move the bunny down the screen if the Down key is pressed.")
-//        bodyDiv:Add(moveBunnyIDE)
 
         Paragraph p11
         p11:AddText("If the down arrow key is pressed, the bunny should move down the screen. 
@@ -409,7 +456,7 @@ end")
         p11:Add(getYCode)
         p11:AddText(" action. 
                     The new y-coordinate should be set to the current y-coordinate minus the speed multiplied by the seconds.")
-        bodyDiv:Add(p11)
+        goal2Section:Add(p11)
 
         Paragraph activity2Paragraph
         Bold activity2Bold
@@ -417,7 +464,7 @@ end")
         activity2Bold:Add(downCode)
         activity2Bold:AddText(" key is pressed.")
         activity2Paragraph:Add(activity2Bold)
-        bodyDiv:Add(activity2Paragraph)
+        goal2Section:Add(activity2Paragraph)
 
         Paragraph p12
         CodeBlock leftCode
@@ -433,7 +480,7 @@ end")
         p12:AddText(" and ")
         p12:Add(rightCode)
         p12:AddText(", respectively.")
-        bodyDiv:Add(p12)
+        goal2Section:Add(p12)
 
         Paragraph p13
         CodeBlock getXCode
@@ -449,12 +496,10 @@ end")
         p13:AddText(" (declared and set earlier in the program) multiplied by the seconds between frames (the parameter of the ")
         p13:Add(updateCode)
         p13:AddText(" action in which you are currently writing your code).")
-        bodyDiv:Add(p13)
+        goal2Section:Add(p13)
 
 
-        bodyDiv:Add(break)
-
-        bodyDiv:AddHeading("Example: Write the code to move the bunny towards the left when the Left key is pressed.", 4)
+        AddHeading(goal2Section, "Example: Write the code to move the bunny towards the left when the Left key is pressed.", 3)
 
         CodeBlock example4Code
         Span s8
@@ -478,14 +523,8 @@ end")
         example4Code:Add(s11)
         example4Code:AddText(   "   bunny:SetX(newX)" + cr 
                             +   "end" )
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(example4Code))
+        goal2Section:Add(preformatter:GeneratePreformattedCode(example4Code))
 
-//        SideBySideIDE moveBunnyRightIDE
-//        moveBunnyRightIDE:SetUniqueIdentifier("moveBunnyRight")
-//        moveBunnyRightIDE:Setup()
-//        moveBunnyRightIDE:GetIDETitle():AddText("Activity: ")
-//        moveBunnyRightIDE:GetIDESubtitle():AddText("Write the code to move the bunny towards the right when the Right key is pressed.")
-//        bodyDiv:Add(moveBunnyRightIDE)
 
         Paragraph p14
         p14:AddText("If the right arrow key is pressed, the bunny should move right across the screen. 
@@ -495,7 +534,7 @@ end")
         p14:Add(getXCode)
         p14:AddText(" action. 
                     The new x-coordinate should be set to the current x-coordinate plus the speed multiplied by the seconds.")
-        bodyDiv:Add(p14)
+        goal2Section:Add(p14)
 
         Paragraph activity3Paragraph
         Bold activity3Bold
@@ -503,9 +542,9 @@ end")
         activity3Bold:Add(rightCode)
         activity3Bold:AddText(" key is pressed.")
         activity3Paragraph:Add(activity3Bold)
-        bodyDiv:Add(activity3Paragraph)
+        goal2Section:Add(activity3Paragraph)
 
-        bodyDiv:AddParagraph("You may now compile and run your code. 
+        goal2Section:AddParagraph("You may now compile and run your code. 
                             There should be no errors. 
                             If there are errors, fix them and try again. 
                             You should be able to move the bunny horizontally and vertically around the screen by pressing the appropriate keys.")
@@ -530,13 +569,21 @@ end")
         activity4Bold:Add(sCode)
         activity4Bold:AddText(" buttons. If you ever intend to make an MMORPG you'll need to start here!")
         activity4Paragraph:Add(activity4Bold)
-        bodyDiv:Add(activity4Paragraph)                   
+        goal2Section:Add(activity4Paragraph)                   
 
-        //WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        bodyDiv:Add(goalsSection)
+        bodyDiv:Add(cspCurriculumSection)
+        bodyDiv:Add(cspStandardsSection)
+        bodyDiv:Add(vocabSection)
+        bodyDiv:Add(overviewSection)
+        bodyDiv:Add(understandingSection)
+        bodyDiv:Add(goal1Section)
+        bodyDiv:Add(goal2Section)
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
