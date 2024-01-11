@@ -1924,9 +1924,9 @@ var __publicField = (obj, key, value) => {
     }
     return { id: file[0].id, name: file[0].display_name };
   }
-  const MSDE_BASE_URL_KEEP_PROD = "https://127.0.0.1";
-  const MSDE_BASE_URL = "https://127.0.0.1";
-  const QUORUM_STANDARD_LIBRARY = `${MSDE_BASE_URL}/script/QuorumStandardLibrary.js?version=11.2.1`;
+  const MSDE_BASE_URL_KEEP_PROD = "https://quorumlanguage.com";
+  const MSDE_BASE_URL = "https://quorumlanguage.com";
+  const QUORUM_STANDARD_LIBRARY = `${MSDE_BASE_URL}/script/QuorumStandardLibrary.js?version=11.3.2`;
   const QUORUM_LOAD = `${MSDE_BASE_URL}/script/load.js?version=1.0.1`;
   let isRunning = false;
   let isThrottled = false;
