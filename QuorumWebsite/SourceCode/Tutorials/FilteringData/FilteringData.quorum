@@ -14,6 +14,12 @@ use Libraries.Web.Page.MainContent
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.OrderedList
 use Libraries.Containers.Array
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.Link
 
 class FilteringData is Lesson
     text dq = ""
@@ -28,27 +34,36 @@ class FilteringData is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
 
         //page header
         Header headDiv
-        headDiv:SetClassAttribute("pageHeader outermostContainer")
-        headDiv:AddHeading("Tutorial: Filtering Data in a Dataset", 1)
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        Heading h_heading = headDiv:AddHeading("Filtering Data in a Dataset", 1)
+        h_heading:AddClassAttribute("text-3xl font-bold")
+        h_heading:AddAttribute("data-text", "Overview on Transformations")
         headDiv:AddText("This tutorial tells us how to use the DataFrame to filter a dataset")
-        Add(headDiv)
+        AddToHeadingArray(h_heading)
+        bodyDiv:Add(headDiv)
 
-        Division bodyDiv
         bodyDiv:SetClassAttribute("bodyContainer")
         
-        bodyDiv:AddHeading("Filtering the data", 2)
+        Section sectionIntro
+sectionIntro:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(sectionIntro)
         
-        bodyDiv:AddParagraph("Being able to look at specific sections of our data may be useful when we have large amounts of entries in our dataset. For example, say that we have a survey sample of 2000 entries on music and we are wanting to look at data based off of entries that contain "+dq+"indie pop"+dq+" within the genre category. Instead of having to manually go through our data and find the individual rows containing "+dq+"indie pop"+dq+" we can simply make it easier on ourselves by filtering.")
+        AddHeading(sectionIntro, "Filtering the data", 2)
+        
+        sectionIntro:AddParagraph("Being able to look at specific sections of our data may be useful when we have large amounts of entries in our dataset. For example, say that we have a survey sample of 2000 entries on music and we are wanting to look at data based off of entries that contain "+dq+"indie pop"+dq+" within the genre category. Instead of having to manually go through our data and find the individual rows containing "+dq+"indie pop"+dq+" we can simply make it easier on ourselves by filtering.")
 
-        bodyDiv:AddParagraph("The example we will be looking at is about dog breeds. In this dataset, it lists over 100 entries of different dog breeds and describes their life span, weight, height, temperament, etc. Now, looking at all these different dogs could be a bit overwhelming and right now, we want to only focus on dogs that may be good in an apartment, so it would make sense to possibly find smaller dogs. Instead of scrolling through every row to manually look for small dogs, we can now filter by the "+dq+"Breed Group."+dq+" To do we would be able to filter all the dog breeds we want using the Filter(text source) function within the DataFrames library.")
+        sectionIntro:AddParagraph("The example we will be looking at is about dog breeds. In this dataset, it lists over 100 entries of different dog breeds and describes their life span, weight, height, temperament, etc. Now, looking at all these different dogs could be a bit overwhelming and right now, we want to only focus on dogs that may be good in an apartment, so it would make sense to possibly find smaller dogs. Instead of scrolling through every row to manually look for small dogs, we can now filter by the "+dq+"Breed Group."+dq+" To do we would be able to filter all the dog breeds we want using the Filter(text source) function within the DataFrames library.")
 
-        bodyDiv:AddParagraph("Here is a brief description of how the Filter() function works.")
+        sectionIntro:AddParagraph("Here is a brief description of how the Filter() function works.")
          
+        WebTable table = AddWebTable("Filter Helper Function")
+        TableBody tableBody = AddTableBody()
          Array<text> rubricText1
         rubricText1:Add("frame:Filter(text source)")
         rubricText1:Add("This function takes in a string expression similar to writing an expression in Quorum.  This function will filter out specific rows based on columns. The expression will evaluate to true or false on each row and either filter that row or not.") 
@@ -58,21 +73,22 @@ frame:Filter("+dq+"Breed = "+dq+" + dq + "+dq+"Toy"+dq+" + dq)
 ")
    
         Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Function", " "))
-        rubricHeader1:Add(AddTextBoldFront("Description", " "))
-        rubricHeader1:Add(AddTextBoldFront("Usage", " "))
+        rubricHeader1:Add("Function")
+        rubricHeader1:Add("Description")
+        rubricHeader1:Add("Usage")
+        TableHeader thead = AddTableHeaderRow(rubricHeader1)
+        table:Add(thead)
 
-        Array<text> rubricRows1
-        rubricRows1:Add(AddTableHeaderTag(rubricHeader1))
       
-        rubricRows1:Add(AddTableDataTag(rubricText1))
+        tableBody:Add(AddTableBodyRow(rubricText1))
         
-        bodyDiv:AddParagraph(AddTableTag(AddRowTag(rubricRows1), "Filter Helper Function"))
+        table:Add(tableBody)
+        sectionIntro:Add(table)
 
 
-        bodyDiv:AddParagraph("Let's try an example and retrieve all rows that contain "+dq+"Toy"+dq+" as the breed group. Doing so will create a copy of our data frame and contain ONLY the rows with "+dq+"Toy,"+dq+" hence we are filtering our dataset. Please note that in the Quorum Language, there is a flaw in the programming language in regard to usability and double quotes (notably, Quorum lacks escape characters), so we must manually make our double quotes as shown above.")
+        sectionIntro:AddParagraph("Let's try an example and retrieve all rows that contain "+dq+"Toy"+dq+" as the breed group. Doing so will create a copy of our data frame and contain ONLY the rows with "+dq+"Toy,"+dq+" hence we are filtering our dataset. Please note that in the Quorum Language, there is a flaw in the programming language in regard to usability and double quotes (notably, Quorum lacks escape characters), so we must manually make our double quotes as shown above.")
 
-        bodyDiv:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+        sectionIntro:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
 
@@ -94,19 +110,40 @@ frame:Filter("+dq+"Breed = "+dq+" + dq + "+dq+"Toy"+dq+" + dq)
 //We can save the frame or output it to the console, like we are doing here.
 output frame:ToText()"))
 
-    AddIDE(bodyDiv,"FilterData","Filtering Data with DataFrames","Example of filtering data","examples/DataFrames/FilterData.quorum")
+        Section tryItYourself
+        tryItYourself:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(tryItYourself)
+Heading h2_try_yourself = tryItYourself:AddHeading("Try it Yourself!", 2)
+    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
+    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
+    AddToHeadingArray(h2_try_yourself)
+tryItYourself:AddAttribute("data-text", "Try it Yourself!")
+tryItYourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
+        
+CodeForIDE code
+    code:AddFileUrl("Main.quorum", "examples/DataFrames/FilterData.quorum")
+        
+IDE ide = AddIDE()
+    ide:SetLightTheme()
+    ide:SetCodeForIDE(code:GetJsonArray())
+    ide:SetIdeTitle("Filtering Data with Dataframes")
+    tryItYourself:Add(ide)
 
-    bodyDiv:AddParagraph(" ")
-    bodyDiv:AddText("Congratulations! We have successfully filtered the data from a dataset. To view the code we just ran, we can reference it")
-    bodyDiv:AddLink(" here","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FilterData.quorum")
-    bodyDiv:AddText(".")
-    bodyDiv:AddParagraph(" ")
+        Paragraph para
+    para:AddText("Congratulations! We have successfully filtered the data from a dataset. To view the code we just ran, we can reference it ")
+        Link filterLink
+        filterLink:AddText("here")
+        filterLink:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FilterData.quorum")
+        filterLink:SetTarget(filterLink:newTab)
+        filterLink:SetClassAttribute("underline text-quorum-blue-150")
+        para:Add(filterLink)
+    para:AddText(".")
+        tryItYourself:Add(para)
 
-        WriteNextTutorial(bodyDiv)
-        mainRegion:Add(bodyDiv)
-        Add(mainRegion)
-        PageFooter footer
-        Add(footer)
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
     action GetMetaDescription returns text
