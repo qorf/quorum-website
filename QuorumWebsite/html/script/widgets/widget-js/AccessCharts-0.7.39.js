@@ -4246,9 +4246,16 @@ var __privateSet = (obj, member, value, setter) => {
   _id = new WeakMap();
   _themeRadios = new WeakMap();
   _themeHeader = new WeakMap();
-  const MSDE_BASE_URL_KEEP_PROD = "https://quorumlanguage.com";
-  const MSDE_BASE_URL = "https://quorumlanguage.com";
-  const QUORUM_STANDARD_LIBRARY = `${MSDE_BASE_URL}/script/QuorumStandardLibrary.js?version=11.2.1`;
+  let runLocation = "https://quorumlanguage.com";
+  if (window.location.href.startsWith('https://127.0.0.1')) {
+    runLocation = 'https://127.0.0.1';
+  }
+  if (window.location.href.startsWith('https://localhost')) {
+    runLocation = 'https://localhost';
+  }
+  const MSDE_BASE_URL_KEEP_PROD = runLocation;
+  const MSDE_BASE_URL = runLocation;
+  const QUORUM_STANDARD_LIBRARY = `${MSDE_BASE_URL}/script/QuorumStandardLibrary.js?version=12.0.0`;
   const QUORUM_CHARTS_JS = `${MSDE_BASE_URL}/script/quorumCharts.js?version=1.1.8`;
   const QUORUM_CHARTS_CSS = `${MSDE_BASE_URL_KEEP_PROD}/style/quorumCharts.css?version=1.1.6`;
   const QUORUM_LOAD = `${MSDE_BASE_URL}/script/load.js?version=1.0.1`;
