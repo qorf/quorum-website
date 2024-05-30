@@ -176,6 +176,17 @@ module.exports = {
           100: "rgba(255, 0, 0, 1)",
         },
       },
+      header: {
+        green: {
+          100: "rgba(50, 148, 65, 1)",
+        },
+        purple: {
+          100: "rgba(33, 30, 147, 1)",
+        },
+        yellow: {
+          100: "rgba(228, 184, 25)",
+        },
+      },
     },
   },
   plugins: plugins,
