@@ -1,0 +1,465 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Bold
+
+class ActionsAndClassesP1 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Actions and Class, Part 1 - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Hour 11: Actions and Classes - Part 1", 1)
+
+        headDiv:AddText("This lesson will introduce you to the basics of actions and classes in Quorum.")
+        bodyDiv:Add(headDiv)
+
+        Section section_overview
+        section_overview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overview, "Overview", 2)
+        section_overview:AddParagraph("In previous lessons, you have seen how to use objects from libraries and how to call actions from those objects. In this lesson, you will learn how to make your own. The first part will focus on learning how to create and use actions.")
+        
+        AddHeading(section_overview, "Goals", 3)
+        section_overview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to use " + dq + "action" + dq + " blocks to create an action")
+        goalList:AddListItem("Learn about the optional properties of actions: parameters and return values")
+        goalList:AddListItem("Discuss how " + dq + "scope" + dq + " impacts variables declared in and out of actions")
+        section_overview:Add(goalList)
+
+        bodyDiv:Add(section_overview)
+
+        Section section_warmUp
+        section_warmUp:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_warmUp)
+        AddHeading(section_warmUp, "Warm up", 2)
+        
+        section_warmUp:AddParagraph("Actions allow programs the ability to perform a task. In the previous lesson, while you were working on Form apps, recall when you were using block commands:")
+        section_warmUp:Add(preformatter:GeneratePreformattedCode("page:AddBanner(" + dq + "banner1" + dq + ", " + dq + "About me!" + dq + ", " + dq + "Welcome reader to my about me page!" + dq + ")" + cr +
+"page:AddButton(" + dq + "Click me!" + dq + ")"))
+
+        section_warmUp:AddParagraph("Each of these calls are an action. Why might programmers write these for us instead of having us write them all ourselves?")
+        
+        AddHeading(section_warmUp, "Vocabulary", 3)
+
+        section_warmUp:AddParagraph("You will be learning about the following vocabulary words: ")
+        
+        WebTable table = AddWebTable("Vocabulary")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Term")
+        tableHeaderArray:Add("Definition") 
+   
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)  
+
+        Array<text> vocab1
+        vocab1:Add("Action")
+        vocab1:Add("A named sequence of code that can be reused later in a program.") 
+   
+        tableBody:Add(AddTableBodyRow(vocab1))
+
+        Array<text> vocab2
+        vocab2:Add("Action Call")
+        vocab2:Add("Code that tells an action to run.") 
+  
+        tableBody:Add(AddTableBodyRow(vocab2))
+
+        Array<text> vocab3
+        vocab3:Add("Parameter")
+        vocab3:Add("A special variable inside an action. It must be provided as an input when the action is called.") 
+     
+        tableBody:Add(AddTableBodyRow(vocab3))
+
+        Array<text> vocab4
+        vocab4:Add("Return Value")
+        vocab4:Add("The result of an action, which can be used like a variable.") 
+     
+        tableBody:Add(AddTableBodyRow(vocab4))
+
+        Array<text> vocab5
+        vocab5:Add("Scope")
+        vocab5:Add("The area where a variable exists and can be used.") 
+     
+        tableBody:Add(AddTableBodyRow(vocab5))
+
+        Array<text> vocab6
+        vocab6:Add("Class")
+        vocab6:Add("A structure that defines a custom Object type. It can contain variables and actions.") 
+     
+        tableBody:Add(AddTableBodyRow(vocab6))
+    
+        table:Add(tableBody)
+        section_warmUp:Add(table)
+
+        section_warmUp:AddParagraph("")
+        AddHeading(section_warmUp, "Code", 3)
+
+        section_warmUp:AddParagraph("You will be using the following new pieces of code: ")
+
+
+        WebTable tableCode = AddWebTable("New Code to Learn")
+        TableBody tableBodyCode = AddTableBody()
+        
+        Array<text> tableHeaderArrayCode
+        tableHeaderArrayCode:Add("Quorum Code")
+        tableHeaderArrayCode:Add("Code Example") 
+        tableHeaderArrayCode:Add("Explanation")
+
+        text indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
+
+        TableHeader theadCode = AddTableHeaderRow(tableHeaderArrayCode)
+        tableCode:Add(theadCode)  
+
+        Array<text> codeEntry1
+        codeEntry1:Add("action <code>NAME</code><br/>"
++ "end")
+        codeEntry1:Add("action AddNumbers<br/>"
++ "end")
+        codeEntry1:Add("Creates an action/function inside of Quorum.") 
+        tableBodyCode:Add(AddTableBodyRow(codeEntry1))
+
+        Array<text> codeEntry2
+        codeEntry2:Add("action <code>NAME</code>(<code>TYPE VARIABLE_NAME</code>)<br/>"
++ "end")
+        codeEntry2:Add("action AddNumbers(integer a, integer b)<br/>"
++ indent + "value = a + b<br/>"
++ "end")
+        codeEntry2:Add("Creates an action that uses parameters, letting you pass in values from the main program to be used in the action.") 
+        tableBodyCode:Add(AddTableBodyRow(codeEntry2))
+
+        Array<text> codeEntry3
+        codeEntry3:Add("action <code>NAME</code> returns <code>TYPE</code><br/>"
++ "end")
+        codeEntry3:Add("action AddNumbers(integer a, integer b) returns integer<br/>"
++ indent + "value = a + b<br/>"
++ indent + "return value<br/>"
++ "end")
+        codeEntry3:Add("Creates an action inside of Quorum that returns a value back once the function is finished.") 
+        tableBodyCode:Add(AddTableBodyRow(codeEntry3))
+
+        Array<text> codeEntry4
+        codeEntry4:Add("return <code>VALUE</code>")
+        codeEntry4:Add("return myVariable")
+        codeEntry4:Add("Code that reports the result of an action. The given value is sent back to the code that called the action.") 
+        tableBodyCode:Add(AddTableBodyRow(codeEntry4))
+
+        Array<text> codeEntry5
+        codeEntry5:Add("class <code>NAME</code><br/>"
++ "end")
+        codeEntry5:Add("class Calculator<br/>"
++ "end")
+        codeEntry5:Add("Creates a class, which can contain variables and actions.") 
+        tableBodyCode:Add(AddTableBodyRow(codeEntry5))
+
+        tableCode:Add(tableBodyCode)
+        section_warmUp:Add(tableCode)
+        section_warmUp:AddParagraph("")
+
+        AddHeading(section_warmUp, "CSTA Standards", 3)
+        section_warmUp:AddParagraph("This lesson covers the following standards:")
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("3A-AP-17")
+        standards:AddListItem("3A-AP-15")
+        section_warmUp:Add(standards)
+  
+        Section sectionExplore
+        sectionExplore:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(sectionExplore)
+        AddHeading(sectionExplore, "Explore", 2)
+        
+        sectionExplore:AddParagraph("As you grow more comfortable with programming, you start to pick up ways to reuse code. So far, you have learned how to shorten repetitive commands by using loops and conditionals "
++ " using " + dq + "repeat" + dq + " and " + dq + "if" + dq + " statements. This lets you reuse concepts, but as code increases in complexity, you need to reuse bigger pieces. ")
+        
+        sectionExplore:AddParagraph("You have already seen that you can instruct <strong>objects</strong> to execute named pieces of code. Unfortunately, the field of computer science never really settled on standardized terms, "
++ "but common ones include " + dq + "function" + dq + ", " + dq + "procedure" + dq + ", " + dq + "method" + dq + ", or " + dq + "action" + dq + ". In Quorum, they are called " + dq + "actions" + dq + ", because "
++ "evidence in the academic literature suggests this name is reasonable [1]. Regardless of the language, this concept is a core feature of modern programming and you really cannot avoid it.")
+        
+        sectionExplore:AddParagraph("An <strong>action</strong> is a chunk of code that has a name. Just like you saw when using objects before, you can run the code in an action by calling its name. Actions are essential, "
++ "especially as your programs start to become more complicated.")
+        sectionExplore:AddParagraph("Here are a few of the benefits of using actions:")
+
+        OrderedList actionBenefits
+        actionBenefits:AddClassAttribute("list-disc list-outside pl-8")
+        actionBenefits:AddListItem("Actions allow you to reuse code.")
+        actionBenefits:AddListItem("Actions can abstract code, letting you focus on what task an action performs without worrying about how it does it.")
+        actionBenefits:AddListItem("Actions can break up a program into smaller pieces, which can make it easier to divide responsibilities between different people on a team.")
+        actionBenefits:AddListItem("Actions can allow others to tap into functionality that they might not know how to write themselves.")
+        sectionExplore:Add(actionBenefits)
+
+        sectionExplore:AddParagraph("Actions are very important. So important, in fact, that you have been using them in every program you have written so far, even if it was not obvious. When you write a "
++ "Quorum program that does not include any actions, one is secretly generated behind the scenes for you. This secret action is called " + dq + "Main" + dq + ", and it wraps around all the code you have "
++ "written. This action is important because a program always starts at the beginning of the special " + dq + "Main" + dq + " action, even if you have other actions.")
+        sectionExplore:AddParagraph("The image below shows a simple Quorum program, and what it secretly converts to under the hood. These two programs are functionally identical.")
+
+        Image i1 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/SecretMainAction.png", "This is a diagram showing how an output hello style block is secretly wrapped by an action behind the scenes. Visually, "
++ "it is a flowchart with the output going to an action main wrapping the action. The visual is not a metaphor. Quorum literally does this behind the scenes.")
+        i1:AddClassAttribute("object-contain max-w-96 max-h-36 rounded overflow-hidden")
+        i1:AddAttribute("data-zoom","")
+
+        sectionExplore:AddParagraph("Although evidence in the literature is not definitive, it is at least plausible that Quorum's automatic hiding of this feature is beneficial for some [2]. Once you start "
++ "to write more complex programs, though, you will need to identify where you want to start your program. This requires you to define your Main function, which you can do with the following lines of code:")
+        sectionExplore:Add(preformatter:GeneratePreformattedCode("action Main " + cr + "end"))
+        sectionExplore:AddParagraph("Any program that includes actions must have a " + dq + "Main" + dq + " action. A sample program that includes a Main and another action would be the following:")
+
+        Image i2 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/ExampleMainAction.png", "A snippet of Quorum block code with 6 lines that read:
+action Main
+    SayGreeting()
+end
+action SayGreeting()
+    output " + dq + "Hello Friend!" + dq + "
+end")
+        i2:AddClassAttribute("object-contain max-w-96 max-h-96 overflow-hidden rounded")
+        i2:AddAttribute("data-zoom","")
+
+        sectionExplore:AddParagraph("In this code example, the program starts at the Main action and runs each command in order until the program reaches the Main action's end. Look at how the program executes, step by step:")
+
+        OrderedList actionFlow
+        actionFlow:AddClassAttribute("list-disc list-outside pl-8")
+        actionFlow:AddListItem("The program always begins on the first line inside the Main action. In this case, it starts on line 2.")
+        actionFlow:AddListItem("The SayGreeting action is called. The program jumps to the first line inside the SayGreeting action, on line 5.")
+        actionFlow:AddListItem("The code on line 5 executes. The program outputs " + dq + "Hello Friend!" + dq + "")
+        actionFlow:AddListItem("The program advances to line 6. Because this is the end of the action, the program returns to where it was before the action was called, back to line 2.")
+        actionFlow:AddListItem("The program advances to line 3. Since this is the end of the " + dq + "Main" + dq + " action, there is no more code left to run, so the program terminates.")
+        sectionExplore:Add(actionFlow)
+
+        AddHeading(sectionExplore, "Actions and the Block Palette", 3)
+        sectionExplore:AddParagraph("In the block palette, the " + dq + "Actions" + dq + " tab has several different action blocks available. While they all function similarly, some of the action blocks have additional properties.")
+
+        Image i3 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/ActionPalette.png", "A screenshot of part of the " + dq + "Action" + dq + " tab. It shows the three types of actions, as well "
++ "as the " + dq + "return" + dq + " block.")
+        i3:AddAttribute("data-zoom","")
+        i3:AddClassAttribute("object-contain max-w-96 max-h-96 overflow-hidden rounded")
+
+        AddHeading(sectionExplore, "Actions without Additional Properties", 3)
+        sectionExplore:AddParagraph("The first block in the palette is the simplest form of action. This is the kind of action you saw in the previous examples so far. It does not have parentheses, "
++ "extra values (called <strong>parameters</strong>), or a " + dq + "return" + dq + " label. The " + dq + "Main" + dq + " action must always be in this format. It cannot take additional parameters.")
+
+        AddHeading(sectionExplore, "Actions with Parameters", 3)
+        sectionExplore:AddParagraph("The second option in the block palette has parentheses, along with a type and a variable name. This action uses what is known as a <strong>parameter</strong>. Parameters are special "
++ "variables that are between parentheses in action blocks. These variables only exist in the scope of an action and their value is set to whatever value you use when you call the action.")
+        sectionExplore:AddParagraph("Parameters provide a way to give input to your actions. This is useful when the action is intended to perform a task on something that could vary. For example, if "
++ "your action performs math operations, you might need a parameter to specify what value you are performing math on.")
+        sectionExplore:AddParagraph("The example below shows a program using an action with a parameter. When the code executes, it runs the " + dq + "PrintValue" + dq + " action twice. The first time, the provided parameter is 2, "
++ "so the " + dq + "value" + dq + " variable is set to 2 inside of " + dq + "PrintValue" + dq + ". The second time it is run, the provided parameter is 4, so the " + dq + "value" + dq + " variable is set to 4.")
+
+        Image i4 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/PrintValueExample.png", "A screenshot of a Quorum program, that reads as follows:
+
+action Main
+PrintValue(2)
+PrintValue(4)
+end
+action PrintValue(integer value)
+output value
+end")
+        i4:AddAttribute("data-zoom","")
+        i4:AddClassAttribute("object-contain max-w-96 max-h-96")
+
+        sectionExplore:AddParagraph("Actions can have multiple parameters. To do so, you need to separate each parameter with a comma, like so:")
+        sectionExplore:Add(preformatter:GeneratePreformattedCode("action DefaultAction(type name1, type name2, type name3)" + cr
++ "    // code" + cr
++ "end"))
+
+        sectionExplore:AddParagraph("Then, calling that action needs the same number of parameters, separated by commas. The order matters -- the first provided parameter always sets the first variable, "
++ "the second parameter the second variable, and so on. In the example below, the passed parameters are 10 and 6, and the output of the program is 4.")
+
+        Image i5 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/PrintDifferenceExample.png", "A screenshot of a Quorum program that reads:
+
+action Main
+PrintDifference(10, 6)
+end
+action PrintDifference(integer value1, integer value2)
+output value1 - value2
+end")
+i5:AddAttribute("data-zoom","")
+i5:AddClassAttribute("object-contain max-w-96 max-h-48 overflow-hidden rounded")
+
+        AddHeading(sectionExplore, "Actions with Returns", 3)
+        sectionExplore:AddParagraph("So far you have created actions that can change their output based on a parameter, but actions can also give back a value. This is where the third block in the action palette comes in. "
++ "It has a property called a <strong>return value</strong>." + dq + " Return values can be thought of as the result of an action. If an action has a return value, you can use the action to set the value of a variable, output to "
++ "the console, or use the returned value in basically any way that you could use a variable.")
+        sectionExplore:AddParagraph("The image below shows an example using a return value. On line 2, the action is called, and its return value is assigned to the " + dq + "result" + dq + " variable. The return value itself "
++ "is on line 6, using a special block called " + dq + "return." + dq + " The return block indicates what value is the result of the action. Different programming languages do it different ways, but typically return values must"
++ " have a type and evidence suggests that forcing people to declare a type is, counterintuitively, helpful [3]. In this case, the return type is a number. This means the value in the " + dq + "return" + dq + " block must match"
++ " the type in the action. When the program in the example runs, it gets the result from the action, assigns it to a variable, then outputs it. The output is 7.")
+
+        Image i6 = sectionExplore:AddImage("/media/Blocks/ActionsClasses1/ReturnExample.png", "A screenshot of a Quorum program. It reads:
+
+action Main
+number result = GetLuckyNumber()
+output result
+end
+action GetLuckyNumber returns number
+return 7
+end")
+i6:AddClassAttribute("object-contain max-w-96 max-h-96 overflow-hidden rounded")
+i6:AddAttribute("data-zoom","")
+
+        AddHeading(sectionExplore, "Scope and Classes", 3)
+        sectionExplore:AddParagraph("In previous lessons, you have learned how multiple line blocks (like repeat and if blocks) have <strong>scope</strong>, which means that variables declared inside of them cannot be used "
++ "outside of them. Action blocks also follow this rule, so variables declared inside an action block cannot be used outside of them.")
+        sectionExplore:AddParagraph("You can also share variables between actions. Since you cannot use a variable declared in one action in another, it would make sense to declare a variable outside of it instead. If you try"
++ " to do that, though, you will encounter an error. In order to resolve this problem, you will need to use another new block: a <strong>class.</strong>")
+        sectionExplore:AddParagraph("An example is shown below, once with blocks and then with code. It shows a program with a class, two actions, "
++ "and a variable declared outside of the actions. You will learn more about classes later, but for now, you can think of a class as "
++ "a container that holds actions and variables. For now, all that is important to know about class blocks is that they allow you to share variables across different actions.")
+        sectionExplore:AddParagraph("The program begins with a variable called " + dq + "globalVariable" + dq + " set to 4. When the program runs, it calls the " + dq + "Double" + dq + " action, which "
++ "sets the variable to 8. After the action concludes, the program returns to the Main action and outputs the variable. The output of the program is 8.")
+
+        Image i7 =sectionExplore:AddImage("/media/Blocks/ActionsClasses1/ClassExample.png", "This demonstrates a class. The code is
+
+class Main
+   integer globalVariable = 4
+   action Main
+      Double()
+      output globalVariable
+   end
+
+   action Double
+      globalVariable = globalVariable * 2
+   end
+end")
+i7:AddClassAttribute("object-contain max-w-96 max-h-96 overflow-hidden rounded")
+i7:AddAttribute("data-zoom","")
+
+        sectionExplore:Add(preformatter:GeneratePreformattedCode("class Main" + cr +
+"   integer globalVariable = 4" + cr +
+"   action Main" + cr +
+"      Double()" + cr +
+"      output globalVariable" + cr +
+"   end" + cr +
+"   action Double" + cr +
+"      globalVariable = globalVariable * 2" + cr +
+"   end" + cr +
+"end"))
+
+        sectionExplore:AddText("<small><strong>[1]</strong> Andreas Stefik and Susanna Siebert. 2013. An Empirical Investigation into Programming Language Syntax. ACM Transactions on Computing Education 13, 4, Article 19 (November 2013), 40 pages.</small>")
+        sectionExplore:AddText("<small><strong>[2]</strong> C. L. Corritore and S. Wiedenbeck, " + dq + "Direction and scope of comprehension-related activities by procedural and object-oriented programmers: an empirical study," + dq + 
+" Proceedings IWPC 2000. 8th International Workshop on Program Comprehension, Limerick, Ireland, 2000, pp. 139-148, doi: 10.1109/WPC.2000.852488.</small>")
+        sectionExplore:AddText("<small><strong>[3]</strong> Stefan Endrikat, Stefan Hanenberg, Romain Robbes, and Andreas Stefik. 2014. How do API documentation and static typing affect API usability?. In Proceedings of the 36th " +
+"International Conference on Software Engineering (ICSE 2014). ACM, New York, NY, USA, 632-642.</small>")
+
+
+        Section sectionEngage
+        sectionEngage:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(sectionEngage)
+        AddHeading(sectionEngage, "Engage", 2)
+
+        sectionEngage:AddParagraph("Now that you have learned the basics of actions, you will make a program that uses them. You will use actions to solve puzzles. "
++ "While perhaps a bit cheesy, you may learn some magic along the way. Or, well, at least something magic adjacent.")
+
+        Image i8 = sectionEngage:AddImage("/media/Blocks/ActionsClasses1/WizardTable.png", "A cluttered table with candles, potion flasks, and a leatherbound tome. The window shows a snowy scene outside. This looks like a wizard's study.")
+        sectionEngage:AddText("<small><center><a href=" + dq + "https://unsplash.com/photos/a-wooden-table-topped-with-a-bottle-of-wine-next-to-a-window-31mUw23QL74" + dq + ">Photo by Amandine BATAILLE</a></small></center>")
+        i8:AddAttribute("data-zoom","")
+        i8:AddClassAttribute("object-contain max-w-96 max-h-96 overflow-hidden rounded")
+
+        AddHeading(sectionEngage, "Directions", 3)
+        sectionEngage:AddParagraph("Welcome to Bogmort's School of Mathcraft and Calculatry. As a new, uh, wizard, you are given four spells that can reshape the very fabric of reality "
++ "(by performing simple arithmetic on a number). These are the four spells you learn:")
+
+        UnorderedList spellList
+        spellList:AddClassAttribute("list-disc list-outside pl-8")
+        spellList:AddListItem("<emph>Incremento:</emph> Add 1 to a value.")
+        spellList:AddListItem("<emph>Subtractio:</emph> Subtract 3 from a value.")
+        spellList:AddListItem("<emph>Multifour:</emph> Multiply a value by 4.")
+        spellList:AddListItem("<emph>Dividenadd:</emph> Divide a value by 2, then add 10.")
+        sectionEngage:Add(spellList)
+
+        sectionEngage:AddParagraph("You will undergo four different trials at the school. At the beginning of each trial, you start with 0 magic points. "
++ "You must use your new spells to increase your magic points to exactly the required number for each trial. For example:")
+        sectionEngage:AddParagraph("<emph>Example Trial: Get your magic points to 9.</emph>")
+        sectionEngage:AddParagraph("You could solve the trial using these spells:")
+
+        OrderedList exampleTrial
+        exampleTrial:AddClassAttribute("list-disc list-outside pl-8")
+        exampleTrial:AddListItem("You start the trial with 0 magic points.")
+        exampleTrial:AddListItem("You cast <emph>Incremento</emph>, increasing your magic points to 1.")
+        exampleTrial:AddListItem("You cast <emph>Multifour</emph>, increasing your points to 4.")
+        exampleTrial:AddListItem("You cast <emph>Dividenadd</emph>. Your points are halved to 2, then you add 10, so you have 12 points.")
+        exampleTrial:AddListItem("You cast <emph>Subtractio</emph>, bringing your points down to 9.")
+        sectionEngage:Add(exampleTrial)
+
+        sectionEngage:AddParagraph("To complete the trials: ")
+        UnorderedList taskList
+        taskList:AddClassAttribute("list-disc list-outside pl-8")
+        taskList:AddListItem("Make a program with integer variables to track your magic points.")
+        taskList:AddListItem("Create an action for each of your four spells. You may want to create actions that take in parameters and return values in order for your program to work.")
+        taskList:AddListItem("Because it is proper wizard etiquette to announce your spells when you cast them, you should say or output the spell's name as part of each action (exclamation points optional, but encouraged).")
+        taskList:AddListItem("In your Main action, use your spells to complete the trials. Output your magic points at the end of each trial to see your result.")
+        sectionEngage:Add(taskList)
+
+        sectionEngage:AddParagraph("<strong>Trial 1:</strong> Get your magic points to 13.")
+        sectionEngage:AddParagraph("<strong>Trial 2:</strong> Using each spell exactly once, get your magic points to 38.")
+        sectionEngage:AddParagraph("<strong>Trial 3:</strong> Using only one spell as many times as you need, get your magic points to 963.")
+        sectionEngage:AddParagraph("<strong>Trial 4:</strong> Get your magic points to 61 by casting 5 spells or fewer.")
+
+    
+        AddHeading(sectionEngage, "Wrap up", 3)
+        sectionEngage:AddParagraph("Consider what your program would have looked like if you did not use actions. Did having actions make this program easier or harder to write? "
++ "What if these so-called spells actually did some very complex math instead (e.g., calculate a sine, run a statistical test), would they then be more useful?")
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to create actions in Quorum"
+    end
+
+    action GetSummaryName returns text
+        return "Actions and Classes, Part 1"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Actions and Classes, Part 1"
+    end
+
+    action GetShortDescription returns text
+        return "how to create actions"
+    end
+
+    action GetLinkName returns text
+        return "Actions and Classes Part 1"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/blocks/ActionsAndClassesP1.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Blocks"
+    end
+end

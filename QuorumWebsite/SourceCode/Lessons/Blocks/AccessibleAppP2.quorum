@@ -1,0 +1,549 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Bold
+
+class AccessibleAppP2 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Getting Started with Blocks - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Hour 14: Create an Accessible App, Part 2 - Behaviors", 1)
+
+        headDiv:AddText("This lesson is to teach you about adding functionality using Behaviors in a Form app.")
+        bodyDiv:Add(headDiv)
+
+        Section section_overview
+        section_overview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overview, "Overview", 2)
+        section_overview:AddParagraph("In a previous lesson, you created the interface for an app. While designing the user interface of an app is important, apps that do nothing are not particularly useful. In this lesson, you will learn how to make an app respond when the user interacts with it.")
+
+        AddHeading(section_overview, "Goals", 3)
+        section_overview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to create a Behavior")
+        goalList:AddListItem("Add a Behavior to a Button in your app")
+        goalList:AddListItem("Think about programming in teams")
+        section_overview:Add(goalList)
+
+        bodyDiv:Add(section_overview)
+
+        Section section_warmUp
+        section_warmUp:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_warmUp)
+        AddHeading(section_warmUp, "Warm up", 2)
+        
+        section_warmUp:AddParagraph("Imagine you recently acquired funds to create a tech startup. Your focus could be on anything. It could be education focused, or maybe it is based on a hobby or interest of yours. Maybe your focus is on an issue you wish there was a better solution for.")
+        section_warmUp:AddParagraph("You need to form a team to start working on a product. What would your product cater towards, and who might use it? As for your team, what kinds of people would you want to work with? How do you think this team would work together while creating this product?")
+        
+        AddHeading(section_warmUp, "Vocabulary", 3)
+
+        section_warmUp:AddParagraph("You will be learning about the following vocabulary words: ")
+        
+        WebTable table = AddWebTable("Vocabulary")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Term")
+        tableHeaderArray:Add("Definition") 
+   
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)  
+
+        Array<text> rubricText1
+        rubricText1:Add("Pair Programming")
+        rubricText1:Add("A technique in software engineering where two programmers work together.") 
+   
+        tableBody:Add(AddTableBodyRow(rubricText1))
+
+        Array<text> rubricText2
+        rubricText2:Add("Event Driven Programming")
+        rubricText2:Add("A style of programming where code runs in response to user input.") 
+  
+        tableBody:Add(AddTableBodyRow(rubricText2))
+
+        Array<text> rubricText3
+        rubricText3:Add("Inheritance")
+        rubricText3:Add("A system where a "+dq+"child"+dq+" class gains the properties of a "+dq+"parent"+dq+" class.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricText3))
+
+         Array<text> rubricTextBehavior
+        rubricTextBehavior:Add("Behaviors")
+        rubricTextBehavior:Add("Inside a Form app, behaviors represent code that will run in response to an event occurring.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricTextBehavior))
+    
+        table:Add(tableBody)
+        section_warmUp:Add(table)
+
+        section_warmUp:AddParagraph("")
+        AddHeading(section_warmUp, "Code", 3)
+
+        section_warmUp:AddParagraph("You will be using the following new pieces of code: ")
+
+
+        WebTable tableCode = AddWebTable("New Code to Learn")
+        TableBody tableBodyCode = AddTableBody()
+        
+        Array<text> tableHeaderArrayCode
+        tableHeaderArrayCode:Add("Quorum Code")
+        tableHeaderArrayCode:Add("Code Example") 
+        tableHeaderArrayCode:Add("Explanation")
+
+        TableHeader theadCode = AddTableHeaderRow(tableHeaderArrayCode)
+        tableCode:Add(theadCode)  
+
+        Array<text> rubricText4
+        rubricText4:Add("use NAME")
+        rubricText4:Add("use Libraries.Interface.Controls.Button")
+        rubricText4:Add("A use statement for the Button object. A button is a selectable user interface component.") 
+   
+        tableBodyCode:Add(AddTableBodyRow(rubricText4))
+
+        Array<text> rubricText5
+        rubricText5:Add("Button buttonObject")
+        rubricText5:Add("Button button")
+        rubricText5:Add("Creates a button object on the form") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricText5))
+
+    
+        Array<text> rubricTextIf
+        rubricTextIf:Add("use NAME")
+        rubricTextIf:Add("use Libraries.Interface.Events.BehaviorEvent")
+        rubricTextIf:Add("A use statement for the BehaviorEvent object. A BehaviorEvent is sent to you when a button is clicked.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextIf))
+
+        Array<text> rubricTextFB
+        rubricTextFB:Add("use NAME")
+        rubricTextFB:Add("use Libraries.Interface.Forms.FormBehavior")
+        rubricTextFB:Add("A use statement for the FormBehavior object. FormBehavior is a special class for handling events.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextFB))
+
+        Array<text> rubricTextAction
+        rubricTextAction:Add("action Run(BehaviorEvent event)
+end
+")
+        rubricTextAction:Add("action Run(BehaviorEvent event)
+   // behavior code runs in this action
+end
+")
+        rubricTextAction:Add("This action is the heart of a Behavior. It will run if a Button is clicked with this Behavior attached to it.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextAction))
+
+        Array<text> rubricTextGF
+        rubricTextGF:Add("GetForm()")
+        rubricTextGF:Add("Form form = GetForm()")
+        rubricTextGF:Add("Returns a Form object representing the form in the app.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextGF))
+
+        Array<text> rubricTextGP
+        rubricTextGP:Add("GetPage()")
+        rubricTextGP:Add("Page page = GetPage()")
+        rubricTextGP:Add("Returns a Page object representing the current page of the app.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextGP))
+
+        Array<text> rubricTextGI
+        rubricTextGI:Add("behaviorEvent:GetItem()")
+        rubricTextGI:Add("event:GetItem()")
+        rubricTextGI:Add("Identifies the element (perhaps a button) that triggered a Behavior.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextGI))
+
+        Array<text> rubricTextSB
+        rubricTextSB:Add("buttonObject:SetBehavior()")
+        rubricTextSB:Add("button:SetBehavior(behave)")
+        rubricTextSB:Add("Attaches a behavior to a button. When the button is clicked, the behavior runs.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextSB))
+
+        Array<text> rubricTextGN
+        rubricTextGN:Add("buttonObject:GetName()")
+        rubricTextGN:Add("text typeOfButton = button:GetName()")
+        rubricTextGN:Add("Retrieves the specific button name from the button click in order to perform a specific action.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextGN))
+
+
+        tableCode:Add(tableBodyCode)
+        section_warmUp:Add(tableCode)
+        section_warmUp:AddParagraph("")
+
+        AddHeading(section_warmUp, "CSTA Standards", 3)
+         section_warmUp:AddParagraph("This lesson covers the following standards:")
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("1A-CS-01")
+        standards:AddListItem("1BCS-01")
+        section_warmUp:Add(standards)
+  
+        Section section_explore
+        section_explore:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_explore)
+        AddHeading(section_explore, "Explore", 2)
+        
+        section_explore:AddParagraph("Over the past several lessons, you have learned a variety of different concepts and techniques, including how to store and modify data, how to use conditional statements to change what code is run, and how to write actions and classes. In a previous lesson, you learned how to design the user interface of an app. Now it is time to bring all of your knowledge together to make an app respond to your input.")
+        
+        AddHeading(section_explore, "Using Behaviors in the Form Library", 3)
+        section_explore:AddParagraph("Recall in your previous Form app where you learned how to create an app. You developed the user interface, adding text, a banner, and buttons. The app itself was not functional yet, though. If you pressed the button on the app, nothing happened. ")
+        section_explore:AddParagraph("Now that you have learned about actions and classes, you are ready to add Behaviors to your app. <strong>Behaviors</strong> are special classes in Quorum that handle the actions your app takes when a user interacts with it. Behaviors are an example of <strong>event-driven programming</strong>, meaning code will run when users trigger an event.")
+
+        Link link1
+        link1:AddText("FormBehavior class")
+        link1:SetAddress("https://quorumlanguage.com/Libraries/Interface/Forms/FormBehavior.html")
+        link1:SetTarget(link1:newTab)
+
+        Paragraph inheritPara
+        inheritPara:AddText("Behaviors work using a concept called <strong>inheritance</strong>. In computer science, the term "+dq+"inheritance"+dq+" means that a class gains the properties of a different class. The custom behaviors you will write for your apps will inherit from the ")
+        inheritPara:Add(link1)
+        inheritPara:AddText(", which handles complicated event handling. You do not need to know exactly how this class works, or the fine details of inheritance. For now, you only need to know that inheritance will let you use the event handling functionality of Behaviors without having to write it all yourself. ")
+        
+        section_explore:Add(inheritPara)
+
+        section_explore:AddParagraph("You will need Behaviors to make your app respond to user input. Like any class, your custom Behavior class will need to go in a separate file from your Main form app. Consider the following example:")
+
+        Image image1 = section_explore:AddImage("/media/Blocks/AccessibleAppP2/FormBehavior.png","This shows the following code:
+
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+class MyBehaviorNew is FormBehavior
+   action Run(BehaviorEvent event)
+      say "+dq+"When you click me I perform an action!"+dq+"
+   end
+end")
+        image1:AddText("This shows the following code:
+
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+class MyBehaviorNew is FormBehavior
+   action Run(BehaviorEvent event)
+      say "+dq+"When you click me I perform an action!"+dq+"
+   end
+end")
+        image1:AddAttribute("data-zoom","")
+        image1:AddClassAttribute("object-contain max-w-96 max-h-96 rounded")
+
+        UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        list:AddListItem("<strong>Line 1</strong>: This line contains a use statement that gives you access to the BehaviorEvent library. BehaviorEvent objects include information about the event that caused the Behavior to run.")
+        list:AddListItem("<strong>Line 2</strong>: This line contains a use statement that gives you access to the FormBehavior library. Inheriting from the FormBehavior library will let your class respond to events.")
+        list:AddListItem("<strong>Line 3</strong>: This line creates a custom class that <strong>inherits</strong> from FormBehavior, using the "+dq+"is"+dq+" keyword. Your new behavior will gain the properties of the "+dq+"parent"+dq+" class it is inheriting from.")
+        list:AddListItem("<strong>Line 4</strong>: This line creates a new action. Importantly, the name <strong>must</strong> be “<strong>Run</strong>”, and it <strong>must</strong> take exactly one BehaviorEvent parameter. The class you are inheriting from expects an action with exactly this name and parameters to use when events occur.")
+        list:AddListItem("<strong>Line 5</strong>: When the action is run, it will say the text "+dq+"When you click me I perform an action."+dq+"")
+        list:AddListItem("<strong>Line 6</strong>: This line encloses the action block.")
+        list:AddListItem("<strong>Line 7</strong>: This line encloses the class block.")
+        section_explore:Add(list)
+
+        section_explore:AddParagraph("All behaviors follow the same code format, so if you have one Behavior written, you can reuse it as a template when you want to add more functionality to your apps. The only parts you need to change are the class name and the code inside the "+dq+"Run"+dq+" action.")
+        AddHeading(section_explore, "Creating an App with Behaviors",4)
+
+        section_explore:AddParagraph("Examine the example below. It shows the Main file of a Form program, which includes two buttons named "+dq+"Hi"+dq+" and "+dq+"Bye."+dq+" You have already seen how to create an interface using Forms before, but there are a few important additions on lines 8 to 14.")
+        section_explore:AddParagraph("First, when the buttons are created on lines 8 and 12, they are now assigned to variables. Since you need to store the Button objects, you also need a use statement for them on line 3, "+dq+"use Libraries.Interface.Controls.Button."+dq+"")
+        section_explore:AddParagraph("Second, on lines 9, 10, 13, and 14, the program creates new "+dq+"MyBehavior"+dq+" objects, and then associates those behaviors with the buttons. Now, when a button is clicked, the behavior will run.")
+
+        Image image2 = section_explore:AddImage("/media/Blocks/AccessibleAppP2/Behavior.png","A screenshot of a Quorum program. The code reads:
+
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Controls.Button
+
+Form form
+Page page = form:GetMainPage()
+
+Button button1  = page:AddButton("+dq+"Hi"+dq+")
+MyBehavior hiBehavior
+button1:SetBehavior(hiBehavior)
+
+Button button2 = page:AddButton("+dq+"Bye"+dq+")
+MyBehavior byeBehavior
+button2:SetBehavior(byeBehavior)
+
+form:Display()")
+        image2:AddText("A screenshot of a Quorum program. The code reads:
+
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Controls.Button
+
+Form form
+Page page = form:GetMainPage()
+
+Button button1  = page:AddButton("+dq+"Hi"+dq+")
+MyBehavior hiBehavior
+button1:SetBehavior(hiBehavior)
+
+Button button2 = page:AddButton("+dq+"Bye"+dq+")
+MyBehavior byeBehavior
+button2:SetBehavior(byeBehavior)
+
+form:Display()")
+        image2:AddAttribute("data-zoom","")
+        image2:AddClassAttribute("object-contain max-w-96 max-h-96 rounded")
+
+        section_explore:AddParagraph("Now, examine the code for the "+dq+"MyBehavior"+dq+" class:")
+
+        Image image3 = section_explore:AddImage("/media/Blocks/AccessibleAppP2/BehaviorTemplate.png","A screenshot of a Quorum file. It reads:
+
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Item
+class MyBehavior is FormBehavior
+action Run(BehaviorEvent event)
+Form form = GetForm()
+Page page = GetPage()
+// retrieve the specific action from our button click
+Item button = event:GetItem()
+text typeOfButton = button:GetName()
+// ADD CODE HERE
+end")
+        image3:AddText("A screenshot of a Quorum file. It reads:
+
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Item
+class MyBehavior is FormBehavior
+action Run(BehaviorEvent event)
+Form form = GetForm()
+Page page = GetPage()
+// retrieve the specific action from our button click
+Item button = event:GetItem()
+text typeOfButton = button:GetName()
+// ADD CODE HERE
+end")
+        image3:AddAttribute("data-zoom","")
+        image3:AddClassAttribute("object-contain max-w-96 max-h-96 rounded")
+
+        section_explore:AddParagraph("The code in this example is a template, and is incomplete, marked by the "+dq+"ADD CODE HERE"+dq+" comment at the end of the action. Still, there are several important things happening in the "+dq+"Run"+dq+" action. ")
+        section_explore:AddParagraph("First, the "+dq+"Run"+dq+" action uses the "+dq+"GetForm"+dq+" and "+dq+"GetPage"+dq+" actions. These return the objects that represent the Form and the currently displayed Page, respectively. These are helpful if you need to get or modify any values in the app or in the user interface.")
+        section_explore:AddParagraph("Second, the action uses "+dq+"GetItem"+dq+" from the BehaviorEvent parameter. The BehaviorEvent is a special object that contains lots of information about the input that triggered your behavior. In this case, "+dq+"GetItem"+dq+" returns an object representing whatever interface element triggered the behavior. In practice, this will be a Button.")
+        section_explore:AddParagraph("The action also gets the button's name and stores it in a variable. A button's name will be the text that you provided when you made it in the Form. In the current example, because there are only two buttons, the name will either be "+dq+"Hi"+dq+" if the first button was clicked, or "+dq+"Bye"+dq+" if the second button was clicked. You can use this information to decide how your behavior should react, depending on which button it is. The end of the template, with the comment that reads "+dq+"ADD CODE HERE,"+dq+" is where you will add more code to determine what your behavior actually does. ")
+
+        AddHeading(section_explore, "Code Templates",4)
+        section_explore:AddParagraph("Here are another set of templates for a form and its behavior file. Notice that if you were to copy and paste these two files of code into Quorum Studio and try running the program, it would automatically turn into blocks from text if you are in that mode. If the name of the button was hi, it would then say hello.")
+        section_explore:AddParagraph("<strong>Main.quorum</strong>")
+        section_explore:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Controls.Button
+
+Form form
+MyBehavior behave
+Page page = form:GetMainPage()
+
+Button button  = page:AddButton("+dq+"Hi"+dq+")
+button:SetBehavior(behave)
+"))
+
+        section_explore:AddParagraph("<strong>MyBehavior.quorum</strong>")
+        section_explore:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Item
+class MyBehavior is FormBehavior
+    action Run(BehaviorEvent event)
+        Form form = GetForm()
+        Page page = GetPage()
+        // retrieve the specific action from our button click
+        Item button = event:GetItem()
+        text typeOfButton = button:GetName()
+        // ADD CODE HERE
+        if typeOfButton = "+dq+"Hi"+dq+"
+            say "+dq+"Hello"+dq+"
+        end
+        
+    end
+end
+"))
+
+        AddHeading(section_explore, "Collaborating with Code",3)
+        section_explore:AddParagraph("As code becomes more complex, collaborating with others becomes increasingly important. When dealing with commercial software, there are often large teams of software engineers that work together on the same project. This often means splitting up work across multiple people, but team members are also often encouraged to collaborate and work together to solve difficult problems.")
+        section_explore:AddParagraph("A practice that is common among software engineers is a collaboration method known as <strong>pair programming</strong>. To Pair Program means that two programmers work together on a single computer. It is a similar practice in learning how to drive: one person writes the code (referred as the driver) and the other person reviews the teammate's code and offers feedback (referred as the navigator). ")
+
+        Section section_engage
+        section_engage:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_engage)
+        AddHeading(section_engage, "Engage", 2)
+        section_engage:AddParagraph("Previously, you designed the interface of an app, but it was not yet interactive. Now, you will work together with a partner to make a thermostat app respond to your input. ")
+
+        AddHeading(section_engage, "Directions", 3)
+        section_engage:AddParagraph("You are an app developer and you want to build a product that allows you to control your home thermostat from your phone. A friend has sent you their work in progress. Their draft has the app's look and feel handled, but when you try to interact with the buttons, they do not do anything yet. Your friend has some ideas of where there is code missing, though, and they have marked the spots. Your job is to examine the existing code with a partner and add code so the buttons work.")
+        section_engage:AddParagraph("Start by selecting a partner to work with, if one is available. Decide who will start as the “driver” (who is writing code) and the "+dq+"navigator"+dq+" (who is providing feedback and guidance). Make sure to periodically swap roles as you are working on your project. ")
+
+        Image image5 = section_engage:AddImage("/media/Blocks/AccessibleAppP2/Thermostat.png","Image of a thermostat at 63 degrees")
+        image5:AddText("Image of a thermostat at 63 degrees")
+        image5:AddAttribute("data-zoom","")
+        image5:AddClassAttribute("object-contain max-w-96 max-h-96 rounded")
+        section_engage:AddText("<center><small><a href=" + dq + "https://unsplash.com/photos/gray-nest-thermostat-displaying-at-63-RFAHj4tI37Y" + dq + ">Thermostat by Dan LeFebvre</a></small></center>")
+
+
+        Paragraph dlPara
+        Link link = dlPara:AddLink("Download the folder with the code before starting", "/files/blocks/ThermostatApp.zip")
+         dlPara:AddText(". Inside of Quorum Studio, open the project inside the File menu once you are ready to work. Before trying to modify the code, run the program first to examine what it does at a high level.")
+        link:AddClassAttribute("underline text-quorum-blue-150")
+        dlPara:AddText(".")
+        section_engage:Add(dlPara)
+
+        AddHeading(section_engage, "Examine the Code Template", 4)
+        section_engage:AddParagraph("Luckily, your friend has already worked on this app and given you most of the structure you will need. You should have two files in this project: <strong>Main.quorum</strong> and <strong>TemperatureBehavior.quorum</strong>. Take a few minutes to familiarize yourself with the code by running it and seeing how it works. Notice the areas that are marked with "+dq+"YOUR CODE GOES HERE."+dq+" While there are many new parts to this code, you only need to modify small parts of this project. You do not need to change anything outside of the marked areas.")
+        section_engage:AddParagraph("<strong>Main.quorum</strong>")
+        section_engage:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.Grouping
+use Libraries.Interface.Forms.Banner
+use Libraries.Interface.Controls.Button
+use Libraries.Game.Graphics.Label
+
+// Create the Form app and get the main page.
+Form form
+Page homePage = form:GetMainPage() // Just an example using page instead of form for things. Anything you can do to a form you can do to a page, basically.
+Banner banner = homePage:AddBanner("+dq+"Home Thermostat App"+dq+", "+dq+"Press the buttons to raise or lower the temperature!"+dq+")
+
+// Add the icons in a single row.
+Grouping imageGroup = homePage:AddGrouping("+dq+"images"+dq+")
+imageGroup:AddIcon("+dq+"Sun"+dq+","+dq+"Images/sun.png"+dq+")
+imageGroup:AddIcon("+dq+"Thermometer"+dq+","+dq+"Images/thermometer.png"+dq+")
+imageGroup:AddIcon("+dq+"Cloud"+dq+","+dq+"Images/angyCloud.png"+dq+")
+imageGroup:SetDescription("+dq+"Image of a sun, a thermometer, and a cloud"+dq+")
+
+// Creates a variable inside the Form for modifying the temperature.
+// Forms can store variables in a special way that lets other classes access them.
+integer temperature = 70
+form:SetInteger("+dq+"temperature"+dq+", 70)
+
+// Make a Label to display the current temperature.
+Label currTemp =  homePage:AddLabel("+dq+"CurrentTemperature"+dq+")
+currTemp:SetText(temperature + "+dq+" F"+dq+")
+currTemp:SetFontSize(24)
+
+/*
+	TemperatureBehavior objects can be used to make the Raise and Lower
+	buttons react when they are clicked.
+*/
+Button up = homePage:AddButton("+dq+"Raise"+dq+")
+// YOUR CODE GOES HERE
+
+Button down = homePage:AddButton("+dq+"Lower"+dq+")
+// YOUR CODE GOES HERE
+
+form:Display()"))
+        section_engage:AddParagraph("<strong>TemperatureBehavior.quorum</strong>")
+        section_engage:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Game.Graphics.Label
+use Libraries.Interface.Item
+
+class TemperatureBehavior is FormBehavior
+	action Run(BehaviorEvent event)
+    	// Get the Form and Page for our app.
+    	Form form = GetForm()
+    	Page page = GetPage()
+// Get the specific button that was triggered.
+    	Item button = event:GetItem()
+    	text typeOfButton = button:GetName()
+    	// Get the temperature variable stored in the Form.
+    	integer temp = form:GetInteger("+dq+"temperature"+dq+")
+    	// Check which button was clicked, then change the temp as needed.
+   	 
+    	// YOUR CODE GOES HERE
+   	 
+    	// After we set the variable, it is essential to update the variable stored in the Form too.
+    	form:SetInteger("+dq+"temperature"+dq+", temp)
+
+    	// Update the temperature label.
+    	Label label = page:GetLabel("+dq+"CurrentTemperature"+dq+")
+    	label:SetText(temp+ "+dq+" F"+dq+")
+	end
+end"))
+
+        AddHeading(section_engage, "Fill in the Code", 4)
+        section_engage:AddParagraph("There are three spots marked "+dq+"YOUR CODE GOES HERE"+dq+" in the project. Two of them are in Main.quorum, and one is in TemperatureBehavior.quorum. Fill in the three spots, making sure to periodically swap who is acting as driver and navigator in your pair. In Main.quorum, create your behaviors and set them on the buttons.")
+        section_engage:AddParagraph("In TemperatureBehavior.quorum, add code to control what happens when a button is pressed. When you click the "+dq+"Raise"+dq+" button, increase the temperature value by 1. If you click the "+dq+"Lower"+dq+" button, reduce the temperature value by 1 instead.")
+
+        AddHeading(section_engage, "Bonus: I'm Feeling Lucky", 4)
+        section_engage:AddParagraph("If you want an extra challenge, once you have completed the rest of your app, try adding a new feature to your app:")
+        UnorderedList listLucky
+        listLucky:AddClassAttribute("list-disc list-outside pl-8")
+        listLucky:AddListItem("Add a new button to your app named "+dq+"I’m Feeling Lucky"+dq+"")
+        listLucky:AddListItem("When the button is pressed, use the <code>Libraries.Compute.Random</code> library to randomly set the temperature to an integer between 60 and 90 degrees.")
+        section_engage:Add(listLucky)
+
+        AddHeading(section_engage, "Wrap up", 3)
+        section_engage:AddParagraph("This completes the entire chapter of learning block-based Quorum Language. Reflect on how you have used Quorum and working with the development environment. What was most successful while you were working and what do you think could have improved while tinkering?")
+        section_engage:AddParagraph("Have a discussion with a partner next to you and discuss these questions in further detail: If you were a student, what pieces of Quorum would stick with a student? Where would you see students struggling the most?")
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to add Behaviors in your Form app in Quorum"
+    end
+
+    action GetSummaryName returns text
+        return "Accessible Apps with Form Library"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Create Accessible Apps"
+    end
+
+    action GetShortDescription returns text
+        return "how to add behaviors in a Form app in Quorum"
+    end
+
+    action GetLinkName returns text
+        return "Create Accessible Apps Part 2"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/blocks/AccessibleAppP2.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Blocks"
+    end
+end

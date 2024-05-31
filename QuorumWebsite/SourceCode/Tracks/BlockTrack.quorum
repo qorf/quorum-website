@@ -1,0 +1,185 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Italic
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.Heading
+use Libraries.System.File
+use Libraries.Web.Page.Section
+use Libraries.Containers.Array
+
+class BlockTrack is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Preformatter preformatter //helper
+
+
+    action Setup(Array<Lesson> startingTutorialArray)
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Block-based Programming - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        //page header
+        ImageHeader header
+        text headerHeading = "Quorum Blocks Programming Track"
+        text headerText = "A professional development workshop involving Block-based programming in Computer Science using Quorum"
+        text headerImage = "/media/userInterface/quorumAssets/Blocks.png"
+        text headerImageAlt = "An image showing block language blocks in various sizes"
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        header:AddClassAttribute("!bg-header-yellow-100 h-80")
+        Add(header)
+
+        //main array of items.
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
+        rightDiv:SetClassAttribute("hidden")
+
+
+        Section section_csp
+        section_csp:SetClassAttribute("flex flex-col gap-y-3 w-full")
+        Heading h_csp = section_csp:AddHeading("About the Course", 1)
+        h_csp:SetClassAttribute("text-2xl font-bold")
+
+        Division card_div_csp
+        card_div_csp:AddClassAttribute("flex flex-col gap-y-3")
+        
+        integer i = 0
+        repeat while i < startingTutorialArray:GetSize()
+            Lesson lesson = startingTutorialArray:Get(i)
+            LongCourseCard card
+            text image_src = lesson:GetImageLocation()
+            text image_alt = ""
+            text description = lesson:GetMetaDescription()
+            text title = lesson:GetSectionName()
+            text url = "/"+lesson:GetLocation()
+            card:Create("", image_alt, description, title, url, true)
+            
+            Division imageDiv = card:GetImageDiv()
+            
+            Span quorumIcon
+            HtmlFileLoader quorumIconFile
+            File file
+            file:SetPath("html/media/userInterface/SVG/WhiteQuorumLogo.svg")
+            quorumIconFile:SetLoaded(file:Read())
+            quorumIcon:AddText(quorumIconFile:ToText())
+            
+            Paragraph p_imageTitle
+            p_imageTitle:AddText(title)
+            imageDiv:Add(quorumIcon)
+            imageDiv:Add(p_imageTitle)
+            
+            imageDiv:AddClassAttribute("bg-quorum-blue-100 flex flex-col items-center justify-center gap-x-2 gap-y-3 px-5")
+            quorumIcon:AddClassAttribute("inline-block w-auto mr-2 h-20")
+            p_imageTitle:AddClassAttribute("font-bold text-neutral-white select-none text-center text-xl")
+            
+            TutorialPreview preview
+            preview:Create(lesson:GetSectionName(), lesson)
+            card_div_csp:Add(preview)
+            
+            card_div_csp:Add(card)
+            i = i + 1
+        end
+        
+//        //types and variables
+//        TrackTable tableDiv
+//        tableDiv:SetTableID("Experience Programming in Quorum (EPIQ)")
+//        tableDiv:SetTableHeading("Experience Programming in Quorum (EPIQ)")
+//        tableDiv:SetTableHeadingParagraph("Learn about Data Science, including topics like
+//            charts, data frames, and descriptive statistics.")
+//        
+//        tableDiv:AddLesson("Introduction to Spreadsheets and Quorum Studio", "/lessons/DataScience/introToDataScience.html")
+//        tableDiv:AddLesson("Introduction to Programming", "/lessons/DataScience/introToProgramming.html")
+//        tableDiv:AddLesson("Loading Tidy DataFrames", "/lessons/DataScience/tidyDataFrames.html")
+//        tableDiv:AddLesson("Overview of Chart Types and Examples", "/lessons/DataScience/overviewOfChartTypesAndExamples.html")
+//       
+//        tableDiv:AddLesson("Bar Charts", "/lessons/DataScience/barCharts.html")
+//        tableDiv:AddLesson("Descriptive Statistics", "/lessons/DataScience/descriptiveStatistics.html")
+//        tableDiv:AddLesson("Histograms, Skew, and Kurtosis", "/lessons/DataScience/histograms.html")
+//        tableDiv:AddLesson("Pie Charts vs. Stacked BarCharts", "/lessons/DataScience/pieCharts.html")
+//        tableDiv:AddLesson("Filtering Data", "/lessons/DataScience/filteringData.html")
+//        tableDiv:AddLesson("Column Calculations Activity", "/lessons/DataScience/columnCalculationsActivity.html")
+//        tableDiv:AddLesson("Scatterplots and Correlations", "/lessons/DataScience/scatterPlotsR2.html")
+//         tableDiv:AddLesson("Multi-Charts, Colors, and Options", "/lessons/DataScience/multiChartsColorsOptions.html")
+//        tableDiv:AddLesson("Box Plots, Violin Plots, and Understanding Dispersion", "/lessons/DataScience/boxViolinDispersion.html")
+//       
+//       
+//        tableDiv:AddLesson("Regression", "/lessons/DataScience/regression.html")
+//        tableDiv:AddLesson("Exporting to SVG", "/lessons/DataScience/SVGExport.html")
+//        
+//        tableDiv:AddGuide("Quick Reference","/lessons/guides/IntroductionToQuorum.pdf")
+//        tableDiv:AddGuide("Quick Reference - Braille","/lessons/guides/IntroductionToQuorumBraille.brf")
+//
+//        tableDiv:SetStandardsTitle("Goals")
+//        tableDiv:AddStandard("Learn about Data Science")
+//        tableDiv:AddStandard("Learn about Quorum Studio")
+//        tableDiv:AddStandard("Learn about Creating Accessible Charts")
+//        tableDiv:AddStandard("Learn about Statistics Concepts")
+//        tableDiv:AddStandard("Learn about Accessibility")
+//        tableDiv:AddStandard("Be EPIQ!")
+//        
+//        tableDiv:AddOptionalLesson("Use Version Control","/tutorials/language/teamsAndVersionControl.html")
+//
+//        tableDiv:GenerateTrackTable()
+//
+//        bodyDiv:Add(tableDiv)
+//
+//        WriteNextTutorial(bodyDiv)
+//        mainRegion:Add(bodyDiv)
+//        Add(mainRegion)
+//        PageFooter footer
+//        Add(footer)
+
+        section_csp:Add(card_div_csp)
+        bodyDiv:Add(section_csp)
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, blocks, block-based programming, block
+programming, MIT scratch, scratch, data science, app development, computer science basics, fundamentals 
+of computer science")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "A 2-day professional development workshop on the Quorum programming language for Block-based programming."
+    end
+
+    action GetSummaryName returns text
+        return ""
+    end
+    action GetName returns text
+        return "Quorum Blocks Professional Development Track"
+    end
+
+    action GetShortDescription returns text
+        return ""
+    end
+    action GetLocation returns text
+        return "lessons/quorumBlocks.html"
+    end
+end

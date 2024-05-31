@@ -1,0 +1,567 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Bold
+
+class VariablesAndOperators is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Getting Started with Blocks - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Hour 3: Variables and Operators", 1)
+
+        headDiv:AddText("This lesson is to teach you about variables and operators.")
+        bodyDiv:Add(headDiv)
+
+        Section section_overview
+        section_overview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overview, "Overview", 2)
+        section_overview:AddParagraph("When writing programs, you give the computer a set of instructions to perform. As part of these instructions, you can give it specific data, called <strong>variables</strong>, at each step. When you hear the term variables, you might relate this topic to saving information. Your computer might save items you download, data you are keeping track of, or information about how you login to a website. In this lesson, you will learn about how to store information in a program using variables. You will also learn how to use operators, like math symbols, to change and combine this stored information.")
+
+        AddHeading(section_overview, "Goals", 3)
+        section_overview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to store information with variables")
+        goalList:AddListItem("Use the four "+dq+"primitive"+dq+" variable types in Quorum")
+        goalList:AddListItem("Use operators to modify variables")
+        section_overview:Add(goalList)
+
+        bodyDiv:Add(section_overview)
+
+        Section section_warmUp
+        section_warmUp:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_warmUp)
+        AddHeading(section_warmUp, "Warm up", 2)
+        
+        section_warmUp:AddParagraph("Consider a few examples of technology in your life. For each of the examples below, what kinds of data do you think are being stored or changed?")
+        UnorderedList techList
+        techList:AddClassAttribute("list-disc list-outside pl-8")
+        techList:AddListItem("Calculator")
+        techList:AddListItem("Car speedometer")
+        techList:AddListItem("Digital light switch")
+        techList:AddListItem("e-Book")
+        techList:AddListItem("Microwave")
+        section_warmUp:Add(techList)
+
+        section_warmUp:AddParagraph("Can you think of other examples of technology that needs to store and change data?")
+
+        AddHeading(section_warmUp, "Vocabulary", 3)
+
+        section_warmUp:AddParagraph("You will be learning about the following vocabulary words: ")
+        
+        WebTable table = AddWebTable("Vocabulary")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Term")
+        tableHeaderArray:Add("Definition") 
+   
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)  
+
+        Array<text> rubricText1
+        rubricText1:Add("Variable")
+        rubricText1:Add("A variable is a storage container. It has a name, a data type, and a value.") 
+   
+        tableBody:Add(AddTableBodyRow(rubricText1))
+
+        Array<text> rubricText2
+        rubricText2:Add("integer")
+        rubricText2:Add("Integers are whole numbers. They can never have a decimal point.") 
+  
+        tableBody:Add(AddTableBodyRow(rubricText2))
+
+        Array<text> rubricText3
+        rubricText3:Add("number")
+        rubricText3:Add("A number is a numerical value with a decimal point.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricText3))
+
+         Array<text> rubrictxt
+        rubrictxt:Add("text")
+        rubrictxt:Add("Text is any combination of written symbols, like letters or numbers.") 
+     
+        tableBody:Add(AddTableBodyRow(rubrictxt))
+
+        Array<text> rubricbool
+        rubricbool:Add("boolean")
+        rubricbool:Add("A boolean variable can be only true or false.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricbool))
+
+        Array<text> rubricPV
+        rubricPV:Add("Primitive Variable")
+        rubricPV:Add("A primitive variable is a variable that stores one of the four basic types of information: integers, numbers, booleans, or text.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricPV))
+
+
+        Array<text> rubricOP
+        rubricOP:Add("Operator")
+        rubricOP:Add("An operator is a symbol that changes or combines pieces of data. The most common operators are math symbols like +, -, *, or /.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricOP))
+    
+        table:Add(tableBody)
+        section_warmUp:Add(table)
+
+        section_warmUp:AddParagraph("")
+        AddHeading(section_warmUp, "Code", 3)
+
+        section_warmUp:AddParagraph("You will be using the following new pieces of code: ")
+
+
+        WebTable tableCode = AddWebTable("New Code to Learn")
+        TableBody tableBodyCode = AddTableBody()
+        
+        Array<text> tableHeaderArrayCode
+        tableHeaderArrayCode:Add("Quorum Code")
+        tableHeaderArrayCode:Add("Code Example") 
+        tableHeaderArrayCode:Add("Explanation")
+
+        TableHeader theadCode = AddTableHeaderRow(tableHeaderArrayCode)
+        tableCode:Add(theadCode)  
+
+        Array<text> rubricText4
+        rubricText4:Add("integer NAME = VALUE")
+        rubricText4:Add("integer a = 0")
+        rubricText4:Add("Creates a new variable called NAME that can store integers, and puts VALUE in the container.") 
+   
+        tableBodyCode:Add(AddTableBodyRow(rubricText4))
+
+        Array<text> rubricText5
+        rubricText5:Add("number NAME = VALUE")
+        rubricText5:Add("number b = 1.8")
+        rubricText5:Add("Creates a new variable called NAME that can store numbers, and puts VALUE in the container.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricText5))
+
+    
+        Array<text> rubricTextString
+        rubricTextString:Add("text NAME = VALUE")
+        rubricTextString:Add("text string = "+dq+"McDonald’s"+dq+"")
+        rubricTextString:Add("Creates a new variable called NAME that can store text, and puts VALUE in the container.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextString))
+
+        Array<text> rubricTextBool
+        rubricTextBool:Add("boolean NAME = VALUE")
+        rubricTextBool:Add("boolean bool = true")
+        rubricTextBool:Add("Creates a new variable called NAME that can store booleans, and puts VALUE in the container.") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextBool))
+
+        tableCode:Add(tableBodyCode)
+        section_warmUp:Add(tableCode)
+        section_warmUp:AddParagraph("")
+
+        AddHeading(section_warmUp, "CSTA Standards", 3)
+         section_warmUp:AddParagraph("This lesson covers the following standards:")
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("2-AP-11")
+        standards:AddListItem("3A-DA-09")
+        standards:AddListItem("3A-DA-10")
+        section_warmUp:Add(standards)
+  
+        Section section_explore
+        section_explore:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_explore)
+        AddHeading(section_explore, "Explore", 2)
+
+        section_explore:AddParagraph("Before you begin, you will need to make a new project to work on. As a reminder, you can make a new project by going to the File Menu and selecting the New Project button. For the project type, select "+dq+"Console."+dq+" A console project really means that it is a blank canvas and you can then have it create whatever you like. Once you have made your project, open the "+dq+"Main.quorum"+dq+" file in the project tree on the left. Then, open the "+dq+"Blocks"+dq+" tab in the left pane. For this lesson, open the "+dq+"Basic"+dq+" tab. Your project should look like the picture below.")
+        
+        Image image = section_explore:AddImage("/media/Blocks/Variables And Operators/HelloWorld.png","A picture of Quorum Studio in dark mode. The left pane shows the Blocks tab with the Basic options selected. The right side has a hello world style output statement.")
+        image:AddText("A picture of Quorum Studio in dark mode. The left pane shows the Blocks tab with the Basic options selected. The right side has a hello world style output statement.")
+        image:AddAttribute("data-zoom","")
+        image:AddClassAttribute("rounded overflow-hidden")
+
+        section_explore:AddParagraph("In previous lessons, when you have given instructions to the computer, like "+dq+"output"+dq+" or "+dq+"say"+dq+", you have given it specific words or other data to use on that line of code. You can tell an output or say statement to interact with a constant, like the integer 5, but you can also use variables.")
+        section_explore:AddParagraph("A variable is a container for information. You can think of it like a box. The box has a label on it that describes what kind of stuff can go inside. The box also has a name written on it, so you can tell different boxes apart. ")
+        section_explore:AddParagraph("There are several blocks on the left side for variables. To start, think about one: ")
+
+        Image image1 = section_explore:AddImage("/media/Blocks/Variables And Operators/HelloWorld.png","A block that reads: integer a = 0")
+        image1:AddText("A block that reads: integer a = 0")
+        image1:AddAttribute("data-zoom","")
+        image1:AddClassAttribute("rounded overflow-hidden")
+
+        section_explore:AddParagraph("First, while the representation above is visual, computer programming often distinguishes between code and such visuals, like blocks. In the Quorum programming language, this distinction does not exist. The above is exactly, mathematically, identical to the line of code:")
+
+        section_explore:Add(preformatter:GeneratePreformattedCode("integer a = 0"))
+
+        section_explore:AddParagraph("Point being, throughout this lesson and the rest, just consider that while the language allows a block or text mode, what they both do is identical. It is purely personal preference which you or your students use. Both are accessible and any program can be written with either. In fact, when Quorum sends a block to be processed for creating the program you are writing, it is not using blocks at all. It just uses the text, but happens to have a visual representation that looks like a block and has extra information embedded for accessibility devices like screen readers. If the word block is referenced, thus, in this material, it is interchangeable with text.
+")        
+        Bold boldA
+        boldA:AddText(""+dq+"a"+dq+"")
+
+        Paragraph createVar
+        createVar:AddText("This block creates a variable, and it has four parts. The first box reads "+dq+"integer"+dq+", which describes the type of information that can be stored in the variable. The second box reads ")
+        createVar:Add(boldA)
+        createVar:AddText(", which is the variable's name. After the second box is an equal sign, which indicates <i>assignment</i> (which is just a fancy term for putting something in the variable box). The last box reads "+dq+"0"+dq+", which is the value of the variable, or in other words, the data being put in the box. For screen reader users, note that this type, name, value terminology is embedded into the screen reader cues, but varies slightly depending on platform and which screen reader is used.
+")
+        section_explore:Add(createVar)
+
+        AddHeading(section_explore, "An Introduction to Variables", 3)
+        section_explore:AddParagraph("Now consider how to make <strong>primitive variables</strong>, which in this context means one of the four basic types: integer, number, boolean, or text. To start, place the "+dq+"integer a = 0"+dq+" block at the top of your program. Then, place a "+dq+"say"+dq+" or "+dq+"output"+dq+" block after it. ")
+
+        Image image2 = section_explore:AddImage("/media/Blocks/Variables And Operators/CreateInteger.png","A picture showing a program in Quorum Studio. The first block reads "+dq+"integer a = 0 "+dq+" and the second block reads  output  "+dq+"words "+dq+"")
+        image2:AddText("A picture showing a program in Quorum Studio. The first block reads "+dq+"integer a = 0 "+dq+" and the second block reads  output  "+dq+"words "+dq+"")
+        image2:AddAttribute("data-zoom","")
+        image2:AddClassAttribute("object-contain max-w-96 max-h-48 rounded overflow-hidden")
+
+        section_explore:AddParagraph("Your program now has a variable, but you are not doing anything with it yet. If you place the name of the variable into the info box on your statement, the result would look like this:")
+
+        Image image3 = section_explore:AddImage("/media/Blocks/Variables And Operators/OutputInteger.png","A picture showing a program in Quorum Studio. The first block reads integer a = 0 and the second block reads output a which will output our variable")
+        image3:AddText("A picture showing a program in Quorum Studio. The first block reads integer a = 0 and the second block reads output a which will output our variable")
+        image3:AddAttribute("data-zoom","")
+        image3:AddClassAttribute("object-contain max-w-96 max-h-48 rounded overflow-hidden")
+
+        section_explore:AddParagraph("If you run your program, it will still output or say the integer 0, but it will do that by looking up what the value of the variable a is in memory, then use that. Remember, you can run your program from the Run menu by selecting the Run option, or by clicking the green "+dq+"play"+dq+" button on the toolbar, or by using the hotkey (Ctrl+R on Windows, or COMMAND+R on Mac).")
+        section_explore:AddParagraph("When you run the program, it should output the value of the variable, which is 0.")
+         
+        AddHeading(section_explore, "Valid and Invalid Variable Names", 3)
+         
+        section_explore:AddParagraph("In order to make your output statement use your variable, you have to give it a name. In big programs, there are often many variables, so giving them meaningful names that represent the kind of purpose they hold can be helpful to human readers. A variable name can be almost anything, but there a few rules:") 
+        
+        UnorderedList validVarList
+        validVarList:AddClassAttribute("list-disc list-outside pl-8")
+        validVarList:AddListItem("Variable names must start with a letter.")
+        validVarList:AddListItem("A name can be made of lowercase letters, uppercase letters, numbers, and the underscore symbol, "+dq+"_"+dq+". ")
+        validVarList:AddListItem("Names cannot contain spaces or other special characters.")
+        validVarList:AddListItem("While quirky, variables cannot end with the underscore character.")
+        section_explore:Add(validVarList)
+
+        AddHeading(section_explore, "Variable Types", 3)
+
+        section_explore:AddParagraph("The first box of your variable block describes the "+dq+"type"+dq+" of the variable. The block palette on the left side has four kinds of variables:")
+        Bold boldInt
+        boldInt:AddText("Integer")
+        Bold boldNum
+        boldNum:AddText("Number")
+        Bold boldTxt
+        boldTxt:AddText("Text")
+        Bold boldBool
+        boldBool:AddText("Boolean")
+
+        UnorderedList varTypes
+        varTypes:AddClassAttribute("list-disc list-outside pl-8")
+        varTypes:AddListItem(boldInt:ToText() + " are whole numbers. They can be positive or negative, but they never have a decimal point.
+")
+        varTypes:AddListItem(boldNum:ToText()  + " are numerical values with a decimal point. 
+")
+        varTypes:AddListItem(boldTxt:ToText()  + " is any sequence of text, including letters, numbers, special characters, etc. To indicate that something is text information instead of code, text is wrapped in quotation marks.
+")
+        varTypes:AddListItem(boldBool:ToText() + "  are data with exactly two possible values: true or false. 
+")
+        section_explore:Add(varTypes)
+
+        Bold boldPrim
+        boldPrim:AddText("primitive types")
+        Paragraph varPara
+        varPara:AddText("These four data types are the building blocks of data and sometimes called ")
+        varPara:Add(boldPrim)
+        varPara:AddText(". The reason is a bit complex, but has to do with how the computer stores certain kinds of data in memory as a program executes. In Quorum, it is also somewhat misleading, because text values are not stored this way. In any case, these are at least common types. The following shows a larger example of using several types of variables:
+")
+        section_explore:Add(varPara)
+
+          Image image4 = section_explore:AddImage("/media/Blocks/Variables And Operators/DefaultVarBlocks.png","A picture of a Quorum program with 9 blocks, as follows:
+integer wholeNumber = 0
+number decimalNumber = 0.0
+boolean myBooleanValue = true
+text greetings = "+dq+"words"+dq+"
+blank block
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings")
+        image4:AddText("A picture of a Quorum program with 9 blocks, as follows:
+integer wholeNumber = 0
+number decimalNumber = 0.0
+boolean myBooleanValue = true
+text greetings = "+dq+"words"+dq+"
+blank block
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings")
+        image4:AddAttribute("data-zoom","")
+        image4:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_explore:AddParagraph("While the above is an image with an alternative description, in code, because the blocks are exactly equivalent to text, if you were to select all blocks and copy paste, you would have the following text:
+")
+        section_explore:Add(preformatter:GeneratePreformattedCode("integer wholeNumber = 0
+number decimalNumber = 0.0
+boolean myBooleanValue = true
+text greetings = "+dq+"words"+dq+"
+
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings
+"))
+
+        AddHeading(section_explore, "Operators", 3)
+
+        section_explore:AddParagraph("While programming, you often need to use math to run calculations. Fortunately, the operators young people learn are largely very similar to what programming languages do. The kind of operators you can use, and what they do, does, however, depend on the data type. 
+")
+        section_explore:AddParagraph("The <strong>operators</strong> described here all work in the same way. One value is placed on the left, another on the right, and an operator is placed in the middle. For example, "+dq+"1 + 2"+dq+" is a mathematical expression with the "+dq+"plus"+dq+" operator placed between the integers 1 and 2. The expression calculates how you might expect with an answer of 3.
+")
+        AddHeading(section_explore, "Numerical Operators", 4)
+        section_explore:AddParagraph("For integers and numbers, you can use the four basic operations of math: addition (+), subtraction (-), multiplication (*), division (/). Integers also have modulus (mod), which calculates the remainder after integer division.")
+        section_explore:AddParagraph("In your program, change the values of your integer and number variables or make a math expression in each using operators to calculate a new value. The image below shows one possible way of doing this.")
+
+         Image image5 = section_explore:AddImage("/media/Blocks/Variables And Operators/NumberOps.png","A screenshot of code in Quorum Studio. Two blocks are shown, which read:
+integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4")
+        image5:AddText("A screenshot of code in Quorum Studio. Two blocks are shown, which read:
+integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4")
+        image5:AddAttribute("data-zoom","")
+        image5:AddClassAttribute("object-contain max-w-96 max-h-40 rounded overflow-hidden")
+
+        section_explore:AddParagraph("Again copy pasting from these blocks reveals is it identical to text, giving the following:")
+        section_explore:Add(preformatter:GeneratePreformattedCode("integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4
+"))
+        AddHeading(section_explore, "Boolean Operators", 4)
+        section_explore:AddParagraph("You can also use comparison operators on integers and numbers. These are equals (=), less than (<), greater than (>), less than or equal to (<=), greater than or equal to (>=), and not equal (not=). These operations produce boolean values. For example, "+dq+"5 < 6"+dq+" produces the boolean value "+dq+"true"+dq+". ")
+        
+        
+        Paragraph paraBool
+        paraBool:Add(boldBool)
+        paraBool:AddText(" values also use equal (=) and not equal (not=). They also use the logical operators "+dq+"and"+dq+" and "+dq+"or"+dq+" to combine values. The "+dq+"and"+dq+" operator produces the boolean value true only if both the left and right value are also true, or produces false if either of them are false. "+dq+"or"+dq+" produces the boolean value true if at least one of the two values are true, and only produces false if both values are false.
+")
+        section_explore:Add(paraBool)
+        section_explore:AddParagraph("Booleans also have a special operator, called "+dq+"not"+dq+". Unlike the other operators discussed here, "+dq+"not"+dq+" only takes one value, not two. "+dq+"not"+dq+" flips the value of true or false. For example, "+dq+"not true"+dq+" produces false, and "+dq+"not false"+dq+" produces true.")
+
+         Image imageBool = section_explore:AddImage("/media/Blocks/Variables And Operators/BoolValue.png","A snippet of a Quorum Studio program, showing the third block in the program. It reads: boolean myBooleanValue = true or false")
+        imageBool:AddText("A snippet of a Quorum Studio program, showing the third block in the program. It reads: boolean myBooleanValue = true or false")
+        imageBool:AddAttribute("data-zoom","")
+        imageBool:AddClassAttribute("object-contain max-w-96 max-h-24 rounded overflow-hidden")
+
+        section_explore:AddParagraph("Again, while the above looks like a block, it is identical to the following text:")
+        section_explore:Add(preformatter:GeneratePreformattedCode("boolean myBooleanValue = true or false"))
+
+        AddHeading(section_explore, "Text Operators", 4)
+
+        Paragraph txtPara
+        txtPara:Add(boldTxt)
+        txtPara:AddText(" values only use one operator, which is the plus symbol (+). When used for text, the plus symbol performs concatenation, or in other words, it adds one piece of text to the end of another. For example, "+dq+"hello "+dq+" + "+dq+"world"+dq+" would produce "+dq+"hello world"+dq+". This idea of concatenation is a higher level topic when it comes to text variable management, but the main idea to note is that you use it to combine text. Here is an example:
+")
+        section_explore:Add(txtPara)
+
+         Image image6 = section_explore:AddImage("/media/Blocks/Variables And Operators/Greeting.png","A snippet of a Quorum Studio program showing a text variable block. It reads: text greetings = "+dq+"Hi "+dq+" + "+dq+"there!"+dq+"")
+        image6:AddText("A snippet of a Quorum Studio program showing a text variable block. It reads: text greetings = "+dq+"Hi "+dq+" + "+dq+"there!"+dq+"")
+        image6:AddAttribute("data-zoom","")
+        image6:AddClassAttribute("object-contain max-w-96 max-h-24 rounded overflow-hidden")
+
+        section_explore:AddParagraph("The text equivalent is identical: ")
+        section_explore:Add(preformatter:GeneratePreformattedCode("text greeting = "+dq+"Hi "+dq+" + "+dq+"there!"+dq+""))
+        section_explore:AddParagraph("Here is one more example with: ")
+
+        Image image7 = section_explore:AddImage("/media/Blocks/Variables And Operators/AllVariables.png","A screenshot of a Quorum Studio program with 8 blocks. They read, in order:
+integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4
+boolean myBooleanValue = true or false
+text greetings =  "+dq+"Hi  "+dq+" +  "+dq+"there! "+dq+"
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings")
+        image7:AddText("A screenshot of a Quorum Studio program with 8 blocks. They read, in order:
+integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4
+boolean myBooleanValue = true or false
+text greetings =  "+dq+"Hi  "+dq+" +  "+dq+"there! "+dq+"
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings")
+        image7:AddAttribute("data-zoom","")
+        image7:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_explore:AddParagraph("The text is again equivalent:")
+        section_explore:Add(preformatter:GeneratePreformattedCode("integer wholeNumber = 7 + 5
+number decimalNumber = 10 / 4
+boolean myBooleanValue = true or false
+text greetings =  "+dq+"Hi  "+dq+" +  "+dq+"there! "+dq+"
+say wholeNumber
+say decimalNumber
+say myBooleanValue
+say greetings"))
+
+        AddHeading(section_explore, "Inputs and Typecasting", 4)
+        section_explore:AddParagraph("In some circumstances, perhaps you want to retrieve user input for a variable to do something with it. The input() command allows you to take user input and save it into a text variable. This block is available for you to use within the "+dq+"Basics"+dq+" category.
+")
+        Image image8 = section_explore:AddImage("/media/Blocks/Variables And Operators/Input.png","A quorum block template that reads:
+        text string = input()")
+        image8:AddText("A quorum block template that reads:
+        text string = input()")
+        image8:AddAttribute("data-zoom","")
+        image8:AddClassAttribute("object-contain max-w-96 max-h-24 rounded overflow-hidden")
+
+        section_explore:AddParagraph("Inside of the parentheses of input, you are able to put a command or question in which the answer you type out will be saved into the text string variable. For example:
+")
+        
+         Image image9 = section_explore:AddImage("/media/Blocks/Variables And Operators/MilkFlavor.png","A quorum block template that reads:
+        text milkFlvaor = input("+dq+"What is your favorite flavor of milk?"+dq+")")
+        image9:AddText("A quorum block template that reads:
+        text milkFlvaor = input("+dq+"What is your favorite flavor of milk?"+dq+")")
+        image9:AddAttribute("data-zoom","")
+        image9:AddClassAttribute("rounded overflow-hidden")
+
+        section_explore:AddParagraph("When you run this piece of code and input your answer into the console, whatever answer you send into Quorum saves the value into the milkFlavor variable. Regardless if your answer is a numerical value or text value, by default, it saves as a text value. Therefore, another operator to know is learning how to convert text variables to integers or numbers using cast().
+")
+        section_explore:AddParagraph("Typecasting is a useful method to convert these numbers into their correct types. In this block of code, the program is asking how many hours of sleep you get via the input method. ")
+
+         Image image10 = section_explore:AddImage("/media/Blocks/Variables And Operators/Sleep.png","A Quorum code snippet that reads:
+         text sleep = input("+dq+"How many hours of sleep do you get?"+dq+")
+integer hours = cast(integer, sleep)
+
+integer need8hours = 8 - hours
+output "+dq+"You get "+dq+" + hours + "+dq+" of sleep. You need "+dq+" + need8hours + "+dq+" hours to get the full 8 hours of sleep!"+dq+" 
+")
+        image10:AddText("A Quorum code snippet that reads:
+         text sleep = input("+dq+"How many hours of sleep do you get?"+dq+")
+integer hours = cast(integer, sleep)
+
+integer need8hours = 8 - hours
+output "+dq+"You get "+dq+" + hours + "+dq+" of sleep. You need "+dq+" + need8hours + "+dq+" hours to get the full 8 hours of sleep!"+dq+" ")
+        image10:AddAttribute("data-zoom","")
+        image10:AddClassAttribute("rounded overflow-hidden")
+
+        section_explore:AddParagraph("The lines of this program read in plain text:
+")
+
+        section_explore:Add(preformatter:GeneratePreformattedCode("text sleep = input("+dq+"How many hours of sleep do you get?"+dq+")
+integer hours = cast(integer, sleep)
+
+integer need8hours = 8 - hours
+output "+dq+"You get "+dq+" + hours + "+dq+" of sleep. You need "+dq+" + need8hours + "+dq+" hours to get the full 8 hours of sleep!"+dq+"
+"))
+
+        section_explore:AddParagraph("Notice how the input saves as a text variable, although you are asking for an integer. You can use the action, cast(type, variableToCast) to convert the text value into an integer as it is shown in line 2. The program saves the value as an integer and can be used in calculations to get the answer in the output. Feel free to copy this code snippet onto Quorum Studio to see how it works.")
+         Section section_engage
+        section_engage:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_engage)
+        AddHeading(section_engage, "Engage", 2)
+
+        section_engage:AddParagraph("After learning how to create variables and use these variables when working with operators, you will practice these skills on your own. You will be creating variables for each Quorum data type and outputting them into the console: 
+")
+        UnorderedList VarList
+        VarList:AddClassAttribute("list-disc list-outside pl-8")
+        VarList:AddListItem("Integer")
+        VarList:AddListItem("Number ")
+        VarList:AddListItem("Text")
+        VarList:AddListItem("Boolean")
+        section_engage:Add(VarList)
+
+        section_engage:AddParagraph("Additionally, with all the datatypes you will also be practicing how to use the operators specific to each type. This section is a bit rote, but practice like this, even if brief, can help get a shared understanding of an extremely important concept in computer science.")
+
+        AddHeading(section_engage, "Directions", 3)
+
+        section_engage:AddParagraph("One day out of the blue you and a partner leave your corporate life and want to move to country life. The hustle culture you have faced prior just became too much and now you suddenly want to live a slower and simple life. Using the money you had in the bank, you buy a small farm and want to grow vegetables and fruits. It is the start of spring and you have to plan out your whole season to grow vegetables effectively. You are going to write a small program to document your farm.")
+
+         Image image11 = section_engage:AddImage("/media/Blocks/Variables And Operators/Farm.png","Picture of a Farm")
+        image11:AddText("Picture of a Farm")
+        image11:AddAttribute("data-zoom","")
+        image11:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+        section_engage:AddText("<center><small><a href=" + dq + "https://unsplash.com/photos/barn-surrounded-by-trees-QcBAZ7VREHQ" + dq + ">Barn by Frances Gunn</a></small></center>")
+        section_engage:AddParagraph("You will first want to name your farm, so create a text variable, saving the value with the name. You can also practice using the text variable operation to add two words together. For example:")
+        section_engage:Add(preformatter:GeneratePreformattedCode("text name =  "+dq+"Mickey "+dq+" + "+dq+"Mouse"+dq+"
+"))
+
+        section_engage:AddParagraph("On your farm you have the choice to grow these or other types of fruits and vegetables:
+")
+
+        UnorderedList vegList
+        vegList:AddClassAttribute("list-disc list-outside pl-8")
+        vegList:AddListItem("Apricots")
+        vegList:AddListItem("Apples")
+        vegList:AddListItem("Garlic")
+        vegList:AddListItem("Pineapples")
+        vegList:AddListItem("Strawberries")
+        vegList:AddListItem("Broccoli")
+        vegList:AddListItem("Lettuce")
+        vegList:AddListItem("Onions")
+        vegList:AddListItem("Mushrooms")
+        vegList:AddListItem("Turnips")
+        section_engage:Add(VarList)
+
+        section_engage:AddParagraph("You have 10 plots available on your land to grow your produce. You will then create integer variables and decide how much of each product you want to grow. After deciding what to grow, add up all the fruit and veggie variables in order to verify you have all 10 plots filled and save this in a new variable named total.")
+        section_engage:AddParagraph("Lastly, create 2 boolean variables: isSunny and isRainy to determine what you want your ideal weather to be as you start to grow your produce. Try to use the boolean operators and see what your expression will result as. You will want to output all of your variables created at the end of the program. If you want to format your output as well using the text operators, feel free to do so if you have extra time left. An example of formatting your variables would be:")
+
+         Image image12 = section_engage:AddImage("/media/Blocks/Variables And Operators/Lettuce.png","A snippet of Quorum code that reads: 
+         say "+dq+"Lettuce Amount: "+dq+" + lettuce")
+        image12:AddText("A snippet of Quorum code that reads: 
+         say "+dq+"Lettuce Amount: "+dq+" + lettuce")
+        image12:AddAttribute("data-zoom","")
+        image12:AddClassAttribute("object-contain max-w-96 max-h-12 rounded overflow-hidden")
+
+        AddHeading(section_engage, "Wrap up", 3)
+        section_engage:AddParagraph("Once you are finished with your program, discuss what you think might be common misunderstandings with students and variables. Are some harder than others? Are some operations easier to understand, or more important, than others?")
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how create variables and use variable operatoes in Quorum"
+    end
+
+    action GetSummaryName returns text
+        return "Variables and Operators"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Variables and Operators"
+    end
+
+    action GetShortDescription returns text
+        return "how create variables in Quorum"
+    end
+
+    action GetLinkName returns text
+        return "Variables and Operators"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/blocks/VariablesAndOperators.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Blocks"
+    end
+end

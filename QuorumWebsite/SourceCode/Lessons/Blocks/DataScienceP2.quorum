@@ -1,0 +1,569 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Bold
+use Libraries.System.FileReader
+use Libraries.System.File
+
+class DataScienceP2 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        LineBreak break //will be used multiple times
+        
+        //html header stuff
+        SetWebPageTitle("Getting Started with Blocks - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Hour 7: Data Science, Part 2 - Accessible Visualizations", 1)
+
+        headDiv:AddText("This lesson is to teach you about using the DataFrame object to create a chart in Quorum.")
+        bodyDiv:Add(headDiv)
+
+        Section section_overview
+        section_overview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section_overview, "Overview", 2)
+        section_overview:AddParagraph("One of the most powerful tools in data science is visual representations of information. Historically, however, these visual representations have been limited to the use of "+dq+"alternative descriptions"+dq+", or "+dq+"alt text"+dq+", for accessibility. In this lesson, you will explore accessible visualization, which is a way to automatically generate visualizations that are, in fact, still visual, but that are sent to the computer in such a way that no alternative description is required. You will use these accessible visualizations to understand a data set.")
+
+        AddHeading(section_overview, "Goals", 3)
+        section_overview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about the kinds of visualizations that are available")
+        goalList:AddListItem("Construct and explore data using an accessible bar chart, or other chart types")
+        goalList:AddListItem("Discuss keyboard controls in the accessible visualizations you have created")
+        goalList:AddListItem("Learn how to customize the appearance of a chart")
+        section_overview:Add(goalList)
+
+        bodyDiv:Add(section_overview)
+
+        Section section_warmUp
+        section_warmUp:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_warmUp)
+        AddHeading(section_warmUp, "Warm up", 2)
+        
+        section_warmUp:AddParagraph("Data visualization is an important tool for conveying information, and it can appear in your everyday lives. What kind of data visualizations have you seen before and where do you find it useful?")
+        
+        AddHeading(section_warmUp, "Vocabulary", 3)
+
+        section_warmUp:AddParagraph("You will be learning about the following vocabulary words: ")
+        
+        WebTable table = AddWebTable("Vocabulary")
+        TableBody tableBody = AddTableBody()
+        
+        Array<text> tableHeaderArray
+        tableHeaderArray:Add("Term")
+        tableHeaderArray:Add("Definition") 
+   
+
+        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
+        table:Add(thead)  
+
+        Array<text> rubricText1
+        rubricText1:Add("Alternative Descriptions")
+        rubricText1:Add("Alternative description describes an image or may provide additional context") 
+   
+        tableBody:Add(AddTableBodyRow(rubricText1))
+
+        Array<text> rubricText2
+        rubricText2:Add("Charts")
+        rubricText2:Add("A Chart is a graphical representation of data") 
+  
+        tableBody:Add(AddTableBodyRow(rubricText2))
+
+        Array<text> rubricText3
+        rubricText3:Add("Bar Chart")
+        rubricText3:Add("A Bar Chart is a graphical representation to display categories of data through rectangular bars. Bar Charts can be displayed horizontally and vertically.") 
+     
+        tableBody:Add(AddTableBodyRow(rubricText3))
+    
+        table:Add(tableBody)
+        section_warmUp:Add(table)
+
+        section_warmUp:AddParagraph("")
+        AddHeading(section_warmUp, "Code", 3)
+
+        section_warmUp:AddParagraph("You will be using the following new pieces of code: ")
+
+
+        WebTable tableCode = AddWebTable("New Code to Learn")
+        TableBody tableBodyCode = AddTableBody()
+        
+        Array<text> tableHeaderArrayCode
+        tableHeaderArrayCode:Add("Quorum Code")
+        tableHeaderArrayCode:Add("Code Example") 
+        tableHeaderArrayCode:Add("Explanation")
+
+        TableHeader theadCode = AddTableHeaderRow(tableHeaderArrayCode)
+        tableCode:Add(theadCode)  
+
+        Array<text> rubricText4
+        rubricText4:Add("use Libraries.Interface.Controls.Charts.BarChart")
+        rubricText4:Add("use Libraries.Interface.Controls.Charts.BarChart")
+        rubricText4:Add("A use statement lets you use a type of Object in your program. In this case, you are using the BarChart object.") 
+   
+        tableBodyCode:Add(AddTableBodyRow(rubricText4))
+
+        Array<text> rubricText5
+        rubricText5:Add("BarChart NAME")
+        rubricText5:Add("BarChart chart")
+        rubricText5:Add("A variable declaration that makes a new BarChart. You can use the assignment operator on bar chart with a DataFrame") 
+  
+        tableBodyCode:Add(AddTableBodyRow(rubricText5))
+
+        Array<text> rubricTextFactors
+        rubricTextFactors:Add("DataFrame:AddSelectedFactors(column)")
+        rubricTextFactors:Add("frame:AddSelectedFactors("+dq+"Breed Group"+dq+")") 
+        rubricTextFactors:Add("Selects a column factor from the CSV file into the DataFrame (can be non-numerical values)") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextFactors))
+
+        Array<text> rubricTextFrame
+        rubricTextFrame:Add("DataFrame:BarChart()")
+        rubricTextFrame:Add("frame:BarChart()") 
+        rubricTextFrame:Add("Creates a bar chart with the selected factors and columns") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextFrame))
+
+        Array<text> rubricTextTitle
+        rubricTextTitle:Add("BarChart:SetTitle(title)")
+        rubricTextTitle:Add("chart:SetTitle("+dq+"Life Expectancy of Dog Breeds"+dq+")") 
+        rubricTextTitle:Add("Sets the title of the bar chart")  
+        tableBodyCode:Add(AddTableBodyRow(rubricTextTitle))   
+
+        Array<text> rubricTextYTitle
+        rubricTextYTitle:Add("BarChart:SetYAxisTitle(title)")
+        rubricTextYTitle:Add("chart:SetYAxisTitle("+dq+"Maximum Life Span"+dq+")") 
+        rubricTextYTitle:Add("Sets the y axis of the bar chart") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextYTitle))
+
+        Array<text> rubricTextXTitle
+        rubricTextXTitle:Add("BarChart:SetXAxisTitle(title)")
+        rubricTextXTitle:Add("chart:SetXAxisTitle("+dq+"Dog Breed Group"+dq+")") 
+        rubricTextXTitle:Add("Sets the x axis of the bar chart") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextXTitle))
+
+        Array<text> rubricTextColor
+        rubricTextColor:Add("BarChart:SetColorPaletteToColorgorical()")
+        rubricTextColor:Add("chart:SetColorPaletteToColorgorical()") 
+        rubricTextColor:Add("Sets the color palette to colorgorical ") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextColor))
+
+        Array<text> rubricTextDisplay
+        rubricTextDisplay:Add("BarChart:Display()")
+        rubricTextDisplay:Add("chart:Display()") 
+        rubricTextDisplay:Add("Displays the chart") 
+        tableBodyCode:Add(AddTableBodyRow(rubricTextDisplay))
+        
+
+        tableCode:Add(tableBodyCode)
+        section_warmUp:Add(tableCode)
+        section_warmUp:AddParagraph("")
+
+        AddHeading(section_warmUp, "CSTA Standards", 3)
+         section_warmUp:AddParagraph("This lesson covers the following standards:")
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("3A-DA-11")
+        standards:AddListItem("3A-AP-23")
+        standards:AddListItem("3A-AP-21")
+        section_warmUp:Add(standards)
+  
+        Section section_explore
+        section_explore:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_explore)
+        AddHeading(section_explore, "Explore", 2)
+        
+        section_explore:AddParagraph("There are many different kinds of data visualizations. While the term visualization is used here, all graphics in the Quorum programming language are accessible. Generating a bar chart does present the chart visually, but it also provides screen reader and accessibility information. Just like before, you generate <strong>charts</strong> with DataFrame objects. ")
+        section_explore:AddParagraph("When it comes to describing data, one of the best options to showcase them is visually because people can easily detect patterns and draw conclusions based off of graphs. It provides a visual summary of data rather than having to read and understand blocks of text. From an accessibility standpoint, this still holds. When Quorum generates accessibility information for, say, a chart, it is not described. All interactions and descriptions are generated automatically by the programming language without human intervention or description. There are no, so-called, <strong>alternative descriptions</strong>, because they are not needed. The following chart types are supported:")
+
+        WebTable tableChart = AddWebTable("Supported Chart Types in Quorum")
+        TableBody tableBodyChart = AddTableBody()
+        
+        Array<text> tableHeaderArrayChart
+        tableHeaderArrayChart:Add("Chart")
+        tableHeaderArrayChart:Add("Usage") 
+   
+
+        TableHeader theadChart = AddTableHeaderRow(tableHeaderArrayChart)
+        tableChart:Add(theadChart)  
+
+        Array<text> rubricTextBar
+        rubricTextBar:Add("Bar Chart")
+        rubricTextBar:Add("To compare categorical data or summary statistics from 1+ groups") 
+   
+        tableBodyChart:Add(AddTableBodyRow(rubricTextBar))
+
+        Array<text> rubricTextHistogram
+        rubricTextHistogram:Add("Histogram")
+        rubricTextHistogram:Add("To portray sampling distribution with continuous independent variables") 
+  
+        tableBodyChart:Add(AddTableBodyRow(rubricTextHistogram))
+
+        Array<text> rubricTextLine
+        rubricTextLine:Add("Line Chart")
+        rubricTextLine:Add("To depict a single variable or multiple variables with respect to change over time") 
+     
+        tableBodyChart:Add(AddTableBodyRow(rubricTextLine))
+
+
+        Array<text> rubricTextBox
+        rubricTextBox:Add("Box Plot")
+        rubricTextBox:Add("To show the distribution of data of 1+ groups") 
+     
+        tableBodyChart:Add(AddTableBodyRow(rubricTextBox))
+
+        Array<text> rubricTextScatter
+        rubricTextScatter:Add("Scatter Plot")
+        rubricTextScatter:Add("To visualize peaks and distributions in numerical data") 
+     
+        tableBodyChart:Add(AddTableBodyRow(rubricTextScatter))
+
+        Array<text> rubricTextViolin
+        rubricTextViolin:Add("Violin Plot")
+        rubricTextViolin:Add("To determine if two variables have a relationship or correlation") 
+     
+        tableBodyChart:Add(AddTableBodyRow(rubricTextViolin))
+
+
+        Array<text> rubricTextPie
+        rubricTextPie:Add("Pie Chart")
+        rubricTextPie:Add("To show frequencies or percentages") 
+        tableBodyChart:Add(AddTableBodyRow(rubricTextPie))
+
+        tableChart:Add(tableBodyChart)
+        section_explore:Add(tableChart)
+
+        AddHeading(section_explore, "Bar Charts", 3)
+        section_explore:AddParagraph("Because <strong>bar charts</strong> visualize quantitative data, it is important that your variables within your x and y axis take discrete values and can be thought of as labels. Typically one axis should be a label or category and the other should represent something numeric. The numeric value is going to determine the length of each bar. Some tips to keep in mind for bar charts include:")
+        UnorderedList listBar
+        listBar:AddClassAttribute("list-disc list-outside pl-8")
+        listBar:AddListItem("Always start your bars are plotted on zero. This allows for better readability.")
+        listBar:AddListItem("Keep your bars in a rectangular form. Curves or 3D effects make it more difficult to see what the true length is at the bar.")
+        listBar:AddListItem("Consider how you color your bars. Too many colors may distract viewers and might not be able to see any distinctions in categories. The automatically chosen colors are designed to be accessible, but there are limits to how the human eye can process colors.")
+        section_explore:Add(listBar)
+
+        AddHeading(section_explore, "Chart Accessibility", 3)
+
+        Link linkLibrary
+        linkLibrary:AddText("this webpage")
+        linkLibrary:SetAddress("https://quorumlanguage.com/tutorials/charts/charttextnavigation.html")
+        linkLibrary:SetTarget(linkLibrary:newTab)
+
+        Paragraph accessibilityPara
+        accessibilityPara:AddText("All charts are accessible by default. All can be navigated with the keyboard and screen reader, in addition to being visual. You may refer to ")
+        accessibilityPara:Add(linkLibrary)
+        accessibilityPara:AddText(" to find out more general chart hotkeys, but to quickly navigate through the different areas in a bar chart you can use the following keys:
+")
+        section_explore:Add(accessibilityPara)
+        
+        WebTable tableAccessibility = AddWebTable("Accessibility Chart Movement")
+        TableBody tableBodyAccessibility = AddTableBody()
+        
+        Array<text> tableHeaderArrayAccessibility
+        tableHeaderArrayAccessibility:Add("Action")
+        tableHeaderArrayAccessibility:Add("Keys") 
+        tableHeaderArrayAccessibility:Add("Description") 
+   
+
+        TableHeader theadAccessibility = AddTableHeaderRow(tableHeaderArrayAccessibility)
+        tableAccessibility:Add(theadAccessibility)  
+
+        Array<text> rubricTextUp
+        rubricTextUp:Add("X-Axis Movement")
+        rubricTextUp:Add("Up Arrow Key") 
+        rubricTextUp:Add("Move to next in sequence") 
+   
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextUp))
+
+        Array<text> rubricTextDown
+        rubricTextDown:Add("X-Axis Movement")
+        rubricTextDown:Add("Down Arrow Key") 
+        rubricTextDown:Add("Move to previous in sequence") 
+  
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextDown))
+
+        Array<text> rubricTextRight
+        rubricTextRight:Add("X-Axis Movement")
+        rubricTextRight:Add("Right Arrow Key")
+        rubricTextRight:Add("Move to next in sequence")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextRight))
+
+        Array<text> rubricTextLeft
+        rubricTextLeft:Add("X-Axis Movement")
+        rubricTextLeft:Add("Left Arrow Key")
+        rubricTextLeft:Add("Move to previous in sequence")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextLeft))
+
+        Array<text> rubricTextPgUp
+        rubricTextPgUp:Add("Value Movement")
+        rubricTextPgUp:Add("Page Up")
+        rubricTextPgUp:Add("Towards smallest valued point movement")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextPgUp))
+
+        Array<text> rubricTextPgDown
+        rubricTextPgDown:Add("Value Movement")
+        rubricTextPgDown:Add("Page Down")
+        rubricTextPgDown:Add("Towards smallest valued point movement")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextPgDown))
+
+         Array<text> rubricTextEnter
+        rubricTextEnter:Add("Move into Subgroup")
+        rubricTextEnter:Add("Enter")
+        rubricTextEnter:Add("Move to from a parent to child, for example within a chart to individual bars")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextEnter))
+
+         Array<text> rubricTextShift
+        rubricTextShift:Add("Move out of Subgroup")
+        rubricTextShift:Add("SHIFT + ENTER")
+        rubricTextShift:Add("Move from a child to a parent, for example from bars to the parent chart")  
+     
+        tableBodyAccessibility:Add(AddTableBodyRow(rubricTextShift))
+
+    
+        tableAccessibility:Add(tableBodyAccessibility)
+        section_explore:Add(tableAccessibility)
+
+        section_explore:AddParagraph("You can navigate with this chart accessible controls. Feel free to test out the navigational controls with a screen reader.")
+
+        AddHeading(section_explore, "Creating a Bar Chart with DataFrames", 3)
+
+        section_explore:AddParagraph("While you know how to properly load in a CSV file through a DataFrame, the next step is to use that data to create a bar chart. Before you are able to create the chart, there are additional libraries and objects you will need in order to customize the bar chart.")
+        section_explore:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.Charts.BarChart
+BarChart chart
+"))
+        section_explore:AddParagraph("This library adds the BarChart object which allows you to customize and label your chart to your liking. When you are on your BarChart object, take a look at the "+dq+"Advice"+dq+" category within the blocks tab. You will see all the available actions that your BarChart option can use. Important notes to consider while creating your chart are to ensure that your data is properly represented and individuals can draw meaningful conclusions. 
+")
+
+        Image image1 = section_explore:AddImage("/media/Blocks/DataScience2/BarChart.png","The Advice column in the Blocks tab showing all available actions for the BarChart object")
+        image1:AddText("The Advice column in the Blocks tab showing all available actions for the BarChart object")
+        image1:AddAttribute("data-zoom","")
+        image1:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_explore:AddParagraph("Actions that may be of interest for you while creating your chart include:")
+
+        UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        list:AddListItem("<code>SetTitle(name)</code>: Changes the title of your bar chart. ")
+        list:AddListItem("<code>SetYAxisTitle(name)</code>: Changes the y axis of your bar chart.")
+        list:AddListItem("<code>SetXAxisTitle(name)</code>: Changes the x axis of your bar chart.")
+        list:AddListItem("<code>SetColorPaletteToColorgorical</code>: Changes the color palette of your bar chart to a colorgorical color palette. The Cologorical color palette caters towards creating distinctive color combinations for individuals with visual impairments while maintaining aesthetics.")
+        section_explore:Add(list)
+
+        Section section_engage
+        section_engage:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(section_engage)
+        AddHeading(section_engage, "Engage", 2)
+
+        section_engage:AddParagraph("In this activity, you will display information in a way that makes it easier to understand. You will use accessible barcharts to inspect and compare data about the Palmer Penguins. A common best practice of making any type of good chart is to give clear and concise context to the viewer, but what this means is at least partially subjective. Data visualization lacks in this area where many elements are inconsistent with the entire design. Common green thumbs to note when creating a chart are:")
+        UnorderedList list1
+        list1:AddClassAttribute("list-disc list-outside pl-8")
+        list1:AddListItem("Creating a descriptive title")
+        list1:AddListItem("Add a subtitle to your chart for more context (if necessary)")
+        list1:AddListItem("Label your x and y axis")
+        list1:AddListItem("Choose a color palette that is distinguishable and clear to your viewers")
+        section_engage:Add(list1)
+
+        section_engage:AddParagraph("What you will be working on is going through the entire process of using the DataFrame and building upon your existing knowledge by going through step by step to create a bar chart through the data you have gathered.")
+        AddHeading(section_engage, "Directions", 3)
+        section_engage:AddParagraph("The goal of this activity is to create  an accessible bar chart and to customize it to your liking. In the first task, you will create the chart. In the second, you will customize it.")
+
+        AddHeading(section_engage, "Introducing the Palmer Penguins Dataset", 4)
+        Link linkPenguin
+        linkPenguin:AddText("Palmer Penguins dataset")
+        linkPenguin:SetAddress("https://allisonhorst.github.io/palmerpenguins/articles/intro.html")
+        linkPenguin:SetTarget(linkPenguin:newTab)
+
+        Link linkPenguinDL
+        linkPenguinDL:AddText("start by downloading the Palmer Penguin dataset")
+        linkPenguinDL:SetAddress("https://gist.githubusercontent.com/slopp/ce3b90b9168f2f921784de84fa445651/raw/4ecf3041f0ed4913e7c230758733948bc561f434/penguins.csv")
+        linkPenguinDL:SetTarget(linkPenguinDL:newTab)
+
+        Paragraph penguinIntro
+        penguinIntro:AddText("Using real data can be helpful in thinking about data science, and as such consider the ")
+        penguinIntro:Add(linkPenguin)
+        penguinIntro:AddText(", a collection of information about three different species of penguins observed on the islands of the Palmer Archipelago in Antarctica. First, ")
+        penguinIntro:Add(linkPenguinDL)
+        penguinIntro:AddText(". Examine the CSV file, specifically at the column headers in the first row.
+")
+        section_engage:Add(penguinIntro)
+        section_engage:AddParagraph("The data contains several categorical variables. The "+dq+"species"+dq+" column indicates one of three penguin species, "+dq+"Chinstrap"+dq+", "+dq+"Gentoo"+dq+", or "+dq+"Adelie"+dq+". The "+dq+"island"+dq+" column indicates which of the three islands in the Palmer Archipelago the penguin was found on. The "+dq+"sex"+dq+" column indicates if a penguin was "+dq+"male"+dq+" or "+dq+"female"+dq+". Finally, the "+dq+"year"+dq+" column indicates what year the measurements were collected for that row of data.")
+
+        Image imagePengu = section_engage:AddImage("/media/Blocks/DataScience2/Penguin.png","Artwork depicting the three species of penguins in the Palmer Penguins dataset: Chinstrap, Gentoo, and Adelie.")
+        imagePengu:AddText("Artwork depicting the three species of penguins in the Palmer Penguins dataset: Chinstrap, Gentoo, and Adelie.")
+        imagePengu:AddAttribute("data-zoom","")
+        imagePengu:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_engage:AddParagraph("<center><small>Artwork by @allison_horst under CC0 from https://allisonhorst.github.io/palmerpenguins/</small></center>")
+        section_engage:AddParagraph("There are also several quantitative measures, or in other words, several values where numbers were measured for each penguin. These include the length and depth of the penguin’s bills in millimeters, the length of their flippers in millimeters, and their body mass weighed in grams.")
+        section_engage:AddParagraph("It is worth noting that a few entries in the data read "+dq+"NA"+dq+", especially in the "+dq+"sex"+dq+" column. These are cases where that particular information could not be measured for a particular penguin. There are lots of potential questions you might ask about these penguins, and lots of potential answers you could get from the data.")
+
+        AddHeading(section_engage, "Task 1: Create the Chart", 4)
+        Paragraph gettingStartedPara
+
+        Link linkPenguinDL1
+        linkPenguinDL1:AddText("dataset")
+        linkPenguinDL1:SetAddress("https://gist.githubusercontent.com/slopp/ce3b90b9168f2f921784de84fa445651/raw/4ecf3041f0ed4913e7c230758733948bc561f434/penguins.csv")
+        linkPenguinDL1:SetTarget(linkPenguinDL:newTab)
+
+        gettingStartedPara:AddText("First, create a new project for your code. Next download the ")
+        gettingStartedPara:Add(linkPenguinDL1)
+        gettingStartedPara:AddText(" and place it in your project if you have not done so already. You can do this by moving the file into the root directory of your project. The root directory is the folder that has the project’s name, and contains a "+dq+"Project"+dq+" and "+dq+"SourceCode"+dq+" folder.
+")
+
+        section_engage:Add(gettingStartedPara)
+        section_engage:AddParagraph("On Windows, by default your project will be located in Documents/Quorum Studio.  On Mac, by default, your project will be located in Users/Quorum Studio.
+")
+
+        Image imageMac = section_engage:AddImage("/media/Blocks/DataScience2/Mac.png","A picture showing the file explorer on Mac. It shows the "+dq+"BarChartExample"+dq+" directory, and it contains two folders, "+dq+"Project"+dq+" and "+dq+"SourceCode"+dq+", and a file called "+dq+"penguins.csv"+dq+".")
+        imageMac:AddText("A picture showing the file explorer on Mac. It shows the "+dq+"BarChartExample"+dq+" directory, and it contains two folders, "+dq+"Project"+dq+" and "+dq+"SourceCode"+dq+", and a file called "+dq+"penguins.csv"+dq+".")
+        imageMac:AddAttribute("data-zoom","")
+        imageMac:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_engage:AddParagraph("<i><center><small>Mac Project Location</small></center></i>")
+
+         Image imageWin = section_engage:AddImage("/media/Blocks/DataScience2/Windows.png","A picture showing the file explorer on Windows. It shows the "+dq+"MyProject"+dq+" directory, and it contains two folders, "+dq+"Project"+dq+" and "+dq+"SourceCode"+dq+", as well as a file called "+dq+".gitignore"+dq+", and a file called "+dq+"penguins.csv"+dq+".")
+        imageWin:AddText("A picture showing the file explorer on Windows. It shows the "+dq+"MyProject"+dq+" directory, and it contains two folders, "+dq+"Project"+dq+" and "+dq+"SourceCode"+dq+", as well as a file called "+dq+".gitignore"+dq+", and a file called "+dq+"penguins.csv"+dq+".")
+        imageWin:AddAttribute("data-zoom","")
+        imageWin:AddClassAttribute("object-contain max-w-96 max-h-32 rounded overflow-hidden")
+
+        section_engage:AddParagraph("<i><center><small>Windows Project Location</small></center></i>")
+        section_engage:AddParagraph("Next, you need to program your barchart. You need the following two libraries:")
+
+        UnorderedList list2
+        list2:AddClassAttribute("list-disc list-outside pl-8")
+        list2:AddListItem("Libraries.Compute.Statistics.DataFrame")
+        list2:AddListItem("Libraries.Interface.Controls.Charts.BarChart")
+        section_engage:Add(list2)
+
+        section_engage:AddParagraph("Including these libraries allows you to create the DataFrame object and now the BarChart object, which you can name as you see fit. For demonstration, the DataFrame will be named "+dq+"frame"+dq+" and the BarChart will be "+dq+"chart."+dq+"")
+        section_engage:AddParagraph("To load in a file, you will want to use your frame object and use the keyboard or the mouse to put in the Load(location) block into the code editor. Inside where the location is, you will need to replace it with the location of the penguin CSV file. Typically, you can decide if you want to have a separate data folder for all your CSVs therefore, the path you would put inside the parameter would be "+dq+"data/penguins.csv"+dq+" however since you are working with only one dataset, it is not entirely necessary.")
+
+        Image image2 = section_engage:AddImage("/media/Blocks/DataScience2/CreateDF.png","A quorum code block that reads:
+        use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.BarChart 
+
+DataFrame frame
+frame:Load("+dq+"penguins.csv"+dq+")")
+        image2:AddText("A quorum code block that reads:
+        use Libraries.Compute.Statistics.DataFrame
+use Libraries.Interface.Controls.Charts.BarChart 
+
+DataFrame frame
+frame:Load("+dq+"penguins.csv"+dq+")")
+        image2:AddAttribute("data-zoom","")
+        image2:AddClassAttribute("object-contain max-w-96 max-h-48 rounded overflow-hidden")
+
+        section_engage:AddParagraph("You will now want to select specific columns of the dataset and play around with it. Make sure you can see the actual dataset so you are able to correctly pull out the correct columns for your charts. This is where you will need the actions AddSelectedColumns() and AddSelectedFactors(). ")
+        Image image3 = section_engage:AddImage("/media/Blocks/DataScience2/PenguinBill.png","A diagram of how to measure a penguin bill with the note: In the raw data, bill 
+        dimensions are recorded as culmen length and culmen depth. The culmen is the dorsal ridge atop the bill")
+        image3:AddText("A diagram of how to measure a penguin bill with the note: In the raw data, bill 
+        dimensions are recorded as culmen length and culmen depth. The culmen is the dorsal ridge atop the bill")
+        image3:AddAttribute("data-zoom","")
+        image3:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section_engage:AddParagraph("<small><center>Artwork by @allison_horst under CC0 from https://allisonhorst.github.io/palmerpenguins/</small></center>")
+        section_engage:AddParagraph("The difference between the two actions is that columns will typically take all the numerical data you have whereas the factors will separate these numerical data points into categories. Remember that you call the actions such as: ")
+        section_engage:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedFactors("+dq+"species"+dq+") and frame:AddSelectedColumns("+dq+"bill_length_mm"+dq+")."))
+
+        Image image4 = section_engage:AddImage("/media/Blocks/DataScience2/AddCol.png","This block has the code
+frame:AddSelectedColumns("+dq+"bill_length_mm"+dq+")")
+        image4:AddText("his block has the code
+frame:AddSelectedColumns("+dq+"bill_length_mm"+dq+")")
+        image4:AddAttribute("data-zoom","")
+
+        section_engage:AddParagraph("Next, the following line of code creates the bar chart and places is in a variable:")
+        section_engage:Add(preformatter:GeneratePreformattedCode("BarChart chart =  frame:BarChart()"))
+
+        section_engage:AddParagraph("Finally, you call the action <code>chart:Display()</code>.")
+        section_engage:AddParagraph("A game window pops up when you run the program that displays your chart. It does not look like much, but this is where you can learn how to customize it to your liking such as fixing labels and adding different color palettes to your chart.")
+
+        File f
+    FileReader reader
+
+    Division chart1
+    chart1:SetStyle("min-width: 100px; max-width: 100%;")
+    f:SetPath("/html/media/Blocks/DataScience2/PenguinLite.svg")
+    reader:OpenForRead(f)
+    chart1:AddText(reader:Read())
+    reader:Close()
+    
+    section_engage:Add(chart1)
+
+    section_engage:AddParagraph("See if you can add more columns to create more bars inside your bar chart. You may run into errors in this part, but that is okay. An easy way to look at adding more to your chart is to take a look at the numerical values left in the dataset. Possibly there are more ways to categorize these three penguin species.")
+
+    AddHeading(section_engage, "Task 2: Customize Your Chart", 4)
+    section_engage:AddParagraph("Use the palette and examine the various actions that can be called. These may include the title, color options, and others. Change your chart to have custom details and then examine visual changes, or those with accessibility devices, and examine how they vary. The following is one example of how you could customize your chart.")
+
+     Division chart2
+    chart2:SetStyle("min-width: 100px; max-width: 100%;")
+    f:SetPath("/html/media/Blocks/DataScience2/PenguinFinal.svg")
+    reader:OpenForRead(f)
+    chart2:AddText(reader:Read())
+    reader:Close()
+    
+    section_engage:Add(chart2)
+
+    AddHeading(section_engage, "Wrap up", 3)
+    section_engage:AddParagraph("Visualization, as it is sometimes called, has historically been a visual only area, with alternative descriptions created by a human to replace the visual. In this system, however, a visualization automatically generates many alternative descriptions automatically and lets you explore. Unlike some Artificial Intelligence (AI) systems, this does not hallucinate and is guaranteed to be a reflection of the data. Compare and contrast with each other the pros and cons of these approaches.")
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how to create a bar chart in Quorum"
+    end
+
+    action GetSummaryName returns text
+        return "Data Science Part 2"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Data Science Part 2"
+    end
+
+    action GetShortDescription returns text
+        return "how to create a bar chart in Quorum using the DataFrame"
+    end
+
+    action GetLinkName returns text
+        return "Data Science Part 2"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/blocks/DataScienceP2.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Quorum Blocks"
+    end
+end
