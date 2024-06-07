@@ -527,6 +527,63 @@ var newRunCode = function(input, output, uiContainer, execute) {
   });
 };
 
+var requestCompile = function(codeData) {
+  return new Promise( function(resolve, reject) {$.ajax({
+      type: "POST",
+      url: "/Fastrun.quorum",
+      data: codeData,
+      success: function(result) {
+        resolve(result)
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        reject("I could not connect to the server at quorumlanguage.com: " + thrownError);
+      }
+    });
+  });
+}
+
+var blockEditorRunCode = function(output, uiContainer, execute = true) {
+  stopProgram();
+  let codeInput = window.BLOCK_EDITOR.GetCode();
+  let outputRegion = document.getElementById(output);
+  let pageURL = window.location.href;
+  let ideName = "Block Editor";
+  let button = execute ? 0 : 1;
+  let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  currentIDEOutput_$Global_ = output;
+  currentUIContainer_$Global_ = uiContainer;
+  let codeData = { code: codeInput, pageURL: pageURL, ideName: ideName, build_only: button, timezone: tz };
+  let compileRequest = requestCompile(codeData, execute);
+  compileRequest.then(
+    (result) => {
+      outputRegion.innerHTML = "";
+      var head = document.getElementsByTagName('head')[0];
+      var run = document.getElementById("Runnable");
+      if (run != null) {
+        head.removeChild(run);
+      }
+      total_console_length239847239482734 = 0;
+      if (result.startsWith("<div class=")) {
+        outputRegion.innerHTML = result;
+      } else if (result.startsWith("Failed to connect")) {
+        outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com";
+      } else {
+        outputRegion.innerHTML = "Build Successful<br/>";
+        if (execute === true) {
+          let script = document.createElement('script');
+          script.id = "Runnable";
+          script.innerHTML = result;
+          head.appendChild(script);
+          Start();
+        }
+      }
+    },
+    (error) => {
+      outputRegion.innerHTML = error;
+    });
+}
+
+
 //this is for testing only
 var validate = function(output) {
   var outputRegion = document.getElementById(output);
