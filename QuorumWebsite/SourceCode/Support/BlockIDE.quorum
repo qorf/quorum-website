@@ -1,0 +1,87 @@
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.Script
+
+
+
+
+class BlockIDE is Division
+    
+    boolean noCanvasMode = false
+    Lesson currentPage
+
+    action Setup(Lesson lesson)
+        me:currentPage = lesson
+        SetClassAttribute("box-border grow flex flex-col m-4 shadow-md divide-y")
+        Division editorHeaderDiv
+        editorHeaderDiv:SetClassAttribute(
+"box-border relative flex flex-row justify-between items-center min-h-fit p-1 rounded-tl-lg rounded-tr-lg bg-quorum-blue-10"
+)
+        editorHeaderDiv:AddHeading("Blocks", 2)
+        Division buttonDiv
+        buttonDiv:SetClassAttribute("flex justify-end items-center w-2/5 mr-5 gap-x-2.5")
+        Button runButton
+        runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl w-28 text-xs font-semibold")
+        runButton:AddText(" &nbsp;Run")
+        runButton:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
+Button stopButton
+        stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white w-28 text-xs font-semibold")
+stopButton:AddText(" &nbsp;Stop")
+        buttonDiv:Add(runButton)
+        buttonDiv:Add(stopButton)
+        editorHeaderDiv:Add(buttonDiv)
+        Add(editorHeaderDiv)
+        
+        Division outerEditorDiv
+        outerEditorDiv:SetClassAttribute("flex grow min-h-128 divide-x")
+        
+        Division editorDiv
+        editorDiv:SetIdentifier("BlockUIContainer")
+        if noCanvasMode
+            editorDiv:SetClassAttribute("grow")
+        else
+                editorDiv:SetClassAttribute("w-1/2")
+end
+outerEditorDiv:Add(editorDiv)
+        
+        if not noCanvasMode
+Division canvasDiv
+        canvasDiv:SetClassAttribute("w-1/2")
+        canvasDiv:SetIdentifier("QuorumUIContainer")
+        outerEditorDiv:Add(canvasDiv)
+        end
+        
+        Add(outerEditorDiv)
+        
+        Division consoleOutput
+        consoleOutput:SetIdentifier("QuorumUIOutput")
+        consoleOutput:SetClassAttribute("h-24 p-1 overflow-auto")
+        Add(consoleOutput)
+        
+        AddScripts()
+    end
+    
+    action AddScripts
+
+Script editorScript
+        editorScript:SetType("module")
+        editorScript:SetAddress("/script/blockEditor.js")
+        Add(editorScript)
+        
+Script startEditorScript
+        startEditorScript:SetCode("Module['onRuntimeInitialized'] = function() {
+                    import('/script/blockEditor.js').then((BlockEditor) => {
+                    window.BLOCK_EDITOR = BlockEditor;
+                    BlockEditor.Start();
+                });
+                console.log('started editor');
+        };")
+        
+currentPage:GetWebPageHeader():Add(startEditorScript)
+    end
+    
+    action SetNoCanvasMode(boolean noCanvasMode)
+        me:noCanvasMode = noCanvasMode
+    end
+
+end
