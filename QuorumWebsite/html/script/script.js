@@ -425,11 +425,23 @@ var keyboardInputShortcuts = function(event, input, output, uiContainer) {
 };
 
 //IDE stop program button action
-var stopProgram = function(uiContainer) {
+var stopProgram = function(uiContainer = null) {
   //prevent errors if nothing has been built yet
-  if (typeof Stop === "function") {
-    Stop();
+  let run = document.getElementById("Runnable");
+  if (run != null) {
+    head.removeChild(run);
+    if (typeof Stop === "function") {
+      Stop();
+    }
+    if (uiContainer != null && uiContainer.id === "QuorumUIContainer") {
+      let medias = window.matchMedia("(max-width: 1280px)");
+      if(medias.matches) {
+        uiContainer.display = "none";
+      }
+    }
+    
   }
+  
 }
 
 var editAreaUpdate = function(element) {
@@ -544,6 +556,8 @@ var requestCompile = function(codeData) {
 
 var blockEditorRunCode = function(output, uiContainer, execute = true) {
   stopProgram();
+  let canvasArea = document.getElementById(uiContainer);
+  
   let codeInput = window.BLOCK_EDITOR.GetCode();
   let outputRegion = document.getElementById(output);
   let pageURL = window.location.href;
@@ -574,6 +588,7 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           script.id = "Runnable";
           script.innerHTML = result;
           head.appendChild(script);
+          canvasArea.display = "block"
           Start();
         }
       }
