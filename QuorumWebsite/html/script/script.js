@@ -425,19 +425,22 @@ var keyboardInputShortcuts = function(event, input, output, uiContainer) {
 };
 
 //IDE stop program button action
-var stopProgram = function(uiContainer = null) {
+var stopProgram = function(uiContainerID = null) {
   //prevent errors if nothing has been built yet
   let run = document.getElementById("Runnable");
   if (run != null) {
+    let head = document.getElementsByTagName("head")[0];
     head.removeChild(run);
     if (typeof Stop === "function") {
       Stop();
     }
+    let uiContainer = null;
+    if (uiContainerID != null) {
+      uiContainer = document.getElementById(uiContainerID);
+    }
     if (uiContainer != null && uiContainer.id === "QuorumUIContainer") {
-      let medias = window.matchMedia("(max-width: 1280px)");
-      if(medias.matches) {
         uiContainer.display = "none";
-      }
+        uiContainer.classList.add("hidden");
     }
     
   }
@@ -555,7 +558,11 @@ var requestCompile = function(codeData) {
 }
 
 var blockEditorRunCode = function(output, uiContainer, execute = true) {
-  stopProgram();
+  if (uiContainer != null) {
+    stopProgram(uiContainer.id);
+  } else {
+    stopProgram();
+  }
   let canvasArea = document.getElementById(uiContainer);
   
   let codeInput = window.BLOCK_EDITOR.GetCode();
@@ -588,7 +595,17 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           script.id = "Runnable";
           script.innerHTML = result;
           head.appendChild(script);
-          canvasArea.display = "block"
+          canvasArea.classList.remove("hidden");
+          canvasArea.display = "block";
+          window.onerror = (a, b, c, d, e) => {
+            console.log(`message: ${a}`);
+            console.log(`source: ${b}`);
+            console.log(`lineno: ${c}`);
+            console.log(`colno: ${d}`);
+            console.log(`error: ${e}`);
+          
+            return true;
+          };
           Start();
         }
       }

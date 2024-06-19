@@ -31,6 +31,7 @@ class BlockIDE is Division
 Button stopButton
         stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white w-28 text-xs font-semibold")
 stopButton:AddText(" &nbsp;Stop")
+        stopButton:SetOnClick("stopProgram('QuorumUIContainer')")
         buttonDiv:Add(runButton)
         buttonDiv:Add(stopButton)
         editorHeaderDiv:Add(buttonDiv)
@@ -48,15 +49,15 @@ stopButton:AddText(" &nbsp;Stop")
             editorDiv:AddAttribute("data-code-for-ide", codeForIDE)
         end
         if noCanvasMode
-            editorDiv:SetClassAttribute("grow")
+            editorDiv:SetClassAttribute("grow relative overflow-hidden")
         else
-                editorDiv:SetClassAttribute("grow")
+                editorDiv:SetClassAttribute("grow relative overflow-hidden")
 end
 outerEditorDiv:Add(editorDiv)
         
         if not noCanvasMode
 Division canvasDiv
-        canvasDiv:SetClassAttribute("hidden w-4/5 xl:block xl:w-1/2 2xl:w-2/5")
+        canvasDiv:SetClassAttribute("hidden w-1/2 relative overflow-hidden")
         canvasDiv:SetIdentifier("QuorumUIContainer")
         outerEditorDiv:Add(canvasDiv)
         end
@@ -81,10 +82,17 @@ Script editorScript
 Script startEditorScript
         startEditorScript:SetCode("Module['onRuntimeInitialized'] = function() {
                     import('/script/blockEditor.js').then((BlockEditor) => {
-                    window.BLOCK_EDITOR = BlockEditor;
-                    BlockEditor.Start();
+window.BLOCK_EDITOR = BlockEditor;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function(){
+    BlockEditor.Start();
+    console.log('started editor');
+});
+} else {
+  BlockEditor.Start();
+  console.log('started editor');
+} 
                 });
-                console.log('started editor');
         };")
         
 currentPage:GetWebPageHeader():Add(startEditorScript)

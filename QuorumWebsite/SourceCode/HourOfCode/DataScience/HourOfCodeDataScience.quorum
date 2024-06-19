@@ -9,10 +9,12 @@ class HourOfCodeDataScience is Lesson
     cr = cr:GetCarriageReturn()
     integer ACTIVITY = 0
     text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
 
     Preformatter preformatter //helper
 
-    action Setup(integer activity, text subtitle, Division intro, Division instructions, IDE ide)
+    action Setup(integer activity, text subtitle, Division intro, Division instructions, BlockIDE ide)
         me:ACTIVITY = activity
         me:ACTIVITY_NAME = subtitle
 
@@ -61,6 +63,7 @@ class HourOfCodeDataScience is Lesson
 
         Section section_activity
         AddHeading(section_activity, "Activity:", 2)
+        ide:Setup(me)
         section_activity:Add(ide)
 
         bodyDiv:Add(section_intro)
@@ -71,6 +74,27 @@ class HourOfCodeDataScience is Lesson
         WriteNextTutorial(nextSection)
         bodyDiv:Add(nextSection)
         rightDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action GetBlockIDE() returns BlockIDE
+CodeForIDE code
+        // blocks only support a single file for now so call it main
+        code:AddFileUrl("Main.quorum", codeForBlocks)
+BlockIDE ide
+        ide:SetNoCanvasMode(false)
+        ide:SetCodeForIDE(code:GetJsonArray())
+        ide:SetPaletteFile(paletteFileName)
+        // setup has to happen in the lesson because scripts need to be added to the head of the document
+        //ide:Setup(me)
+        return ide
+    end
+    
+    action SetPaletteFileName(text paletteFileName)
+        me:paletteFileName = paletteFileName
+    end
+    
+    action SetCodeForBlocks(text fileName)
+        me:codeForBlocks = fileName
     end
 
     action GetMetaDescription returns text
