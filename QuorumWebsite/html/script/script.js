@@ -434,17 +434,7 @@ var stopProgram = function(uiContainerID = null) {
     if (typeof Stop === "function") {
       Stop();
     }
-    let uiContainer = null;
-    if (uiContainerID != null) {
-      uiContainer = document.getElementById(uiContainerID);
-    }
-    if (uiContainer != null && uiContainer.id === "QuorumUIContainer") {
-        uiContainer.display = "none";
-        uiContainer.classList.add("hidden");
-    }
-    
   }
-  
 }
 
 var editAreaUpdate = function(element) {
@@ -595,25 +585,19 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           script.id = "Runnable";
           script.innerHTML = result;
           head.appendChild(script);
-          canvasArea.classList.remove("hidden");
-          canvasArea.display = "block";
-          window.onerror = (a, b, c, d, e) => {
-            console.log(`message: ${a}`);
-            console.log(`source: ${b}`);
-            console.log(`lineno: ${c}`);
-            console.log(`colno: ${d}`);
-            console.log(`error: ${e}`);
-          
-            return true;
-          };
-          Start();
+          try {
+            Start();
+          } catch(error) {
+            outputRegion.innerHTML += error.message;
+            head.removeChild(script);
+          }
         }
       }
     },
     (error) => {
       outputRegion.innerHTML = error;
     });
-}
+};
 
 
 //this is for testing only
