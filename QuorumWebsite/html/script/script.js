@@ -599,6 +599,62 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
     });
 };
 
+var blockEditorZoomIn = function() {
+  window.BLOCK_EDITOR.ScaleUp();
+};
+
+var blockEditorZoomOut = function() {
+  window.BLOCK_EDITOR.ScaleDown();
+};
+
+var blockEditorTogglePalette = function() {
+  let showing = window.BLOCK_EDITOR.TogglePalette();
+  let hidePaletteContainer = document.getElementById("HidePaletteContainer");
+  if (hidePaletteContainer != null) {
+    if(showing) {
+      hidePaletteContainer.innerHTML = "Hide Palette";
+    } else {
+      hidePaletteContainer.innerHTML = "Show Palette";
+    }
+  }
+}
+
+var showBlockHelpModal = function() {
+  const modal = document.getElementById("blockHelpModal");
+  modal.style.display = "block";
+  modal.ariaHidden = "false";
+  modal.tabIndex = 0;
+  modal.focus();
+  const focusableElements = modal.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstFocusableElement = focusableElements.item(0);
+  const lastFocusableElement = focusableElements.item(
+    focusableElements.length - 1
+  );
+  lastFocusableElement.addEventListener("keydown", (event) => {
+    const keyboardEvent = event;
+    if (keyboardEvent.key === "Tab" && !keyboardEvent.shiftKey) {
+      event.preventDefault();
+      firstFocusableElement.focus();
+    }
+  });
+};
+
+var hideBlockHelpModal = function() {
+  const helpModal = document.getElementById("blockHelpModal");
+  if (!helpModal)
+    return;
+  helpModal.style.display = "none";
+  helpModal.ariaHidden = "true";
+  helpModal.tabIndex = -1;
+  const helpButton = document.getElementById(IDE.id + "helpButton");
+  helpButton == null ? void 0 : helpButton.focus();
+};
+
+var showBlockSettingsModal = function() {
+
+};
 
 //this is for testing only
 var validate = function(output) {
