@@ -2,6 +2,9 @@ use Libraries.Web.Page.Division
 use Libraries.Web.Page.Button
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.Heading
+use Libraries.System.File
+use Libraries.Containers.Array
+use Libraries.Web.Page.UnorderedList
 
 
 
@@ -15,23 +18,92 @@ class BlockIDE is Division
 
     action Setup(Lesson lesson)
         me:currentPage = lesson
-        SetClassAttribute("grow flex flex-col m-4 shadow-md divide-y")
+        SetClassAttribute("relative grow flex flex-col m-4 shadow-md divide-y")
         Division editorHeaderDiv
         editorHeaderDiv:SetClassAttribute(
 "relative flex flex-row justify-between items-center min-h-fit p-1 rounded-tl-lg rounded-tr-lg bg-quorum-blue-10"
 )
-        Heading ideTitle = editorHeaderDiv:AddHeading("Blocks", 1)
+        Division titleDiv
+        titleDiv:SetClassAttribute("flex flex-row gap-x-2.5 items-center")
+        File quorumIcon
+        quorumIcon:SetPath("icons/quorumIcon.svg")
+        titleDiv:AddText(quorumIcon:Read())
+        
+        Heading ideTitle = titleDiv:AddHeading("Blocks", 1)
         ideTitle:AddClassAttribute("text-2xl font-bold")
+        editorHeaderDiv:Add(titleDiv)
+        
         Division buttonDiv
         buttonDiv:SetClassAttribute("flex justify-end items-center w-2/5 mr-5 gap-x-2.5")
+        
+Button hidePaletteButton
+hidePaletteButton:SetClassAttribute("flex flex-col items-center w-auto p-2.5 text-xs")
+        File eyeIcon
+        eyeIcon:SetPath("icons/eyeIcon.svg")
+        hidePaletteButton:AddText(eyeIcon:Read())
+        Division hidePaletteDiv
+        hidePaletteDiv:SetIdentifier("HidePaletteContainer")
+        hidePaletteDiv:AddClassAttribute("text-center mt-1")
+hidePaletteDiv:SetStyle("text-wrap: nowrap;")
+        hidePaletteDiv:AddText("Hide Palette")
+        hidePaletteButton:AddNestedTag(hidePaletteDiv)
+hidePaletteButton:SetOnClick("blockEditorTogglePalette()")
+        
+        Button zoomInButton
+zoomInButton:SetClassAttribute("flex flex-col items-center w-auto p-2.5 text-xs")
+        File zoomInIcon
+        zoomInIcon:SetPath("icons/zoomIn.svg")
+        zoomInButton:AddText(zoomInIcon:Read())
+        Division zoomInDiv
+        zoomInDiv:AddClassAttribute("text-center mt-1")
+zoomInDiv:SetStyle("text-wrap: nowrap;")
+        zoomInDiv:AddText("Zoom In")
+        zoomInButton:AddNestedTag(zoomInDiv)
+zoomInButton:SetOnClick("blockEditorZoomIn()")
+        
+Button zoomOutButton
+zoomOutButton:SetClassAttribute("flex flex-col items-center w-auto p-2.5 text-xs")
+        File zoomOutIcon
+        zoomOutIcon:SetPath("icons/zoomOut.svg")
+        zoomOutButton:AddText(zoomOutIcon:Read())
+        Division zoomOutDiv
+        zoomOutDiv:AddClassAttribute("text-center mt-1")
+        zoomOutDiv:SetStyle("text-wrap: nowrap;")
+        zoomOutDiv:AddText("Zoom Out")
+        zoomOutButton:AddNestedTag(zoomOutDiv)
+        zoomOutButton:SetOnClick("blockEditorZoomOut()")
+        
+        Button helpButton
+        helpButton:SetIdentifier("blockHelpButton")
+        helpButton:SetClassAttribute("flex flex-col items-center p-2.5 text-xs")
+        File helpIcon
+        helpIcon:SetPath("icons/helpIcon.svg")
+        helpButton:AddText(helpIcon:Read())
+        Division helpDiv
+        helpDiv:AddClassAttribute("text-center mt-1")
+        helpDiv:AddText("Help")
+        helpButton:AddNestedTag(helpDiv)
+        helpButton:SetOnClick("showBlockHelpModal()")
+        
         Button runButton
-        runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl w-28 text-xs font-semibold")
+        runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl w-28 h-6 text-xs font-semibold flex items-center justify-center")
+File runIcon
+        runIcon:SetPath("icons/runIcon.svg")
+        runButton:AddText(runIcon:Read())
         runButton:AddText(" &nbsp;Run")
         runButton:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
 Button stopButton
-        stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white w-28 text-xs font-semibold")
+        stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white w-28 h-6 text-xs font-semibold flex items-center justify-center")
+        File stopIcon
+        stopIcon:SetPath("icons/stopIcon.svg")
+        stopButton:AddText(stopIcon:Read())
 stopButton:AddText(" &nbsp;Stop")
         stopButton:SetOnClick("stopProgram('QuorumUIContainer')")
+        
+        buttonDiv:Add(hidePaletteButton)
+        buttonDiv:Add(zoomInButton)
+buttonDiv:Add(zoomOutButton)
+        buttonDiv:Add(helpButton)
         buttonDiv:Add(runButton)
         buttonDiv:Add(stopButton)
         editorHeaderDiv:Add(buttonDiv)
@@ -68,8 +140,47 @@ Division canvasDiv
         consoleOutput:SetIdentifier("QuorumUIOutput")
         consoleOutput:SetClassAttribute("h-24 p-1 overflow-auto")
         Add(consoleOutput)
+        Add(CreateHelpModal())
         
         AddScripts()
+    end
+    
+    action CreateHelpModal returns Division
+        Division helpModal
+        helpModal:SetIdentifier("blockHelpModal")
+        helpModal:AddAttribute("aria-modal", "true")
+helpModal:AddAttribute("aria-roledescription", "dialog")
+helpModal:AddAttribute("aria-hidden", "true")
+        helpModal:SetClassAttribute("hidden absolute bg-neutral-grey-10 z-10 left-2.5 bottom-24 w-auto h-auto rounded-md shadow-md overflow-y-auto p-5")
+        helpModal:SetStyle("max-height: calc(-100px + 100vh);")
+        Division helpModalContent
+        helpModalContent:SetIdentifier("blockHelpModalContent")
+        helpModalContent:SetClassAttribute("flex flex-col justify-center bg-transparent p-0 m-0 w-full h-full overflow-auto divide-y")
+        helpModalContent:SetTabIndex("0")
+        
+        Button helpCloseButton
+        helpCloseButton:SetTabIndex("0")
+        helpCloseButton:SetClassAttribute("absolute top-5 right-5 bg-transparent p-0 m-0")
+        helpCloseButton:AddText("X")
+        helpCloseButton:SetOnClick("hideBlockHelpModal()")
+        Division helpModalSection1
+        helpModalSection1:AddHeading("What Is Quorum", 2)
+        helpModalSection1:AddParagraph("The Quorum Programming Language is an evidence-based language that simplifies syntax and provide accessibility for blind or visually-impaired students.")
+Division helpModalSection2
+        helpModalSection2:AddHeading("How to use Blocks",2)
+        helpModalSection2:AddParagraph("The Quorum Code Editor is a built in text editor and compiler. We can type code on the text editor section, found on the left side of the code editor and are shown output, found on the right side of the code editor. To run our code, we can press the run button found within the top of the code editor or use our keyboard shortcut.")
+Division helpModalSection3
+        helpModalSection3:AddHeading("Hotkey Shortcuts")
+        UnorderedList hotkeyList
+        hotkeyList:AddListItem("Sorry None right now")
+        helpModalSection3:Add(hotkeyList)
+        
+        helpModal:Add(helpModalContent)
+        helpModalContent:Add(helpCloseButton)
+        helpModalContent:Add(helpModalSection1)
+helpModalContent:Add(helpModalSection2)
+helpModalContent:Add(helpModalSection3)
+        return helpModal
     end
     
     action AddScripts
