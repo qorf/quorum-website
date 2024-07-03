@@ -632,6 +632,30 @@ var showBlockHelpModal = function() {
   const lastFocusableElement = focusableElements.item(
     focusableElements.length - 1
   );
+
+  document.addEventListener('click', function(event) {
+    const modal = document.getElementById('blockHelpModal');
+    const helpButton = document.getElementById('blockHelpButton');
+    if (
+      event.target &&
+      helpButton &&
+      modal &&
+      event.target !== modal &&
+      !modal.contains(event.target) &&
+      event.target !== helpButton &&
+      !helpButton.contains(event.target)
+    ) {
+      if (modal.style.display === 'block') {
+        hideBlockHelpModal();
+      }
+    }
+  })
+  modal.addEventListener("keydown", (event) => {
+    const keyboardEvent = event;
+    if (keyboardEvent.key === "Escape") {
+      hideBlockHelpModal();
+    }
+  });
   lastFocusableElement.addEventListener("keydown", (event) => {
     const keyboardEvent = event;
     if (keyboardEvent.key === "Tab" && !keyboardEvent.shiftKey) {
@@ -648,7 +672,7 @@ var hideBlockHelpModal = function() {
   helpModal.style.display = "none";
   helpModal.ariaHidden = "true";
   helpModal.tabIndex = -1;
-  const helpButton = document.getElementById(IDE.id + "helpButton");
+  const helpButton = document.getElementById("blockHelpButton");
   helpButton == null ? void 0 : helpButton.focus();
 };
 
