@@ -548,12 +548,7 @@ var requestCompile = function(codeData) {
 }
 
 var blockEditorRunCode = function(output, uiContainer, execute = true) {
-  if (uiContainer != null) {
-    stopProgram(uiContainer.id);
-  } else {
-    stopProgram();
-  }
-  let canvasArea = document.getElementById(uiContainer);
+  window.BLOCK_EDITOR.BlockEditorStop();
   
   let codeInput = window.BLOCK_EDITOR.GetCode();
   let outputRegion = document.getElementById(output);
