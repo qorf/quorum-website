@@ -42,6 +42,7 @@ class BlockIDE is Division
         
 Button hidePaletteButton
 hidePaletteButton:SetClassAttribute(toolbarButtonStyle)
+hidePaletteButton:AddAttribute("aria-label", "Hide Palette")
         File eyeIcon
         eyeIcon:SetPath("icons/eyeIcon.svg")
         hidePaletteButton:AddText(eyeIcon:Read())
@@ -55,6 +56,7 @@ hidePaletteButton:SetOnClick("blockEditorTogglePalette()")
         
         Button zoomInButton
 zoomInButton:SetClassAttribute(toolbarButtonStyle)
+zoomInButton:AddAttribute("aria-label", "Zoom In")
         File zoomInIcon
         zoomInIcon:SetPath("icons/zoomIn.svg")
         zoomInButton:AddText(zoomInIcon:Read())
@@ -67,6 +69,7 @@ zoomInButton:SetOnClick("blockEditorZoomIn()")
         
 Button zoomOutButton
 zoomOutButton:SetClassAttribute(toolbarButtonStyle)
+zoomOutButton:AddAttribute("aria-label", "Zoom Out")
         File zoomOutIcon
         zoomOutIcon:SetPath("icons/zoomOut.svg")
         zoomOutButton:AddText(zoomOutIcon:Read())
@@ -80,6 +83,7 @@ zoomOutButton:SetClassAttribute(toolbarButtonStyle)
         Button helpButton
         helpButton:SetIdentifier("blockHelpButton")
         helpButton:SetClassAttribute(toolbarButtonStyle)
+helpButton:AddAttribute("aria-label", "Help")
         File helpIcon
         helpIcon:SetPath("icons/helpIcon.svg")
         helpButton:AddText(helpIcon:Read())
@@ -91,6 +95,7 @@ zoomOutButton:SetClassAttribute(toolbarButtonStyle)
         
         Button runButton
         runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+runButton:AddAttribute("aria-label", "Run Program")
 File runIcon
         runIcon:SetPath("icons/runIcon.svg")
         runButton:AddText(runIcon:Read())
@@ -98,11 +103,12 @@ File runIcon
         runButton:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
 Button stopButton
         stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+stopButton:AddAttribute("aria-label", "Stop Program")
         File stopIcon
         stopIcon:SetPath("icons/stopIcon.svg")
         stopButton:AddText(stopIcon:Read())
 stopButton:AddText(" &nbsp;Stop")
-        stopButton:SetOnClick("stopProgram('QuorumUIContainer')")
+        stopButton:SetOnClick("window.BLOCK_EDITOR.BlockEditorStop()")
         
         buttonDiv:Add(hidePaletteButton)
         buttonDiv:Add(zoomInButton)
@@ -143,6 +149,9 @@ Division canvasDiv
         
         Division consoleOutput
         consoleOutput:SetIdentifier("QuorumUIOutput")
+        consoleOutput:AddAttribute("role", "log")
+        consoleOutput:AddAttribute("aria-label", "Console Output")
+        consoleOutput:SetTabIndex("0")
         consoleOutput:SetClassAttribute("h-24 p-1 overflow-auto")
         Add(consoleOutput)
         Add(CreateHelpModal())
@@ -180,7 +189,7 @@ helpModal:AddAttribute("aria-hidden", "true")
 Division helpModalSection2
         Heading heading2 = helpModalSection2:AddHeading("How to use Blocks",2)
         heading2:SetClassAttribute(headerStyle)
-        Paragraph para2 = helpModalSection2:AddParagraph("The Quorum Code Editor is a built in text editor and compiler. We can type code on the text editor section, found on the left side of the code editor and are shown output, found on the right side of the code editor. To run our code, we can press the run button found within the top of the code editor or use our keyboard shortcut.")
+        Paragraph para2 = helpModalSection2:AddParagraph("The Quorum Block Editor is a built in editor and compiler. We can type code on the text editor section, found on the right side of the code editor (CTRL + 2). Block also come with a palette to help fill out code found on the left side (CTRL + 1) We are also shown output, found either in the console or a canvas will appear over the blocks. To run our code, we can press the run button found within the top of the code editor or use our keyboard shortcut.")
         para2:SetClassAttribute(paragraphStyle)
         
 Division helpModalSection3
@@ -244,6 +253,36 @@ elements.forEach(keySpan => {
 });
 ")
         Add(hotkeyScript)
+        
+        Script canvasObserver
+        canvasObserver:SetCode("
+// observe the ui container for mutations
+const observerUIContainer = document.getElementById('QuorumUIContainer');
+const observerBlockContainer = document.getElementById('BlockUIContainer');
+var observerFocused = false;
+// check to see if canvas was added to the ui container
+const callback = (mutationList) => {
+  if(observerUIContainer.hasChildNodes()) {
+    let list = observerUIContainer.getElementsByTagName('canvas');
+    if (list.length != 0 && !observerFocused) {
+      observerBlockContainer.display = 'none';
+      observerBlockContainer.GetElementsByTagName('button')[0].tabIndex = -1;
+      if (observerBlockContainer.contains(document.activeElement)) {
+        observerUIContainer.getElementsByTagName('button')[0].focus();
+        observerFocused = true;
+      }
+    }
+  } else {
+    observerBlockContainer.display = 'block';
+    observerBlockContainer.GetElementsByTagName('button')[0].tabIndex = 0;
+    observerFocused = false;
+  }
+};
+
+const observer = new MutationObserver(callback);
+observer.observe(observerUIContainer, {childList: true});
+")
+        Add(canvasObserver)
         
 Script startEditorScript
         startEditorScript:SetCode("Module['onRuntimeInitialized'] = function() {

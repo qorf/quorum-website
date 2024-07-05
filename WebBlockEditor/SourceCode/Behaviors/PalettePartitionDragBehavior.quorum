@@ -1,0 +1,38 @@
+package WebEditor.Behaviors
+
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Events.DragAndDropEvent
+use Libraries.Game.InputSet
+use Libraries.Interface.Controls.Control
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Game.GameStateManager
+use WebEditor.BlockEditor
+
+
+class PalettePartitionDragBehavior is Behavior
+    
+    GameStateManager manager
+    number clickOffset = 0
+    
+    Control panel = undefined
+    
+    action Run(BehaviorEvent event)
+        DragAndDropEvent dragEvent = event:GetDragAndDropEvent()
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+        if not editor:IsPaletteShowing()
+            return now
+        end
+        InputSet set = event:GetInputSet()
+        if set:GetInputTrigger() = set:BEGIN
+            clickOffset = dragEvent:GetStartX() - dragEvent:GetSource():GetGlobalX()
+        elseif dragEvent:GetMovementX() not= 0
+            panel:SetPixelWidth((dragEvent:GetX() - clickOffset) / panel:GetInterfaceScale())
+            panel:RequestLayout()
+        end
+    end
+    
+    action SetPanel(Control panel)
+        me:panel = panel
+    end
+    
+end
