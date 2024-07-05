@@ -65,6 +65,8 @@ ParserToBlockListener listener
     Control editorPanel
     BlockPalette editorPalette = undefined
     CodeEditor editorBlocks = undefined
+    EditorItem paletteItem = undefined
+    EditorItem blocksItem = undefined
     
     system action GetTextForIDE(text containerID) returns text
 //    action GetTextForIDE(text containerID) returns text
@@ -165,9 +167,30 @@ editorPanel:Add(editor)
         me:editorPalette = palette
         me:editorBlocks = editor
        SetInterfaceScale(1.25)
-        SetScreenSize(2400, 1000)
+        SetupEditorItems()
         AddDefaultKeys()
+        paletteItem:Focus()
 end
+    
+    action SetupEditorItems
+        EditorItem tempPalette
+        paletteItem = tempPalette
+        paletteItem:SetName("Palette, To navigate to the palette press Enter. To navigate to the editor use Tab. To navigate back to here from the palette press Shift+Enter.")
+        paletteItem:SetTarget(GetBlockPalette())
+        
+        EditorItem tempBlocks
+        blocksItem = tempBlocks
+        blocksItem:SetName("Block Editor, To navigate to the editor press Enter. To navigate to the palette use Tab. To navigate back to here from the editor press Shift+Enter.")
+        blocksItem:SetTarget(GetBlockEditor())
+        
+        paletteItem:SetNextFocus(blocksItem)
+        paletteItem:SetPreviousFocus(blocksItem)
+        blocksItem:SetNextFocus(paletteItem)
+        blocksItem:SetPreviousFocus(paletteItem)
+        Add(paletteItem)
+        Add(blocksItem)
+        
+    end
     
     action AddDefaultKeys
         KeyboardEvent keys
@@ -190,7 +213,7 @@ GameStateManager manager
         
 InputSet focusBlocks
         focusBlocks:SetKeyboardInput(keys:NUM_2)
-                    focusPalette:AddModifier(focusBlocks:CONTROL)
+        focusBlocks:AddModifier(focusBlocks:CONTROL)
         FocusEditorBehavior focusEditorBehavior
         defaultTable:Add(focusBlocks, focusEditorBehavior)
         
@@ -209,9 +232,9 @@ InputSet stopSet
         stopSet:SetKeyboardInput(keys:S)
         stopSet:AddModifier(runSet:SHIFT)
 if isWindows
-                    runSet:AddModifier(runSet:ALT)
+                    stopSet:AddModifier(runSet:ALT)
         else
-runSet:AddModifier(runSet:CONTROL)
+stopSet:AddModifier(runSet:CONTROL)
         end
         StopGameBehavior stopBehavior
         defaultTable:Add(stopSet, stopBehavior)
@@ -249,6 +272,21 @@ zoomOutSet:AddModifier(zoomOutSet:CONTROL)
         zoomOutBehavior:SetToZoomOut()
         defaultTable:Add(zoomOutSet, zoomOutBehavior)
         
+InputTable editorTable
+        editorTable:SetIdentifier("EditorItem")
+        InputSet focusTargetSet
+        focusTargetSet:SetKeyboardInput(keys:ENTER)
+        EditorItemFocusTargetBehavior focusTargetBehavior
+        editorTable:Add(focusTargetSet, focusTargetBehavior)
+        AddInputTable(editorTable)
+        
+        InputSet focusEditorItemSet
+        focusEditorItemSet:SetKeyboardInput(keys:ENTER)
+        focusEditorItemSet:AddModifier(focusEditorItemSet:SHIFT)
+        FocusEditorItemBehavior focusEditorItemBehavior
+        focusEditorItemBehavior:SetPaletteItem(paletteItem)
+        focusEditorItemBehavior:SetBlocksItem(blocksItem)
+        defaultTable:Add(focusEditorItemSet,focusEditorItemBehavior)
     end
     
  action Format(text source) returns text
