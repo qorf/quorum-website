@@ -82,6 +82,9 @@ module.exports = {
         '2%': '2%',
         '1%': '1%',
       },
+      minHeight: {
+        '128': '32rem',
+      }
     },
     colors: {
       website: {

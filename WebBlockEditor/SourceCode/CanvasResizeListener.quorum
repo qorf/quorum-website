@@ -1,0 +1,73 @@
+package WebEditor
+use Libraries.Interface.Events.ResizeListener
+use Libraries.Interface.Events.ResizeEvent
+use Libraries.Containers.Array
+use Libraries.Interface.Controls.Control
+use Libraries.Game.GameStateManager
+
+
+class CanvasResizeListener is ResizeListener
+
+    constant integer SMALL = 640
+    constant text SM = "SM"
+constant integer MEDIUM = 768
+constant text MD = "MD"
+constant integer LARGE = 1024
+constant text LG = "LG"
+constant integer X_LARGE = 1280
+constant text XL = "XL"
+constant integer X2_LARGE = 1536
+constant text X2L = "X2L"
+    
+    Array<Control> editorPanels
+    
+action SizeChanged(ResizeEvent event)
+        GameStateManager manager
+        BlockEditor editor = cast(BlockEditor, manager:GetGame())
+        if not editor:IsPaletteShowing()
+            return now
+        end
+        integer width = event:GetWidth()
+        integer height = event:GetHeight()
+        text mediaSize = MatchMediaQuery(width)
+        if mediaSize not= ""
+            ResizeControls(mediaSize)
+        end
+    end
+    
+    action ResizeControls(text mediaSize)
+        Control palettePanel = editorPanels:Get(0)
+        Control blockPanel = editorPanels:Get(1)
+        if mediaSize = SM
+            palettePanel:SetPixelWidth(50)
+        elseif mediaSize = MD
+palettePanel:SetPixelWidth(100)
+elseif mediaSize = LG
+palettePanel:SetPixelWidth(300)
+elseif mediaSize = XL
+palettePanel:SetPixelWidth(300)
+elseif mediaSize = X2L
+            palettePanel:SetPixelWidth(350)
+        end
+    end
+    
+    action AddPanel(Control control)
+        editorPanels:AddToEnd(control)
+    end
+    
+    action MatchMediaQuery(integer width) returns text
+        if width < SMALL
+            return SM
+        elseif width < MEDIUM
+return MD
+elseif width < LARGE
+return LG
+elseif width < X_LARGE
+return XL
+else
+return X2L
+        end
+        return ""
+    end
+
+end

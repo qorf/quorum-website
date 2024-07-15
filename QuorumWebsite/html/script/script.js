@@ -425,10 +425,15 @@ var keyboardInputShortcuts = function(event, input, output, uiContainer) {
 };
 
 //IDE stop program button action
-var stopProgram = function(uiContainer) {
+var stopProgram = function(uiContainerID = null) {
   //prevent errors if nothing has been built yet
-  if (typeof Stop === "function") {
-    Stop();
+  let run = document.getElementById("Runnable");
+  if (run != null) {
+    let head = document.getElementsByTagName("head")[0];
+    head.removeChild(run);
+    if (typeof Stop === "function") {
+      Stop();
+    }
   }
 }
 
@@ -525,6 +530,149 @@ var newRunCode = function(input, output, uiContainer, execute) {
       outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com: " + thrownError;
     }
   });
+};
+
+var requestCompile = function(codeData) {
+  return new Promise( function(resolve, reject) {$.ajax({
+      type: "POST",
+      url: "/Fastrun.quorum",
+      data: codeData,
+      success: function(result) {
+        resolve(result)
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        reject("I could not connect to the server at quorumlanguage.com: " + thrownError);
+      }
+    });
+  });
+}
+
+var blockEditorRunCode = function(output, uiContainer, execute = true) {
+  window.BLOCK_EDITOR.BlockEditorStop();
+  
+  let codeInput = window.BLOCK_EDITOR.GetCode();
+  let outputRegion = document.getElementById(output);
+  let pageURL = window.location.href;
+  let ideName = "Block Editor";
+  let button = execute ? 0 : 1;
+  let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  currentIDEOutput_$Global_ = output;
+  currentUIContainer_$Global_ = uiContainer;
+  let codeData = { code: codeInput, pageURL: pageURL, ideName: ideName, build_only: button, timezone: tz };
+  let compileRequest = requestCompile(codeData, execute);
+  compileRequest.then(
+    (result) => {
+      outputRegion.innerHTML = "";
+      var head = document.getElementsByTagName('head')[0];
+      var run = document.getElementById("Runnable");
+      if (run != null) {
+        head.removeChild(run);
+      }
+      total_console_length239847239482734 = 0;
+      if (result.startsWith("<div class=")) {
+        outputRegion.innerHTML = result;
+      } else if (result.startsWith("Failed to connect")) {
+        outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com";
+      } else {
+        outputRegion.innerHTML = "Build Successful<br/>";
+        if (execute === true) {
+          let script = document.createElement('script');
+          script.id = "Runnable";
+          script.innerHTML = result;
+          head.appendChild(script);
+          try {
+            Start();
+          } catch(error) {
+            outputRegion.innerHTML += error.message;
+            head.removeChild(script);
+          }
+        }
+      }
+    },
+    (error) => {
+      outputRegion.innerHTML = error;
+    });
+};
+
+var blockEditorZoomIn = function() {
+  window.BLOCK_EDITOR.ScaleUp();
+};
+
+var blockEditorZoomOut = function() {
+  window.BLOCK_EDITOR.ScaleDown();
+};
+
+var blockEditorTogglePalette = function() {
+  let showing = window.BLOCK_EDITOR.TogglePalette();
+  let hidePaletteContainer = document.getElementById("HidePaletteContainer");
+  if (hidePaletteContainer != null) {
+    if(showing) {
+      hidePaletteContainer.innerHTML = "Hide Palette";
+    } else {
+      hidePaletteContainer.innerHTML = "Show Palette";
+    }
+  }
+}
+
+var showBlockHelpModal = function() {
+  const modal = document.getElementById("blockHelpModal");
+  modal.style.display = "block";
+  modal.ariaHidden = "false";
+  modal.tabIndex = 0;
+  modal.focus();
+  const focusableElements = modal.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstFocusableElement = focusableElements.item(0);
+  const lastFocusableElement = focusableElements.item(
+    focusableElements.length - 1
+  );
+
+  document.addEventListener('click', function(event) {
+    const modal = document.getElementById('blockHelpModal');
+    const helpButton = document.getElementById('blockHelpButton');
+    if (
+      event.target &&
+      helpButton &&
+      modal &&
+      event.target !== modal &&
+      !modal.contains(event.target) &&
+      event.target !== helpButton &&
+      !helpButton.contains(event.target)
+    ) {
+      if (modal.style.display === 'block') {
+        hideBlockHelpModal();
+      }
+    }
+  })
+  modal.addEventListener("keydown", (event) => {
+    const keyboardEvent = event;
+    if (keyboardEvent.key === "Escape") {
+      hideBlockHelpModal();
+    }
+  });
+  lastFocusableElement.addEventListener("keydown", (event) => {
+    const keyboardEvent = event;
+    if (keyboardEvent.key === "Tab" && !keyboardEvent.shiftKey) {
+      event.preventDefault();
+      firstFocusableElement.focus();
+    }
+  });
+};
+
+var hideBlockHelpModal = function() {
+  const helpModal = document.getElementById("blockHelpModal");
+  if (!helpModal)
+    return;
+  helpModal.style.display = "none";
+  helpModal.ariaHidden = "true";
+  helpModal.tabIndex = -1;
+  const helpButton = document.getElementById("blockHelpButton");
+  helpButton == null ? void 0 : helpButton.focus();
+};
+
+var showBlockSettingsModal = function() {
+
 };
 
 //this is for testing only

@@ -1,0 +1,147 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+
+class HourOfCodeDataScience is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    integer ACTIVITY = 0
+    text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
+
+    Preformatter preformatter //helper
+
+    action Setup(integer activity, text subtitle, Division intro, Division instructions, BlockIDE ide, Division questions)
+        me:ACTIVITY = activity
+        me:ACTIVITY_NAME = subtitle
+
+        intro:AddClassAttribute("flex flex-col gap-y-2")
+        instructions:AddClassAttribute("flex flex-col gap-y-2")
+        questions:AddClassAttribute("flex flex-col gap-y-2")
+
+        LineBreak break //will be used multiple times
+        File file
+        
+        //html header stuff
+        SetWebPageTitle("Data Science Hour of Code Activity " + activity + " | Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        AdjustMain(mainRegion)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:AddClassAttribute("w-1/5")
+        bodyDiv:AddClassAttribute("w-3/5")
+        rightDiv:AddClassAttribute("hidden")
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Data Science Hour of Code", 1)
+
+        headDiv:AddText("Activity " + activity + ": " + subtitle)
+        bodyDiv:Add(headDiv)
+
+Section section_scenario
+        AddHeading(section_scenario, "Scenario:", 2)
+        section_scenario:Add(GetScenario())
+        
+        Section section_intro
+        AddHeading(section_intro, "Introduction:", 2)
+        if activity >= 16
+            AddHeading(section_intro, "(Advanced Lesson)", 3)
+        end
+        section_intro:Add(intro)
+
+        Section section_instructions
+        AddHeading(section_instructions, "Instructions:", 2)
+        section_instructions:Add(instructions)
+
+        Section section_activity
+        AddHeading(section_activity, "Coding:", 2)
+        ide:Setup(me)
+        section_activity:Add(ide)
+
+        Section section_questions
+        AddHeading(section_questions, "Activity:", 2)
+        section_questions:Add(questions)
+        
+        bodyDiv:Add(section_scenario)
+        bodyDiv:Add(section_intro)
+        bodyDiv:Add(section_instructions)
+        bodyDiv:Add(section_activity)
+        bodyDiv:Add(section_questions)
+        
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        rightDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action GetBlockIDE() returns BlockIDE
+        CodeForIDE code
+        // blocks only support a single file for now so call it main
+        code:AddFileUrl("Main.quorum", codeForBlocks)
+        BlockIDE ide
+        ide:SetNoCanvasMode(false)
+        ide:SetCodeForIDE(code:GetJsonArray())
+        ide:SetPaletteFile(paletteFileName)
+        // setup has to happen in the lesson because scripts need to be added to the head of the document
+        //ide:Setup(me)
+        return ide
+    end
+
+    action GetScenario() returns Division
+        Division scenario
+
+        UnorderedList scenarioList
+        scenarioList:AddListItem("You're a data scientist working with a group of researchers from Antarctica.")
+        scenarioList:AddListItem("They have collected a bunch of data about <a href='https://allisonhorst.github.io/palmerpenguins/' class='underline text-quorum-blue-150'>penguins</a>, but need help answering questions about it.")
+        scenarioList:AddListItem("Your job is to make some charts from the data and answer some of their questions.")
+        scenarioList:AddClassAttribute("list-disc list-outside pl-8")
+        scenario:Add(scenarioList)   
+
+        return scenario
+    end
+
+    action GetQuestions() returns Division
+        Division questions
+        return questions
+    end
+    
+    action SetPaletteFileName(text paletteFileName)
+        me:paletteFileName = paletteFileName
+    end
+    
+    action SetCodeForBlocks(text fileName)
+        me:codeForBlocks = fileName
+    end
+
+    action GetMetaDescription returns text
+        return "Try an accessible data science themed Hour of Code in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return "Data Science Hour of Code | Activity " + ACTIVITY
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetName returns text
+        return "Data Science Hour of Code | Activity " + ACTIVITY
+    end
+
+    action GetShortDescription returns text
+        return "Accessible data science themed Hour of Code"
+    end
+end

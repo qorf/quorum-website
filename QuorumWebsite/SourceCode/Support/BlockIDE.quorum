@@ -1,0 +1,321 @@
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Button
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.Heading
+use Libraries.System.File
+use Libraries.Containers.Array
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Span
+
+
+
+
+class BlockIDE is Division
+    
+    boolean noCanvasMode = false
+    Lesson currentPage
+    text paletteFile = ""
+    text codeForIDE = ""
+
+    action Setup(Lesson lesson)
+        me:currentPage = lesson
+        SetClassAttribute("relative grow flex flex-col m-4 shadow-md divide-y")
+        Division editorHeaderDiv
+        editorHeaderDiv:SetClassAttribute(
+"relative flex flex-row justify-between items-center min-h-fit p-1 rounded-tl-lg rounded-tr-lg bg-quorum-blue-10"
+)
+        Division titleDiv
+        titleDiv:SetClassAttribute("flex flex-row gap-x-2.5 items-center")
+        File quorumIcon
+        quorumIcon:SetPath("icons/quorumIcon.svg")
+        titleDiv:AddText(quorumIcon:Read())
+        
+        Heading ideTitle = titleDiv:AddHeading("Blocks", 1)
+        ideTitle:AddClassAttribute("text-2xl font-bold")
+        editorHeaderDiv:Add(titleDiv)
+        
+        Division buttonDiv
+        buttonDiv:SetClassAttribute("flex flex-wrap justify-end items-center w-3/5 mr-5 gap-x-2.5")
+        
+        text toolbarButtonStyle = "flex flex-col items-center w-auto p-1 text-xs rounded-2xl hover:bg-quorum-blue-25 hover:shadow-md hover:shadow-accent-hover active:bg-quorum-blue-50 focus:bg-quorum-blue-25"
+        
+Button hidePaletteButton
+hidePaletteButton:SetClassAttribute(toolbarButtonStyle)
+hidePaletteButton:AddAttribute("aria-label", "Hide Palette")
+        File eyeIcon
+        eyeIcon:SetPath("icons/eyeIcon.svg")
+        hidePaletteButton:AddText(eyeIcon:Read())
+        Division hidePaletteDiv
+        hidePaletteDiv:SetIdentifier("HidePaletteContainer")
+        hidePaletteDiv:AddClassAttribute("text-center mt-1")
+hidePaletteDiv:SetStyle("text-wrap: nowrap;")
+        hidePaletteDiv:AddText("Hide Palette")
+        hidePaletteButton:AddNestedTag(hidePaletteDiv)
+hidePaletteButton:SetOnClick("blockEditorTogglePalette()")
+        
+        Button zoomInButton
+zoomInButton:SetClassAttribute(toolbarButtonStyle)
+zoomInButton:AddAttribute("aria-label", "Zoom In")
+        File zoomInIcon
+        zoomInIcon:SetPath("icons/zoomIn.svg")
+        zoomInButton:AddText(zoomInIcon:Read())
+        Division zoomInDiv
+        zoomInDiv:AddClassAttribute("text-center mt-1")
+zoomInDiv:SetStyle("text-wrap: nowrap;")
+        zoomInDiv:AddText("Zoom In")
+        zoomInButton:AddNestedTag(zoomInDiv)
+zoomInButton:SetOnClick("blockEditorZoomIn()")
+        
+Button zoomOutButton
+zoomOutButton:SetClassAttribute(toolbarButtonStyle)
+zoomOutButton:AddAttribute("aria-label", "Zoom Out")
+        File zoomOutIcon
+        zoomOutIcon:SetPath("icons/zoomOut.svg")
+        zoomOutButton:AddText(zoomOutIcon:Read())
+        Division zoomOutDiv
+        zoomOutDiv:AddClassAttribute("text-center mt-1")
+        zoomOutDiv:SetStyle("text-wrap: nowrap;")
+        zoomOutDiv:AddText("Zoom Out")
+        zoomOutButton:AddNestedTag(zoomOutDiv)
+        zoomOutButton:SetOnClick("blockEditorZoomOut()")
+        
+        Button helpButton
+        helpButton:SetIdentifier("blockHelpButton")
+        helpButton:SetClassAttribute(toolbarButtonStyle)
+helpButton:AddAttribute("aria-label", "Help")
+        File helpIcon
+        helpIcon:SetPath("icons/helpIcon.svg")
+        helpButton:AddText(helpIcon:Read())
+        Division helpDiv
+        helpDiv:AddClassAttribute("text-center mt-1")
+        helpDiv:AddText("Help")
+        helpButton:AddNestedTag(helpDiv)
+        helpButton:SetOnClick("showBlockHelpModal()")
+        
+        Button runButton
+        runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+runButton:AddAttribute("aria-label", "Run Program")
+File runIcon
+        runIcon:SetPath("icons/runIcon.svg")
+        runButton:AddText(runIcon:Read())
+        runButton:AddText(" &nbsp;Run")
+        runButton:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
+Button stopButton
+        stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+stopButton:AddAttribute("aria-label", "Stop Program")
+        File stopIcon
+        stopIcon:SetPath("icons/stopIcon.svg")
+        stopButton:AddText(stopIcon:Read())
+stopButton:AddText(" &nbsp;Stop")
+        stopButton:SetOnClick("window.BLOCK_EDITOR.BlockEditorStop()")
+        
+        buttonDiv:Add(hidePaletteButton)
+        buttonDiv:Add(zoomInButton)
+buttonDiv:Add(zoomOutButton)
+        buttonDiv:Add(helpButton)
+        buttonDiv:Add(runButton)
+        buttonDiv:Add(stopButton)
+        editorHeaderDiv:Add(buttonDiv)
+        Add(editorHeaderDiv)
+        
+        Division outerEditorDiv
+        outerEditorDiv:SetClassAttribute("flex grow min-h-128 divide-x")
+        outerEditorDiv:SetStyle("touch-action: none;")
+        
+        Division editorDiv
+        editorDiv:SetIdentifier("BlockUIContainer")
+        if paletteFile not= ""
+            editorDiv:AddAttribute("data-palette-for-ide", paletteFile)
+        end
+        if codeForIDE not= ""
+            editorDiv:AddAttribute("data-code-for-ide", codeForIDE)
+        end
+        if noCanvasMode
+            editorDiv:SetClassAttribute("grow relative overflow-hidden")
+        else
+                editorDiv:SetClassAttribute("grow relative overflow-hidden")
+end
+outerEditorDiv:Add(editorDiv)
+        
+        if not noCanvasMode
+Division canvasDiv
+        canvasDiv:SetClassAttribute("empty:hidden w-full relative overflow-hidden")
+        canvasDiv:SetIdentifier("QuorumUIContainer")
+        outerEditorDiv:Add(canvasDiv)
+        end
+        
+        Add(outerEditorDiv)
+        
+        Division consoleOutput
+        consoleOutput:SetIdentifier("QuorumUIOutput")
+        consoleOutput:AddAttribute("role", "log")
+        consoleOutput:AddAttribute("aria-label", "Console Output")
+        consoleOutput:SetTabIndex("0")
+        consoleOutput:SetClassAttribute("h-24 p-1 overflow-auto")
+        Add(consoleOutput)
+        Add(CreateHelpModal())
+        
+        AddScripts()
+    end
+    
+    action CreateHelpModal returns Division
+        Division helpModal
+        helpModal:SetIdentifier("blockHelpModal")
+        helpModal:AddAttribute("aria-modal", "true")
+helpModal:AddAttribute("aria-roledescription", "dialog")
+helpModal:AddAttribute("aria-hidden", "true")
+        helpModal:SetClassAttribute("hidden absolute bg-neutral-grey-10 z-10 left-2.5 bottom-24 w-auto h-auto rounded-md shadow-md overflow-y-auto p-5")
+        helpModal:SetStyle("max-height: calc(-100px + 100vh);")
+        Division helpModalContent
+        helpModalContent:SetIdentifier("blockHelpModalContent")
+        helpModalContent:SetClassAttribute("flex flex-col justify-center bg-transparent p-0 m-0 w-full h-full overflow-auto divide-y")
+        helpModalContent:SetTabIndex("0")
+        
+        text headerStyle = "text-2xl self-start mb-2.5 font-bold p-0"
+        text paragraphStyle = "text-base self-start m-0 p-0"
+        
+        Button helpCloseButton
+        helpCloseButton:SetTabIndex("0")
+        helpCloseButton:SetClassAttribute("absolute top-5 right-5 bg-transparent p-0 m-0")
+        helpCloseButton:AddText("X")
+        helpCloseButton:SetOnClick("hideBlockHelpModal()")
+        Division helpModalSection1
+        Heading heading1 = helpModalSection1:AddHeading("What Is Quorum", 2)
+        heading1:SetClassAttribute(headerStyle)
+        Paragraph para1 = helpModalSection1:AddParagraph("The Quorum Programming Language is an evidence-based language that simplifies syntax and provide accessibility for blind or visually-impaired students.")
+        para1:SetClassAttribute(paragraphStyle)
+        
+Division helpModalSection2
+        Heading heading2 = helpModalSection2:AddHeading("How to use Blocks",2)
+        heading2:SetClassAttribute(headerStyle)
+        Paragraph para2 = helpModalSection2:AddParagraph("The Quorum Block Editor is a built in editor and compiler. We can type code on the text editor section, found on the right side of the code editor (CTRL + 2). Block also come with a palette to help fill out code found on the left side (CTRL + 1) We are also shown output, found either in the console or a canvas will appear over the blocks. To run our code, we can press the run button found within the top of the code editor or use our keyboard shortcut.")
+        para2:SetClassAttribute(paragraphStyle)
+        
+Division helpModalSection3
+        Heading heading3 = helpModalSection3:AddHeading("Hotkey Shortcuts")
+        heading3:SetClassAttribute(headerStyle)
+        heading3:SetIdentifier("blockHotkeyTitle")
+        UnorderedList hotkeyList
+        hotkeyList:AddListItem("Run Program " + GetHotkeySpan("CTRL", "OSSpecifc") + " + " +GetHotkeySpan("SHIFT") + " + " + GetHotkeySpan("R")):SetClassAttribute("mb-2.5")
+        hotkeyList:AddListItem("Stop Program " + GetHotkeySpan("CTRL", "OSSpecific") + " + " +GetHotkeySpan("SHIFT") + " + " + GetHotkeySpan("S")):SetClassAttribute("mb-2.5")
+        hotkeyList:AddListItem("Hide Palette " + GetHotkeySpan("CTRL", "OSSpecific") + " + " +GetHotkeySpan("SHIFT") + " + " + GetHotkeySpan("X")):SetClassAttribute("mb-2.5")
+        hotkeyList:AddListItem("Zoom In " + GetHotkeySpan("CTRL", "OSSpecific") + " + " + GetHotkeySpan("+")):SetClassAttribute("mb-2.5")
+        hotkeyList:AddListItem("Zoom Out " + GetHotkeySpan("CTRL", "OSSpecific")+ " + " + GetHotkeySpan("-")):SetClassAttribute("mb-2.5")
+        hotkeyList:AddListItem("Navigate to Palette " + GetHotkeySpan("CTRL")+ " + " + GetHotkeySpan("1")):SetClassAttribute("mb-2.5")
+hotkeyList:AddListItem("Navigate to Blocks " + GetHotkeySpan("CTRL")+ " + " + GetHotkeySpan("2")):SetClassAttribute("mb-2.5")
+hotkeyList:AddListItem("Enter Navigation Mode " + GetHotkeySpan("SHIFT")+ " + " + GetHotkeySpan("ENTER")):SetClassAttribute("mb-2.5")
+        helpModalSection3:Add(hotkeyList)
+        
+        helpModal:Add(helpModalContent)
+        helpModalContent:Add(helpCloseButton)
+        helpModalContent:Add(helpModalSection1)
+helpModalContent:Add(helpModalSection2)
+helpModalContent:Add(helpModalSection3)
+        return helpModal
+    end
+    
+    action GetHotkeySpan(text keyName) returns text
+        return GetHotkeySpan(keyName, "")
+    end
+    
+    action GetHotkeySpan(text keyName, text className) returns text
+        Span span
+        span:SetClassAttribute("inline-block text-xs py-0.5 px-1 bg-neutral-white rounded")
+        if className not= ""
+            span:AddClassAttribute(className)
+        end
+        span:AddText(keyName)
+        return span:Generate()
+    end
+    
+    action AddScripts
+
+Script editorScript
+        editorScript:SetType("module")
+        editorScript:SetAddress("/script/blockEditor.js")
+        Add(editorScript)
+        
+        Script hotkeyScript
+        hotkeyScript:SetCode("
+const elements = document.querySelectorAll('.OSSpecific');
+let OSkey = 'UNKNOWN';
+let userAgent = window.navigator.userAgent;
+
+if (userAgent.indexOf('Win') != -1) {
+  OSkey = 'ALT';
+} else if (userAgent.indexOf('Mac') != -1) {
+  OSkey = 'CTRL';
+  let heading = document.getElementById('blockHotkeyTitle');
+  heading.innerText = 'Hotkey Shortcuts (Mac)';
+} else {
+  OSkey = 'ALT';
+}
+elements.forEach(keySpan => {
+  keySpan.innerHTML = OSkey;
+});
+")
+        Add(hotkeyScript)
+        
+        Script canvasObserver
+        canvasObserver:SetCode("
+// observe the ui container for mutations
+const observerUIContainer = document.getElementById('QuorumUIContainer');
+const observerBlockContainer = document.getElementById('BlockUIContainer');
+var observerFocused = false;
+// check to see if canvas was added to the ui container
+const callback = (mutationList) => {
+  if(observerUIContainer.hasChildNodes()) {
+    let list = observerUIContainer.getElementsByTagName('canvas');
+    if (list.length != 0 && !observerFocused) {
+      observerBlockContainer.display = 'none';
+      observerBlockContainer.GetElementsByTagName('button')[0].tabIndex = -1;
+      if (observerBlockContainer.contains(document.activeElement)) {
+        observerUIContainer.getElementsByTagName('button')[0].focus();
+        observerFocused = true;
+      }
+    }
+  } else {
+    observerBlockContainer.display = 'block';
+    observerBlockContainer.GetElementsByTagName('button')[0].tabIndex = 0;
+    observerFocused = false;
+  }
+};
+
+const observer = new MutationObserver(callback);
+observer.observe(observerUIContainer, {childList: true});
+")
+        Add(canvasObserver)
+        
+Script startEditorScript
+        startEditorScript:SetCode("Module['onRuntimeInitialized'] = function() {
+                    import('/script/blockEditor.js').then((BlockEditor) => {
+window.BLOCK_EDITOR = BlockEditor;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function(){
+    BlockEditor.Start();
+    console.log('started editor');
+});
+} else {
+  BlockEditor.Start();
+  console.log('started editor');
+} 
+                });
+        };")
+        
+currentPage:GetWebPageHeader():Add(startEditorScript)
+    end
+    
+    action SetNoCanvasMode(boolean noCanvasMode)
+        me:noCanvasMode = noCanvasMode
+    end
+    
+action SetCodeForIDE(text codeForIDE)
+        me:codeForIDE = codeForIDE
+    end
+    
+    action SetPaletteFile(text paletteFile)
+        me:paletteFile = paletteFile
+    end
+
+end

@@ -1,0 +1,57 @@
+package WebEditor.Behaviors
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use WebEditor.EditorItem
+use Libraries.Game.GameStateManager
+use Libraries.Interface.Item
+use Libraries.Interface.Controls.Blocks.Palette.BlockPalette
+use Libraries.Interface.Controls.Blocks.CodeEditor
+use Libraries.Interface.Item2D
+
+
+class FocusEditorItemBehavior is Behavior
+    EditorItem paletteItem = undefined
+    EditorItem blocksItem = undefined
+    
+action Run(BehaviorEvent event)
+        GameStateManager manager
+        Item item = manager:GetFocus()
+        if not (item is Item2D)
+            return now
+        end
+        Item2D parentItem = cast(Item2D, item)
+        if item is EditorItem
+            return now
+        end
+        boolean inPalette = false
+        boolean inEditor = false
+        repeat while parentItem not= undefined
+            if parentItem is BlockPalette
+                inPalette = true
+                parentItem = undefined
+            elseif parentItem is CodeEditor
+                inEditor = true
+                parentItem = undefined
+            end
+            if parentItem not= undefined
+                        parentItem = parentItem:GetParent()
+end
+        end
+        
+        if inPalette
+            me:paletteItem:Focus()
+        elseif inEditor
+            me:blocksItem:Focus()
+        end
+            
+end
+    
+    action SetPaletteItem(EditorItem item)
+        me:paletteItem = item
+    end
+    
+    action SetBlocksItem(EditorItem item)
+        me:blocksItem = item
+    end
+    
+end

@@ -1,0 +1,437 @@
+package WebEditor
+
+use Libraries.Language.Compile.Parsing.QuorumLexer
+use Libraries.System.File
+use Libraries.Language.Compile.Parsing.QuorumParser
+use Libraries.Language.Compile.Context.StartContext
+use Libraries.Language.Compile.CompilerErrorManager
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Game.Game
+use Libraries.Interface.Controls.Blocks.Block
+use Libraries.Interface.Layouts.ManualLayout
+use Libraries.Interface.Controls.Blocks.CodeEditor
+use Libraries.Interface.Layouts.FlowLayout
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.TextBox
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+use Libraries.Containers.Array
+use Libraries.Interface.Options.LightBlockOptions
+use Libraries.Game.InputTable
+use Libraries.Game.InputSet
+use Libraries.Interface.Options.DarkBlockOptions
+use Libraries.Interface.Events.TextChangeListener
+use Libraries.Interface.Events.TextChangeEvent
+use Libraries.Game.Graphics.Font
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectionDownBehavior
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectionUpBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectNextBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectPreviousBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorEscapeBehavior
+use Libraries.Interface.Behaviors.Controls.ScrollBarDragBehavior
+use Libraries.Interface.Behaviors.Controls.ScrollableControlMouseScrollBehavior
+use Libraries.Language.Compile.Blocks.ParserToBlockListener
+use Libraries.Interface.Behaviors.Blocks.CodeEditorNewLineBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorDeleteBlockBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorFreeformEditingBehavior
+use Libraries.Language.Compile.Parsing.FormatListener
+use Libraries.Game.GameStateManager
+use Libraries.Interface.Behaviors.Blocks.CodeEditorUndoBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorRedoBehavior
+use Libraries.Interface.Controls.Blocks.BlockSelectionListener
+use Libraries.Language.Compile.Parsing.TokenIterator
+use Libraries.Language.Compile.Parsing.Token
+use Libraries.Game.WebConfiguration
+use Libraries.Interface.Controls.Control
+use Libraries.Game.DesktopConfiguration
+use Libraries.Interface.Controls.Icon
+use Libraries.Interface.Controls.Blocks.Palette.BlockPalette
+use Libraries.Game.Graphics.Fonts.FontManager
+use Libraries.Interface.Accessibility
+use Libraries.Interface.Layouts.LayoutProperties
+use Libraries.Game.WebApplication
+use WebEditor.Behaviors.all
+
+class BlockEditor is Game, Behavior, TextChangeListener
+
+    constant text CONTAINER_ID = "BlockUIContainer"
+CodeEditor editor = undefined
+ParserToBlockListener listener
+    Control palettePanel
+    Control palettePartition
+    Control editorPanel
+    BlockPalette editorPalette = undefined
+    CodeEditor editorBlocks = undefined
+    EditorItem paletteItem = undefined
+    EditorItem blocksItem = undefined
+    
+    system action GetTextForIDE(text containerID) returns text
+//    action GetTextForIDE(text containerID) returns text
+//        return "output true"
+    //end
+    system action GetPaletteFileName(text containerID) returns text
+    //action GetPaletteFileName(text containerID) returns text
+//        return "palette.xml"
+//    end
+    
+    system action RunGame
+    system action StopGame
+    system action UpdateTogglePaletteButton(boolean status)
+    
+    
+action Main
+        WebConfiguration config = GetWebConfiguration()
+        config:title = "Block Editor"
+        config:containerID = CONTAINER_ID
+        SetConfiguration(config)
+        DesktopConfiguration deskConfig = GetDesktopConfiguration()
+        deskConfig:resizable = true
+    StartGame()
+        
+end
+ action CreateGame
+LightBlockOptions options
+      //DarkBlockOptions options
+    SetInterfaceOptions(options)
+        
+listener:startLine= 0
+        
+FlowLayout layout
+    SetLayout(layout)
+    CodeEditor editor2
+        editor = editor2
+        
+editor:SetBlockListener(listener)
+    text read = ""
+            read = GetTextForIDE(CONTAINER_ID)
+            if read = ""
+                read = "output true"
+            end
+      read = Format(read)
+    
+     integer size = 12
+    BlockSelectionListener listen
+    editor:SetPercentageWidth(1)
+    editor:SetPercentageHeight(1)
+    editor:SetFontSize(size)
+    editor:AddSelectionListener(listen)
+        editor:SetCode(read)
+        
+        BlockPalette palette
+        palette:SetPercentageHeight(1)
+palette:SetPercentageWidth(1)
+        palette:SetEditor(editor)
+        
+        File customPalettePage
+        customPalettePage = GetPaletteFile()
+        if customPalettePage not= undefined
+            palette:AddCustomPalettePage(customPalettePage)
+        end
+        
+    Color color
+        FlowLayout panelFlow
+        panelFlow:SetSingleLine(true)
+palettePanel:SetLayout(panelFlow)
+        LayoutProperties panelProp = palettePanel:GetDefaultLayoutProperties()
+        //panelProp:SetHorizontalLayoutMode(palettePanel:FIT_CONTENTS)
+        palettePanel:SetPercentageX(0)
+        palettePanel:SetPercentageY(0)
+        palettePanel:SetPercentageHeight(1)
+        palettePanel:SetPixelWidth(200)
+        palettePanel:SetName("Palette Panel")
+        
+        FlowLayout flow
+        editorPanel:SetLayout(flow)
+editorPanel:SetPercentageY(0)
+        editorPanel:SetPercentageHeight(1)
+        editorPanel:SetHorizontalLayoutMode(editorPanel:FILL)
+editorPanel:SetName("Editor Panel")
+        
+        Add(palettePanel)
+        palettePanel:Add(palette)
+        palette:IncludeSuggestions(false)
+        palette:Setup()
+        
+        Control palettePartition = CreatePalettePartition()
+        Add(palettePartition)
+        AddPartitionInputTable(palettePanel)
+        
+        Add(editorPanel)
+editorPanel:Add(editor)
+        
+        CanvasResizeListener resizeListener
+        resizeListener:AddPanel(palettePanel)
+        resizeListener:AddPanel(editorPanel)
+        AddResizeListener(resizeListener)
+        me:editorPalette = palette
+        me:editorBlocks = editor
+       SetInterfaceScale(1.25)
+        SetupEditorItems()
+        AddDefaultKeys()
+        paletteItem:Focus()
+end
+    
+    action SetupEditorItems
+        EditorItem tempPalette
+        paletteItem = tempPalette
+        paletteItem:SetName("Palette, To navigate to the palette press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the palette press Shift+Enter.")
+        paletteItem:SetTarget(GetBlockPalette())
+        
+        EditorItem tempBlocks
+        blocksItem = tempBlocks
+        blocksItem:SetName("Block Editor, To navigate to the editor press Enter. To navigate to the palette use the arrow keys. To navigate back to here from the editor press Shift+Enter.")
+        blocksItem:SetTarget(GetBlockEditor())
+        
+        paletteItem:SetNextFocus(blocksItem)
+        paletteItem:SetPreviousFocus(blocksItem)
+        blocksItem:SetNextFocus(paletteItem)
+        blocksItem:SetPreviousFocus(paletteItem)
+        Add(paletteItem)
+        Add(blocksItem)
+        
+    end
+    
+    action AddDefaultKeys
+        KeyboardEvent keys
+InputTable defaultTable = GetDefaultInputTable()
+        isWindows = true
+GameStateManager manager
+        WebApplication webApp = cast(WebApplication, manager:GetApplication())
+        if webApp:GetWebOperatingSystem():Contains("Windows")
+            isWindows = true
+        else
+            isWindows = false
+        end
+        // Creating input sets for the default focus behaviors.
+        InputSet focusPalette
+        focusPalette:SetKeyboardInput(keys:NUM_1)
+                    focusPalette:AddModifier(focusPalette:CONTROL)
+        FocusPaletteBehavior focusPaletteBehavior
+        defaultTable:Add(focusPalette, focusPaletteBehavior)
+        
+        
+InputSet focusBlocks
+        focusBlocks:SetKeyboardInput(keys:NUM_2)
+        focusBlocks:AddModifier(focusBlocks:CONTROL)
+        FocusEditorBehavior focusEditorBehavior
+        defaultTable:Add(focusBlocks, focusEditorBehavior)
+        
+InputSet runSet
+        runSet:SetKeyboardInput(keys:R)
+        runSet:AddModifier(runSet:SHIFT)
+if isWindows
+                    runSet:AddModifier(runSet:ALT)
+        else
+runSet:AddModifier(runSet:CONTROL)
+        end
+        RunGameBehavior runBehavior
+        defaultTable:Add(runSet, runBehavior)
+        
+InputSet stopSet
+        stopSet:SetKeyboardInput(keys:S)
+        stopSet:AddModifier(runSet:SHIFT)
+if isWindows
+                    stopSet:AddModifier(runSet:ALT)
+        else
+stopSet:AddModifier(runSet:CONTROL)
+        end
+        StopGameBehavior stopBehavior
+        defaultTable:Add(stopSet, stopBehavior)
+        
+InputSet togglePaletteSet
+        togglePaletteSet:SetKeyboardInput(keys:X)
+        togglePaletteSet:AddModifier(runSet:SHIFT)
+if isWindows
+                    togglePaletteSet:AddModifier(togglePaletteSet:ALT)
+        else
+togglePaletteSet:AddModifier(togglePaletteSet:CONTROL)
+        end
+        TogglePaletteBehavior toggleBehavior
+        defaultTable:Add(togglePaletteSet, toggleBehavior)
+        
+InputSet zoomInSet
+        zoomInSet:SetKeyboardInput(keys:EQUALS)
+if isWindows
+                    zoomInSet:AddModifier(zoomInSet:ALT)
+        else
+zoomInSet:AddModifier(zoomInSet:CONTROL)
+        end
+        ZoomBehavior zoomInBehavior
+        zoomInBehavior:SetToZoomIn()
+        defaultTable:Add(zoomInSet, zoomInBehavior)
+        
+InputSet zoomOutSet
+        zoomOutSet:SetKeyboardInput(keys:MINUS)
+if isWindows
+                    zoomOutSet:AddModifier(zoomOutSet:ALT)
+        else
+zoomOutSet:AddModifier(zoomOutSet:CONTROL)
+        end
+        ZoomBehavior zoomOutBehavior
+        zoomOutBehavior:SetToZoomOut()
+        defaultTable:Add(zoomOutSet, zoomOutBehavior)
+        
+InputTable editorTable
+        editorTable:SetIdentifier("EditorItem")
+        InputSet focusTargetSet
+        focusTargetSet:SetKeyboardInput(keys:ENTER)
+        EditorItemFocusTargetBehavior focusTargetBehavior
+        editorTable:Add(focusTargetSet, focusTargetBehavior)
+        
+        InputSet left
+        left:SetKeyboardInput(keys:LEFT)
+        
+        InputSet right
+        right:SetKeyboardInput(keys:RIGHT)
+        
+        InputSet up
+        up:SetKeyboardInput(keys:UP)
+        
+        InputSet down
+        down:SetKeyboardInput(keys:DOWN)
+        
+        EditorItemFocusNext focusNext
+        EditorItemFocusPrevious focusPrevious
+        editorTable:Add(up, focusNext)
+editorTable:Add(right, focusNext)
+editorTable:Add(left, focusPrevious)
+editorTable:Add(down, focusPrevious)
+        AddInputTable(editorTable)
+        
+        InputSet focusEditorItemSet
+        focusEditorItemSet:SetKeyboardInput(keys:ENTER)
+        focusEditorItemSet:AddModifier(focusEditorItemSet:SHIFT)
+        FocusEditorItemBehavior focusEditorItemBehavior
+        focusEditorItemBehavior:SetPaletteItem(paletteItem)
+        focusEditorItemBehavior:SetBlocksItem(blocksItem)
+        defaultTable:Add(focusEditorItemSet,focusEditorItemBehavior)
+    end
+    
+ action Format(text source) returns text
+    CompilerErrorManager manager
+    QuorumLexer lexer
+    lexer:SetIgnoreWhiteSpace(false)
+    lexer:SetCompilerErrorManager(manager)
+    lexer:Read(source)
+    
+    if not manager:IsCompilationErrorFree()
+        text value = manager:GetCompilerErrorsAsText()
+            output value
+        return source
+    end
+    QuorumParser parser
+    parser:SetCompilerErrorManager(manager)
+    parser:SetLexer(lexer)
+    StartContext start = parser:Start()
+    if not manager:IsCompilationErrorFree()
+        text value = manager:GetCompilerErrorsAsText()
+            output value
+        return source
+    end
+    FormatListener formatter
+    formatter:SetQuorumLexer(lexer)
+    formatter:SetSource(source)
+    start:Traverse(formatter)
+    
+     text formatted = formatter:GetSourceFormatted()
+    return formatted
+end
+    
+    
+action CreatePalettePartition returns Control
+        Control palettePartition
+        LayoutProperties paletteProperties = palettePartition:GetDefaultLayoutProperties()
+        paletteProperties:SetPixelWidth(8)
+        paletteProperties:SetVerticalLayoutMode(paletteProperties:FILL)
+        
+        palettePartition:SetInputGroup("PalettePartition")
+        palettePartition:SetName("Palette Pane Partition")
+        return palettePartition
+    end
+    
+    action AddPartitionInputTable(Control palettePanel)
+InputTable palettePartitionTable
+        palettePartitionTable:SetIdentifier("PalettePartition")
+        
+        InputSet dragSet
+        dragSet:SetDragItemInput()
+        InputSet dragContinueSet = dragSet:Copy()
+        dragContinueSet:SetInputTrigger(dragContinueSet:CONTINUE)
+        PalettePartitionDragBehavior paletteDrag
+        paletteDrag:SetPanel(palettePanel)
+        
+        palettePartitionTable:Add(dragSet, paletteDrag)
+palettePartitionTable:Add(dragContinueSet, paletteDrag)
+        AddInputTable(palettePartitionTable)
+        
+    end
+    
+    action GetPaletteFile returns File
+        File file
+        if GetPaletteFileName(CONTAINER_ID) not= ""
+            file:SetPath(GetPaletteFileName(CONTAINER_ID))
+            return file
+        end
+        return undefined
+    end
+    
+    action SetCode(text code)
+        me:editor:SetCode(code)
+    end
+    
+    number scaleAmount = 0.2
+    action ScaleUp
+number scale = GetInterfaceScale()
+            scale = scale + scaleAmount
+
+        if scale >= 0.1
+            SetInterfaceScale(scale)
+    end
+    end
+    
+    action ScaleDown
+number scale = GetInterfaceScale()
+            scale = scale - scaleAmount
+        if scale >= 0.1
+            SetInterfaceScale(scale)
+    end
+    end
+    
+    number lastWidth = 0
+    action TogglePalette returns boolean
+        if palettePanel:IsShowing()
+            lastWidth = palettePanel:GetPixelWidth()
+            palettePanel:SetPixelWidth(0)
+            palettePanel:Hide()
+            palettePartition:Hide()
+            editorBlocks:Focus()
+palettePanel:RequestLayout()
+            return false
+        else
+            palettePanel:Show()
+            palettePartition:Show()
+            palettePanel:SetPixelWidth(lastWidth)
+palettePanel:RequestLayout()
+            return true
+        end
+    end
+    
+    action IsPaletteShowing returns boolean
+        return palettePanel:IsShowing()
+    end
+    
+    action GetBlockEditor returns CodeEditor
+        return me:editorBlocks
+    end
+    
+    action GetBlockPalette returns BlockPalette
+        return me:editorPalette
+    end
+
+action Update(number seconds)
+    
+end
+end

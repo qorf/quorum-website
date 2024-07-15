@@ -1,0 +1,138 @@
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.LineBreak
+use Libraries.Web.Page.MetaData
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.UnorderedList
+use Libraries.Web.Page.Bold
+use Libraries.Web.Page.CodeBlock
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.PreformattedText
+use Libraries.Web.Page.Comment
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
+use Libraries.Web.Page.OrderedList
+use Libraries.Containers.Array
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.Section
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.WebTag
+use Libraries.Web.Page.Script
+use Libraries.Web.Page.Button
+
+class BlockPage is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Block Editor")
+        AddDefaultHeaders()
+
+
+        //Figure out getting main regions properly.
+Array<Division> divs = InitializeDivisions()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        
+        Division runningCanvas
+        runningCanvas:SetIdentifier("QuorumUIContainer")
+        runningCanvas:SetClassAttribute("box-border flex w-full aspect-square border-2")
+        leftDiv:Add(runningCanvas)
+        Division consoleOutput
+        consoleOutput:SetIdentifier("QuorumUIOutput")
+        consoleOutput:SetClassAttribute("w-full border-2 aspect-square overflow-auto")
+        leftDiv:Add(consoleOutput)
+        
+        Division instructionDiv
+        instructionDiv:SetClassAttribute("box-border p-2 m-2 grow-0 h-1/6 border-2 shadow-lg")
+        instructionDiv:AddHeading("Use Blocks")
+        instructionDiv:AddParagraph("Use the block editor below")
+        bodyDiv:Add(instructionDiv)
+        
+        BlockIDE ide
+        ide:SetNoCanvasMode(true)
+CodeForIDE code
+        code:AddFileUrl("Main.quorum", "html/hourofcode/datascience/datascience1.quorum")
+        ide:SetCodeForIDE(code:GetJsonArray())
+        ide:SetPaletteFile("palette/testPalette.xml")
+        ide:Setup(me)
+        bodyDiv:Add(ide)
+        
+    end
+    
+action InitializeDivisions returns Array<Division>
+        Division outerDiv
+        outerDiv:AddClassAttribute("flex flex-col h-full-body max-h-screen box-border")
+
+        MainContent mainRegion
+        mainRegion:AddClassAttribute("my-8 mx-8 box-border flex-grow")
+        AdjustMain(mainRegion)
+
+        Division innerDiv
+        innerDiv:SetIdentifier("mainDiv")
+        innerDiv:AddClassAttribute("flex flex-row box-border h-full")
+                
+        Division leftDiv
+        //Heading tocHeading = tocDiv:AddHeading(GetSectionName(), 2)
+        leftDiv:AddClassAttribute("flex flex-col sm:block w-2/6 lg:w-1/5 sticky top-8 h-full")
+
+        /*
+            content body
+        */
+        Division bodyDiv
+        bodyDiv:SetIdentifier("content")
+        bodyDiv:AddClassAttribute("box-border flex flex-col w-4/6 lg:w-4/5 mx-4 overflow-visible")
+
+
+        innerDiv:Add(leftDiv)
+        innerDiv:Add(bodyDiv)
+
+        mainRegion:Add(innerDiv)
+        outerDiv:Add(mainRegion)
+        Add(outerDiv)
+
+        Array<WebTag> divs
+        divs:Add(leftDiv)
+        divs:Add(bodyDiv)
+        divs:Add(innerDiv)
+        divs:Add(outerDiv)
+        divs:Add(mainRegion)
+        return divs
+    end
+
+    action GetMetaDescription returns text
+        return "Use the block editor online."
+    end
+
+    action GetSummaryName returns text
+        return "filtering data with DataFrames"
+    end
+
+    action GetName returns text
+        return "block editor"
+    end
+
+    action GetShortDescription returns text
+        return "test version of the block editor online"
+    end
+
+    action GetLocation returns text
+        return "blocks/blocks.html"
+    end
+
+    action GetLinkName returns text
+        return "Filtering Data"
+    end
+
+    action GetSectionName returns text
+        return "Block Editor"
+    end
+end
