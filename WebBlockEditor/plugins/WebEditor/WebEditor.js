@@ -5,7 +5,6 @@ function plugins_quorum_WebEditor_BlockEditor_() {
             const data = JSON.parse(container.dataset.codeForIde);
             for (let i = 0; i < data.length; i++) {
               const fileObj = data[i];
-              console.count("fileObj");
               const fileName = fileObj.file;
               const fileText = fileObj.data;
               return fileText;

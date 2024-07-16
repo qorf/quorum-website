@@ -197,35 +197,42 @@ end
     action AddDefaultKeys
         KeyboardEvent keys
 InputTable defaultTable = GetDefaultInputTable()
-        isWindows = true
+        // Mac has different keys
+        isMac = false
 GameStateManager manager
         WebApplication webApp = cast(WebApplication, manager:GetApplication())
-        if webApp:GetWebOperatingSystem():Contains("Windows")
-            isWindows = true
-        else
-            isWindows = false
+        if webApp:GetWebOperatingSystem():Contains("Mac")
+            isMac = true
         end
         // Creating input sets for the default focus behaviors.
         InputSet focusPalette
         focusPalette:SetKeyboardInput(keys:NUM_1)
-                    focusPalette:AddModifier(focusPalette:CONTROL)
+        if isMac
+                                focusPalette:AddModifier(focusPalette:CONTROL)
+        else
+            focusPalette:AddModifier(focusPalette:ALT)
+        end
         FocusPaletteBehavior focusPaletteBehavior
         defaultTable:Add(focusPalette, focusPaletteBehavior)
         
         
 InputSet focusBlocks
         focusBlocks:SetKeyboardInput(keys:NUM_2)
-        focusBlocks:AddModifier(focusBlocks:CONTROL)
+        if isMac
+                    focusBlocks:AddModifier(focusBlocks:CONTROL)
+        else
+            focusBlocks:AddModifier(focusBlocks:ALT)
+        end
         FocusEditorBehavior focusEditorBehavior
         defaultTable:Add(focusBlocks, focusEditorBehavior)
         
 InputSet runSet
         runSet:SetKeyboardInput(keys:R)
         runSet:AddModifier(runSet:SHIFT)
-if isWindows
-                    runSet:AddModifier(runSet:ALT)
+if isMac
+                    runSet:AddModifier(runSet:CONTROL)
         else
-runSet:AddModifier(runSet:CONTROL)
+runSet:AddModifier(runSet:ALT)
         end
         RunGameBehavior runBehavior
         defaultTable:Add(runSet, runBehavior)
@@ -233,10 +240,10 @@ runSet:AddModifier(runSet:CONTROL)
 InputSet stopSet
         stopSet:SetKeyboardInput(keys:S)
         stopSet:AddModifier(runSet:SHIFT)
-if isWindows
-                    stopSet:AddModifier(runSet:ALT)
+if isMac
+                    stopSet:AddModifier(runSet:CONTROL)
         else
-stopSet:AddModifier(runSet:CONTROL)
+stopSet:AddModifier(runSet:ALT)
         end
         StopGameBehavior stopBehavior
         defaultTable:Add(stopSet, stopBehavior)
@@ -244,20 +251,20 @@ stopSet:AddModifier(runSet:CONTROL)
 InputSet togglePaletteSet
         togglePaletteSet:SetKeyboardInput(keys:X)
         togglePaletteSet:AddModifier(runSet:SHIFT)
-if isWindows
-                    togglePaletteSet:AddModifier(togglePaletteSet:ALT)
+if isMac
+                    togglePaletteSet:AddModifier(togglePaletteSet:CONTROL)
         else
-togglePaletteSet:AddModifier(togglePaletteSet:CONTROL)
+togglePaletteSet:AddModifier(togglePaletteSet:ALT)
         end
         TogglePaletteBehavior toggleBehavior
         defaultTable:Add(togglePaletteSet, toggleBehavior)
         
 InputSet zoomInSet
         zoomInSet:SetKeyboardInput(keys:EQUALS)
-if isWindows
-                    zoomInSet:AddModifier(zoomInSet:ALT)
+if isMac
+                    zoomInSet:AddModifier(zoomInSet:CONTROL)
         else
-zoomInSet:AddModifier(zoomInSet:CONTROL)
+zoomInSet:AddModifier(zoomInSet:ALT)
         end
         ZoomBehavior zoomInBehavior
         zoomInBehavior:SetToZoomIn()
@@ -265,10 +272,10 @@ zoomInSet:AddModifier(zoomInSet:CONTROL)
         
 InputSet zoomOutSet
         zoomOutSet:SetKeyboardInput(keys:MINUS)
-if isWindows
-                    zoomOutSet:AddModifier(zoomOutSet:ALT)
+if isMac
+                    zoomOutSet:AddModifier(zoomOutSet:CONTROL)
         else
-zoomOutSet:AddModifier(zoomOutSet:CONTROL)
+zoomOutSet:AddModifier(zoomOutSet:ALT)
         end
         ZoomBehavior zoomOutBehavior
         zoomOutBehavior:SetToZoomOut()
@@ -342,13 +349,17 @@ end
     
     
 action CreatePalettePartition returns Control
-        Control palettePartition
+        Icon palettePartition
+Color bgColor
+        bgColor:SetColor(238.0/255,250.0/255,254.0/255,1)
+        palettePartition:LoadFilledRectangle(8,500, bgColor)
         LayoutProperties paletteProperties = palettePartition:GetDefaultLayoutProperties()
         paletteProperties:SetPixelWidth(8)
         paletteProperties:SetVerticalLayoutMode(paletteProperties:FILL)
         
         palettePartition:SetInputGroup("PalettePartition")
         palettePartition:SetName("Palette Pane Partition")
+        palettePartition:SetZ(-10)
         return palettePartition
     end
     

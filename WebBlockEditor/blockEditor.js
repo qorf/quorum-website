@@ -5,7 +5,6 @@ function plugins_quorum_WebEditor_BlockEditor_() {
             const data = JSON.parse(container.dataset.codeForIde);
             for (let i = 0; i < data.length; i++) {
               const fileObj = data[i];
-              console.count("fileObj");
               const fileName = fileObj.file;
               const fileText = fileObj.data;
               return fileText;
@@ -2755,10 +2754,10 @@ this.ResizeControls$quorum_text = function (mediaSize) {
 var palettePanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(0);
 var blockPanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(1);
 if ((mediaSize == this.Get_WebEditor_CanvasResizeListener__SM_())) {
-palettePanel.SetPixelWidth$quorum_number(50 * 1.0);
+palettePanel.SetPixelWidth$quorum_number(200 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__MD_())) {
-palettePanel.SetPixelWidth$quorum_number(100 * 1.0);
+palettePanel.SetPixelWidth$quorum_number(200 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__LG_())) {
 palettePanel.SetPixelWidth$quorum_number(300 * 1.0);
@@ -3920,76 +3919,83 @@ this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEdi
 this.AddDefaultKeys = function () {
 var keys = new quorum_Libraries_Interface_Events_KeyboardEvent_();
 var defaultTable = this.prototype.GetDefaultInputTable();
-var isWindows = true;
+var isMac = false;
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webApp = global_CheckCast(manager.GetApplication(), "Libraries.Game.WebApplication");
-if (webApp.GetWebOperatingSystem().Contains$quorum_text("Windows")) {
-isWindows = true;
-}
-else { 
-isWindows = false;
+if (webApp.GetWebOperatingSystem().Contains$quorum_text("Mac")) {
+isMac = true;
 }
 var focusPalette = new quorum_Libraries_Game_InputSet_();
 focusPalette.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__NUM_1_());
+if (isMac) {
 focusPalette.AddModifier$quorum_integer(focusPalette.Get_Libraries_Game_InputSet__CONTROL_());
+}
+else { 
+focusPalette.AddModifier$quorum_integer(focusPalette.Get_Libraries_Game_InputSet__ALT_());
+}
 var focusPaletteBehavior = new quorum_WebEditor_Behaviors_FocusPaletteBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(focusPalette, focusPaletteBehavior);
 var focusBlocks = new quorum_Libraries_Game_InputSet_();
 focusBlocks.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__NUM_2_());
+if (isMac) {
 focusBlocks.AddModifier$quorum_integer(focusBlocks.Get_Libraries_Game_InputSet__CONTROL_());
+}
+else { 
+focusBlocks.AddModifier$quorum_integer(focusBlocks.Get_Libraries_Game_InputSet__ALT_());
+}
 var focusEditorBehavior = new quorum_WebEditor_Behaviors_FocusEditorBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(focusBlocks, focusEditorBehavior);
 var runSet = new quorum_Libraries_Game_InputSet_();
 runSet.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__R_());
 runSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__SHIFT_());
-if (isWindows) {
-runSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__ALT_());
+if (isMac) {
+runSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__CONTROL_());
 }
 else { 
-runSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__CONTROL_());
+runSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__ALT_());
 }
 var runBehavior = new quorum_WebEditor_Behaviors_RunGameBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(runSet, runBehavior);
 var stopSet = new quorum_Libraries_Game_InputSet_();
 stopSet.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__S_());
 stopSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__SHIFT_());
-if (isWindows) {
-stopSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__ALT_());
+if (isMac) {
+stopSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__CONTROL_());
 }
 else { 
-stopSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__CONTROL_());
+stopSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__ALT_());
 }
 var stopBehavior = new quorum_WebEditor_Behaviors_StopGameBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(stopSet, stopBehavior);
 var togglePaletteSet = new quorum_Libraries_Game_InputSet_();
 togglePaletteSet.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__X_());
 togglePaletteSet.AddModifier$quorum_integer(runSet.Get_Libraries_Game_InputSet__SHIFT_());
-if (isWindows) {
-togglePaletteSet.AddModifier$quorum_integer(togglePaletteSet.Get_Libraries_Game_InputSet__ALT_());
+if (isMac) {
+togglePaletteSet.AddModifier$quorum_integer(togglePaletteSet.Get_Libraries_Game_InputSet__CONTROL_());
 }
 else { 
-togglePaletteSet.AddModifier$quorum_integer(togglePaletteSet.Get_Libraries_Game_InputSet__CONTROL_());
+togglePaletteSet.AddModifier$quorum_integer(togglePaletteSet.Get_Libraries_Game_InputSet__ALT_());
 }
 var toggleBehavior = new quorum_WebEditor_Behaviors_TogglePaletteBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(togglePaletteSet, toggleBehavior);
 var zoomInSet = new quorum_Libraries_Game_InputSet_();
 zoomInSet.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__EQUALS_());
-if (isWindows) {
-zoomInSet.AddModifier$quorum_integer(zoomInSet.Get_Libraries_Game_InputSet__ALT_());
+if (isMac) {
+zoomInSet.AddModifier$quorum_integer(zoomInSet.Get_Libraries_Game_InputSet__CONTROL_());
 }
 else { 
-zoomInSet.AddModifier$quorum_integer(zoomInSet.Get_Libraries_Game_InputSet__CONTROL_());
+zoomInSet.AddModifier$quorum_integer(zoomInSet.Get_Libraries_Game_InputSet__ALT_());
 }
 var zoomInBehavior = new quorum_WebEditor_Behaviors_ZoomBehavior_();
 zoomInBehavior.SetToZoomIn();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(zoomInSet, zoomInBehavior);
 var zoomOutSet = new quorum_Libraries_Game_InputSet_();
 zoomOutSet.SetKeyboardInput$quorum_integer(keys.Get_Libraries_Interface_Events_KeyboardEvent__MINUS_());
-if (isWindows) {
-zoomOutSet.AddModifier$quorum_integer(zoomOutSet.Get_Libraries_Game_InputSet__ALT_());
+if (isMac) {
+zoomOutSet.AddModifier$quorum_integer(zoomOutSet.Get_Libraries_Game_InputSet__CONTROL_());
 }
 else { 
-zoomOutSet.AddModifier$quorum_integer(zoomOutSet.Get_Libraries_Game_InputSet__CONTROL_());
+zoomOutSet.AddModifier$quorum_integer(zoomOutSet.Get_Libraries_Game_InputSet__ALT_());
 }
 var zoomOutBehavior = new quorum_WebEditor_Behaviors_ZoomBehavior_();
 zoomOutBehavior.SetToZoomOut();
@@ -4051,12 +4057,16 @@ var formatted = formatter.GetSourceFormatted();
 return formatted;
 };
 this.CreatePalettePartition = function () {
-var palettePartition = new quorum_Libraries_Interface_Controls_Control_();
+var palettePartition = new quorum_Libraries_Interface_Controls_Icon_();
+var bgColor = new quorum_Libraries_Game_Graphics_Color_();
+bgColor.SetColor$quorum_number$quorum_number$quorum_number$quorum_number((238.0 / 255), (250.0 / 255), (254.0 / 255), 1 * 1.0);
+palettePartition.LoadFilledRectangle$quorum_integer$quorum_integer$quorum_Libraries_Game_Graphics_ColorGroup(8, 500, bgColor);
 var paletteProperties = palettePartition.GetDefaultLayoutProperties();
 paletteProperties.SetPixelWidth$quorum_number(8 * 1.0);
 paletteProperties.SetVerticalLayoutMode$quorum_integer(paletteProperties.Get_Libraries_Interface_Layouts_LayoutProperties__FILL_());
 palettePartition.SetInputGroup$quorum_text("PalettePartition");
 palettePartition.SetName$quorum_text("Palette Pane Partition");
+palettePartition.SetZ$quorum_number(-10 * 1.0);
 return palettePartition;
 };
 this.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control = function (palettePanel) {
