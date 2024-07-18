@@ -614,6 +614,21 @@ var blockEditorTogglePalette = function() {
   }
 }
 
+var blockEditorFullscreen = function() {
+  const editorDiv = document.getElementById("BlockEditor");
+  if(editorDiv.hasAttribute('style')) {
+    editorDiv.removeAttribute('style');
+  } else {
+    editorDiv.style.position = "fixed";
+    editorDiv.style.width = "100dvw";
+    editorDiv.style.height = "100dvh";
+    editorDiv.style.margin = "0";
+    editorDiv.style.left = "0";
+    editorDiv.style.top = "0";
+    editorDiv.style.zIndex = "10";
+  }
+}
+
 var showBlockHelpModal = function() {
   const modal = document.getElementById("blockHelpModal");
   modal.style.display = "block";

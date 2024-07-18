@@ -4059,8 +4059,8 @@ return formatted;
 this.CreatePalettePartition = function () {
 var palettePartition = new quorum_Libraries_Interface_Controls_Icon_();
 var bgColor = new quorum_Libraries_Game_Graphics_Color_();
-bgColor.SetColor$quorum_number$quorum_number$quorum_number$quorum_number((238.0 / 255), (250.0 / 255), (254.0 / 255), 1 * 1.0);
-palettePartition.LoadFilledRectangle$quorum_integer$quorum_integer$quorum_Libraries_Game_Graphics_ColorGroup(8, 500, bgColor);
+bgColor.SetColor$quorum_number$quorum_number$quorum_number$quorum_number(0.25, 0.25, 0.25, 1 * 1.0);
+palettePartition.LoadFilledRectangle$quorum_integer$quorum_integer$quorum_Libraries_Game_Graphics_ColorGroup(4, 500, bgColor);
 var paletteProperties = palettePartition.GetDefaultLayoutProperties();
 paletteProperties.SetPixelWidth$quorum_number(8 * 1.0);
 paletteProperties.SetVerticalLayoutMode$quorum_integer(paletteProperties.Get_Libraries_Interface_Layouts_LayoutProperties__FILL_());
