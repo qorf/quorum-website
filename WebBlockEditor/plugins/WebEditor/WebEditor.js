@@ -27,6 +27,10 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         window.BLOCK_EDITOR.BlockEditorStop();
     };
 
+    this.ShowHelpModal = function() {
+      showBlockHelpModal();
+    };
+
     this.UpdateTogglePaletteButton$quorum_boolean = function(status) {
         let hidePaletteContainer = document.getElementById("HidePaletteContainer");
         if (hidePaletteContainer != null) {
