@@ -93,12 +93,14 @@ table or spreadsheet. For example, below we have a few sample rows and columns f
 
     action GetInstructions() returns Division
         Division instructions
+        text dq = ""
+        dq = dq:GetDoubleQuote()
         
         instructions:AddParagraph("")
         instructions:AddParagraph("In the code editor below, we have a program that reads in this file to a DataFrame and makes a Chart. Take code blocks from the palette and place them at the bottom of the program.")
         OrderedList instructionsList
         instructionsList:AddListItem("<b>Use the block(s) in the palette on the left.</b>")
-        instructionsList:AddListItem("<b>Place the 'chart:Display' block below the 'chart:ShowLegend' block at the bottom of the block editor on the right.</b>")
+        instructionsList:AddListItem("<b>Place the 'chart:Display()' block below the 'chart:ShowLegend(false)' block at the bottom of the block editor on the right.</b>")
         instructionsList:AddListItem("<b>Run the program.</b>")
         instructionsList:AddListItem("<b>Use the chart in the canvas to answer the questions in the <i>Activity</i> section.</b>")
         instructionsList:AddClassAttribute("list-decimal list-outside pl-8")
@@ -132,6 +134,15 @@ action GetQuestions() returns Division
         //FieldSet questionSet
 
         //questionForm:Add(questionSet)
+        Division totalCorrect
+        totalCorrect:AddAttribute("role","region")
+        totalCorrect:AddAttribute("aria-live","polite")
+        Span totalCorrectText
+        totalCorrectText:SetIdentifier("totalCorrectText")
+        totalCorrect:Add(totalCorrectText)
+        questionForm:Add(totalCorrect)
+        questionForm:AddText("<br>")
+        
 
         //13.1 21.5 32.1 59.6
         Label question1
@@ -144,19 +155,22 @@ action GetQuestions() returns Division
         
         Input input1
         input1:SetType("number")
-        input1:SetPlaceHolder("0")
-        input1:SetClassAttribute("mx-2 p-2 rounded-md border border-neutral-grey-50")
+        input1:SetClassAttribute("mx-2 p-2 rounded-md border border-neutral-grey-50 aria-[invalid='true']:border-attention-red-100")
         input1:SetIdentifier("input1")
 
+        Division validationDiv1
+        validationDiv1:AddAttribute("role","region")
+        validationDiv1:AddAttribute("aria-live","polite")
         Span validation1
         validation1:SetIdentifier("validation1")
         validation1:SetClassAttribute("mx-2 text-sm hidden")
+        validationDiv1:Add(validation1)
 
         questionForm:Add(question1)
         questionForm:AddText("<br>")
         questionForm:Add(input1)
         questionForm:AddText("<br>")
-        questionForm:Add(validation1)
+        questionForm:Add(validationDiv1)
         questionForm:AddText("<br>")
         
         Label question2
@@ -169,19 +183,22 @@ action GetQuestions() returns Division
         
         Input input2
         input2:SetType("number")
-        input2:SetPlaceHolder("0")
-        input2:SetClassAttribute("mx-2 p-2 rounded-md border border-neutral-grey-50")
+        input2:SetClassAttribute("mx-2 p-2 rounded-md border border-neutral-grey-50 aria-[invalid='true']:border-attention-red-100")
         input2:SetIdentifier("input2")
 
+        Division validationDiv2
+        validationDiv2:AddAttribute("role","region")
+        validationDiv2:AddAttribute("aria-live","polite")
         Span validation2
         validation2:SetIdentifier("validation2")
         validation2:SetClassAttribute("mx-2 text-sm hidden")
+        validationDiv2:Add(validation2)
        
         questionForm:Add(question2)
         questionForm:AddText("<br>")
         questionForm:Add(input2)
         questionForm:AddText("<br>")
-        questionForm:Add(validation2)
+        questionForm:Add(validationDiv2)
         questionForm:AddText("<br>")
 
         Button checkAnswers
@@ -193,7 +210,7 @@ action GetQuestions() returns Division
         //turning off post until the backend is setup, just do frontend validation
 
         questionForm:Add(checkAnswers)
-
+        
         Script script
         text quote = ""
         quote = quote:GetDoubleQuote()
@@ -207,53 +224,68 @@ action GetQuestions() returns Division
             if (input[0].value === undefined || input[0].value === '') {
                 input.removeClass('border-neutral-grey-50 border-green-500')
                 input.addClass('border-red-500');
+                input.attr('aria-invalid','true');
                 validation.removeClass('hidden text-green-500')
-                validation.addClass('text-red-500');
+                validation.addClass('text-red-500 text-attention-red-100');
                 validation.text('Please enter an answer.');
             }
-            else {
-            //else if (input[0].value >= 58 && input[0].value <= 61) {
+            else if (input[0].value >= 58 && input[0].value <= 61) {
                 input.removeClass('border-neutral-grey-50 border-red-500');
                 input.addClass('border-green-500');
-                validation.removeClass('hidden text-red-500')
+                input.attr('aria-invalid',false);
+                validation.removeClass('hidden text-red-500 text-attention-red-100')
                 validation.addClass('text-green-500');
-                validation.text('Submitted.');
-                totalCorrect += totalCorrect;
+                validation.text('Correct.');
+                totalCorrect++;
             }
-//            else {
-//                input.removeClass('border-neutral-grey-50 border-green-500')
-//                input.addClass('border-red-500');
-//                validation.removeClass('hidden text-green-500')
-//                validation.addClass('text-red-500');
-//                validation.text('Incorrect, please try again.');
-//            }
+            else {
+                input.removeClass('border-neutral-grey-50 border-green-500')
+                input.addClass('border-red-500');
+                input.attr('aria-invalid','true');
+                validation.removeClass('hidden text-green-500')
+                validation.addClass('text-red-500 text-attention-red-100');
+                validation.text('Incorrect, please try again.');
+            }
 
             var input = $('#input2');
             var validation = $('#validation2');
             if (input[0].value === undefined || input[0].value === '') {
                 input.removeClass('border-neutral-grey-50 border-green-500')
                 input.addClass('border-red-500');
+                input.attr('aria-invalid','true');
                 validation.removeClass('hidden text-green-500')
-                validation.addClass('text-red-500');
+                validation.addClass('text-red-500 text-attention-red-100');
                 validation.text('Please enter an answer.');
             }
-            else {
-            //else if (input[0].value >= 21 && input[0].value <= 22) {
+            else if (input[0].value >= 21 && input[0].value <= 22) {
                 input.removeClass('border-neutral-grey-50 border-red-500')
                 input.addClass('border-green-500');
-                validation.removeClass('hidden text-red-500')
+                input.attr('aria-invalid',false);
+                validation.removeClass('hidden text-red-500 text-attention-red-100')
                 validation.addClass('text-green-500');
-                validation.text('Submitted.');
-                totalCorrect += totalCorrect;
+                validation.text('Correct.');
+                totalCorrect++;
             }
-//            else {
-//                input.removeClass('border-neutral-grey-50 border-green-500')
-//                input.addClass('border-red-500');
-//                validation.removeClass('hidden text-green-500')
-//                validation.addClass('text-red-500');
-//                validation.text('Incorrect, please try again.');
-//            }
-                
+            else {
+                input.removeClass('border-neutral-grey-50 border-green-500')
+                input.addClass('border-red-500');
+                input.attr('aria-invalid','true');
+                validation.removeClass('hidden text-green-500')
+                validation.addClass('text-red-500 text-attention-red-100');
+                validation.text('Incorrect, please try again.');
+            }
+            
+            var totalCorrectText = $('#totalCorrectText');
+            var message = totalCorrect + ' of ' + totalQuestions + ' correct.'
+            totalCorrectText.text(message); 
+            if (totalCorrect < totalQuestions) {
+                totalCorrectText.removeClass('text-green-500');
+                totalCorrectText.addClass('text-red-500 text-attention-red-100');
+            }
+            else {
+                totalCorrectText.removeClass('text-red-500 text-attention-red-100');
+                totalCorrectText.addClass('text-green-500');
+            }
         };
         ")
 
