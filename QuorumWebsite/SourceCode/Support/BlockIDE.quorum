@@ -9,8 +9,6 @@ use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.Span
 
 
-
-
 class BlockIDE is Division
     
     boolean noCanvasMode = false
@@ -110,7 +108,8 @@ fullscreenDiv:SetStyle("text-wrap: nowrap;")
         fullscreenButton:SetOnClick("blockEditorFullscreen()")
         
         Button runButton
-        runButton:SetClassAttribute("bg-quorum-blue-50 rounded-2xl px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+        runButton:SetIdentifier("blockRunButton")
+        runButton:SetClassAttribute("bg-quorum-blue-50 disabled:bg-neutral-grey-50 disabled:text-neutral-white rounded-2xl px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
 runButton:AddAttribute("aria-label", "Run Program")
 File runIcon
         runIcon:SetPath("icons/runIcon.svg")
@@ -118,13 +117,15 @@ File runIcon
         runButton:AddText(" &nbsp;Run")
         runButton:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
 Button stopButton
-        stopButton:SetClassAttribute("bg-secondary-red-100 rounded-2xl text-neutral-white px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
+        stopButton:SetIdentifier("blockStopButton")
+        stopButton:SetClassAttribute("bg-secondary-red-100 disabled:bg-neutral-grey-50 rounded-2xl text-neutral-white px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
 stopButton:AddAttribute("aria-label", "Stop Program")
         File stopIcon
         stopIcon:SetPath("icons/stopIcon.svg")
         stopButton:AddText(stopIcon:Read())
 stopButton:AddText(" &nbsp;Stop")
         stopButton:SetOnClick("window.BLOCK_EDITOR.BlockEditorStop()")
+        stopButton:SetDisabled(true)
         
         
         buttonDiv:Add(hidePaletteButton)
@@ -288,7 +289,8 @@ const callback = (mutationList) => {
     if (list.length != 0 && !observerFocused) {
       observerBlockContainer.display = 'none';
       observerBlockContainer.ariaHidden = 'true';
-      observerBlockContainer.getElementsByTagName('button')[0].tabIndex = -1;
+      let buttons = observerBlockContainer.getElementsByTagName('button');
+      if(buttons.length > 0) buttons[0].tabIndex = 0;
       if (observerBlockContainer.contains(document.activeElement)) {
         observerUIContainer.getElementsByTagName('button')[0].focus();
         observerFocused = true;
@@ -297,7 +299,8 @@ const callback = (mutationList) => {
   } else {
     observerBlockContainer.display = 'block';
     observerBlockContainer.ariaHidden = 'false';
-    observerBlockContainer.getElementsByTagName('button')[0].tabIndex = 0;
+    let buttons = observerBlockContainer.getElementsByTagName('button');
+    if(buttons.length > 0) buttons[0].tabIndex = 0;
     observerFocused = false;
   }
 };

@@ -547,7 +547,32 @@ var requestCompile = function(codeData) {
   });
 }
 
+var gameRunning = false
+document.addEventListener('GameStarted', (event) => {
+  if (event.detail.title !== 'Block Editor') {
+    let runButton = document.getElementById('blockRunButton');
+    let stopButton = document.getElementById('blockStopButton');
+    gameRunning = true;
+    runButton.disabled = true;
+    stopButton.disabled = false;
+    window.BLOCK_EDITOR.PauseBlockExecution();
+  }
+});
+document.addEventListener('GameClosed', (event) => {
+  if (event.detail.title !== 'Block Editor') {
+    let runButton = document.getElementById('blockRunButton');
+    let stopButton = document.getElementById('blockStopButton');
+    runButton.disabled = false;
+    stopButton.disabled = true;
+    currentUIContainer_$Global_ = "BlockUIContainer";
+    window.BLOCK_EDITOR.Start();
+  }
+});
+
 var blockEditorRunCode = function(output, uiContainer, execute = true) {
+  let runButton = document.getElementById('blockRunButton');
+  let stopButton = document.getElementById('blockStopButton');
+  runButton.disabled = true;
   window.BLOCK_EDITOR.BlockEditorStop();
   
   let codeInput = window.BLOCK_EDITOR.GetCode();
@@ -571,8 +596,10 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
       total_console_length239847239482734 = 0;
       if (result.startsWith("<div class=")) {
         outputRegion.innerHTML = result;
+        runButton.disabled = false;
       } else if (result.startsWith("Failed to connect")) {
         outputRegion.innerHTML = "I could not connect to the server at quorumlanguage.com";
+        runButton.disabled = false;
       } else {
         outputRegion.innerHTML = "Build Successful<br/>";
         if (execute === true) {
@@ -580,17 +607,23 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           script.id = "Runnable";
           script.innerHTML = result;
           head.appendChild(script);
+          gameRunning = false;
           try {
             Start();
+            if(!gameRunning) {
+              runButton.disabled = false;
+            }
           } catch(error) {
             outputRegion.innerHTML += error.message;
             head.removeChild(script);
+            runButton.disabled = false;
           }
         }
       }
     },
     (error) => {
       outputRegion.innerHTML = error;
+      runButton.disabled = false;
     });
 };
 

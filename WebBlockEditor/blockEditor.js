@@ -1,5 +1,8 @@
 function plugins_quorum_WebEditor_BlockEditor_() {
     this.GetTextForIDE$quorum_text = function(containerID) {
+      if(code != null) {
+        return code;
+      }
         let container = document.getElementById(containerID);
         if (container.dataset.codeForIde) {
             const data = JSON.parse(container.dataset.codeForIde);
@@ -4525,6 +4528,12 @@ function TogglePalette() {
 }
 function BlockEditorStop() {
     var manager = new quorum_Libraries_Game_GameStateManager_();
+    let gameMap = plugins_quorum_Libraries_Game_GameStateManager_.registeredGames
+    for (let [game, gameInfo] of gameMap) {
+        if(gameInfo.application === null) {
+            gameMap.delete(game);
+        }
+    }
     var game = manager.GetGame();
     let run = document.getElementById("Runnable");
     if (game.GetWebConfiguration().Get_Libraries_Game_WebConfiguration__title_() === 'Block Editor') {
@@ -4546,4 +4555,19 @@ function BlockEditorStop() {
         head.removeChild(run);
     }
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop}
+var code = null;
+function PauseBlockExecution() {
+    let gameMap = plugins_quorum_Libraries_Game_GameStateManager_.registeredGames
+    code = GetCode();
+    let game = null;
+    for (let [key, value] of gameMap) {
+        if (key instanceof quorum_WebEditor_BlockEditor_) {
+            game = value.game
+        }
+    }
+    if ((game != null)) {
+        game.Exit();
+    }
+    global_Empty_Shared_Classes();
+}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution}

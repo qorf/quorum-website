@@ -1,5 +1,8 @@
 function plugins_quorum_WebEditor_BlockEditor_() {
     this.GetTextForIDE$quorum_text = function(containerID) {
+      if(code != null) {
+        return code;
+      }
         let container = document.getElementById(containerID);
         if (container.dataset.codeForIde) {
             const data = JSON.parse(container.dataset.codeForIde);
