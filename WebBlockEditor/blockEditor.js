@@ -2949,6 +2949,102 @@ globalStaticHash = globalStaticHash + 1;
 
 };
 
+function quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorDoubleTapBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+this.Update$quorum_number = function(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+this.Compare$quorum_Libraries_Language_Object = function(object) {
+return global_Object_Compare(this.prototype, object);
+}
+this.SetRunOnUpdate$quorum_boolean = function(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+this.Dispose = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+this.IsFinished = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+this.IsRunningOnUpdate = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+this.Equals$quorum_Libraries_Language_Object = function(object) {
+return global_Object_Equals(this.prototype, object);
+}
+this.GetHashCode = function() {
+return global_Object_GetHashCode(this.prototype, );
+}
+this.HasBeenRun = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+if ((event.GetGestureEvent() != null)) {
+var gesture = event.GetGestureEvent();
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
+event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
+var newLineBehavior = new quorum_Libraries_Interface_Behaviors_Blocks_CodeEditorNewLineBehavior_();
+newLineBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else { 
+event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
+var controlBehavior = new quorum_Libraries_Interface_Behaviors_Controls_ControlActivationBehavior_();
+controlBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+}
+};
+this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+
+};
+
 function quorum_WebEditor_Behaviors_StopGameBehavior_(parents) {
 this.prototype = this;
 this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.StopGameBehavior'];
@@ -2987,6 +3083,134 @@ this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 editor.StopGame();
+};
+this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+
+};
+
+function quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSwipeBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+this.Update$quorum_number = function(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+this.Compare$quorum_Libraries_Language_Object = function(object) {
+return global_Object_Compare(this.prototype, object);
+}
+this.SetRunOnUpdate$quorum_boolean = function(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+this.Dispose = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+this.IsFinished = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+this.IsRunningOnUpdate = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+this.Equals$quorum_Libraries_Language_Object = function(object) {
+return global_Object_Equals(this.prototype, object);
+}
+this.GetHashCode = function() {
+return global_Object_GetHashCode(this.prototype, );
+}
+this.HasBeenRun = function() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+if ((event.GetGestureEvent() != null)) {
+var gesture = event.GetGestureEvent();
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+if ((((gesture.Get_Libraries_Interface_Events_GestureEvent__maxFingerCount_() == 2) && (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__RIGHT_())) && !this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus()))) {
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+editor.SetFocus$quorum_Libraries_Interface_Item(editor.GetBlockEditor());
+return;
+}
+if ((((gesture.Get_Libraries_Interface_Events_GestureEvent__maxFingerCount_() == 2) && (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__LEFT_())) && !this.prototype.IsInPalette$quorum_Libraries_Interface_Item(manager.GetFocus()))) {
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+if (editor.IsPaletteShowing()) {
+editor.SetFocus$quorum_Libraries_Interface_Item(editor.GetBlockPalette());
+}
+return;
+}
+if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
+event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
+if ((gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__LEFT_())) {
+var previous = new quorum_Libraries_Interface_Behaviors_Blocks_CodeEditorSelectPreviousBehavior_();
+previous.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else if( (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__RIGHT_())) {
+var next = new quorum_Libraries_Interface_Behaviors_Blocks_CodeEditorSelectNextBehavior_();
+next.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else if( (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__UP_())) {
+var up = new quorum_Libraries_Interface_Behaviors_Blocks_CodeEditorSelectionUpBehavior_();
+up.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else if( (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__DOWN_())) {
+var down = new quorum_Libraries_Interface_Behaviors_Blocks_CodeEditorSelectionDownBehavior_();
+down.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+}
+else { 
+event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
+if (((gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__LEFT_()) || (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__UP_()))) {
+var prevBehavior = new quorum_Libraries_Interface_Behaviors_FocusPreviousBehavior_();
+prevBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else if( ((gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__RIGHT_()) || (gesture.GetDirection() == gesture.Get_Libraries_Interface_Events_GestureEvent__DOWN_()))) {
+var nextBehavior = new quorum_Libraries_Interface_Behaviors_FocusNextBehavior_();
+nextBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+}
+}
+};
+this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
 };
 this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
@@ -4112,6 +4336,23 @@ var focusEditorItemBehavior = new quorum_WebEditor_Behaviors_FocusEditorItemBeha
 focusEditorItemBehavior.SetPaletteItem$quorum_WebEditor_EditorItem(this.Get_WebEditor_BlockEditor__paletteItem_());
 focusEditorItemBehavior.SetBlocksItem$quorum_WebEditor_EditorItem(this.Get_WebEditor_BlockEditor__blocksItem_());
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(focusEditorItemSet, focusEditorItemBehavior);
+var swipeSet = new quorum_Libraries_Game_InputSet_();
+var gestures = new quorum_Libraries_Interface_Events_GestureEvent_();
+swipeSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__SWIPE_());
+var tapSet = new quorum_Libraries_Game_InputSet_();
+tapSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__SINGLE_TAP_());
+var doubleTapSet = new quorum_Libraries_Game_InputSet_();
+doubleTapSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__DOUBLE_TAP_());
+var panSet = new quorum_Libraries_Game_InputSet_();
+panSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PAN_());
+var longPressSet = new quorum_Libraries_Game_InputSet_();
+longPressSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__LONG_PRESS_());
+var pinchSet = new quorum_Libraries_Game_InputSet_();
+pinchSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PINCH_());
+var swipeBehavior = new quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_();
+defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(swipeSet, swipeBehavior);
+var doubleTapBehavior = new quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_();
+defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(doubleTapSet, doubleTapBehavior);
 };
 this.Format$quorum_text = function (source) {
 var manager = new quorum_Libraries_Language_Compile_CompilerErrorManager_();

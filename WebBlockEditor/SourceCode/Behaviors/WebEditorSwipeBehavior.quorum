@@ -1,0 +1,86 @@
+package WebEditor.Behaviors
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Events.GestureEvent
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectPreviousBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectNextBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectionUpBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorSelectionDownBehavior
+use Libraries.Interface.Item
+use Libraries.Interface.Controls.Blocks.Palette.BlockPalette
+use Libraries.Interface.Behaviors.FocusPreviousBehavior
+use Libraries.Interface.Behaviors.FocusNextBehavior
+use Libraries.Game.GameStateManager
+use Libraries.Interface.Controls.Blocks.CodeEditor
+use WebEditor.BlockEditor
+
+
+class WebEditorSwipeBehavior is Behavior
+    
+action Run(BehaviorEvent event)
+if event:GetGestureEvent() not= undefined
+GestureEvent gesture = event:GetGestureEvent()
+            GameStateManager manager
+            if gesture:maxFingerCount = 2 and gesture:GetDirection() = gesture:RIGHT and not IsInBlockEditor(manager:GetFocus())
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+editor:SetFocus(editor:GetBlockEditor())
+                return now
+            end
+if gesture:maxFingerCount = 2 and gesture:GetDirection() = gesture:LEFT and not IsInPalette(manager:GetFocus())
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+if editor:IsPaletteShowing()
+editor:SetFocus(editor:GetBlockPalette())
+        end
+                return now
+            end
+                                if IsInBlockEditor(manager:GetFocus())
+                event:SetItem(manager:GetFocus())
+if gesture:GetDirection() = gesture:LEFT
+                CodeEditorSelectPreviousBehavior previous
+                previous:Run(event)
+            elseif gesture:GetDirection() = gesture:RIGHT
+                CodeEditorSelectNextBehavior next
+                next:Run(event)
+elseif gesture:GetDirection() = gesture:UP
+                CodeEditorSelectionUpBehavior up
+                up:Run(event)
+elseif gesture:GetDirection() = gesture:DOWN
+                CodeEditorSelectionDownBehavior down
+                down:Run(event)
+                end
+            else
+event:SetItem(manager:GetFocus())
+if gesture:GetDirection() = gesture:LEFT or gesture:GetDirection() = gesture:UP
+                    FocusPreviousBehavior prevBehavior
+                    prevBehavior:Run(event)
+            elseif gesture:GetDirection() = gesture:RIGHT or gesture:GetDirection() = gesture:DOWN
+FocusNextBehavior nextBehavior
+                    nextBehavior:Run(event)
+                end
+                        end
+end
+  end
+    
+    action IsInPalette(Item item) returns boolean
+        repeat until item = undefined
+            if item is BlockPalette
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
+    end
+    
+    action IsInBlockEditor(Item item) returns boolean
+repeat until item = undefined
+            if item is CodeEditor
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
+    end
+
+end
