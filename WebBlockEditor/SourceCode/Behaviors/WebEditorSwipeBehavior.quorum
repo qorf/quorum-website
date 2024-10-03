@@ -13,6 +13,11 @@ use Libraries.Interface.Behaviors.FocusNextBehavior
 use Libraries.Game.GameStateManager
 use Libraries.Interface.Controls.Blocks.CodeEditor
 use WebEditor.BlockEditor
+use Libraries.Interface.Behaviors.Blocks.CodeEditorFreeformEditingBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorRedoBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorUndoBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorNavigateToStartBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorNavigateToEndBehavior
 
 
 class WebEditorSwipeBehavior is Behavior
@@ -26,6 +31,18 @@ BlockEditor editor = cast(BlockEditor, manager:GetGame())
 editor:SetFocus(editor:GetBlockEditor())
                 return now
             end
+if gesture:maxFingerCount = 2 and gesture:GetDirection() = gesture:UP and IsInBlockEditor(manager:GetFocus())
+event:SetItem(manager:GetFocus())
+CodeEditorNavigateToStartBehavior gotoStartBehavior
+                        gotoStartBehavior:Run(event)
+                        return now
+            end
+if gesture:maxFingerCount = 2 and gesture:GetDirection() = gesture:DOWN and IsInBlockEditor(manager:GetFocus())
+event:SetItem(manager:GetFocus())
+CodeEditorNavigateToEndBehavior gotoEndBehavior
+                        gotoEndBehavior:Run(event)
+                        return now
+            end
 if gesture:maxFingerCount = 2 and gesture:GetDirection() = gesture:LEFT and not IsInPalette(manager:GetFocus())
 BlockEditor editor = cast(BlockEditor, manager:GetGame())
 if editor:IsPaletteShowing()
@@ -33,14 +50,67 @@ editor:SetFocus(editor:GetBlockPalette())
         end
                 return now
             end
+            if gesture:maxFingerCount = 3
+                if IsInBlockEditor(manager:GetFocus())
+                if gesture:GetDirection() = gesture:LEFT or gesture:GetDirection() = gesture:RIGHT
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+                CodeEditor blocks = editor:GetBlockEditor()
+                    if not blocks:IsKeyboardMovingBlocks()
+event:SetItem(manager:GetFocus())
+CodeEditorFreeformEditingBehavior freeformBehavior
+                            freeformBehavior:SetForceEditing(true)
+                        freeformBehavior:Run(event)
+                        return now
+                    end
+                                    elseif gesture:GetDirection() = gesture:UP
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+                CodeEditor blocks = editor:GetBlockEditor()
+                    if not blocks:IsKeyboardMovingBlocks()
+event:SetItem(manager:GetFocus())
+                            CodeEditorRedoBehavior redo
+                            redo:Run(event)
+                        return now
+                    end
+elseif gesture:GetDirection() = gesture:DOWN
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+                CodeEditor blocks = editor:GetBlockEditor()
+                    if not blocks:IsKeyboardMovingBlocks()
+event:SetItem(manager:GetFocus())
+                            CodeEditorUndoBehavior undo
+                            undo:Run(event)
+                        return now
+                    end
+                    end
+                            end
+end
                                 if IsInBlockEditor(manager:GetFocus())
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+                CodeEditor blocks = editor:GetBlockEditor()
                 event:SetItem(manager:GetFocus())
 if gesture:GetDirection() = gesture:LEFT
+                    if blocks:IsKeyboardMovingBlocks()
+                        blocks:ConfirmKeyboardMovingBlocks()
+blocks:MoveSelectionDown()
+                        CodeEditorFreeformEditingBehavior freeformBehavior
+freeformBehavior:SetForceEditing(true)
+                        event:SetItem(manager:GetFocus())
+                        freeformBehavior:Run(event)
+                    else
                 CodeEditorSelectPreviousBehavior previous
                 previous:Run(event)
-            elseif gesture:GetDirection() = gesture:RIGHT
+                                end
+elseif gesture:GetDirection() = gesture:RIGHT
+if blocks:IsKeyboardMovingBlocks()
+                        blocks:ConfirmKeyboardMovingBlocks()
+                        blocks:MoveSelectionDown()
+CodeEditorFreeformEditingBehavior freeformBehavior
+freeformBehavior:SetForceEditing(true)
+                        event:SetItem(manager:GetFocus())
+                        freeformBehavior:Run(event)
+                    else
                 CodeEditorSelectNextBehavior next
                 next:Run(event)
+end
 elseif gesture:GetDirection() = gesture:UP
                 CodeEditorSelectionUpBehavior up
                 up:Run(event)

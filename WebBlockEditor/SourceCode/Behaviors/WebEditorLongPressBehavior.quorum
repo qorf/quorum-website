@@ -1,0 +1,71 @@
+package WebEditor.Behaviors
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Events.GestureEvent
+use Libraries.Interface.Item
+use Libraries.Interface.Controls.Blocks.Palette.BlockPalette
+use Libraries.Interface.Behaviors.FocusPreviousBehavior
+use Libraries.Interface.Behaviors.FocusNextBehavior
+use Libraries.Game.GameStateManager
+use Libraries.Interface.Controls.Blocks.CodeEditor
+use WebEditor.BlockEditor
+use Libraries.Interface.Behaviors.Blocks.CodeEditorNewLineBehavior
+use Libraries.Interface.Behaviors.Controls.ControlActivationBehavior
+use Libraries.Interface.Behaviors.Blocks.BlockPickUpBehavior
+use Libraries.Interface.Controls.Blocks.Palette.BlockPaletteItem
+
+
+class WebEditorLongPressBehavior is Behavior
+    
+action Run(BehaviorEvent event)
+if event:GetGestureEvent() not= undefined
+GestureEvent gesture = event:GetGestureEvent()
+            GameStateManager manager
+            
+                            if IsInBlockEditor(manager:GetFocus())
+BlockEditor editor = cast(BlockEditor, manager:GetGame())
+                CodeEditor blocks = editor:GetBlockEditor()    
+                if not blocks:IsKeyboardMovingBlocks()
+                event:SetItem(manager:GetFocus())
+                BlockPickUpBehavior pickUpBehavior
+                pickUpBehavior:Run(event)
+                else
+                    blocks:CancelKeyboardMovingBlocks()
+end
+            elseif manager:GetFocus() is BlockPaletteItem
+event:SetItem(manager:GetFocus())
+                ControlActivationBehavior controlBehavior
+                controlBehavior:Run(event)
+            else
+event:SetItem(manager:GetFocus())
+                ControlActivationBehavior controlBehavior
+                //controlBehavior:Run(event)
+                        end
+end
+  end
+    
+    action IsInPalette(Item item) returns boolean
+        repeat until item = undefined
+            if item is BlockPalette
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
+    end
+    
+    action IsInBlockEditor(Item item) returns boolean
+repeat until item = undefined
+            if item is CodeEditor
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
+    end
+
+end
+
+
