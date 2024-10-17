@@ -2484,7 +2484,6 @@ newLineBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 else if( global_InstanceOf(manager.GetFocus(),'Libraries.Interface.Controls.Blocks.Palette.BlockPaletteItem')) {
 event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
 var controlBehavior = new quorum_Libraries_Interface_Behaviors_Controls_ControlActivationBehavior_();
-controlBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 }
 else { 
 event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
@@ -3789,11 +3788,35 @@ this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-if ((gesture.Get_Libraries_Interface_Events_GestureEvent__timingCode_() == gesture.Get_Libraries_Interface_Events_GestureEvent__BEGIN_())) {
+var gameInput = global_CheckCast(manager.GetInput(), "Libraries.Game.StandardInput");
+var layer = manager.GetGame().GetCurrentLayer2D();
+var counter = layer.GetSize();
+var temp = null;
+var result = null;
+var pointVector = layer.GetCamera().ScreenToWorldCoordinates$quorum_number$quorum_number(gesture.GetX() * 1.0, gesture.GetY() * 1.0);
+while ((counter > 0)) {
+counter = (counter - 1);
+temp = layer.Get$quorum_integer(counter).GetItemAt$quorum_number$quorum_number(pointVector.GetX(), pointVector.GetY());
+if ((temp != null)) {
+result = temp;
+}
+}
+if (((gesture.Get_Libraries_Interface_Events_GestureEvent__timingCode_() == gesture.Get_Libraries_Interface_Events_GestureEvent__BEGIN_()) && (temp != null))) {
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Set$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Item$quorum_Libraries_Interface_Item(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Get_Libraries_Interface_Events_DragAndDropEvent__DRAGGING_BEGAN_(), gesture.GetX(), gesture.GetY(), gesture.GetX(), gesture.GetY(), 0, 0, result, null);
 }
 else if( (gesture.Get_Libraries_Interface_Events_GestureEvent__timingCode_() == gesture.Get_Libraries_Interface_Events_GestureEvent__CONTINUE_())) {
+if ((this.Get_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_() == false)) {
+gameInput.ProcessDragEvent$quorum_Libraries_Interface_Events_DragAndDropEvent(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_());
+this.startedDrag = true;
+}
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Set$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Item$quorum_Libraries_Interface_Item(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Get_Libraries_Interface_Events_DragAndDropEvent__DRAGGING_CONTINUED_(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetStartX(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetStartY(), gesture.GetX(), gesture.GetY(), (gesture.GetX() - this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetX()), (gesture.GetY() - this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetY()), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetSource(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetDestination());
+gameInput.ProcessDragEvent$quorum_Libraries_Interface_Events_DragAndDropEvent(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_());
 }
 else if( (gesture.Get_Libraries_Interface_Events_GestureEvent__timingCode_() == gesture.Get_Libraries_Interface_Events_GestureEvent__FINISH_())) {
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Set$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Item$quorum_Libraries_Interface_Item(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Get_Libraries_Interface_Events_DragAndDropEvent__DROPPED_(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetStartX(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetStartY(), gesture.GetX(), gesture.GetY(), 0, 0, this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetSource(), this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().GetDestination());
+gameInput.ProcessDragEvent$quorum_Libraries_Interface_Events_DragAndDropEvent(this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_());
+this.startedDrag = false;
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Set$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Item$quorum_Libraries_Interface_Item(-1, 0, 0, 0, 0, 0, 0, null, null);
 }
 }
 };
@@ -3819,6 +3842,18 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_ = function() {
+   return this.dragEvent;
+};
+this.Set_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_ = function(value) {
+   this.dragEvent = value;
+};
+this.Get_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_ = function() {
+   return this.startedDrag;
+};
+this.Set_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_ = function(value) {
+   this.startedDrag = value;
+};
 this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
@@ -3835,6 +3870,8 @@ if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
 }
+this.dragEvent = new quorum_Libraries_Interface_Events_DragAndDropEvent_();
+this.startedDrag = false;
 
 if(parents == null) {
 }
@@ -4712,8 +4749,15 @@ var tapSet = new quorum_Libraries_Game_InputSet_();
 tapSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__SINGLE_TAP_());
 var doubleTapSet = new quorum_Libraries_Game_InputSet_();
 doubleTapSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__DOUBLE_TAP_());
-var panSet = new quorum_Libraries_Game_InputSet_();
-panSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PAN_());
+var panBeginSet = new quorum_Libraries_Game_InputSet_();
+panBeginSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PAN_());
+panBeginSet.SetInputTrigger$quorum_integer(panBeginSet.Get_Libraries_Game_InputSet__BEGIN_());
+var panContinueSet = new quorum_Libraries_Game_InputSet_();
+panContinueSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PAN_());
+panContinueSet.SetInputTrigger$quorum_integer(panContinueSet.Get_Libraries_Game_InputSet__CONTINUE_());
+var panEndSet = new quorum_Libraries_Game_InputSet_();
+panEndSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__PAN_());
+panEndSet.SetInputTrigger$quorum_integer(panEndSet.Get_Libraries_Game_InputSet__FINISH_());
 var longPressSet = new quorum_Libraries_Game_InputSet_();
 longPressSet.SetGestureInput$quorum_integer(gestures.Get_Libraries_Interface_Events_GestureEvent__LONG_PRESS_());
 var pinchSet = new quorum_Libraries_Game_InputSet_();
@@ -4727,7 +4771,9 @@ defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behav
 var singleTapBehavior = new quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_();
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(tapSet, singleTapBehavior);
 var panBehavior = new quorum_WebEditor_Behaviors_WebEditorPanBehavior_();
-defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panSet, panBehavior);
+defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panBeginSet, panBehavior);
+defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panContinueSet, panBehavior);
+defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panEndSet, panBehavior);
 };
 this.Format$quorum_text = function (source) {
 var manager = new quorum_Libraries_Language_Compile_CompilerErrorManager_();
