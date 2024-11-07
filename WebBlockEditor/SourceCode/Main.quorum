@@ -57,8 +57,11 @@ use WebEditor.Behaviors.all
 use Libraries.Interface.Events.GestureEvent
 use Libraries.Interface.Behaviors.Controls.ControlActivationBehavior
 use Libraries.Interface.Accessibility.WebAccessibility
+use Libraries.Interface.Events.WebAccessibilityListener
+use Libraries.Interface.Events.WebAccessibilityEvent
+use Libraries.Interface.Item
 
-class BlockEditor is Game, Behavior, TextChangeListener
+class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener
 
     constant text CONTAINER_ID = "BlockUIContainer"
 CodeEditor editor = undefined
@@ -100,9 +103,19 @@ end
  action CreateGame
         GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
+webAccess:AddHiddenHeader("Navigation", "Navigation")
+        webAccess:AddHiddenButton("Go To Palette")
+webAccess:AddHiddenButton("Go To Editor")
+webAccess:AddHiddenHeader("Blocks", "Blocks")
+        webAccess:AddHiddenButton("Pick Up Current")
+        webAccess:AddHiddenButton("Delete")
+webAccess:AddHiddenButton("Move Up")
+webAccess:AddHiddenButton("Move Down")
         webAccess:AddHiddenHeader("Control", "Control")
-        webAccess:AddHiddenLabel("ControlLabel", "This is a hidden control label that only you can see")
-        webAccess:AddHiddenButton("ControlButton")
+        webAccess:AddHiddenButton("Undo")
+webAccess:AddHiddenButton("Redo")
+webAccess:AddHiddenButton("Exit")
+        webAccess:AddWebAccessibilityListener(me)
 LightBlockOptions options
       //DarkBlockOptions options
     SetInterfaceOptions(options)
@@ -453,6 +466,46 @@ palettePartitionTable:Add(dragContinueSet, paletteDrag)
             return file
         end
         return undefined
+    end
+    
+    action FocusChanged(WebAccessibilityEvent event)
+        text elementName = event:elementName
+GameStateManager manager
+        WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
+        if elementName = "Go To Palette"
+            editorPalette:Focus()
+        elseif elementName = "Go To Editor"
+            editorBlocks:Focus()
+elseif elementName = "Pick Up Current"
+            
+elseif elementName = "Delete"
+            editor:DeleteSelectedBlock(false)
+            editor:Focus()
+elseif elementName = "Undo"
+            editor:GetBlockEditManager():Undo()
+editor:Focus()
+elseif elementName = "Redo"
+editor:GetBlockEditManager():Redo()
+editor:Focus()
+        elseif elementName = "Exit"
+            webAccess:ForceReleaseFocus()
+elseif elementName = "Move Up"
+            editor:MoveSelectionUp()
+editor:Focus()
+elseif elementName = "Move Down"
+editor:MoveSelectionDown()
+editor:Focus()
+        end
+        
+    end
+    
+    action HiddenElementClicked(WebAccessibilityEvent event)
+        Item clicked = event:GetItem()
+        if clicked is Block
+            if editor:IsKeyboardMovingBlocks()
+                editor:ConfirmKeyboardMovingBlocks()
+            end
+        end
     end
     
     action SetCode(text code)
