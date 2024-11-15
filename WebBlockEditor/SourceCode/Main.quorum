@@ -60,15 +60,18 @@ use Libraries.Interface.Accessibility.WebAccessibility
 use Libraries.Interface.Events.WebAccessibilityListener
 use Libraries.Interface.Events.WebAccessibilityEvent
 use Libraries.Interface.Item
+use Libraries.Interface.Events.FocusListener
+use Libraries.Interface.Events.FocusEvent
+use Libraries.Interface.Behaviors.Blocks.BlockPickUpBehavior
 
-class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener
+class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener
 
     constant text CONTAINER_ID = "BlockUIContainer"
 CodeEditor editor = undefined
 ParserToBlockListener listener
-    Control palettePanel
+    WebControlPanel palettePanel
     Control palettePartition
-    Control editorPanel
+    WebControlPanel editorPanel
     BlockPalette editorPalette = undefined
     CodeEditor editorBlocks = undefined
     EditorItem paletteItem = undefined
@@ -103,18 +106,18 @@ end
  action CreateGame
         GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
-webAccess:AddHiddenHeader("Navigation", "Navigation")
+webAccess:AddHiddenHeader("Navigation Area", "Navigation Area")
         webAccess:AddHiddenButton("Go To Palette")
 webAccess:AddHiddenButton("Go To Editor")
-webAccess:AddHiddenHeader("Blocks", "Blocks")
+webAccess:AddHiddenButton("Exit")
+webAccess:AddHiddenHeader("Block Control Area", "Block Control Area")
         webAccess:AddHiddenButton("Pick Up Current")
+        webAccess:AddHiddenSlider("Block Mover", 1, 1, 1)
+webAccess:AddHiddenButton("Drop Block")
         webAccess:AddHiddenButton("Delete")
-webAccess:AddHiddenButton("Move Up")
-webAccess:AddHiddenButton("Move Down")
-        webAccess:AddHiddenHeader("Control", "Control")
+        webAccess:AddHiddenHeader("Edit Area", "Edit Area")
         webAccess:AddHiddenButton("Undo")
 webAccess:AddHiddenButton("Redo")
-webAccess:AddHiddenButton("Exit")
         webAccess:AddWebAccessibilityListener(me)
 LightBlockOptions options
       //DarkBlockOptions options
@@ -165,14 +168,21 @@ palettePanel:SetLayout(panelFlow)
         palettePanel:SetPercentageHeight(1)
         palettePanel:SetPixelWidth(200)
         palettePanel:SetName("Palette Panel")
+        palettePanel:SetAccessibilityCode(9)
+        palettePanel:SetFocusable(false)
         
         FlowLayout flow
         editorPanel:SetLayout(flow)
 editorPanel:SetPercentageY(0)
         editorPanel:SetPercentageHeight(1)
-        editorPanel:SetHorizontalLayoutMode(editorPanel:FILL)
+        editorPanel:SetHorizontalLayoutMode(editorPanel:parent:Control:FILL)
 editorPanel:SetName("Editor Panel")
+editorPanel:SetAccessibilityCode(9)
+        editorPanel:SetFocusable(false)
         
+        webAccess:AddHiddenHeader("paletteHeader", "BlockPalette", true)
+        webAccess:AddHiddenLabel("paletteLabel", "The next item should be the Block Palette. Activate an item in the palette to insert into the text. Remember you need to confirm the placement of the block and that can be
+done in the Block Control Area using the Drop Block button.", true)
         Add(palettePanel)
         palettePanel:Add(palette)
         palette:IncludeSuggestions(false)
@@ -182,6 +192,8 @@ editorPanel:SetName("Editor Panel")
         Add(palettePartition)
         AddPartitionInputTable(palettePanel)
         
+webAccess:AddHiddenHeader("editorHeader", "Blocks", true)
+        webAccess:AddHiddenLabel("currentBlock", "This would tell you the currently selected block if Gabe knew what he was doing: ", true)
         Add(editorPanel)
 editorPanel:Add(editor)
         
@@ -195,6 +207,11 @@ editorPanel:Add(editor)
         SetupEditorItems()
         AddDefaultKeys()
         paletteItem:Focus()
+        AddFocusListener(me)
+        webAccess:SetHiddenOnElement("Go To PalettehiddenButton", true)
+webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", true)
+webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", true)
+        webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), true)
 end
     
     action SetupEditorItems
@@ -477,7 +494,21 @@ GameStateManager manager
         elseif elementName = "Go To Editor"
             editorBlocks:Focus()
 elseif elementName = "Pick Up Current"
-            
+if not editorBlocks:IsKeyboardMovingBlocks()
+                BehaviorEvent pickUpEvent
+                        pickUpEvent:SetItem(editorBlocks:GetSelectedBlocks():Get(0))
+                text blockName = editorBlocks:GetSelectedBlocks():Get(0):GetName()
+                BlockPickUpBehavior pickUpBehavior
+                pickUpBehavior:Run(pickUpEvent)
+                webAccess:ModifyHiddenSlider("Block Mover", 0, editorBlocks:GetLineCount() - 1, 1)
+                webAccess:SetHiddenSliderCurrentValue("Block Mover", editorBlocks:GetSelection():GetLine())
+                webAccess:SetHiddenSliderValueText("Block Mover", blockName)
+                webAccess:FocusHiddenElement("Block Mover")
+end
+        elseif elementName = "Drop Block"
+if editorBlocks:IsKeyboardMovingBlocks()
+                editorBlocks:ConfirmKeyboardMovingBlocks()
+end
 elseif elementName = "Delete"
             editor:DeleteSelectedBlock(false)
             editor:Focus()
@@ -499,13 +530,74 @@ editor:Focus()
         
     end
     
+    action SliderChanged(WebAccessibilityEvent event)
+        text elementName = event:GetElementName()
+GameStateManager manager
+        WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
+        if elementName = "Block Mover"
+            editorBlocks:SelectBlockAtLine(event:GetSliderValue())
+text blockName = editorBlocks:GetSelectedBlocks():Get(0):GetName()
+            webAccess:SetHiddenSliderValueText("Block Mover", blockName)
+webAccess:FocusHiddenElement("Block Mover")
+        end
+    end
+    
     action HiddenElementClicked(WebAccessibilityEvent event)
+        output "Something clicked on"
         Item clicked = event:GetItem()
         if clicked is Block
             if editor:IsKeyboardMovingBlocks()
                 editor:ConfirmKeyboardMovingBlocks()
             end
         end
+    end
+    
+action GainedFocus(FocusEvent event)
+GameStateManager manager
+        WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
+        if IsInPalette(event:GetNewFocus())
+webAccess:SetHiddenOnElement("Go To PalettehiddenButton", true)
+            webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), false)
+webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", false)
+webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", false)
+            webAccess:SetHiddenOnElement("Go To EditorhiddenButton", false)
+            webAccess:SetHiddenOnElement(cast(text, editorPanel:GetHashCode()), true)
+webAccess:SetHiddenOnElement("editorHeaderhiddenHeader", true)
+        elseif IsInBlockEditor(event:GetNewFocus())
+webAccess:SetHiddenOnElement("Go To PalettehiddenButton", false)
+            webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), true)
+webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", true)
+webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", true)
+            webAccess:SetHiddenOnElement("Go To EditorhiddenButton", true)
+            webAccess:SetHiddenOnElement(cast(text, editorPanel:GetHashCode()), false)
+webAccess:SetHiddenOnElement("editorHeaderhiddenHeader", false)
+        end
+    end
+
+    action LostFocus(FocusEvent event)
+
+    end
+    
+action IsInPalette(Item item) returns boolean
+        repeat until item = undefined
+            if item is BlockPalette
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
+    end
+    
+    action IsInBlockEditor(Item item) returns boolean
+repeat until item = undefined
+            if item is CodeEditor
+                return true
+            else
+                item = item:GetAccessibleParent()
+            end
+        end
+        return false
     end
     
     action SetCode(text code)
