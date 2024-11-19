@@ -540,6 +540,9 @@ this.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener = func
 this.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
      return this.Libraries_Interface_Controls_Control__.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
 }
+this.GetDefaultProportionalFontName = function() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultProportionalFontName();
+}
 this.SetScaleFromCenter$quorum_number$quorum_number = function(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number$quorum_number(newX, newY);
 }
@@ -902,6 +905,9 @@ this.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, 
 }
 this.SetTopMargin$quorum_number = function(padding) {
      return this.Libraries_Interface_Controls_Control__.SetTopMargin$quorum_number(padding);
+}
+this.GetDefaultMonospaceFontName = function() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultMonospaceFontName();
 }
 this.HasShadowWidth = function() {
      return this.Libraries_Interface_Controls_Control__.HasShadowWidth();
@@ -2865,6 +2871,9 @@ this.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener = func
 this.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
      return this.Libraries_Interface_Controls_Control__.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
 }
+this.GetDefaultProportionalFontName = function() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultProportionalFontName();
+}
 this.SetScaleFromCenter$quorum_number$quorum_number = function(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number$quorum_number(newX, newY);
 }
@@ -3227,6 +3236,9 @@ this.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, 
 }
 this.SetTopMargin$quorum_number = function(padding) {
      return this.Libraries_Interface_Controls_Control__.SetTopMargin$quorum_number(padding);
+}
+this.GetDefaultMonospaceFontName = function() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultMonospaceFontName();
 }
 this.HasShadowWidth = function() {
      return this.Libraries_Interface_Controls_Control__.HasShadowWidth();
@@ -6840,6 +6852,9 @@ webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To PalettehiddenButt
 webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteHeaderhiddenHeader", true);
 webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteLabelhiddenLabel", true);
 webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__palettePanel_().GetHashCode() + "", true);
+this.prototype.SetColliding$quorum_boolean(false);
+this.prototype.EnablePhysics2D$quorum_boolean(false);
+this.prototype.EnablePhysics3D$quorum_boolean(false);
 };
 this.SetupEditorItems = function () {
 var tempPalette = new quorum_WebEditor_EditorItem_();
