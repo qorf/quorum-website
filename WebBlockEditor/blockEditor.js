@@ -6581,9 +6581,6 @@ this.SetFullScreen$quorum_boolean = function(fullScreen) {
 this.SelectApplicationType = function() {
      return this.Libraries_Game_Game__.SelectApplicationType();
 }
-this.OnExit = function() {
-     return this.Libraries_Game_Game__.OnExit();
-}
 this.EnableTextureAutoResizing$quorum_boolean = function(resize) {
      return this.Libraries_Game_Game__.EnableTextureAutoResizing$quorum_boolean(resize);
 }
@@ -6758,6 +6755,18 @@ var deskConfig = this.prototype.GetDesktopConfiguration();
 deskConfig.Set_Libraries_Game_DesktopConfiguration__resizable_(true);
 this.prototype.StartGame();
 };
+this.OnExit = function () {
+this.editor = null;
+this.listener = null;
+this.palettePanel = null;
+this.palettePartition = null;
+this.editorPanel = null;
+this.editorPalette = null;
+this.editorBlocks = null;
+this.paletteItem = null;
+this.blocksItem = null;
+return true;
+};
 this.CreateGame = function () {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
@@ -6830,6 +6839,7 @@ this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEdi
 this.Get_WebEditor_BlockEditor__palettePanel_().Add$quorum_Libraries_Interface_Item2D(palette);
 palette.IncludeSuggestions$quorum_boolean(false);
 palette.Setup();
+palette.HideVerticalBars();
 var palettePartition = this.prototype.CreatePalettePartition();
 this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
@@ -6853,8 +6863,6 @@ webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteHeaderhiddenHead
 webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteLabelhiddenLabel", true);
 webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__palettePanel_().GetHashCode() + "", true);
 this.prototype.SetColliding$quorum_boolean(false);
-this.prototype.EnablePhysics2D$quorum_boolean(false);
-this.prototype.EnablePhysics3D$quorum_boolean(false);
 };
 this.SetupEditorItems = function () {
 var tempPalette = new quorum_WebEditor_EditorItem_();
