@@ -1,25 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.TableRow
-use Libraries.Web.Page.TableHeaderCell
-use Libraries.Web.Page.TableData
-use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Section
-use Libraries.Web.Page.TableHeader
-use Libraries.Web.Page.TableBody
 
 class EpiqCommittees is Lesson
     text dq = ""
@@ -30,188 +10,138 @@ class EpiqCommittees is Lesson
 
     action Setup
         LineBreak break //will be used multiple times
-        
+
         //html header stuff
-        SetWebPageTitle("EPIQ Committees - Quorum Programming Language")
+        SetWebPageTitle("Experience Programming in Quorum (EPIQ) - Quorum Programming Language")
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        Array<Division> divs = InitializeTutorialPage()
+        Array<Division> divs = InitializeIndex()
+        Division leftDiv = divs:Get(0)
         Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+        Division rightDiv = divs:Get(2)
 
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "EPIQ Committees", 1)
-        headDiv:AddText("This page describes the institutions and people that run EPIQ")
-        bodyDiv:Add(headDiv)
-
-        Section introSection
-        introSection:AddClassAttribute("flex flex-col gap-y-2")
-
-        introSection:AddParagraph("There are three primary committees that run the EPIQ conference.  The Quorum Outreach and Research Foundation is a lead non-profit that handles finances. Logistics of the meeting and planning are controlled by
-            the EPIQ Steering Committee, which collaborates with QORF and other partners. 
-            The EPIQ Curriculum Committee collaborates with a variety of partners 
-            on iterative improvements to the curriculum. For all committees, members 
-            are selected by popular vote 
-            of attendees of the conference. Voting members include:
-            1) registered attendees, 2) any committee members, 3) invited guests to the venue. Votes typically occur on the second to last day of the venue.
-")
-
-        AddHeading(introSection, "Steering Committee", 2)
-        introSection:AddParagraph("
-            The primary responsibilities of this committee include planning, registration, 
-            and working with hosting venues to ensure a smooth conference. Members handle
-            registration and scheduling details.")
-        introSection:Add(AddSteeringCommittee())
-
-        AddHeading(introSection, "Curriculum Committee", 2)
-        introSection:AddParagraph("
-            The primary responsibilities of this committee include writing lessons
-            to be included in the EPIQ and school curriculum, mapping curriculum 
-            to national or state standards, and collaborating with partners to ensure
-            the curriculum meets the needs of attendees and participating organizations.")
-        introSection:Add(AddCurriculumCommittee())
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full")
 
 
-        bodyDiv:Add(introSection)
+        Section header = makeImageBanner()
+        Section epiqIntro = makeEPIQIntro()
+        Section epiqCommitteePage = makeEPIQComitteeGallery()
 
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
 
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        bodyDiv:Add(header)
+        bodyDiv:Add(epiqIntro)
+        bodyDiv:Add(epiqCommitteePage)
+        
     end
 
-    private action AddSteeringCommittee returns WebTable
-        WebTable tableFormat = AddWebTable("Steering Committee")
-        TableBody tableBodyFormat = AddTableBody()
+    action makeImageBanner returns Section
+        
+        Section imageBanner
 
-        Array<text> tableHeaderArrayFormat
-        tableHeaderArrayFormat:Add("Who")
-        tableHeaderArrayFormat:Add("Affiliation") 
-        tableHeaderArrayFormat:Add("End of Term")
+        Division CTA
+        CTA:AddAttribute("tabindex","0")
+        CTA:AddClassAttribute("relative w-screen mx-0 px-0 flex items-center justify-center")
+        Image image
+        image:SetClassAttribute("top-0 left-0 w-full h-full object-cover")
+        image:SetAddress("media/userInterface/quorumAssets/epiq-header.png")
+        image:SetAlternate("A header of a professor helping students with it saying: Experience Programming in Quorum")
 
-        TableHeader theadFormat = AddTableHeaderRow(tableHeaderArrayFormat)
-        tableFormat:Add(theadFormat) 
+        CTA:Add(image)
 
-        Array<text> row2
-        row2:Add("Alex Hoffman")
-        row2:Add("University of Nevada, Las Vegas")
-        row2:Add("2026")
+        imageBanner:Add(CTA)
 
-        Array<text> row3
-        row3:Add("Andreas Stefik (Chair)")
-        row3:Add("University of Nevada, Las Vegas")
-        row3:Add("2024")
-
-        Array<text> row4
-        row4:Add("Art Rizzino")
-        row4:Add("Blind and Vision Rehabilitation Services of Pittsburgh")
-        row4:Add("2024")
-
-        Array<text> row5
-        row5:Add("Mike Face")
-        row5:Add("Washington State School for the Blind")
-        row5:Add("2025")
-
-        Array<text> row6
-        row6:Add("Sara Larkin")
-        row6:Add("Iowa Educational Services for the Blind and Visually Impaired")
-        row6:Add("2025")
-
-        tableBodyFormat:Add(AddTableBodyRow(row6))
-        tableBodyFormat:Add(AddTableBodyRow(row5))
-        tableBodyFormat:Add(AddTableBodyRow(row4))
-        tableBodyFormat:Add(AddTableBodyRow(row2))
-        tableBodyFormat:Add(AddTableBodyRow(row3))
-
-        tableFormat:Add(tableBodyFormat)
-        return tableFormat
+        return imageBanner
     end
 
-    private action AddCurriculumCommittee returns WebTable
-        WebTable tableFormat = AddWebTable("Steering Committee")
-        TableBody tableBodyFormat = AddTableBody()
+    action makeEPIQIntro returns Section
+        Section introEpiq
+        introEpiq:AddAttribute("aria-live", "polite")
+        introEpiq:AddClassAttribute("flex flex-col w-full justify-center px-5% lg:px-10% space-y-8 pt-8 pb-8 py-12")
+        
+        Paragraph h1 
+        h1:AddText("EPIQ Committees")
+        h1:AddAttribute("tabindex","0")
+        h1:AddClassAttribute("font-bold text-center text-4xl py-4")
+        introEpiq:Add(h1)
 
-        Array<text> tableHeaderArrayFormat
-        tableHeaderArrayFormat:Add("Who")
-        tableHeaderArrayFormat:Add("Affiliation") 
-        tableHeaderArrayFormat:Add("End of Term")
+        Division words
+        Paragraph p1
+        p1:AddClassAttribute("text-center")
+        p1:AddText("There are three primary committees that run the EPIQ conference. The Quorum Outreach and Research Foundation is a lead non-profit that handles finances. Logistics of the meeting and planning are controlled by the EPIQ Steering Committee, which collaborates with QORF and other partners. The EPIQ Curriculum Committee collaborates with a variety of partners on iterative improvements to the curriculum. For all committees, members are selected by popular vote of attendees of the conference. Voting members include: 1) registered attendees, 2) any committee members, 3) invited guests to the venue. Votes typically occur on the second to last day of the venue.")
+    
+        words:Add(p1)
 
-        TableHeader theadFormat = AddTableHeaderRow(tableHeaderArrayFormat)
-        tableFormat:Add(theadFormat) 
+        introEpiq:Add(words)
 
-        Array<text> row
-        row:Add("Andrew Zacarias")
-        row:Add("Albuquerque Public Schools")
-        row:Add("2024")
-
-        Array<text> row2
-        row2:Add("Ko Inamura")
-        row2:Add("Lincoln Public Schools")
-        row2:Add("2024")
-
-        Array<text> row3
-        row3:Add("Gina Fugate")
-        row3:Add("Maryland School for the Blind")
-        row3:Add("2025")
-
-        Array<text> row4
-        row4:Add("Steve Raparelli")
-        row4:Add("Seattle Public Schools")
-        row4:Add("2025")
-
-        Array<text> row5
-        row5:Add("Amanda Rodda (Chair)")
-        row5:Add("Washington State School for the Blind")
-        row5:Add("2024")
-
-        Array<text> row6
-        row6:Add("Tim Lockwood")
-        row6:Add("Nebraska Center for the Education for the Children with Visual Impairment and Blindness")
-        row6:Add("2024")
-
-        tableBodyFormat:Add(AddTableBodyRow(row2))
-        tableBodyFormat:Add(AddTableBodyRow(row3))
-        tableBodyFormat:Add(AddTableBodyRow(row6))
-        tableBodyFormat:Add(AddTableBodyRow(row4))
-        tableBodyFormat:Add(AddTableBodyRow(row5))
-
-        tableFormat:Add(tableBodyFormat)
-
-        return tableFormat
+        return introEpiq
     end
 
-    private action GetDataCell(text value) returns TableData
-        TableData data
-        data:AddText(value)
-        return data
+
+    action makeEPIQComitteeGallery returns Section
+
+        Section team
+        team:AddClassAttribute("flex flex-col w-full justify-center px-5% lg:px-10% space-y-8 pt-8 pb-8 py-12")
+
+        Division teamContainer
+        teamContainer:SetIdentifier("teamContainer")
+        teamContainer:AddClassAttribute("grid gap-x-28 grid-auto-rows sm:grid-cols-1 items-center")
+
+        Division textAndStreak
+        textAndStreak:AddClassAttribute("text-center")
+
+        AddHeading(textAndStreak, "Steering Committee", 1)
+   
+        Paragraph p1
+        p1:AddText("The primary responsibilities of this committee include planning, registration, and working with hosting venues to ensure a smooth conference. Members handle registration and scheduling details.")
+        
+        textAndStreak:Add(p1)
+
+        team:Add(textAndStreak)
+
+        Division teammates
+        teammates:AddClassAttribute("grid gap-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1justify-between")
+
+        TeamPhoto photo1
+        photo1:Create("media/userInterface/quorumAssets/placeholder.png","Sara Larkin","Iowa Educational Services for the Blind and Visually Impaired","2024", "Photo of Sara")
+        teammates:Add(photo1)
+
+        TeamPhoto photo2
+        photo2:Create("media/userInterface/quorumAssets/placeholder.png","Mike Face","Washington State School for the Blind", "2025", "Photo of Mike")
+        teammates:Add(photo2)
+       
+        TeamPhoto photo4
+        photo4:Create("media/userInterface/quorumAssets/placeholder.png","Art Rizzino","Blind and Vision Rehabilitation Services of Pittsburgh", "2024", "Photo of Art")
+        teammates:Add(photo4)
+
+        TeamPhoto photo6
+        photo6:Create("media/userInterface/cherise.png","Cherise Jerrard","SASED Vision Program", "2024", "Photo of Cherise")
+        teammates:Add(photo6)
+
+        TeamPhoto photo3
+        photo3:Create("media/userInterface/alex.png","Alex Hoffman","University of Nevada, Las Vegas", "2026", "Photo of Alex")
+        teammates:Add(photo3)
+
+
+        TeamPhoto photo5
+        photo5:Create("media/userInterface/quorumAssets/placeholder.png","Andreas Stefik (Chair)","University of Nevada, Las Vegas", "2024", "Photo of Stefik")
+        teammates:Add(photo5)
+
+        teamContainer:Add(teammates)
+        team:Add(teamContainer)
+
+        return team
     end
+
 
     action GetLinkName returns text
-        return "EPIQ Committees"
+        return "Committee Page for Computer Science Professional Development in Quorum"
     end
 
     action GetMetaDescription returns text
-        return "Learn about the committees involved in the Experience Programming in Quorum annual conference."
-    end
-
-    action GetSummaryName returns text
-        return "EPIQ Committees"
-    end
-
-    action GetImageLocation returns text
-        return "/media/games/Animation2D.png"
-    end
-
-    action GetName returns text
-        return "EPIQ Committees"
-    end
-
-    action GetShortDescription returns text
-        return "the committees involved in the EPIQ conference."
+        return "Join an EPIQ community of people learning the Quorum programming language at our annual conference: Experience Programming in Quorum."
     end
 
     action GetLocation returns text

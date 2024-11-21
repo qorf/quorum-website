@@ -1,0 +1,77 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.System.File
+
+class Accordion is Division
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+
+    Image image = undefined
+    Division imageDiv = undefined
+    Heading heading_card = undefined
+    Button previewButton = undefined
+    Link link_course = undefined
+    Paragraph p_description = undefined
+    text buttonText = "View Course"
+
+    action CreateAccordion(text question, text answer) returns Array<WebTag>
+
+      Division container
+      container:AddClassAttribute("py-4 mx-auto flex flex-col")
+
+      Span rightChevronIcon
+      rightChevronIcon:SetIdentifier("accordion-icon")
+      rightChevronIcon:AddClassAttribute("transform transition-transform")
+      HtmlFileLoader rightChevronIconFile
+      File fileRight
+      fileRight:SetPath("html/media/userInterface/SVG/Chevron.svg")
+      rightChevronIconFile:SetLoaded(fileRight:Read())
+      rightChevronIcon:AddText(rightChevronIconFile:ToText())
+
+      Button rightArrow
+      rightArrow:SetIdentifier("accordion-btn")
+      rightArrow:AddClassAttribute("flex justify-start text-left text-3xl mb-2  justify-between flex-row px-4 accordion disabled:opacity-50 disabled:cursor-not-allowed")
+      rightArrow:AddText(question)
+      rightArrow:AddText(rightChevronIcon:ToText())
+      rightArrow:SetOnClick("
+        var accordElement = document.getElementsByClassName('accordion');
+        
+    for (i = 0; i < accordElement.length; i++) {
+      accordElement[i].addEventListener('click', function() {
+        this.classList.toggle('active');
+        var panel = this.nextElementSibling;
+        if (panel.style.display === 'grid') {
+          panel.style.display = 'none';
+        } else {
+          panel.style.display = 'grid';
+        }
+      });
+    }
+      ")
+
+      Division panel
+      panel:AddClassAttribute("panel p-4 px-8 py-4 text-left h-full flex flex-col justify-start mb-2 max-w-screen-sm")
+      Paragraph p1
+      p1:AddClassAttribute("text-sm mb-4")
+      p1:AddAttribute("tabindex","0")
+      p1:AddText(answer)
+      panel:Add(p1)
+
+      container:Add(rightArrow)
+      container:Add(panel)
+
+      Add(container)
+
+      Array<WebTag> tags
+      tags:Add(me)
+      tags:Add(rightArrow)
+      tags:Add(panel)
+      return tags
+    end
+
+
+   
+end
