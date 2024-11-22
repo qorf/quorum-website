@@ -6839,7 +6839,6 @@ this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEdi
 this.Get_WebEditor_BlockEditor__palettePanel_().Add$quorum_Libraries_Interface_Item2D(palette);
 palette.IncludeSuggestions$quorum_boolean(false);
 palette.Setup();
-palette.HideVerticalBars();
 var palettePartition = this.prototype.CreatePalettePartition();
 this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());

@@ -609,10 +609,12 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           head.appendChild(script);
           gameRunning = false;
           try {
-            Start();
-            if(!gameRunning) {
-              runButton.disabled = false;
-            }
+            setTimeout(() => {
+              Start();
+              if(!gameRunning) {
+                runButton.disabled = false;
+              }
+            }, 10);
           } catch(error) {
             outputRegion.innerHTML += error.message;
             head.removeChild(script);
