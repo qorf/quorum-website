@@ -6843,7 +6843,7 @@ palette.Setup();
 var palettePartition = this.prototype.CreatePalettePartition();
 this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
-webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Block Editor", true);
+webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, \nswipe right to find the items in the code editor, swipe left and you will find the palette.\n Navigation by headings is recommended if you want to find other landmarks.", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editorPanel_());
 this.Get_WebEditor_BlockEditor__editorPanel_().Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editor_());
 var resizeListener = new quorum_WebEditor_CanvasResizeListener_();
@@ -7132,7 +7132,7 @@ this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionDown();
 }
 else if( (elementName == "Move Placeholder Block Up")) {
 if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
-this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionDown();
+this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionUp();
 }
 }
 else if( (elementName == "Drop Block")) {
