@@ -609,10 +609,12 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
           head.appendChild(script);
           gameRunning = false;
           try {
-            Start();
-            if(!gameRunning) {
-              runButton.disabled = false;
-            }
+            setTimeout(() => {
+              Start();
+              if(!gameRunning) {
+                runButton.disabled = false;
+              }
+            }, 10);
           } catch(error) {
             outputRegion.innerHTML += error.message;
             head.removeChild(script);
@@ -651,6 +653,18 @@ var blockEditorFullscreen = function() {
   const editorDiv = document.getElementById("BlockEditor");
   if(editorDiv.hasAttribute('style')) {
     editorDiv.removeAttribute('style');
+    const codingDiv = document.getElementById("coding:").parentNode;
+    codingDiv.append(editorDiv);
+    const mainDiv = document.getElementById("main");
+    const footerDiv = document.getElementById("footer");
+    const navBar = document.getElementById("navbar");
+    mainDiv.ariaHidden = false;
+    mainDiv.inert = false;
+    footerDiv.ariaHidden = false;
+    footerDiv.inert = false;
+    navBar.ariaHidden = false;
+    navBar.inert = false;
+    document.body.style.overflowY = 'auto';
   } else {
     editorDiv.style.position = "fixed";
     editorDiv.style.width = "100dvw";
@@ -659,6 +673,17 @@ var blockEditorFullscreen = function() {
     editorDiv.style.left = "0";
     editorDiv.style.top = "0";
     editorDiv.style.zIndex = "10";
+    const mainDiv = document.getElementById("main");
+    const footerDiv = document.getElementById("footer");
+    const navBar = document.getElementById("navbar");
+    mainDiv.ariaHidden = true;
+    mainDiv.inert = true;
+    footerDiv.ariaHidden = true;
+    footerDiv.inert = true;
+    navBar.ariaHidden = true;
+    navBar.inert = true;
+    document.body.style.overflowY = 'hidden';
+    document.body.append(editorDiv);
   }
 }
 
