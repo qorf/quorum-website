@@ -117,16 +117,20 @@ palettePanel = undefined
  action CreateGame
         GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
-webAccess:AddHiddenHeader("Navigation Area", "Navigation Area")
+webAccess:AddHiddenHeader("Navigation Area", "Navigation Menu, Landmark 1 of 5,
+ You are on the Navigation Menu, swipe right to find buttons that will take you directly to the palette or editor. ")
         webAccess:AddHiddenButton("Go To Palette")
 webAccess:AddHiddenButton("Go To Editor")
 webAccess:AddHiddenButton("Exit")
-webAccess:AddHiddenHeader("Block Control Area", "Block Control Area")
+webAccess:AddHiddenHeader("Block Control Area", "Block Control Menu, Landmark 2 of 5, 
+You are on the Block Control Menu, swipe right to find buttons to move blocks around or delete them.")
         webAccess:AddHiddenButton("Pick Up Current")
-        webAccess:AddHiddenSlider("Block Mover", 1, 1, 1)
+webAccess:AddHiddenButton("Move Placeholder Block Up")
+webAccess:AddHiddenButton("Move Placeholder Block Down")
 webAccess:AddHiddenButton("Drop Block")
         webAccess:AddHiddenButton("Delete")
-        webAccess:AddHiddenHeader("Edit Area", "Edit Area")
+        webAccess:AddHiddenHeader("Edit Area", "Edit Menu, Landmark 3 of 5, 
+You are on the Edit Menu, swipe right to find buttons to help you Undo and Redo in the block editor")
         webAccess:AddHiddenButton("Undo")
 webAccess:AddHiddenButton("Redo")
         webAccess:AddWebAccessibilityListener(me)
@@ -191,9 +195,11 @@ editorPanel:SetName("Editor Panel")
 editorPanel:SetAccessibilityCode(9)
         editorPanel:SetFocusable(false)
         
-        webAccess:AddHiddenHeader("paletteHeader", "BlockPalette", true)
-        webAccess:AddHiddenLabel("paletteLabel", "The next item should be the Block Palette. Activate an item in the palette to insert into the text. Remember you need to confirm the placement of the block and that can be
-done in the Block Control Area using the Drop Block button.", true)
+        webAccess:AddHiddenHeader("paletteHeader", "Block Palette, Landmark 4 of 5, You are on the Block Palette Header, 
+swipe right to find the items in the block palette, swipe left and you will find the other menus.
+ Navigation by headings is recommended if you want to find other landmarks.", true)
+        webAccess:AddHiddenLabel("paletteLabel", "Block Palette Help. Activate or double tap an item in the palette to insert into the text. 
+Landmark 2 will point you to buttons that can help move the activated palette item in the editor.", true)
         Add(palettePanel)
         palettePanel:Add(palette)
         palette:IncludeSuggestions(false)
@@ -203,8 +209,9 @@ done in the Block Control Area using the Drop Block button.", true)
         Add(palettePartition)
         AddPartitionInputTable(palettePanel)
         
-webAccess:AddHiddenHeader("editorHeader", "Blocks", true)
-        webAccess:AddHiddenLabel("currentBlock", "This would tell you the currently selected block if Gabe knew what he was doing: ", true)
+webAccess:AddHiddenHeader("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, 
+swipe right to find the items in the code editor, swipe left and you will find the palette.
+ Navigation by headings is recommended if you want to find other landmarks.", true)
         Add(editorPanel)
 editorPanel:Add(editor)
         
@@ -219,14 +226,24 @@ editorPanel:Add(editor)
         AddDefaultKeys()
         paletteItem:Focus()
         AddFocusListener(me)
-        webAccess:SetHiddenOnElement("Go To PalettehiddenButton", true)
-webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", true)
-webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", true)
-        webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), true)
         SetColliding(false)
 end
     
     action SetupEditorItems
+GameStateManager manager
+        WebApplication webApp = cast(WebApplication, manager:GetApplication())
+        if webApp:GetWebOperatingSystem():Contains("Android") or webApp:GetWebOperatingSystem():Contains("iOS")
+ or webApp:GetWebOperatingSystem():Contains("Mobile")
+EditorItem tempPalette
+        paletteItem = tempPalette
+        paletteItem:SetName("Block Editor, You are in the Block Editor.
+ If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding
+ to 3 menus, the block palette, and then the block editor. Swipe Left and Right to navigate item by item.
+ Swipe up and down to navigate by landmarks.")
+        paletteItem:SetTarget(GetBlockPalette())
+            Add(paletteItem)
+            return now
+        end
         EditorItem tempPalette
         paletteItem = tempPalette
         paletteItem:SetName("Palette, To navigate to the palette press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the palette press Shift+Enter.")
@@ -517,6 +534,14 @@ if not editorBlocks:IsKeyboardMovingBlocks()
                 webAccess:SetHiddenSliderValueText("Block Mover", blockName)
                 webAccess:FocusHiddenElement("Block Mover")
 end
+        elseif elementName = "Move Placeholder Block Down"
+            if editorBlocks:IsKeyboardMovingBlocks()
+                editorBlocks:MoveSelectionDown()
+            end
+elseif elementName = "Move Placeholder Block Up"
+if editorBlocks:IsKeyboardMovingBlocks()
+                editorBlocks:MoveSelectionUp()
+            end
         elseif elementName = "Drop Block"
 if editorBlocks:IsKeyboardMovingBlocks()
                 editorBlocks:ConfirmKeyboardMovingBlocks()
@@ -555,7 +580,6 @@ webAccess:FocusHiddenElement("Block Mover")
     end
     
     action HiddenElementClicked(WebAccessibilityEvent event)
-        output "Something clicked on"
         Item clicked = event:GetItem()
         if clicked is Block
             if editor:IsKeyboardMovingBlocks()
@@ -565,26 +589,7 @@ webAccess:FocusHiddenElement("Block Mover")
     end
     
 action GainedFocus(FocusEvent event)
-GameStateManager manager
-        WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
-        if IsInPalette(event:GetNewFocus())
-webAccess:SetHiddenOnElement("Go To PalettehiddenButton", true)
-            webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), false)
-webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", false)
-webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", false)
-            webAccess:SetHiddenOnElement("Go To EditorhiddenButton", false)
-            webAccess:SetHiddenOnElement(cast(text, editorPanel:GetHashCode()), true)
-webAccess:SetHiddenOnElement("editorHeaderhiddenHeader", true)
-        elseif IsInBlockEditor(event:GetNewFocus())
-webAccess:SetHiddenOnElement("Go To PalettehiddenButton", false)
-            webAccess:SetHiddenOnElement(cast(text, palettePanel:GetHashCode()), true)
-webAccess:SetHiddenOnElement("paletteHeaderhiddenHeader", true)
-webAccess:SetHiddenOnElement("paletteLabelhiddenLabel", true)
-            webAccess:SetHiddenOnElement("Go To EditorhiddenButton", true)
-            webAccess:SetHiddenOnElement(cast(text, editorPanel:GetHashCode()), false)
-webAccess:SetHiddenOnElement("editorHeaderhiddenHeader", false)
-        end
-    end
+end
 
     action LostFocus(FocusEvent event)
 

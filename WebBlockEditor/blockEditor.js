@@ -6770,16 +6770,17 @@ return true;
 this.CreateGame = function () {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
-webAccess.AddHiddenHeader$quorum_text$quorum_text("Navigation Area", "Navigation Area");
+webAccess.AddHiddenHeader$quorum_text$quorum_text("Navigation Area", "Navigation Menu, Landmark 1 of 5,\n You are on the Navigation Menu, swipe right to find buttons that will take you directly to the palette or editor. ");
 webAccess.AddHiddenButton$quorum_text("Go To Palette");
 webAccess.AddHiddenButton$quorum_text("Go To Editor");
 webAccess.AddHiddenButton$quorum_text("Exit");
-webAccess.AddHiddenHeader$quorum_text$quorum_text("Block Control Area", "Block Control Area");
+webAccess.AddHiddenHeader$quorum_text$quorum_text("Block Control Area", "Block Control Menu, Landmark 2 of 5, \nYou are on the Block Control Menu, swipe right to find buttons to move blocks around or delete them.");
 webAccess.AddHiddenButton$quorum_text("Pick Up Current");
-webAccess.AddHiddenSlider$quorum_text$quorum_integer$quorum_integer$quorum_integer("Block Mover", 1, 1, 1);
+webAccess.AddHiddenButton$quorum_text("Move Placeholder Block Up");
+webAccess.AddHiddenButton$quorum_text("Move Placeholder Block Down");
 webAccess.AddHiddenButton$quorum_text("Drop Block");
 webAccess.AddHiddenButton$quorum_text("Delete");
-webAccess.AddHiddenHeader$quorum_text$quorum_text("Edit Area", "Edit Area");
+webAccess.AddHiddenHeader$quorum_text$quorum_text("Edit Area", "Edit Menu, Landmark 3 of 5, \nYou are on the Edit Menu, swipe right to find buttons to help you Undo and Redo in the block editor");
 webAccess.AddHiddenButton$quorum_text("Undo");
 webAccess.AddHiddenButton$quorum_text("Redo");
 webAccess.AddWebAccessibilityListener$quorum_Libraries_Interface_Events_WebAccessibilityListener(this.prototype);
@@ -6833,8 +6834,8 @@ this.Get_WebEditor_BlockEditor__editorPanel_().SetHorizontalLayoutMode$quorum_in
 this.Get_WebEditor_BlockEditor__editorPanel_().SetName$quorum_text("Editor Panel");
 this.Get_WebEditor_BlockEditor__editorPanel_().SetAccessibilityCode$quorum_integer(9);
 this.Get_WebEditor_BlockEditor__editorPanel_().SetFocusable$quorum_boolean(false);
-webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("paletteHeader", "BlockPalette", true);
-webAccess.AddHiddenLabel$quorum_text$quorum_text$quorum_boolean("paletteLabel", "The next item should be the Block Palette. Activate an item in the palette to insert into the text. Remember you need to confirm the placement of the block and that can be\ndone in the Block Control Area using the Drop Block button.", true);
+webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("paletteHeader", "Block Palette, Landmark 4 of 5, You are on the Block Palette Header, \nswipe right to find the items in the block palette, swipe left and you will find the other menus.\n Navigation by headings is recommended if you want to find other landmarks.", true);
+webAccess.AddHiddenLabel$quorum_text$quorum_text$quorum_boolean("paletteLabel", "Block Palette Help. Activate or double tap an item in the palette to insert into the text. \nLandmark 2 will point you to buttons that can help move the activated palette item in the editor.", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__palettePanel_());
 this.Get_WebEditor_BlockEditor__palettePanel_().Add$quorum_Libraries_Interface_Item2D(palette);
 palette.IncludeSuggestions$quorum_boolean(false);
@@ -6842,8 +6843,7 @@ palette.Setup();
 var palettePartition = this.prototype.CreatePalettePartition();
 this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
-webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Blocks", true);
-webAccess.AddHiddenLabel$quorum_text$quorum_text$quorum_boolean("currentBlock", "This would tell you the currently selected block if Gabe knew what he was doing: ", true);
+webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Block Editor", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editorPanel_());
 this.Get_WebEditor_BlockEditor__editorPanel_().Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editor_());
 var resizeListener = new quorum_WebEditor_CanvasResizeListener_();
@@ -6857,13 +6857,19 @@ this.prototype.SetupEditorItems();
 this.prototype.AddDefaultKeys();
 this.Get_WebEditor_BlockEditor__paletteItem_().Focus();
 this.prototype.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(this.prototype);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To PalettehiddenButton", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteHeaderhiddenHeader", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteLabelhiddenLabel", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__palettePanel_().GetHashCode() + "", true);
 this.prototype.SetColliding$quorum_boolean(false);
 };
 this.SetupEditorItems = function () {
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+var webApp = global_CheckCast(manager.GetApplication(), "Libraries.Game.WebApplication");
+if (((webApp.GetWebOperatingSystem().Contains$quorum_text("Android") || webApp.GetWebOperatingSystem().Contains$quorum_text("iOS")) || webApp.GetWebOperatingSystem().Contains$quorum_text("Mobile"))) {
+var tempPalette = new quorum_WebEditor_EditorItem_();
+this.paletteItem = tempPalette;
+this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Block Editor, You are in the Block Editor.\n If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding\n to 3 menus, the block palette, and then the block editor. Swipe Left and Right to navigate item by item.\n Swipe up and down to navigate by landmarks.");
+this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
+this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
+return;
+}
 var tempPalette = new quorum_WebEditor_EditorItem_();
 this.paletteItem = tempPalette;
 this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Palette, To navigate to the palette press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the palette press Shift+Enter.");
@@ -7119,6 +7125,16 @@ webAccess.SetHiddenSliderValueText$quorum_text$quorum_text("Block Mover", blockN
 webAccess.FocusHiddenElement$quorum_text("Block Mover");
 }
 }
+else if( (elementName == "Move Placeholder Block Down")) {
+if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
+this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionDown();
+}
+}
+else if( (elementName == "Move Placeholder Block Up")) {
+if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
+this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionDown();
+}
+}
 else if( (elementName == "Drop Block")) {
 if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
 this.Get_WebEditor_BlockEditor__editorBlocks_().ConfirmKeyboardMovingBlocks();
@@ -7160,7 +7176,6 @@ webAccess.FocusHiddenElement$quorum_text("Block Mover");
 }
 };
 this.HiddenElementClicked$quorum_Libraries_Interface_Events_WebAccessibilityEvent = function (event) {
-global_Output_("Something clicked on");
 var clicked = event.GetItem();
 if (global_InstanceOf(clicked,'Libraries.Interface.Controls.Blocks.Block')) {
 if (this.Get_WebEditor_BlockEditor__editor_().IsKeyboardMovingBlocks()) {
@@ -7169,26 +7184,6 @@ this.Get_WebEditor_BlockEditor__editor_().ConfirmKeyboardMovingBlocks();
 }
 };
 this.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent = function (event) {
-var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
-if (this.prototype.IsInPalette$quorum_Libraries_Interface_Item(event.GetNewFocus())) {
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To PalettehiddenButton", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__palettePanel_().GetHashCode() + "", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteHeaderhiddenHeader", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteLabelhiddenLabel", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To EditorhiddenButton", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__editorPanel_().GetHashCode() + "", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("editorHeaderhiddenHeader", true);
-}
-else if( this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(event.GetNewFocus())) {
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To PalettehiddenButton", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__palettePanel_().GetHashCode() + "", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteHeaderhiddenHeader", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("paletteLabelhiddenLabel", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("Go To EditorhiddenButton", true);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean(this.Get_WebEditor_BlockEditor__editorPanel_().GetHashCode() + "", false);
-webAccess.SetHiddenOnElement$quorum_text$quorum_boolean("editorHeaderhiddenHeader", false);
-}
 };
 this.LostFocus$quorum_Libraries_Interface_Events_FocusEvent = function (event) {
 };
