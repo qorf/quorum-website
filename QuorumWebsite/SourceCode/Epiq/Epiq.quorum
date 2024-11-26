@@ -1,27 +1,5 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.InlineFrame
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Form
-use Libraries.Web.Page.Input
-use Libraries.Web.Page.Label
-use Libraries.Web.Page.Script
+use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.Web.Page.Section
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.Heading
-use Libraries.Web.Page.OrderedList
 
 class Epiq is Lesson
     text dq = ""
@@ -38,94 +16,198 @@ class Epiq is Lesson
         AddDefaultHeaders()
 
         //Figure out getting main regions properly.
-        Array<Division> divs = InitializeTutorialPage()
+        Array<Division> divs = InitializeIndex()
         Division leftDiv = divs:Get(0)
         Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+        Division rightDiv = divs:Get(2)
 
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Professional Development for Teachers", 1)
-        headDiv:AddParagraph("The 15th Annual Experience Programming in Quorum (EPIQ 2024). July 8th - 12th, 2024 at the Washington State School for the Blind.")
-        bodyDiv:Add(headDiv)
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full")
 
 
-        Section introSection
-        introSection:AddClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(introSection, "Professional Development", 2)
-        introSection:AddParagraph("This year's workshop is devoted to teaching computer science in practice
-        with blocks and Quorum. Content choices are being explored and ideas are welcome. 
-        Each day attendees will focus on select programming goals and build upon the previous day's 
-        experience.")
-
-        Section scheduleSection
-        scheduleSection:AddClassAttribute("flex flex-col gap-y-2")
+        Section header = makeImageBanner()
+        Section epiqIntro = makeEPIQIntro()
+        Section epiqAboutPage = makeEPIQAbout()
+        Section epiqCommitteePage = makeEPIQComittee()
 
 
-        Link scheduleLink
-        scheduleLink:AddClassAttribute("border-quorum-blue-50 border-solid border-[2px] w-fit px-4 py-2 rounded-2xl text-quorum-blue-150")
-        scheduleLink:AddText("EPIQ 2024 Schedule")
-        scheduleLink:SetAddress("https://docs.google.com/spreadsheets/d/1oA0f0GU5_8Y7RHT8ZSTGb4Cl1FFxCtdFu8GmEMRTjY8")
-        scheduleSection:Add(scheduleLink)
-
-
-        Section committeSection
-        committeSection:AddClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(committeSection, "Committees and Awards",2)
-        committeSection:AddParagraph("
-            For more information on the organization of EPIQ, the committees that make
-            it function, and the awards participants have received, reference the material below.")
+        bodyDiv:Add(header)
+        bodyDiv:Add(epiqIntro)
+        bodyDiv:Add(epiqAboutPage)
+        bodyDiv:Add(epiqCommitteePage)
         
-        Link committeeLink
-        committeeLink:AddClassAttribute("border-quorum-blue-50 border-solid border-[2px] w-fit px-4 py-2 rounded-2xl text-quorum-blue-150")
-        committeeLink:AddText("EPIQ Committees")
-        committeeLink:SetAddress("/committees.html")
-        committeSection:Add(committeeLink)
+    end
 
-        Link awardLink
-        awardLink:AddClassAttribute("border-quorum-blue-50 border-solid border-[2px] w-fit px-4 py-2 rounded-2xl text-quorum-blue-150")
-        awardLink:AddText("EPIQ Awards")
-        awardLink:SetAddress("/awards.html")
-        committeSection:Add(awardLink)
+    action makeImageBanner returns Section
+        
+        Section imageBanner
 
-        Section section_other_issues
-        section_other_issues:SetClassAttribute("flex flex-col gap-y-3")
-        Heading h1_2 = section_other_issues:AddHeading("Questions? Contact Us", 1)
-        h1_2:SetClassAttribute("text-2xl font-bold")
+        Division CTA
+        CTA:AddAttribute("tabindex","0")
+        CTA:AddClassAttribute("relative w-screen mx-0 px-0 flex items-center justify-center")
+        Image image
+        image:SetClassAttribute("top-0 left-0 w-full h-full object-cover")
+        image:SetAddress("media/userInterface/quorumAssets/epiq-header.png")
+        image:SetAlternate("A header of a professor helping students with it saying: Experience Programming in Quorum")
 
-        Paragraph p_other_issues
-        p_other_issues:AddText("If you have a question, please contact us on the ")
-        Link link_other_issues
-        link_other_issues:SetAddress("https://groups.google.com/g/quorum-language")
-        link_other_issues:AddText("Quorum Forum")
-        link_other_issues:AddClassAttribute("underline text-quorum-blue-100")
-        p_other_issues:Add(link_other_issues)
-        p_other_issues:AddText(", and let us know how we can help!")
-        section_other_issues:Add(p_other_issues)
+        CTA:Add(image)
 
-        OrderedList ol_other_issues
-        ol_other_issues:AddClassAttribute("list-decimal list-outside pl-8")
-        ListItem li_other_issues
-        li_other_issues:AddText("Login to a google account")
-        ListItem li_other_issues2
-        li_other_issues2:AddText("Select the "+dq+"Ask to join group"+dq+" button")
+        imageBanner:Add(CTA)
 
-        ol_other_issues:Add(li_other_issues)
-        ol_other_issues:Add(li_other_issues2)
+        return imageBanner
+    end
 
-        section_other_issues:Add(ol_other_issues)
+    action makeEPIQIntro returns Section
+        Section introEpiq
+        introEpiq:AddAttribute("aria-live", "polite")
+        introEpiq:AddClassAttribute("flex flex-col w-full py-4 items-center justify-center px-5% lg:px-10% space-y-8 pt-8 pb-8")
+        
+        Paragraph h1 
+        h1:AddText("Professional Development for Teachers")
+        h1:AddAttribute("tabindex","0")
+        h1:AddClassAttribute("font-bold text-center text-4xl py-4")
+        introEpiq:Add(h1)
 
-        bodyDiv:Add(introSection)
-        bodyDiv:Add(scheduleSection)
-        bodyDiv:Add(committeSection)
+        Division words
+        Paragraph p1
+        p1:AddClassAttribute("text-center")
+        p1:AddText("Join us this summer for the 15th Annual Experience Programming in Quorum (EPIQ 2024). July 8th - 12th, 2024 at the Washington State School for the Blind.")
+        Paragraph p2
+        p2:AddClassAttribute("text-center")
+        p2:AddText("This year's workshop is devoted to teaching computer science in practice with blocks and Quorum. Content choices are being explored and ideas are welcome. Each day attendees will focus on select programming goals and build upon the previous day's experience.")
 
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
+        words:Add(p1)
+        words:Add(p2)
 
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        introEpiq:Add(words)
+
+        Division imageHolder
+        imageHolder:AddClassAttribute("grid w-full lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1")
+        Array<text> imageAddress
+        Array<text> imageAlt
+
+        imageAddress:Add("media/userInterface/quorumAssets/epiq-home-1.png")
+        imageAlt:Add("Teachers working on a quorum project in a learning workshop")
+
+        imageAddress:Add("media/userInterface/quorumAssets/epiq-home-2.png")
+        imageAlt:Add("Sara Larkin teaching a group of teachers")
+
+        imageAddress:Add("media/userInterface/quorumAssets/epiq-home-3.png")
+        imageAlt:Add("One man pondering on a quorum project in a learning workshop and another one helping")
+
+        imageAddress:Add("media/userInterface/quorumAssets/epiq-home-4.png")
+        imageAlt:Add("Teachers learning in an auditorium")
+
+        integer i = 0
+        repeat until i > imageAddress:GetSize() - 1
+            Image image
+            image:SetAddress(imageAddress:Get(i))
+            image:SetAlternate(imageAlt:Get(i))
+            image:AddClassAttribute("max-w-[600px] w-full max-h-[600px]")
+            imageHolder:Add(image)
+            i = i + 1
+        end
+        introEpiq:Add(imageHolder)
+
+        Division words2
+        Paragraph p3
+        p3:AddClassAttribute("text-center")
+        p3:AddText("We strive to help anyone to be able to learn how to program. By using Quorum at your school, not only you are teaching students valuable programming skills, but also advocating for accessible programming. Find out what we will be teaching for this conference by viewing the EPIQ 2024 schedule below.")
+        words2:Add(p3)
+        introEpiq:Add(words2)
+
+        Division linkContainter
+        linkContainter:AddClassAttribute("py-8 items-center object-center align-center")
+        Link link
+        link:AddText("Get event details")
+        link:SetAddress("/eventEpiq.html")
+        link:AddAttribute("data-test", "get-started-button-2")
+        link:AddClassAttribute("bg-quorum-blue-100 w-fit px-4 py-2 rounded-3xl text-neutral-grey-95 font-bold justify-self-center")
+        linkContainter:Add(link)
+
+        introEpiq:Add(linkContainter)
+
+        return introEpiq
+
+    end
+
+    action makeEPIQAbout returns Section
+    
+        Section epiqAbout
+        epiqAbout:AddAttribute("aria-live", "polite")
+        epiqAbout:AddClassAttribute("flex flex-col justify-center items-center w-full px-5% lg:px-10% space-y-8 pt-8 pb-8")
+            
+        Paragraph h1 
+        h1:AddText("Why do we host EPIQ?")
+        h1:AddAttribute("tabindex","0")
+        h1:AddClassAttribute("font-bold text-center text-4xl pt-4")
+        epiqAbout:Add(h1)
+
+        Division words
+        Paragraph p1
+        p1:AddClassAttribute("text-center")
+        p1:AddText("The Experience Programming in Quorum (EPIQ) workshop is a 5-day annual get together between teachers and Quorum experts that want to teach K-12 students computer science. It is fun, engaging, community-based experience, that fosters accessibility advocacy, and has new code to consider every year.")
+    
+        words:Add(p1)
+
+        epiqAbout:Add(words)
+
+        Image image
+        image:AddClassAttribute("h-1/2 w-1/2")
+        image:SetAddress("media/userInterface/quorumAssets/collage.png")
+
+        epiqAbout:Add(image)
+
+        Division linkContainter
+        linkContainter:AddClassAttribute("py-8 items-center object-center align-center")
+        Link link
+        link:AddText("About us")
+        link:SetAddress("/aboutEpiq.html")
+        link:AddAttribute("data-test", "get-started-button-2")
+        link:AddClassAttribute("bg-quorum-blue-100 w-fit px-4 py-2 rounded-3xl text-neutral-grey-95 font-bold justify-self-center")
+        linkContainter:Add(link)
+
+        epiqAbout:Add(linkContainter)
+
+        return epiqAbout
+
+    end
+
+    action makeEPIQComittee returns Section
+    
+        Section epiqCommittee
+        epiqCommittee:AddAttribute("aria-live", "polite")
+        epiqCommittee:AddClassAttribute("flex flex-col w-full items-center justify-center px-5% lg:px-10% space-y-8 pt-8 pb-8")
+            
+        Paragraph h1 
+        h1:AddText("EPIQ Committee")
+        h1:AddAttribute("tabindex","0")
+        h1:AddClassAttribute("font-bold text-center text-4xl pt-4")
+        epiqCommittee:Add(h1)
+
+        Division words
+        Paragraph p1
+        p1:AddClassAttribute("text-center")
+        p1:AddText("For more information on the organization of EPIQ, the committees that make it function, and the awards participants have received, reference the material below.")
+    
+        words:Add(p1)
+
+        epiqCommittee:Add(words)
+
+        Division linkContainter
+        linkContainter:AddClassAttribute("py-8 items-center object-center align-center ")
+        Link link
+        link:AddText("EPIQ committee")
+        link:SetAddress("/committees.html")
+        link:AddAttribute("data-test", "get-started-button-2")
+        link:AddClassAttribute("border-quorum-blue-150 border-solid border-[2px] w-fit px-4 py-2 rounded-3xl text-quorum-blue-150 font-bold justify-self-center")
+        linkContainter:Add(link)
+
+        epiqCommittee:Add(linkContainter)
+
+        return epiqCommittee
+
     end
 
     action GetLinkName returns text

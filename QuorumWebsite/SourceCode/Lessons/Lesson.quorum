@@ -217,6 +217,65 @@ class Lesson is WebPage
         return headingArray
     end
 
+    action InitializeIndex returns Array<Division>
+        Division outerDiv
+        outerDiv:AddClassAttribute("flex flex-col h-full-body box-border")
+
+        //Figure out getting main regions properly.
+        MainContent mainRegion
+        mainRegion:AddClassAttribute("box-border flex-grow")
+        AdjustMain(mainRegion)
+        
+
+        Division innerDiv
+        innerDiv:SetIdentifier("mainDiv")
+        innerDiv:AddClassAttribute("flex flex-row box-border h-full")
+                
+        /*
+            lesson table of contents
+        */
+        Division tocDiv
+        //on hover show the full heading and make it lay on top of the other content
+        Heading tocHeading = tocDiv:AddHeading(GetSectionName(), 2)
+        tocHeading:AddClassAttribute("font-bold uppercase whitespace-nowrap h-[2ch] overflow-hidden text-ellipsis")
+        tocHeading:AddAttribute("title", GetSectionName())
+        tocDiv:Add(CreateTableOfContents())
+        tocDiv:AddClassAttribute("hidden sm:block w-1/5 sticky top-8 h-0")
+
+        /*
+            content body
+        */
+        Division bodyDiv
+        bodyDiv:SetIdentifier("content")
+        bodyDiv:AddClassAttribute("flex flex-col w-5/5 sm:w-4/5 md:w-3/5 mx-4 overflow-auto gap-y-4")
+
+        /*
+            On this page table of contents
+        */
+        Division onPageDiv
+        onPageDiv:AddClassAttribute("hidden md:block w-1/5 sticky top-8 h-0")
+
+        innerDiv:Add(tocDiv)
+        innerDiv:Add(bodyDiv)
+        innerDiv:Add(onPageDiv)
+
+        PageFooter footer
+        mainRegion:Add(innerDiv)
+        outerDiv:Add(mainRegion)
+        outerDiv:Add(footer)
+        Add(outerDiv)
+
+        Array<WebTag> divs
+        divs:Add(tocDiv)
+        divs:Add(bodyDiv)
+        divs:Add(onPageDiv)
+        divs:Add(innerDiv)
+        divs:Add(outerDiv)
+        divs:Add(mainRegion)
+        onPageDiv:AddHeading("", 2):AddClassAttribute("font-bold uppercase")
+        return divs
+end
+
     action CreateHeadingTableOfContents returns Division
         Array<Lesson> lessonArray = CreateLinkedArrays()
         Division div
