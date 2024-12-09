@@ -7128,11 +7128,13 @@ webAccess.FocusHiddenElement$quorum_text("Block Mover");
 else if( (elementName == "Move Placeholder Block Down")) {
 if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
 this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionDown();
+webAccess.FocusHiddenElement$quorum_text("Move Placeholder Block Down");
 }
 }
 else if( (elementName == "Move Placeholder Block Up")) {
 if (this.Get_WebEditor_BlockEditor__editorBlocks_().IsKeyboardMovingBlocks()) {
 this.Get_WebEditor_BlockEditor__editorBlocks_().MoveSelectionUp();
+webAccess.FocusHiddenElement$quorum_text("Move Placeholder Block Up");
 }
 }
 else if( (elementName == "Drop Block")) {
