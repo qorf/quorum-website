@@ -1,0 +1,45 @@
+package Libraries.Web
+
+use Libraries.Containers.Support.Comparison
+use Libraries.Containers.HashTable
+use Libraries.Web.OrderedProblem
+
+class ProblemSetSorter is Comparison
+HashTable<text, integer> order
+    action Compare(Object a, Object b) returns integer
+        if a = undefined or b = undefined
+            return 0
+        end
+        OrderedProblem ap = cast(OrderedProblem, a)
+OrderedProblem bp = cast(OrderedProblem, b)
+        
+        //if either doesn't have a key, bail early to avoid a crash
+        if not order:HasKey(ap:GetId())
+            return 1
+        end
+        
+        if not order:HasKey(bp:GetId())
+            return -1
+        end
+        
+        integer av = order:GetValue(ap:GetId())
+integer bv = order:GetValue(bp:GetId())
+        
+        if av < bv
+            return -1
+        elseif av > bv
+            return 1
+        else
+            //the keys are equal, so compare text
+            return ap:GetId():Compare(bp:GetId())
+        end
+    end
+    action GetOrder returns HashTable<text, integer>
+        return order
+    end
+
+    action SetOrder(HashTable<text, integer> order)
+        me:order = order
+    end
+
+end

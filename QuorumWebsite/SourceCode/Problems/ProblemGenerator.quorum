@@ -1,0 +1,78 @@
+use Libraries.System.File
+use Libraries.Containers.Array
+use Libraries.Web.Problems
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.HashTable
+use Libraries.Web.ProblemSetSorter
+use Libraries.Containers.Iterator
+class ProblemGenerator
+    Array<Problems> allProblemsArray
+    action Generate
+        File file
+        file:SetPath("problems")
+        if not file:IsDirectory()
+            output "No problems folder found."
+        else
+            output "Found the problems folder"
+GenerateAllProblemPages(file)
+            ProcessMetaFolder(file)
+        end
+    end
+    
+    action GenerateAllProblemPages(File root)
+Array<File> array = root:GetDirectoryListing()
+        i = 0
+        repeat while i < array:GetSize()
+            File file = array:Get(i)
+            if file:GetFileExtension() = "json"
+                Problems problems = GenerateProblemSet(file)
+                File location
+                location:SetWorkingDirectory(root:GetAbsolutePath())
+                location:SetPath(problems:GetId())
+                allProblemsArray:Add(problems)
+            end
+            
+            i = i + 1
+        end
+    end
+    
+    
+action ProcessMetaFolder(File root)
+File sort
+        sort:SetWorkingDirectory(root:GetAbsolutePath())
+        sort:SetPath("meta/sort.json")
+        
+JavaScriptObjectNotation json
+        json:Read(sort)
+        
+HashTable<text, integer> hashOrder
+        JavaScriptObjectNotation order = json:GetObject("order")
+        JavaScriptObjectNotation array = order:GetArray()
+        i = 0
+        repeat while i < array:GetSize()
+            JavaScriptObjectNotation item = array:Get(i)
+text key = item:GetText()
+            hashOrder:Add(key, i + 1)
+            i = i + 1
+        end
+        
+ProblemSetSorter sorter
+        sorter:SetOrder(hashOrder)
+        allProblemsArray:Sort(sorter)
+    end
+    
+    action GenerateProblemSet(File file) returns Problems 
+        Problems problems
+        problems:Load(file)
+        output "    ---    " + problems:GetTitle()
+        return problems
+    end
+    
+    action GetAllProblemsArray returns Array<Problems>
+        return allProblemsArray
+    end
+    
+    action GetProblemsIterator returns Iterator<Problems>
+        return allProblemsArray:GetIterator()
+    end
+end

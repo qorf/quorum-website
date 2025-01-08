@@ -1,0 +1,194 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+use Libraries.Web.Problem
+use Libraries.Web.Problems
+use Libraries.Containers.Iterator
+
+class ProblemPage is Lesson
+text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    integer ACTIVITY = 0
+    text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
+
+    Preformatter preformatter
+    Problem problem = undefined
+ //helper
+    
+action Setup
+        //html header stuff
+        SetWebPageTitle("Learn Quorum - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Main Region
+        ImageHeader blueSection = makeBlueHeader()
+        Add(blueSection)
+
+        Stepper stepper = MakeStepper()
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
+
+        
+Heading trackHeader
+        trackHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        trackHeader:SetScale(2)
+        trackHeader:AddText("Problems")
+        bodyDiv:Add(trackHeader)
+        
+bodyDiv:Add(stepper)
+        Section problemSection = MakeProblemSection()
+        bodyDiv:Add(problemSection)
+    end
+    
+    action MakeStepper returns Stepper
+        Stepper stepper
+        
+        Problems problems = problem:GetProblems()
+        i = 1
+        Iterator<Problem> iterator = problems:GetProblemIterator()
+        repeat while iterator:HasNext()
+            Problem problem = iterator:Next()
+            stepper:AddStepperLink("" + i, problem:GetId() + ".html")
+            i = i + 1
+        end
+        integer index = problem:GetIndex()
+        stepper:SetSelected(index)
+                stepper:Setup()
+return stepper
+    end
+    
+    
+action MakeProblemSection returns Section
+        Section section
+        if problem = undefined
+            return section
+        end
+        
+        text title = problem:GetTitle()
+        text description = problem:GetDescription()
+        
+        Division courseDiv
+        courseDiv:AddClassAttribute("space-y-4")
+        Heading courseHeader
+        courseHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        courseHeader:SetScale(2)
+        courseHeader:AddText(problem:GetTitle())
+        
+        
+Section section_instructions
+        AddHeading(section_instructions, "Instructions:", 2)
+        section_instructions:Add(GetInstructions())
+
+        Section section_activity
+        AddHeading(section_activity, "Coding:", 2)
+        BlockIDE ide = GetBlockIDE()
+        ide:Setup(me)
+        section_activity:Add(ide)
+        
+        
+        
+        courseDiv:Add(courseHeader)
+        courseDiv:AddText(description)
+courseDiv:Add(section_activity)
+        
+        section:Add(courseDiv)
+    return section
+end
+    
+    
+action GetInstructions returns Division
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        Division instructions
+        
+text title = problem:GetTitle()
+        text description = problem:GetDescription()
+
+        instructions:AddHeading(title, 3)
+        instructions:AddParagraph(description)
+
+        return instructions
+    end
+    
+    
+action GetBlockIDE() returns BlockIDE
+        CodeForIDE code
+        text file = problem:GetMainCode()
+        // blocks only support a single file for now so call it main
+        code:AddFileUrl("Main.quorum", file)
+        
+        
+        BlockIDE ide
+        ide:SetNoCanvasMode(false)
+        text value = code:GetJsonArray()
+        ide:SetCodeForIDE(code:GetJsonArray())
+        text bag = problem:GetBag()
+        ide:SetPaletteFile(bag)
+        return ide
+    end
+
+
+action makeBlueHeader returns ImageHeader
+        ImageHeader header
+        text headerHeading = "Do Practice Problems in Quorum"
+        text headerText = "Learn code through small examples."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        return header
+    end
+    
+    action SetPaletteFileName(text paletteFileName)
+        me:paletteFileName = paletteFileName
+    end
+    
+    action SetCodeForBlocks(text fileName)
+        me:codeForBlocks = fileName
+    end
+
+    action GetMetaDescription returns text
+        return problem:GetTitle()
+    end
+
+    action GetSummaryName returns text
+        return problem:GetTitle()
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetName returns text
+        return problem:GetTitle()
+    end
+
+    action GetShortDescription returns text
+        return problem:GetDescription()
+    end
+    
+    
+action GetLocation returns text
+        text problemID = problem:GetProblems():GetId()
+        text id = problem:GetId()
+        return "problems/" + problemID + "/" + id + ".html"
+    end
+    
+    action GetProblem returns Problem
+        return problem
+    end
+
+    action SetProblem(Problem problem)
+        me:problem = problem
+    end
+end

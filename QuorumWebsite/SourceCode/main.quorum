@@ -1,6 +1,9 @@
 use Libraries.System.File
 use Libraries.Web.Page.Body
 use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+use Libraries.Web.Problems
+use Libraries.Web.Problem
 
 
 /*
@@ -299,10 +302,49 @@ class Main
         WriteLessons()
         output "Website finished."
 
+        output "Writing Problems Pages"
+        WriteProblemsPages()
+        output "Finished Problems Pages"
+        
         BuildSiteMap()
 
         output "Sitemap created"
     end
+    
+    action WriteProblemsPages
+ProblemGenerator generator
+        generator:Generate()
+        
+        AllProblemsPage allProblemsPage
+        allProblemsPage:SetGenerator(generator)
+        
+allProblemsPage:Setup()
+        allProblemsPage:Write(WRITE_PATH)
+        
+        Iterator<Problems> problemsIterator = generator:GetProblemsIterator()
+        repeat while problemsIterator:HasNext()
+            Problems problems = problemsIterator:Next()
+            //generate the problems page
+            ProblemsPage problemsPage
+            problemsPage:SetProblems(problems)
+            problemsPage:Setup()
+            problemsPage:Write(WRITE_PATH)
+            File writeFolder
+            writeFolder:SetAbsolutePath(WRITE_PATH)
+            
+            //now generate all the pages for the individual problems
+            Iterator<Problem> problemIterator = problems:GetProblemIterator()
+            repeat while problemIterator:HasNext()
+                Problem problem = problemIterator:Next()
+                ProblemPage page
+                page:SetProblem(problem)
+                page:Setup()
+                page:Write(WRITE_PATH)
+            end
+problems:CopyTo(WRITE_PATH)
+        end
+    end
+    
 
     action BuildSiteMap
         File file
