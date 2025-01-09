@@ -40,34 +40,91 @@ action Setup
         bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
 
         
+        text stepperLabel = "Problems"
+        if problem not= undefined
+            Problems problems = problem:GetProblems()
+            text id = problems:GetId()
+            text firstChar = id:GetSubtext(0,1)
+            firstChar = firstChar:ToUpperCase()
+            id = firstChar + id:GetSubtext(1)
+            stepperLabel = id + " Problems"
+        end
 Heading trackHeader
         trackHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
         trackHeader:SetScale(2)
-        trackHeader:AddText("Problems")
+        trackHeader:AddText(stepperLabel)
         bodyDiv:Add(trackHeader)
+        
+        Section buttonsSection = MakeButtonsSection()
         
 bodyDiv:Add(stepper)
         Section problemSection = MakeProblemSection()
         bodyDiv:Add(problemSection)
+bodyDiv:Add(buttonsSection)
     end
     
     action MakeStepper returns Stepper
         Stepper stepper
+integer index = problem:GetIndex()
+        stepper:SetSelected(index)
         
         Problems problems = problem:GetProblems()
-        i = 1
+        i = 0
         Iterator<Problem> iterator = problems:GetProblemIterator()
         repeat while iterator:HasNext()
             Problem problem = iterator:Next()
-            stepper:AddStepperLink("" + i, problem:GetId() + ".html")
+            stepper:AddStepperLink(problem:GetId(), i, problem:GetId() + ".html")
             i = i + 1
         end
-        integer index = problem:GetIndex()
-        stepper:SetSelected(index)
+        
                 stepper:Setup()
 return stepper
     end
     
+    action MakeButtonsSection returns Section
+        Section section
+        section:SetClassAttribute("flex justify-between items-center w-full p-4")
+if problem = undefined
+            return section
+        end
+        text tailwind = "py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-50 aria-disabled:bg-neutral-grey-25 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
+        
+        Link previousButton
+        previousButton:SetClassAttribute(tailwind)
+        previousButton:AddText("Previous")
+        previousButton:SetAddress("")
+        Problem prevProblem = problem:GetPreviousProblem()
+        if prevProblem not= undefined
+            text address = prevProblem:GetId() + ".html"
+            previousButton:SetAddress(address)
+else
+previousButton:AddAttribute("aria-disabled", "true")
+        end
+        
+Link nextButton
+                        nextButton:SetClassAttribute(tailwind)
+nextButton:AddText("Next")
+        nextButton:SetAddress("")
+Problem nextProblem = problem:GetNextProblem()
+        if nextProblem not= undefined
+            text address = nextProblem:GetId() + ".html"
+            nextButton:SetAddress(address)
+        else
+nextButton:AddAttribute("aria-disabled", "true")
+end
+        
+        
+Button checkButton
+        checkButton:SetClassAttribute(tailwind)
+        checkButton:AddText("Check")
+        
+        
+        section:Add(previousButton)
+section:Add(checkButton)
+section:Add(nextButton)
+        
+        return section
+    end
     
 action MakeProblemSection returns Section
         Section section
