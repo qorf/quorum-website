@@ -18,6 +18,8 @@ text dq = ""
     Preformatter preformatter
     Problem problem = undefined
  //helper
+    text answerElement = "answerElement"
+    text hintElement = "hintElement"
     
 action Setup
         //html header stuff
@@ -60,7 +62,53 @@ Heading trackHeader
 bodyDiv:Add(stepper)
         Section problemSection = MakeProblemSection()
         bodyDiv:Add(problemSection)
+        Division hint = MakeHint()
+        bodyDiv:Add(hint)
 bodyDiv:Add(buttonsSection)
+        Division answer = MakeAnswer()
+        bodyDiv:Add(answer)
+    end
+    
+    action MakeHint returns Division
+        Division division
+division:SetIdentifier(hintElement)
+division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        division:AddAttribute("tabindex","0")
+        
+        Division heading
+heading:SetClassAttribute("overflow-hidden rounded-t-lg bg-quorum-blue-150 px-6 py-2 font-bold text-neutral-white")
+        heading:AddHeading("Hint", 2)
+        division:Add(heading)
+        
+        
+Division hintDivision
+        Paragraph right = hintDivision:AddParagraph("<strong>Great job!</strong>")
+        right:SetIdentifier("rightAnswerElement")
+right:SetStyle("display: none;")
+        right:AddAttribute("aria-disabled", "true")
+        
+        Paragraph wrong = hintDivision:AddParagraph("<strong>Try again</strong>")
+wrong:SetIdentifier("wrongAnswerElement")
+wrong:SetStyle("display: none;")
+        wrong:AddAttribute("aria-disabled", "true")
+        
+        hintDivision:SetClassAttribute("rounded-b-lg bg-neutral-white px-6 py-2")
+text hint = problem:GetHint()
+        Paragraph hintParagraph = hintDivision:AddParagraph(hint)
+        
+        division:Add(hintDivision)
+        return division
+    end
+    
+    action MakeAnswer returns Division
+        Division division
+        division:SetIdentifier(answerElement)
+        division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        text answer = problem:GetAnswer()
+        division:AddText(answer)
+        return division
     end
     
     action MakeStepper returns Stepper
@@ -117,7 +165,31 @@ end
 Button checkButton
         checkButton:SetClassAttribute(tailwind)
         checkButton:AddText("Check")
-        
+        checkButton:SetOnClick("
+var hint = document.getElementById('hintElement');
+hint.style.display = 'block';
+hint.setAttribute('aria-disabled', 'false');
+
+var console = document.getElementById('QuorumUIOutput').textContent;
+var correct = document.getElementById('answerElement').textContent;
+
+var wrong = document.getElementById('wrongAnswerElement');
+var right = document.getElementById('rightAnswerElement');
+
+if(console === correct) {
+    wrong.style.display = 'none';
+    wrong.setAttribute('aria-disabled', 'true');
+
+    right.style.display = 'block';
+    right.setAttribute('aria-disabled', 'false');
+} else {
+    wrong.style.display = 'block';
+    wrong.setAttribute('aria-disabled', 'false');
+
+    right.style.display = 'none';
+    right.setAttribute('aria-disabled', 'true');
+}
+")
         
         section:Add(previousButton)
 section:Add(checkButton)
