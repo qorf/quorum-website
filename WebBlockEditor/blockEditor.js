@@ -45,57 +45,59 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         }
     };
 }
-function quorum_WebEditor_Behaviors_FocusEditorBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusEditorBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+class quorum_WebEditor_Behaviors_FocusEditorBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 editor.SetFocus$quorum_Libraries_Interface_Item(editor.GetBlockEditor());
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusEditorBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -105,16 +107,13 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_EditorItem_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Item', 'Libraries.Interface.Controls.Control', 'Libraries.Interface.Item2D', 'Libraries.Language.Object',  'WebEditor.EditorItem'];
-this.Libraries_Interface_Item__ = null;
-this.Libraries_Interface_Controls_Control__ = null;
-this.Libraries_Interface_Item2D__ = null;
-this.constructor_ = function () {
+
+class quorum_WebEditor_EditorItem_ {
+constructor_() {
 this.prototype.SetInputGroup$quorum_text("EditorItem");
 this.prototype.SetAccessibilityCode$quorum_integer(this.Libraries_Interface_Item__.CUSTOM);
 this.prototype.SetFocusable$quorum_boolean(true);
@@ -123,2196 +122,2203 @@ this.prototype.SetPixelHeight$quorum_number(1 * 1.0);
 this.prototype.SetPixelX$quorum_number(0 * 1.0);
 this.prototype.SetPixelY$quorum_number(0 * 1.0);
 };
-this.GetShadowColor = function() {
+GetShadowColor() {
      return this.Libraries_Interface_Controls_Control__.GetShadowColor();
 }
-this.GetTopRightPixelRounding = function() {
+GetTopRightPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.GetTopRightPixelRounding();
 }
-this.SetOrigin$quorum_number$quorum_number = function(setX, setY) {
+SetOrigin$quorum_number$quorum_number(setX, setY) {
      return this.Libraries_Interface_Item2D__.SetOrigin$quorum_number$quorum_number(setX, setY);
 }
-this.RequireSimulation$quorum_boolean = function(flag) {
+RequireSimulation$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.RequireSimulation$quorum_boolean(flag);
 }
-this.HasBottomRightPixelRounding = function() {
+HasBottomRightPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.HasBottomRightPixelRounding();
 }
-this.BeginMouseOver = function() {
+BeginMouseOver() {
      return this.Libraries_Interface_Controls_Control__.BeginMouseOver();
 }
-this.SetTorque$quorum_number = function(torque) {
+SetTorque$quorum_number(torque) {
      return this.Libraries_Interface_Item2D__.SetTorque$quorum_number(torque);
 }
-this.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
+RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Interface_Item__.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
 }
-this.GetLayoutRows = function() {
+GetLayoutRows() {
      return this.Libraries_Interface_Controls_Control__.GetLayoutRows();
 }
-this.SetLayout$quorum_Libraries_Interface_Layouts_Layout = function(layout) {
+SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout) {
      return this.Libraries_Interface_Controls_Control__.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
 }
-this.IsRotationAllowed = function() {
+IsRotationAllowed() {
      return this.Libraries_Interface_Item2D__.IsRotationAllowed();
 }
-this.SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.IsSimulated = function() {
+IsSimulated() {
      return this.Libraries_Interface_Item2D__.IsSimulated();
 }
-this.SetShadowY$quorum_number = function(value) {
+SetShadowY$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowY$quorum_number(value);
 }
-this.GetJointList = function() {
+GetJointList() {
      return this.Libraries_Interface_Item2D__.GetJointList();
 }
-this.Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(broadphase, transform1, transform2) {
+Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform1, transform2) {
      return this.Libraries_Interface_Item2D__.Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform1, transform2);
 }
-this.GetItemAt$quorum_number$quorum_number = function(x, y) {
+GetItemAt$quorum_number$quorum_number(x, y) {
      return this.Libraries_Interface_Item2D__.GetItemAt$quorum_number$quorum_number(x, y);
 }
-this.SetTopPadding$quorum_number = function(padding) {
+SetTopPadding$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetTopPadding$quorum_number(padding);
 }
-this.ApplyForceToCenter$quorum_Libraries_Compute_Vector2 = function(force) {
+ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force) {
      return this.Libraries_Interface_Item2D__.ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force);
 }
-this.SetMass$quorum_number = function(mass) {
+SetMass$quorum_number(mass) {
      return this.Libraries_Interface_Item2D__.SetMass$quorum_number(mass);
 }
-this.SetResponsive = function() {
+SetResponsive() {
      return this.Libraries_Interface_Item2D__.SetResponsive();
 }
-this.GetLeftPadding = function() {
+GetLeftPadding() {
      return this.Libraries_Interface_Controls_Control__.GetLeftPadding();
 }
-this.SetPixelY$quorum_number = function(y) {
+SetPixelY$quorum_number(y) {
      return this.Libraries_Interface_Controls_Control__.SetPixelY$quorum_number(y);
 }
-this.HasTopRightPixelRounding = function() {
+HasTopRightPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.HasTopRightPixelRounding();
 }
-this.SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D = function(properties) {
+SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D(properties) {
      return this.Libraries_Interface_Item2D__.SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D(properties);
 }
-this.SetGridHeight$quorum_integer = function(gridHeight) {
+SetGridHeight$quorum_integer(gridHeight) {
      return this.Libraries_Interface_Controls_Control__.SetGridHeight$quorum_integer(gridHeight);
 }
-this.IsSimulationRequired = function() {
+IsSimulationRequired() {
      return this.Libraries_Interface_Item2D__.IsSimulationRequired();
 }
-this.GetAccentColor = function() {
+GetAccentColor() {
      return this.Libraries_Interface_Controls_Control__.GetAccentColor();
 }
-this.HasTopLeftRounding = function() {
+HasTopLeftRounding() {
      return this.Libraries_Interface_Controls_Control__.HasTopLeftRounding();
 }
-this.SetParent$quorum_Libraries_Interface_Item2D = function(newItem) {
+SetParent$quorum_Libraries_Interface_Item2D(newItem) {
      return this.Libraries_Interface_Item2D__.SetParent$quorum_Libraries_Interface_Item2D(newItem);
 }
-this.GetShadowX = function() {
+GetShadowX() {
      return this.Libraries_Interface_Controls_Control__.GetShadowX();
 }
-this.GetShadowY = function() {
+GetShadowY() {
      return this.Libraries_Interface_Controls_Control__.GetShadowY();
 }
-this.SelectByFirstLetters$quorum_text = function(firstLetter) {
+SelectByFirstLetters$quorum_text(firstLetter) {
      return this.Libraries_Interface_Controls_Control__.SelectByFirstLetters$quorum_text(firstLetter);
 }
-this.SetTransform$quorum_Libraries_Compute_Vector2$quorum_number = function(position, angle) {
+SetTransform$quorum_Libraries_Compute_Vector2$quorum_number(position, angle) {
      return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Compute_Vector2$quorum_number(position, angle);
 }
-this.GetDefaultFontName = function() {
+GetDefaultFontName() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultFontName();
 }
-this.GetRightMargin = function() {
+GetRightMargin() {
      return this.Libraries_Interface_Controls_Control__.GetRightMargin();
 }
-this.RequestLayout = function() {
+RequestLayout() {
      return this.Libraries_Interface_Controls_Control__.RequestLayout();
 }
-this.GetLinearDamping = function() {
+GetLinearDamping() {
      return this.Libraries_Interface_Item2D__.GetLinearDamping();
 }
-this.GetBottomRightRounding = function() {
+GetBottomRightRounding() {
      return this.Libraries_Interface_Controls_Control__.GetBottomRightRounding();
 }
-this.SetGridX$quorum_integer = function(gridX) {
+SetGridX$quorum_integer(gridX) {
      return this.Libraries_Interface_Controls_Control__.SetGridX$quorum_integer(gridX);
 }
-this.SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D = function(edge) {
+SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D(edge) {
      return this.Libraries_Interface_Item2D__.SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D(edge);
 }
-this.SetScale$quorum_number = function(scale) {
+SetScale$quorum_number(scale) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number(scale);
 }
-this.GetBottomMargin = function() {
+GetBottomMargin() {
      return this.Libraries_Interface_Controls_Control__.GetBottomMargin();
 }
-this.SetToSmallFont = function() {
+SetToSmallFont() {
      return this.Libraries_Interface_Controls_Control__.SetToSmallFont();
 }
-this.ClickedMouse = function() {
+ClickedMouse() {
      return this.Libraries_Interface_Controls_Control__.ClickedMouse();
 }
-this.GetLinearVelocity = function() {
+GetLinearVelocity() {
      return this.Libraries_Interface_Item2D__.GetLinearVelocity();
 }
-this.SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(transform) {
+SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
      return this.Libraries_Interface_Item2D__.SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
 }
-this.SetLinearVelocityX$quorum_number = function(linearVelocityX) {
+SetLinearVelocityX$quorum_number(linearVelocityX) {
      return this.Libraries_Interface_Item2D__.SetLinearVelocityX$quorum_number(linearVelocityX);
 }
-this.QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
+QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D(painter) {
      return this.Libraries_Interface_Item2D__.QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D(painter);
 }
-this.UpdateTransformY = function() {
+UpdateTransformY() {
      return this.Libraries_Interface_Item2D__.UpdateTransformY();
 }
-this.UpdateTransformX = function() {
+UpdateTransformX() {
      return this.Libraries_Interface_Item2D__.UpdateTransformX();
 }
-this.ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(force, point) {
+ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(force, point) {
      return this.Libraries_Interface_Item2D__.ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(force, point);
 }
-this.GetVisibleItemAt$quorum_number$quorum_number = function(x, y) {
+GetVisibleItemAt$quorum_number$quorum_number(x, y) {
      return this.Libraries_Interface_Item2D__.GetVisibleItemAt$quorum_number$quorum_number(x, y);
 }
-this.IsRenderingSelection = function() {
+IsRenderingSelection() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingSelection();
 }
-this.IsEmpty = function() {
+IsEmpty() {
      return this.Libraries_Interface_Item2D__.IsEmpty();
 }
-this.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
+AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
      return this.Libraries_Interface_Controls_Control__.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
 }
-this.SetLinearVelocityY$quorum_number = function(linearVelocityY) {
+SetLinearVelocityY$quorum_number(linearVelocityY) {
      return this.Libraries_Interface_Item2D__.SetLinearVelocityY$quorum_number(linearVelocityY);
 }
-this.GetShadowHeight = function() {
+GetShadowHeight() {
      return this.Libraries_Interface_Controls_Control__.GetShadowHeight();
 }
-this.IsFlippedY = function() {
+IsFlippedY() {
      return this.Libraries_Interface_Item2D__.IsFlippedY();
 }
-this.IsFlippedX = function() {
+IsFlippedX() {
      return this.Libraries_Interface_Item2D__.IsFlippedX();
 }
-this.GetGridHeight = function() {
+GetGridHeight() {
      return this.Libraries_Interface_Controls_Control__.GetGridHeight();
 }
-this.GetFocusListeners = function() {
+GetFocusListeners() {
      return this.Libraries_Interface_Item__.GetFocusListeners();
 }
-this.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
+AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
      return this.Libraries_Interface_Item__.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
 }
-this.SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetTopRightRounding$quorum_number = function(value) {
+SetTopRightRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetTopRightRounding$quorum_number(value);
 }
-this.GetTransform0 = function() {
+GetTransform0() {
      return this.Libraries_Interface_Item2D__.GetTransform0();
 }
-this.GetInverseInertia = function() {
+GetInverseInertia() {
      return this.Libraries_Interface_Item2D__.GetInverseInertia();
 }
-this.Resize = function() {
+Resize() {
      return this.Libraries_Interface_Item2D__.Resize();
 }
-this.GetCurrentLayoutProperties = function() {
+GetCurrentLayoutProperties() {
      return this.Libraries_Interface_Controls_Control__.GetCurrentLayoutProperties();
 }
-this.FinishCollision$quorum_Libraries_Interface_Item = function(item) {
+FinishCollision$quorum_Libraries_Interface_Item(item) {
      return this.Libraries_Interface_Item__.FinishCollision$quorum_Libraries_Interface_Item(item);
 }
-this.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
+AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
      return this.Libraries_Interface_Controls_Control__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
 }
-this.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
+RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
      return this.Libraries_Interface_Controls_Control__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
 }
-this.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
+RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
      return this.Libraries_Interface_Item__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
 }
-this.SetAccessibilityCode$quorum_integer = function(newAccessibilityCode) {
+SetAccessibilityCode$quorum_integer(newAccessibilityCode) {
      return this.Libraries_Interface_Item__.SetAccessibilityCode$quorum_integer(newAccessibilityCode);
 }
-this.HasShadowX = function() {
+HasShadowX() {
      return this.Libraries_Interface_Controls_Control__.HasShadowX();
 }
-this.SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.HasShadowY = function() {
+HasShadowY() {
      return this.Libraries_Interface_Controls_Control__.HasShadowY();
 }
-this.GetAngularDamping = function() {
+GetAngularDamping() {
      return this.Libraries_Interface_Item2D__.GetAngularDamping();
 }
-this.SetInterfaceOptionsKey$quorum_text = function(key) {
+SetInterfaceOptionsKey$quorum_text(key) {
      return this.Libraries_Interface_Controls_Control__.SetInterfaceOptionsKey$quorum_text(key);
 }
-this.RequestReloadGraphics = function() {
+RequestReloadGraphics() {
      return this.Libraries_Interface_Controls_Control__.RequestReloadGraphics();
 }
-this.GetAccessibilityRoleDescription = function() {
+GetAccessibilityRoleDescription() {
      return this.Libraries_Interface_Item__.GetAccessibilityRoleDescription();
 }
-this.GetRotationInRadians = function() {
+GetRotationInRadians() {
      return this.Libraries_Interface_Item2D__.GetRotationInRadians();
 }
-this.MoveX$quorum_number = function(xAmount) {
+MoveX$quorum_number(xAmount) {
      return this.Libraries_Interface_Item2D__.MoveX$quorum_number(xAmount);
 }
-this.ResetMass = function() {
+ResetMass() {
      return this.Libraries_Interface_Item2D__.ResetMass();
 }
-this.GetFontColor = function() {
+GetFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetFontColor();
 }
-this.RequestVerticesUpdate = function() {
+RequestVerticesUpdate() {
      return this.Libraries_Interface_Item2D__.RequestVerticesUpdate();
 }
-this.HasLeftBorder = function() {
+HasLeftBorder() {
      return this.Libraries_Interface_Controls_Control__.HasLeftBorder();
 }
-this.HasTopLeftPixelRounding = function() {
+HasTopLeftPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.HasTopLeftPixelRounding();
 }
-this.GetActivationBehavior = function() {
+GetActivationBehavior() {
      return this.Libraries_Interface_Controls_Control__.GetActivationBehavior();
 }
-this.UpdateBehaviors$quorum_number = function(seconds) {
+UpdateBehaviors$quorum_number(seconds) {
      return this.Libraries_Interface_Item__.UpdateBehaviors$quorum_number(seconds);
 }
-this.SetCollisionGroupIndex$quorum_integer = function(index) {
+SetCollisionGroupIndex$quorum_integer(index) {
      return this.Libraries_Interface_Item2D__.SetCollisionGroupIndex$quorum_integer(index);
 }
-this.GetRestitution = function() {
+GetRestitution() {
      return this.Libraries_Interface_Item2D__.GetRestitution();
 }
-this.SetScreenPositionFromPhysicsPosition = function() {
+SetScreenPositionFromPhysicsPosition() {
      return this.Libraries_Interface_Item2D__.SetScreenPositionFromPhysicsPosition();
 }
-this.IsPhysicsEnabled = function() {
+IsPhysicsEnabled() {
      return this.Libraries_Interface_Item2D__.IsPhysicsEnabled();
 }
-this.SetClipping$quorum_boolean = function(clip) {
+SetClipping$quorum_boolean(clip) {
      return this.Libraries_Interface_Item2D__.SetClipping$quorum_boolean(clip);
 }
-this.SetScaleFromCenter$quorum_number = function(scale) {
+SetScaleFromCenter$quorum_number(scale) {
      return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number(scale);
 }
-this.IsShowing = function() {
+IsShowing() {
      return this.Libraries_Interface_Item__.IsShowing();
 }
-this.SetBorderStyle$quorum_integer = function(style) {
+SetBorderStyle$quorum_integer(style) {
      return this.Libraries_Interface_Controls_Control__.SetBorderStyle$quorum_integer(style);
 }
-this.Contains$quorum_number$quorum_number = function(containsX, containsY) {
+Contains$quorum_number$quorum_number(containsX, containsY) {
      return this.Libraries_Interface_Item2D__.Contains$quorum_number$quorum_number(containsX, containsY);
 }
-this.IsCollidable = function() {
+IsCollidable() {
      return this.Libraries_Interface_Item2D__.IsCollidable();
 }
-this.Simulate$quorum_boolean = function(flag) {
+Simulate$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.Simulate$quorum_boolean(flag);
 }
-this.GetPhysicsProperties = function() {
+GetPhysicsProperties() {
      return this.Libraries_Interface_Item2D__.GetPhysicsProperties();
 }
-this.GetRightPadding = function() {
+GetRightPadding() {
      return this.Libraries_Interface_Controls_Control__.GetRightPadding();
 }
-this.SetY$quorum_number = function(setY) {
+SetY$quorum_number(setY) {
      return this.Libraries_Interface_Item2D__.SetY$quorum_number(setY);
 }
-this.SetMass$quorum_Libraries_Game_Physics_Mass2D = function(mass) {
+SetMass$quorum_Libraries_Game_Physics_Mass2D(mass) {
      return this.Libraries_Interface_Item2D__.SetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
 }
-this.GetBorderThickness = function() {
+GetBorderThickness() {
      return this.Libraries_Interface_Controls_Control__.GetBorderThickness();
 }
-this.GetAccessibleParent = function() {
+GetAccessibleParent() {
      return this.Libraries_Interface_Item2D__.GetAccessibleParent();
 }
-this.SetFlipY$quorum_boolean = function(flip) {
+SetFlipY$quorum_boolean(flip) {
      return this.Libraries_Interface_Item2D__.SetFlipY$quorum_boolean(flip);
 }
-this.GetName = function() {
+GetName() {
      return this.Libraries_Interface_Item__.GetName();
 }
-this.GetPixelWidth = function() {
+GetPixelWidth() {
      return this.Libraries_Interface_Controls_Control__.GetPixelWidth();
 }
-this.ManageShape = function() {
+ManageShape() {
      return this.Libraries_Interface_Item2D__.ManageShape();
 }
-this.GetBottomLeftRounding = function() {
+GetBottomLeftRounding() {
      return this.Libraries_Interface_Controls_Control__.GetBottomLeftRounding();
 }
-this.GetLeftMargin = function() {
+GetLeftMargin() {
      return this.Libraries_Interface_Controls_Control__.GetLeftMargin();
 }
-this.GetFriction = function() {
+GetFriction() {
      return this.Libraries_Interface_Item2D__.GetFriction();
 }
-this.GetSelectionListeners = function() {
+GetSelectionListeners() {
      return this.Libraries_Interface_Controls_Control__.GetSelectionListeners();
 }
-this.SetHasMoved$quorum_boolean = function(flag) {
+SetHasMoved$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.SetHasMoved$quorum_boolean(flag);
 }
-this.FastMoving$quorum_boolean = function(flag) {
+FastMoving$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.FastMoving$quorum_boolean(flag);
 }
-this.SetFont$quorum_Libraries_Game_Graphics_Font = function(font) {
+SetFont$quorum_Libraries_Game_Graphics_Font(font) {
      return this.Libraries_Interface_Controls_Control__.SetFont$quorum_Libraries_Game_Graphics_Font(font);
 }
-this.SetPercentageX$quorum_number = function(x) {
+SetPercentageX$quorum_number(x) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageX$quorum_number(x);
 }
-this.GetBorderStyle = function() {
+GetBorderStyle() {
      return this.Libraries_Interface_Controls_Control__.GetBorderStyle();
 }
-this.ResetLayoutFlag = function() {
+ResetLayoutFlag() {
      return this.Libraries_Interface_Controls_Control__.ResetLayoutFlag();
 }
-this.SetTopRightPixelRounding$quorum_number = function(value) {
+SetTopRightPixelRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetTopRightPixelRounding$quorum_number(value);
 }
-this.UpdateTransformAngle = function() {
+UpdateTransformAngle() {
      return this.Libraries_Interface_Item2D__.UpdateTransformAngle();
 }
-this.GetUnfocusedSelectionBorderColor = function() {
+GetUnfocusedSelectionBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionBorderColor();
 }
-this.EmptySelectionListeners = function() {
+EmptySelectionListeners() {
      return this.Libraries_Interface_Controls_Control__.EmptySelectionListeners();
 }
-this.GetLayer = function() {
+GetLayer() {
      return this.Libraries_Interface_Item2D__.GetLayer();
 }
-this.GetWorldVector$quorum_Libraries_Compute_Vector2 = function(localVector) {
+GetWorldVector$quorum_Libraries_Compute_Vector2(localVector) {
      return this.Libraries_Interface_Item2D__.GetWorldVector$quorum_Libraries_Compute_Vector2(localVector);
 }
-this.GetMouseDownColor = function() {
+GetMouseDownColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseDownColor();
 }
-this.HasFontOutlineThickness = function() {
+HasFontOutlineThickness() {
      return this.Libraries_Interface_Controls_Control__.HasFontOutlineThickness();
 }
-this.GetFocusFontColor = function() {
+GetFocusFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusFontColor();
 }
-this.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetInterfaceOptionsKey = function() {
+GetInterfaceOptionsKey() {
      return this.Libraries_Interface_Controls_Control__.GetInterfaceOptionsKey();
 }
-this.GetHorizontalLayoutMode = function() {
+GetHorizontalLayoutMode() {
      return this.Libraries_Interface_Controls_Control__.GetHorizontalLayoutMode();
 }
-this.SetGridWidth$quorum_integer = function(gridWidth) {
+SetGridWidth$quorum_integer(gridWidth) {
      return this.Libraries_Interface_Controls_Control__.SetGridWidth$quorum_integer(gridWidth);
 }
-this.GetMass$quorum_Libraries_Game_Physics_Mass2D = function(mass) {
+GetMass$quorum_Libraries_Game_Physics_Mass2D(mass) {
      return this.Libraries_Interface_Item2D__.GetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
 }
-this.SetToLargeFont = function() {
+SetToLargeFont() {
      return this.Libraries_Interface_Controls_Control__.SetToLargeFont();
 }
-this.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
+AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
      return this.Libraries_Interface_Item__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
 }
-this.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
+SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight) {
      return this.Libraries_Interface_Controls_Control__.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
 }
-this.GetDefaultProportionalFontName = function() {
+GetDefaultProportionalFontName() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultProportionalFontName();
 }
-this.SetScaleFromCenter$quorum_number$quorum_number = function(newX, newY) {
+SetScaleFromCenter$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number$quorum_number(newX, newY);
 }
-this.SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetContainerGridWidth = function() {
+GetContainerGridWidth() {
      return this.Libraries_Interface_Controls_Control__.GetContainerGridWidth();
 }
-this.HasBottomLeftPixelRounding = function() {
+HasBottomLeftPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.HasBottomLeftPixelRounding();
 }
-this.GetDefaultFont = function() {
+GetDefaultFont() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultFont();
 }
-this.GetMouseDownGlowColor = function() {
+GetMouseDownGlowColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseDownGlowColor();
 }
-this.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(transform) {
+SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
      return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
 }
-this.HasMoved = function() {
+HasMoved() {
      return this.Libraries_Interface_Item2D__.HasMoved();
 }
-this.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
+RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
      return this.Libraries_Interface_Item__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
-this.SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetShapeType = function() {
+GetShapeType() {
      return this.Libraries_Interface_Item2D__.GetShapeType();
 }
-this.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
+AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
      return this.Libraries_Interface_Item__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
 }
-this.SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetOffsetX = function() {
+GetOffsetX() {
      return this.Libraries_Interface_Item2D__.GetOffsetX();
 }
-this.GetOffsetZ = function() {
+GetOffsetZ() {
      return this.Libraries_Interface_Item2D__.GetOffsetZ();
 }
-this.GetOffsetY = function() {
+GetOffsetY() {
      return this.Libraries_Interface_Item2D__.GetOffsetY();
 }
-this.GetItems = function() {
+GetItems() {
      return this.Libraries_Interface_Item2D__.GetItems();
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.GetMouseOverColor = function() {
+GetMouseOverColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseOverColor();
 }
-this.GetPixelHeight = function() {
+GetPixelHeight() {
      return this.Libraries_Interface_Controls_Control__.GetPixelHeight();
 }
-this.SetOffsetY$quorum_number = function(yAmount) {
+SetOffsetY$quorum_number(yAmount) {
      return this.Libraries_Interface_Item2D__.SetOffsetY$quorum_number(yAmount);
 }
-this.HasProperty$quorum_text = function(key) {
+HasProperty$quorum_text(key) {
      return this.Libraries_Interface_Item__.HasProperty$quorum_text(key);
 }
-this.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
+AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
      return this.Libraries_Interface_Item__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
 }
-this.SetLinearDamping$quorum_number = function(linearDamping) {
+SetLinearDamping$quorum_number(linearDamping) {
      return this.Libraries_Interface_Item2D__.SetLinearDamping$quorum_number(linearDamping);
 }
-this.PrepareVertices = function() {
+PrepareVertices() {
      return this.Libraries_Interface_Item2D__.PrepareVertices();
 }
-this.SetChildrenProcessingMouseEvents$quorum_boolean = function(shouldProcess) {
+SetChildrenProcessingMouseEvents$quorum_boolean(shouldProcess) {
      return this.Libraries_Interface_Item2D__.SetChildrenProcessingMouseEvents$quorum_boolean(shouldProcess);
 }
-this.GetTopLeftPixelRounding = function() {
+GetTopLeftPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.GetTopLeftPixelRounding();
 }
-this.GetBottomLeftPixelRounding = function() {
+GetBottomLeftPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.GetBottomLeftPixelRounding();
 }
-this.GetBoundingBox$quorum_integer = function(childIndex) {
+GetBoundingBox$quorum_integer(childIndex) {
      return this.Libraries_Interface_Item2D__.GetBoundingBox$quorum_integer(childIndex);
 }
-this.GetWidth = function() {
+GetWidth() {
      return this.Libraries_Interface_Item2D__.GetWidth();
 }
-this.SetPercentageOriginY$quorum_number = function(y) {
+SetPercentageOriginY$quorum_number(y) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageOriginY$quorum_number(y);
 }
-this.HasBottomBorder = function() {
+HasBottomBorder() {
      return this.Libraries_Interface_Controls_Control__.HasBottomBorder();
 }
-this.HasTopRightRounding = function() {
+HasTopRightRounding() {
      return this.Libraries_Interface_Controls_Control__.HasTopRightRounding();
 }
-this.Activate$quorum_Libraries_Interface_Events_BehaviorEvent = function(event) {
+Activate$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
      return this.Libraries_Interface_Controls_Control__.Activate$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 }
-this.IsFocusable = function() {
+IsFocusable() {
      return this.Libraries_Interface_Item__.IsFocusable();
 }
-this.NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent = function(event) {
+NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent(event) {
      return this.Libraries_Interface_Controls_Control__.NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent(event);
 }
-this.GetCollisionList = function() {
+GetCollisionList() {
      return this.Libraries_Interface_Item2D__.GetCollisionList();
 }
-this.GetPreviousFocus = function() {
+GetPreviousFocus() {
      return this.Libraries_Interface_Item__.GetPreviousFocus();
 }
-this.SetFontSize$quorum_integer = function(size) {
+SetFontSize$quorum_integer(size) {
      return this.Libraries_Interface_Controls_Control__.SetFontSize$quorum_integer(size);
 }
-this.GetDescription = function() {
+GetDescription() {
      return this.Libraries_Interface_Item__.GetDescription();
 }
-this.GetUnfocusedSelectionColor = function() {
+GetUnfocusedSelectionColor() {
      return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionColor();
 }
-this.GetPercentageX = function() {
+GetPercentageX() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageX();
 }
-this.SetBottomLeftRounding$quorum_number = function(value) {
+SetBottomLeftRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetBottomLeftRounding$quorum_number(value);
 }
-this.GetPercentageY = function() {
+GetPercentageY() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageY();
 }
-this.SetView2D$quorum_Libraries_Interface_Views_View2D = function(content) {
+SetView2D$quorum_Libraries_Interface_Views_View2D(content) {
      return this.Libraries_Interface_Item2D__.SetView2D$quorum_Libraries_Interface_Views_View2D(content);
 }
-this.GetBoundingRectangle = function() {
+GetBoundingRectangle() {
      return this.Libraries_Interface_Item2D__.GetBoundingRectangle();
 }
-this.GetMouseMovementListeners = function() {
+GetMouseMovementListeners() {
      return this.Libraries_Interface_Item__.GetMouseMovementListeners();
 }
-this.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetGridY$quorum_integer = function(gridY) {
+SetGridY$quorum_integer(gridY) {
      return this.Libraries_Interface_Controls_Control__.SetGridY$quorum_integer(gridY);
 }
-this.GetHeight = function() {
+GetHeight() {
      return this.Libraries_Interface_Item2D__.GetHeight();
 }
-this.GetPercentageWidth = function() {
+GetPercentageWidth() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageWidth();
 }
-this.GetProperty$quorum_text = function(key) {
+GetProperty$quorum_text(key) {
      return this.Libraries_Interface_Item__.GetProperty$quorum_text(key);
 }
-this.LostSelection = function() {
+LostSelection() {
      return this.Libraries_Interface_Controls_Control__.LostSelection();
 }
-this.Advance$quorum_number = function(time) {
+Advance$quorum_number(time) {
      return this.Libraries_Interface_Item2D__.Advance$quorum_number(time);
 }
-this.SetOffset$quorum_number$quorum_number$quorum_number = function(xAmount, yAmount, zAmount) {
+SetOffset$quorum_number$quorum_number$quorum_number(xAmount, yAmount, zAmount) {
      return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number$quorum_number(xAmount, yAmount, zAmount);
 }
-this.GetUnfocusedSelectionFontColor = function() {
+GetUnfocusedSelectionFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionFontColor();
 }
-this.IsOnLayer = function() {
+IsOnLayer() {
      return this.Libraries_Interface_Item2D__.IsOnLayer();
 }
-this.ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent = function(event) {
+ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent(event) {
      return this.Libraries_Interface_Item2D__.ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent(event);
 }
-this.GetLayoutProperties$quorum_number$quorum_number = function(containerWidth, containerHeight) {
+GetLayoutProperties$quorum_number$quorum_number(containerWidth, containerHeight) {
      return this.Libraries_Interface_Controls_Control__.GetLayoutProperties$quorum_number$quorum_number(containerWidth, containerHeight);
 }
-this.HasColorPropertyOverride$quorum_text = function(property) {
+HasColorPropertyOverride$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.HasColorPropertyOverride$quorum_text(property);
 }
-this.HasRightBorder = function() {
+HasRightBorder() {
      return this.Libraries_Interface_Controls_Control__.HasRightBorder();
 }
-this.SetOffsetZ$quorum_number = function(zAmount) {
+SetOffsetZ$quorum_number(zAmount) {
      return this.Libraries_Interface_Item2D__.SetOffsetZ$quorum_number(zAmount);
 }
-this.SetFlipX$quorum_boolean = function(flip) {
+SetFlipX$quorum_boolean(flip) {
      return this.Libraries_Interface_Item2D__.SetFlipX$quorum_boolean(flip);
 }
-this.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
+AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Interface_Item__.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
 }
-this.RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
+RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
      return this.Libraries_Interface_Controls_Control__.RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
 }
-this.SetFriction$quorum_number = function(friction) {
+SetFriction$quorum_number(friction) {
      return this.Libraries_Interface_Item2D__.SetFriction$quorum_number(friction);
 }
-this.GetLocalPoint$quorum_Libraries_Compute_Vector2 = function(worldPoint) {
+GetLocalPoint$quorum_Libraries_Compute_Vector2(worldPoint) {
      return this.Libraries_Interface_Item2D__.GetLocalPoint$quorum_Libraries_Compute_Vector2(worldPoint);
 }
-this.GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2 = function(localPoint) {
+GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2(localPoint) {
      return this.Libraries_Interface_Item2D__.GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2(localPoint);
 }
-this.SetName$quorum_text = function(newName) {
+SetName$quorum_text(newName) {
      return this.Libraries_Interface_Item__.SetName$quorum_text(newName);
 }
-this.GainedSelection = function() {
+GainedSelection() {
      return this.Libraries_Interface_Controls_Control__.GainedSelection();
 }
-this.ManageLayers = function() {
+ManageLayers() {
      return this.Libraries_Interface_Item2D__.ManageLayers();
 }
-this.SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetGridPosition$quorum_integer$quorum_integer = function(gridX, gridY) {
+SetGridPosition$quorum_integer$quorum_integer(gridX, gridY) {
      return this.Libraries_Interface_Controls_Control__.SetGridPosition$quorum_integer$quorum_integer(gridX, gridY);
 }
-this.NotifyAccessibilityBoundsChanged = function() {
+NotifyAccessibilityBoundsChanged() {
      return this.Libraries_Interface_Item2D__.NotifyAccessibilityBoundsChanged();
 }
-this.SetShadowX$quorum_number = function(value) {
+SetShadowX$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowX$quorum_number(value);
 }
-this.SetRightMargin$quorum_number = function(padding) {
+SetRightMargin$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetRightMargin$quorum_number(padding);
 }
-this.HasBottomLeftRounding = function() {
+HasBottomLeftRounding() {
      return this.Libraries_Interface_Controls_Control__.HasBottomLeftRounding();
 }
-this.AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
+AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
      return this.Libraries_Interface_Controls_Control__.AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
 }
-this.LostFocus$quorum_Libraries_Interface_Events_FocusEvent = function(event) {
+LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
      return this.Libraries_Interface_Controls_Control__.LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
 }
-this.CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(broadphase, transform) {
+CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform) {
      return this.Libraries_Interface_Item2D__.CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform);
 }
-this.SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
+SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight) {
      return this.Libraries_Interface_Controls_Control__.SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
 }
-this.SetBottomMargin$quorum_number = function(padding) {
+SetBottomMargin$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetBottomMargin$quorum_number(padding);
 }
-this.HasProperties = function() {
+HasProperties() {
      return this.Libraries_Interface_Item__.HasProperties();
 }
-this.SetHorizontalLayoutMode$quorum_integer = function(mode) {
+SetHorizontalLayoutMode$quorum_integer(mode) {
      return this.Libraries_Interface_Controls_Control__.SetHorizontalLayoutMode$quorum_integer(mode);
 }
-this.SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu = function(menu) {
+SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu(menu) {
      return this.Libraries_Interface_Controls_Control__.SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu(menu);
 }
-this.SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetAngularDamping$quorum_number = function(angularDamping) {
+SetAngularDamping$quorum_number(angularDamping) {
      return this.Libraries_Interface_Item2D__.SetAngularDamping$quorum_number(angularDamping);
 }
-this.GetShadowWidth = function() {
+GetShadowWidth() {
      return this.Libraries_Interface_Controls_Control__.GetShadowWidth();
 }
-this.HasShadowHeight = function() {
+HasShadowHeight() {
      return this.Libraries_Interface_Controls_Control__.HasShadowHeight();
 }
-this.GetNumberProperty$quorum_text = function(property) {
+GetNumberProperty$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.GetNumberProperty$quorum_text(property);
 }
-this.HasBorderThickness = function() {
+HasBorderThickness() {
      return this.Libraries_Interface_Controls_Control__.HasBorderThickness();
 }
-this.GetMouseOverFontColor = function() {
+GetMouseOverFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseOverFontColor();
 }
-this.GetScaleY = function() {
+GetScaleY() {
      return this.Libraries_Interface_Item2D__.GetScaleY();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetScaleX = function() {
+GetScaleX() {
      return this.Libraries_Interface_Item2D__.GetScaleX();
 }
-this.SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
+SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D(painter) {
      return this.Libraries_Interface_Item2D__.SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D(painter);
 }
-this.GetView2D = function() {
+GetView2D() {
      return this.Libraries_Interface_Item2D__.GetView2D();
 }
-this.GetDefaultFontSize = function() {
+GetDefaultFontSize() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultFontSize();
 }
-this.SetCollidable$quorum_boolean = function(flag) {
+SetCollidable$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.SetCollidable$quorum_boolean(flag);
 }
-this.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent = function(event) {
+GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
      return this.Libraries_Interface_Controls_Control__.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
 }
-this.SetWidth$quorum_number = function(newWidth) {
+SetWidth$quorum_number(newWidth) {
      return this.Libraries_Interface_Item2D__.SetWidth$quorum_number(newWidth);
 }
-this.GetSelectionBorderColor = function() {
+GetSelectionBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetSelectionBorderColor();
 }
-this.SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetInverseMass = function() {
+GetInverseMass() {
      return this.Libraries_Interface_Item2D__.GetInverseMass();
 }
-this.GetTransform = function() {
+GetTransform() {
      return this.Libraries_Interface_Item2D__.GetTransform();
 }
-this.HasBottomRightRounding = function() {
+HasBottomRightRounding() {
      return this.Libraries_Interface_Controls_Control__.HasBottomRightRounding();
 }
-this.GetRotation = function() {
+GetRotation() {
      return this.Libraries_Interface_Item2D__.GetRotation();
 }
-this.GetDensity = function() {
+GetDensity() {
      return this.Libraries_Interface_Item2D__.GetDensity();
 }
-this.GetPropertyKeyIterator = function() {
+GetPropertyKeyIterator() {
      return this.Libraries_Interface_Item__.GetPropertyKeyIterator();
 }
-this.SynchronizeNodes = function() {
+SynchronizeNodes() {
      return this.Libraries_Interface_Item2D__.SynchronizeNodes();
 }
-this.SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation = function(key, value) {
+SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation(key, value) {
      return this.Libraries_Interface_Item__.SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation(key, value);
 }
-this.GetDefaultLayoutProperties = function() {
+GetDefaultLayoutProperties() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultLayoutProperties();
 }
-this.SetLeftPadding$quorum_number = function(padding) {
+SetLeftPadding$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetLeftPadding$quorum_number(padding);
 }
-this.SetLayer$quorum_Libraries_Game_Layer2D = function(parentLayer) {
+SetLayer$quorum_Libraries_Game_Layer2D(parentLayer) {
      return this.Libraries_Interface_Item2D__.SetLayer$quorum_Libraries_Game_Layer2D(parentLayer);
 }
-this.IsRenderingFocus = function() {
+IsRenderingFocus() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingFocus();
 }
-this.GetForegroundSelectionColor = function() {
+GetForegroundSelectionColor() {
      return this.Libraries_Interface_Controls_Control__.GetForegroundSelectionColor();
 }
-this.GetLocalCenter = function() {
+GetLocalCenter() {
      return this.Libraries_Interface_Item2D__.GetLocalCenter();
 }
-this.SetNonResponsive = function() {
+SetNonResponsive() {
      return this.Libraries_Interface_Item2D__.SetNonResponsive();
 }
-this.SetRotation$quorum_number = function(degrees) {
+SetRotation$quorum_number(degrees) {
      return this.Libraries_Interface_Item2D__.SetRotation$quorum_number(degrees);
 }
-this.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, newItem) {
+SetItem$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem) {
      return this.Libraries_Interface_Item2D__.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
 }
-this.SetTopMargin$quorum_number = function(padding) {
+SetTopMargin$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetTopMargin$quorum_number(padding);
 }
-this.GetDefaultMonospaceFontName = function() {
+GetDefaultMonospaceFontName() {
      return this.Libraries_Interface_Controls_Control__.GetDefaultMonospaceFontName();
 }
-this.HasShadowWidth = function() {
+HasShadowWidth() {
      return this.Libraries_Interface_Controls_Control__.HasShadowWidth();
 }
-this.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
+RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
      return this.Libraries_Interface_Controls_Control__.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
 }
-this.Focus = function() {
+Focus() {
      return this.Libraries_Interface_Item__.Focus();
 }
-this.SetScale$quorum_number$quorum_number = function(newX, newY) {
+SetScale$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
 }
-this.SetInterfaceScale$quorum_number = function(scale) {
+SetInterfaceScale$quorum_number(scale) {
      return this.Libraries_Interface_Controls_Control__.SetInterfaceScale$quorum_number(scale);
 }
-this.SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.HasTopBorder = function() {
+HasTopBorder() {
      return this.Libraries_Interface_Controls_Control__.HasTopBorder();
 }
-this.SetBottomRightRounding$quorum_number = function(value) {
+SetBottomRightRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetBottomRightRounding$quorum_number(value);
 }
-this.ShouldCollide$quorum_Libraries_Interface_Item2D = function(otherItem) {
+ShouldCollide$quorum_Libraries_Interface_Item2D(otherItem) {
      return this.Libraries_Interface_Item2D__.ShouldCollide$quorum_Libraries_Interface_Item2D(otherItem);
 }
-this.SetNumberProperty$quorum_text$quorum_number = function(property, value) {
+SetNumberProperty$quorum_text$quorum_number(property, value) {
      return this.Libraries_Interface_Controls_Control__.SetNumberProperty$quorum_text$quorum_number(property, value);
 }
-this.SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetAngularVelocity$quorum_number = function(angularVelocity) {
+SetAngularVelocity$quorum_number(angularVelocity) {
      return this.Libraries_Interface_Item2D__.SetAngularVelocity$quorum_number(angularVelocity);
 }
-this.ApplyAngularImpulse$quorum_number = function(impulse) {
+ApplyAngularImpulse$quorum_number(impulse) {
      return this.Libraries_Interface_Item2D__.ApplyAngularImpulse$quorum_number(impulse);
 }
-this.SetSize$quorum_number$quorum_number = function(newWidth, newHeight) {
+SetSize$quorum_number$quorum_number(newWidth, newHeight) {
      return this.Libraries_Interface_Item2D__.SetSize$quorum_number$quorum_number(newWidth, newHeight);
 }
-this.SetContainerGridHeight$quorum_integer = function(containerGridHeight) {
+SetContainerGridHeight$quorum_integer(containerGridHeight) {
      return this.Libraries_Interface_Controls_Control__.SetContainerGridHeight$quorum_integer(containerGridHeight);
 }
-this.SetUpdateTransform$quorum_boolean = function(flag) {
+SetUpdateTransform$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.SetUpdateTransform$quorum_boolean(flag);
 }
-this.Draw$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
+Draw$quorum_Libraries_Game_Graphics_Painter2D(painter) {
      return this.Libraries_Interface_Item2D__.Draw$quorum_Libraries_Game_Graphics_Painter2D(painter);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Item__.Dispose();
 }
-this.GetItemCount = function() {
+GetItemCount() {
      return this.Libraries_Interface_Item2D__.GetItemCount();
 }
-this.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
+RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
      return this.Libraries_Interface_Item__.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
 }
-this.GetIcon = function() {
+GetIcon() {
      return this.Libraries_Interface_Controls_Control__.GetIcon();
 }
-this.SetDescription$quorum_text = function(newDescription) {
+SetDescription$quorum_text(newDescription) {
      return this.Libraries_Interface_Item__.SetDescription$quorum_text(newDescription);
 }
-this.GetGridX = function() {
+GetGridX() {
      return this.Libraries_Interface_Controls_Control__.GetGridX();
 }
-this.GetGridY = function() {
+GetGridY() {
      return this.Libraries_Interface_Controls_Control__.GetGridY();
 }
-this.GetColorProperty$quorum_text = function(property) {
+GetColorProperty$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.GetColorProperty$quorum_text(property);
 }
-this.GetBackgroundColor = function() {
+GetBackgroundColor() {
      return this.Libraries_Interface_Controls_Control__.GetBackgroundColor();
 }
-this.GetMouseDownFontColor = function() {
+GetMouseDownFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseDownFontColor();
 }
-this.SetForce$quorum_Libraries_Compute_Vector2 = function(force) {
+SetForce$quorum_Libraries_Compute_Vector2(force) {
      return this.Libraries_Interface_Item2D__.SetForce$quorum_Libraries_Compute_Vector2(force);
 }
-this.SetBorderThickness$quorum_number = function(value) {
+SetBorderThickness$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetBorderThickness$quorum_number(value);
 }
-this.CancelBehaviors = function() {
+CancelBehaviors() {
      return this.Libraries_Interface_Item__.CancelBehaviors();
 }
-this.SetDensity$quorum_number = function(density) {
+SetDensity$quorum_number(density) {
      return this.Libraries_Interface_Item2D__.SetDensity$quorum_number(density);
 }
-this.GetItem$quorum_integer = function(index) {
+GetItem$quorum_integer(index) {
      return this.Libraries_Interface_Item2D__.GetItem$quorum_integer(index);
 }
-this.GetLocalVector$quorum_Libraries_Compute_Vector2 = function(worldVector) {
+GetLocalVector$quorum_Libraries_Compute_Vector2(worldVector) {
      return this.Libraries_Interface_Item2D__.GetLocalVector$quorum_Libraries_Compute_Vector2(worldVector);
 }
-this.GetLayoutProperties = function() {
+GetLayoutProperties() {
      return this.Libraries_Interface_Controls_Control__.GetLayoutProperties();
 }
-this.GetInterfaceScale = function() {
+GetInterfaceScale() {
      return this.Libraries_Interface_Controls_Control__.GetInterfaceScale();
 }
-this.SetHeight$quorum_number = function(newHeight) {
+SetHeight$quorum_number(newHeight) {
      return this.Libraries_Interface_Item2D__.SetHeight$quorum_number(newHeight);
 }
-this.IsCustomDrawing = function() {
+IsCustomDrawing() {
      return this.Libraries_Interface_Item2D__.IsCustomDrawing();
 }
-this.GetInputGroup = function() {
+GetInputGroup() {
      return this.Libraries_Interface_Item__.GetInputGroup();
 }
-this.GetMass = function() {
+GetMass() {
      return this.Libraries_Interface_Item2D__.GetMass();
 }
-this.GetBottomRightPixelRounding = function() {
+GetBottomRightPixelRounding() {
      return this.Libraries_Interface_Controls_Control__.GetBottomRightPixelRounding();
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.GetPercentageHeight = function() {
+GetPercentageHeight() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageHeight();
 }
-this.GetBorderColor = function() {
+GetBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetBorderColor();
 }
-this.GetGlobalZ = function() {
+GetGlobalZ() {
      return this.Libraries_Interface_Item2D__.GetGlobalZ();
 }
-this.GetGlobalY = function() {
+GetGlobalY() {
      return this.Libraries_Interface_Item2D__.GetGlobalY();
 }
-this.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
+RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
      return this.Libraries_Interface_Item__.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
 }
-this.GetTopPadding = function() {
+GetTopPadding() {
      return this.Libraries_Interface_Controls_Control__.GetTopPadding();
 }
-this.SetLayoutRows$quorum_number = function(layoutRows) {
+SetLayoutRows$quorum_number(layoutRows) {
      return this.Libraries_Interface_Controls_Control__.SetLayoutRows$quorum_number(layoutRows);
 }
-this.SetPixelWidth$quorum_number = function(width) {
+SetPixelWidth$quorum_number(width) {
      return this.Libraries_Interface_Controls_Control__.SetPixelWidth$quorum_number(width);
 }
-this.NeedsLayout = function() {
+NeedsLayout() {
      return this.Libraries_Interface_Controls_Control__.NeedsLayout();
 }
-this.LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
+LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
      return this.Libraries_Interface_Controls_Control__.LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
 }
-this.SetOffset$quorum_number$quorum_number = function(xAmount, yAmount) {
+SetOffset$quorum_number$quorum_number(xAmount, yAmount) {
      return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number(xAmount, yAmount);
 }
-this.GetAngularVelocity = function() {
+GetAngularVelocity() {
      return this.Libraries_Interface_Item2D__.GetAngularVelocity();
 }
-this.GetInertia = function() {
+GetInertia() {
      return this.Libraries_Interface_Item2D__.GetInertia();
 }
-this.SetScaleX$quorum_number = function(scaleX) {
+SetScaleX$quorum_number(scaleX) {
      return this.Libraries_Interface_Item2D__.SetScaleX$quorum_number(scaleX);
 }
-this.GetGridWidth = function() {
+GetGridWidth() {
      return this.Libraries_Interface_Controls_Control__.GetGridWidth();
 }
-this.GetLabelText = function() {
+GetLabelText() {
      return this.Libraries_Interface_Controls_Control__.GetLabelText();
 }
-this.DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D = function(broadphase) {
+DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D(broadphase) {
      return this.Libraries_Interface_Item2D__.DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D(broadphase);
 }
-this.GetGestureListeners = function() {
+GetGestureListeners() {
      return this.Libraries_Interface_Item__.GetGestureListeners();
 }
-this.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetFocusBorderColor = function() {
+GetFocusBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusBorderColor();
 }
-this.GetShadowEdgeFade = function() {
+GetShadowEdgeFade() {
      return this.Libraries_Interface_Controls_Control__.GetShadowEdgeFade();
 }
-this.SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number = function(newX, newY, newWidth, newHeight) {
+SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number(newX, newY, newWidth, newHeight) {
      return this.Libraries_Interface_Item2D__.SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number(newX, newY, newWidth, newHeight);
 }
-this.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
+RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
      return this.Libraries_Interface_Item__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
 }
-this.SetNextFocus$quorum_Libraries_Interface_Item = function(next) {
+SetNextFocus$quorum_Libraries_Interface_Item(next) {
      return this.Libraries_Interface_Item__.SetNextFocus$quorum_Libraries_Interface_Item(next);
 }
-this.SetPosition$quorum_number$quorum_number = function(setX, setY) {
+SetPosition$quorum_number$quorum_number(setX, setY) {
      return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number(setX, setY);
 }
-this.FlipY = function() {
+FlipY() {
      return this.Libraries_Interface_Item2D__.FlipY();
 }
-this.GetChildAsItem$quorum_integer = function(index) {
+GetChildAsItem$quorum_integer(index) {
      return this.Libraries_Interface_Item2D__.GetChildAsItem$quorum_integer(index);
 }
-this.SetCenterY$quorum_number = function(setY) {
+SetCenterY$quorum_number(setY) {
      return this.Libraries_Interface_Item2D__.SetCenterY$quorum_number(setY);
 }
-this.ReleasedMouse = function() {
+ReleasedMouse() {
      return this.Libraries_Interface_Controls_Control__.ReleasedMouse();
 }
-this.FlipX = function() {
+FlipX() {
      return this.Libraries_Interface_Item2D__.FlipX();
 }
-this.SetBottomRightPixelRounding$quorum_number = function(value) {
+SetBottomRightPixelRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetBottomRightPixelRounding$quorum_number(value);
 }
-this.GetCollisionGroupIndex = function() {
+GetCollisionGroupIndex() {
      return this.Libraries_Interface_Item2D__.GetCollisionGroupIndex();
 }
-this.SetRestitution$quorum_number = function(restitution) {
+SetRestitution$quorum_number(restitution) {
      return this.Libraries_Interface_Item2D__.SetRestitution$quorum_number(restitution);
 }
-this.EmptyChildren = function() {
+EmptyChildren() {
      return this.Libraries_Interface_Item__.EmptyChildren();
 }
-this.GetSelectionFontColor = function() {
+GetSelectionFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetSelectionFontColor();
 }
-this.UpdateAll$quorum_number = function(seconds) {
+UpdateAll$quorum_number(seconds) {
      return this.Libraries_Interface_Controls_Control__.UpdateAll$quorum_number(seconds);
 }
-this.Move$quorum_Libraries_Compute_Vector2 = function(movement) {
+Move$quorum_Libraries_Compute_Vector2(movement) {
      return this.Libraries_Interface_Item2D__.Move$quorum_Libraries_Compute_Vector2(movement);
 }
-this.GetSleepTime = function() {
+GetSleepTime() {
      return this.Libraries_Interface_Item2D__.GetSleepTime();
 }
-this.GetTouchListeners = function() {
+GetTouchListeners() {
      return this.Libraries_Interface_Item__.GetTouchListeners();
 }
-this.SetGridSize$quorum_integer$quorum_integer = function(gridWidth, gridHeight) {
+SetGridSize$quorum_integer$quorum_integer(gridWidth, gridHeight) {
      return this.Libraries_Interface_Controls_Control__.SetGridSize$quorum_integer$quorum_integer(gridWidth, gridHeight);
 }
-this.GetX = function() {
+GetX() {
      return this.Libraries_Interface_Item2D__.GetX();
 }
-this.GetY = function() {
+GetY() {
      return this.Libraries_Interface_Item2D__.GetY();
 }
-this.GetTopMargin = function() {
+GetTopMargin() {
      return this.Libraries_Interface_Controls_Control__.GetTopMargin();
 }
-this.GetZ = function() {
+GetZ() {
      return this.Libraries_Interface_Item2D__.GetZ();
 }
-this.SetCustomDrawing$quorum_boolean = function(isCustom) {
+SetCustomDrawing$quorum_boolean(isCustom) {
      return this.Libraries_Interface_Item2D__.SetCustomDrawing$quorum_boolean(isCustom);
 }
-this.EnablePhysics$quorum_boolean = function(flag) {
+EnablePhysics$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.EnablePhysics$quorum_boolean(flag);
 }
-this.SetLeftMargin$quorum_number = function(padding) {
+SetLeftMargin$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetLeftMargin$quorum_number(padding);
 }
-this.SynchronizeTransform = function() {
+SynchronizeTransform() {
      return this.Libraries_Interface_Item2D__.SynchronizeTransform();
 }
-this.SetIcon$quorum_Libraries_Game_Graphics_TextureRegion = function(icon) {
+SetIcon$quorum_Libraries_Game_Graphics_TextureRegion(icon) {
      return this.Libraries_Interface_Controls_Control__.SetIcon$quorum_Libraries_Game_Graphics_TextureRegion(icon);
 }
-this.IsNonResponsive = function() {
+IsNonResponsive() {
      return this.Libraries_Interface_Item2D__.IsNonResponsive();
 }
-this.SetShadowEdgeFade$quorum_number = function(value) {
+SetShadowEdgeFade$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowEdgeFade$quorum_number(value);
 }
-this.CanRotate$quorum_boolean = function(flag) {
+CanRotate$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.CanRotate$quorum_boolean(flag);
 }
-this.HasShadowEdgeFade = function() {
+HasShadowEdgeFade() {
      return this.Libraries_Interface_Controls_Control__.HasShadowEdgeFade();
 }
-this.SetTopLeftPixelRounding$quorum_number = function(value) {
+SetTopLeftPixelRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetTopLeftPixelRounding$quorum_number(value);
 }
-this.GetShape = function() {
+GetShape() {
      return this.Libraries_Interface_Item2D__.GetShape();
 }
-this.SetPercentageHeight$quorum_number = function(height) {
+SetPercentageHeight$quorum_number(height) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageHeight$quorum_number(height);
 }
-this.Hide = function() {
+Hide() {
      return this.Libraries_Interface_Item__.Hide();
 }
-this.SetTopLeftRounding$quorum_number = function(value) {
+SetTopLeftRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetTopLeftRounding$quorum_number(value);
 }
-this.GetCenterY = function() {
+GetCenterY() {
      return this.Libraries_Interface_Item2D__.GetCenterY();
 }
-this.SetVerticalLayoutMode$quorum_integer = function(mode) {
+SetVerticalLayoutMode$quorum_integer(mode) {
      return this.Libraries_Interface_Controls_Control__.SetVerticalLayoutMode$quorum_integer(mode);
 }
-this.Rotate$quorum_number = function(degrees) {
+Rotate$quorum_number(degrees) {
      return this.Libraries_Interface_Item2D__.Rotate$quorum_number(degrees);
 }
-this.GetCenterX = function() {
+GetCenterX() {
      return this.Libraries_Interface_Item2D__.GetCenterX();
 }
-this.ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2 = function(point, childIndex, normalOut) {
+ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2(point, childIndex, normalOut) {
      return this.Libraries_Interface_Item2D__.ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2(point, childIndex, normalOut);
 }
-this.GetAccessibilityType = function() {
+GetAccessibilityType() {
      return this.Libraries_Interface_Item__.GetAccessibilityType();
 }
-this.Update$quorum_number = function(secondsSinceUpdate) {
+Update$quorum_number(secondsSinceUpdate) {
      return this.Libraries_Interface_Item__.Update$quorum_number(secondsSinceUpdate);
 }
-this.GetCollisionGroupFlag = function() {
+GetCollisionGroupFlag() {
      return this.Libraries_Interface_Item2D__.GetCollisionGroupFlag();
 }
-this.IsRenderingMouseOver = function() {
+IsRenderingMouseOver() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingMouseOver();
 }
-this.SetShadowWidth$quorum_number = function(value) {
+SetShadowWidth$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowWidth$quorum_number(value);
 }
-this.SetCenter$quorum_number$quorum_number = function(setX, setY) {
+SetCenter$quorum_number$quorum_number(setX, setY) {
      return this.Libraries_Interface_Item2D__.SetCenter$quorum_number$quorum_number(setX, setY);
 }
-this.SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D = function(shape) {
+SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D(shape) {
      return this.Libraries_Interface_Item2D__.SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D(shape);
 }
-this.SetFocusable$quorum_boolean = function(focus) {
+SetFocusable$quorum_boolean(focus) {
      return this.Libraries_Interface_Item__.SetFocusable$quorum_boolean(focus);
 }
-this.GetDrawableShape = function() {
+GetDrawableShape() {
      return this.Libraries_Interface_Item2D__.GetDrawableShape();
 }
-this.SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetInputGroup$quorum_text = function(group) {
+SetInputGroup$quorum_text(group) {
      return this.Libraries_Interface_Item__.SetInputGroup$quorum_text(group);
 }
-this.IsRenderingMouseDown = function() {
+IsRenderingMouseDown() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingMouseDown();
 }
-this.GetPercentageOriginX = function() {
+GetPercentageOriginX() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageOriginX();
 }
-this.GetPercentageOriginY = function() {
+GetPercentageOriginY() {
      return this.Libraries_Interface_Controls_Control__.GetPercentageOriginY();
 }
-this.ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent = function(event) {
+ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent(event) {
      return this.Libraries_Interface_Item2D__.ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent(event);
 }
-this.SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.TestPoint$quorum_Libraries_Compute_Vector2 = function(point) {
+TestPoint$quorum_Libraries_Compute_Vector2(point) {
      return this.Libraries_Interface_Item2D__.TestPoint$quorum_Libraries_Compute_Vector2(point);
 }
-this.GetNodes = function() {
+GetNodes() {
      return this.Libraries_Interface_Item2D__.GetNodes();
 }
-this.GetForce = function() {
+GetForce() {
      return this.Libraries_Interface_Item2D__.GetForce();
 }
-this.GetChildren = function() {
+GetChildren() {
      return this.Libraries_Interface_Item2D__.GetChildren();
 }
-this.SetCollisionGroupFlag$quorum_boolean = function(flag) {
+SetCollisionGroupFlag$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.SetCollisionGroupFlag$quorum_boolean(flag);
 }
-this.GetForegroundColor = function() {
+GetForegroundColor() {
      return this.Libraries_Interface_Controls_Control__.GetForegroundColor();
 }
-this.GetNextFocus = function() {
+GetNextFocus() {
      return this.Libraries_Interface_Item__.GetNextFocus();
 }
-this.GetMouseOverGlowColor = function() {
+GetMouseOverGlowColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseOverGlowColor();
 }
-this.ApplyTorque$quorum_number = function(torque) {
+ApplyTorque$quorum_number(torque) {
      return this.Libraries_Interface_Item2D__.ApplyTorque$quorum_number(torque);
 }
-this.CollideWithChildren = function() {
+CollideWithChildren() {
      return this.Libraries_Interface_Item2D__.CollideWithChildren();
 }
-this.Empty = function() {
+Empty() {
      return this.Libraries_Interface_Item2D__.Empty();
 }
-this.GetScreenX = function() {
+GetScreenX() {
      return this.Libraries_Interface_Item2D__.GetScreenX();
 }
-this.Add$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, newItem) {
+Add$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem) {
      return this.Libraries_Interface_Controls_Control__.Add$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
 }
-this.GetScreenY = function() {
+GetScreenY() {
      return this.Libraries_Interface_Item2D__.GetScreenY();
 }
-this.SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetWorldCenter = function() {
+GetWorldCenter() {
      return this.Libraries_Interface_Item2D__.GetWorldCenter();
 }
-this.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent = function(event) {
+ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event) {
      return this.Libraries_Interface_Item2D__.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event);
 }
-this.GetFontOutlineColor = function() {
+GetFontOutlineColor() {
      return this.Libraries_Interface_Controls_Control__.GetFontOutlineColor();
 }
-this.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
+AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
      return this.Libraries_Interface_Item__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
-this.GetBottomPadding = function() {
+GetBottomPadding() {
      return this.Libraries_Interface_Controls_Control__.GetBottomPadding();
 }
-this.GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(xCoords, yCoords) {
+GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(xCoords, yCoords) {
      return this.Libraries_Interface_Item2D__.GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(xCoords, yCoords);
 }
-this.Show = function() {
+Show() {
      return this.Libraries_Interface_Item__.Show();
 }
-this.GetFont = function() {
+GetFont() {
      return this.Libraries_Interface_Controls_Control__.GetFont();
 }
-this.EndMouseOver = function() {
+EndMouseOver() {
      return this.Libraries_Interface_Controls_Control__.EndMouseOver();
 }
-this.SetOffsetX$quorum_number = function(xAmount) {
+SetOffsetX$quorum_number(xAmount) {
      return this.Libraries_Interface_Item2D__.SetOffsetX$quorum_number(xAmount);
 }
-this.SetPixelX$quorum_number = function(x) {
+SetPixelX$quorum_number(x) {
      return this.Libraries_Interface_Controls_Control__.SetPixelX$quorum_number(x);
 }
-this.SetFontOutlineThickness$quorum_number = function(value) {
+SetFontOutlineThickness$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetFontOutlineThickness$quorum_number(value);
 }
-this.GetSweep = function() {
+GetSweep() {
      return this.Libraries_Interface_Item2D__.GetSweep();
 }
-this.GetNodeCount = function() {
+GetNodeCount() {
      return this.Libraries_Interface_Item2D__.GetNodeCount();
 }
-this.ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(impulse, point) {
+ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(impulse, point) {
      return this.Libraries_Interface_Item2D__.ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(impulse, point);
 }
-this.Activate = function() {
+Activate() {
      return this.Libraries_Interface_Controls_Control__.Activate();
 }
-this.SetLabelText$quorum_text = function(labelText) {
+SetLabelText$quorum_text(labelText) {
      return this.Libraries_Interface_Controls_Control__.SetLabelText$quorum_text(labelText);
 }
-this.GetIconColor = function() {
+GetIconColor() {
      return this.Libraries_Interface_Controls_Control__.GetIconColor();
 }
-this.GetTopRightRounding = function() {
+GetTopRightRounding() {
      return this.Libraries_Interface_Controls_Control__.GetTopRightRounding();
 }
-this.IsAcceptingMouseInput = function() {
+IsAcceptingMouseInput() {
      return this.Libraries_Interface_Item__.IsAcceptingMouseInput();
 }
-this.GetPropertiesSize = function() {
+GetPropertiesSize() {
      return this.Libraries_Interface_Item__.GetPropertiesSize();
 }
-this.SetBottomPadding$quorum_number = function(padding) {
+SetBottomPadding$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetBottomPadding$quorum_number(padding);
 }
-this.HasNumberPropertyOverride$quorum_text = function(property) {
+HasNumberPropertyOverride$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.HasNumberPropertyOverride$quorum_text(property);
 }
-this.GetContainerGridHeight = function() {
+GetContainerGridHeight() {
      return this.Libraries_Interface_Controls_Control__.GetContainerGridHeight();
 }
-this.SetOriginCenter = function() {
+SetOriginCenter() {
      return this.Libraries_Interface_Item2D__.SetOriginCenter();
 }
-this.EmptyAll = function() {
+EmptyAll() {
      return this.Libraries_Interface_Item__.EmptyAll();
 }
-this.RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D = function(item) {
+RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Interface_Item2D__.RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D(item);
 }
-this.ScaleFromCenter$quorum_number = function(amount) {
+ScaleFromCenter$quorum_number(amount) {
      return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number(amount);
 }
-this.NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent = function(event) {
+NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent(event) {
      return this.Libraries_Interface_Controls_Control__.NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent(event);
 }
-this.IsAccessibleParent = function() {
+IsAccessibleParent() {
      return this.Libraries_Interface_Item__.IsAccessibleParent();
 }
-this.GetFontOutlineThickness = function() {
+GetFontOutlineThickness() {
      return this.Libraries_Interface_Controls_Control__.GetFontOutlineThickness();
 }
-this.GetParent = function() {
+GetParent() {
      return this.Libraries_Interface_Item2D__.GetParent();
 }
-this.SetAcceptsMouseInput$quorum_boolean = function(accepts) {
+SetAcceptsMouseInput$quorum_boolean(accepts) {
      return this.Libraries_Interface_Item__.SetAcceptsMouseInput$quorum_boolean(accepts);
 }
-this.GetMouseListeners = function() {
+GetMouseListeners() {
      return this.Libraries_Interface_Item__.GetMouseListeners();
 }
-this.ScaleFromCenter$quorum_number$quorum_number = function(xAmount, yAmount) {
+ScaleFromCenter$quorum_number$quorum_number(xAmount, yAmount) {
      return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number$quorum_number(xAmount, yAmount);
 }
-this.IsResponsive = function() {
+IsResponsive() {
      return this.Libraries_Interface_Item2D__.IsResponsive();
 }
-this.Remove$quorum_integer = function(index) {
+Remove$quorum_integer(index) {
      return this.Libraries_Interface_Controls_Control__.Remove$quorum_integer(index);
 }
-this.SetToMediumFont = function() {
+SetToMediumFont() {
      return this.Libraries_Interface_Controls_Control__.SetToMediumFont();
 }
-this.SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D = function(edge) {
+SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D(edge) {
      return this.Libraries_Interface_Item2D__.SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D(edge);
 }
-this.GetRawInertia = function() {
+GetRawInertia() {
      return this.Libraries_Interface_Item2D__.GetRawInertia();
 }
-this.DisposeChildren = function() {
+DisposeChildren() {
      return this.Libraries_Interface_Item__.DisposeChildren();
 }
-this.DisposeAll = function() {
+DisposeAll() {
      return this.Libraries_Interface_Item__.DisposeAll();
 }
-this.GetOriginY = function() {
+GetOriginY() {
      return this.Libraries_Interface_Item2D__.GetOriginY();
 }
-this.GetOriginX = function() {
+GetOriginX() {
      return this.Libraries_Interface_Item2D__.GetOriginX();
 }
-this.IsUnmovable = function() {
+IsUnmovable() {
      return this.Libraries_Interface_Item2D__.IsUnmovable();
 }
-this.MoveZ$quorum_number = function(zAmount) {
+MoveZ$quorum_number(zAmount) {
      return this.Libraries_Interface_Item2D__.MoveZ$quorum_number(zAmount);
 }
-this.SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetUnmovable = function() {
+SetUnmovable() {
      return this.Libraries_Interface_Item2D__.SetUnmovable();
 }
-this.SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetResponsiveness = function() {
+GetResponsiveness() {
      return this.Libraries_Interface_Item2D__.GetResponsiveness();
 }
-this.IsFocused = function() {
+IsFocused() {
      return this.Libraries_Interface_Item__.IsFocused();
 }
-this.SetToDefaultFontSize = function() {
+SetToDefaultFontSize() {
      return this.Libraries_Interface_Controls_Control__.SetToDefaultFontSize();
 }
-this.GetGlowColor = function() {
+GetGlowColor() {
      return this.Libraries_Interface_Controls_Control__.GetGlowColor();
 }
-this.SetScaleY$quorum_number = function(scaleY) {
+SetScaleY$quorum_number(scaleY) {
      return this.Libraries_Interface_Item2D__.SetScaleY$quorum_number(scaleY);
 }
-this.GetMouseWheelListeners = function() {
+GetMouseWheelListeners() {
      return this.Libraries_Interface_Item__.GetMouseWheelListeners();
 }
-this.GetInputTable = function() {
+GetInputTable() {
      return this.Libraries_Interface_Item__.GetInputTable();
 }
-this.SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetCollideWithChildren$quorum_boolean = function(flag) {
+SetCollideWithChildren$quorum_boolean(flag) {
      return this.Libraries_Interface_Item2D__.SetCollideWithChildren$quorum_boolean(flag);
 }
-this.SetSleepTime$quorum_number = function(time) {
+SetSleepTime$quorum_number(time) {
      return this.Libraries_Interface_Item2D__.SetSleepTime$quorum_number(time);
 }
-this.SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.IsClipping = function() {
+IsClipping() {
      return this.Libraries_Interface_Item2D__.IsClipping();
 }
-this.GetWorldPoint$quorum_Libraries_Compute_Vector2 = function(localPoint) {
+GetWorldPoint$quorum_Libraries_Compute_Vector2(localPoint) {
      return this.Libraries_Interface_Item2D__.GetWorldPoint$quorum_Libraries_Compute_Vector2(localPoint);
 }
-this.GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2 = function(worldPoint) {
+GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2(worldPoint) {
      return this.Libraries_Interface_Item2D__.GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2(worldPoint);
 }
-this.GetAccessibilityCode = function() {
+GetAccessibilityCode() {
      return this.Libraries_Interface_Item__.GetAccessibilityCode();
 }
-this.Add$quorum_Libraries_Interface_Item2D = function(newItem) {
+Add$quorum_Libraries_Interface_Item2D(newItem) {
      return this.Libraries_Interface_Controls_Control__.Add$quorum_Libraries_Interface_Item2D(newItem);
 }
-this.SetLinearVelocity$quorum_Libraries_Compute_Vector2 = function(linearVelocity) {
+SetLinearVelocity$quorum_Libraries_Compute_Vector2(linearVelocity) {
      return this.Libraries_Interface_Item2D__.SetLinearVelocity$quorum_Libraries_Compute_Vector2(linearVelocity);
 }
-this.SetRightPadding$quorum_number = function(padding) {
+SetRightPadding$quorum_number(padding) {
      return this.Libraries_Interface_Controls_Control__.SetRightPadding$quorum_number(padding);
 }
-this.Move$quorum_number$quorum_number = function(xAmount, yAmount) {
+Move$quorum_number$quorum_number(xAmount, yAmount) {
      return this.Libraries_Interface_Item2D__.Move$quorum_number$quorum_number(xAmount, yAmount);
 }
-this.Scale$quorum_number = function(amount) {
+Scale$quorum_number(amount) {
      return this.Libraries_Interface_Item2D__.Scale$quorum_number(amount);
 }
-this.AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior = function(behavior) {
+AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior(behavior) {
      return this.Libraries_Interface_Item__.AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior(behavior);
 }
-this.SetBottomLeftPixelRounding$quorum_number = function(value) {
+SetBottomLeftPixelRounding$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetBottomLeftPixelRounding$quorum_number(value);
 }
-this.SetContainerGridWidth$quorum_integer = function(containerGridWidth) {
+SetContainerGridWidth$quorum_integer(containerGridWidth) {
      return this.Libraries_Interface_Controls_Control__.SetContainerGridWidth$quorum_integer(containerGridWidth);
 }
-this.GetTopLeftRounding = function() {
+GetTopLeftRounding() {
      return this.Libraries_Interface_Controls_Control__.GetTopLeftRounding();
 }
-this.SetShadowHeight$quorum_number = function(value) {
+SetShadowHeight$quorum_number(value) {
      return this.Libraries_Interface_Controls_Control__.SetShadowHeight$quorum_number(value);
 }
-this.SetPercentageWidth$quorum_number = function(width) {
+SetPercentageWidth$quorum_number(width) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageWidth$quorum_number(width);
 }
-this.GetGlobalX = function() {
+GetGlobalX() {
      return this.Libraries_Interface_Item2D__.GetGlobalX();
 }
-this.MoveY$quorum_number = function(yAmount) {
+MoveY$quorum_number(yAmount) {
      return this.Libraries_Interface_Item2D__.MoveY$quorum_number(yAmount);
 }
-this.SetCenterX$quorum_number = function(setX) {
+SetCenterX$quorum_number(setX) {
      return this.Libraries_Interface_Item2D__.SetCenterX$quorum_number(setX);
 }
-this.SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.GetPixelX = function() {
+GetPixelX() {
      return this.Libraries_Interface_Controls_Control__.GetPixelX();
 }
-this.GetPixelY = function() {
+GetPixelY() {
      return this.Libraries_Interface_Controls_Control__.GetPixelY();
 }
-this.SetX$quorum_number = function(setX) {
+SetX$quorum_number(setX) {
      return this.Libraries_Interface_Item2D__.SetX$quorum_number(setX);
 }
-this.SetToHugeFont = function() {
+SetToHugeFont() {
      return this.Libraries_Interface_Controls_Control__.SetToHugeFont();
 }
-this.SetAccessibilityRoleDescription$quorum_text = function(newRoleDescription) {
+SetAccessibilityRoleDescription$quorum_text(newRoleDescription) {
      return this.Libraries_Interface_Item__.SetAccessibilityRoleDescription$quorum_text(newRoleDescription);
 }
-this.AreChildrenProcessingMouseEvents = function() {
+AreChildrenProcessingMouseEvents() {
      return this.Libraries_Interface_Item2D__.AreChildrenProcessingMouseEvents();
 }
-this.CopyAndActivateInputTable$quorum_text = function(name) {
+CopyAndActivateInputTable$quorum_text(name) {
      return this.Libraries_Interface_Controls_Control__.CopyAndActivateInputTable$quorum_text(name);
 }
-this.SetPosition$quorum_number$quorum_number$quorum_number = function(setX, setY, setZ) {
+SetPosition$quorum_number$quorum_number$quorum_number(setX, setY, setZ) {
      return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number$quorum_number(setX, setY, setZ);
 }
-this.GetTorque = function() {
+GetTorque() {
      return this.Libraries_Interface_Item2D__.GetTorque();
 }
-this.GetFontSize = function() {
+GetFontSize() {
      return this.Libraries_Interface_Controls_Control__.GetFontSize();
 }
-this.IsFastMoving = function() {
+IsFastMoving() {
      return this.Libraries_Interface_Item2D__.IsFastMoving();
 }
-this.SetPercentageOriginX$quorum_number = function(x) {
+SetPercentageOriginX$quorum_number(x) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageOriginX$quorum_number(x);
 }
-this.SetPixelHeight$quorum_number = function(height) {
+SetPixelHeight$quorum_number(height) {
      return this.Libraries_Interface_Controls_Control__.SetPixelHeight$quorum_number(height);
 }
-this.GetLayout = function() {
+GetLayout() {
      return this.Libraries_Interface_Controls_Control__.GetLayout();
 }
-this.GetFocusColor = function() {
+GetFocusColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusColor();
 }
-this.GetVerticalLayoutMode = function() {
+GetVerticalLayoutMode() {
      return this.Libraries_Interface_Controls_Control__.GetVerticalLayoutMode();
 }
-this.SetToTinyFont = function() {
+SetToTinyFont() {
      return this.Libraries_Interface_Controls_Control__.SetToTinyFont();
 }
-this.SetPreviousFocus$quorum_Libraries_Interface_Item = function(previous) {
+SetPreviousFocus$quorum_Libraries_Interface_Item(previous) {
      return this.Libraries_Interface_Item__.SetPreviousFocus$quorum_Libraries_Interface_Item(previous);
 }
-this.BeginCollision$quorum_Libraries_Interface_Item = function(item) {
+BeginCollision$quorum_Libraries_Interface_Item(item) {
      return this.Libraries_Interface_Item__.BeginCollision$quorum_Libraries_Interface_Item(item);
 }
-this.GetSelectionColor = function() {
+GetSelectionColor() {
      return this.Libraries_Interface_Controls_Control__.GetSelectionColor();
 }
-this.Scale$quorum_number$quorum_number = function(xAmount, yAmount) {
+Scale$quorum_number$quorum_number(xAmount, yAmount) {
      return this.Libraries_Interface_Item2D__.Scale$quorum_number$quorum_number(xAmount, yAmount);
 }
-this.Remove$quorum_Libraries_Interface_Item2D = function(item) {
+Remove$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Interface_Controls_Control__.Remove$quorum_Libraries_Interface_Item2D(item);
 }
-this.GetPopupMenu = function() {
+GetPopupMenu() {
      return this.Libraries_Interface_Controls_Control__.GetPopupMenu();
 }
-this.SetZ$quorum_number = function(setZ) {
+SetZ$quorum_number(setZ) {
      return this.Libraries_Interface_Item2D__.SetZ$quorum_number(setZ);
 }
-this.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup = function(property, value) {
+SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(property, value) {
      return this.Libraries_Interface_Controls_Control__.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(property, value);
 }
-this.SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
+SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
-this.SetPercentageY$quorum_number = function(y) {
+SetPercentageY$quorum_number(y) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageY$quorum_number(y);
 }
-this.SetResponsiveness$quorum_integer = function(type) {
+SetResponsiveness$quorum_integer(type) {
      return this.Libraries_Interface_Item2D__.SetResponsiveness$quorum_integer(type);
 }
-this.SetTarget$quorum_Libraries_Interface_Controls_Control = function (target) {
+SetTarget$quorum_Libraries_Interface_Controls_Control(target) {
 this.target = target;
 };
-this.GetTarget = function () {
+GetTarget() {
 return this.Get_WebEditor_EditorItem__target_();
 };
-this.FocusTarget = function () {
+FocusTarget() {
 this.Get_WebEditor_EditorItem__target_().Focus();
 };
-this.Get_WebEditor_EditorItem__target_ = function() {
+Get_WebEditor_EditorItem__target_() {
    return this.target;
 };
-this.Set_WebEditor_EditorItem__target_ = function(value) {
+Set_WebEditor_EditorItem__target_(value) {
    this.target = value;
 };
-this.Get_Libraries_Interface_Item__manager_ = function() {
+Get_Libraries_Interface_Item__manager_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__manager_();
 };
-this.Set_Libraries_Interface_Item__manager_ = function(value) {
+Set_Libraries_Interface_Item__manager_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__manager_(value);
 };
-this.Get_Libraries_Interface_Item__visible_ = function() {
+Get_Libraries_Interface_Item__visible_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__visible_();
 };
-this.Set_Libraries_Interface_Item__visible_ = function(value) {
+Set_Libraries_Interface_Item__visible_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__visible_(value);
 };
-this.Get_Libraries_Interface_Item__RADIO_BUTTON_ = function() {
+Get_Libraries_Interface_Item__RADIO_BUTTON_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__RADIO_BUTTON_();
 };
-this.Set_Libraries_Interface_Item__RADIO_BUTTON_ = function(value) {
+Set_Libraries_Interface_Item__RADIO_BUTTON_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__RADIO_BUTTON_(value);
 };
-this.Get_Libraries_Interface_Item__accessibilityRoleDescription_ = function() {
+Get_Libraries_Interface_Item__accessibilityRoleDescription_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityRoleDescription_();
 };
-this.Set_Libraries_Interface_Item__accessibilityRoleDescription_ = function(value) {
+Set_Libraries_Interface_Item__accessibilityRoleDescription_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityRoleDescription_(value);
 };
-this.Get_Libraries_Interface_Item__BUTTON_ = function() {
+Get_Libraries_Interface_Item__BUTTON_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__BUTTON_();
 };
-this.Set_Libraries_Interface_Item__BUTTON_ = function(value) {
+Set_Libraries_Interface_Item__BUTTON_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__BUTTON_(value);
 };
-this.Get_Libraries_Interface_Item__TOGGLE_BUTTON_ = function() {
+Get_Libraries_Interface_Item__TOGGLE_BUTTON_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOGGLE_BUTTON_();
 };
-this.Set_Libraries_Interface_Item__TOGGLE_BUTTON_ = function(value) {
+Set_Libraries_Interface_Item__TOGGLE_BUTTON_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOGGLE_BUTTON_(value);
 };
-this.Get_Libraries_Interface_Item__TABLE_ = function() {
+Get_Libraries_Interface_Item__TABLE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TABLE_();
 };
-this.Set_Libraries_Interface_Item__TABLE_ = function(value) {
+Set_Libraries_Interface_Item__TABLE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TABLE_(value);
 };
-this.Get_Libraries_Interface_Item__CELL_ = function() {
+Get_Libraries_Interface_Item__CELL_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CELL_();
 };
-this.Set_Libraries_Interface_Item__CELL_ = function(value) {
+Set_Libraries_Interface_Item__CELL_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CELL_(value);
 };
-this.Get_Libraries_Interface_Item__CHART_SECTION_ = function() {
+Get_Libraries_Interface_Item__CHART_SECTION_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_SECTION_();
 };
-this.Set_Libraries_Interface_Item__CHART_SECTION_ = function(value) {
+Set_Libraries_Interface_Item__CHART_SECTION_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_SECTION_(value);
 };
-this.Get_Libraries_Interface_Item__nextFocus_ = function() {
+Get_Libraries_Interface_Item__nextFocus_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__nextFocus_();
 };
-this.Set_Libraries_Interface_Item__nextFocus_ = function(value) {
+Set_Libraries_Interface_Item__nextFocus_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__nextFocus_(value);
 };
-this.Get_Libraries_Interface_Item__description_ = function() {
+Get_Libraries_Interface_Item__description_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__description_();
 };
-this.Set_Libraries_Interface_Item__description_ = function(value) {
+Set_Libraries_Interface_Item__description_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__description_(value);
 };
-this.Get_Libraries_Interface_Item__behaviors_ = function() {
+Get_Libraries_Interface_Item__behaviors_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__behaviors_();
 };
-this.Set_Libraries_Interface_Item__behaviors_ = function(value) {
+Set_Libraries_Interface_Item__behaviors_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__behaviors_(value);
 };
-this.Get_Libraries_Interface_Item__LIST_ITEM_ = function() {
+Get_Libraries_Interface_Item__LIST_ITEM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_ITEM_();
 };
-this.Set_Libraries_Interface_Item__LIST_ITEM_ = function(value) {
+Set_Libraries_Interface_Item__LIST_ITEM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_ITEM_(value);
 };
-this.Get_Libraries_Interface_Item__PANE_ = function() {
+Get_Libraries_Interface_Item__PANE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PANE_();
 };
-this.Set_Libraries_Interface_Item__PANE_ = function(value) {
+Set_Libraries_Interface_Item__PANE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PANE_(value);
 };
-this.Get_Libraries_Interface_Item__mouseWheelListeners_ = function() {
+Get_Libraries_Interface_Item__mouseWheelListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseWheelListeners_();
 };
-this.Set_Libraries_Interface_Item__mouseWheelListeners_ = function(value) {
+Set_Libraries_Interface_Item__mouseWheelListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseWheelListeners_(value);
 };
-this.Get_Libraries_Interface_Item__TREE_TABLE_CELL_ = function() {
+Get_Libraries_Interface_Item__TREE_TABLE_CELL_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_CELL_();
 };
-this.Set_Libraries_Interface_Item__TREE_TABLE_CELL_ = function(value) {
+Set_Libraries_Interface_Item__TREE_TABLE_CELL_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_CELL_(value);
 };
-this.Get_Libraries_Interface_Item__MENU_BAR_ = function() {
+Get_Libraries_Interface_Item__MENU_BAR_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_BAR_();
 };
-this.Set_Libraries_Interface_Item__MENU_BAR_ = function(value) {
+Set_Libraries_Interface_Item__MENU_BAR_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_BAR_(value);
 };
-this.Get_Libraries_Interface_Item__TREE_ = function() {
+Get_Libraries_Interface_Item__TREE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_();
 };
-this.Set_Libraries_Interface_Item__TREE_ = function(value) {
+Set_Libraries_Interface_Item__TREE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_(value);
 };
-this.Get_Libraries_Interface_Item__CUSTOM_ = function() {
+Get_Libraries_Interface_Item__CUSTOM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CUSTOM_();
 };
-this.Set_Libraries_Interface_Item__CUSTOM_ = function(value) {
+Set_Libraries_Interface_Item__CUSTOM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CUSTOM_(value);
 };
-this.Get_Libraries_Interface_Item__TAB_PANE_ = function() {
+Get_Libraries_Interface_Item__TAB_PANE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_PANE_();
 };
-this.Set_Libraries_Interface_Item__TAB_PANE_ = function(value) {
+Set_Libraries_Interface_Item__TAB_PANE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_PANE_(value);
 };
-this.Get_Libraries_Interface_Item__properties_ = function() {
+Get_Libraries_Interface_Item__properties_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__properties_();
 };
-this.Set_Libraries_Interface_Item__properties_ = function(value) {
+Set_Libraries_Interface_Item__properties_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__properties_(value);
 };
-this.Get_Libraries_Interface_Item__DIALOG_ = function() {
+Get_Libraries_Interface_Item__DIALOG_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__DIALOG_();
 };
-this.Set_Libraries_Interface_Item__DIALOG_ = function(value) {
+Set_Libraries_Interface_Item__DIALOG_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__DIALOG_(value);
 };
-this.Get_Libraries_Interface_Item__MENU_ITEM_ = function() {
+Get_Libraries_Interface_Item__MENU_ITEM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_ITEM_();
 };
-this.Set_Libraries_Interface_Item__MENU_ITEM_ = function(value) {
+Set_Libraries_Interface_Item__MENU_ITEM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_ITEM_(value);
 };
-this.Get_Libraries_Interface_Item__mouseMoveListeners_ = function() {
+Get_Libraries_Interface_Item__mouseMoveListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseMoveListeners_();
 };
-this.Set_Libraries_Interface_Item__mouseMoveListeners_ = function(value) {
+Set_Libraries_Interface_Item__mouseMoveListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseMoveListeners_(value);
 };
-this.Get_Libraries_Interface_Item__TEXTBOX_ = function() {
+Get_Libraries_Interface_Item__TEXTBOX_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXTBOX_();
 };
-this.Set_Libraries_Interface_Item__TEXTBOX_ = function(value) {
+Set_Libraries_Interface_Item__TEXTBOX_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXTBOX_(value);
 };
-this.Get_Libraries_Interface_Item__PROGRESS_BAR_ = function() {
+Get_Libraries_Interface_Item__PROGRESS_BAR_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PROGRESS_BAR_();
 };
-this.Set_Libraries_Interface_Item__PROGRESS_BAR_ = function(value) {
+Set_Libraries_Interface_Item__PROGRESS_BAR_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PROGRESS_BAR_(value);
 };
-this.Get_Libraries_Interface_Item__accessibilityCode_ = function() {
+Get_Libraries_Interface_Item__accessibilityCode_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityCode_();
 };
-this.Set_Libraries_Interface_Item__accessibilityCode_ = function(value) {
+Set_Libraries_Interface_Item__accessibilityCode_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityCode_(value);
 };
-this.Get_Libraries_Interface_Item__ITEM_ = function() {
+Get_Libraries_Interface_Item__ITEM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__ITEM_();
 };
-this.Set_Libraries_Interface_Item__ITEM_ = function(value) {
+Set_Libraries_Interface_Item__ITEM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__ITEM_(value);
 };
-this.Get_Libraries_Interface_Item__TEXT_FIELD_ = function() {
+Get_Libraries_Interface_Item__TEXT_FIELD_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXT_FIELD_();
 };
-this.Set_Libraries_Interface_Item__TEXT_FIELD_ = function(value) {
+Set_Libraries_Interface_Item__TEXT_FIELD_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXT_FIELD_(value);
 };
-this.Get_Libraries_Interface_Item__TREE_ITEM_ = function() {
+Get_Libraries_Interface_Item__TREE_ITEM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_ITEM_();
 };
-this.Set_Libraries_Interface_Item__TREE_ITEM_ = function(value) {
+Set_Libraries_Interface_Item__TREE_ITEM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_ITEM_(value);
 };
-this.Get_Libraries_Interface_Item__touchListeners_ = function() {
+Get_Libraries_Interface_Item__touchListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__touchListeners_();
 };
-this.Set_Libraries_Interface_Item__touchListeners_ = function(value) {
+Set_Libraries_Interface_Item__touchListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__touchListeners_(value);
 };
-this.Get_Libraries_Interface_Item__CHECKBOX_ = function() {
+Get_Libraries_Interface_Item__CHECKBOX_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHECKBOX_();
 };
-this.Set_Libraries_Interface_Item__CHECKBOX_ = function(value) {
+Set_Libraries_Interface_Item__CHECKBOX_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHECKBOX_(value);
 };
-this.Get_Libraries_Interface_Item__TAB_ = function() {
+Get_Libraries_Interface_Item__TAB_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_();
 };
-this.Set_Libraries_Interface_Item__TAB_ = function(value) {
+Set_Libraries_Interface_Item__TAB_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_(value);
 };
-this.Get_Libraries_Interface_Item__acceptsMouseInput_ = function() {
+Get_Libraries_Interface_Item__acceptsMouseInput_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__acceptsMouseInput_();
 };
-this.Set_Libraries_Interface_Item__acceptsMouseInput_ = function(value) {
+Set_Libraries_Interface_Item__acceptsMouseInput_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__acceptsMouseInput_(value);
 };
-this.Get_Libraries_Interface_Item__name_ = function() {
+Get_Libraries_Interface_Item__name_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__name_();
 };
-this.Set_Libraries_Interface_Item__name_ = function(value) {
+Set_Libraries_Interface_Item__name_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__name_(value);
 };
-this.Get_Libraries_Interface_Item__LIST_ = function() {
+Get_Libraries_Interface_Item__LIST_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_();
 };
-this.Set_Libraries_Interface_Item__LIST_ = function(value) {
+Set_Libraries_Interface_Item__LIST_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_(value);
 };
-this.Get_Libraries_Interface_Item__mouseListeners_ = function() {
+Get_Libraries_Interface_Item__mouseListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseListeners_();
 };
-this.Set_Libraries_Interface_Item__mouseListeners_ = function(value) {
+Set_Libraries_Interface_Item__mouseListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseListeners_(value);
 };
-this.Get_Libraries_Interface_Item__focusable_ = function() {
+Get_Libraries_Interface_Item__focusable_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusable_();
 };
-this.Set_Libraries_Interface_Item__focusable_ = function(value) {
+Set_Libraries_Interface_Item__focusable_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusable_(value);
 };
-this.Get_Libraries_Interface_Item__GROUP_ = function() {
+Get_Libraries_Interface_Item__GROUP_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__GROUP_();
 };
-this.Set_Libraries_Interface_Item__GROUP_ = function(value) {
+Set_Libraries_Interface_Item__GROUP_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__GROUP_(value);
 };
-this.Get_Libraries_Interface_Item__gestureListeners_ = function() {
+Get_Libraries_Interface_Item__gestureListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__gestureListeners_();
 };
-this.Set_Libraries_Interface_Item__gestureListeners_ = function(value) {
+Set_Libraries_Interface_Item__gestureListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__gestureListeners_(value);
 };
-this.Get_Libraries_Interface_Item__NOT_ACCESSIBLE_ = function() {
+Get_Libraries_Interface_Item__NOT_ACCESSIBLE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__NOT_ACCESSIBLE_();
 };
-this.Set_Libraries_Interface_Item__NOT_ACCESSIBLE_ = function(value) {
+Set_Libraries_Interface_Item__NOT_ACCESSIBLE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__NOT_ACCESSIBLE_(value);
 };
-this.Get_Libraries_Interface_Item__LABEL_ = function() {
+Get_Libraries_Interface_Item__LABEL_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LABEL_();
 };
-this.Set_Libraries_Interface_Item__LABEL_ = function(value) {
+Set_Libraries_Interface_Item__LABEL_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LABEL_(value);
 };
-this.Get_Libraries_Interface_Item__inputGroup_ = function() {
+Get_Libraries_Interface_Item__inputGroup_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__inputGroup_();
 };
-this.Set_Libraries_Interface_Item__inputGroup_ = function(value) {
+Set_Libraries_Interface_Item__inputGroup_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__inputGroup_(value);
 };
-this.Get_Libraries_Interface_Item__TOOLBAR_ = function() {
+Get_Libraries_Interface_Item__TOOLBAR_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOOLBAR_();
 };
-this.Set_Libraries_Interface_Item__TOOLBAR_ = function(value) {
+Set_Libraries_Interface_Item__TOOLBAR_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOOLBAR_(value);
 };
-this.Get_Libraries_Interface_Item__TREE_TABLE_ = function() {
+Get_Libraries_Interface_Item__TREE_TABLE_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_();
 };
-this.Set_Libraries_Interface_Item__TREE_TABLE_ = function(value) {
+Set_Libraries_Interface_Item__TREE_TABLE_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_(value);
 };
-this.Get_Libraries_Interface_Item__previousFocus_ = function() {
+Get_Libraries_Interface_Item__previousFocus_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__previousFocus_();
 };
-this.Set_Libraries_Interface_Item__previousFocus_ = function(value) {
+Set_Libraries_Interface_Item__previousFocus_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__previousFocus_(value);
 };
-this.Get_Libraries_Interface_Item__CHART_ = function() {
+Get_Libraries_Interface_Item__CHART_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_();
 };
-this.Set_Libraries_Interface_Item__CHART_ = function(value) {
+Set_Libraries_Interface_Item__CHART_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_(value);
 };
-this.Get_Libraries_Interface_Item__CHART_ITEM_ = function() {
+Get_Libraries_Interface_Item__CHART_ITEM_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_ITEM_();
 };
-this.Set_Libraries_Interface_Item__CHART_ITEM_ = function(value) {
+Set_Libraries_Interface_Item__CHART_ITEM_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_ITEM_(value);
 };
-this.Get_Libraries_Interface_Item__POPUP_MENU_ = function() {
+Get_Libraries_Interface_Item__POPUP_MENU_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__POPUP_MENU_();
 };
-this.Set_Libraries_Interface_Item__POPUP_MENU_ = function(value) {
+Set_Libraries_Interface_Item__POPUP_MENU_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__POPUP_MENU_(value);
 };
-this.Get_Libraries_Interface_Item__focusListeners_ = function() {
+Get_Libraries_Interface_Item__focusListeners_() {
    return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusListeners_();
 };
-this.Set_Libraries_Interface_Item__focusListeners_ = function(value) {
+Set_Libraries_Interface_Item__focusListeners_(value) {
    this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusListeners_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__renderMouseDown_ = function() {
+Get_Libraries_Interface_Controls_Control__renderMouseDown_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseDown_();
 };
-this.Set_Libraries_Interface_Controls_Control__renderMouseDown_ = function(value) {
+Set_Libraries_Interface_Controls_Control__renderMouseDown_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseDown_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__listeners_ = function() {
+Get_Libraries_Interface_Controls_Control__listeners_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__listeners_();
 };
-this.Set_Libraries_Interface_Controls_Control__listeners_ = function(value) {
+Set_Libraries_Interface_Controls_Control__listeners_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__listeners_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__contextMenu_ = function() {
+Get_Libraries_Interface_Controls_Control__contextMenu_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__contextMenu_();
 };
-this.Set_Libraries_Interface_Controls_Control__contextMenu_ = function(value) {
+Set_Libraries_Interface_Controls_Control__contextMenu_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__contextMenu_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__renderMouseOver_ = function() {
+Get_Libraries_Interface_Controls_Control__renderMouseOver_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseOver_();
 };
-this.Set_Libraries_Interface_Controls_Control__renderMouseOver_ = function(value) {
+Set_Libraries_Interface_Controls_Control__renderMouseOver_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseOver_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__FILL_ = function() {
+Get_Libraries_Interface_Controls_Control__FILL_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FILL_();
 };
-this.Set_Libraries_Interface_Controls_Control__FILL_ = function(value) {
+Set_Libraries_Interface_Controls_Control__FILL_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FILL_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__needsLayout_ = function() {
+Get_Libraries_Interface_Controls_Control__needsLayout_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__needsLayout_();
 };
-this.Set_Libraries_Interface_Controls_Control__needsLayout_ = function(value) {
+Set_Libraries_Interface_Controls_Control__needsLayout_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__needsLayout_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__currentProperties_ = function() {
+Get_Libraries_Interface_Controls_Control__currentProperties_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__currentProperties_();
 };
-this.Set_Libraries_Interface_Controls_Control__currentProperties_ = function(value) {
+Set_Libraries_Interface_Controls_Control__currentProperties_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__currentProperties_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__defaultProperties_ = function() {
+Get_Libraries_Interface_Controls_Control__defaultProperties_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__defaultProperties_();
 };
-this.Set_Libraries_Interface_Controls_Control__defaultProperties_ = function(value) {
+Set_Libraries_Interface_Controls_Control__defaultProperties_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__defaultProperties_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__FIT_FONT_ = function() {
+Get_Libraries_Interface_Controls_Control__FIT_FONT_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_FONT_();
 };
-this.Set_Libraries_Interface_Controls_Control__FIT_FONT_ = function(value) {
+Set_Libraries_Interface_Controls_Control__FIT_FONT_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_FONT_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__renderSelected_ = function() {
+Get_Libraries_Interface_Controls_Control__renderSelected_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderSelected_();
 };
-this.Set_Libraries_Interface_Controls_Control__renderSelected_ = function(value) {
+Set_Libraries_Interface_Controls_Control__renderSelected_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderSelected_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_ = function() {
+Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_();
 };
-this.Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_ = function(value) {
+Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__layout_ = function() {
+Get_Libraries_Interface_Controls_Control__layout_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layout_();
 };
-this.Set_Libraries_Interface_Controls_Control__layout_ = function(value) {
+Set_Libraries_Interface_Controls_Control__layout_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layout_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__selectionListeners_ = function() {
+Get_Libraries_Interface_Controls_Control__selectionListeners_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__selectionListeners_();
 };
-this.Set_Libraries_Interface_Controls_Control__selectionListeners_ = function(value) {
+Set_Libraries_Interface_Controls_Control__selectionListeners_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__selectionListeners_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__STANDARD_ = function() {
+Get_Libraries_Interface_Controls_Control__STANDARD_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__STANDARD_();
 };
-this.Set_Libraries_Interface_Controls_Control__STANDARD_ = function(value) {
+Set_Libraries_Interface_Controls_Control__STANDARD_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__STANDARD_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__layoutProperties_ = function() {
+Get_Libraries_Interface_Controls_Control__layoutProperties_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layoutProperties_();
 };
-this.Set_Libraries_Interface_Controls_Control__layoutProperties_ = function(value) {
+Set_Libraries_Interface_Controls_Control__layoutProperties_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layoutProperties_(value);
 };
-this.Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_ = function() {
+Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_() {
    return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_();
 };
-this.Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_ = function(value) {
+Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_(value) {
    this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_(value);
 };
-this.Get_Libraries_Interface_Item2D__position_ = function() {
+Get_Libraries_Interface_Item2D__position_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__position_();
 };
-this.Set_Libraries_Interface_Item2D__position_ = function(value) {
+Set_Libraries_Interface_Item2D__position_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__position_(value);
 };
-this.Get_Libraries_Interface_Item2D__scale_ = function() {
+Get_Libraries_Interface_Item2D__scale_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scale_();
 };
-this.Set_Libraries_Interface_Item2D__scale_ = function(value) {
+Set_Libraries_Interface_Item2D__scale_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scale_(value);
 };
-this.Get_Libraries_Interface_Item2D__workVector2B_ = function() {
+Get_Libraries_Interface_Item2D__workVector2B_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2B_();
 };
-this.Set_Libraries_Interface_Item2D__workVector2B_ = function(value) {
+Set_Libraries_Interface_Item2D__workVector2B_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2B_(value);
 };
-this.Get_Libraries_Interface_Item2D__manager_ = function() {
+Get_Libraries_Interface_Item2D__manager_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__manager_();
 };
-this.Set_Libraries_Interface_Item2D__manager_ = function(value) {
+Set_Libraries_Interface_Item2D__manager_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__manager_(value);
 };
-this.Get_Libraries_Interface_Item2D__workVector2A_ = function() {
+Get_Libraries_Interface_Item2D__workVector2A_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2A_();
 };
-this.Set_Libraries_Interface_Item2D__workVector2A_ = function(value) {
+Set_Libraries_Interface_Item2D__workVector2A_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2A_(value);
 };
-this.Get_Libraries_Interface_Item2D__jointList_ = function() {
+Get_Libraries_Interface_Item2D__jointList_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__jointList_();
 };
-this.Set_Libraries_Interface_Item2D__jointList_ = function(value) {
+Set_Libraries_Interface_Item2D__jointList_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__jointList_(value);
 };
-this.Get_Libraries_Interface_Item2D__updateTransform_ = function() {
+Get_Libraries_Interface_Item2D__updateTransform_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__updateTransform_();
 };
-this.Set_Libraries_Interface_Item2D__updateTransform_ = function(value) {
+Set_Libraries_Interface_Item2D__updateTransform_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__updateTransform_(value);
 };
-this.Get_Libraries_Interface_Item2D__children_ = function() {
+Get_Libraries_Interface_Item2D__children_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__children_();
 };
-this.Set_Libraries_Interface_Item2D__children_ = function(value) {
+Set_Libraries_Interface_Item2D__children_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__children_(value);
 };
-this.Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_ = function() {
+Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_();
 };
-this.Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_ = function(value) {
+Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_(value);
 };
-this.Get_Libraries_Interface_Item2D__hasMoved_ = function() {
+Get_Libraries_Interface_Item2D__hasMoved_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__hasMoved_();
 };
-this.Set_Libraries_Interface_Item2D__hasMoved_ = function(value) {
+Set_Libraries_Interface_Item2D__hasMoved_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__hasMoved_(value);
 };
-this.Get_Libraries_Interface_Item2D__visualView_ = function() {
+Get_Libraries_Interface_Item2D__visualView_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__visualView_();
 };
-this.Set_Libraries_Interface_Item2D__visualView_ = function(value) {
+Set_Libraries_Interface_Item2D__visualView_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__visualView_(value);
 };
-this.Get_Libraries_Interface_Item2D__widthSet_ = function() {
+Get_Libraries_Interface_Item2D__widthSet_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__widthSet_();
 };
-this.Set_Libraries_Interface_Item2D__widthSet_ = function(value) {
+Set_Libraries_Interface_Item2D__widthSet_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__widthSet_(value);
 };
-this.Get_Libraries_Interface_Item2D__transform_ = function() {
+Get_Libraries_Interface_Item2D__transform_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform_();
 };
-this.Set_Libraries_Interface_Item2D__transform_ = function(value) {
+Set_Libraries_Interface_Item2D__transform_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform_(value);
 };
-this.Get_Libraries_Interface_Item2D__physicsEnabled_ = function() {
+Get_Libraries_Interface_Item2D__physicsEnabled_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__physicsEnabled_();
 };
-this.Set_Libraries_Interface_Item2D__physicsEnabled_ = function(value) {
+Set_Libraries_Interface_Item2D__physicsEnabled_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__physicsEnabled_(value);
 };
-this.Get_Libraries_Interface_Item2D__layerSet_ = function() {
+Get_Libraries_Interface_Item2D__layerSet_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layerSet_();
 };
-this.Set_Libraries_Interface_Item2D__layerSet_ = function(value) {
+Set_Libraries_Interface_Item2D__layerSet_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layerSet_(value);
 };
-this.Get_Libraries_Interface_Item2D__rotation_ = function() {
+Get_Libraries_Interface_Item2D__rotation_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__rotation_();
 };
-this.Set_Libraries_Interface_Item2D__rotation_ = function(value) {
+Set_Libraries_Interface_Item2D__rotation_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__rotation_(value);
 };
-this.Get_Libraries_Interface_Item2D__dimensions_ = function() {
+Get_Libraries_Interface_Item2D__dimensions_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__dimensions_();
 };
-this.Set_Libraries_Interface_Item2D__dimensions_ = function(value) {
+Set_Libraries_Interface_Item2D__dimensions_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__dimensions_(value);
 };
-this.Get_Libraries_Interface_Item2D__collideWithChildren_ = function() {
+Get_Libraries_Interface_Item2D__collideWithChildren_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collideWithChildren_();
 };
-this.Set_Libraries_Interface_Item2D__collideWithChildren_ = function(value) {
+Set_Libraries_Interface_Item2D__collideWithChildren_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collideWithChildren_(value);
 };
-this.Get_Libraries_Interface_Item2D__offset_ = function() {
+Get_Libraries_Interface_Item2D__offset_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__offset_();
 };
-this.Set_Libraries_Interface_Item2D__offset_ = function(value) {
+Set_Libraries_Interface_Item2D__offset_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__offset_(value);
 };
-this.Get_Libraries_Interface_Item2D__nodeCount_ = function() {
+Get_Libraries_Interface_Item2D__nodeCount_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodeCount_();
 };
-this.Set_Libraries_Interface_Item2D__nodeCount_ = function(value) {
+Set_Libraries_Interface_Item2D__nodeCount_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodeCount_(value);
 };
-this.Get_Libraries_Interface_Item2D__transform0_ = function() {
+Get_Libraries_Interface_Item2D__transform0_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform0_();
 };
-this.Set_Libraries_Interface_Item2D__transform0_ = function(value) {
+Set_Libraries_Interface_Item2D__transform0_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform0_(value);
 };
-this.Get_Libraries_Interface_Item2D__scaleOffset_ = function() {
+Get_Libraries_Interface_Item2D__scaleOffset_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scaleOffset_();
 };
-this.Set_Libraries_Interface_Item2D__scaleOffset_ = function(value) {
+Set_Libraries_Interface_Item2D__scaleOffset_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scaleOffset_(value);
 };
-this.Get_Libraries_Interface_Item2D__nodesSet_ = function() {
+Get_Libraries_Interface_Item2D__nodesSet_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodesSet_();
 };
-this.Set_Libraries_Interface_Item2D__nodesSet_ = function(value) {
+Set_Libraries_Interface_Item2D__nodesSet_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodesSet_(value);
 };
-this.Get_Libraries_Interface_Item2D__workVector3_ = function() {
+Get_Libraries_Interface_Item2D__workVector3_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector3_();
 };
-this.Set_Libraries_Interface_Item2D__workVector3_ = function(value) {
+Set_Libraries_Interface_Item2D__workVector3_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector3_(value);
 };
-this.Get_Libraries_Interface_Item2D__origin_ = function() {
+Get_Libraries_Interface_Item2D__origin_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__origin_();
 };
-this.Set_Libraries_Interface_Item2D__origin_ = function(value) {
+Set_Libraries_Interface_Item2D__origin_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__origin_(value);
 };
-this.Get_Libraries_Interface_Item2D__layer_ = function() {
+Get_Libraries_Interface_Item2D__layer_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layer_();
 };
-this.Set_Libraries_Interface_Item2D__layer_ = function(value) {
+Set_Libraries_Interface_Item2D__layer_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layer_(value);
 };
-this.Get_Libraries_Interface_Item2D__isCustomDrawing_ = function() {
+Get_Libraries_Interface_Item2D__isCustomDrawing_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isCustomDrawing_();
 };
-this.Set_Libraries_Interface_Item2D__isCustomDrawing_ = function(value) {
+Set_Libraries_Interface_Item2D__isCustomDrawing_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isCustomDrawing_(value);
 };
-this.Get_Libraries_Interface_Item2D__shape_ = function() {
+Get_Libraries_Interface_Item2D__shape_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shape_();
 };
-this.Set_Libraries_Interface_Item2D__shape_ = function(value) {
+Set_Libraries_Interface_Item2D__shape_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shape_(value);
 };
-this.Get_Libraries_Interface_Item2D__properties_ = function() {
+Get_Libraries_Interface_Item2D__properties_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__properties_();
 };
-this.Set_Libraries_Interface_Item2D__properties_ = function(value) {
+Set_Libraries_Interface_Item2D__properties_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__properties_(value);
 };
-this.Get_Libraries_Interface_Item2D__shouldTriggerSimulation_ = function() {
+Get_Libraries_Interface_Item2D__shouldTriggerSimulation_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shouldTriggerSimulation_();
 };
-this.Set_Libraries_Interface_Item2D__shouldTriggerSimulation_ = function(value) {
+Set_Libraries_Interface_Item2D__shouldTriggerSimulation_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shouldTriggerSimulation_(value);
 };
-this.Get_Libraries_Interface_Item2D__sweep_ = function() {
+Get_Libraries_Interface_Item2D__sweep_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__sweep_();
 };
-this.Set_Libraries_Interface_Item2D__sweep_ = function(value) {
+Set_Libraries_Interface_Item2D__sweep_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__sweep_(value);
 };
-this.Get_Libraries_Interface_Item2D__isResizing_ = function() {
+Get_Libraries_Interface_Item2D__isResizing_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isResizing_();
 };
-this.Set_Libraries_Interface_Item2D__isResizing_ = function(value) {
+Set_Libraries_Interface_Item2D__isResizing_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isResizing_(value);
 };
-this.Get_Libraries_Interface_Item2D__collidable_ = function() {
+Get_Libraries_Interface_Item2D__collidable_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collidable_();
 };
-this.Set_Libraries_Interface_Item2D__collidable_ = function(value) {
+Set_Libraries_Interface_Item2D__collidable_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collidable_(value);
 };
-this.Get_Libraries_Interface_Item2D__bounds_ = function() {
+Get_Libraries_Interface_Item2D__bounds_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__bounds_();
 };
-this.Set_Libraries_Interface_Item2D__bounds_ = function(value) {
+Set_Libraries_Interface_Item2D__bounds_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__bounds_(value);
 };
-this.Get_Libraries_Interface_Item2D__nodes_ = function() {
+Get_Libraries_Interface_Item2D__nodes_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodes_();
 };
-this.Set_Libraries_Interface_Item2D__nodes_ = function(value) {
+Set_Libraries_Interface_Item2D__nodes_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodes_(value);
 };
-this.Get_Libraries_Interface_Item2D__flipX_ = function() {
+Get_Libraries_Interface_Item2D__flipX_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipX_();
 };
-this.Set_Libraries_Interface_Item2D__flipX_ = function(value) {
+Set_Libraries_Interface_Item2D__flipX_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipX_(value);
 };
-this.Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_ = function() {
+Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_();
 };
-this.Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_ = function(value) {
+Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_(value);
 };
-this.Get_Libraries_Interface_Item2D__collisionList_ = function() {
+Get_Libraries_Interface_Item2D__collisionList_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collisionList_();
 };
-this.Set_Libraries_Interface_Item2D__collisionList_ = function(value) {
+Set_Libraries_Interface_Item2D__collisionList_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collisionList_(value);
 };
-this.Get_Libraries_Interface_Item2D__heightSet_ = function() {
+Get_Libraries_Interface_Item2D__heightSet_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__heightSet_();
 };
-this.Set_Libraries_Interface_Item2D__heightSet_ = function(value) {
+Set_Libraries_Interface_Item2D__heightSet_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__heightSet_(value);
 };
-this.Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_ = function() {
+Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_();
 };
-this.Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_ = function(value) {
+Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_(value);
 };
-this.Get_Libraries_Interface_Item2D__parentItem_ = function() {
+Get_Libraries_Interface_Item2D__parentItem_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__parentItem_();
 };
-this.Set_Libraries_Interface_Item2D__parentItem_ = function(value) {
+Set_Libraries_Interface_Item2D__parentItem_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__parentItem_(value);
 };
-this.Get_Libraries_Interface_Item2D__clipPixels_ = function() {
+Get_Libraries_Interface_Item2D__clipPixels_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__clipPixels_();
 };
-this.Set_Libraries_Interface_Item2D__clipPixels_ = function(value) {
+Set_Libraries_Interface_Item2D__clipPixels_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__clipPixels_(value);
 };
-this.Get_Libraries_Interface_Item2D__z_ = function() {
+Get_Libraries_Interface_Item2D__z_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__z_();
 };
-this.Set_Libraries_Interface_Item2D__z_ = function(value) {
+Set_Libraries_Interface_Item2D__z_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__z_(value);
 };
-this.Get_Libraries_Interface_Item2D__flipY_ = function() {
+Get_Libraries_Interface_Item2D__flipY_() {
    return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipY_();
 };
-this.Set_Libraries_Interface_Item2D__flipY_ = function(value) {
+Set_Libraries_Interface_Item2D__flipY_(value) {
    this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipY_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Interface.Item', 'Libraries.Interface.Controls.Control', 'Libraries.Interface.Item2D', 'Libraries.Language.Object',  'WebEditor.EditorItem'];
+this.Libraries_Interface_Item__ = null;
+this.Libraries_Interface_Controls_Control__ = null;
+this.Libraries_Interface_Item2D__ = null;
 if(parents == null) {
    this.Libraries_Interface_Item__ = new quorum_Libraries_Interface_Item_(false);
    this.Libraries_Interface_Item2D__ = new quorum_Libraries_Interface_Item2D_(false);
@@ -2335,44 +2341,43 @@ this.Libraries_Interface_Item2D__.constructor_();
 if (parents == null) {this.constructor_();}
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSingleTapBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -2402,7 +2407,7 @@ temp.Focus();
 }
 }
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -2413,7 +2418,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -2424,18 +2429,23 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSingleTapBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -2445,2190 +2455,2194 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_WebControlPanel_(parents) {
+
+class quorum_WebEditor_WebControlPanel_ {
+GetShadowColor() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowColor();
+}
+GetTopRightPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetTopRightPixelRounding();
+}
+SetOrigin$quorum_number$quorum_number(setX, setY) {
+     return this.Libraries_Interface_Item2D__.SetOrigin$quorum_number$quorum_number(setX, setY);
+}
+RequireSimulation$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.RequireSimulation$quorum_boolean(flag);
+}
+HasBottomRightPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasBottomRightPixelRounding();
+}
+BeginMouseOver() {
+     return this.Libraries_Interface_Controls_Control__.BeginMouseOver();
+}
+SetTorque$quorum_number(torque) {
+     return this.Libraries_Interface_Item2D__.SetTorque$quorum_number(torque);
+}
+RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
+}
+GetLayoutRows() {
+     return this.Libraries_Interface_Controls_Control__.GetLayoutRows();
+}
+SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout) {
+     return this.Libraries_Interface_Controls_Control__.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
+}
+IsRotationAllowed() {
+     return this.Libraries_Interface_Item2D__.IsRotationAllowed();
+}
+SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+IsSimulated() {
+     return this.Libraries_Interface_Item2D__.IsSimulated();
+}
+SetShadowY$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowY$quorum_number(value);
+}
+GetJointList() {
+     return this.Libraries_Interface_Item2D__.GetJointList();
+}
+Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform1, transform2) {
+     return this.Libraries_Interface_Item2D__.Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform1, transform2);
+}
+GetItemAt$quorum_number$quorum_number(x, y) {
+     return this.Libraries_Interface_Item2D__.GetItemAt$quorum_number$quorum_number(x, y);
+}
+SetTopPadding$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetTopPadding$quorum_number(padding);
+}
+ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force) {
+     return this.Libraries_Interface_Item2D__.ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force);
+}
+SetMass$quorum_number(mass) {
+     return this.Libraries_Interface_Item2D__.SetMass$quorum_number(mass);
+}
+SetResponsive() {
+     return this.Libraries_Interface_Item2D__.SetResponsive();
+}
+GetLeftPadding() {
+     return this.Libraries_Interface_Controls_Control__.GetLeftPadding();
+}
+SetPixelY$quorum_number(y) {
+     return this.Libraries_Interface_Controls_Control__.SetPixelY$quorum_number(y);
+}
+HasTopRightPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasTopRightPixelRounding();
+}
+SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D(properties) {
+     return this.Libraries_Interface_Item2D__.SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D(properties);
+}
+SetGridHeight$quorum_integer(gridHeight) {
+     return this.Libraries_Interface_Controls_Control__.SetGridHeight$quorum_integer(gridHeight);
+}
+IsSimulationRequired() {
+     return this.Libraries_Interface_Item2D__.IsSimulationRequired();
+}
+GetAccentColor() {
+     return this.Libraries_Interface_Controls_Control__.GetAccentColor();
+}
+HasTopLeftRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasTopLeftRounding();
+}
+SetParent$quorum_Libraries_Interface_Item2D(newItem) {
+     return this.Libraries_Interface_Item2D__.SetParent$quorum_Libraries_Interface_Item2D(newItem);
+}
+GetShadowX() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowX();
+}
+GetShadowY() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowY();
+}
+SelectByFirstLetters$quorum_text(firstLetter) {
+     return this.Libraries_Interface_Controls_Control__.SelectByFirstLetters$quorum_text(firstLetter);
+}
+SetTransform$quorum_Libraries_Compute_Vector2$quorum_number(position, angle) {
+     return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Compute_Vector2$quorum_number(position, angle);
+}
+GetDefaultFontName() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultFontName();
+}
+GetRightMargin() {
+     return this.Libraries_Interface_Controls_Control__.GetRightMargin();
+}
+RequestLayout() {
+     return this.Libraries_Interface_Controls_Control__.RequestLayout();
+}
+GetLinearDamping() {
+     return this.Libraries_Interface_Item2D__.GetLinearDamping();
+}
+GetBottomRightRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomRightRounding();
+}
+SetGridX$quorum_integer(gridX) {
+     return this.Libraries_Interface_Controls_Control__.SetGridX$quorum_integer(gridX);
+}
+SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D(edge) {
+     return this.Libraries_Interface_Item2D__.SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D(edge);
+}
+SetScale$quorum_number(scale) {
+     return this.Libraries_Interface_Item2D__.SetScale$quorum_number(scale);
+}
+GetBottomMargin() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomMargin();
+}
+SetToSmallFont() {
+     return this.Libraries_Interface_Controls_Control__.SetToSmallFont();
+}
+ClickedMouse() {
+     return this.Libraries_Interface_Controls_Control__.ClickedMouse();
+}
+GetLinearVelocity() {
+     return this.Libraries_Interface_Item2D__.GetLinearVelocity();
+}
+SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
+     return this.Libraries_Interface_Item2D__.SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
+}
+SetLinearVelocityX$quorum_number(linearVelocityX) {
+     return this.Libraries_Interface_Item2D__.SetLinearVelocityX$quorum_number(linearVelocityX);
+}
+QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D(painter) {
+     return this.Libraries_Interface_Item2D__.QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D(painter);
+}
+UpdateTransformY() {
+     return this.Libraries_Interface_Item2D__.UpdateTransformY();
+}
+UpdateTransformX() {
+     return this.Libraries_Interface_Item2D__.UpdateTransformX();
+}
+ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(force, point) {
+     return this.Libraries_Interface_Item2D__.ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(force, point);
+}
+GetVisibleItemAt$quorum_number$quorum_number(x, y) {
+     return this.Libraries_Interface_Item2D__.GetVisibleItemAt$quorum_number$quorum_number(x, y);
+}
+IsRenderingSelection() {
+     return this.Libraries_Interface_Controls_Control__.IsRenderingSelection();
+}
+IsEmpty() {
+     return this.Libraries_Interface_Item2D__.IsEmpty();
+}
+AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
+     return this.Libraries_Interface_Controls_Control__.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
+}
+SetLinearVelocityY$quorum_number(linearVelocityY) {
+     return this.Libraries_Interface_Item2D__.SetLinearVelocityY$quorum_number(linearVelocityY);
+}
+GetShadowHeight() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowHeight();
+}
+IsFlippedY() {
+     return this.Libraries_Interface_Item2D__.IsFlippedY();
+}
+IsFlippedX() {
+     return this.Libraries_Interface_Item2D__.IsFlippedX();
+}
+GetGridHeight() {
+     return this.Libraries_Interface_Controls_Control__.GetGridHeight();
+}
+GetFocusListeners() {
+     return this.Libraries_Interface_Item__.GetFocusListeners();
+}
+AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
+     return this.Libraries_Interface_Item__.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
+}
+SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetTopRightRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetTopRightRounding$quorum_number(value);
+}
+GetTransform0() {
+     return this.Libraries_Interface_Item2D__.GetTransform0();
+}
+GetInverseInertia() {
+     return this.Libraries_Interface_Item2D__.GetInverseInertia();
+}
+Resize() {
+     return this.Libraries_Interface_Item2D__.Resize();
+}
+GetCurrentLayoutProperties() {
+     return this.Libraries_Interface_Controls_Control__.GetCurrentLayoutProperties();
+}
+FinishCollision$quorum_Libraries_Interface_Item(item) {
+     return this.Libraries_Interface_Item__.FinishCollision$quorum_Libraries_Interface_Item(item);
+}
+AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
+     return this.Libraries_Interface_Controls_Control__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
+}
+RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
+     return this.Libraries_Interface_Controls_Control__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
+}
+RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
+}
+SetAccessibilityCode$quorum_integer(newAccessibilityCode) {
+     return this.Libraries_Interface_Item__.SetAccessibilityCode$quorum_integer(newAccessibilityCode);
+}
+HasShadowX() {
+     return this.Libraries_Interface_Controls_Control__.HasShadowX();
+}
+SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+HasShadowY() {
+     return this.Libraries_Interface_Controls_Control__.HasShadowY();
+}
+GetAngularDamping() {
+     return this.Libraries_Interface_Item2D__.GetAngularDamping();
+}
+SetInterfaceOptionsKey$quorum_text(key) {
+     return this.Libraries_Interface_Controls_Control__.SetInterfaceOptionsKey$quorum_text(key);
+}
+RequestReloadGraphics() {
+     return this.Libraries_Interface_Controls_Control__.RequestReloadGraphics();
+}
+GetAccessibilityRoleDescription() {
+     return this.Libraries_Interface_Item__.GetAccessibilityRoleDescription();
+}
+GetRotationInRadians() {
+     return this.Libraries_Interface_Item2D__.GetRotationInRadians();
+}
+MoveX$quorum_number(xAmount) {
+     return this.Libraries_Interface_Item2D__.MoveX$quorum_number(xAmount);
+}
+ResetMass() {
+     return this.Libraries_Interface_Item2D__.ResetMass();
+}
+GetFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetFontColor();
+}
+RequestVerticesUpdate() {
+     return this.Libraries_Interface_Item2D__.RequestVerticesUpdate();
+}
+HasLeftBorder() {
+     return this.Libraries_Interface_Controls_Control__.HasLeftBorder();
+}
+HasTopLeftPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasTopLeftPixelRounding();
+}
+GetActivationBehavior() {
+     return this.Libraries_Interface_Controls_Control__.GetActivationBehavior();
+}
+UpdateBehaviors$quorum_number(seconds) {
+     return this.Libraries_Interface_Item__.UpdateBehaviors$quorum_number(seconds);
+}
+SetCollisionGroupIndex$quorum_integer(index) {
+     return this.Libraries_Interface_Item2D__.SetCollisionGroupIndex$quorum_integer(index);
+}
+GetRestitution() {
+     return this.Libraries_Interface_Item2D__.GetRestitution();
+}
+SetScreenPositionFromPhysicsPosition() {
+     return this.Libraries_Interface_Item2D__.SetScreenPositionFromPhysicsPosition();
+}
+IsPhysicsEnabled() {
+     return this.Libraries_Interface_Item2D__.IsPhysicsEnabled();
+}
+SetClipping$quorum_boolean(clip) {
+     return this.Libraries_Interface_Item2D__.SetClipping$quorum_boolean(clip);
+}
+SetScaleFromCenter$quorum_number(scale) {
+     return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number(scale);
+}
+IsShowing() {
+     return this.Libraries_Interface_Item__.IsShowing();
+}
+SetBorderStyle$quorum_integer(style) {
+     return this.Libraries_Interface_Controls_Control__.SetBorderStyle$quorum_integer(style);
+}
+Contains$quorum_number$quorum_number(containsX, containsY) {
+     return this.Libraries_Interface_Item2D__.Contains$quorum_number$quorum_number(containsX, containsY);
+}
+IsCollidable() {
+     return this.Libraries_Interface_Item2D__.IsCollidable();
+}
+Simulate$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.Simulate$quorum_boolean(flag);
+}
+GetPhysicsProperties() {
+     return this.Libraries_Interface_Item2D__.GetPhysicsProperties();
+}
+GetRightPadding() {
+     return this.Libraries_Interface_Controls_Control__.GetRightPadding();
+}
+SetY$quorum_number(setY) {
+     return this.Libraries_Interface_Item2D__.SetY$quorum_number(setY);
+}
+SetMass$quorum_Libraries_Game_Physics_Mass2D(mass) {
+     return this.Libraries_Interface_Item2D__.SetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
+}
+GetBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetBorderThickness();
+}
+GetAccessibleParent() {
+     return this.Libraries_Interface_Item2D__.GetAccessibleParent();
+}
+SetFlipY$quorum_boolean(flip) {
+     return this.Libraries_Interface_Item2D__.SetFlipY$quorum_boolean(flip);
+}
+GetName() {
+     return this.Libraries_Interface_Item__.GetName();
+}
+GetPixelWidth() {
+     return this.Libraries_Interface_Controls_Control__.GetPixelWidth();
+}
+ManageShape() {
+     return this.Libraries_Interface_Item2D__.ManageShape();
+}
+GetBottomLeftRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomLeftRounding();
+}
+GetLeftMargin() {
+     return this.Libraries_Interface_Controls_Control__.GetLeftMargin();
+}
+GetFriction() {
+     return this.Libraries_Interface_Item2D__.GetFriction();
+}
+GetSelectionListeners() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionListeners();
+}
+SetHasMoved$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.SetHasMoved$quorum_boolean(flag);
+}
+FastMoving$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.FastMoving$quorum_boolean(flag);
+}
+SetFont$quorum_Libraries_Game_Graphics_Font(font) {
+     return this.Libraries_Interface_Controls_Control__.SetFont$quorum_Libraries_Game_Graphics_Font(font);
+}
+SetPercentageX$quorum_number(x) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageX$quorum_number(x);
+}
+GetBorderStyle() {
+     return this.Libraries_Interface_Controls_Control__.GetBorderStyle();
+}
+ResetLayoutFlag() {
+     return this.Libraries_Interface_Controls_Control__.ResetLayoutFlag();
+}
+SetTopRightPixelRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetTopRightPixelRounding$quorum_number(value);
+}
+UpdateTransformAngle() {
+     return this.Libraries_Interface_Item2D__.UpdateTransformAngle();
+}
+GetUnfocusedSelectionBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionBorderColor();
+}
+EmptySelectionListeners() {
+     return this.Libraries_Interface_Controls_Control__.EmptySelectionListeners();
+}
+GetLayer() {
+     return this.Libraries_Interface_Item2D__.GetLayer();
+}
+GetWorldVector$quorum_Libraries_Compute_Vector2(localVector) {
+     return this.Libraries_Interface_Item2D__.GetWorldVector$quorum_Libraries_Compute_Vector2(localVector);
+}
+GetMouseDownColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseDownColor();
+}
+HasFontOutlineThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasFontOutlineThickness();
+}
+GetFocusFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetFocusFontColor();
+}
+SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetInterfaceOptionsKey() {
+     return this.Libraries_Interface_Controls_Control__.GetInterfaceOptionsKey();
+}
+GetHorizontalLayoutMode() {
+     return this.Libraries_Interface_Controls_Control__.GetHorizontalLayoutMode();
+}
+SetGridWidth$quorum_integer(gridWidth) {
+     return this.Libraries_Interface_Controls_Control__.SetGridWidth$quorum_integer(gridWidth);
+}
+GetMass$quorum_Libraries_Game_Physics_Mass2D(mass) {
+     return this.Libraries_Interface_Item2D__.GetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
+}
+SetToLargeFont() {
+     return this.Libraries_Interface_Controls_Control__.SetToLargeFont();
+}
+AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
+     return this.Libraries_Interface_Item__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
+}
+SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight) {
+     return this.Libraries_Interface_Controls_Control__.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
+}
+GetDefaultProportionalFontName() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultProportionalFontName();
+}
+SetScaleFromCenter$quorum_number$quorum_number(newX, newY) {
+     return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number$quorum_number(newX, newY);
+}
+SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetContainerGridWidth() {
+     return this.Libraries_Interface_Controls_Control__.GetContainerGridWidth();
+}
+HasBottomLeftPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasBottomLeftPixelRounding();
+}
+GetDefaultFont() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultFont();
+}
+GetMouseDownGlowColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseDownGlowColor();
+}
+SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
+     return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
+}
+HasMoved() {
+     return this.Libraries_Interface_Item2D__.HasMoved();
+}
+RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
+}
+SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetShapeType() {
+     return this.Libraries_Interface_Item2D__.GetShapeType();
+}
+AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
+     return this.Libraries_Interface_Item__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
+}
+SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetOffsetX() {
+     return this.Libraries_Interface_Item2D__.GetOffsetX();
+}
+GetOffsetZ() {
+     return this.Libraries_Interface_Item2D__.GetOffsetZ();
+}
+GetOffsetY() {
+     return this.Libraries_Interface_Item2D__.GetOffsetY();
+}
+GetItems() {
+     return this.Libraries_Interface_Item2D__.GetItems();
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+GetMouseOverColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverColor();
+}
+GetPixelHeight() {
+     return this.Libraries_Interface_Controls_Control__.GetPixelHeight();
+}
+SetOffsetY$quorum_number(yAmount) {
+     return this.Libraries_Interface_Item2D__.SetOffsetY$quorum_number(yAmount);
+}
+HasProperty$quorum_text(key) {
+     return this.Libraries_Interface_Item__.HasProperty$quorum_text(key);
+}
+AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
+     return this.Libraries_Interface_Item__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
+}
+SetLinearDamping$quorum_number(linearDamping) {
+     return this.Libraries_Interface_Item2D__.SetLinearDamping$quorum_number(linearDamping);
+}
+PrepareVertices() {
+     return this.Libraries_Interface_Item2D__.PrepareVertices();
+}
+SetChildrenProcessingMouseEvents$quorum_boolean(shouldProcess) {
+     return this.Libraries_Interface_Item2D__.SetChildrenProcessingMouseEvents$quorum_boolean(shouldProcess);
+}
+GetTopLeftPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetTopLeftPixelRounding();
+}
+GetBottomLeftPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomLeftPixelRounding();
+}
+GetBoundingBox$quorum_integer(childIndex) {
+     return this.Libraries_Interface_Item2D__.GetBoundingBox$quorum_integer(childIndex);
+}
+GetWidth() {
+     return this.Libraries_Interface_Item2D__.GetWidth();
+}
+SetPercentageOriginY$quorum_number(y) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageOriginY$quorum_number(y);
+}
+HasBottomBorder() {
+     return this.Libraries_Interface_Controls_Control__.HasBottomBorder();
+}
+HasTopRightRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasTopRightRounding();
+}
+Activate$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
+     return this.Libraries_Interface_Controls_Control__.Activate$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+IsFocusable() {
+     return this.Libraries_Interface_Item__.IsFocusable();
+}
+NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent(event) {
+     return this.Libraries_Interface_Controls_Control__.NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent(event);
+}
+GetCollisionList() {
+     return this.Libraries_Interface_Item2D__.GetCollisionList();
+}
+GetPreviousFocus() {
+     return this.Libraries_Interface_Item__.GetPreviousFocus();
+}
+SetFontSize$quorum_integer(size) {
+     return this.Libraries_Interface_Controls_Control__.SetFontSize$quorum_integer(size);
+}
+GetDescription() {
+     return this.Libraries_Interface_Item__.GetDescription();
+}
+GetUnfocusedSelectionColor() {
+     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionColor();
+}
+GetPercentageX() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageX();
+}
+SetBottomLeftRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomLeftRounding$quorum_number(value);
+}
+GetPercentageY() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageY();
+}
+SetView2D$quorum_Libraries_Interface_Views_View2D(content) {
+     return this.Libraries_Interface_Item2D__.SetView2D$quorum_Libraries_Interface_Views_View2D(content);
+}
+GetBoundingRectangle() {
+     return this.Libraries_Interface_Item2D__.GetBoundingRectangle();
+}
+GetMouseMovementListeners() {
+     return this.Libraries_Interface_Item__.GetMouseMovementListeners();
+}
+SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetGridY$quorum_integer(gridY) {
+     return this.Libraries_Interface_Controls_Control__.SetGridY$quorum_integer(gridY);
+}
+GetHeight() {
+     return this.Libraries_Interface_Item2D__.GetHeight();
+}
+GetPercentageWidth() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageWidth();
+}
+GetProperty$quorum_text(key) {
+     return this.Libraries_Interface_Item__.GetProperty$quorum_text(key);
+}
+LostSelection() {
+     return this.Libraries_Interface_Controls_Control__.LostSelection();
+}
+Advance$quorum_number(time) {
+     return this.Libraries_Interface_Item2D__.Advance$quorum_number(time);
+}
+SetOffset$quorum_number$quorum_number$quorum_number(xAmount, yAmount, zAmount) {
+     return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number$quorum_number(xAmount, yAmount, zAmount);
+}
+GetUnfocusedSelectionFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionFontColor();
+}
+IsOnLayer() {
+     return this.Libraries_Interface_Item2D__.IsOnLayer();
+}
+ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent(event) {
+     return this.Libraries_Interface_Item2D__.ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent(event);
+}
+GetLayoutProperties$quorum_number$quorum_number(containerWidth, containerHeight) {
+     return this.Libraries_Interface_Controls_Control__.GetLayoutProperties$quorum_number$quorum_number(containerWidth, containerHeight);
+}
+HasColorPropertyOverride$quorum_text(property) {
+     return this.Libraries_Interface_Controls_Control__.HasColorPropertyOverride$quorum_text(property);
+}
+HasRightBorder() {
+     return this.Libraries_Interface_Controls_Control__.HasRightBorder();
+}
+SetOffsetZ$quorum_number(zAmount) {
+     return this.Libraries_Interface_Item2D__.SetOffsetZ$quorum_number(zAmount);
+}
+SetFlipX$quorum_boolean(flip) {
+     return this.Libraries_Interface_Item2D__.SetFlipX$quorum_boolean(flip);
+}
+AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
+     return this.Libraries_Interface_Item__.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
+}
+RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
+     return this.Libraries_Interface_Controls_Control__.RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
+}
+SetFriction$quorum_number(friction) {
+     return this.Libraries_Interface_Item2D__.SetFriction$quorum_number(friction);
+}
+GetLocalPoint$quorum_Libraries_Compute_Vector2(worldPoint) {
+     return this.Libraries_Interface_Item2D__.GetLocalPoint$quorum_Libraries_Compute_Vector2(worldPoint);
+}
+GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2(localPoint) {
+     return this.Libraries_Interface_Item2D__.GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2(localPoint);
+}
+SetName$quorum_text(newName) {
+     return this.Libraries_Interface_Item__.SetName$quorum_text(newName);
+}
+GainedSelection() {
+     return this.Libraries_Interface_Controls_Control__.GainedSelection();
+}
+ManageLayers() {
+     return this.Libraries_Interface_Item2D__.ManageLayers();
+}
+SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetGridPosition$quorum_integer$quorum_integer(gridX, gridY) {
+     return this.Libraries_Interface_Controls_Control__.SetGridPosition$quorum_integer$quorum_integer(gridX, gridY);
+}
+NotifyAccessibilityBoundsChanged() {
+     return this.Libraries_Interface_Item2D__.NotifyAccessibilityBoundsChanged();
+}
+SetShadowX$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowX$quorum_number(value);
+}
+SetRightMargin$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetRightMargin$quorum_number(padding);
+}
+HasBottomLeftRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasBottomLeftRounding();
+}
+AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
+     return this.Libraries_Interface_Controls_Control__.AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
+}
+LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
+     return this.Libraries_Interface_Controls_Control__.LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
+}
+CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform) {
+     return this.Libraries_Interface_Item2D__.CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform);
+}
+SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight) {
+     return this.Libraries_Interface_Controls_Control__.SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
+}
+SetBottomMargin$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomMargin$quorum_number(padding);
+}
+HasProperties() {
+     return this.Libraries_Interface_Item__.HasProperties();
+}
+SetHorizontalLayoutMode$quorum_integer(mode) {
+     return this.Libraries_Interface_Controls_Control__.SetHorizontalLayoutMode$quorum_integer(mode);
+}
+SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu(menu) {
+     return this.Libraries_Interface_Controls_Control__.SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu(menu);
+}
+SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetAngularDamping$quorum_number(angularDamping) {
+     return this.Libraries_Interface_Item2D__.SetAngularDamping$quorum_number(angularDamping);
+}
+GetShadowWidth() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowWidth();
+}
+HasShadowHeight() {
+     return this.Libraries_Interface_Controls_Control__.HasShadowHeight();
+}
+GetNumberProperty$quorum_text(property) {
+     return this.Libraries_Interface_Controls_Control__.GetNumberProperty$quorum_text(property);
+}
+HasBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasBorderThickness();
+}
+GetMouseOverFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverFontColor();
+}
+GetScaleY() {
+     return this.Libraries_Interface_Item2D__.GetScaleY();
+}
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetScaleX() {
+     return this.Libraries_Interface_Item2D__.GetScaleX();
+}
+SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D(painter) {
+     return this.Libraries_Interface_Item2D__.SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D(painter);
+}
+GetView2D() {
+     return this.Libraries_Interface_Item2D__.GetView2D();
+}
+GetDefaultFontSize() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultFontSize();
+}
+SetCollidable$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.SetCollidable$quorum_boolean(flag);
+}
+GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
+     return this.Libraries_Interface_Controls_Control__.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
+}
+SetWidth$quorum_number(newWidth) {
+     return this.Libraries_Interface_Item2D__.SetWidth$quorum_number(newWidth);
+}
+GetSelectionBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionBorderColor();
+}
+SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetInverseMass() {
+     return this.Libraries_Interface_Item2D__.GetInverseMass();
+}
+GetTransform() {
+     return this.Libraries_Interface_Item2D__.GetTransform();
+}
+HasBottomRightRounding() {
+     return this.Libraries_Interface_Controls_Control__.HasBottomRightRounding();
+}
+GetRotation() {
+     return this.Libraries_Interface_Item2D__.GetRotation();
+}
+GetDensity() {
+     return this.Libraries_Interface_Item2D__.GetDensity();
+}
+GetPropertyKeyIterator() {
+     return this.Libraries_Interface_Item__.GetPropertyKeyIterator();
+}
+SynchronizeNodes() {
+     return this.Libraries_Interface_Item2D__.SynchronizeNodes();
+}
+SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation(key, value) {
+     return this.Libraries_Interface_Item__.SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation(key, value);
+}
+GetDefaultLayoutProperties() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultLayoutProperties();
+}
+SetLeftPadding$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetLeftPadding$quorum_number(padding);
+}
+SetLayer$quorum_Libraries_Game_Layer2D(parentLayer) {
+     return this.Libraries_Interface_Item2D__.SetLayer$quorum_Libraries_Game_Layer2D(parentLayer);
+}
+IsRenderingFocus() {
+     return this.Libraries_Interface_Controls_Control__.IsRenderingFocus();
+}
+GetForegroundSelectionColor() {
+     return this.Libraries_Interface_Controls_Control__.GetForegroundSelectionColor();
+}
+GetLocalCenter() {
+     return this.Libraries_Interface_Item2D__.GetLocalCenter();
+}
+SetNonResponsive() {
+     return this.Libraries_Interface_Item2D__.SetNonResponsive();
+}
+SetRotation$quorum_number(degrees) {
+     return this.Libraries_Interface_Item2D__.SetRotation$quorum_number(degrees);
+}
+SetItem$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem) {
+     return this.Libraries_Interface_Item2D__.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
+}
+SetTopMargin$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetTopMargin$quorum_number(padding);
+}
+GetDefaultMonospaceFontName() {
+     return this.Libraries_Interface_Controls_Control__.GetDefaultMonospaceFontName();
+}
+HasShadowWidth() {
+     return this.Libraries_Interface_Controls_Control__.HasShadowWidth();
+}
+RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
+     return this.Libraries_Interface_Controls_Control__.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
+}
+Focus() {
+     return this.Libraries_Interface_Item__.Focus();
+}
+SetScale$quorum_number$quorum_number(newX, newY) {
+     return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
+}
+SetInterfaceScale$quorum_number(scale) {
+     return this.Libraries_Interface_Controls_Control__.SetInterfaceScale$quorum_number(scale);
+}
+SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+HasTopBorder() {
+     return this.Libraries_Interface_Controls_Control__.HasTopBorder();
+}
+SetBottomRightRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomRightRounding$quorum_number(value);
+}
+ShouldCollide$quorum_Libraries_Interface_Item2D(otherItem) {
+     return this.Libraries_Interface_Item2D__.ShouldCollide$quorum_Libraries_Interface_Item2D(otherItem);
+}
+SetNumberProperty$quorum_text$quorum_number(property, value) {
+     return this.Libraries_Interface_Controls_Control__.SetNumberProperty$quorum_text$quorum_number(property, value);
+}
+SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetAngularVelocity$quorum_number(angularVelocity) {
+     return this.Libraries_Interface_Item2D__.SetAngularVelocity$quorum_number(angularVelocity);
+}
+ApplyAngularImpulse$quorum_number(impulse) {
+     return this.Libraries_Interface_Item2D__.ApplyAngularImpulse$quorum_number(impulse);
+}
+SetSize$quorum_number$quorum_number(newWidth, newHeight) {
+     return this.Libraries_Interface_Item2D__.SetSize$quorum_number$quorum_number(newWidth, newHeight);
+}
+SetContainerGridHeight$quorum_integer(containerGridHeight) {
+     return this.Libraries_Interface_Controls_Control__.SetContainerGridHeight$quorum_integer(containerGridHeight);
+}
+SetUpdateTransform$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.SetUpdateTransform$quorum_boolean(flag);
+}
+Draw$quorum_Libraries_Game_Graphics_Painter2D(painter) {
+     return this.Libraries_Interface_Item2D__.Draw$quorum_Libraries_Game_Graphics_Painter2D(painter);
+}
+Dispose() {
+     return this.Libraries_Interface_Item__.Dispose();
+}
+GetItemCount() {
+     return this.Libraries_Interface_Item2D__.GetItemCount();
+}
+RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
+}
+GetIcon() {
+     return this.Libraries_Interface_Controls_Control__.GetIcon();
+}
+SetDescription$quorum_text(newDescription) {
+     return this.Libraries_Interface_Item__.SetDescription$quorum_text(newDescription);
+}
+GetGridX() {
+     return this.Libraries_Interface_Controls_Control__.GetGridX();
+}
+GetGridY() {
+     return this.Libraries_Interface_Controls_Control__.GetGridY();
+}
+GetColorProperty$quorum_text(property) {
+     return this.Libraries_Interface_Controls_Control__.GetColorProperty$quorum_text(property);
+}
+GetBackgroundColor() {
+     return this.Libraries_Interface_Controls_Control__.GetBackgroundColor();
+}
+GetMouseDownFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseDownFontColor();
+}
+SetForce$quorum_Libraries_Compute_Vector2(force) {
+     return this.Libraries_Interface_Item2D__.SetForce$quorum_Libraries_Compute_Vector2(force);
+}
+SetBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBorderThickness$quorum_number(value);
+}
+CancelBehaviors() {
+     return this.Libraries_Interface_Item__.CancelBehaviors();
+}
+SetDensity$quorum_number(density) {
+     return this.Libraries_Interface_Item2D__.SetDensity$quorum_number(density);
+}
+GetItem$quorum_integer(index) {
+     return this.Libraries_Interface_Item2D__.GetItem$quorum_integer(index);
+}
+GetLocalVector$quorum_Libraries_Compute_Vector2(worldVector) {
+     return this.Libraries_Interface_Item2D__.GetLocalVector$quorum_Libraries_Compute_Vector2(worldVector);
+}
+GetLayoutProperties() {
+     return this.Libraries_Interface_Controls_Control__.GetLayoutProperties();
+}
+GetInterfaceScale() {
+     return this.Libraries_Interface_Controls_Control__.GetInterfaceScale();
+}
+SetHeight$quorum_number(newHeight) {
+     return this.Libraries_Interface_Item2D__.SetHeight$quorum_number(newHeight);
+}
+IsCustomDrawing() {
+     return this.Libraries_Interface_Item2D__.IsCustomDrawing();
+}
+GetInputGroup() {
+     return this.Libraries_Interface_Item__.GetInputGroup();
+}
+GetMass() {
+     return this.Libraries_Interface_Item2D__.GetMass();
+}
+GetBottomRightPixelRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomRightPixelRounding();
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+GetPercentageHeight() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageHeight();
+}
+GetBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetBorderColor();
+}
+GetGlobalZ() {
+     return this.Libraries_Interface_Item2D__.GetGlobalZ();
+}
+GetGlobalY() {
+     return this.Libraries_Interface_Item2D__.GetGlobalY();
+}
+RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
+}
+GetTopPadding() {
+     return this.Libraries_Interface_Controls_Control__.GetTopPadding();
+}
+SetLayoutRows$quorum_number(layoutRows) {
+     return this.Libraries_Interface_Controls_Control__.SetLayoutRows$quorum_number(layoutRows);
+}
+SetPixelWidth$quorum_number(width) {
+     return this.Libraries_Interface_Controls_Control__.SetPixelWidth$quorum_number(width);
+}
+NeedsLayout() {
+     return this.Libraries_Interface_Controls_Control__.NeedsLayout();
+}
+LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties(properties) {
+     return this.Libraries_Interface_Controls_Control__.LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
+}
+SetOffset$quorum_number$quorum_number(xAmount, yAmount) {
+     return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number(xAmount, yAmount);
+}
+GetAngularVelocity() {
+     return this.Libraries_Interface_Item2D__.GetAngularVelocity();
+}
+GetInertia() {
+     return this.Libraries_Interface_Item2D__.GetInertia();
+}
+SetScaleX$quorum_number(scaleX) {
+     return this.Libraries_Interface_Item2D__.SetScaleX$quorum_number(scaleX);
+}
+GetGridWidth() {
+     return this.Libraries_Interface_Controls_Control__.GetGridWidth();
+}
+GetLabelText() {
+     return this.Libraries_Interface_Controls_Control__.GetLabelText();
+}
+DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D(broadphase) {
+     return this.Libraries_Interface_Item2D__.DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D(broadphase);
+}
+GetGestureListeners() {
+     return this.Libraries_Interface_Item__.GetGestureListeners();
+}
+SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetFocusBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetFocusBorderColor();
+}
+GetShadowEdgeFade() {
+     return this.Libraries_Interface_Controls_Control__.GetShadowEdgeFade();
+}
+SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number(newX, newY, newWidth, newHeight) {
+     return this.Libraries_Interface_Item2D__.SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number(newX, newY, newWidth, newHeight);
+}
+RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
+     return this.Libraries_Interface_Item__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
+}
+SetNextFocus$quorum_Libraries_Interface_Item(next) {
+     return this.Libraries_Interface_Item__.SetNextFocus$quorum_Libraries_Interface_Item(next);
+}
+SetPosition$quorum_number$quorum_number(setX, setY) {
+     return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number(setX, setY);
+}
+FlipY() {
+     return this.Libraries_Interface_Item2D__.FlipY();
+}
+GetChildAsItem$quorum_integer(index) {
+     return this.Libraries_Interface_Item2D__.GetChildAsItem$quorum_integer(index);
+}
+SetCenterY$quorum_number(setY) {
+     return this.Libraries_Interface_Item2D__.SetCenterY$quorum_number(setY);
+}
+ReleasedMouse() {
+     return this.Libraries_Interface_Controls_Control__.ReleasedMouse();
+}
+FlipX() {
+     return this.Libraries_Interface_Item2D__.FlipX();
+}
+SetBottomRightPixelRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomRightPixelRounding$quorum_number(value);
+}
+GetCollisionGroupIndex() {
+     return this.Libraries_Interface_Item2D__.GetCollisionGroupIndex();
+}
+SetRestitution$quorum_number(restitution) {
+     return this.Libraries_Interface_Item2D__.SetRestitution$quorum_number(restitution);
+}
+EmptyChildren() {
+     return this.Libraries_Interface_Item__.EmptyChildren();
+}
+GetSelectionFontColor() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionFontColor();
+}
+UpdateAll$quorum_number(seconds) {
+     return this.Libraries_Interface_Controls_Control__.UpdateAll$quorum_number(seconds);
+}
+Move$quorum_Libraries_Compute_Vector2(movement) {
+     return this.Libraries_Interface_Item2D__.Move$quorum_Libraries_Compute_Vector2(movement);
+}
+GetSleepTime() {
+     return this.Libraries_Interface_Item2D__.GetSleepTime();
+}
+GetTouchListeners() {
+     return this.Libraries_Interface_Item__.GetTouchListeners();
+}
+SetGridSize$quorum_integer$quorum_integer(gridWidth, gridHeight) {
+     return this.Libraries_Interface_Controls_Control__.SetGridSize$quorum_integer$quorum_integer(gridWidth, gridHeight);
+}
+GetX() {
+     return this.Libraries_Interface_Item2D__.GetX();
+}
+GetY() {
+     return this.Libraries_Interface_Item2D__.GetY();
+}
+GetTopMargin() {
+     return this.Libraries_Interface_Controls_Control__.GetTopMargin();
+}
+GetZ() {
+     return this.Libraries_Interface_Item2D__.GetZ();
+}
+SetCustomDrawing$quorum_boolean(isCustom) {
+     return this.Libraries_Interface_Item2D__.SetCustomDrawing$quorum_boolean(isCustom);
+}
+EnablePhysics$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.EnablePhysics$quorum_boolean(flag);
+}
+SetLeftMargin$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetLeftMargin$quorum_number(padding);
+}
+SynchronizeTransform() {
+     return this.Libraries_Interface_Item2D__.SynchronizeTransform();
+}
+SetIcon$quorum_Libraries_Game_Graphics_TextureRegion(icon) {
+     return this.Libraries_Interface_Controls_Control__.SetIcon$quorum_Libraries_Game_Graphics_TextureRegion(icon);
+}
+IsNonResponsive() {
+     return this.Libraries_Interface_Item2D__.IsNonResponsive();
+}
+SetShadowEdgeFade$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowEdgeFade$quorum_number(value);
+}
+CanRotate$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.CanRotate$quorum_boolean(flag);
+}
+HasShadowEdgeFade() {
+     return this.Libraries_Interface_Controls_Control__.HasShadowEdgeFade();
+}
+SetTopLeftPixelRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetTopLeftPixelRounding$quorum_number(value);
+}
+GetShape() {
+     return this.Libraries_Interface_Item2D__.GetShape();
+}
+SetPercentageHeight$quorum_number(height) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageHeight$quorum_number(height);
+}
+Hide() {
+     return this.Libraries_Interface_Item__.Hide();
+}
+SetTopLeftRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetTopLeftRounding$quorum_number(value);
+}
+GetCenterY() {
+     return this.Libraries_Interface_Item2D__.GetCenterY();
+}
+SetVerticalLayoutMode$quorum_integer(mode) {
+     return this.Libraries_Interface_Controls_Control__.SetVerticalLayoutMode$quorum_integer(mode);
+}
+Rotate$quorum_number(degrees) {
+     return this.Libraries_Interface_Item2D__.Rotate$quorum_number(degrees);
+}
+GetCenterX() {
+     return this.Libraries_Interface_Item2D__.GetCenterX();
+}
+ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2(point, childIndex, normalOut) {
+     return this.Libraries_Interface_Item2D__.ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2(point, childIndex, normalOut);
+}
+GetAccessibilityType() {
+     return this.Libraries_Interface_Item__.GetAccessibilityType();
+}
+Update$quorum_number(secondsSinceUpdate) {
+     return this.Libraries_Interface_Item__.Update$quorum_number(secondsSinceUpdate);
+}
+GetCollisionGroupFlag() {
+     return this.Libraries_Interface_Item2D__.GetCollisionGroupFlag();
+}
+IsRenderingMouseOver() {
+     return this.Libraries_Interface_Controls_Control__.IsRenderingMouseOver();
+}
+SetShadowWidth$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowWidth$quorum_number(value);
+}
+SetCenter$quorum_number$quorum_number(setX, setY) {
+     return this.Libraries_Interface_Item2D__.SetCenter$quorum_number$quorum_number(setX, setY);
+}
+SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D(shape) {
+     return this.Libraries_Interface_Item2D__.SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D(shape);
+}
+SetFocusable$quorum_boolean(focus) {
+     return this.Libraries_Interface_Item__.SetFocusable$quorum_boolean(focus);
+}
+GetDrawableShape() {
+     return this.Libraries_Interface_Item2D__.GetDrawableShape();
+}
+SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetInputGroup$quorum_text(group) {
+     return this.Libraries_Interface_Item__.SetInputGroup$quorum_text(group);
+}
+IsRenderingMouseDown() {
+     return this.Libraries_Interface_Controls_Control__.IsRenderingMouseDown();
+}
+GetPercentageOriginX() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageOriginX();
+}
+GetPercentageOriginY() {
+     return this.Libraries_Interface_Controls_Control__.GetPercentageOriginY();
+}
+ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent(event) {
+     return this.Libraries_Interface_Item2D__.ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent(event);
+}
+SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+TestPoint$quorum_Libraries_Compute_Vector2(point) {
+     return this.Libraries_Interface_Item2D__.TestPoint$quorum_Libraries_Compute_Vector2(point);
+}
+GetNodes() {
+     return this.Libraries_Interface_Item2D__.GetNodes();
+}
+GetForce() {
+     return this.Libraries_Interface_Item2D__.GetForce();
+}
+GetChildren() {
+     return this.Libraries_Interface_Item2D__.GetChildren();
+}
+SetCollisionGroupFlag$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.SetCollisionGroupFlag$quorum_boolean(flag);
+}
+GetForegroundColor() {
+     return this.Libraries_Interface_Controls_Control__.GetForegroundColor();
+}
+GetNextFocus() {
+     return this.Libraries_Interface_Item__.GetNextFocus();
+}
+GetMouseOverGlowColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverGlowColor();
+}
+ApplyTorque$quorum_number(torque) {
+     return this.Libraries_Interface_Item2D__.ApplyTorque$quorum_number(torque);
+}
+CollideWithChildren() {
+     return this.Libraries_Interface_Item2D__.CollideWithChildren();
+}
+Empty() {
+     return this.Libraries_Interface_Item2D__.Empty();
+}
+GetScreenX() {
+     return this.Libraries_Interface_Item2D__.GetScreenX();
+}
+Add$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem) {
+     return this.Libraries_Interface_Controls_Control__.Add$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
+}
+GetScreenY() {
+     return this.Libraries_Interface_Item2D__.GetScreenY();
+}
+SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetWorldCenter() {
+     return this.Libraries_Interface_Item2D__.GetWorldCenter();
+}
+ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event) {
+     return this.Libraries_Interface_Item2D__.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event);
+}
+GetFontOutlineColor() {
+     return this.Libraries_Interface_Controls_Control__.GetFontOutlineColor();
+}
+AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
+     return this.Libraries_Interface_Item__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
+}
+GetBottomPadding() {
+     return this.Libraries_Interface_Controls_Control__.GetBottomPadding();
+}
+GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(xCoords, yCoords) {
+     return this.Libraries_Interface_Item2D__.GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(xCoords, yCoords);
+}
+Show() {
+     return this.Libraries_Interface_Item__.Show();
+}
+GetFont() {
+     return this.Libraries_Interface_Controls_Control__.GetFont();
+}
+EndMouseOver() {
+     return this.Libraries_Interface_Controls_Control__.EndMouseOver();
+}
+SetOffsetX$quorum_number(xAmount) {
+     return this.Libraries_Interface_Item2D__.SetOffsetX$quorum_number(xAmount);
+}
+SetPixelX$quorum_number(x) {
+     return this.Libraries_Interface_Controls_Control__.SetPixelX$quorum_number(x);
+}
+SetFontOutlineThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFontOutlineThickness$quorum_number(value);
+}
+GetSweep() {
+     return this.Libraries_Interface_Item2D__.GetSweep();
+}
+GetNodeCount() {
+     return this.Libraries_Interface_Item2D__.GetNodeCount();
+}
+ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(impulse, point) {
+     return this.Libraries_Interface_Item2D__.ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(impulse, point);
+}
+Activate() {
+     return this.Libraries_Interface_Controls_Control__.Activate();
+}
+SetLabelText$quorum_text(labelText) {
+     return this.Libraries_Interface_Controls_Control__.SetLabelText$quorum_text(labelText);
+}
+GetIconColor() {
+     return this.Libraries_Interface_Controls_Control__.GetIconColor();
+}
+GetTopRightRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetTopRightRounding();
+}
+IsAcceptingMouseInput() {
+     return this.Libraries_Interface_Item__.IsAcceptingMouseInput();
+}
+GetPropertiesSize() {
+     return this.Libraries_Interface_Item__.GetPropertiesSize();
+}
+SetBottomPadding$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomPadding$quorum_number(padding);
+}
+HasNumberPropertyOverride$quorum_text(property) {
+     return this.Libraries_Interface_Controls_Control__.HasNumberPropertyOverride$quorum_text(property);
+}
+GetContainerGridHeight() {
+     return this.Libraries_Interface_Controls_Control__.GetContainerGridHeight();
+}
+SetOriginCenter() {
+     return this.Libraries_Interface_Item2D__.SetOriginCenter();
+}
+EmptyAll() {
+     return this.Libraries_Interface_Item__.EmptyAll();
+}
+RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D(item) {
+     return this.Libraries_Interface_Item2D__.RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D(item);
+}
+ScaleFromCenter$quorum_number(amount) {
+     return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number(amount);
+}
+NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent(event) {
+     return this.Libraries_Interface_Controls_Control__.NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent(event);
+}
+GetFontOutlineThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetFontOutlineThickness();
+}
+GetParent() {
+     return this.Libraries_Interface_Item2D__.GetParent();
+}
+SetAcceptsMouseInput$quorum_boolean(accepts) {
+     return this.Libraries_Interface_Item__.SetAcceptsMouseInput$quorum_boolean(accepts);
+}
+GetMouseListeners() {
+     return this.Libraries_Interface_Item__.GetMouseListeners();
+}
+ScaleFromCenter$quorum_number$quorum_number(xAmount, yAmount) {
+     return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number$quorum_number(xAmount, yAmount);
+}
+IsResponsive() {
+     return this.Libraries_Interface_Item2D__.IsResponsive();
+}
+Remove$quorum_integer(index) {
+     return this.Libraries_Interface_Controls_Control__.Remove$quorum_integer(index);
+}
+SetToMediumFont() {
+     return this.Libraries_Interface_Controls_Control__.SetToMediumFont();
+}
+SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D(edge) {
+     return this.Libraries_Interface_Item2D__.SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D(edge);
+}
+GetRawInertia() {
+     return this.Libraries_Interface_Item2D__.GetRawInertia();
+}
+DisposeChildren() {
+     return this.Libraries_Interface_Item__.DisposeChildren();
+}
+DisposeAll() {
+     return this.Libraries_Interface_Item__.DisposeAll();
+}
+GetOriginY() {
+     return this.Libraries_Interface_Item2D__.GetOriginY();
+}
+GetOriginX() {
+     return this.Libraries_Interface_Item2D__.GetOriginX();
+}
+IsUnmovable() {
+     return this.Libraries_Interface_Item2D__.IsUnmovable();
+}
+MoveZ$quorum_number(zAmount) {
+     return this.Libraries_Interface_Item2D__.MoveZ$quorum_number(zAmount);
+}
+SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetUnmovable() {
+     return this.Libraries_Interface_Item2D__.SetUnmovable();
+}
+SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetResponsiveness() {
+     return this.Libraries_Interface_Item2D__.GetResponsiveness();
+}
+IsFocused() {
+     return this.Libraries_Interface_Item__.IsFocused();
+}
+SetToDefaultFontSize() {
+     return this.Libraries_Interface_Controls_Control__.SetToDefaultFontSize();
+}
+GetGlowColor() {
+     return this.Libraries_Interface_Controls_Control__.GetGlowColor();
+}
+SetScaleY$quorum_number(scaleY) {
+     return this.Libraries_Interface_Item2D__.SetScaleY$quorum_number(scaleY);
+}
+GetMouseWheelListeners() {
+     return this.Libraries_Interface_Item__.GetMouseWheelListeners();
+}
+GetInputTable() {
+     return this.Libraries_Interface_Item__.GetInputTable();
+}
+SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetCollideWithChildren$quorum_boolean(flag) {
+     return this.Libraries_Interface_Item2D__.SetCollideWithChildren$quorum_boolean(flag);
+}
+SetSleepTime$quorum_number(time) {
+     return this.Libraries_Interface_Item2D__.SetSleepTime$quorum_number(time);
+}
+SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+IsClipping() {
+     return this.Libraries_Interface_Item2D__.IsClipping();
+}
+GetWorldPoint$quorum_Libraries_Compute_Vector2(localPoint) {
+     return this.Libraries_Interface_Item2D__.GetWorldPoint$quorum_Libraries_Compute_Vector2(localPoint);
+}
+GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2(worldPoint) {
+     return this.Libraries_Interface_Item2D__.GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2(worldPoint);
+}
+GetAccessibilityCode() {
+     return this.Libraries_Interface_Item__.GetAccessibilityCode();
+}
+Add$quorum_Libraries_Interface_Item2D(newItem) {
+     return this.Libraries_Interface_Controls_Control__.Add$quorum_Libraries_Interface_Item2D(newItem);
+}
+SetLinearVelocity$quorum_Libraries_Compute_Vector2(linearVelocity) {
+     return this.Libraries_Interface_Item2D__.SetLinearVelocity$quorum_Libraries_Compute_Vector2(linearVelocity);
+}
+SetRightPadding$quorum_number(padding) {
+     return this.Libraries_Interface_Controls_Control__.SetRightPadding$quorum_number(padding);
+}
+Move$quorum_number$quorum_number(xAmount, yAmount) {
+     return this.Libraries_Interface_Item2D__.Move$quorum_number$quorum_number(xAmount, yAmount);
+}
+Scale$quorum_number(amount) {
+     return this.Libraries_Interface_Item2D__.Scale$quorum_number(amount);
+}
+AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior(behavior) {
+     return this.Libraries_Interface_Item__.AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior(behavior);
+}
+SetBottomLeftPixelRounding$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetBottomLeftPixelRounding$quorum_number(value);
+}
+SetContainerGridWidth$quorum_integer(containerGridWidth) {
+     return this.Libraries_Interface_Controls_Control__.SetContainerGridWidth$quorum_integer(containerGridWidth);
+}
+GetTopLeftRounding() {
+     return this.Libraries_Interface_Controls_Control__.GetTopLeftRounding();
+}
+SetShadowHeight$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetShadowHeight$quorum_number(value);
+}
+SetPercentageWidth$quorum_number(width) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageWidth$quorum_number(width);
+}
+GetGlobalX() {
+     return this.Libraries_Interface_Item2D__.GetGlobalX();
+}
+MoveY$quorum_number(yAmount) {
+     return this.Libraries_Interface_Item2D__.MoveY$quorum_number(yAmount);
+}
+SetCenterX$quorum_number(setX) {
+     return this.Libraries_Interface_Item2D__.SetCenterX$quorum_number(setX);
+}
+SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+GetPixelX() {
+     return this.Libraries_Interface_Controls_Control__.GetPixelX();
+}
+GetPixelY() {
+     return this.Libraries_Interface_Controls_Control__.GetPixelY();
+}
+SetX$quorum_number(setX) {
+     return this.Libraries_Interface_Item2D__.SetX$quorum_number(setX);
+}
+SetToHugeFont() {
+     return this.Libraries_Interface_Controls_Control__.SetToHugeFont();
+}
+SetAccessibilityRoleDescription$quorum_text(newRoleDescription) {
+     return this.Libraries_Interface_Item__.SetAccessibilityRoleDescription$quorum_text(newRoleDescription);
+}
+AreChildrenProcessingMouseEvents() {
+     return this.Libraries_Interface_Item2D__.AreChildrenProcessingMouseEvents();
+}
+CopyAndActivateInputTable$quorum_text(name) {
+     return this.Libraries_Interface_Controls_Control__.CopyAndActivateInputTable$quorum_text(name);
+}
+SetPosition$quorum_number$quorum_number$quorum_number(setX, setY, setZ) {
+     return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number$quorum_number(setX, setY, setZ);
+}
+GetTorque() {
+     return this.Libraries_Interface_Item2D__.GetTorque();
+}
+GetFontSize() {
+     return this.Libraries_Interface_Controls_Control__.GetFontSize();
+}
+IsFastMoving() {
+     return this.Libraries_Interface_Item2D__.IsFastMoving();
+}
+SetPercentageOriginX$quorum_number(x) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageOriginX$quorum_number(x);
+}
+SetPixelHeight$quorum_number(height) {
+     return this.Libraries_Interface_Controls_Control__.SetPixelHeight$quorum_number(height);
+}
+GetLayout() {
+     return this.Libraries_Interface_Controls_Control__.GetLayout();
+}
+GetFocusColor() {
+     return this.Libraries_Interface_Controls_Control__.GetFocusColor();
+}
+GetVerticalLayoutMode() {
+     return this.Libraries_Interface_Controls_Control__.GetVerticalLayoutMode();
+}
+SetToTinyFont() {
+     return this.Libraries_Interface_Controls_Control__.SetToTinyFont();
+}
+SetPreviousFocus$quorum_Libraries_Interface_Item(previous) {
+     return this.Libraries_Interface_Item__.SetPreviousFocus$quorum_Libraries_Interface_Item(previous);
+}
+BeginCollision$quorum_Libraries_Interface_Item(item) {
+     return this.Libraries_Interface_Item__.BeginCollision$quorum_Libraries_Interface_Item(item);
+}
+GetSelectionColor() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionColor();
+}
+Scale$quorum_number$quorum_number(xAmount, yAmount) {
+     return this.Libraries_Interface_Item2D__.Scale$quorum_number$quorum_number(xAmount, yAmount);
+}
+Remove$quorum_Libraries_Interface_Item2D(item) {
+     return this.Libraries_Interface_Controls_Control__.Remove$quorum_Libraries_Interface_Item2D(item);
+}
+GetPopupMenu() {
+     return this.Libraries_Interface_Controls_Control__.GetPopupMenu();
+}
+SetZ$quorum_number(setZ) {
+     return this.Libraries_Interface_Item2D__.SetZ$quorum_number(setZ);
+}
+SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(property, value) {
+     return this.Libraries_Interface_Controls_Control__.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(property, value);
+}
+SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+SetPercentageY$quorum_number(y) {
+     return this.Libraries_Interface_Controls_Control__.SetPercentageY$quorum_number(y);
+}
+SetResponsiveness$quorum_integer(type) {
+     return this.Libraries_Interface_Item2D__.SetResponsiveness$quorum_integer(type);
+}
+IsAccessibleParent() {
+return true;
+};
+Get_Libraries_Interface_Item__manager_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__manager_();
+};
+Set_Libraries_Interface_Item__manager_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__manager_(value);
+};
+Get_Libraries_Interface_Item__visible_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__visible_();
+};
+Set_Libraries_Interface_Item__visible_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__visible_(value);
+};
+Get_Libraries_Interface_Item__RADIO_BUTTON_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__RADIO_BUTTON_();
+};
+Set_Libraries_Interface_Item__RADIO_BUTTON_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__RADIO_BUTTON_(value);
+};
+Get_Libraries_Interface_Item__accessibilityRoleDescription_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityRoleDescription_();
+};
+Set_Libraries_Interface_Item__accessibilityRoleDescription_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityRoleDescription_(value);
+};
+Get_Libraries_Interface_Item__BUTTON_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__BUTTON_();
+};
+Set_Libraries_Interface_Item__BUTTON_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__BUTTON_(value);
+};
+Get_Libraries_Interface_Item__TOGGLE_BUTTON_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOGGLE_BUTTON_();
+};
+Set_Libraries_Interface_Item__TOGGLE_BUTTON_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOGGLE_BUTTON_(value);
+};
+Get_Libraries_Interface_Item__TABLE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TABLE_();
+};
+Set_Libraries_Interface_Item__TABLE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TABLE_(value);
+};
+Get_Libraries_Interface_Item__CELL_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CELL_();
+};
+Set_Libraries_Interface_Item__CELL_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CELL_(value);
+};
+Get_Libraries_Interface_Item__CHART_SECTION_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_SECTION_();
+};
+Set_Libraries_Interface_Item__CHART_SECTION_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_SECTION_(value);
+};
+Get_Libraries_Interface_Item__nextFocus_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__nextFocus_();
+};
+Set_Libraries_Interface_Item__nextFocus_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__nextFocus_(value);
+};
+Get_Libraries_Interface_Item__description_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__description_();
+};
+Set_Libraries_Interface_Item__description_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__description_(value);
+};
+Get_Libraries_Interface_Item__behaviors_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__behaviors_();
+};
+Set_Libraries_Interface_Item__behaviors_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__behaviors_(value);
+};
+Get_Libraries_Interface_Item__LIST_ITEM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_ITEM_();
+};
+Set_Libraries_Interface_Item__LIST_ITEM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_ITEM_(value);
+};
+Get_Libraries_Interface_Item__PANE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PANE_();
+};
+Set_Libraries_Interface_Item__PANE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PANE_(value);
+};
+Get_Libraries_Interface_Item__mouseWheelListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseWheelListeners_();
+};
+Set_Libraries_Interface_Item__mouseWheelListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseWheelListeners_(value);
+};
+Get_Libraries_Interface_Item__TREE_TABLE_CELL_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_CELL_();
+};
+Set_Libraries_Interface_Item__TREE_TABLE_CELL_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_CELL_(value);
+};
+Get_Libraries_Interface_Item__MENU_BAR_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_BAR_();
+};
+Set_Libraries_Interface_Item__MENU_BAR_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_BAR_(value);
+};
+Get_Libraries_Interface_Item__TREE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_();
+};
+Set_Libraries_Interface_Item__TREE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_(value);
+};
+Get_Libraries_Interface_Item__CUSTOM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CUSTOM_();
+};
+Set_Libraries_Interface_Item__CUSTOM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CUSTOM_(value);
+};
+Get_Libraries_Interface_Item__TAB_PANE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_PANE_();
+};
+Set_Libraries_Interface_Item__TAB_PANE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_PANE_(value);
+};
+Get_Libraries_Interface_Item__properties_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__properties_();
+};
+Set_Libraries_Interface_Item__properties_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__properties_(value);
+};
+Get_Libraries_Interface_Item__DIALOG_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__DIALOG_();
+};
+Set_Libraries_Interface_Item__DIALOG_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__DIALOG_(value);
+};
+Get_Libraries_Interface_Item__MENU_ITEM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_ITEM_();
+};
+Set_Libraries_Interface_Item__MENU_ITEM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_ITEM_(value);
+};
+Get_Libraries_Interface_Item__mouseMoveListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseMoveListeners_();
+};
+Set_Libraries_Interface_Item__mouseMoveListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseMoveListeners_(value);
+};
+Get_Libraries_Interface_Item__TEXTBOX_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXTBOX_();
+};
+Set_Libraries_Interface_Item__TEXTBOX_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXTBOX_(value);
+};
+Get_Libraries_Interface_Item__PROGRESS_BAR_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PROGRESS_BAR_();
+};
+Set_Libraries_Interface_Item__PROGRESS_BAR_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PROGRESS_BAR_(value);
+};
+Get_Libraries_Interface_Item__accessibilityCode_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityCode_();
+};
+Set_Libraries_Interface_Item__accessibilityCode_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityCode_(value);
+};
+Get_Libraries_Interface_Item__ITEM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__ITEM_();
+};
+Set_Libraries_Interface_Item__ITEM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__ITEM_(value);
+};
+Get_Libraries_Interface_Item__TEXT_FIELD_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXT_FIELD_();
+};
+Set_Libraries_Interface_Item__TEXT_FIELD_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXT_FIELD_(value);
+};
+Get_Libraries_Interface_Item__TREE_ITEM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_ITEM_();
+};
+Set_Libraries_Interface_Item__TREE_ITEM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_ITEM_(value);
+};
+Get_Libraries_Interface_Item__touchListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__touchListeners_();
+};
+Set_Libraries_Interface_Item__touchListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__touchListeners_(value);
+};
+Get_Libraries_Interface_Item__CHECKBOX_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHECKBOX_();
+};
+Set_Libraries_Interface_Item__CHECKBOX_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHECKBOX_(value);
+};
+Get_Libraries_Interface_Item__TAB_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_();
+};
+Set_Libraries_Interface_Item__TAB_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_(value);
+};
+Get_Libraries_Interface_Item__acceptsMouseInput_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__acceptsMouseInput_();
+};
+Set_Libraries_Interface_Item__acceptsMouseInput_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__acceptsMouseInput_(value);
+};
+Get_Libraries_Interface_Item__name_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__name_();
+};
+Set_Libraries_Interface_Item__name_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__name_(value);
+};
+Get_Libraries_Interface_Item__LIST_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_();
+};
+Set_Libraries_Interface_Item__LIST_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_(value);
+};
+Get_Libraries_Interface_Item__mouseListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseListeners_();
+};
+Set_Libraries_Interface_Item__mouseListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseListeners_(value);
+};
+Get_Libraries_Interface_Item__focusable_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusable_();
+};
+Set_Libraries_Interface_Item__focusable_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusable_(value);
+};
+Get_Libraries_Interface_Item__GROUP_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__GROUP_();
+};
+Set_Libraries_Interface_Item__GROUP_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__GROUP_(value);
+};
+Get_Libraries_Interface_Item__gestureListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__gestureListeners_();
+};
+Set_Libraries_Interface_Item__gestureListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__gestureListeners_(value);
+};
+Get_Libraries_Interface_Item__NOT_ACCESSIBLE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__NOT_ACCESSIBLE_();
+};
+Set_Libraries_Interface_Item__NOT_ACCESSIBLE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__NOT_ACCESSIBLE_(value);
+};
+Get_Libraries_Interface_Item__LABEL_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LABEL_();
+};
+Set_Libraries_Interface_Item__LABEL_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LABEL_(value);
+};
+Get_Libraries_Interface_Item__inputGroup_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__inputGroup_();
+};
+Set_Libraries_Interface_Item__inputGroup_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__inputGroup_(value);
+};
+Get_Libraries_Interface_Item__TOOLBAR_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOOLBAR_();
+};
+Set_Libraries_Interface_Item__TOOLBAR_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOOLBAR_(value);
+};
+Get_Libraries_Interface_Item__TREE_TABLE_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_();
+};
+Set_Libraries_Interface_Item__TREE_TABLE_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_(value);
+};
+Get_Libraries_Interface_Item__previousFocus_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__previousFocus_();
+};
+Set_Libraries_Interface_Item__previousFocus_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__previousFocus_(value);
+};
+Get_Libraries_Interface_Item__CHART_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_();
+};
+Set_Libraries_Interface_Item__CHART_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_(value);
+};
+Get_Libraries_Interface_Item__CHART_ITEM_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_ITEM_();
+};
+Set_Libraries_Interface_Item__CHART_ITEM_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_ITEM_(value);
+};
+Get_Libraries_Interface_Item__POPUP_MENU_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__POPUP_MENU_();
+};
+Set_Libraries_Interface_Item__POPUP_MENU_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__POPUP_MENU_(value);
+};
+Get_Libraries_Interface_Item__focusListeners_() {
+   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusListeners_();
+};
+Set_Libraries_Interface_Item__focusListeners_(value) {
+   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusListeners_(value);
+};
+Get_Libraries_Interface_Controls_Control__renderMouseDown_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseDown_();
+};
+Set_Libraries_Interface_Controls_Control__renderMouseDown_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseDown_(value);
+};
+Get_Libraries_Interface_Controls_Control__listeners_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__listeners_();
+};
+Set_Libraries_Interface_Controls_Control__listeners_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__listeners_(value);
+};
+Get_Libraries_Interface_Controls_Control__contextMenu_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__contextMenu_();
+};
+Set_Libraries_Interface_Controls_Control__contextMenu_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__contextMenu_(value);
+};
+Get_Libraries_Interface_Controls_Control__renderMouseOver_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseOver_();
+};
+Set_Libraries_Interface_Controls_Control__renderMouseOver_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseOver_(value);
+};
+Get_Libraries_Interface_Controls_Control__FILL_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FILL_();
+};
+Set_Libraries_Interface_Controls_Control__FILL_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FILL_(value);
+};
+Get_Libraries_Interface_Controls_Control__needsLayout_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__needsLayout_();
+};
+Set_Libraries_Interface_Controls_Control__needsLayout_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__needsLayout_(value);
+};
+Get_Libraries_Interface_Controls_Control__currentProperties_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__currentProperties_();
+};
+Set_Libraries_Interface_Controls_Control__currentProperties_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__currentProperties_(value);
+};
+Get_Libraries_Interface_Controls_Control__defaultProperties_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__defaultProperties_();
+};
+Set_Libraries_Interface_Controls_Control__defaultProperties_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__defaultProperties_(value);
+};
+Get_Libraries_Interface_Controls_Control__FIT_FONT_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_FONT_();
+};
+Set_Libraries_Interface_Controls_Control__FIT_FONT_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_FONT_(value);
+};
+Get_Libraries_Interface_Controls_Control__renderSelected_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderSelected_();
+};
+Set_Libraries_Interface_Controls_Control__renderSelected_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderSelected_(value);
+};
+Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_();
+};
+Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_(value);
+};
+Get_Libraries_Interface_Controls_Control__layout_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layout_();
+};
+Set_Libraries_Interface_Controls_Control__layout_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layout_(value);
+};
+Get_Libraries_Interface_Controls_Control__selectionListeners_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__selectionListeners_();
+};
+Set_Libraries_Interface_Controls_Control__selectionListeners_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__selectionListeners_(value);
+};
+Get_Libraries_Interface_Controls_Control__STANDARD_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__STANDARD_();
+};
+Set_Libraries_Interface_Controls_Control__STANDARD_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__STANDARD_(value);
+};
+Get_Libraries_Interface_Controls_Control__layoutProperties_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layoutProperties_();
+};
+Set_Libraries_Interface_Controls_Control__layoutProperties_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layoutProperties_(value);
+};
+Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_() {
+   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_();
+};
+Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_(value) {
+   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_(value);
+};
+Get_Libraries_Interface_Item2D__position_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__position_();
+};
+Set_Libraries_Interface_Item2D__position_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__position_(value);
+};
+Get_Libraries_Interface_Item2D__scale_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scale_();
+};
+Set_Libraries_Interface_Item2D__scale_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scale_(value);
+};
+Get_Libraries_Interface_Item2D__workVector2B_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2B_();
+};
+Set_Libraries_Interface_Item2D__workVector2B_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2B_(value);
+};
+Get_Libraries_Interface_Item2D__manager_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__manager_();
+};
+Set_Libraries_Interface_Item2D__manager_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__manager_(value);
+};
+Get_Libraries_Interface_Item2D__workVector2A_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2A_();
+};
+Set_Libraries_Interface_Item2D__workVector2A_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2A_(value);
+};
+Get_Libraries_Interface_Item2D__jointList_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__jointList_();
+};
+Set_Libraries_Interface_Item2D__jointList_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__jointList_(value);
+};
+Get_Libraries_Interface_Item2D__updateTransform_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__updateTransform_();
+};
+Set_Libraries_Interface_Item2D__updateTransform_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__updateTransform_(value);
+};
+Get_Libraries_Interface_Item2D__children_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__children_();
+};
+Set_Libraries_Interface_Item2D__children_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__children_(value);
+};
+Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_();
+};
+Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_(value);
+};
+Get_Libraries_Interface_Item2D__hasMoved_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__hasMoved_();
+};
+Set_Libraries_Interface_Item2D__hasMoved_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__hasMoved_(value);
+};
+Get_Libraries_Interface_Item2D__visualView_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__visualView_();
+};
+Set_Libraries_Interface_Item2D__visualView_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__visualView_(value);
+};
+Get_Libraries_Interface_Item2D__widthSet_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__widthSet_();
+};
+Set_Libraries_Interface_Item2D__widthSet_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__widthSet_(value);
+};
+Get_Libraries_Interface_Item2D__transform_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform_();
+};
+Set_Libraries_Interface_Item2D__transform_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform_(value);
+};
+Get_Libraries_Interface_Item2D__physicsEnabled_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__physicsEnabled_();
+};
+Set_Libraries_Interface_Item2D__physicsEnabled_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__physicsEnabled_(value);
+};
+Get_Libraries_Interface_Item2D__layerSet_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layerSet_();
+};
+Set_Libraries_Interface_Item2D__layerSet_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layerSet_(value);
+};
+Get_Libraries_Interface_Item2D__rotation_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__rotation_();
+};
+Set_Libraries_Interface_Item2D__rotation_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__rotation_(value);
+};
+Get_Libraries_Interface_Item2D__dimensions_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__dimensions_();
+};
+Set_Libraries_Interface_Item2D__dimensions_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__dimensions_(value);
+};
+Get_Libraries_Interface_Item2D__collideWithChildren_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collideWithChildren_();
+};
+Set_Libraries_Interface_Item2D__collideWithChildren_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collideWithChildren_(value);
+};
+Get_Libraries_Interface_Item2D__offset_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__offset_();
+};
+Set_Libraries_Interface_Item2D__offset_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__offset_(value);
+};
+Get_Libraries_Interface_Item2D__nodeCount_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodeCount_();
+};
+Set_Libraries_Interface_Item2D__nodeCount_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodeCount_(value);
+};
+Get_Libraries_Interface_Item2D__transform0_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform0_();
+};
+Set_Libraries_Interface_Item2D__transform0_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform0_(value);
+};
+Get_Libraries_Interface_Item2D__scaleOffset_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scaleOffset_();
+};
+Set_Libraries_Interface_Item2D__scaleOffset_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scaleOffset_(value);
+};
+Get_Libraries_Interface_Item2D__nodesSet_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodesSet_();
+};
+Set_Libraries_Interface_Item2D__nodesSet_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodesSet_(value);
+};
+Get_Libraries_Interface_Item2D__workVector3_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector3_();
+};
+Set_Libraries_Interface_Item2D__workVector3_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector3_(value);
+};
+Get_Libraries_Interface_Item2D__origin_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__origin_();
+};
+Set_Libraries_Interface_Item2D__origin_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__origin_(value);
+};
+Get_Libraries_Interface_Item2D__layer_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layer_();
+};
+Set_Libraries_Interface_Item2D__layer_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layer_(value);
+};
+Get_Libraries_Interface_Item2D__isCustomDrawing_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isCustomDrawing_();
+};
+Set_Libraries_Interface_Item2D__isCustomDrawing_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isCustomDrawing_(value);
+};
+Get_Libraries_Interface_Item2D__shape_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shape_();
+};
+Set_Libraries_Interface_Item2D__shape_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shape_(value);
+};
+Get_Libraries_Interface_Item2D__properties_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__properties_();
+};
+Set_Libraries_Interface_Item2D__properties_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__properties_(value);
+};
+Get_Libraries_Interface_Item2D__shouldTriggerSimulation_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shouldTriggerSimulation_();
+};
+Set_Libraries_Interface_Item2D__shouldTriggerSimulation_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shouldTriggerSimulation_(value);
+};
+Get_Libraries_Interface_Item2D__sweep_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__sweep_();
+};
+Set_Libraries_Interface_Item2D__sweep_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__sweep_(value);
+};
+Get_Libraries_Interface_Item2D__isResizing_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isResizing_();
+};
+Set_Libraries_Interface_Item2D__isResizing_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isResizing_(value);
+};
+Get_Libraries_Interface_Item2D__collidable_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collidable_();
+};
+Set_Libraries_Interface_Item2D__collidable_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collidable_(value);
+};
+Get_Libraries_Interface_Item2D__bounds_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__bounds_();
+};
+Set_Libraries_Interface_Item2D__bounds_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__bounds_(value);
+};
+Get_Libraries_Interface_Item2D__nodes_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodes_();
+};
+Set_Libraries_Interface_Item2D__nodes_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodes_(value);
+};
+Get_Libraries_Interface_Item2D__flipX_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipX_();
+};
+Set_Libraries_Interface_Item2D__flipX_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipX_(value);
+};
+Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_();
+};
+Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_(value);
+};
+Get_Libraries_Interface_Item2D__collisionList_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collisionList_();
+};
+Set_Libraries_Interface_Item2D__collisionList_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collisionList_(value);
+};
+Get_Libraries_Interface_Item2D__heightSet_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__heightSet_();
+};
+Set_Libraries_Interface_Item2D__heightSet_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__heightSet_(value);
+};
+Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_();
+};
+Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_(value);
+};
+Get_Libraries_Interface_Item2D__parentItem_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__parentItem_();
+};
+Set_Libraries_Interface_Item2D__parentItem_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__parentItem_(value);
+};
+Get_Libraries_Interface_Item2D__clipPixels_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__clipPixels_();
+};
+Set_Libraries_Interface_Item2D__clipPixels_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__clipPixels_(value);
+};
+Get_Libraries_Interface_Item2D__z_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__z_();
+};
+Set_Libraries_Interface_Item2D__z_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__z_(value);
+};
+Get_Libraries_Interface_Item2D__flipY_() {
+   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipY_();
+};
+Set_Libraries_Interface_Item2D__flipY_(value) {
+   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipY_(value);
+};
+
+constructor(parents) {
 this.prototype = this;
 this.parentNames_ = ['Libraries.Interface.Item', 'Libraries.Interface.Controls.Control', 'Libraries.Interface.Item2D', 'Libraries.Language.Object',  'WebEditor.WebControlPanel'];
 this.Libraries_Interface_Item__ = null;
 this.Libraries_Interface_Controls_Control__ = null;
 this.Libraries_Interface_Item2D__ = null;
-this.GetShadowColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowColor();
-}
-this.GetTopRightPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopRightPixelRounding();
-}
-this.SetOrigin$quorum_number$quorum_number = function(setX, setY) {
-     return this.Libraries_Interface_Item2D__.SetOrigin$quorum_number$quorum_number(setX, setY);
-}
-this.RequireSimulation$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.RequireSimulation$quorum_boolean(flag);
-}
-this.HasBottomRightPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBottomRightPixelRounding();
-}
-this.BeginMouseOver = function() {
-     return this.Libraries_Interface_Controls_Control__.BeginMouseOver();
-}
-this.SetTorque$quorum_number = function(torque) {
-     return this.Libraries_Interface_Item2D__.SetTorque$quorum_number(torque);
-}
-this.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
-}
-this.GetLayoutRows = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLayoutRows();
-}
-this.SetLayout$quorum_Libraries_Interface_Layouts_Layout = function(layout) {
-     return this.Libraries_Interface_Controls_Control__.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
-}
-this.IsRotationAllowed = function() {
-     return this.Libraries_Interface_Item2D__.IsRotationAllowed();
-}
-this.SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.IsSimulated = function() {
-     return this.Libraries_Interface_Item2D__.IsSimulated();
-}
-this.SetShadowY$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowY$quorum_number(value);
-}
-this.GetJointList = function() {
-     return this.Libraries_Interface_Item2D__.GetJointList();
-}
-this.Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(broadphase, transform1, transform2) {
-     return this.Libraries_Interface_Item2D__.Synchronize$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform1, transform2);
-}
-this.GetItemAt$quorum_number$quorum_number = function(x, y) {
-     return this.Libraries_Interface_Item2D__.GetItemAt$quorum_number$quorum_number(x, y);
-}
-this.SetTopPadding$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetTopPadding$quorum_number(padding);
-}
-this.ApplyForceToCenter$quorum_Libraries_Compute_Vector2 = function(force) {
-     return this.Libraries_Interface_Item2D__.ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force);
-}
-this.SetMass$quorum_number = function(mass) {
-     return this.Libraries_Interface_Item2D__.SetMass$quorum_number(mass);
-}
-this.SetResponsive = function() {
-     return this.Libraries_Interface_Item2D__.SetResponsive();
-}
-this.GetLeftPadding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLeftPadding();
-}
-this.SetPixelY$quorum_number = function(y) {
-     return this.Libraries_Interface_Controls_Control__.SetPixelY$quorum_number(y);
-}
-this.HasTopRightPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasTopRightPixelRounding();
-}
-this.SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D = function(properties) {
-     return this.Libraries_Interface_Item2D__.SetPhysicsProperties$quorum_Libraries_Game_Physics_PhysicsProperties2D(properties);
-}
-this.SetGridHeight$quorum_integer = function(gridHeight) {
-     return this.Libraries_Interface_Controls_Control__.SetGridHeight$quorum_integer(gridHeight);
-}
-this.IsSimulationRequired = function() {
-     return this.Libraries_Interface_Item2D__.IsSimulationRequired();
-}
-this.GetAccentColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetAccentColor();
-}
-this.HasTopLeftRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasTopLeftRounding();
-}
-this.SetParent$quorum_Libraries_Interface_Item2D = function(newItem) {
-     return this.Libraries_Interface_Item2D__.SetParent$quorum_Libraries_Interface_Item2D(newItem);
-}
-this.GetShadowX = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowX();
-}
-this.GetShadowY = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowY();
-}
-this.SelectByFirstLetters$quorum_text = function(firstLetter) {
-     return this.Libraries_Interface_Controls_Control__.SelectByFirstLetters$quorum_text(firstLetter);
-}
-this.SetTransform$quorum_Libraries_Compute_Vector2$quorum_number = function(position, angle) {
-     return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Compute_Vector2$quorum_number(position, angle);
-}
-this.GetDefaultFontName = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultFontName();
-}
-this.GetRightMargin = function() {
-     return this.Libraries_Interface_Controls_Control__.GetRightMargin();
-}
-this.RequestLayout = function() {
-     return this.Libraries_Interface_Controls_Control__.RequestLayout();
-}
-this.GetLinearDamping = function() {
-     return this.Libraries_Interface_Item2D__.GetLinearDamping();
-}
-this.GetBottomRightRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomRightRounding();
-}
-this.SetGridX$quorum_integer = function(gridX) {
-     return this.Libraries_Interface_Controls_Control__.SetGridX$quorum_integer(gridX);
-}
-this.SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetForegroundSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D = function(edge) {
-     return this.Libraries_Interface_Item2D__.SetCollisionList$quorum_Libraries_Game_Collision_CollisionEdge2D(edge);
-}
-this.SetScale$quorum_number = function(scale) {
-     return this.Libraries_Interface_Item2D__.SetScale$quorum_number(scale);
-}
-this.GetBottomMargin = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomMargin();
-}
-this.SetToSmallFont = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToSmallFont();
-}
-this.ClickedMouse = function() {
-     return this.Libraries_Interface_Controls_Control__.ClickedMouse();
-}
-this.GetLinearVelocity = function() {
-     return this.Libraries_Interface_Item2D__.GetLinearVelocity();
-}
-this.SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(transform) {
-     return this.Libraries_Interface_Item2D__.SetTransform0$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
-}
-this.SetLinearVelocityX$quorum_number = function(linearVelocityX) {
-     return this.Libraries_Interface_Item2D__.SetLinearVelocityX$quorum_number(linearVelocityX);
-}
-this.QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
-     return this.Libraries_Interface_Item2D__.QueueForDrawing$quorum_Libraries_Game_Graphics_Painter2D(painter);
-}
-this.UpdateTransformY = function() {
-     return this.Libraries_Interface_Item2D__.UpdateTransformY();
-}
-this.UpdateTransformX = function() {
-     return this.Libraries_Interface_Item2D__.UpdateTransformX();
-}
-this.ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(force, point) {
-     return this.Libraries_Interface_Item2D__.ApplyForce$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(force, point);
-}
-this.GetVisibleItemAt$quorum_number$quorum_number = function(x, y) {
-     return this.Libraries_Interface_Item2D__.GetVisibleItemAt$quorum_number$quorum_number(x, y);
-}
-this.IsRenderingSelection = function() {
-     return this.Libraries_Interface_Controls_Control__.IsRenderingSelection();
-}
-this.IsEmpty = function() {
-     return this.Libraries_Interface_Item2D__.IsEmpty();
-}
-this.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
-     return this.Libraries_Interface_Controls_Control__.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
-}
-this.SetLinearVelocityY$quorum_number = function(linearVelocityY) {
-     return this.Libraries_Interface_Item2D__.SetLinearVelocityY$quorum_number(linearVelocityY);
-}
-this.GetShadowHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowHeight();
-}
-this.IsFlippedY = function() {
-     return this.Libraries_Interface_Item2D__.IsFlippedY();
-}
-this.IsFlippedX = function() {
-     return this.Libraries_Interface_Item2D__.IsFlippedX();
-}
-this.GetGridHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.GetGridHeight();
-}
-this.GetFocusListeners = function() {
-     return this.Libraries_Interface_Item__.GetFocusListeners();
-}
-this.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
-}
-this.SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseDownFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetTopRightRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetTopRightRounding$quorum_number(value);
-}
-this.GetTransform0 = function() {
-     return this.Libraries_Interface_Item2D__.GetTransform0();
-}
-this.GetInverseInertia = function() {
-     return this.Libraries_Interface_Item2D__.GetInverseInertia();
-}
-this.Resize = function() {
-     return this.Libraries_Interface_Item2D__.Resize();
-}
-this.GetCurrentLayoutProperties = function() {
-     return this.Libraries_Interface_Controls_Control__.GetCurrentLayoutProperties();
-}
-this.FinishCollision$quorum_Libraries_Interface_Item = function(item) {
-     return this.Libraries_Interface_Item__.FinishCollision$quorum_Libraries_Interface_Item(item);
-}
-this.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
-     return this.Libraries_Interface_Controls_Control__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
-}
-this.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
-     return this.Libraries_Interface_Controls_Control__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
-}
-this.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
-}
-this.SetAccessibilityCode$quorum_integer = function(newAccessibilityCode) {
-     return this.Libraries_Interface_Item__.SetAccessibilityCode$quorum_integer(newAccessibilityCode);
-}
-this.HasShadowX = function() {
-     return this.Libraries_Interface_Controls_Control__.HasShadowX();
-}
-this.SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBackgroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.HasShadowY = function() {
-     return this.Libraries_Interface_Controls_Control__.HasShadowY();
-}
-this.GetAngularDamping = function() {
-     return this.Libraries_Interface_Item2D__.GetAngularDamping();
-}
-this.SetInterfaceOptionsKey$quorum_text = function(key) {
-     return this.Libraries_Interface_Controls_Control__.SetInterfaceOptionsKey$quorum_text(key);
-}
-this.RequestReloadGraphics = function() {
-     return this.Libraries_Interface_Controls_Control__.RequestReloadGraphics();
-}
-this.GetAccessibilityRoleDescription = function() {
-     return this.Libraries_Interface_Item__.GetAccessibilityRoleDescription();
-}
-this.GetRotationInRadians = function() {
-     return this.Libraries_Interface_Item2D__.GetRotationInRadians();
-}
-this.MoveX$quorum_number = function(xAmount) {
-     return this.Libraries_Interface_Item2D__.MoveX$quorum_number(xAmount);
-}
-this.ResetMass = function() {
-     return this.Libraries_Interface_Item2D__.ResetMass();
-}
-this.GetFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFontColor();
-}
-this.RequestVerticesUpdate = function() {
-     return this.Libraries_Interface_Item2D__.RequestVerticesUpdate();
-}
-this.HasLeftBorder = function() {
-     return this.Libraries_Interface_Controls_Control__.HasLeftBorder();
-}
-this.HasTopLeftPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasTopLeftPixelRounding();
-}
-this.GetActivationBehavior = function() {
-     return this.Libraries_Interface_Controls_Control__.GetActivationBehavior();
-}
-this.UpdateBehaviors$quorum_number = function(seconds) {
-     return this.Libraries_Interface_Item__.UpdateBehaviors$quorum_number(seconds);
-}
-this.SetCollisionGroupIndex$quorum_integer = function(index) {
-     return this.Libraries_Interface_Item2D__.SetCollisionGroupIndex$quorum_integer(index);
-}
-this.GetRestitution = function() {
-     return this.Libraries_Interface_Item2D__.GetRestitution();
-}
-this.SetScreenPositionFromPhysicsPosition = function() {
-     return this.Libraries_Interface_Item2D__.SetScreenPositionFromPhysicsPosition();
-}
-this.IsPhysicsEnabled = function() {
-     return this.Libraries_Interface_Item2D__.IsPhysicsEnabled();
-}
-this.SetClipping$quorum_boolean = function(clip) {
-     return this.Libraries_Interface_Item2D__.SetClipping$quorum_boolean(clip);
-}
-this.SetScaleFromCenter$quorum_number = function(scale) {
-     return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number(scale);
-}
-this.IsShowing = function() {
-     return this.Libraries_Interface_Item__.IsShowing();
-}
-this.SetBorderStyle$quorum_integer = function(style) {
-     return this.Libraries_Interface_Controls_Control__.SetBorderStyle$quorum_integer(style);
-}
-this.Contains$quorum_number$quorum_number = function(containsX, containsY) {
-     return this.Libraries_Interface_Item2D__.Contains$quorum_number$quorum_number(containsX, containsY);
-}
-this.IsCollidable = function() {
-     return this.Libraries_Interface_Item2D__.IsCollidable();
-}
-this.Simulate$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.Simulate$quorum_boolean(flag);
-}
-this.GetPhysicsProperties = function() {
-     return this.Libraries_Interface_Item2D__.GetPhysicsProperties();
-}
-this.GetRightPadding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetRightPadding();
-}
-this.SetY$quorum_number = function(setY) {
-     return this.Libraries_Interface_Item2D__.SetY$quorum_number(setY);
-}
-this.SetMass$quorum_Libraries_Game_Physics_Mass2D = function(mass) {
-     return this.Libraries_Interface_Item2D__.SetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
-}
-this.GetBorderThickness = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBorderThickness();
-}
-this.GetAccessibleParent = function() {
-     return this.Libraries_Interface_Item2D__.GetAccessibleParent();
-}
-this.SetFlipY$quorum_boolean = function(flip) {
-     return this.Libraries_Interface_Item2D__.SetFlipY$quorum_boolean(flip);
-}
-this.GetName = function() {
-     return this.Libraries_Interface_Item__.GetName();
-}
-this.GetPixelWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPixelWidth();
-}
-this.ManageShape = function() {
-     return this.Libraries_Interface_Item2D__.ManageShape();
-}
-this.GetBottomLeftRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomLeftRounding();
-}
-this.GetLeftMargin = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLeftMargin();
-}
-this.GetFriction = function() {
-     return this.Libraries_Interface_Item2D__.GetFriction();
-}
-this.GetSelectionListeners = function() {
-     return this.Libraries_Interface_Controls_Control__.GetSelectionListeners();
-}
-this.SetHasMoved$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.SetHasMoved$quorum_boolean(flag);
-}
-this.FastMoving$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.FastMoving$quorum_boolean(flag);
-}
-this.SetFont$quorum_Libraries_Game_Graphics_Font = function(font) {
-     return this.Libraries_Interface_Controls_Control__.SetFont$quorum_Libraries_Game_Graphics_Font(font);
-}
-this.SetPercentageX$quorum_number = function(x) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageX$quorum_number(x);
-}
-this.GetBorderStyle = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBorderStyle();
-}
-this.ResetLayoutFlag = function() {
-     return this.Libraries_Interface_Controls_Control__.ResetLayoutFlag();
-}
-this.SetTopRightPixelRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetTopRightPixelRounding$quorum_number(value);
-}
-this.UpdateTransformAngle = function() {
-     return this.Libraries_Interface_Item2D__.UpdateTransformAngle();
-}
-this.GetUnfocusedSelectionBorderColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionBorderColor();
-}
-this.EmptySelectionListeners = function() {
-     return this.Libraries_Interface_Controls_Control__.EmptySelectionListeners();
-}
-this.GetLayer = function() {
-     return this.Libraries_Interface_Item2D__.GetLayer();
-}
-this.GetWorldVector$quorum_Libraries_Compute_Vector2 = function(localVector) {
-     return this.Libraries_Interface_Item2D__.GetWorldVector$quorum_Libraries_Compute_Vector2(localVector);
-}
-this.GetMouseDownColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseDownColor();
-}
-this.HasFontOutlineThickness = function() {
-     return this.Libraries_Interface_Controls_Control__.HasFontOutlineThickness();
-}
-this.GetFocusFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFocusFontColor();
-}
-this.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetInterfaceOptionsKey = function() {
-     return this.Libraries_Interface_Controls_Control__.GetInterfaceOptionsKey();
-}
-this.GetHorizontalLayoutMode = function() {
-     return this.Libraries_Interface_Controls_Control__.GetHorizontalLayoutMode();
-}
-this.SetGridWidth$quorum_integer = function(gridWidth) {
-     return this.Libraries_Interface_Controls_Control__.SetGridWidth$quorum_integer(gridWidth);
-}
-this.GetMass$quorum_Libraries_Game_Physics_Mass2D = function(mass) {
-     return this.Libraries_Interface_Item2D__.GetMass$quorum_Libraries_Game_Physics_Mass2D(mass);
-}
-this.SetToLargeFont = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToLargeFont();
-}
-this.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
-}
-this.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
-     return this.Libraries_Interface_Controls_Control__.SetCornerRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
-}
-this.GetDefaultProportionalFontName = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultProportionalFontName();
-}
-this.SetScaleFromCenter$quorum_number$quorum_number = function(newX, newY) {
-     return this.Libraries_Interface_Item2D__.SetScaleFromCenter$quorum_number$quorum_number(newX, newY);
-}
-this.SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetAccentColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetContainerGridWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.GetContainerGridWidth();
-}
-this.HasBottomLeftPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBottomLeftPixelRounding();
-}
-this.GetDefaultFont = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultFont();
-}
-this.GetMouseDownGlowColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseDownGlowColor();
-}
-this.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(transform) {
-     return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
-}
-this.HasMoved = function() {
-     return this.Libraries_Interface_Item2D__.HasMoved();
-}
-this.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
-}
-this.SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFontOutlineColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetShapeType = function() {
-     return this.Libraries_Interface_Item2D__.GetShapeType();
-}
-this.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
-}
-this.SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseDownGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetOffsetX = function() {
-     return this.Libraries_Interface_Item2D__.GetOffsetX();
-}
-this.GetOffsetZ = function() {
-     return this.Libraries_Interface_Item2D__.GetOffsetZ();
-}
-this.GetOffsetY = function() {
-     return this.Libraries_Interface_Item2D__.GetOffsetY();
-}
-this.GetItems = function() {
-     return this.Libraries_Interface_Item2D__.GetItems();
-}
-this.GetHashCode = function() {
-return global_Object_GetHashCode(this.prototype, );
-}
-this.GetMouseOverColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseOverColor();
-}
-this.GetPixelHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPixelHeight();
-}
-this.SetOffsetY$quorum_number = function(yAmount) {
-     return this.Libraries_Interface_Item2D__.SetOffsetY$quorum_number(yAmount);
-}
-this.HasProperty$quorum_text = function(key) {
-     return this.Libraries_Interface_Item__.HasProperty$quorum_text(key);
-}
-this.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
-}
-this.SetLinearDamping$quorum_number = function(linearDamping) {
-     return this.Libraries_Interface_Item2D__.SetLinearDamping$quorum_number(linearDamping);
-}
-this.PrepareVertices = function() {
-     return this.Libraries_Interface_Item2D__.PrepareVertices();
-}
-this.SetChildrenProcessingMouseEvents$quorum_boolean = function(shouldProcess) {
-     return this.Libraries_Interface_Item2D__.SetChildrenProcessingMouseEvents$quorum_boolean(shouldProcess);
-}
-this.GetTopLeftPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopLeftPixelRounding();
-}
-this.GetBottomLeftPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomLeftPixelRounding();
-}
-this.GetBoundingBox$quorum_integer = function(childIndex) {
-     return this.Libraries_Interface_Item2D__.GetBoundingBox$quorum_integer(childIndex);
-}
-this.GetWidth = function() {
-     return this.Libraries_Interface_Item2D__.GetWidth();
-}
-this.SetPercentageOriginY$quorum_number = function(y) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageOriginY$quorum_number(y);
-}
-this.HasBottomBorder = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBottomBorder();
-}
-this.HasTopRightRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasTopRightRounding();
-}
-this.Activate$quorum_Libraries_Interface_Events_BehaviorEvent = function(event) {
-     return this.Libraries_Interface_Controls_Control__.Activate$quorum_Libraries_Interface_Events_BehaviorEvent(event);
-}
-this.IsFocusable = function() {
-     return this.Libraries_Interface_Item__.IsFocusable();
-}
-this.NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent = function(event) {
-     return this.Libraries_Interface_Controls_Control__.NotifySelectionListeners$quorum_Libraries_Interface_Events_SelectionEvent(event);
-}
-this.GetCollisionList = function() {
-     return this.Libraries_Interface_Item2D__.GetCollisionList();
-}
-this.GetPreviousFocus = function() {
-     return this.Libraries_Interface_Item__.GetPreviousFocus();
-}
-this.SetFontSize$quorum_integer = function(size) {
-     return this.Libraries_Interface_Controls_Control__.SetFontSize$quorum_integer(size);
-}
-this.GetDescription = function() {
-     return this.Libraries_Interface_Item__.GetDescription();
-}
-this.GetUnfocusedSelectionColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionColor();
-}
-this.GetPercentageX = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageX();
-}
-this.SetBottomLeftRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomLeftRounding$quorum_number(value);
-}
-this.GetPercentageY = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageY();
-}
-this.SetView2D$quorum_Libraries_Interface_Views_View2D = function(content) {
-     return this.Libraries_Interface_Item2D__.SetView2D$quorum_Libraries_Interface_Views_View2D(content);
-}
-this.GetBoundingRectangle = function() {
-     return this.Libraries_Interface_Item2D__.GetBoundingRectangle();
-}
-this.GetMouseMovementListeners = function() {
-     return this.Libraries_Interface_Item__.GetMouseMovementListeners();
-}
-this.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetGridY$quorum_integer = function(gridY) {
-     return this.Libraries_Interface_Controls_Control__.SetGridY$quorum_integer(gridY);
-}
-this.GetHeight = function() {
-     return this.Libraries_Interface_Item2D__.GetHeight();
-}
-this.GetPercentageWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageWidth();
-}
-this.GetProperty$quorum_text = function(key) {
-     return this.Libraries_Interface_Item__.GetProperty$quorum_text(key);
-}
-this.LostSelection = function() {
-     return this.Libraries_Interface_Controls_Control__.LostSelection();
-}
-this.Advance$quorum_number = function(time) {
-     return this.Libraries_Interface_Item2D__.Advance$quorum_number(time);
-}
-this.SetOffset$quorum_number$quorum_number$quorum_number = function(xAmount, yAmount, zAmount) {
-     return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number$quorum_number(xAmount, yAmount, zAmount);
-}
-this.GetUnfocusedSelectionFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetUnfocusedSelectionFontColor();
-}
-this.IsOnLayer = function() {
-     return this.Libraries_Interface_Item2D__.IsOnLayer();
-}
-this.ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent = function(event) {
-     return this.Libraries_Interface_Item2D__.ProcessMouseEvent$quorum_Libraries_Interface_Events_MouseEvent(event);
-}
-this.GetLayoutProperties$quorum_number$quorum_number = function(containerWidth, containerHeight) {
-     return this.Libraries_Interface_Controls_Control__.GetLayoutProperties$quorum_number$quorum_number(containerWidth, containerHeight);
-}
-this.HasColorPropertyOverride$quorum_text = function(property) {
-     return this.Libraries_Interface_Controls_Control__.HasColorPropertyOverride$quorum_text(property);
-}
-this.HasRightBorder = function() {
-     return this.Libraries_Interface_Controls_Control__.HasRightBorder();
-}
-this.SetOffsetZ$quorum_number = function(zAmount) {
-     return this.Libraries_Interface_Item2D__.SetOffsetZ$quorum_number(zAmount);
-}
-this.SetFlipX$quorum_boolean = function(flip) {
-     return this.Libraries_Interface_Item2D__.SetFlipX$quorum_boolean(flip);
-}
-this.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
-}
-this.RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
-     return this.Libraries_Interface_Controls_Control__.RemoveLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
-}
-this.SetFriction$quorum_number = function(friction) {
-     return this.Libraries_Interface_Item2D__.SetFriction$quorum_number(friction);
-}
-this.GetLocalPoint$quorum_Libraries_Compute_Vector2 = function(worldPoint) {
-     return this.Libraries_Interface_Item2D__.GetLocalPoint$quorum_Libraries_Compute_Vector2(worldPoint);
-}
-this.GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2 = function(localPoint) {
-     return this.Libraries_Interface_Item2D__.GetLinearVelocityFromLocalPoint$quorum_Libraries_Compute_Vector2(localPoint);
-}
-this.SetName$quorum_text = function(newName) {
-     return this.Libraries_Interface_Item__.SetName$quorum_text(newName);
-}
-this.GainedSelection = function() {
-     return this.Libraries_Interface_Controls_Control__.GainedSelection();
-}
-this.ManageLayers = function() {
-     return this.Libraries_Interface_Item2D__.ManageLayers();
-}
-this.SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseOverFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetGridPosition$quorum_integer$quorum_integer = function(gridX, gridY) {
-     return this.Libraries_Interface_Controls_Control__.SetGridPosition$quorum_integer$quorum_integer(gridX, gridY);
-}
-this.NotifyAccessibilityBoundsChanged = function() {
-     return this.Libraries_Interface_Item2D__.NotifyAccessibilityBoundsChanged();
-}
-this.SetShadowX$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowX$quorum_number(value);
-}
-this.SetRightMargin$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetRightMargin$quorum_number(padding);
-}
-this.HasBottomLeftRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBottomLeftRounding();
-}
-this.AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
-     return this.Libraries_Interface_Controls_Control__.AddLayoutProperties$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
-}
-this.LostFocus$quorum_Libraries_Interface_Events_FocusEvent = function(event) {
-     return this.Libraries_Interface_Controls_Control__.LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
-}
-this.CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D = function(broadphase, transform) {
-     return this.Libraries_Interface_Item2D__.CreateNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D$quorum_Libraries_Game_Collision_PhysicsPosition2D(broadphase, transform);
-}
-this.SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number = function(bottomLeft, bottomRight, topLeft, topRight) {
-     return this.Libraries_Interface_Controls_Control__.SetCornerPixelRounding$quorum_number$quorum_number$quorum_number$quorum_number(bottomLeft, bottomRight, topLeft, topRight);
-}
-this.SetBottomMargin$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomMargin$quorum_number(padding);
-}
-this.HasProperties = function() {
-     return this.Libraries_Interface_Item__.HasProperties();
-}
-this.SetHorizontalLayoutMode$quorum_integer = function(mode) {
-     return this.Libraries_Interface_Controls_Control__.SetHorizontalLayoutMode$quorum_integer(mode);
-}
-this.SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu = function(menu) {
-     return this.Libraries_Interface_Controls_Control__.SetPopupMenu$quorum_Libraries_Interface_Controls_PopupMenu(menu);
-}
-this.SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseOverGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetAngularDamping$quorum_number = function(angularDamping) {
-     return this.Libraries_Interface_Item2D__.SetAngularDamping$quorum_number(angularDamping);
-}
-this.GetShadowWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowWidth();
-}
-this.HasShadowHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.HasShadowHeight();
-}
-this.GetNumberProperty$quorum_text = function(property) {
-     return this.Libraries_Interface_Controls_Control__.GetNumberProperty$quorum_text(property);
-}
-this.HasBorderThickness = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBorderThickness();
-}
-this.GetMouseOverFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseOverFontColor();
-}
-this.GetScaleY = function() {
-     return this.Libraries_Interface_Item2D__.GetScaleY();
-}
-this.Equals$quorum_Libraries_Language_Object = function(object) {
-return global_Object_Equals(this.prototype, object);
-}
-this.GetScaleX = function() {
-     return this.Libraries_Interface_Item2D__.GetScaleX();
-}
-this.SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
-     return this.Libraries_Interface_Item2D__.SetClipCoordinates$quorum_Libraries_Game_Graphics_Painter2D(painter);
-}
-this.GetView2D = function() {
-     return this.Libraries_Interface_Item2D__.GetView2D();
-}
-this.GetDefaultFontSize = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultFontSize();
-}
-this.SetCollidable$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.SetCollidable$quorum_boolean(flag);
-}
-this.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent = function(event) {
-     return this.Libraries_Interface_Controls_Control__.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
-}
-this.SetWidth$quorum_number = function(newWidth) {
-     return this.Libraries_Interface_Item2D__.SetWidth$quorum_number(newWidth);
-}
-this.GetSelectionBorderColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetSelectionBorderColor();
-}
-this.SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetSelectionFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetInverseMass = function() {
-     return this.Libraries_Interface_Item2D__.GetInverseMass();
-}
-this.GetTransform = function() {
-     return this.Libraries_Interface_Item2D__.GetTransform();
-}
-this.HasBottomRightRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.HasBottomRightRounding();
-}
-this.GetRotation = function() {
-     return this.Libraries_Interface_Item2D__.GetRotation();
-}
-this.GetDensity = function() {
-     return this.Libraries_Interface_Item2D__.GetDensity();
-}
-this.GetPropertyKeyIterator = function() {
-     return this.Libraries_Interface_Item__.GetPropertyKeyIterator();
-}
-this.SynchronizeNodes = function() {
-     return this.Libraries_Interface_Item2D__.SynchronizeNodes();
-}
-this.SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation = function(key, value) {
-     return this.Libraries_Interface_Item__.SetProperty$quorum_text$quorum_Libraries_Data_Formats_JavaScriptObjectNotation(key, value);
-}
-this.GetDefaultLayoutProperties = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultLayoutProperties();
-}
-this.SetLeftPadding$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetLeftPadding$quorum_number(padding);
-}
-this.SetLayer$quorum_Libraries_Game_Layer2D = function(parentLayer) {
-     return this.Libraries_Interface_Item2D__.SetLayer$quorum_Libraries_Game_Layer2D(parentLayer);
-}
-this.IsRenderingFocus = function() {
-     return this.Libraries_Interface_Controls_Control__.IsRenderingFocus();
-}
-this.GetForegroundSelectionColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetForegroundSelectionColor();
-}
-this.GetLocalCenter = function() {
-     return this.Libraries_Interface_Item2D__.GetLocalCenter();
-}
-this.SetNonResponsive = function() {
-     return this.Libraries_Interface_Item2D__.SetNonResponsive();
-}
-this.SetRotation$quorum_number = function(degrees) {
-     return this.Libraries_Interface_Item2D__.SetRotation$quorum_number(degrees);
-}
-this.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, newItem) {
-     return this.Libraries_Interface_Item2D__.SetItem$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
-}
-this.SetTopMargin$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetTopMargin$quorum_number(padding);
-}
-this.GetDefaultMonospaceFontName = function() {
-     return this.Libraries_Interface_Controls_Control__.GetDefaultMonospaceFontName();
-}
-this.HasShadowWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.HasShadowWidth();
-}
-this.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
-     return this.Libraries_Interface_Controls_Control__.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
-}
-this.Focus = function() {
-     return this.Libraries_Interface_Item__.Focus();
-}
-this.SetScale$quorum_number$quorum_number = function(newX, newY) {
-     return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
-}
-this.SetInterfaceScale$quorum_number = function(scale) {
-     return this.Libraries_Interface_Controls_Control__.SetInterfaceScale$quorum_number(scale);
-}
-this.SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFocusFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.HasTopBorder = function() {
-     return this.Libraries_Interface_Controls_Control__.HasTopBorder();
-}
-this.SetBottomRightRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomRightRounding$quorum_number(value);
-}
-this.ShouldCollide$quorum_Libraries_Interface_Item2D = function(otherItem) {
-     return this.Libraries_Interface_Item2D__.ShouldCollide$quorum_Libraries_Interface_Item2D(otherItem);
-}
-this.SetNumberProperty$quorum_text$quorum_number = function(property, value) {
-     return this.Libraries_Interface_Controls_Control__.SetNumberProperty$quorum_text$quorum_number(property, value);
-}
-this.SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFocusBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetAngularVelocity$quorum_number = function(angularVelocity) {
-     return this.Libraries_Interface_Item2D__.SetAngularVelocity$quorum_number(angularVelocity);
-}
-this.ApplyAngularImpulse$quorum_number = function(impulse) {
-     return this.Libraries_Interface_Item2D__.ApplyAngularImpulse$quorum_number(impulse);
-}
-this.SetSize$quorum_number$quorum_number = function(newWidth, newHeight) {
-     return this.Libraries_Interface_Item2D__.SetSize$quorum_number$quorum_number(newWidth, newHeight);
-}
-this.SetContainerGridHeight$quorum_integer = function(containerGridHeight) {
-     return this.Libraries_Interface_Controls_Control__.SetContainerGridHeight$quorum_integer(containerGridHeight);
-}
-this.SetUpdateTransform$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.SetUpdateTransform$quorum_boolean(flag);
-}
-this.Draw$quorum_Libraries_Game_Graphics_Painter2D = function(painter) {
-     return this.Libraries_Interface_Item2D__.Draw$quorum_Libraries_Game_Graphics_Painter2D(painter);
-}
-this.Dispose = function() {
-     return this.Libraries_Interface_Item__.Dispose();
-}
-this.GetItemCount = function() {
-     return this.Libraries_Interface_Item2D__.GetItemCount();
-}
-this.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
-}
-this.GetIcon = function() {
-     return this.Libraries_Interface_Controls_Control__.GetIcon();
-}
-this.SetDescription$quorum_text = function(newDescription) {
-     return this.Libraries_Interface_Item__.SetDescription$quorum_text(newDescription);
-}
-this.GetGridX = function() {
-     return this.Libraries_Interface_Controls_Control__.GetGridX();
-}
-this.GetGridY = function() {
-     return this.Libraries_Interface_Controls_Control__.GetGridY();
-}
-this.GetColorProperty$quorum_text = function(property) {
-     return this.Libraries_Interface_Controls_Control__.GetColorProperty$quorum_text(property);
-}
-this.GetBackgroundColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBackgroundColor();
-}
-this.GetMouseDownFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseDownFontColor();
-}
-this.SetForce$quorum_Libraries_Compute_Vector2 = function(force) {
-     return this.Libraries_Interface_Item2D__.SetForce$quorum_Libraries_Compute_Vector2(force);
-}
-this.SetBorderThickness$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBorderThickness$quorum_number(value);
-}
-this.CancelBehaviors = function() {
-     return this.Libraries_Interface_Item__.CancelBehaviors();
-}
-this.SetDensity$quorum_number = function(density) {
-     return this.Libraries_Interface_Item2D__.SetDensity$quorum_number(density);
-}
-this.GetItem$quorum_integer = function(index) {
-     return this.Libraries_Interface_Item2D__.GetItem$quorum_integer(index);
-}
-this.GetLocalVector$quorum_Libraries_Compute_Vector2 = function(worldVector) {
-     return this.Libraries_Interface_Item2D__.GetLocalVector$quorum_Libraries_Compute_Vector2(worldVector);
-}
-this.GetLayoutProperties = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLayoutProperties();
-}
-this.GetInterfaceScale = function() {
-     return this.Libraries_Interface_Controls_Control__.GetInterfaceScale();
-}
-this.SetHeight$quorum_number = function(newHeight) {
-     return this.Libraries_Interface_Item2D__.SetHeight$quorum_number(newHeight);
-}
-this.IsCustomDrawing = function() {
-     return this.Libraries_Interface_Item2D__.IsCustomDrawing();
-}
-this.GetInputGroup = function() {
-     return this.Libraries_Interface_Item__.GetInputGroup();
-}
-this.GetMass = function() {
-     return this.Libraries_Interface_Item2D__.GetMass();
-}
-this.GetBottomRightPixelRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomRightPixelRounding();
-}
-this.Compare$quorum_Libraries_Language_Object = function(object) {
-return global_Object_Compare(this.prototype, object);
-}
-this.GetPercentageHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageHeight();
-}
-this.GetBorderColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBorderColor();
-}
-this.GetGlobalZ = function() {
-     return this.Libraries_Interface_Item2D__.GetGlobalZ();
-}
-this.GetGlobalY = function() {
-     return this.Libraries_Interface_Item2D__.GetGlobalY();
-}
-this.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
-}
-this.GetTopPadding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopPadding();
-}
-this.SetLayoutRows$quorum_number = function(layoutRows) {
-     return this.Libraries_Interface_Controls_Control__.SetLayoutRows$quorum_number(layoutRows);
-}
-this.SetPixelWidth$quorum_number = function(width) {
-     return this.Libraries_Interface_Controls_Control__.SetPixelWidth$quorum_number(width);
-}
-this.NeedsLayout = function() {
-     return this.Libraries_Interface_Controls_Control__.NeedsLayout();
-}
-this.LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties = function(properties) {
-     return this.Libraries_Interface_Controls_Control__.LoadGraphics$quorum_Libraries_Interface_Layouts_LayoutProperties(properties);
-}
-this.SetOffset$quorum_number$quorum_number = function(xAmount, yAmount) {
-     return this.Libraries_Interface_Item2D__.SetOffset$quorum_number$quorum_number(xAmount, yAmount);
-}
-this.GetAngularVelocity = function() {
-     return this.Libraries_Interface_Item2D__.GetAngularVelocity();
-}
-this.GetInertia = function() {
-     return this.Libraries_Interface_Item2D__.GetInertia();
-}
-this.SetScaleX$quorum_number = function(scaleX) {
-     return this.Libraries_Interface_Item2D__.SetScaleX$quorum_number(scaleX);
-}
-this.GetGridWidth = function() {
-     return this.Libraries_Interface_Controls_Control__.GetGridWidth();
-}
-this.GetLabelText = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLabelText();
-}
-this.DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D = function(broadphase) {
-     return this.Libraries_Interface_Item2D__.DestroyNodes$quorum_Libraries_Game_Collision_BroadphaseCollision2D(broadphase);
-}
-this.GetGestureListeners = function() {
-     return this.Libraries_Interface_Item__.GetGestureListeners();
-}
-this.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetFocusBorderColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFocusBorderColor();
-}
-this.GetShadowEdgeFade = function() {
-     return this.Libraries_Interface_Controls_Control__.GetShadowEdgeFade();
-}
-this.SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number = function(newX, newY, newWidth, newHeight) {
-     return this.Libraries_Interface_Item2D__.SetBoundingBox$quorum_number$quorum_number$quorum_number$quorum_number(newX, newY, newWidth, newHeight);
-}
-this.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
-     return this.Libraries_Interface_Item__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
-}
-this.SetNextFocus$quorum_Libraries_Interface_Item = function(next) {
-     return this.Libraries_Interface_Item__.SetNextFocus$quorum_Libraries_Interface_Item(next);
-}
-this.SetPosition$quorum_number$quorum_number = function(setX, setY) {
-     return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number(setX, setY);
-}
-this.FlipY = function() {
-     return this.Libraries_Interface_Item2D__.FlipY();
-}
-this.GetChildAsItem$quorum_integer = function(index) {
-     return this.Libraries_Interface_Item2D__.GetChildAsItem$quorum_integer(index);
-}
-this.SetCenterY$quorum_number = function(setY) {
-     return this.Libraries_Interface_Item2D__.SetCenterY$quorum_number(setY);
-}
-this.ReleasedMouse = function() {
-     return this.Libraries_Interface_Controls_Control__.ReleasedMouse();
-}
-this.FlipX = function() {
-     return this.Libraries_Interface_Item2D__.FlipX();
-}
-this.SetBottomRightPixelRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomRightPixelRounding$quorum_number(value);
-}
-this.GetCollisionGroupIndex = function() {
-     return this.Libraries_Interface_Item2D__.GetCollisionGroupIndex();
-}
-this.SetRestitution$quorum_number = function(restitution) {
-     return this.Libraries_Interface_Item2D__.SetRestitution$quorum_number(restitution);
-}
-this.EmptyChildren = function() {
-     return this.Libraries_Interface_Item__.EmptyChildren();
-}
-this.GetSelectionFontColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetSelectionFontColor();
-}
-this.UpdateAll$quorum_number = function(seconds) {
-     return this.Libraries_Interface_Controls_Control__.UpdateAll$quorum_number(seconds);
-}
-this.Move$quorum_Libraries_Compute_Vector2 = function(movement) {
-     return this.Libraries_Interface_Item2D__.Move$quorum_Libraries_Compute_Vector2(movement);
-}
-this.GetSleepTime = function() {
-     return this.Libraries_Interface_Item2D__.GetSleepTime();
-}
-this.GetTouchListeners = function() {
-     return this.Libraries_Interface_Item__.GetTouchListeners();
-}
-this.SetGridSize$quorum_integer$quorum_integer = function(gridWidth, gridHeight) {
-     return this.Libraries_Interface_Controls_Control__.SetGridSize$quorum_integer$quorum_integer(gridWidth, gridHeight);
-}
-this.GetX = function() {
-     return this.Libraries_Interface_Item2D__.GetX();
-}
-this.GetY = function() {
-     return this.Libraries_Interface_Item2D__.GetY();
-}
-this.GetTopMargin = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopMargin();
-}
-this.GetZ = function() {
-     return this.Libraries_Interface_Item2D__.GetZ();
-}
-this.SetCustomDrawing$quorum_boolean = function(isCustom) {
-     return this.Libraries_Interface_Item2D__.SetCustomDrawing$quorum_boolean(isCustom);
-}
-this.EnablePhysics$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.EnablePhysics$quorum_boolean(flag);
-}
-this.SetLeftMargin$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetLeftMargin$quorum_number(padding);
-}
-this.SynchronizeTransform = function() {
-     return this.Libraries_Interface_Item2D__.SynchronizeTransform();
-}
-this.SetIcon$quorum_Libraries_Game_Graphics_TextureRegion = function(icon) {
-     return this.Libraries_Interface_Controls_Control__.SetIcon$quorum_Libraries_Game_Graphics_TextureRegion(icon);
-}
-this.IsNonResponsive = function() {
-     return this.Libraries_Interface_Item2D__.IsNonResponsive();
-}
-this.SetShadowEdgeFade$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowEdgeFade$quorum_number(value);
-}
-this.CanRotate$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.CanRotate$quorum_boolean(flag);
-}
-this.HasShadowEdgeFade = function() {
-     return this.Libraries_Interface_Controls_Control__.HasShadowEdgeFade();
-}
-this.SetTopLeftPixelRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetTopLeftPixelRounding$quorum_number(value);
-}
-this.GetShape = function() {
-     return this.Libraries_Interface_Item2D__.GetShape();
-}
-this.SetPercentageHeight$quorum_number = function(height) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageHeight$quorum_number(height);
-}
-this.Hide = function() {
-     return this.Libraries_Interface_Item__.Hide();
-}
-this.SetTopLeftRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetTopLeftRounding$quorum_number(value);
-}
-this.GetCenterY = function() {
-     return this.Libraries_Interface_Item2D__.GetCenterY();
-}
-this.SetVerticalLayoutMode$quorum_integer = function(mode) {
-     return this.Libraries_Interface_Controls_Control__.SetVerticalLayoutMode$quorum_integer(mode);
-}
-this.Rotate$quorum_number = function(degrees) {
-     return this.Libraries_Interface_Item2D__.Rotate$quorum_number(degrees);
-}
-this.GetCenterX = function() {
-     return this.Libraries_Interface_Item2D__.GetCenterX();
-}
-this.ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2 = function(point, childIndex, normalOut) {
-     return this.Libraries_Interface_Item2D__.ComputeDistance$quorum_Libraries_Compute_Vector2$quorum_integer$quorum_Libraries_Compute_Vector2(point, childIndex, normalOut);
-}
-this.GetAccessibilityType = function() {
-     return this.Libraries_Interface_Item__.GetAccessibilityType();
-}
-this.Update$quorum_number = function(secondsSinceUpdate) {
-     return this.Libraries_Interface_Item__.Update$quorum_number(secondsSinceUpdate);
-}
-this.GetCollisionGroupFlag = function() {
-     return this.Libraries_Interface_Item2D__.GetCollisionGroupFlag();
-}
-this.IsRenderingMouseOver = function() {
-     return this.Libraries_Interface_Controls_Control__.IsRenderingMouseOver();
-}
-this.SetShadowWidth$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowWidth$quorum_number(value);
-}
-this.SetCenter$quorum_number$quorum_number = function(setX, setY) {
-     return this.Libraries_Interface_Item2D__.SetCenter$quorum_number$quorum_number(setX, setY);
-}
-this.SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D = function(shape) {
-     return this.Libraries_Interface_Item2D__.SetShape$quorum_Libraries_Game_Collision_Shapes_CollisionShape2D(shape);
-}
-this.SetFocusable$quorum_boolean = function(focus) {
-     return this.Libraries_Interface_Item__.SetFocusable$quorum_boolean(focus);
-}
-this.GetDrawableShape = function() {
-     return this.Libraries_Interface_Item2D__.GetDrawableShape();
-}
-this.SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetInputGroup$quorum_text = function(group) {
-     return this.Libraries_Interface_Item__.SetInputGroup$quorum_text(group);
-}
-this.IsRenderingMouseDown = function() {
-     return this.Libraries_Interface_Controls_Control__.IsRenderingMouseDown();
-}
-this.GetPercentageOriginX = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageOriginX();
-}
-this.GetPercentageOriginY = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPercentageOriginY();
-}
-this.ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent = function(event) {
-     return this.Libraries_Interface_Item2D__.ProcessTouchEvent$quorum_Libraries_Interface_Events_TouchEvent(event);
-}
-this.SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetForegroundColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.TestPoint$quorum_Libraries_Compute_Vector2 = function(point) {
-     return this.Libraries_Interface_Item2D__.TestPoint$quorum_Libraries_Compute_Vector2(point);
-}
-this.GetNodes = function() {
-     return this.Libraries_Interface_Item2D__.GetNodes();
-}
-this.GetForce = function() {
-     return this.Libraries_Interface_Item2D__.GetForce();
-}
-this.GetChildren = function() {
-     return this.Libraries_Interface_Item2D__.GetChildren();
-}
-this.SetCollisionGroupFlag$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.SetCollisionGroupFlag$quorum_boolean(flag);
-}
-this.GetForegroundColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetForegroundColor();
-}
-this.GetNextFocus = function() {
-     return this.Libraries_Interface_Item__.GetNextFocus();
-}
-this.GetMouseOverGlowColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetMouseOverGlowColor();
-}
-this.ApplyTorque$quorum_number = function(torque) {
-     return this.Libraries_Interface_Item2D__.ApplyTorque$quorum_number(torque);
-}
-this.CollideWithChildren = function() {
-     return this.Libraries_Interface_Item2D__.CollideWithChildren();
-}
-this.Empty = function() {
-     return this.Libraries_Interface_Item2D__.Empty();
-}
-this.GetScreenX = function() {
-     return this.Libraries_Interface_Item2D__.GetScreenX();
-}
-this.Add$quorum_integer$quorum_Libraries_Interface_Item2D = function(index, newItem) {
-     return this.Libraries_Interface_Controls_Control__.Add$quorum_integer$quorum_Libraries_Interface_Item2D(index, newItem);
-}
-this.GetScreenY = function() {
-     return this.Libraries_Interface_Item2D__.GetScreenY();
-}
-this.SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetWorldCenter = function() {
-     return this.Libraries_Interface_Item2D__.GetWorldCenter();
-}
-this.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent = function(event) {
-     return this.Libraries_Interface_Item2D__.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event);
-}
-this.GetFontOutlineColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFontOutlineColor();
-}
-this.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
-     return this.Libraries_Interface_Item__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
-}
-this.GetBottomPadding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetBottomPadding();
-}
-this.GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(xCoords, yCoords) {
-     return this.Libraries_Interface_Item2D__.GetClipCoordinates$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(xCoords, yCoords);
-}
-this.Show = function() {
-     return this.Libraries_Interface_Item__.Show();
-}
-this.GetFont = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFont();
-}
-this.EndMouseOver = function() {
-     return this.Libraries_Interface_Controls_Control__.EndMouseOver();
-}
-this.SetOffsetX$quorum_number = function(xAmount) {
-     return this.Libraries_Interface_Item2D__.SetOffsetX$quorum_number(xAmount);
-}
-this.SetPixelX$quorum_number = function(x) {
-     return this.Libraries_Interface_Controls_Control__.SetPixelX$quorum_number(x);
-}
-this.SetFontOutlineThickness$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFontOutlineThickness$quorum_number(value);
-}
-this.GetSweep = function() {
-     return this.Libraries_Interface_Item2D__.GetSweep();
-}
-this.GetNodeCount = function() {
-     return this.Libraries_Interface_Item2D__.GetNodeCount();
-}
-this.ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2 = function(impulse, point) {
-     return this.Libraries_Interface_Item2D__.ApplyLinearImpulse$quorum_Libraries_Compute_Vector2$quorum_Libraries_Compute_Vector2(impulse, point);
-}
-this.Activate = function() {
-     return this.Libraries_Interface_Controls_Control__.Activate();
-}
-this.SetLabelText$quorum_text = function(labelText) {
-     return this.Libraries_Interface_Controls_Control__.SetLabelText$quorum_text(labelText);
-}
-this.GetIconColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetIconColor();
-}
-this.GetTopRightRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopRightRounding();
-}
-this.IsAcceptingMouseInput = function() {
-     return this.Libraries_Interface_Item__.IsAcceptingMouseInput();
-}
-this.GetPropertiesSize = function() {
-     return this.Libraries_Interface_Item__.GetPropertiesSize();
-}
-this.SetBottomPadding$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomPadding$quorum_number(padding);
-}
-this.HasNumberPropertyOverride$quorum_text = function(property) {
-     return this.Libraries_Interface_Controls_Control__.HasNumberPropertyOverride$quorum_text(property);
-}
-this.GetContainerGridHeight = function() {
-     return this.Libraries_Interface_Controls_Control__.GetContainerGridHeight();
-}
-this.SetOriginCenter = function() {
-     return this.Libraries_Interface_Item2D__.SetOriginCenter();
-}
-this.EmptyAll = function() {
-     return this.Libraries_Interface_Item__.EmptyAll();
-}
-this.RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D = function(item) {
-     return this.Libraries_Interface_Item2D__.RequestHierarchyUpdate$quorum_Libraries_Interface_Item2D(item);
-}
-this.ScaleFromCenter$quorum_number = function(amount) {
-     return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number(amount);
-}
-this.NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent = function(event) {
-     return this.Libraries_Interface_Controls_Control__.NotifyControlActivationListeners$quorum_Libraries_Interface_Events_ControlActivationEvent(event);
-}
-this.GetFontOutlineThickness = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFontOutlineThickness();
-}
-this.GetParent = function() {
-     return this.Libraries_Interface_Item2D__.GetParent();
-}
-this.SetAcceptsMouseInput$quorum_boolean = function(accepts) {
-     return this.Libraries_Interface_Item__.SetAcceptsMouseInput$quorum_boolean(accepts);
-}
-this.GetMouseListeners = function() {
-     return this.Libraries_Interface_Item__.GetMouseListeners();
-}
-this.ScaleFromCenter$quorum_number$quorum_number = function(xAmount, yAmount) {
-     return this.Libraries_Interface_Item2D__.ScaleFromCenter$quorum_number$quorum_number(xAmount, yAmount);
-}
-this.IsResponsive = function() {
-     return this.Libraries_Interface_Item2D__.IsResponsive();
-}
-this.Remove$quorum_integer = function(index) {
-     return this.Libraries_Interface_Controls_Control__.Remove$quorum_integer(index);
-}
-this.SetToMediumFont = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToMediumFont();
-}
-this.SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D = function(edge) {
-     return this.Libraries_Interface_Item2D__.SetJointList$quorum_Libraries_Game_Physics_Joints_JointEdge2D(edge);
-}
-this.GetRawInertia = function() {
-     return this.Libraries_Interface_Item2D__.GetRawInertia();
-}
-this.DisposeChildren = function() {
-     return this.Libraries_Interface_Item__.DisposeChildren();
-}
-this.DisposeAll = function() {
-     return this.Libraries_Interface_Item__.DisposeAll();
-}
-this.GetOriginY = function() {
-     return this.Libraries_Interface_Item2D__.GetOriginY();
-}
-this.GetOriginX = function() {
-     return this.Libraries_Interface_Item2D__.GetOriginX();
-}
-this.IsUnmovable = function() {
-     return this.Libraries_Interface_Item2D__.IsUnmovable();
-}
-this.MoveZ$quorum_number = function(zAmount) {
-     return this.Libraries_Interface_Item2D__.MoveZ$quorum_number(zAmount);
-}
-this.SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseDownColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetUnmovable = function() {
-     return this.Libraries_Interface_Item2D__.SetUnmovable();
-}
-this.SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetUnfocusedSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetResponsiveness = function() {
-     return this.Libraries_Interface_Item2D__.GetResponsiveness();
-}
-this.IsFocused = function() {
-     return this.Libraries_Interface_Item__.IsFocused();
-}
-this.SetToDefaultFontSize = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToDefaultFontSize();
-}
-this.GetGlowColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetGlowColor();
-}
-this.SetScaleY$quorum_number = function(scaleY) {
-     return this.Libraries_Interface_Item2D__.SetScaleY$quorum_number(scaleY);
-}
-this.GetMouseWheelListeners = function() {
-     return this.Libraries_Interface_Item__.GetMouseWheelListeners();
-}
-this.GetInputTable = function() {
-     return this.Libraries_Interface_Item__.GetInputTable();
-}
-this.SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetCollideWithChildren$quorum_boolean = function(flag) {
-     return this.Libraries_Interface_Item2D__.SetCollideWithChildren$quorum_boolean(flag);
-}
-this.SetSleepTime$quorum_number = function(time) {
-     return this.Libraries_Interface_Item2D__.SetSleepTime$quorum_number(time);
-}
-this.SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetFontColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.IsClipping = function() {
-     return this.Libraries_Interface_Item2D__.IsClipping();
-}
-this.GetWorldPoint$quorum_Libraries_Compute_Vector2 = function(localPoint) {
-     return this.Libraries_Interface_Item2D__.GetWorldPoint$quorum_Libraries_Compute_Vector2(localPoint);
-}
-this.GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2 = function(worldPoint) {
-     return this.Libraries_Interface_Item2D__.GetLinearVelocityFromWorldPoint$quorum_Libraries_Compute_Vector2(worldPoint);
-}
-this.GetAccessibilityCode = function() {
-     return this.Libraries_Interface_Item__.GetAccessibilityCode();
-}
-this.Add$quorum_Libraries_Interface_Item2D = function(newItem) {
-     return this.Libraries_Interface_Controls_Control__.Add$quorum_Libraries_Interface_Item2D(newItem);
-}
-this.SetLinearVelocity$quorum_Libraries_Compute_Vector2 = function(linearVelocity) {
-     return this.Libraries_Interface_Item2D__.SetLinearVelocity$quorum_Libraries_Compute_Vector2(linearVelocity);
-}
-this.SetRightPadding$quorum_number = function(padding) {
-     return this.Libraries_Interface_Controls_Control__.SetRightPadding$quorum_number(padding);
-}
-this.Move$quorum_number$quorum_number = function(xAmount, yAmount) {
-     return this.Libraries_Interface_Item2D__.Move$quorum_number$quorum_number(xAmount, yAmount);
-}
-this.Scale$quorum_number = function(amount) {
-     return this.Libraries_Interface_Item2D__.Scale$quorum_number(amount);
-}
-this.AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior = function(behavior) {
-     return this.Libraries_Interface_Item__.AddBehavior$quorum_Libraries_Interface_Behaviors_Behavior(behavior);
-}
-this.SetBottomLeftPixelRounding$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetBottomLeftPixelRounding$quorum_number(value);
-}
-this.SetContainerGridWidth$quorum_integer = function(containerGridWidth) {
-     return this.Libraries_Interface_Controls_Control__.SetContainerGridWidth$quorum_integer(containerGridWidth);
-}
-this.GetTopLeftRounding = function() {
-     return this.Libraries_Interface_Controls_Control__.GetTopLeftRounding();
-}
-this.SetShadowHeight$quorum_number = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetShadowHeight$quorum_number(value);
-}
-this.SetPercentageWidth$quorum_number = function(width) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageWidth$quorum_number(width);
-}
-this.GetGlobalX = function() {
-     return this.Libraries_Interface_Item2D__.GetGlobalX();
-}
-this.MoveY$quorum_number = function(yAmount) {
-     return this.Libraries_Interface_Item2D__.MoveY$quorum_number(yAmount);
-}
-this.SetCenterX$quorum_number = function(setX) {
-     return this.Libraries_Interface_Item2D__.SetCenterX$quorum_number(setX);
-}
-this.SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetMouseOverColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.GetPixelX = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPixelX();
-}
-this.GetPixelY = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPixelY();
-}
-this.SetX$quorum_number = function(setX) {
-     return this.Libraries_Interface_Item2D__.SetX$quorum_number(setX);
-}
-this.SetToHugeFont = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToHugeFont();
-}
-this.SetAccessibilityRoleDescription$quorum_text = function(newRoleDescription) {
-     return this.Libraries_Interface_Item__.SetAccessibilityRoleDescription$quorum_text(newRoleDescription);
-}
-this.AreChildrenProcessingMouseEvents = function() {
-     return this.Libraries_Interface_Item2D__.AreChildrenProcessingMouseEvents();
-}
-this.CopyAndActivateInputTable$quorum_text = function(name) {
-     return this.Libraries_Interface_Controls_Control__.CopyAndActivateInputTable$quorum_text(name);
-}
-this.SetPosition$quorum_number$quorum_number$quorum_number = function(setX, setY, setZ) {
-     return this.Libraries_Interface_Item2D__.SetPosition$quorum_number$quorum_number$quorum_number(setX, setY, setZ);
-}
-this.GetTorque = function() {
-     return this.Libraries_Interface_Item2D__.GetTorque();
-}
-this.GetFontSize = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFontSize();
-}
-this.IsFastMoving = function() {
-     return this.Libraries_Interface_Item2D__.IsFastMoving();
-}
-this.SetPercentageOriginX$quorum_number = function(x) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageOriginX$quorum_number(x);
-}
-this.SetPixelHeight$quorum_number = function(height) {
-     return this.Libraries_Interface_Controls_Control__.SetPixelHeight$quorum_number(height);
-}
-this.GetLayout = function() {
-     return this.Libraries_Interface_Controls_Control__.GetLayout();
-}
-this.GetFocusColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetFocusColor();
-}
-this.GetVerticalLayoutMode = function() {
-     return this.Libraries_Interface_Controls_Control__.GetVerticalLayoutMode();
-}
-this.SetToTinyFont = function() {
-     return this.Libraries_Interface_Controls_Control__.SetToTinyFont();
-}
-this.SetPreviousFocus$quorum_Libraries_Interface_Item = function(previous) {
-     return this.Libraries_Interface_Item__.SetPreviousFocus$quorum_Libraries_Interface_Item(previous);
-}
-this.BeginCollision$quorum_Libraries_Interface_Item = function(item) {
-     return this.Libraries_Interface_Item__.BeginCollision$quorum_Libraries_Interface_Item(item);
-}
-this.GetSelectionColor = function() {
-     return this.Libraries_Interface_Controls_Control__.GetSelectionColor();
-}
-this.Scale$quorum_number$quorum_number = function(xAmount, yAmount) {
-     return this.Libraries_Interface_Item2D__.Scale$quorum_number$quorum_number(xAmount, yAmount);
-}
-this.Remove$quorum_Libraries_Interface_Item2D = function(item) {
-     return this.Libraries_Interface_Controls_Control__.Remove$quorum_Libraries_Interface_Item2D(item);
-}
-this.GetPopupMenu = function() {
-     return this.Libraries_Interface_Controls_Control__.GetPopupMenu();
-}
-this.SetZ$quorum_number = function(setZ) {
-     return this.Libraries_Interface_Item2D__.SetZ$quorum_number(setZ);
-}
-this.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup = function(property, value) {
-     return this.Libraries_Interface_Controls_Control__.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(property, value);
-}
-this.SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup = function(value) {
-     return this.Libraries_Interface_Controls_Control__.SetSelectionColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
-}
-this.SetPercentageY$quorum_number = function(y) {
-     return this.Libraries_Interface_Controls_Control__.SetPercentageY$quorum_number(y);
-}
-this.SetResponsiveness$quorum_integer = function(type) {
-     return this.Libraries_Interface_Item2D__.SetResponsiveness$quorum_integer(type);
-}
-this.IsAccessibleParent = function () {
-return true;
-};
-this.Get_Libraries_Interface_Item__manager_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__manager_();
-};
-this.Set_Libraries_Interface_Item__manager_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__manager_(value);
-};
-this.Get_Libraries_Interface_Item__visible_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__visible_();
-};
-this.Set_Libraries_Interface_Item__visible_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__visible_(value);
-};
-this.Get_Libraries_Interface_Item__RADIO_BUTTON_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__RADIO_BUTTON_();
-};
-this.Set_Libraries_Interface_Item__RADIO_BUTTON_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__RADIO_BUTTON_(value);
-};
-this.Get_Libraries_Interface_Item__accessibilityRoleDescription_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityRoleDescription_();
-};
-this.Set_Libraries_Interface_Item__accessibilityRoleDescription_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityRoleDescription_(value);
-};
-this.Get_Libraries_Interface_Item__BUTTON_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__BUTTON_();
-};
-this.Set_Libraries_Interface_Item__BUTTON_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__BUTTON_(value);
-};
-this.Get_Libraries_Interface_Item__TOGGLE_BUTTON_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOGGLE_BUTTON_();
-};
-this.Set_Libraries_Interface_Item__TOGGLE_BUTTON_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOGGLE_BUTTON_(value);
-};
-this.Get_Libraries_Interface_Item__TABLE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TABLE_();
-};
-this.Set_Libraries_Interface_Item__TABLE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TABLE_(value);
-};
-this.Get_Libraries_Interface_Item__CELL_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CELL_();
-};
-this.Set_Libraries_Interface_Item__CELL_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CELL_(value);
-};
-this.Get_Libraries_Interface_Item__CHART_SECTION_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_SECTION_();
-};
-this.Set_Libraries_Interface_Item__CHART_SECTION_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_SECTION_(value);
-};
-this.Get_Libraries_Interface_Item__nextFocus_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__nextFocus_();
-};
-this.Set_Libraries_Interface_Item__nextFocus_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__nextFocus_(value);
-};
-this.Get_Libraries_Interface_Item__description_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__description_();
-};
-this.Set_Libraries_Interface_Item__description_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__description_(value);
-};
-this.Get_Libraries_Interface_Item__behaviors_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__behaviors_();
-};
-this.Set_Libraries_Interface_Item__behaviors_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__behaviors_(value);
-};
-this.Get_Libraries_Interface_Item__LIST_ITEM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_ITEM_();
-};
-this.Set_Libraries_Interface_Item__LIST_ITEM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_ITEM_(value);
-};
-this.Get_Libraries_Interface_Item__PANE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PANE_();
-};
-this.Set_Libraries_Interface_Item__PANE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PANE_(value);
-};
-this.Get_Libraries_Interface_Item__mouseWheelListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseWheelListeners_();
-};
-this.Set_Libraries_Interface_Item__mouseWheelListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseWheelListeners_(value);
-};
-this.Get_Libraries_Interface_Item__TREE_TABLE_CELL_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_CELL_();
-};
-this.Set_Libraries_Interface_Item__TREE_TABLE_CELL_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_CELL_(value);
-};
-this.Get_Libraries_Interface_Item__MENU_BAR_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_BAR_();
-};
-this.Set_Libraries_Interface_Item__MENU_BAR_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_BAR_(value);
-};
-this.Get_Libraries_Interface_Item__TREE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_();
-};
-this.Set_Libraries_Interface_Item__TREE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_(value);
-};
-this.Get_Libraries_Interface_Item__CUSTOM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CUSTOM_();
-};
-this.Set_Libraries_Interface_Item__CUSTOM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CUSTOM_(value);
-};
-this.Get_Libraries_Interface_Item__TAB_PANE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_PANE_();
-};
-this.Set_Libraries_Interface_Item__TAB_PANE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_PANE_(value);
-};
-this.Get_Libraries_Interface_Item__properties_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__properties_();
-};
-this.Set_Libraries_Interface_Item__properties_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__properties_(value);
-};
-this.Get_Libraries_Interface_Item__DIALOG_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__DIALOG_();
-};
-this.Set_Libraries_Interface_Item__DIALOG_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__DIALOG_(value);
-};
-this.Get_Libraries_Interface_Item__MENU_ITEM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__MENU_ITEM_();
-};
-this.Set_Libraries_Interface_Item__MENU_ITEM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__MENU_ITEM_(value);
-};
-this.Get_Libraries_Interface_Item__mouseMoveListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseMoveListeners_();
-};
-this.Set_Libraries_Interface_Item__mouseMoveListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseMoveListeners_(value);
-};
-this.Get_Libraries_Interface_Item__TEXTBOX_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXTBOX_();
-};
-this.Set_Libraries_Interface_Item__TEXTBOX_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXTBOX_(value);
-};
-this.Get_Libraries_Interface_Item__PROGRESS_BAR_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__PROGRESS_BAR_();
-};
-this.Set_Libraries_Interface_Item__PROGRESS_BAR_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__PROGRESS_BAR_(value);
-};
-this.Get_Libraries_Interface_Item__accessibilityCode_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__accessibilityCode_();
-};
-this.Set_Libraries_Interface_Item__accessibilityCode_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__accessibilityCode_(value);
-};
-this.Get_Libraries_Interface_Item__ITEM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__ITEM_();
-};
-this.Set_Libraries_Interface_Item__ITEM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__ITEM_(value);
-};
-this.Get_Libraries_Interface_Item__TEXT_FIELD_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TEXT_FIELD_();
-};
-this.Set_Libraries_Interface_Item__TEXT_FIELD_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TEXT_FIELD_(value);
-};
-this.Get_Libraries_Interface_Item__TREE_ITEM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_ITEM_();
-};
-this.Set_Libraries_Interface_Item__TREE_ITEM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_ITEM_(value);
-};
-this.Get_Libraries_Interface_Item__touchListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__touchListeners_();
-};
-this.Set_Libraries_Interface_Item__touchListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__touchListeners_(value);
-};
-this.Get_Libraries_Interface_Item__CHECKBOX_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHECKBOX_();
-};
-this.Set_Libraries_Interface_Item__CHECKBOX_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHECKBOX_(value);
-};
-this.Get_Libraries_Interface_Item__TAB_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TAB_();
-};
-this.Set_Libraries_Interface_Item__TAB_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TAB_(value);
-};
-this.Get_Libraries_Interface_Item__acceptsMouseInput_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__acceptsMouseInput_();
-};
-this.Set_Libraries_Interface_Item__acceptsMouseInput_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__acceptsMouseInput_(value);
-};
-this.Get_Libraries_Interface_Item__name_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__name_();
-};
-this.Set_Libraries_Interface_Item__name_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__name_(value);
-};
-this.Get_Libraries_Interface_Item__LIST_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LIST_();
-};
-this.Set_Libraries_Interface_Item__LIST_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LIST_(value);
-};
-this.Get_Libraries_Interface_Item__mouseListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__mouseListeners_();
-};
-this.Set_Libraries_Interface_Item__mouseListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__mouseListeners_(value);
-};
-this.Get_Libraries_Interface_Item__focusable_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusable_();
-};
-this.Set_Libraries_Interface_Item__focusable_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusable_(value);
-};
-this.Get_Libraries_Interface_Item__GROUP_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__GROUP_();
-};
-this.Set_Libraries_Interface_Item__GROUP_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__GROUP_(value);
-};
-this.Get_Libraries_Interface_Item__gestureListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__gestureListeners_();
-};
-this.Set_Libraries_Interface_Item__gestureListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__gestureListeners_(value);
-};
-this.Get_Libraries_Interface_Item__NOT_ACCESSIBLE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__NOT_ACCESSIBLE_();
-};
-this.Set_Libraries_Interface_Item__NOT_ACCESSIBLE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__NOT_ACCESSIBLE_(value);
-};
-this.Get_Libraries_Interface_Item__LABEL_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__LABEL_();
-};
-this.Set_Libraries_Interface_Item__LABEL_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__LABEL_(value);
-};
-this.Get_Libraries_Interface_Item__inputGroup_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__inputGroup_();
-};
-this.Set_Libraries_Interface_Item__inputGroup_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__inputGroup_(value);
-};
-this.Get_Libraries_Interface_Item__TOOLBAR_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TOOLBAR_();
-};
-this.Set_Libraries_Interface_Item__TOOLBAR_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TOOLBAR_(value);
-};
-this.Get_Libraries_Interface_Item__TREE_TABLE_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__TREE_TABLE_();
-};
-this.Set_Libraries_Interface_Item__TREE_TABLE_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__TREE_TABLE_(value);
-};
-this.Get_Libraries_Interface_Item__previousFocus_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__previousFocus_();
-};
-this.Set_Libraries_Interface_Item__previousFocus_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__previousFocus_(value);
-};
-this.Get_Libraries_Interface_Item__CHART_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_();
-};
-this.Set_Libraries_Interface_Item__CHART_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_(value);
-};
-this.Get_Libraries_Interface_Item__CHART_ITEM_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__CHART_ITEM_();
-};
-this.Set_Libraries_Interface_Item__CHART_ITEM_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__CHART_ITEM_(value);
-};
-this.Get_Libraries_Interface_Item__POPUP_MENU_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__POPUP_MENU_();
-};
-this.Set_Libraries_Interface_Item__POPUP_MENU_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__POPUP_MENU_(value);
-};
-this.Get_Libraries_Interface_Item__focusListeners_ = function() {
-   return this.Libraries_Interface_Item__.Get_Libraries_Interface_Item__focusListeners_();
-};
-this.Set_Libraries_Interface_Item__focusListeners_ = function(value) {
-   this.Libraries_Interface_Item__.Set_Libraries_Interface_Item__focusListeners_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__renderMouseDown_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseDown_();
-};
-this.Set_Libraries_Interface_Controls_Control__renderMouseDown_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseDown_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__listeners_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__listeners_();
-};
-this.Set_Libraries_Interface_Controls_Control__listeners_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__listeners_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__contextMenu_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__contextMenu_();
-};
-this.Set_Libraries_Interface_Controls_Control__contextMenu_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__contextMenu_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__renderMouseOver_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderMouseOver_();
-};
-this.Set_Libraries_Interface_Controls_Control__renderMouseOver_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderMouseOver_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__FILL_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FILL_();
-};
-this.Set_Libraries_Interface_Controls_Control__FILL_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FILL_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__needsLayout_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__needsLayout_();
-};
-this.Set_Libraries_Interface_Controls_Control__needsLayout_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__needsLayout_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__currentProperties_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__currentProperties_();
-};
-this.Set_Libraries_Interface_Controls_Control__currentProperties_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__currentProperties_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__defaultProperties_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__defaultProperties_();
-};
-this.Set_Libraries_Interface_Controls_Control__defaultProperties_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__defaultProperties_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__FIT_FONT_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_FONT_();
-};
-this.Set_Libraries_Interface_Controls_Control__FIT_FONT_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_FONT_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__renderSelected_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__renderSelected_();
-};
-this.Set_Libraries_Interface_Controls_Control__renderSelected_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__renderSelected_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__FIT_CONTENTS_();
-};
-this.Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__FIT_CONTENTS_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__layout_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layout_();
-};
-this.Set_Libraries_Interface_Controls_Control__layout_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layout_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__selectionListeners_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__selectionListeners_();
-};
-this.Set_Libraries_Interface_Controls_Control__selectionListeners_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__selectionListeners_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__STANDARD_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__STANDARD_();
-};
-this.Set_Libraries_Interface_Controls_Control__STANDARD_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__STANDARD_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__layoutProperties_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__layoutProperties_();
-};
-this.Set_Libraries_Interface_Controls_Control__layoutProperties_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__layoutProperties_(value);
-};
-this.Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_ = function() {
-   return this.Libraries_Interface_Controls_Control__.Get_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_();
-};
-this.Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_ = function(value) {
-   this.Libraries_Interface_Controls_Control__.Set_Libraries_Interface_Controls_Control__MAINTAIN_ASPECT_RATIO_(value);
-};
-this.Get_Libraries_Interface_Item2D__position_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__position_();
-};
-this.Set_Libraries_Interface_Item2D__position_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__position_(value);
-};
-this.Get_Libraries_Interface_Item2D__scale_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scale_();
-};
-this.Set_Libraries_Interface_Item2D__scale_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scale_(value);
-};
-this.Get_Libraries_Interface_Item2D__workVector2B_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2B_();
-};
-this.Set_Libraries_Interface_Item2D__workVector2B_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2B_(value);
-};
-this.Get_Libraries_Interface_Item2D__manager_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__manager_();
-};
-this.Set_Libraries_Interface_Item2D__manager_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__manager_(value);
-};
-this.Get_Libraries_Interface_Item2D__workVector2A_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector2A_();
-};
-this.Set_Libraries_Interface_Item2D__workVector2A_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector2A_(value);
-};
-this.Get_Libraries_Interface_Item2D__jointList_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__jointList_();
-};
-this.Set_Libraries_Interface_Item2D__jointList_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__jointList_(value);
-};
-this.Get_Libraries_Interface_Item2D__updateTransform_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__updateTransform_();
-};
-this.Set_Libraries_Interface_Item2D__updateTransform_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__updateTransform_(value);
-};
-this.Get_Libraries_Interface_Item2D__children_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__children_();
-};
-this.Set_Libraries_Interface_Item2D__children_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__children_(value);
-};
-this.Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__childrenProcessingMouseEvents_();
-};
-this.Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__childrenProcessingMouseEvents_(value);
-};
-this.Get_Libraries_Interface_Item2D__hasMoved_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__hasMoved_();
-};
-this.Set_Libraries_Interface_Item2D__hasMoved_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__hasMoved_(value);
-};
-this.Get_Libraries_Interface_Item2D__visualView_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__visualView_();
-};
-this.Set_Libraries_Interface_Item2D__visualView_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__visualView_(value);
-};
-this.Get_Libraries_Interface_Item2D__widthSet_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__widthSet_();
-};
-this.Set_Libraries_Interface_Item2D__widthSet_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__widthSet_(value);
-};
-this.Get_Libraries_Interface_Item2D__transform_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform_();
-};
-this.Set_Libraries_Interface_Item2D__transform_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform_(value);
-};
-this.Get_Libraries_Interface_Item2D__physicsEnabled_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__physicsEnabled_();
-};
-this.Set_Libraries_Interface_Item2D__physicsEnabled_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__physicsEnabled_(value);
-};
-this.Get_Libraries_Interface_Item2D__layerSet_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layerSet_();
-};
-this.Set_Libraries_Interface_Item2D__layerSet_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layerSet_(value);
-};
-this.Get_Libraries_Interface_Item2D__rotation_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__rotation_();
-};
-this.Set_Libraries_Interface_Item2D__rotation_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__rotation_(value);
-};
-this.Get_Libraries_Interface_Item2D__dimensions_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__dimensions_();
-};
-this.Set_Libraries_Interface_Item2D__dimensions_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__dimensions_(value);
-};
-this.Get_Libraries_Interface_Item2D__collideWithChildren_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collideWithChildren_();
-};
-this.Set_Libraries_Interface_Item2D__collideWithChildren_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collideWithChildren_(value);
-};
-this.Get_Libraries_Interface_Item2D__offset_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__offset_();
-};
-this.Set_Libraries_Interface_Item2D__offset_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__offset_(value);
-};
-this.Get_Libraries_Interface_Item2D__nodeCount_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodeCount_();
-};
-this.Set_Libraries_Interface_Item2D__nodeCount_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodeCount_(value);
-};
-this.Get_Libraries_Interface_Item2D__transform0_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__transform0_();
-};
-this.Set_Libraries_Interface_Item2D__transform0_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__transform0_(value);
-};
-this.Get_Libraries_Interface_Item2D__scaleOffset_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__scaleOffset_();
-};
-this.Set_Libraries_Interface_Item2D__scaleOffset_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__scaleOffset_(value);
-};
-this.Get_Libraries_Interface_Item2D__nodesSet_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodesSet_();
-};
-this.Set_Libraries_Interface_Item2D__nodesSet_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodesSet_(value);
-};
-this.Get_Libraries_Interface_Item2D__workVector3_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__workVector3_();
-};
-this.Set_Libraries_Interface_Item2D__workVector3_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__workVector3_(value);
-};
-this.Get_Libraries_Interface_Item2D__origin_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__origin_();
-};
-this.Set_Libraries_Interface_Item2D__origin_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__origin_(value);
-};
-this.Get_Libraries_Interface_Item2D__layer_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__layer_();
-};
-this.Set_Libraries_Interface_Item2D__layer_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__layer_(value);
-};
-this.Get_Libraries_Interface_Item2D__isCustomDrawing_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isCustomDrawing_();
-};
-this.Set_Libraries_Interface_Item2D__isCustomDrawing_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isCustomDrawing_(value);
-};
-this.Get_Libraries_Interface_Item2D__shape_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shape_();
-};
-this.Set_Libraries_Interface_Item2D__shape_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shape_(value);
-};
-this.Get_Libraries_Interface_Item2D__properties_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__properties_();
-};
-this.Set_Libraries_Interface_Item2D__properties_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__properties_(value);
-};
-this.Get_Libraries_Interface_Item2D__shouldTriggerSimulation_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__shouldTriggerSimulation_();
-};
-this.Set_Libraries_Interface_Item2D__shouldTriggerSimulation_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__shouldTriggerSimulation_(value);
-};
-this.Get_Libraries_Interface_Item2D__sweep_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__sweep_();
-};
-this.Set_Libraries_Interface_Item2D__sweep_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__sweep_(value);
-};
-this.Get_Libraries_Interface_Item2D__isResizing_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__isResizing_();
-};
-this.Set_Libraries_Interface_Item2D__isResizing_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__isResizing_(value);
-};
-this.Get_Libraries_Interface_Item2D__collidable_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collidable_();
-};
-this.Set_Libraries_Interface_Item2D__collidable_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collidable_(value);
-};
-this.Get_Libraries_Interface_Item2D__bounds_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__bounds_();
-};
-this.Set_Libraries_Interface_Item2D__bounds_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__bounds_(value);
-};
-this.Get_Libraries_Interface_Item2D__nodes_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__nodes_();
-};
-this.Set_Libraries_Interface_Item2D__nodes_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__nodes_(value);
-};
-this.Get_Libraries_Interface_Item2D__flipX_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipX_();
-};
-this.Set_Libraries_Interface_Item2D__flipX_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipX_(value);
-};
-this.Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__synchronizeNodesTempPosition_();
-};
-this.Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__synchronizeNodesTempPosition_(value);
-};
-this.Get_Libraries_Interface_Item2D__collisionList_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__collisionList_();
-};
-this.Set_Libraries_Interface_Item2D__collisionList_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__collisionList_(value);
-};
-this.Get_Libraries_Interface_Item2D__heightSet_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__heightSet_();
-};
-this.Set_Libraries_Interface_Item2D__heightSet_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__heightSet_(value);
-};
-this.Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_();
-};
-this.Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__PHYSICS_ERROR_MESSAGE_(value);
-};
-this.Get_Libraries_Interface_Item2D__parentItem_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__parentItem_();
-};
-this.Set_Libraries_Interface_Item2D__parentItem_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__parentItem_(value);
-};
-this.Get_Libraries_Interface_Item2D__clipPixels_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__clipPixels_();
-};
-this.Set_Libraries_Interface_Item2D__clipPixels_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__clipPixels_(value);
-};
-this.Get_Libraries_Interface_Item2D__z_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__z_();
-};
-this.Set_Libraries_Interface_Item2D__z_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__z_(value);
-};
-this.Get_Libraries_Interface_Item2D__flipY_ = function() {
-   return this.Libraries_Interface_Item2D__.Get_Libraries_Interface_Item2D__flipY_();
-};
-this.Set_Libraries_Interface_Item2D__flipY_ = function(value) {
-   this.Libraries_Interface_Item2D__.Set_Libraries_Interface_Item2D__flipY_(value);
-};
 if(parents == null) {
    this.Libraries_Interface_Item__ = new quorum_Libraries_Interface_Item_(false);
    this.Libraries_Interface_Item2D__ = new quorum_Libraries_Interface_Item2D_(false);
@@ -4649,44 +4663,43 @@ this.Libraries_Interface_Item2D__.constructor_();
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_WebEditorLongPressBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorLongPressBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_WebEditorLongPressBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -4705,7 +4718,7 @@ var controlBehavior = new quorum_Libraries_Interface_Behaviors_Controls_ControlA
 }
 }
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -4716,7 +4729,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -4727,18 +4740,23 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorLongPressBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -4748,61 +4766,65 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_TogglePaletteBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.TogglePaletteBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_TogglePaletteBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 var status = editor.TogglePalette();
 editor.UpdateTogglePaletteButton$quorum_boolean(status);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.TogglePaletteBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -4812,60 +4834,64 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_ShowHelpModalBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ShowHelpModalBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_ShowHelpModalBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 editor.ShowHelpModal();
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ShowHelpModalBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -4875,44 +4901,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_FocusEditorItemBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusEditorItemBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_FocusEditorItemBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var item = manager.GetFocus();
 if (!global_InstanceOf(item,'Libraries.Interface.Item2D')) {
@@ -4944,36 +4969,41 @@ else if( inEditor) {
 this.Get_WebEditor_Behaviors_FocusEditorItemBehavior__blocksItem_().Focus();
 }
 };
-this.SetPaletteItem$quorum_WebEditor_EditorItem = function (item) {
+SetPaletteItem$quorum_WebEditor_EditorItem(item) {
 this.paletteItem = item;
 };
-this.SetBlocksItem$quorum_WebEditor_EditorItem = function (item) {
+SetBlocksItem$quorum_WebEditor_EditorItem(item) {
 this.blocksItem = item;
 };
-this.Get_WebEditor_Behaviors_FocusEditorItemBehavior__blocksItem_ = function() {
+Get_WebEditor_Behaviors_FocusEditorItemBehavior__blocksItem_() {
    return this.blocksItem;
 };
-this.Set_WebEditor_Behaviors_FocusEditorItemBehavior__blocksItem_ = function(value) {
+Set_WebEditor_Behaviors_FocusEditorItemBehavior__blocksItem_(value) {
    this.blocksItem = value;
 };
-this.Get_WebEditor_Behaviors_FocusEditorItemBehavior__paletteItem_ = function() {
+Get_WebEditor_Behaviors_FocusEditorItemBehavior__paletteItem_() {
    return this.paletteItem;
 };
-this.Set_WebEditor_Behaviors_FocusEditorItemBehavior__paletteItem_ = function(value) {
+Set_WebEditor_Behaviors_FocusEditorItemBehavior__paletteItem_(value) {
    this.paletteItem = value;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusEditorItemBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -4985,44 +5015,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_PalettePartitionDragBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.PalettePartitionDragBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_PalettePartitionDragBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var dragEvent = event.GetDragAndDropEvent();
 var editor = global_CheckCast(this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__manager_().GetGame(), "WebEditor.BlockEditor");
 if (!editor.IsPaletteShowing()) {
@@ -5037,39 +5066,44 @@ this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_().SetPixelWidt
 this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_().RequestLayout();
 }
 };
-this.SetPanel$quorum_Libraries_Interface_Controls_Control = function (panel) {
+SetPanel$quorum_Libraries_Interface_Controls_Control(panel) {
 this.panel = panel;
 };
-this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_ = function() {
+Get_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_() {
    return this.panel;
 };
-this.Set_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_ = function(value) {
+Set_WebEditor_Behaviors_PalettePartitionDragBehavior__panel_(value) {
    this.panel = value;
 };
-this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__manager_ = function() {
+Get_WebEditor_Behaviors_PalettePartitionDragBehavior__manager_() {
    return this.manager;
 };
-this.Set_WebEditor_Behaviors_PalettePartitionDragBehavior__manager_ = function(value) {
+Set_WebEditor_Behaviors_PalettePartitionDragBehavior__manager_(value) {
    this.manager = value;
 };
-this.Get_WebEditor_Behaviors_PalettePartitionDragBehavior__clickOffset_ = function() {
+Get_WebEditor_Behaviors_PalettePartitionDragBehavior__clickOffset_() {
    return this.clickOffset;
 };
-this.Set_WebEditor_Behaviors_PalettePartitionDragBehavior__clickOffset_ = function(value) {
+Set_WebEditor_Behaviors_PalettePartitionDragBehavior__clickOffset_(value) {
    this.clickOffset = value;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.PalettePartitionDragBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5082,60 +5116,64 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_RunGameBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.RunGameBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_RunGameBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 editor.RunGame();
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.RunGameBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5145,62 +5183,66 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_FocusPaletteBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusPaletteBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_FocusPaletteBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 if (editor.IsPaletteShowing()) {
 editor.SetFocus$quorum_Libraries_Interface_Item(editor.GetBlockPalette());
 }
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.FocusPaletteBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5210,23 +5252,22 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_CanvasResizeListener_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Events.ResizeListener',  'WebEditor.CanvasResizeListener'];
-this.Libraries_Interface_Events_ResizeListener__ = null;
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+
+class quorum_WebEditor_CanvasResizeListener_ {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SizeChanged$quorum_Libraries_Interface_Events_ResizeEvent = function (event) {
+SizeChanged$quorum_Libraries_Interface_Events_ResizeEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 if (!editor.IsPaletteShowing()) {
@@ -5239,7 +5280,7 @@ if ((mediaSize != "")) {
 this.prototype.ResizeControls$quorum_text(mediaSize);
 }
 };
-this.ResizeControls$quorum_text = function (mediaSize) {
+ResizeControls$quorum_text(mediaSize) {
 var palettePanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(0);
 var blockPanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(1);
 if ((mediaSize == this.Get_WebEditor_CanvasResizeListener__SM_())) {
@@ -5258,10 +5299,10 @@ else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__X2L_())) {
 palettePanel.SetPixelWidth$quorum_number(350 * 1.0);
 }
 };
-this.AddPanel$quorum_Libraries_Interface_Controls_Control = function (control) {
+AddPanel$quorum_Libraries_Interface_Controls_Control(control) {
 this.Get_WebEditor_CanvasResizeListener__editorPanels_().AddToEnd$quorum_Libraries_Language_Object(control);
 };
-this.MatchMediaQuery$quorum_integer = function (width) {
+MatchMediaQuery$quorum_integer(width) {
 if ((width < this.Get_WebEditor_CanvasResizeListener__SMALL_())) {
 return this.Get_WebEditor_CanvasResizeListener__SM_();
 }
@@ -5279,72 +5320,77 @@ return this.Get_WebEditor_CanvasResizeListener__X2L_();
 }
 return "";
 };
-this.Get_WebEditor_CanvasResizeListener__X2_LARGE_ = function() {
+Get_WebEditor_CanvasResizeListener__X2_LARGE_() {
    return this.X2_LARGE;
 };
-this.Set_WebEditor_CanvasResizeListener__X2_LARGE_ = function(value) {
+Set_WebEditor_CanvasResizeListener__X2_LARGE_(value) {
    this.X2_LARGE = value;
 };
-this.Get_WebEditor_CanvasResizeListener__LARGE_ = function() {
+Get_WebEditor_CanvasResizeListener__LARGE_() {
    return this.LARGE;
 };
-this.Set_WebEditor_CanvasResizeListener__LARGE_ = function(value) {
+Set_WebEditor_CanvasResizeListener__LARGE_(value) {
    this.LARGE = value;
 };
-this.Get_WebEditor_CanvasResizeListener__SMALL_ = function() {
+Get_WebEditor_CanvasResizeListener__SMALL_() {
    return this.SMALL;
 };
-this.Set_WebEditor_CanvasResizeListener__SMALL_ = function(value) {
+Set_WebEditor_CanvasResizeListener__SMALL_(value) {
    this.SMALL = value;
 };
-this.Get_WebEditor_CanvasResizeListener__MEDIUM_ = function() {
+Get_WebEditor_CanvasResizeListener__MEDIUM_() {
    return this.MEDIUM;
 };
-this.Set_WebEditor_CanvasResizeListener__MEDIUM_ = function(value) {
+Set_WebEditor_CanvasResizeListener__MEDIUM_(value) {
    this.MEDIUM = value;
 };
-this.Get_WebEditor_CanvasResizeListener__SM_ = function() {
+Get_WebEditor_CanvasResizeListener__SM_() {
    return this.SM;
 };
-this.Set_WebEditor_CanvasResizeListener__SM_ = function(value) {
+Set_WebEditor_CanvasResizeListener__SM_(value) {
    this.SM = value;
 };
-this.Get_WebEditor_CanvasResizeListener__X_LARGE_ = function() {
+Get_WebEditor_CanvasResizeListener__X_LARGE_() {
    return this.X_LARGE;
 };
-this.Set_WebEditor_CanvasResizeListener__X_LARGE_ = function(value) {
+Set_WebEditor_CanvasResizeListener__X_LARGE_(value) {
    this.X_LARGE = value;
 };
-this.Get_WebEditor_CanvasResizeListener__X2L_ = function() {
+Get_WebEditor_CanvasResizeListener__X2L_() {
    return this.X2L;
 };
-this.Set_WebEditor_CanvasResizeListener__X2L_ = function(value) {
+Set_WebEditor_CanvasResizeListener__X2L_(value) {
    this.X2L = value;
 };
-this.Get_WebEditor_CanvasResizeListener__editorPanels_ = function() {
+Get_WebEditor_CanvasResizeListener__editorPanels_() {
    return this.editorPanels;
 };
-this.Set_WebEditor_CanvasResizeListener__editorPanels_ = function(value) {
+Set_WebEditor_CanvasResizeListener__editorPanels_(value) {
    this.editorPanels = value;
 };
-this.Get_WebEditor_CanvasResizeListener__MD_ = function() {
+Get_WebEditor_CanvasResizeListener__MD_() {
    return this.MD;
 };
-this.Set_WebEditor_CanvasResizeListener__MD_ = function(value) {
+Set_WebEditor_CanvasResizeListener__MD_(value) {
    this.MD = value;
 };
-this.Get_WebEditor_CanvasResizeListener__LG_ = function() {
+Get_WebEditor_CanvasResizeListener__LG_() {
    return this.LG;
 };
-this.Set_WebEditor_CanvasResizeListener__LG_ = function(value) {
+Set_WebEditor_CanvasResizeListener__LG_(value) {
    this.LG = value;
 };
-this.Get_WebEditor_CanvasResizeListener__XL_ = function() {
+Get_WebEditor_CanvasResizeListener__XL_() {
    return this.XL;
 };
-this.Set_WebEditor_CanvasResizeListener__XL_ = function(value) {
+Set_WebEditor_CanvasResizeListener__XL_(value) {
    this.XL = value;
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Events.ResizeListener',  'WebEditor.CanvasResizeListener'];
+this.Libraries_Interface_Events_ResizeListener__ = null;
 if(parents == null) {
    this.Libraries_Interface_Events_ResizeListener__ = new quorum_Libraries_Interface_Events_ResizeListener_(false);
    this.Libraries_Interface_Events_ResizeListener__.prototype = this;
@@ -5365,44 +5411,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorDoubleTapBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -5434,7 +5479,7 @@ controlBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 }
 }
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -5445,7 +5490,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -5456,18 +5501,23 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorDoubleTapBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5477,60 +5527,64 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_StopGameBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.StopGameBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_StopGameBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 editor.StopGame();
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.StopGameBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5540,44 +5594,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSwipeBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -5686,7 +5739,7 @@ nextBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 }
 }
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -5697,7 +5750,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -5708,18 +5761,23 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSwipeBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5729,50 +5787,49 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_ZoomBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ZoomBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_ZoomBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.SetToZoomIn = function () {
+SetToZoomIn() {
 this.zoomIn = true;
 };
-this.SetToZoomOut = function () {
+SetToZoomOut() {
 this.zoomIn = false;
 };
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
 if (this.Get_WebEditor_Behaviors_ZoomBehavior__zoomIn_()) {
@@ -5782,24 +5839,29 @@ else {
 editor.ScaleDown();
 }
 };
-this.Get_WebEditor_Behaviors_ZoomBehavior__zoomIn_ = function() {
+Get_WebEditor_Behaviors_ZoomBehavior__zoomIn_() {
    return this.zoomIn;
 };
-this.Set_WebEditor_Behaviors_ZoomBehavior__zoomIn_ = function(value) {
+Set_WebEditor_Behaviors_ZoomBehavior__zoomIn_(value) {
    this.zoomIn = value;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ZoomBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5810,23 +5872,22 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Events.SelectionListener', 'Libraries.Language.Object',  'Libraries.Interface.Controls.Blocks.BlockSelectionListener'];
-this.Libraries_Interface_Events_SelectionListener__ = null;
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+
+class quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_ {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent = function (event) {
+SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent(event) {
 var selection = event.GetSelection();
 if ((selection != null)) {
 var blockSelection = global_CheckCast(selection, "Libraries.Interface.Selections.CodeEditorSelection");
@@ -5835,6 +5896,11 @@ if ((block != null)) {
 }
 }
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Interface.Events.SelectionListener', 'Libraries.Language.Object',  'Libraries.Interface.Controls.Blocks.BlockSelectionListener'];
+this.Libraries_Interface_Events_SelectionListener__ = null;
 if(parents == null) {
    this.Libraries_Interface_Events_SelectionListener__ = new quorum_Libraries_Interface_Events_SelectionListener_(false);
    this.Libraries_Interface_Events_SelectionListener__.prototype = this;
@@ -5844,61 +5910,65 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_EditorItemFocusPrevious_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusPrevious'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_EditorItemFocusPrevious_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if (global_InstanceOf(event.GetItem(),'WebEditor.EditorItem')) {
 var editorItem = global_CheckCast(event.GetItem(), "WebEditor.EditorItem");
 editorItem.GetPreviousFocus().Focus();
 }
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusPrevious'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5908,61 +5978,65 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_EditorItemFocusNext_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusNext'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_EditorItemFocusNext_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if (global_InstanceOf(event.GetItem(),'WebEditor.EditorItem')) {
 var editorItem = global_CheckCast(event.GetItem(), "WebEditor.EditorItem");
 editorItem.GetNextFocus().Focus();
 }
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusNext'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -5972,44 +6046,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_WebEditorPanBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorPanBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_WebEditorPanBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if ((event.GetGestureEvent() != null)) {
 var gesture = event.GetGestureEvent();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -6045,7 +6118,7 @@ this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_().Set$quorum_integ
 }
 }
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -6056,7 +6129,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -6067,30 +6140,35 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_ = function() {
+Get_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_() {
    return this.dragEvent;
 };
-this.Set_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_ = function(value) {
+Set_WebEditor_Behaviors_WebEditorPanBehavior__dragEvent_(value) {
    this.dragEvent = value;
 };
-this.Get_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_ = function() {
+Get_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_() {
    return this.startedDrag;
 };
-this.Set_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_ = function(value) {
+Set_WebEditor_Behaviors_WebEditorPanBehavior__startedDrag_(value) {
    this.startedDrag = value;
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorPanBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -6102,44 +6180,43 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
 
-function quorum_WebEditor_Behaviors_EditorItemFocusTargetBehavior_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusTargetBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.Update$quorum_number = function(seconds) {
+
+class quorum_WebEditor_Behaviors_EditorItemFocusTargetBehavior_ {
+Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function (event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
 if (global_InstanceOf(event.GetItem(),'WebEditor.EditorItem')) {
 var editorItem = global_CheckCast(event.GetItem(), "WebEditor.EditorItem");
 if (global_InstanceOf(editorItem.GetTarget(),'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
@@ -6152,18 +6229,23 @@ editor.UpdateTogglePaletteButton$quorum_boolean(editor.TogglePalette());
 editorItem.FocusTarget();
 }
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.EditorItemFocusTargetBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
@@ -6173,580 +6255,575 @@ if(parents == null) {
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
+
 var OuTpUt_$tRiNg_ = "";
 
-function quorum_WebEditor_BlockEditor_(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Events.FocusListener', 'Libraries.Interface.Events.TextChangeListener', 'Libraries.Interface.Events.WebAccessibilityListener', 'Libraries.Game.Game', 'Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.BlockEditor'];
-this.Libraries_Interface_Events_FocusListener__ = null;
-this.Libraries_Interface_Events_TextChangeListener__ = null;
-this.Libraries_Interface_Events_WebAccessibilityListener__ = null;
-this.Libraries_Game_Game__ = null;
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-this.IsWindowFocused = function() {
+class quorum_WebEditor_BlockEditor_ {
+IsWindowFocused() {
      return this.Libraries_Game_Game__.IsWindowFocused();
 }
-this.SaveScene$quorum_Libraries_System_File = function(file) {
+SaveScene$quorum_Libraries_System_File(file) {
      return this.Libraries_Game_Game__.SaveScene$quorum_Libraries_System_File(file);
 }
-this.ProcessScreenshots = function() {
+ProcessScreenshots() {
      return this.Libraries_Game_Game__.ProcessScreenshots();
 }
-this.IsWindowMinimized = function() {
+IsWindowMinimized() {
      return this.Libraries_Game_Game__.IsWindowMinimized();
 }
-this.SetVSync$quorum_boolean = function(vSync) {
+SetVSync$quorum_boolean(vSync) {
      return this.Libraries_Game_Game__.SetVSync$quorum_boolean(vSync);
 }
-this.ResetDepthBuffer = function() {
+ResetDepthBuffer() {
      return this.Libraries_Game_Game__.ResetDepthBuffer();
 }
-this.FindItem2DByName$quorum_text = function(name) {
+FindItem2DByName$quorum_text(name) {
      return this.Libraries_Game_Game__.FindItem2DByName$quorum_text(name);
 }
-this.RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener = function(listener) {
+RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener) {
      return this.Libraries_Game_Game__.RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener);
 }
-this.GetInterfaceOptions = function() {
+GetInterfaceOptions() {
      return this.Libraries_Game_Game__.GetInterfaceOptions();
 }
-this.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
+AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
      return this.Libraries_Game_Game__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
 }
-this.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
+RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Game_Game__.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
 }
-this.SetLayout$quorum_Libraries_Interface_Layouts_Layout = function(layout) {
+SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout) {
      return this.Libraries_Game_Game__.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
 }
-this.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
+RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
      return this.Libraries_Game_Game__.RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
 }
-this.GetPointLights = function() {
+GetPointLights() {
      return this.Libraries_Game_Game__.GetPointLights();
 }
-this.RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener = function(listener) {
+RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener) {
      return this.Libraries_Game_Game__.RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener);
 }
-this.IsWindowMaximized = function() {
+IsWindowMaximized() {
      return this.Libraries_Game_Game__.IsWindowMaximized();
 }
-this.AddLayer$quorum_integer$quorum_Libraries_Game_Layer = function(index, layer) {
+AddLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer) {
      return this.Libraries_Game_Game__.AddLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer);
 }
-this.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
+AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
      return this.Libraries_Game_Game__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
-this.AddTextInputListener$quorum_Libraries_Interface_Events_TextInputListener = function(listener) {
+AddTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener) {
      return this.Libraries_Game_Game__.AddTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener);
 }
-this.UpdateAll = function() {
+UpdateAll() {
      return this.Libraries_Game_Game__.UpdateAll();
 }
-this.RemoveLayer$quorum_integer = function(index) {
+RemoveLayer$quorum_integer(index) {
      return this.Libraries_Game_Game__.RemoveLayer$quorum_integer(index);
 }
-this.SetInterfaceScale$quorum_number = function(scale) {
+SetInterfaceScale$quorum_number(scale) {
      return this.Libraries_Game_Game__.SetInterfaceScale$quorum_number(scale);
 }
-this.SetLayer$quorum_integer$quorum_Libraries_Game_Layer = function(index, layer) {
+SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer) {
      return this.Libraries_Game_Game__.SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer);
 }
-this.IsFinished = function() {
+IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
 }
-this.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener = function(listener) {
+RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
      return this.Libraries_Game_Game__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
-this.GetSceneManager = function() {
+GetSceneManager() {
      return this.Libraries_Game_Game__.GetSceneManager();
 }
-this.Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener = function(callback) {
+Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback) {
      return this.Libraries_Game_Game__.Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback);
 }
-this.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D = function(listener) {
+AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener) {
      return this.Libraries_Game_Game__.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener);
 }
-this.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener = function(x, y, width, height, callback) {
+Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback) {
      return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback);
 }
-this.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
+AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
      return this.Libraries_Game_Game__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
 }
-this.TestForCollisions$quorum_number = function(seconds) {
+TestForCollisions$quorum_number(seconds) {
      return this.Libraries_Game_Game__.TestForCollisions$quorum_number(seconds);
 }
-this.GetFocus = function() {
+GetFocus() {
      return this.Libraries_Game_Game__.GetFocus();
 }
-this.GetWebConfiguration = function() {
+GetWebConfiguration() {
      return this.Libraries_Game_Game__.GetWebConfiguration();
 }
-this.Remove$quorum_Libraries_Game_Graphics_PointLight = function(light) {
+Remove$quorum_Libraries_Game_Graphics_PointLight(light) {
      return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_PointLight(light);
 }
-this.Dispose = function() {
+Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
 }
-this.GetShaderManager = function() {
+GetShaderManager() {
      return this.Libraries_Game_Game__.GetShaderManager();
 }
-this.GetDesktopConfiguration = function() {
+GetDesktopConfiguration() {
      return this.Libraries_Game_Game__.GetDesktopConfiguration();
 }
-this.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener = function(listener) {
+RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
      return this.Libraries_Game_Game__.RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
 }
-this.GetHashCode = function() {
+GetHashCode() {
 return global_Object_GetHashCode(this.prototype, );
 }
-this.GetEditManager = function() {
+GetEditManager() {
      return this.Libraries_Game_Game__.GetEditManager();
 }
-this.GetFirstLetterNavigationTime = function() {
+GetFirstLetterNavigationTime() {
      return this.Libraries_Game_Game__.GetFirstLetterNavigationTime();
 }
-this.StartAndroidGame = function() {
+StartAndroidGame() {
      return this.Libraries_Game_Game__.StartAndroidGame();
 }
-this.SetScreenSize$quorum_integer$quorum_integer$quorum_boolean = function(width, height, adjustCameras) {
+SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras) {
      return this.Libraries_Game_Game__.SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras);
 }
-this.CompleteInitialSetup$quorum_Libraries_Game_Application = function(application) {
+CompleteInitialSetup$quorum_Libraries_Game_Application(application) {
      return this.Libraries_Game_Game__.CompleteInitialSetup$quorum_Libraries_Game_Application(application);
 }
-this.GetFontManager = function() {
+GetFontManager() {
      return this.Libraries_Game_Game__.GetFontManager();
 }
-this.Remove$quorum_Libraries_Game_Graphics_DirectionalLight = function(light) {
+Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light) {
      return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light);
 }
-this.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
+AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
      return this.Libraries_Game_Game__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
 }
-this.DrawAll = function() {
+DrawAll() {
      return this.Libraries_Game_Game__.DrawAll();
 }
-this.GetCamera2D = function() {
+GetCamera2D() {
      return this.Libraries_Game_Game__.GetCamera2D();
 }
-this.GetInterfaceScale = function() {
+GetInterfaceScale() {
      return this.Libraries_Game_Game__.GetInterfaceScale();
 }
-this.SetSimulationThreshold2D$quorum_number = function(threshold) {
+SetSimulationThreshold2D$quorum_number(threshold) {
      return this.Libraries_Game_Game__.SetSimulationThreshold2D$quorum_number(threshold);
 }
-this.SaveScene = function() {
+SaveScene() {
      return this.Libraries_Game_Game__.SaveScene();
 }
-this.GetDirectionalLight$quorum_integer = function(index) {
+GetDirectionalLight$quorum_integer(index) {
      return this.Libraries_Game_Game__.GetDirectionalLight$quorum_integer(index);
 }
-this.Compare$quorum_Libraries_Language_Object = function(object) {
+Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-this.EnablePhysics2D$quorum_boolean = function(flag) {
+EnablePhysics2D$quorum_boolean(flag) {
      return this.Libraries_Game_Game__.EnablePhysics2D$quorum_boolean(flag);
 }
-this.SetAmbientLight$quorum_Libraries_Game_Graphics_AmbientLight = function(light) {
+SetAmbientLight$quorum_Libraries_Game_Graphics_AmbientLight(light) {
      return this.Libraries_Game_Game__.SetAmbientLight$quorum_Libraries_Game_Graphics_AmbientLight(light);
 }
-this.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D = function(listener) {
+RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener) {
      return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener);
 }
-this.SetCurrentLayer2D$quorum_Libraries_Game_Layer2D = function(layer) {
+SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer) {
      return this.Libraries_Game_Game__.SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer);
 }
-this.SetGameName$quorum_text = function(name) {
+SetGameName$quorum_text(name) {
      return this.Libraries_Game_Game__.SetGameName$quorum_text(name);
 }
-this.GetAvailableResolutions = function() {
+GetAvailableResolutions() {
      return this.Libraries_Game_Game__.GetAvailableResolutions();
 }
-this.RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener = function(listener) {
+RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
      return this.Libraries_Game_Game__.RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
 }
-this.SetGravity2D$quorum_Libraries_Compute_Vector2 = function(gravity) {
+SetGravity2D$quorum_Libraries_Compute_Vector2(gravity) {
      return this.Libraries_Game_Game__.SetGravity2D$quorum_Libraries_Compute_Vector2(gravity);
 }
-this.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener = function(listener) {
+RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
      return this.Libraries_Game_Game__.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
 }
-this.EnablePhysics3D$quorum_boolean = function(flag) {
+EnablePhysics3D$quorum_boolean(flag) {
      return this.Libraries_Game_Game__.EnablePhysics3D$quorum_boolean(flag);
 }
-this.AddInputTable$quorum_Libraries_Game_InputTable = function(table) {
+AddInputTable$quorum_Libraries_Game_InputTable(table) {
      return this.Libraries_Game_Game__.AddInputTable$quorum_Libraries_Game_InputTable(table);
 }
-this.GetLayerIterator = function() {
+GetLayerIterator() {
      return this.Libraries_Game_Game__.GetLayerIterator();
 }
-this.UseDesktopResolution$quorum_boolean = function(adjustCameras) {
+UseDesktopResolution$quorum_boolean(adjustCameras) {
      return this.Libraries_Game_Game__.UseDesktopResolution$quorum_boolean(adjustCameras);
 }
-this.RemoveWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener = function(listener) {
+RemoveWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener) {
      return this.Libraries_Game_Game__.RemoveWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener);
 }
-this.Add$quorum_Libraries_Game_Graphics_DirectionalLight = function(light) {
+Add$quorum_Libraries_Game_Graphics_DirectionalLight(light) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Game_Graphics_DirectionalLight(light);
 }
-this.Screenshot = function() {
+Screenshot() {
      return this.Libraries_Game_Game__.Screenshot();
 }
-this.GetPointLight$quorum_integer = function(index) {
+GetPointLight$quorum_integer(index) {
      return this.Libraries_Game_Game__.GetPointLight$quorum_integer(index);
 }
-this.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener = function(listener) {
+AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
      return this.Libraries_Game_Game__.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
 }
-this.GetScreenWidth = function() {
+GetScreenWidth() {
      return this.Libraries_Game_Game__.GetScreenWidth();
 }
-this.GetCamera3D = function() {
+GetCamera3D() {
      return this.Libraries_Game_Game__.GetCamera3D();
 }
-this.RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener = function(listener) {
+RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
 }
-this.RemoveAmbientLight = function() {
+RemoveAmbientLight() {
      return this.Libraries_Game_Game__.RemoveAmbientLight();
 }
-this.SetWindowMinimized$quorum_boolean = function(minimized) {
+SetWindowMinimized$quorum_boolean(minimized) {
      return this.Libraries_Game_Game__.SetWindowMinimized$quorum_boolean(minimized);
 }
-this.FindItem3DByName$quorum_text = function(name) {
+FindItem3DByName$quorum_text(name) {
      return this.Libraries_Game_Game__.FindItem3DByName$quorum_text(name);
 }
-this.RemoveTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener = function(listener) {
+RemoveTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener);
 }
-this.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener = function(listener) {
+AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener) {
      return this.Libraries_Game_Game__.AddControlActivationListener$quorum_Libraries_Interface_Events_ControlActivationListener(listener);
 }
-this.SetApplicationIcon$quorum_Libraries_System_File = function(file) {
+SetApplicationIcon$quorum_Libraries_System_File(file) {
      return this.Libraries_Game_Game__.SetApplicationIcon$quorum_Libraries_System_File(file);
 }
-this.SetRunOnUpdate$quorum_boolean = function(run) {
+SetRunOnUpdate$quorum_boolean(run) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
 }
-this.SetScreenSize$quorum_integer$quorum_integer = function(width, height) {
+SetScreenSize$quorum_integer$quorum_integer(width, height) {
      return this.Libraries_Game_Game__.SetScreenSize$quorum_integer$quorum_integer(width, height);
 }
-this.SetCamera3D$quorum_Libraries_Game_Graphics_Camera = function(cam) {
+SetCamera3D$quorum_Libraries_Game_Graphics_Camera(cam) {
      return this.Libraries_Game_Game__.SetCamera3D$quorum_Libraries_Game_Graphics_Camera(cam);
 }
-this.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D = function(listener) {
+RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
      return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
 }
-this.SetConfiguration$quorum_Libraries_Game_DesktopConfiguration = function(config) {
+SetConfiguration$quorum_Libraries_Game_DesktopConfiguration(config) {
      return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_DesktopConfiguration(config);
 }
-this.AddLayer$quorum_Libraries_Game_Layer = function(layer) {
+AddLayer$quorum_Libraries_Game_Layer(layer) {
      return this.Libraries_Game_Game__.AddLayer$quorum_Libraries_Game_Layer(layer);
 }
-this.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
+AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
      return this.Libraries_Game_Game__.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
 }
-this.HasBeenRun = function() {
+HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-this.SetDefaultInputTable$quorum_Libraries_Game_InputTable = function(table) {
+SetDefaultInputTable$quorum_Libraries_Game_InputTable(table) {
      return this.Libraries_Game_Game__.SetDefaultInputTable$quorum_Libraries_Game_InputTable(table);
 }
-this.SetScreenResolution$quorum_Libraries_Game_ScreenResolution$quorum_boolean = function(resolution, adjustCameras) {
+SetScreenResolution$quorum_Libraries_Game_ScreenResolution$quorum_boolean(resolution, adjustCameras) {
      return this.Libraries_Game_Game__.SetScreenResolution$quorum_Libraries_Game_ScreenResolution$quorum_boolean(resolution, adjustCameras);
 }
-this.SetSceneManager$quorum_Libraries_Game_Scenes_SceneManager = function(scene) {
+SetSceneManager$quorum_Libraries_Game_Scenes_SceneManager(scene) {
      return this.Libraries_Game_Game__.SetSceneManager$quorum_Libraries_Game_Scenes_SceneManager(scene);
 }
-this.Exit = function() {
+Exit() {
      return this.Libraries_Game_Game__.Exit();
 }
-this.LoadScene$quorum_Libraries_Game_Scenes_Scene = function(scene) {
+LoadScene$quorum_Libraries_Game_Scenes_Scene(scene) {
      return this.Libraries_Game_Game__.LoadScene$quorum_Libraries_Game_Scenes_Scene(scene);
 }
-this.SetGravity3D$quorum_Libraries_Compute_Vector3 = function(gravity) {
+SetGravity3D$quorum_Libraries_Compute_Vector3(gravity) {
      return this.Libraries_Game_Game__.SetGravity3D$quorum_Libraries_Compute_Vector3(gravity);
 }
-this.GetSecondsBetweenFrames = function() {
+GetSecondsBetweenFrames() {
      return this.Libraries_Game_Game__.GetSecondsBetweenFrames();
 }
-this.RemoveLayer$quorum_Libraries_Game_Layer = function(layer) {
+RemoveLayer$quorum_Libraries_Game_Layer(layer) {
      return this.Libraries_Game_Game__.RemoveLayer$quorum_Libraries_Game_Layer(layer);
 }
-this.AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener = function(listener) {
+AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
      return this.Libraries_Game_Game__.AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
 }
-this.ProcessInputEvents = function() {
+ProcessInputEvents() {
      return this.Libraries_Game_Game__.ProcessInputEvents();
 }
-this.Remove$quorum_Libraries_Interface_Item3D = function(item) {
+Remove$quorum_Libraries_Interface_Item3D(item) {
      return this.Libraries_Game_Game__.Remove$quorum_Libraries_Interface_Item3D(item);
 }
-this.SetFontManager$quorum_Libraries_Game_Graphics_Fonts_FontManager = function(fontManager) {
+SetFontManager$quorum_Libraries_Game_Graphics_Fonts_FontManager(fontManager) {
      return this.Libraries_Game_Game__.SetFontManager$quorum_Libraries_Game_Graphics_Fonts_FontManager(fontManager);
 }
-this.SetWindowMaximized$quorum_boolean = function(maximized) {
+SetWindowMaximized$quorum_boolean(maximized) {
      return this.Libraries_Game_Game__.SetWindowMaximized$quorum_boolean(maximized);
 }
-this.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer = function(x, y, width, height) {
+Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height) {
      return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height);
 }
-this.SetColorFilter$quorum_Libraries_Game_Graphics_Color = function(color) {
+SetColorFilter$quorum_Libraries_Game_Graphics_Color(color) {
      return this.Libraries_Game_Game__.SetColorFilter$quorum_Libraries_Game_Graphics_Color(color);
 }
-this.SetScreenResolution$quorum_Libraries_Game_ScreenResolution = function(resolution) {
+SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution) {
      return this.Libraries_Game_Game__.SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution);
 }
-this.GetAmbientLight = function() {
+GetAmbientLight() {
      return this.Libraries_Game_Game__.GetAmbientLight();
 }
-this.SelectApplicationTypeNative = function() {
+SelectApplicationTypeNative() {
      return this.Libraries_Game_Game__.SelectApplicationTypeNative();
 }
-this.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
+AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
      return this.Libraries_Game_Game__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
 }
-this.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener = function(listener) {
+AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Game_Game__.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
 }
-this.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener = function(listener) {
+RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
      return this.Libraries_Game_Game__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
 }
-this.SetGravity2D$quorum_number$quorum_number = function(gravityX, gravityY) {
+SetGravity2D$quorum_number$quorum_number(gravityX, gravityY) {
      return this.Libraries_Game_Game__.SetGravity2D$quorum_number$quorum_number(gravityX, gravityY);
 }
-this.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener = function(listener) {
+RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
      return this.Libraries_Game_Game__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
 }
-this.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener = function(listener) {
+RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
      return this.Libraries_Game_Game__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
 }
-this.SetSkybox$quorum_Libraries_Game_Graphics_Skybox = function(skybox) {
+SetSkybox$quorum_Libraries_Game_Graphics_Skybox(skybox) {
      return this.Libraries_Game_Game__.SetSkybox$quorum_Libraries_Game_Graphics_Skybox(skybox);
 }
-this.GetFocusManager = function() {
+GetFocusManager() {
      return this.Libraries_Game_Game__.GetFocusManager();
 }
-this.EnableResizing$quorum_boolean = function(resize) {
+EnableResizing$quorum_boolean(resize) {
      return this.Libraries_Game_Game__.EnableResizing$quorum_boolean(resize);
 }
-this.Add$quorum_Libraries_Interface_Item2D = function(item) {
+Add$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Interface_Item2D(item);
 }
-this.SetEditManager$quorum_Libraries_Interface_Undo_EditManager = function(edits) {
+SetEditManager$quorum_Libraries_Interface_Undo_EditManager(edits) {
      return this.Libraries_Game_Game__.SetEditManager$quorum_Libraries_Interface_Undo_EditManager(edits);
 }
-this.InitializeLayers = function() {
+InitializeLayers() {
      return this.Libraries_Game_Game__.InitializeLayers();
 }
-this.GetDefaultInputTable = function() {
+GetDefaultInputTable() {
      return this.Libraries_Game_Game__.GetDefaultInputTable();
 }
-this.SetInterfaceOptions$quorum_Libraries_Interface_Options_InterfaceOptions = function(options) {
+SetInterfaceOptions$quorum_Libraries_Interface_Options_InterfaceOptions(options) {
      return this.Libraries_Game_Game__.SetInterfaceOptions$quorum_Libraries_Interface_Options_InterfaceOptions(options);
 }
-this.AddWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener = function(listener) {
+AddWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener) {
      return this.Libraries_Game_Game__.AddWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener);
 }
-this.RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener = function(listener) {
+RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener) {
      return this.Libraries_Game_Game__.RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener);
 }
-this.ClearScreen = function() {
+ClearScreen() {
      return this.Libraries_Game_Game__.ClearScreen();
 }
-this.GetDirectionalLights = function() {
+GetDirectionalLights() {
      return this.Libraries_Game_Game__.GetDirectionalLights();
 }
-this.SetCamera2D$quorum_Libraries_Game_Graphics_Camera = function(cam) {
+SetCamera2D$quorum_Libraries_Game_Graphics_Camera(cam) {
      return this.Libraries_Game_Game__.SetCamera2D$quorum_Libraries_Game_Graphics_Camera(cam);
 }
-this.SetWebContainerID$quorum_text = function(id) {
+SetWebContainerID$quorum_text(id) {
      return this.Libraries_Game_Game__.SetWebContainerID$quorum_text(id);
 }
-this.RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener = function(listener) {
+RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
 }
-this.AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener = function(listener) {
+AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener) {
      return this.Libraries_Game_Game__.AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener);
 }
-this.AddTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener = function(listener) {
+AddTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener) {
      return this.Libraries_Game_Game__.AddTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener);
 }
-this.SetFullScreen$quorum_boolean = function(fullScreen) {
+SetFullScreen$quorum_boolean(fullScreen) {
      return this.Libraries_Game_Game__.SetFullScreen$quorum_boolean(fullScreen);
 }
-this.SelectApplicationType = function() {
+SelectApplicationType() {
      return this.Libraries_Game_Game__.SelectApplicationType();
 }
-this.EnableTextureAutoResizing$quorum_boolean = function(resize) {
+EnableTextureAutoResizing$quorum_boolean(resize) {
      return this.Libraries_Game_Game__.EnableTextureAutoResizing$quorum_boolean(resize);
 }
-this.GetSimulationThreshold2D = function() {
+GetSimulationThreshold2D() {
      return this.Libraries_Game_Game__.GetSimulationThreshold2D();
 }
-this.Run$quorum_Libraries_Interface_Events_BehaviorEvent = function(event) {
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
      return this.Libraries_Interface_Behaviors_Behavior__.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
 }
-this.GetDesktopResolution = function() {
+GetDesktopResolution() {
      return this.Libraries_Game_Game__.GetDesktopResolution();
 }
-this.SetFirstLetterNavigationTime$quorum_number = function(firstLetterNavigationTime) {
+SetFirstLetterNavigationTime$quorum_number(firstLetterNavigationTime) {
      return this.Libraries_Game_Game__.SetFirstLetterNavigationTime$quorum_number(firstLetterNavigationTime);
 }
-this.SetColliding$quorum_boolean = function(collide) {
+SetColliding$quorum_boolean(collide) {
      return this.Libraries_Game_Game__.SetColliding$quorum_boolean(collide);
 }
-this.IsRunningOnUpdate = function() {
+IsRunningOnUpdate() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
 }
-this.SetConfiguration$quorum_Libraries_Game_WebConfiguration = function(config) {
+SetConfiguration$quorum_Libraries_Game_WebConfiguration(config) {
      return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_WebConfiguration(config);
 }
-this.LoadScene$quorum_text = function(path) {
+LoadScene$quorum_text(path) {
      return this.Libraries_Game_Game__.LoadScene$quorum_text(path);
 }
-this.GetGameName = function() {
+GetGameName() {
      return this.Libraries_Game_Game__.GetGameName();
 }
-this.SetFocusManager$quorum_Libraries_Game_FocusManager = function(focus) {
+SetFocusManager$quorum_Libraries_Game_FocusManager(focus) {
      return this.Libraries_Game_Game__.SetFocusManager$quorum_Libraries_Game_FocusManager(focus);
 }
-this.StartGame = function() {
+StartGame() {
      return this.Libraries_Game_Game__.StartGame();
 }
-this.FocusWindow = function() {
+FocusWindow() {
      return this.Libraries_Game_Game__.FocusWindow();
 }
-this.TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent = function(event) {
+TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event) {
      return this.Libraries_Interface_Events_TextChangeListener__.TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event);
 }
-this.SetFocus$quorum_Libraries_Interface_Item = function(item) {
+SetFocus$quorum_Libraries_Interface_Item(item) {
      return this.Libraries_Game_Game__.SetFocus$quorum_Libraries_Interface_Item(item);
 }
-this.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D = function(listener) {
+AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
      return this.Libraries_Game_Game__.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
 }
-this.LoadScene$quorum_Libraries_System_File = function(file) {
+LoadScene$quorum_Libraries_System_File(file) {
      return this.Libraries_Game_Game__.LoadScene$quorum_Libraries_System_File(file);
 }
-this.AddKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener = function(listener) {
+AddKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener) {
      return this.Libraries_Game_Game__.AddKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener);
 }
-this.Add$quorum_Libraries_Game_Graphics_PointLight = function(light) {
+Add$quorum_Libraries_Game_Graphics_PointLight(light) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Game_Graphics_PointLight(light);
 }
-this.SetAccessibility$quorum_Libraries_Interface_Accessibility = function(accessibilityManager) {
+SetAccessibility$quorum_Libraries_Interface_Accessibility(accessibilityManager) {
      return this.Libraries_Game_Game__.SetAccessibility$quorum_Libraries_Interface_Accessibility(accessibilityManager);
 }
-this.GetSkybox = function() {
+GetSkybox() {
      return this.Libraries_Game_Game__.GetSkybox();
 }
-this.GetInputTable$quorum_text = function(key) {
+GetInputTable$quorum_text(key) {
      return this.Libraries_Game_Game__.GetInputTable$quorum_text(key);
 }
-this.GetLayout = function() {
+GetLayout() {
      return this.Libraries_Game_Game__.GetLayout();
 }
-this.Equals$quorum_Libraries_Language_Object = function(object) {
+Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
-this.SetClipboard$quorum_text = function(value) {
+SetClipboard$quorum_text(value) {
      return this.Libraries_Game_Game__.SetClipboard$quorum_text(value);
 }
-this.SetGravity3D$quorum_number$quorum_number$quorum_number = function(gravityX, gravityY, gravityZ) {
+SetGravity3D$quorum_number$quorum_number$quorum_number(gravityX, gravityY, gravityZ) {
      return this.Libraries_Game_Game__.SetGravity3D$quorum_number$quorum_number$quorum_number(gravityX, gravityY, gravityZ);
 }
-this.SetHasRunFlag$quorum_boolean = function(hasRun) {
+SetHasRunFlag$quorum_boolean(hasRun) {
      return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
 }
-this.SetConfiguration$quorum_Libraries_Game_AndroidConfiguration = function(config) {
+SetConfiguration$quorum_Libraries_Game_AndroidConfiguration(config) {
      return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_AndroidConfiguration(config);
 }
-this.SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number = function(red, green, blue, alpha) {
+SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha) {
      return this.Libraries_Game_Game__.SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha);
 }
-this.GetDialogLayerPool = function() {
+GetDialogLayerPool() {
      return this.Libraries_Game_Game__.GetDialogLayerPool();
 }
-this.GetAndroidConfiguration = function() {
+GetAndroidConfiguration() {
      return this.Libraries_Game_Game__.GetAndroidConfiguration();
 }
-this.GetScreenHeight = function() {
+GetScreenHeight() {
      return this.Libraries_Game_Game__.GetScreenHeight();
 }
-this.RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener = function(listener) {
+RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener);
 }
-this.GetAccessibility = function() {
+GetAccessibility() {
      return this.Libraries_Game_Game__.GetAccessibility();
 }
-this.GetSharedTextureManager = function() {
+GetSharedTextureManager() {
      return this.Libraries_Game_Game__.GetSharedTextureManager();
 }
-this.Remove$quorum_Libraries_Interface_Item2D = function(item) {
+Remove$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Game_Game__.Remove$quorum_Libraries_Interface_Item2D(item);
 }
-this.AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener = function(listener) {
+AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
      return this.Libraries_Game_Game__.AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
 }
-this.AddTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener = function(listener) {
+AddTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener) {
      return this.Libraries_Game_Game__.AddTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener);
 }
-this.GetCurrentLayer3D = function() {
+GetCurrentLayer3D() {
      return this.Libraries_Game_Game__.GetCurrentLayer3D();
 }
-this.GetCurrentLayer2D = function() {
+GetCurrentLayer2D() {
      return this.Libraries_Game_Game__.GetCurrentLayer2D();
 }
-this.Add$quorum_Libraries_Interface_Item3D = function(item) {
+Add$quorum_Libraries_Interface_Item3D(item) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Interface_Item3D(item);
 }
-this.RemoveInputTable$quorum_text = function(key) {
+RemoveInputTable$quorum_text(key) {
      return this.Libraries_Game_Game__.RemoveInputTable$quorum_text(key);
 }
-this.IsColliding = function() {
+IsColliding() {
      return this.Libraries_Game_Game__.IsColliding();
 }
-this.GetClipboard = function() {
+GetClipboard() {
      return this.Libraries_Game_Game__.GetClipboard();
 }
-this.CreateDefaultInputTables = function() {
+CreateDefaultInputTables() {
      return this.Libraries_Game_Game__.CreateDefaultInputTables();
 }
-this.ContinueGame = function() {
+ContinueGame() {
      return this.Libraries_Game_Game__.ContinueGame();
 }
-this.GetScreenResolution = function() {
+GetScreenResolution() {
      return this.Libraries_Game_Game__.GetScreenResolution();
 }
-this.UseDesktopResolution = function() {
+UseDesktopResolution() {
      return this.Libraries_Game_Game__.UseDesktopResolution();
 }
-this.SetCurrentLayer3D$quorum_Libraries_Game_Layer3D = function(layer) {
+SetCurrentLayer3D$quorum_Libraries_Game_Layer3D(layer) {
      return this.Libraries_Game_Game__.SetCurrentLayer3D$quorum_Libraries_Game_Layer3D(layer);
 }
-this.GetTextForIDE$quorum_text = function (containerID) {
+GetTextForIDE$quorum_text(containerID) {
 return this.plugin_.GetTextForIDE$quorum_text(containerID);
 };
-this.GetPaletteFileName$quorum_text = function (containerID) {
+GetPaletteFileName$quorum_text(containerID) {
 return this.plugin_.GetPaletteFileName$quorum_text(containerID);
 };
-this.RunGame = function () {
+RunGame() {
 return this.plugin_.RunGame();
 };
-this.StopGame = function () {
+StopGame() {
 return this.plugin_.StopGame();
 };
-this.UpdateTogglePaletteButton$quorum_boolean = function (status) {
+UpdateTogglePaletteButton$quorum_boolean(status) {
 return this.plugin_.UpdateTogglePaletteButton$quorum_boolean(status);
 };
-this.ShowHelpModal = function () {
+ShowHelpModal() {
 return this.plugin_.ShowHelpModal();
 };
-this.Main = function () {
+Main() {
 var config = this.prototype.GetWebConfiguration();
 config.Set_Libraries_Game_WebConfiguration__title_("Block Editor");
 config.Set_Libraries_Game_WebConfiguration__containerID_(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
@@ -6755,7 +6832,7 @@ var deskConfig = this.prototype.GetDesktopConfiguration();
 deskConfig.Set_Libraries_Game_DesktopConfiguration__resizable_(true);
 this.prototype.StartGame();
 };
-this.OnExit = function () {
+OnExit() {
 this.editor = null;
 this.listener = null;
 this.palettePanel = null;
@@ -6767,7 +6844,7 @@ this.paletteItem = null;
 this.blocksItem = null;
 return true;
 };
-this.CreateGame = function () {
+CreateGame() {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
 webAccess.AddHiddenHeader$quorum_text$quorum_text("Navigation Area", "Navigation Menu, Landmark 1 of 5,\n You are on the Navigation Menu, swipe right to find buttons that will take you directly to the palette or editor. ");
@@ -6859,7 +6936,7 @@ this.Get_WebEditor_BlockEditor__paletteItem_().Focus();
 this.prototype.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(this.prototype);
 this.prototype.SetColliding$quorum_boolean(false);
 };
-this.SetupEditorItems = function () {
+SetupEditorItems() {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webApp = global_CheckCast(manager.GetApplication(), "Libraries.Game.WebApplication");
 if (((webApp.GetWebOperatingSystem().Contains$quorum_text("Android") || webApp.GetWebOperatingSystem().Contains$quorum_text("iOS")) || webApp.GetWebOperatingSystem().Contains$quorum_text("Mobile"))) {
@@ -6885,7 +6962,7 @@ this.Get_WebEditor_BlockEditor__blocksItem_().SetPreviousFocus$quorum_Libraries_
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__blocksItem_());
 };
-this.AddDefaultKeys = function () {
+AddDefaultKeys() {
 var keys = new quorum_Libraries_Interface_Events_KeyboardEvent_();
 var defaultTable = this.prototype.GetDefaultInputTable();
 var isMac = false;
@@ -7041,7 +7118,7 @@ defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behav
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panContinueSet, panBehavior);
 defaultTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(panEndSet, panBehavior);
 };
-this.Format$quorum_text = function (source) {
+Format$quorum_text(source) {
 var manager = new quorum_Libraries_Language_Compile_CompilerErrorManager_();
 var lexer = new quorum_Libraries_Language_Compile_Parsing_QuorumLexer_();
 lexer.SetIgnoreWhiteSpace$quorum_boolean(false);
@@ -7068,7 +7145,7 @@ start.Traverse$quorum_Libraries_Language_Compile_QuorumSourceListener(formatter)
 var formatted = formatter.GetSourceFormatted();
 return formatted;
 };
-this.CreatePalettePartition = function () {
+CreatePalettePartition() {
 var palettePartition = new quorum_Libraries_Interface_Controls_Icon_();
 var bgColor = new quorum_Libraries_Game_Graphics_Color_();
 bgColor.SetColor$quorum_number$quorum_number$quorum_number$quorum_number(0.25, 0.25, 0.25, 1 * 1.0);
@@ -7081,7 +7158,7 @@ palettePartition.SetName$quorum_text("Palette Pane Partition");
 palettePartition.SetZ$quorum_number(-10 * 1.0);
 return palettePartition;
 };
-this.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control = function (palettePanel) {
+AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(palettePanel) {
 var palettePartitionTable = new quorum_Libraries_Game_InputTable_();
 palettePartitionTable.SetIdentifier$quorum_text("PalettePartition");
 var dragSet = new quorum_Libraries_Game_InputSet_();
@@ -7094,7 +7171,7 @@ palettePartitionTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interf
 palettePartitionTable.Add$quorum_Libraries_Game_InputSet$quorum_Libraries_Interface_Behaviors_Behavior(dragContinueSet, paletteDrag);
 this.prototype.AddInputTable$quorum_Libraries_Game_InputTable(palettePartitionTable);
 };
-this.GetPaletteFile = function () {
+GetPaletteFile() {
 var file = new quorum_Libraries_System_File_();
 if ((this.prototype.GetPaletteFileName$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_()) != "")) {
 file.SetPath$quorum_text(this.prototype.GetPaletteFileName$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_()));
@@ -7102,7 +7179,7 @@ return file;
 }
 return null;
 };
-this.FocusChanged$quorum_Libraries_Interface_Events_WebAccessibilityEvent = function (event) {
+FocusChanged$quorum_Libraries_Interface_Events_WebAccessibilityEvent(event) {
 var elementName = event.Get_Libraries_Interface_Events_WebAccessibilityEvent__elementName_();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
@@ -7166,7 +7243,7 @@ this.Get_WebEditor_BlockEditor__editor_().MoveSelectionDown();
 this.Get_WebEditor_BlockEditor__editor_().Focus();
 }
 };
-this.SliderChanged$quorum_Libraries_Interface_Events_WebAccessibilityEvent = function (event) {
+SliderChanged$quorum_Libraries_Interface_Events_WebAccessibilityEvent(event) {
 var elementName = event.GetElementName();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
@@ -7177,7 +7254,7 @@ webAccess.SetHiddenSliderValueText$quorum_text$quorum_text("Block Mover", blockN
 webAccess.FocusHiddenElement$quorum_text("Block Mover");
 }
 };
-this.HiddenElementClicked$quorum_Libraries_Interface_Events_WebAccessibilityEvent = function (event) {
+HiddenElementClicked$quorum_Libraries_Interface_Events_WebAccessibilityEvent(event) {
 var clicked = event.GetItem();
 if (global_InstanceOf(clicked,'Libraries.Interface.Controls.Blocks.Block')) {
 if (this.Get_WebEditor_BlockEditor__editor_().IsKeyboardMovingBlocks()) {
@@ -7185,11 +7262,11 @@ this.Get_WebEditor_BlockEditor__editor_().ConfirmKeyboardMovingBlocks();
 }
 }
 };
-this.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent = function (event) {
+GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
 };
-this.LostFocus$quorum_Libraries_Interface_Events_FocusEvent = function (event) {
+LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
 };
-this.IsInPalette$quorum_Libraries_Interface_Item = function (item) {
+IsInPalette$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
 return true;
@@ -7200,7 +7277,7 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.IsInBlockEditor$quorum_Libraries_Interface_Item = function (item) {
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
 while (!((item == null))) {
 if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
 return true;
@@ -7211,24 +7288,24 @@ item = item.GetAccessibleParent();
 }
 return false;
 };
-this.SetCode$quorum_text = function (code) {
+SetCode$quorum_text(code) {
 this.Get_WebEditor_BlockEditor__editor_().SetCode$quorum_text(code);
 };
-this.ScaleUp = function () {
+ScaleUp() {
 var scale = this.prototype.GetInterfaceScale();
 scale = (scale + this.Get_WebEditor_BlockEditor__scaleAmount_());
 if ((scale >= 0.1)) {
 this.prototype.SetInterfaceScale$quorum_number(scale);
 }
 };
-this.ScaleDown = function () {
+ScaleDown() {
 var scale = this.prototype.GetInterfaceScale();
 scale = (scale - this.Get_WebEditor_BlockEditor__scaleAmount_());
 if ((scale >= 0.1)) {
 this.prototype.SetInterfaceScale$quorum_number(scale);
 }
 };
-this.TogglePalette = function () {
+TogglePalette() {
 if (this.Get_WebEditor_BlockEditor__palettePanel_().IsShowing()) {
 this.lastWidth = this.Get_WebEditor_BlockEditor__palettePanel_().GetPixelWidth();
 this.Get_WebEditor_BlockEditor__palettePanel_().SetPixelWidth$quorum_number(0 * 1.0);
@@ -7246,263 +7323,272 @@ this.Get_WebEditor_BlockEditor__palettePanel_().RequestLayout();
 return true;
 }
 };
-this.IsPaletteShowing = function () {
+IsPaletteShowing() {
 return this.Get_WebEditor_BlockEditor__palettePanel_().IsShowing();
 };
-this.GetBlockEditor = function () {
+GetBlockEditor() {
 return this.Get_WebEditor_BlockEditor__editorBlocks_();
 };
-this.GetBlockPalette = function () {
+GetBlockPalette() {
 return this.Get_WebEditor_BlockEditor__editorPalette_();
 };
-this.Update$quorum_number = function (seconds) {
+Update$quorum_number(seconds) {
 };
-this.Get_WebEditor_BlockEditor__scaleAmount_ = function() {
+Get_WebEditor_BlockEditor__scaleAmount_() {
    return this.scaleAmount;
 };
-this.Set_WebEditor_BlockEditor__scaleAmount_ = function(value) {
+Set_WebEditor_BlockEditor__scaleAmount_(value) {
    this.scaleAmount = value;
 };
-this.Get_WebEditor_BlockEditor__editorPanel_ = function() {
+Get_WebEditor_BlockEditor__editorPanel_() {
    return this.editorPanel;
 };
-this.Set_WebEditor_BlockEditor__editorPanel_ = function(value) {
+Set_WebEditor_BlockEditor__editorPanel_(value) {
    this.editorPanel = value;
 };
-this.Get_WebEditor_BlockEditor__palettePanel_ = function() {
+Get_WebEditor_BlockEditor__palettePanel_() {
    return this.palettePanel;
 };
-this.Set_WebEditor_BlockEditor__palettePanel_ = function(value) {
+Set_WebEditor_BlockEditor__palettePanel_(value) {
    this.palettePanel = value;
 };
-this.Get_WebEditor_BlockEditor__palettePartition_ = function() {
+Get_WebEditor_BlockEditor__palettePartition_() {
    return this.palettePartition;
 };
-this.Set_WebEditor_BlockEditor__palettePartition_ = function(value) {
+Set_WebEditor_BlockEditor__palettePartition_(value) {
    this.palettePartition = value;
 };
-this.Get_WebEditor_BlockEditor__CONTAINER_ID_ = function() {
+Get_WebEditor_BlockEditor__CONTAINER_ID_() {
    return this.CONTAINER_ID;
 };
-this.Set_WebEditor_BlockEditor__CONTAINER_ID_ = function(value) {
+Set_WebEditor_BlockEditor__CONTAINER_ID_(value) {
    this.CONTAINER_ID = value;
 };
-this.Get_WebEditor_BlockEditor__editor_ = function() {
+Get_WebEditor_BlockEditor__editor_() {
    return this.editor;
 };
-this.Set_WebEditor_BlockEditor__editor_ = function(value) {
+Set_WebEditor_BlockEditor__editor_(value) {
    this.editor = value;
 };
-this.Get_WebEditor_BlockEditor__blocksItem_ = function() {
+Get_WebEditor_BlockEditor__blocksItem_() {
    return this.blocksItem;
 };
-this.Set_WebEditor_BlockEditor__blocksItem_ = function(value) {
+Set_WebEditor_BlockEditor__blocksItem_(value) {
    this.blocksItem = value;
 };
-this.Get_WebEditor_BlockEditor__paletteItem_ = function() {
+Get_WebEditor_BlockEditor__paletteItem_() {
    return this.paletteItem;
 };
-this.Set_WebEditor_BlockEditor__paletteItem_ = function(value) {
+Set_WebEditor_BlockEditor__paletteItem_(value) {
    this.paletteItem = value;
 };
-this.Get_WebEditor_BlockEditor__listener_ = function() {
+Get_WebEditor_BlockEditor__listener_() {
    return this.listener;
 };
-this.Set_WebEditor_BlockEditor__listener_ = function(value) {
+Set_WebEditor_BlockEditor__listener_(value) {
    this.listener = value;
 };
-this.Get_WebEditor_BlockEditor__editorBlocks_ = function() {
+Get_WebEditor_BlockEditor__editorBlocks_() {
    return this.editorBlocks;
 };
-this.Set_WebEditor_BlockEditor__editorBlocks_ = function(value) {
+Set_WebEditor_BlockEditor__editorBlocks_(value) {
    this.editorBlocks = value;
 };
-this.Get_WebEditor_BlockEditor__lastWidth_ = function() {
+Get_WebEditor_BlockEditor__lastWidth_() {
    return this.lastWidth;
 };
-this.Set_WebEditor_BlockEditor__lastWidth_ = function(value) {
+Set_WebEditor_BlockEditor__lastWidth_(value) {
    this.lastWidth = value;
 };
-this.Get_WebEditor_BlockEditor__editorPalette_ = function() {
+Get_WebEditor_BlockEditor__editorPalette_() {
    return this.editorPalette;
 };
-this.Set_WebEditor_BlockEditor__editorPalette_ = function(value) {
+Set_WebEditor_BlockEditor__editorPalette_(value) {
    this.editorPalette = value;
 };
-this.Get_Libraries_Game_Game__focusManager_ = function() {
+Get_Libraries_Game_Game__focusManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__focusManager_();
 };
-this.Set_Libraries_Game_Game__focusManager_ = function(value) {
+Set_Libraries_Game_Game__focusManager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__focusManager_(value);
 };
-this.Get_Libraries_Game_Game__DESKTOP_APPLICATION_ = function() {
+Get_Libraries_Game_Game__DESKTOP_APPLICATION_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__DESKTOP_APPLICATION_();
 };
-this.Set_Libraries_Game_Game__DESKTOP_APPLICATION_ = function(value) {
+Set_Libraries_Game_Game__DESKTOP_APPLICATION_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__DESKTOP_APPLICATION_(value);
 };
-this.Get_Libraries_Game_Game__exitRequested_ = function() {
+Get_Libraries_Game_Game__exitRequested_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__exitRequested_();
 };
-this.Set_Libraries_Game_Game__exitRequested_ = function(value) {
+Set_Libraries_Game_Game__exitRequested_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__exitRequested_(value);
 };
-this.Get_Libraries_Game_Game__manager_ = function() {
+Get_Libraries_Game_Game__manager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__manager_();
 };
-this.Set_Libraries_Game_Game__manager_ = function(value) {
+Set_Libraries_Game_Game__manager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__manager_(value);
 };
-this.Get_Libraries_Game_Game__layers_ = function() {
+Get_Libraries_Game_Game__layers_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__layers_();
 };
-this.Set_Libraries_Game_Game__layers_ = function(value) {
+Set_Libraries_Game_Game__layers_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__layers_(value);
 };
-this.Get_Libraries_Game_Game__pendingScreenshots_ = function() {
+Get_Libraries_Game_Game__pendingScreenshots_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__pendingScreenshots_();
 };
-this.Set_Libraries_Game_Game__pendingScreenshots_ = function(value) {
+Set_Libraries_Game_Game__pendingScreenshots_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__pendingScreenshots_(value);
 };
-this.Get_Libraries_Game_Game__gameInput_ = function() {
+Get_Libraries_Game_Game__gameInput_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__gameInput_();
 };
-this.Set_Libraries_Game_Game__gameInput_ = function(value) {
+Set_Libraries_Game_Game__gameInput_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__gameInput_(value);
 };
-this.Get_Libraries_Game_Game__applicationType_ = function() {
+Get_Libraries_Game_Game__applicationType_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__applicationType_();
 };
-this.Set_Libraries_Game_Game__applicationType_ = function(value) {
+Set_Libraries_Game_Game__applicationType_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__applicationType_(value);
 };
-this.Get_Libraries_Game_Game__currentLayer3D_ = function() {
+Get_Libraries_Game_Game__currentLayer3D_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__currentLayer3D_();
 };
-this.Set_Libraries_Game_Game__currentLayer3D_ = function(value) {
+Set_Libraries_Game_Game__currentLayer3D_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__currentLayer3D_(value);
 };
-this.Get_Libraries_Game_Game__interfaceOptions_ = function() {
+Get_Libraries_Game_Game__interfaceOptions_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__interfaceOptions_();
 };
-this.Set_Libraries_Game_Game__interfaceOptions_ = function(value) {
+Set_Libraries_Game_Game__interfaceOptions_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__interfaceOptions_(value);
 };
-this.Get_Libraries_Game_Game__androidConfig_ = function() {
+Get_Libraries_Game_Game__androidConfig_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__androidConfig_();
 };
-this.Set_Libraries_Game_Game__androidConfig_ = function(value) {
+Set_Libraries_Game_Game__androidConfig_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__androidConfig_(value);
 };
-this.Get_Libraries_Game_Game__ANDROID_APPLICATION_ = function() {
+Get_Libraries_Game_Game__ANDROID_APPLICATION_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__ANDROID_APPLICATION_();
 };
-this.Set_Libraries_Game_Game__ANDROID_APPLICATION_ = function(value) {
+Set_Libraries_Game_Game__ANDROID_APPLICATION_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__ANDROID_APPLICATION_(value);
 };
-this.Get_Libraries_Game_Game__iosConfig_ = function() {
+Get_Libraries_Game_Game__iosConfig_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__iosConfig_();
 };
-this.Set_Libraries_Game_Game__iosConfig_ = function(value) {
+Set_Libraries_Game_Game__iosConfig_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__iosConfig_(value);
 };
-this.Get_Libraries_Game_Game__gl20_ = function() {
+Get_Libraries_Game_Game__gl20_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__gl20_();
 };
-this.Set_Libraries_Game_Game__gl20_ = function(value) {
+Set_Libraries_Game_Game__gl20_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__gl20_(value);
 };
-this.Get_Libraries_Game_Game__collide_ = function() {
+Get_Libraries_Game_Game__collide_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__collide_();
 };
-this.Set_Libraries_Game_Game__collide_ = function(value) {
+Set_Libraries_Game_Game__collide_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__collide_(value);
 };
-this.Get_Libraries_Game_Game__webConfig_ = function() {
+Get_Libraries_Game_Game__webConfig_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__webConfig_();
 };
-this.Set_Libraries_Game_Game__webConfig_ = function(value) {
+Set_Libraries_Game_Game__webConfig_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__webConfig_(value);
 };
-this.Get_Libraries_Game_Game__accessibility_ = function() {
+Get_Libraries_Game_Game__accessibility_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__accessibility_();
 };
-this.Set_Libraries_Game_Game__accessibility_ = function(value) {
+Set_Libraries_Game_Game__accessibility_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__accessibility_(value);
 };
-this.Get_Libraries_Game_Game__sharedTextureManager_ = function() {
+Get_Libraries_Game_Game__sharedTextureManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__sharedTextureManager_();
 };
-this.Set_Libraries_Game_Game__sharedTextureManager_ = function(value) {
+Set_Libraries_Game_Game__sharedTextureManager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__sharedTextureManager_(value);
 };
-this.Get_Libraries_Game_Game__editManager_ = function() {
+Get_Libraries_Game_Game__editManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__editManager_();
 };
-this.Set_Libraries_Game_Game__editManager_ = function(value) {
+Set_Libraries_Game_Game__editManager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__editManager_(value);
 };
-this.Get_Libraries_Game_Game__firstLetterNavigationTime_ = function() {
+Get_Libraries_Game_Game__firstLetterNavigationTime_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__firstLetterNavigationTime_();
 };
-this.Set_Libraries_Game_Game__firstLetterNavigationTime_ = function(value) {
+Set_Libraries_Game_Game__firstLetterNavigationTime_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__firstLetterNavigationTime_(value);
 };
-this.Get_Libraries_Game_Game__shaderManager_ = function() {
+Get_Libraries_Game_Game__shaderManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__shaderManager_();
 };
-this.Set_Libraries_Game_Game__shaderManager_ = function(value) {
+Set_Libraries_Game_Game__shaderManager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__shaderManager_(value);
 };
-this.Get_Libraries_Game_Game__desktopConfig_ = function() {
+Get_Libraries_Game_Game__desktopConfig_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__desktopConfig_();
 };
-this.Set_Libraries_Game_Game__desktopConfig_ = function(value) {
+Set_Libraries_Game_Game__desktopConfig_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__desktopConfig_(value);
 };
-this.Get_Libraries_Game_Game__currentLayer2D_ = function() {
+Get_Libraries_Game_Game__currentLayer2D_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__currentLayer2D_();
 };
-this.Set_Libraries_Game_Game__currentLayer2D_ = function(value) {
+Set_Libraries_Game_Game__currentLayer2D_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__currentLayer2D_(value);
 };
-this.Get_Libraries_Game_Game__WEB_APPLICATION_ = function() {
+Get_Libraries_Game_Game__WEB_APPLICATION_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__WEB_APPLICATION_();
 };
-this.Set_Libraries_Game_Game__WEB_APPLICATION_ = function(value) {
+Set_Libraries_Game_Game__WEB_APPLICATION_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__WEB_APPLICATION_(value);
 };
-this.Get_Libraries_Game_Game__dialogLayerPool_ = function() {
+Get_Libraries_Game_Game__dialogLayerPool_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__dialogLayerPool_();
 };
-this.Set_Libraries_Game_Game__dialogLayerPool_ = function(value) {
+Set_Libraries_Game_Game__dialogLayerPool_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__dialogLayerPool_(value);
 };
-this.Get_Libraries_Game_Game__IOS_APPLICATION_ = function() {
+Get_Libraries_Game_Game__IOS_APPLICATION_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__IOS_APPLICATION_();
 };
-this.Set_Libraries_Game_Game__IOS_APPLICATION_ = function(value) {
+Set_Libraries_Game_Game__IOS_APPLICATION_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__IOS_APPLICATION_(value);
 };
-this.Get_Libraries_Game_Game__sceneManager_ = function() {
+Get_Libraries_Game_Game__sceneManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__sceneManager_();
 };
-this.Set_Libraries_Game_Game__sceneManager_ = function(value) {
+Set_Libraries_Game_Game__sceneManager_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__sceneManager_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
 };
-this.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function() {
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
    return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
 };
-this.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_ = function(value) {
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
    this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
 };
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Interface.Events.FocusListener', 'Libraries.Interface.Events.TextChangeListener', 'Libraries.Interface.Events.WebAccessibilityListener', 'Libraries.Game.Game', 'Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.BlockEditor'];
+this.Libraries_Interface_Events_FocusListener__ = null;
+this.Libraries_Interface_Events_TextChangeListener__ = null;
+this.Libraries_Interface_Events_WebAccessibilityListener__ = null;
+this.Libraries_Game_Game__ = null;
+this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Events_FocusListener__ = new quorum_Libraries_Interface_Events_FocusListener_(false);
    this.Libraries_Interface_Events_TextChangeListener__ = new quorum_Libraries_Interface_Events_TextChangeListener_(false);
@@ -7534,8 +7620,10 @@ this.Libraries_Game_Game__.constructor_();
 }
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
+}
 
 };
+
 var $starter;function Start(){
 $starter = new quorum_WebEditor_BlockEditor_();
 $starter.Main();
