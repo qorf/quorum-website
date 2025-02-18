@@ -38,10 +38,6 @@ class HoCDataScience1 is HourOfCodeDataScience
         dq = dq:GetDoubleQuote()
         Division intro
         Preformatter pre
-
-        // tracking pixel for code.org
-        Image image = intro:AddImage("https://code.org/api/hour/begin_quorum_penguin.png", "Tracking Pixel for Code.org")
-        image:SetStyle("width: 1px; height: 1px;")
         
         intro:AddParagraph("")
         Paragraph p1
@@ -119,6 +115,7 @@ action GetQuestions() returns Division
         Division questions
 
         AddStylesheet("/style/checkAnswers.css")
+        AddScript("/script/logging.js")
         
 
         questions:AddParagraph("")
@@ -167,8 +164,8 @@ action GetQuestions() returns Division
         question1Select:Add(question1Option1)
 
         Option question1Option2
-        question1Option2:AddAttribute("value","46")
-        question1Option2:AddText("46")
+        question1Option2:AddAttribute("value","17")
+        question1Option2:AddText("17")
         question1Select:Add(question1Option2)
 
         Option question1Option3
@@ -177,13 +174,13 @@ action GetQuestions() returns Division
         question1Select:Add(question1Option3)
 
         Option question1Option4
-        question1Option4:AddAttribute("value","59.6")
-        question1Option4:AddText("59.6")
+        question1Option4:AddAttribute("value","46")
+        question1Option4:AddText("46")
         question1Select:Add(question1Option4)
 
         Option question1Option5
-        question1Option5:AddAttribute("value","17")
-        question1Option5:AddText("17")
+        question1Option5:AddAttribute("value","59.6")
+        question1Option5:AddText("59.6")
         question1Select:Add(question1Option5)
 
 
@@ -222,8 +219,8 @@ action GetQuestions() returns Division
         question2Select:Add(question2Option1)
 
         Option question2Option2
-        question2Option2:AddAttribute("value","46")
-        question2Option2:AddText("46")
+        question2Option2:AddAttribute("value","17")
+        question2Option2:AddText("17")
         question2Select:Add(question2Option2)
 
         Option question2Option3
@@ -232,13 +229,13 @@ action GetQuestions() returns Division
         question2Select:Add(question2Option3)
 
         Option question2Option4
-        question2Option4:AddAttribute("value","59.6")
-        question2Option4:AddText("59.6")
+        question2Option4:AddAttribute("value","46")
+        question2Option4:AddText("46")
         question2Select:Add(question2Option4)
 
         Option question2Option5
-        question2Option5:AddAttribute("value","17")
-        question2Option5:AddText("17")
+        question2Option5:AddAttribute("value","59.6")
+        question2Option5:AddText("59.6")
         question2Select:Add(question2Option5)
         
         Button questionFormButton
@@ -304,6 +301,95 @@ action GetQuestions() returns Division
 
             function checkAnswers(logging) {
                 let score = 0;
+            
+                // Correct answers
+                const correctAnswers = {
+                    q1: '59.6',
+                    q2: '21.5'
+                };
+            
+                // Extract activity number from the URL
+                const activityNumber = extractActivityNumberFromURL();
+                
+                // Array to store question results
+                const questionsData = [];
+           
+                //Reset state before checking answers (generic for all questions)
+                document.querySelectorAll('select').forEach(select => {
+                    select.removeAttribute('data-state');
+                    select.removeAttribute('aria-invalid');
+                });
+            
+                document.querySelectorAll(`[id$='-validation']`).forEach(validationElement => {
+                    validationElement.innerText = '';
+                    validationElement.classList.remove('text-green-600', 'text-red-600');
+                });
+            
+                //Loop through each question dynamically
+                Object.keys(correctAnswers).forEach((questionId) => {
+                    let selectedAnswer = document.querySelector(`#${questionId}`).value;
+                    let questionLabelElement = document.querySelector(`#${questionId}-label`);
+                    let questionText = questionLabelElement ? questionLabelElement.innerText.trim() : `Unknown Question (${questionId})`;
+                    let correctAnswer = correctAnswers[questionId];
+                    let isCorrect = selectedAnswer === correctAnswer;
+            
+                    if (selectedAnswer) {
+                        if (isCorrect) {
+                            score++;
+                            document.getElementById(questionId).setAttribute('data-state', 'correct');
+                            document.getElementById(`${questionId}-validation`).innerText = 'Correct';
+                            document.getElementById(`${questionId}-validation`).classList.add('text-green-600');
+                        } else {
+                            document.getElementById(questionId).setAttribute('data-state', 'incorrect');
+                            document.getElementById(questionId).setAttribute('aria-invalid', 'true');
+                            document.getElementById(`${questionId}-validation`).innerText = 'Incorrect';
+                            document.getElementById(`${questionId}-validation`).classList.add('text-red-600');
+                        }
+            
+                        // ? Store question result
+                        questionsData.push({
+                            question_id: questionId,
+                            question: questionText,
+                            user_response: selectedAnswer,
+                            correct_answer: correctAnswer,
+                            result: isCorrect ? 'correct' : 'incorrect'
+                        });
+                    }
+                });
+            
+                // Display score and feedback
+                let resultDiv = document.getElementById('result');
+                let totalQuestions = Object.keys(correctAnswers).length;
+                if (score === totalQuestions) {
+                    resultDiv.innerHTML = `<p class='text-green-600'>You got everything correct.</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p class='text-red-600'>You got ${score} out of ${totalQuestions} correct. Please try again!</p>`;
+                }
+            
+                //If logging is enabled, log the event
+                if (logging) {
+                    logEvent('check_answers', {
+                        activity_number: activityNumber,
+                        total_correct: score,
+                        total_questions: totalQuestions,
+                        questions: questionsData
+                    });
+                }
+            }
+            
+            //Function to extract the activity number from the URL
+            function extractActivityNumberFromURL() {
+                const urlParts = window.location.pathname.split('/'); // Split URL path
+                const lastPart = urlParts[urlParts.length - 1]; // Get last section (e.g., 'datascience1.html')
+                const match = lastPart.match(/\d+/); // Extract numeric part
+                return match ? match[0] : 'N/A'; // Return number or 'N/A' if not found
+            }
+
+
+
+            /*
+            function checkAnswers(logging) {
+                let score = 0;
                 let totalQuestions = 2;
     
                 // Correct answers
@@ -365,6 +451,7 @@ action GetQuestions() returns Division
                 //if logging
                 //    log_event
             }
+            */
         ")
         questions:Add(checkAnswersScript)
 
