@@ -28,7 +28,7 @@ class HoCDataScience1 is HourOfCodeDataScience
     action Setup()
         
 // set values for the block ide on this page
-        SetPaletteFileName("palette/dataScience1.xml")
+        SetPaletteFileName("quorum/palette/dataScience1.xml")
         SetCodeForBlocks("html/hourofcode/datascience/datascience1.quorum")
         Setup(ACTIVITY, SUBTITLE, GetIntro(), GetInstructions(), GetBlockIDE(), GetQuestions())
     end
@@ -102,7 +102,7 @@ table or spreadsheet. For example, below we have a few sample rows and columns f
         instructionsList:AddListItem("<b>Use the block(s) in the palette on the left.</b>")
         instructionsList:AddListItem("<b>Place the 'chart:Display()' block below the 'chart:ShowLegend(false)' block at the bottom of the block editor on the right.</b>")
         instructionsList:AddListItem("<b>Run the program.</b>")
-        instructionsList:AddListItem("<b>Use the chart in the canvas to answer the questions in the <i>Activity</i> section.</b>")
+        instructionsList:AddListItem("<b>Use the chart in the canvas to answer the questions in the Activity section.</b>")
         instructionsList:AddClassAttribute("list-decimal list-outside pl-8")
         instructions:Add(instructionsList)   
         instructions:AddParagraph("")
@@ -119,7 +119,7 @@ action GetQuestions() returns Division
         
 
         questions:AddParagraph("")
-        questions:AddParagraph("Use the chart(s) you've created in the <i>Coding</i> section to answer a few questions.")
+        questions:AddParagraph("Use the chart(s) you've created in the Coding section to answer a few questions.")
         questions:AddParagraph("")
         
         Division hiddenStyling
@@ -138,7 +138,7 @@ action GetQuestions() returns Division
         Paragraph question1Paragraph
         question1Paragraph:SetIdentifier("q1-label")
         question1Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
-        question1Paragraph:AddText("1. What's the largest bill length?")
+        question1Paragraph:AddText("1. What's the largest recorded bill length among the penguins?")
         question1:Add(question1Paragraph)
 
         Paragraph question1Validation
@@ -151,6 +151,8 @@ action GetQuestions() returns Division
         question1Select:SetIdentifier("q1")
         question1Select:AddAttribute("aria-labelledby","q1-label")
         question1Select:AddAttribute("aria-describedby","q1-validation")
+//        question1Select:AddAttribute("aria-haspopup","listbox")
+//        question1Select:AddAttribute("aria-expanded","false")
         question1Select:AddClassAttribute("mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 p-2 
                        data-[state=incorrect]:border-red-500 data-[state=incorrect]:focus:ring-red-500 data-[state=incorrect]:focus:border-red-500 
                        data-[state=correct]:border-green-500 data-[state=correct]:focus:ring-green-500 data-[state=correct]:focus:border-green-500")
@@ -193,7 +195,7 @@ action GetQuestions() returns Division
         Paragraph question2Paragraph
         question2Paragraph:SetIdentifier("q2-label")
         question2Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
-        question2Paragraph:AddText("2. What's the largest bill depth?")
+        question2Paragraph:AddText("2. What's the largest recorded bill depth among the penguins?")
         question2:Add(question2Paragraph)
 
         Paragraph question2Validation
@@ -206,6 +208,8 @@ action GetQuestions() returns Division
         question2Select:SetIdentifier("q2")
         question2Select:AddAttribute("aria-labelledby","q2-label")
         question2Select:AddAttribute("aria-describedby","q2-validation")
+//        question2Select:AddAttribute("aria-haspopup","listbox")
+//        question2Select:AddAttribute("aria-expanded","false")
         question2Select:AddClassAttribute("mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 p-2 
                        data-[state=incorrect]:border-red-500 data-[state=incorrect]:focus:ring-red-500 data-[state=incorrect]:focus:border-red-500 
                        data-[state=correct]:border-green-500 data-[state=correct]:focus:ring-green-500 data-[state=correct]:focus:border-green-500")
@@ -260,26 +264,35 @@ action GetQuestions() returns Division
             });
     
             function saveAnswer(question, value) {
-                localStorage.setItem(question, value);
+                sessionStorage.setItem(question, value);
             }
     
             function loadSavedAnswers() {
                 // Load dropdown selection
                 let savedAnswers = 0
-                let savedQ1 = localStorage.getItem('l1q1');
+                let savedQ1 = sessionStorage.getItem('l1q1');
                 if (savedQ1) {
                     document.getElementById('q1').value = savedQ1;
                     savedAnswers++;
                 }
     
                 // Load dropdown selection
-                let savedQ2 = localStorage.getItem('l1q2');
+                let savedQ2 = sessionStorage.getItem('l1q2');
                 if (savedQ2) {
                     document.getElementById('q2').value = savedQ2;
                     savedAnswers++;
                 }
-                if (savedAnswers > 0)
-                    checkAnswers(true);
+                
+                //Reset state before checking answers (generic for all questions)
+                document.querySelectorAll('select').forEach(select => {
+                    select.removeAttribute('data-state');
+                    select.removeAttribute('aria-invalid');
+                });
+            
+                document.querySelectorAll(`[id$='-validation']`).forEach(validationElement => {
+                    validationElement.innerText = '';
+                    validationElement.classList.remove('text-green-600', 'text-red-600');
+                });
             }
 
             // Attach event listeners to save selections
@@ -346,7 +359,7 @@ action GetQuestions() returns Division
                             document.getElementById(`${questionId}-validation`).classList.add('text-red-600');
                         }
             
-                        // ? Store question result
+                        // Store question result
                         questionsData.push({
                             question_id: questionId,
                             question: questionText,
@@ -384,74 +397,6 @@ action GetQuestions() returns Division
                 const match = lastPart.match(/\d+/); // Extract numeric part
                 return match ? match[0] : 'N/A'; // Return number or 'N/A' if not found
             }
-
-
-
-            /*
-            function checkAnswers(logging) {
-                let score = 0;
-                let totalQuestions = 2;
-    
-                // Correct answers
-                const correctAnswers = {
-                    q1: '59.6',
-                    q2: '21.5'
-                };
-    
-                // Reset state before checking answers
-                document.querySelectorAll('select').forEach(select => {
-                    select.removeAttribute('data-state');
-                    select.removeAttribute('aria-invalid');
-                });
-                document.getElementById('q1-validation').innerText = '';
-                document.getElementById('q2-validation').innerText = '';
-                document.getElementById('q1-validation').classList.remove('text-green-600', 'text-red-600');
-                document.getElementById('q2-validation').classList.remove('text-green-600', 'text-red-600');
-    
-                // Question 1 validation (Dropdown)
-                let q1_selected = document.querySelector('#q1').value;
-                if (q1_selected) {
-                    if (q1_selected === correctAnswers.q1) {
-                        score++;
-                        document.getElementById('q1').setAttribute('data-state', 'correct');
-                        document.getElementById('q1-validation').innerText = 'Correct';
-                        document.getElementById('q1-validation').classList.add('text-green-600');
-                    } else {
-                        document.getElementById('q1').setAttribute('data-state', 'incorrect');
-                        document.getElementById('q1').setAttribute('aria-invalid','true');
-                        document.getElementById('q1-validation').innerText = 'Incorrect';
-                        document.getElementById('q1-validation').classList.add('text-red-600');
-                    }
-                }
-    
-                // Question 2 validation (Dropdown)
-                let q2_selected = document.querySelector('#q2').value;
-                if (q2_selected) {
-                    if (q2_selected === correctAnswers.q2) {
-                        score++;
-                        document.getElementById('q2').setAttribute('data-state', 'correct');
-                        document.getElementById('q2-validation').innerText = 'Correct';
-                        document.getElementById('q2-validation').classList.add('text-green-600');
-                    } else {
-                        document.getElementById('q2').setAttribute('data-state', 'incorrect');
-                        document.getElementById('q2').setAttribute('aria-invalid','true');
-                        document.getElementById('q2-validation').innerText = 'Incorrect';
-                        document.getElementById('q2-validation').classList.add('text-red-600');
-                    }
-                }
-    
-                // Display score and feedback
-                let resultDiv = document.getElementById('result');
-                if (score === totalQuestions) {
-                    resultDiv.innerHTML = `<p class='text-green-600'>You got everything correct.</p>`;
-                } else {
-                    resultDiv.innerHTML = `<p class='text-red-600'>You got ${score} out of ${totalQuestions} correct. Please try again!</p>`;
-                }
-
-                //if logging
-                //    log_event
-            }
-            */
         ")
         questions:Add(checkAnswersScript)
 
@@ -475,6 +420,10 @@ action GetQuestions() returns Division
 
     action GetLocation returns text
         return "hourofcode/datascience" + ACTIVITY + ".html"
+    end
+
+    action GetDocrootLocation returns text
+        return "quorum/hourofcode/datascience" + ACTIVITY + ".html"
     end
 
     action GetLinkName returns text

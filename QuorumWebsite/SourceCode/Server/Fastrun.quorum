@@ -13,7 +13,15 @@ use Libraries.Network.NetworkConnection
 use Libraries.Network.NetworkRequestListener
 use Libraries.Network.NetworkResponseEvent
 use Libraries.Data.Database.Insert
+use Libraries.Data.Database.QueryResult
 use Libraries.System.Properties
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.QueryMetaData
+use Libraries.Data.Database.DatabaseMetaData
+use Libraries.Containers.Iterator
+use Libraries.Data.Database.DatabaseTable
+use Libraries.Data.Database.DatabaseColumn
 
 class Fastrun is ResponsePage, NetworkRequestListener
 
@@ -31,7 +39,11 @@ class Fastrun is ResponsePage, NetworkRequestListener
     text ip = ""
     text url = undefined
     text ideName = undefined
+    text uuid = undefined
+    text timestamp = undefined
+    text experiment_key = undefined
     action ResponseReceived(NetworkExchange exchange)
+        output "RESPONSE RECEIVED - exchange"
         text response = ""
         text dq = response:GetDoubleQuote()
         SharedConnection con
@@ -67,17 +79,29 @@ class Fastrun is ResponsePage, NetworkRequestListener
         if params:HasKey("ideName")
             ideName = params:GetValue("ideName")
         end
-
+        if params:HasKey("uuid")
+            uuid = params:GetValue("uuid")
+        end
+        if params:HasKey("timestamp")
+            timestamp = params:GetValue("timestamp")
+        end
+        if params:HasKey("experiment_key")
+            experiment_key = params:GetValue("experiment_key")
+        end
         codeToSave = code
 
         redis:Connect("redis")
         codeHash = exchange:HashString("SHA-1", code)
+        output "IS IT ALREADY HASHED?"
+        output codeHash
         if redis:Exists(codeHash)
+            output "NOPE, HASH IT"
             response = redis:Get(codeHash)
             returnExchange:SendResponseHeaders(200, response)
             returnExchange:SendResponse(response)
             // save to database
-            SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName)
+            SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName, uuid, timestamp, experiment_key)
+            
             return now
         end
 
@@ -110,6 +134,7 @@ class Fastrun is ResponsePage, NetworkRequestListener
 
 
     action ResponseReceived(NetworkResponseEvent requestResponse)
+        output "RESPONSE RECEIVED - request response"
         text response = requestResponse:GetResponseText()
         returnExchange:SendResponseHeaders(200, response)
         returnExchange:SendResponse(response)
@@ -117,11 +142,12 @@ class Fastrun is ResponsePage, NetworkRequestListener
         redis:Set(codeHash, response)
 
         // save to database
-        SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName)
+        SaveRunFile(COMPILER_VERSION, codeToSave, build, timezone, ip, url, ideName, uuid, timestamp, experiment_key)
 
     end
 
-    action SaveRunFile(text version, text code, boolean build, text timezone, text ip, text url, text ide)
+    action SaveRunFile(text version, text code, boolean build, text timezone, text ip, text url, text ide, text uuid, text timestamp, text experiment_key)
+        output "SAVERUNFILE"
         SharedConnection con
         Connection connect = con:GetConnection()
         Database db
@@ -156,6 +182,34 @@ class Fastrun is ResponsePage, NetworkRequestListener
         filesInsert:Add("hash",fileHash)
         filesInsert:Add("code",code)
         db:Insert(filesInsert)
+        
+        //Get ID for UUID
+        Find findLoggingUserID
+        findLoggingUserID:SetTable("logging_user")
+        findLoggingUserID:AddColumn("id")
+        findLoggingUserID:AddColumn("uuid")
+        QueryResult results = db:Find(findLoggingUserID)
+        integer id = -1
+        repeat while results:HasNext() and id = -1
+            results:Next()
+            if results:GetText("uuid") = uuid
+                id =results:GetInteger("id")
+            end
+        end
+
+        if id not= -1 and timestamp not= undefined
+            Insert logCompileEvent
+            logCompileEvent:SetTable("logging_events")
+            logCompileEvent:Add("user_id",id)
+            logCompileEvent:Add("event_type","compile")
+            logCompileEvent:Add("client_timestamp",timestamp)
+            logCompileEvent:Add("page_url",url)
+            JavaScriptObjectNotation json
+            json:Add("hash",fileHash)
+            logCompileEvent:Add("extra_data",json:ToText())
+            db:Insert(logCompileEvent)
+        end
+        
     end
 
     action GetPath returns text

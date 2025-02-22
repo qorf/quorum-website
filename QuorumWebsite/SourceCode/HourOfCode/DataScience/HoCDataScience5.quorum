@@ -14,17 +14,20 @@ use Libraries.Web.Page.Span
 use Libraries.Web.Page.Button
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.FieldSet
+use Libraries.Web.Page.Legend
 use Libraries.Web.Page.Select
 use Libraries.Web.Page.Option
 
 
 class HoCDataScience5 is HourOfCodeDataScience
     integer ACTIVITY = 5
-    text SUBTITLE = "Customizing the Colors"
+    text SUBTITLE = "Trying Other Charts"
 
     action Setup()
 // set values for the block ide on this page
-        SetPaletteFileName("palette/dataScience5.xml")
+        SetPaletteFileName("quorum/palette/dataScience5.xml")
         SetCodeForBlocks("html/hourofcode/datascience/datascience5.quorum")
         Setup(ACTIVITY, SUBTITLE, GetIntro(), GetInstructions(), GetBlockIDE(), GetQuestions())
     end
@@ -38,17 +41,15 @@ class HoCDataScience5 is HourOfCodeDataScience
         // tracking pixel for code.org
         //intro:AddImage("https://code.org/api/hour/begin_quorum_astronomy.png", "")
         intro:AddParagraph("")
-        intro:AddParagraph("You can select many different columns and factors at the same time. This breaks our data down into more and more groups, which each have their own color assigned so that we can differentiate them in the Chart. 
-The first column we select is plotted against each of the other selected columns, and those sets are separated into groups based on the selected factors. So if we select Columns bill_depth and bill_length, and then we select Factors species and island, 
-we end up getting 5 total groups of data (Note: not all of the species live on each island). Each of these comparisons is called a Series and is listed in our Legend. The points for each Series have a unique color, that way you can compare the trends. 
-In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and Purple. If you don't like these colors, there are many color palettes to choose from.")
+        Paragraph p1
+        p1:AddText("There are a lot of chart types that can help us to answer different questions. Instead of making a Scatter Plot, let's try making some other chart types from the same data. Try making a Bar Chart, Box Plot, 
+Histogram and Pie Chart. Each of these charts will show the same data from our ")
+        Link link1 = p1:AddLink("Penguins2.csv", "/data/Penguins2.csv")
+        link1:AddClassAttribute("underline text-quorum-blue-150")
+        p1:AddText(" but presents it in a different way.")
+        intro:Add(p1)
         intro:AddParagraph("")
-        //CodeBlock cb1
-        //cb1:AddText("output " + dq + "telescope" + dq + "")
-        //intro:Add(pre:GeneratePreformattedCode(cb1))
-
-        //intro:AddParagraph("in the online code window below and then select the green Run Program button below the editor on the right (second in the tab order).")
-
+        
         WebTable table = AddWebTable("Sample of Penguins2.CSV file")
         TableBody tableBody = AddTableBody()
         
@@ -110,17 +111,20 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
     end
 
     action GetInstructions() returns Division
+        text dq = ""
+        dq = dq:GetDoubleQuote()
         Division instructions
         
-
         instructions:AddParagraph("")
-        instructions:AddParagraph("In the code editor below, we have a program that makes a Chart with two Series. Take code blocks from the palette and place them below where we make the Chart object but before we Display it.")
+        instructions:AddParagraph("In the code editor below, we have a similar program to the last lesson, except we've removed the code black that makes our chart a Scatter Plot. Add a code block from the palette below and place it above the other blocks that reference <i>chart</i>.")
         OrderedList instructionsList
         instructionsList:AddListItem("<b>Use the block(s) in the palette on the left.</b>")
-        instructionsList:AddListItem("<b>Place the 'chart:SetColorPaletteToCalm()' block below the 'ScatterPlot chart = frame:ScatterPlot()' block in the block editor.</b>")
+        instructionsList:AddListItem("<b>Place the 'BarChart chart = frame:BarChart()' block below the 'frame:AddSelectedFactors(" + dq + "island" + dq + ")' block in the block editor.</b>")
         instructionsList:AddListItem("<b>Run the program.</b>")
-        instructionsList:AddListItem("<b>To try other color options: stop the program, delete the block you added to the block editor and place one of the other blocks from the palette in the same location.</b>")
-        instructionsList:AddListItem("<b>Use the chart in the canvas to answer the questions in the <i>Activity</i> section.</b>")
+        instructionsList:AddListItem("<b>Hint: You may need to try different Chart types to find the answers to the questions below.</b>")
+        instructionsList:AddListItem("<b>Use the chart in the canvas to answer the questions in the Activity section.</b>")
+        instructionsList:AddListItem("<b>To try other chart types: stop the program, delete the block you added to the block editor and place one of the other blocks from the palette in the same location.</b>")
+        instructionsList:AddListItem("<b>Use the new chart in the canvas to answer the questions in the Activity section.</b>")
         instructionsList:AddClassAttribute("list-decimal list-outside pl-8")
         instructions:Add(instructionsList)  
         instructions:AddParagraph("")
@@ -128,20 +132,34 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         return instructions
     end
 
-    
+    action GetIDE() returns IDE
+        CodeForIDE code
+        code:AddFileUrl("Main.quorum", "html/hourofcode/datascience/datascience7.quorum")
+        IDE ide = AddIDE()
+        ide:SetLightTheme()
+        ide:SetCodeForIDE(code:GetJsonArray())
+        ide:SetIdeTitle("Type your code below...")
+        
+        return ide
+    end
+
     action GetQuestions() returns Division
         Division questions
 
         AddStylesheet("/style/checkAnswers.css")
+        AddScript("/script/logging.js")
         
 
         questions:AddParagraph("")
-        questions:AddParagraph("Use the chart(s) you've created in the <i>Coding</i> section to answer a few questions.")
+        questions:AddParagraph("Use the chart(s) you've created in the Coding section to answer a few questions.")
         questions:AddParagraph("")
         
         Division hiddenStyling
         hiddenStyling:AddClassAttribute("hidden text-green-600 text-red-600 border-green-500 border-red-500")
+        Paragraph hiddenParagraph
+        hiddenParagraph:AddClassAttribute("hidden text-green-600 text-red-600")
         questions:Add(hiddenStyling)
+        questions:Add(hiddenParagraph)
 
         Form questionForm
         questionForm:SetIdentifier("quiz-form")
@@ -155,7 +173,7 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         Paragraph question1Paragraph
         question1Paragraph:SetIdentifier("q1-label")
         question1Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
-        question1Paragraph:AddText("1. Which color palette was easiest to distinguish the different groups?")
+        question1Paragraph:AddText("1. Which island has the least combined bill length?")
         question1:Add(question1Paragraph)
 
         Paragraph question1Validation
@@ -181,39 +199,19 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         question1Select:Add(question1Option1)
 
         Option question1Option2
-        question1Option2:AddAttribute("value","Default - Colorgorical")
-        question1Option2:AddText("Default - Colorgorical")
+        question1Option2:AddAttribute("value","Biscoe")
+        question1Option2:AddText("Biscoe")
         question1Select:Add(question1Option2)
 
         Option question1Option3
-        question1Option3:AddAttribute("value","Calm")
-        question1Option3:AddText("Calm")
+        question1Option3:AddAttribute("value","Dream")
+        question1Option3:AddText("Dream")
         question1Select:Add(question1Option3)
 
         Option question1Option4
-        question1Option4:AddAttribute("value","Disturbing")
-        question1Option4:AddText("Disturbing")
+        question1Option4:AddAttribute("value","Torgersen")
+        question1Option4:AddText("Torgersen")
         question1Select:Add(question1Option4)
-
-        Option question1Option5
-        question1Option5:AddAttribute("value","Exciting")
-        question1Option5:AddText("Exciting")
-        question1Select:Add(question1Option5)
-
-        Option question1Option6
-        question1Option6:AddAttribute("value","Magma")
-        question1Option6:AddText("Magma")
-        question1Select:Add(question1Option6)
-
-        Option question1Option7
-        question1Option7:AddAttribute("value","Playful")
-        question1Option7:AddText("Playful")
-        question1Select:Add(question1Option7)
-
-        Option question1Option8
-        question1Option8:AddAttribute("value","Serious")
-        question1Option8:AddText("Serious")
-        question1Select:Add(question1Option8)
 
 
 
@@ -225,7 +223,7 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         Paragraph question2Paragraph
         question2Paragraph:SetIdentifier("q2-label")
         question2Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
-        question2Paragraph:AddText("2. What's your favorite color palette?")
+        question2Paragraph:AddText("2. Which island has largest range of bill length values?")
         question2:Add(question2Paragraph)
 
         Paragraph question2Validation
@@ -251,39 +249,20 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         question2Select:Add(question2Option1)
 
         Option question2Option2
-        question2Option2:AddAttribute("value","Default - Colorgorical")
-        question2Option2:AddText("Default - Colorgorical")
+        question2Option2:AddAttribute("value","Biscoe")
+        question2Option2:AddText("Biscoe")
         question2Select:Add(question2Option2)
 
         Option question2Option3
-        question2Option3:AddAttribute("value","Calm")
-        question2Option3:AddText("Calm")
+        question2Option3:AddAttribute("value","Dream")
+        question2Option3:AddText("Dream")
         question2Select:Add(question2Option3)
 
         Option question2Option4
-        question2Option4:AddAttribute("value","Disturbing")
-        question2Option4:AddText("Disturbing")
+        question2Option4:AddAttribute("value","Torgersen")
+        question2Option4:AddText("Torgersen")
         question2Select:Add(question2Option4)
 
-        Option question2Option5
-        question2Option5:AddAttribute("value","Exciting")
-        question2Option5:AddText("Exciting")
-        question2Select:Add(question2Option5)
-
-        Option question2Option6
-        question2Option6:AddAttribute("value","Magma")
-        question2Option6:AddText("Magma")
-        question2Select:Add(question2Option6)
-
-        Option question2Option7
-        question2Option7:AddAttribute("value","Playful")
-        question2Option7:AddText("Playful")
-        question2Select:Add(question2Option7)
-
-        Option question2Option8
-        question2Option8:AddAttribute("value","Serious")
-        question2Option8:AddText("Serious")
-        question2Select:Add(question2Option8)
 
         //Question 3
         Division question3
@@ -293,7 +272,7 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         Paragraph question3Paragraph
         question3Paragraph:SetIdentifier("q3-label")
         question3Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
-        question3Paragraph:AddText("3. What's your least favorite color palette?")
+        question3Paragraph:AddText("3. Which bin has the highest frequency for the Torgersen Bill Length subchart?")
         question3:Add(question3Paragraph)
 
         Paragraph question3Validation
@@ -319,39 +298,69 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         question3Select:Add(question3Option1)
 
         Option question3Option2
-        question3Option2:AddAttribute("value","Default - Colorgorical")
-        question3Option2:AddText("Default - Colorgorical")
+        question3Option2:AddAttribute("value","0 to 20")
+        question3Option2:AddText("0 to 20")
         question3Select:Add(question3Option2)
 
         Option question3Option3
-        question3Option3:AddAttribute("value","Calm")
-        question3Option3:AddText("Calm")
+        question3Option3:AddAttribute("value","20 to 40")
+        question3Option3:AddText("20 to 40")
         question3Select:Add(question3Option3)
 
         Option question3Option4
-        question3Option4:AddAttribute("value","Disturbing")
-        question3Option4:AddText("Disturbing")
+        question3Option4:AddAttribute("value","40 to 60")
+        question3Option4:AddText("40 to 60")
         question3Select:Add(question3Option4)
 
-        Option question3Option5
-        question3Option5:AddAttribute("value","Exciting")
-        question3Option5:AddText("Exciting")
-        question3Select:Add(question3Option5)
 
-        Option question3Option6
-        question3Option6:AddAttribute("value","Magma")
-        question3Option6:AddText("Magma")
-        question3Select:Add(question3Option6)
 
-        Option question3Option7
-        question3Option7:AddAttribute("value","Playful")
-        question3Option7:AddText("Playful")
-        question3Select:Add(question3Option7)
+        //Question 4
+        Division question4
+        question4:AddClassAttribute("mb-4")
+        questionForm:Add(question4)
 
-        Option question3Option8
-        question3Option8:AddAttribute("value","Serious")
-        question3Option8:AddText("Serious")
-        question3Select:Add(question3Option8)
+        Paragraph question4Paragraph
+        question4Paragraph:SetIdentifier("q4-label")
+        question4Paragraph:AddClassAttribute("text-lg font-semibold text-gray-700")
+        question4Paragraph:AddText("4. What percentage of the data was from Dream island?")
+        question4:Add(question4Paragraph)
+
+        Paragraph question4Validation
+        question4Validation:SetIdentifier("q4-validation")
+        question4Validation:AddAttribute("aria-live","polite")
+        question4Validation:AddClassAttribute("text-sm mt-1")
+        question4:Add(question4Validation)
+
+        Select question4Select
+        question4Select:SetIdentifier("q4")
+        question4Select:AddAttribute("aria-labelledby","q4-label")
+        question4Select:AddAttribute("aria-describedby","q4-validation")
+        question4Select:AddClassAttribute("mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 p-2 
+                       data-[state=incorrect]:border-red-500 data-[state=incorrect]:focus:ring-red-500 data-[state=incorrect]:focus:border-red-500 
+                       data-[state=correct]:border-green-500 data-[state=correct]:focus:ring-green-500 data-[state=correct]:focus:border-green-500")
+        question4:Add(question4Select)
+
+        Option question4Option1
+        question4Option1:AddAttribute("value","")
+        question4Option1:SetSelected(true)
+        question4Option1:SetDisabled(true)
+        question4Option1:AddText("Choose an option")
+        question4Select:Add(question4Option1)
+
+        Option question4Option2
+        question4Option2:AddAttribute("value","18.35%")
+        question4Option2:AddText("18.35%")
+        question4Select:Add(question4Option2)
+
+        Option question4Option3
+        question4Option3:AddAttribute("value","40.18%")
+        question4Option3:AddText("40.18%")
+        question4Select:Add(question4Option3)
+
+        Option question4Option4
+        question4Option4:AddAttribute("value","41.47%")
+        question4Option4:AddText("41.47%")
+        question4Select:Add(question4Option4)
         
         Button questionFormButton
         questionFormButton:SetType("button")
@@ -375,32 +384,38 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
             });
     
             function saveAnswer(question, value) {
-                localStorage.setItem(question, value);
+                sessionStorage.setItem(question, value);
             }
     
             function loadSavedAnswers() {
                 // Load dropdown selection
                 let savedAnswers = 0
-                let savedQ1 = localStorage.getItem('l5q1');
+                let savedQ1 = sessionStorage.getItem('l5q1');
                 if (savedQ1) {
                     document.getElementById('q1').value = savedQ1;
                     savedAnswers++;
                 }
     
                 // Load dropdown selection
-                let savedQ2 = localStorage.getItem('l5q2');
+                let savedQ2 = sessionStorage.getItem('l5q2');
                 if (savedQ2) {
                     document.getElementById('q2').value = savedQ2;
                     savedAnswers++;
                 }
     
                 // Load dropdown selection
-                let savedQ3 = localStorage.getItem('l5q3');
+                let savedQ3 = sessionStorage.getItem('l5q3');
                 if (savedQ3) {
                     document.getElementById('q3').value = savedQ3;
                     savedAnswers++;
                 }
-
+    
+                // Load dropdown selection
+                let savedQ4 = sessionStorage.getItem('l5q4');
+                if (savedQ4) {
+                    document.getElementById('q4').value = savedQ4;
+                    savedAnswers++;
+                }
                 if (savedAnswers > 0)
                     checkAnswers(true);
             }
@@ -409,83 +424,121 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
             document.getElementById('q1').addEventListener('change', function () {
                 saveAnswer('l5q1', this.value);
                 document.getElementById('q1').removeAttribute('data-state');
+                document.getElementById('q1').removeAttribute('aria-invalid');
                 document.getElementById('q1-validation').innerText = '';
-                document.getElementById('q1-validation').classList.remove('text-green-600');
+                document.getElementById('q1-validation').classList.remove('text-green-600', 'text-red-600');
             });
             
             document.getElementById('q2').addEventListener('change', function () {
                 saveAnswer('l5q2', this.value);
                 document.getElementById('q2').removeAttribute('data-state');
+                document.getElementById('q2').removeAttribute('aria-invalid');
                 document.getElementById('q2-validation').innerText = '';
-                document.getElementById('q2-validation').classList.remove('text-green-600');
+                document.getElementById('q2-validation').classList.remove('text-green-600', 'text-red-600');
             });
             
             document.getElementById('q3').addEventListener('change', function () {
                 saveAnswer('l5q3', this.value);
                 document.getElementById('q3').removeAttribute('data-state');
+                document.getElementById('q3').removeAttribute('aria-invalid');
                 document.getElementById('q3-validation').innerText = '';
-                document.getElementById('q3-validation').classList.remove('text-green-600');
+                document.getElementById('q3-validation').classList.remove('text-green-600', 'text-red-600');
+            });
+            
+            document.getElementById('q4').addEventListener('change', function () {
+                saveAnswer('l5q4', this.value);
+                document.getElementById('q4').removeAttribute('data-state');
+                document.getElementById('q4').removeAttribute('aria-invalid');
+                document.getElementById('q4-validation').innerText = '';
+                document.getElementById('q4-validation').classList.remove('text-green-600', 'text-red-600');
             });
 
             function checkAnswers(logging) {
                 let score = 0;
-                let totalQuestions = 3;
     
                 // Correct answers
                 const correctAnswers = {
-                    q1: '',
-                    q2: '',
-                    q3: ''
+                    q1: 'Torgersen',
+                    q2: 'Biscoe',
+                    q3: '40 to 60',
+                    q4: '40.18%'
                 };
-    
-                // Reset state before checking answers
+            
+                // Extract activity number from the URL
+                const activityNumber = extractActivityNumberFromURL();
+                
+                // Array to store question results
+                const questionsData = [];
+           
+                //Reset state before checking answers (generic for all questions)
                 document.querySelectorAll('select').forEach(select => {
                     select.removeAttribute('data-state');
+                    select.removeAttribute('aria-invalid');
                 });
-                document.getElementById('q1-validation').innerText = '';
-                document.getElementById('q2-validation').innerText = '';
-                document.getElementById('q3-validation').innerText = '';
-                document.getElementById('q1-validation').classList.remove('text-green-600');
-                document.getElementById('q2-validation').classList.remove('text-green-600');
-                document.getElementById('q3-validation').classList.remove('text-green-600');
-    
-                // Question 1 validation (Dropdown)
-                let q1_selected = document.querySelector('#q1').value;
-                if (q1_selected) {
-                    score++;
-                    document.getElementById('q1').setAttribute('data-state', 'correct');
-                    document.getElementById('q1-validation').innerText = 'Submitted';
-                    document.getElementById('q1-validation').classList.add('text-green-600');
-                }
-    
-                // Question 2 validation (Dropdown)
-                let q2_selected = document.querySelector('#q2').value;
-                if (q2_selected) {
-                    score++;
-                    document.getElementById('q2').setAttribute('data-state', 'correct');
-                    document.getElementById('q2-validation').innerText = 'Submitted';
-                    document.getElementById('q2-validation').classList.add('text-green-600');
-                }
-    
-                // Question 3 validation (Dropdown)
-                let q3_selected = document.querySelector('#q3').value;
-                if (q3_selected) {
-                    score++;
-                    document.getElementById('q3').setAttribute('data-state', 'correct');
-                    document.getElementById('q3-validation').innerText = 'Submitted';
-                    document.getElementById('q3-validation').classList.add('text-green-600');
-                }
-    
+            
+                document.querySelectorAll(`[id$='-validation']`).forEach(validationElement => {
+                    validationElement.innerText = '';
+                    validationElement.classList.remove('text-green-600', 'text-red-600');
+                });
+            
+                //Loop through each question dynamically
+                Object.keys(correctAnswers).forEach((questionId) => {
+                    let selectedAnswer = document.querySelector(`#${questionId}`).value;
+                    let questionLabelElement = document.querySelector(`#${questionId}-label`);
+                    let questionText = questionLabelElement ? questionLabelElement.innerText.trim() : `Unknown Question (${questionId})`;
+                    let correctAnswer = correctAnswers[questionId];
+                    let isCorrect = selectedAnswer === correctAnswer;
+            
+                    if (selectedAnswer) {
+                        if (isCorrect) {
+                            score++;
+                            document.getElementById(questionId).setAttribute('data-state', 'correct');
+                            document.getElementById(`${questionId}-validation`).innerText = 'Correct';
+                            document.getElementById(`${questionId}-validation`).classList.add('text-green-600');
+                        } else {
+                            document.getElementById(questionId).setAttribute('data-state', 'incorrect');
+                            document.getElementById(questionId).setAttribute('aria-invalid', 'true');
+                            document.getElementById(`${questionId}-validation`).innerText = 'Incorrect';
+                            document.getElementById(`${questionId}-validation`).classList.add('text-red-600');
+                        }
+            
+                        // Store question result
+                        questionsData.push({
+                            question_id: questionId,
+                            question: questionText,
+                            user_response: selectedAnswer,
+                            correct_answer: correctAnswer,
+                            result: isCorrect ? 'correct' : 'incorrect'
+                        });
+                    }
+                });
+            
                 // Display score and feedback
                 let resultDiv = document.getElementById('result');
+                let totalQuestions = Object.keys(correctAnswers).length;
                 if (score === totalQuestions) {
-                    resultDiv.innerHTML = `<p class='text-green-600'>Thanks for answering.</p>`;
+                    resultDiv.innerHTML = `<p class='text-green-600'>You got everything correct.</p>`;
                 } else {
-                    resultDiv.innerHTML = `<p class='text-red-600'>You've answered ${score} out of ${totalQuestions} questions. Feel free to provide more answers, but they are not required.</p>`;
+                    resultDiv.innerHTML = `<p class='text-red-600'>You got ${score} out of ${totalQuestions} correct. Please try again!</p>`;
                 }
-
-                //if logging
-                //    log_event
+            
+                //If logging is enabled, log the event
+                if (logging) {
+                    logEvent('check_answers', {
+                        activity_number: activityNumber,
+                        total_correct: score,
+                        total_questions: totalQuestions,
+                        questions: questionsData
+                    });
+                }
+            }
+            
+            //Function to extract the activity number from the URL
+            function extractActivityNumberFromURL() {
+                const urlParts = window.location.pathname.split('/'); // Split URL path
+                const lastPart = urlParts[urlParts.length - 1]; // Get last section (e.g., 'datascience1.html')
+                const match = lastPart.match(/\d+/); // Extract numeric part
+                return match ? match[0] : 'N/A'; // Return number or 'N/A' if not found
             }
         ")
         questions:Add(checkAnswersScript)
@@ -493,23 +546,16 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
         return questions
     end
 
-//    action GetIDE() returns IDE
-//        CodeForIDE code
-//        code:AddFileUrl("Main.quorum", "html/hourofcode/datascience/datascience4.quorum")
-//        IDE ide = AddIDE()
-//        ide:SetLightTheme()
-//        ide:SetCodeForIDE(code:GetJsonArray())
-//        ide:SetIdeTitle("Type your code below...")
-//        
-//        return ide
-//    end
-
     action GetLocation returns text
         return "hourofcode/datascience" + ACTIVITY + ".html"
     end
 
+    action GetDocrootLocation returns text
+        return "quorum/hourofcode/datascience" + ACTIVITY + ".html"
+    end
+
     action GetLinkName returns text
-        return SUBTITLE
+        return  SUBTITLE
     end
 
     action GetSectionName returns text
@@ -521,6 +567,6 @@ In this case, the default colors used are Dark Blue, Light Blue, Green, Teal and
     end
 
     action GetShortDescription returns text
-        return "how to customize the colors in the Chart."
+        return "how to look at data with different Chart types."
     end
 end
