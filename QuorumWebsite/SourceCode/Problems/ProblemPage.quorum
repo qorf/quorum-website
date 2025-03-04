@@ -19,6 +19,7 @@ text dq = ""
     Problem problem = undefined
  //helper
     text answerElement = "answerElement"
+text hasAnswerElement = "hasAnswerElement"
     text hintElement = "hintElement"
     
 action Setup
@@ -67,6 +68,24 @@ bodyDiv:Add(stepper)
 bodyDiv:Add(buttonsSection)
         Division answer = MakeAnswer()
         bodyDiv:Add(answer)
+Division hasAnswer = MakeHasAnswer()
+        bodyDiv:Add(hasAnswer)
+    end
+    
+    
+action MakeHasAnswer returns Division
+        Division division
+        division:SetIdentifier(hasAnswerElement)
+        division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        Array<text> answers = problem:GetAnswer()
+        if answers:IsEmpty()
+            division:AddText("false")
+        else
+division:AddText("true")
+        end
+        
+        return division
     end
     
     action MakeHint returns Division
@@ -170,11 +189,21 @@ end
         
 Button checkButton
         checkButton:SetClassAttribute(tailwind)
-        checkButton:AddText("Check")
+Array<text> answers = problem:GetAnswer()
+        if answers:IsEmpty()
+checkButton:AddText("Hint")
+        else
+                    checkButton:AddText("Check")
+        end
         checkButton:SetOnClick("
 var hint = document.getElementById('hintElement');
 hint.style.display = 'block';
 hint.setAttribute('aria-disabled', 'false');
+
+const element = document.getElementById('hasAnswerElement');
+const value = element.textContent.trim().toLowerCase(); 
+
+const hasAnswer = value === 'true';
 
 var remove = 'Build Successful';
 var console = document.getElementById('QuorumUIOutput').textContent;
@@ -186,20 +215,23 @@ var correct = document.getElementById('answerElement').textContent;
 var wrong = document.getElementById('wrongAnswerElement');
 var right = document.getElementById('rightAnswerElement');
 
-if(console === correct) {
-    wrong.style.display = 'none';
-    wrong.setAttribute('aria-disabled', 'true');
+if(hasAnswer) {
+    if(console === correct) {
+        wrong.style.display = 'none';
+        wrong.setAttribute('aria-disabled', 'true');
 
-    right.style.display = 'block';
-    right.setAttribute('aria-disabled', 'false');
-} else {
-    wrong.style.display = 'block';
-    wrong.setAttribute('aria-disabled', 'false');
+        right.style.display = 'block';
+        right.setAttribute('aria-disabled', 'false');
+    } else {
+        wrong.style.display = 'block';
+        wrong.setAttribute('aria-disabled', 'false');
 
-    right.style.display = 'none';
-    right.setAttribute('aria-disabled', 'true');
+        right.style.display = 'none';
+        right.setAttribute('aria-disabled', 'true');
+    }
 }
 ")
+        
         
         section:Add(previousButton)
 section:Add(checkButton)
