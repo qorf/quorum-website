@@ -8,11 +8,11 @@ class Problem is OrderedProblem
     text title = ""
     text description = ""
     text id = ""
-    text bag = undefined
+    text tray = undefined
     Array<text> code
+Array<text> answers
     Problems problems = undefined
     integer index = 0
-    text answer = ""
     text hint = ""
     
     action Load(File file)
@@ -40,10 +40,16 @@ text value = file:Read()
             title = json:GetText()
         elseif key = "description"
 description = json:GetText()
-        elseif key = "bag"
-            bag = json:GetText()
+        elseif key = "tray"
+            tray = json:GetText()
         elseif key = "answer"
-            answer = json:GetText()
+            JavaScriptObjectNotation answers = json:GetArray()
+            i = 0
+            repeat while i < answers:GetSize()
+                JavaScriptObjectNotation answer = answers:Get(i)
+                answers:Add(answer:GetText())
+                i = i + 1
+            end
         elseif key = "hint"
             hint = json:GetText()
 elseif key = "code"
@@ -68,10 +74,10 @@ id = json:GetText()
         text wd = problems:GetFolder()
         File file
         file:SetWorkingDirectory("problems/" + wd + "/")
-        file:SetPath(bag)
+        file:SetPath(tray)
         
         File theNew
-        theNew:SetPath(folder + "/problems/" + wd + "/" + bag)
+        theNew:SetPath(folder + "/problems/" + wd + "/" + tray)
         file:Copy(theNew)
         
     end
@@ -108,8 +114,8 @@ action GetDefaultLink returns text
         me:problems = problems
     end
     
-    action GetBag returns text
-        return "problems/" + problems:GetId() + "/" + bag
+    action GetTray returns text
+        return "problems/" + problems:GetId() + "/" + tray
     end
 
     action GetMainCode returns text
@@ -146,8 +152,8 @@ action GetDefaultLink returns text
         return undefined
     end
 
-    action GetAnswer returns text
-        return answer
+    action GetAnswer returns Array<text>
+        return answers
     end
 
     action GetHint returns text
