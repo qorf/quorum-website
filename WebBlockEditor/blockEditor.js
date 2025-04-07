@@ -38,14 +38,14 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         let hidePaletteContainer = document.getElementById("HidePaletteContainer");
         if (hidePaletteContainer != null) {
           if(status) {
-            hidePaletteContainer.innerHTML = "Hide Palette";
+            hidePaletteContainer.innerHTML = "Hide Tray";
           } else {
-            hidePaletteContainer.innerHTML = "Show Palette";
+            hidePaletteContainer.innerHTML = "Show Tray";
           }
         }
     };
 }
-class quorum_WebEditor_Behaviors_FocusEditorBehavior_ {
+var quorum_WebEditor_Behaviors_FocusEditorBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -112,7 +112,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_EditorItem_ {
+var quorum_WebEditor_EditorItem_ = class {
 constructor_() {
 this.prototype.SetInputGroup$quorum_text("EditorItem");
 this.prototype.SetAccessibilityCode$quorum_integer(this.Libraries_Interface_Item__.CUSTOM);
@@ -842,6 +842,9 @@ SetCollidable$quorum_boolean(flag) {
 GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
      return this.Libraries_Interface_Controls_Control__.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
 }
+SetSelectionBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetSelectionBorderThickness$quorum_number(value);
+}
 SetWidth$quorum_number(newWidth) {
      return this.Libraries_Interface_Item2D__.SetWidth$quorum_number(newWidth);
 }
@@ -1229,6 +1232,9 @@ Update$quorum_number(secondsSinceUpdate) {
 GetCollisionGroupFlag() {
      return this.Libraries_Interface_Item2D__.GetCollisionGroupFlag();
 }
+GetSelectionBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionBorderThickness();
+}
 IsRenderingMouseOver() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingMouseOver();
 }
@@ -1318,6 +1324,9 @@ GetWorldCenter() {
 }
 ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event) {
      return this.Libraries_Interface_Item2D__.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event);
+}
+HasSelectionBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasSelectionBorderThickness();
 }
 GetFontOutlineColor() {
      return this.Libraries_Interface_Controls_Control__.GetFontOutlineColor();
@@ -2346,7 +2355,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_ {
+var quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -2460,7 +2469,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_WebControlPanel_ {
+var quorum_WebEditor_WebControlPanel_ = class {
 GetShadowColor() {
      return this.Libraries_Interface_Controls_Control__.GetShadowColor();
 }
@@ -3181,6 +3190,9 @@ SetCollidable$quorum_boolean(flag) {
 GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
      return this.Libraries_Interface_Controls_Control__.GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event);
 }
+SetSelectionBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetSelectionBorderThickness$quorum_number(value);
+}
 SetWidth$quorum_number(newWidth) {
      return this.Libraries_Interface_Item2D__.SetWidth$quorum_number(newWidth);
 }
@@ -3568,6 +3580,9 @@ Update$quorum_number(secondsSinceUpdate) {
 GetCollisionGroupFlag() {
      return this.Libraries_Interface_Item2D__.GetCollisionGroupFlag();
 }
+GetSelectionBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetSelectionBorderThickness();
+}
 IsRenderingMouseOver() {
      return this.Libraries_Interface_Controls_Control__.IsRenderingMouseOver();
 }
@@ -3657,6 +3672,9 @@ GetWorldCenter() {
 }
 ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event) {
      return this.Libraries_Interface_Item2D__.ProcessGestureEvent$quorum_Libraries_Interface_Events_GestureEvent(event);
+}
+HasSelectionBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasSelectionBorderThickness();
 }
 GetFontOutlineColor() {
      return this.Libraries_Interface_Controls_Control__.GetFontOutlineColor();
@@ -4668,7 +4686,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_WebEditorLongPressBehavior_ {
+var quorum_WebEditor_Behaviors_WebEditorLongPressBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -4771,7 +4789,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_TogglePaletteBehavior_ {
+var quorum_WebEditor_Behaviors_TogglePaletteBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -4839,7 +4857,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_ShowHelpModalBehavior_ {
+var quorum_WebEditor_Behaviors_ShowHelpModalBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -4906,7 +4924,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_FocusEditorItemBehavior_ {
+var quorum_WebEditor_Behaviors_FocusEditorItemBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5020,7 +5038,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_PalettePartitionDragBehavior_ {
+var quorum_WebEditor_Behaviors_PalettePartitionDragBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5121,7 +5139,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_RunGameBehavior_ {
+var quorum_WebEditor_Behaviors_RunGameBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5188,7 +5206,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_FocusPaletteBehavior_ {
+var quorum_WebEditor_Behaviors_FocusPaletteBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5257,7 +5275,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_CanvasResizeListener_ {
+var quorum_WebEditor_CanvasResizeListener_ = class {
 Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
@@ -5416,7 +5434,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_ {
+var quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5532,7 +5550,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_StopGameBehavior_ {
+var quorum_WebEditor_Behaviors_StopGameBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5599,7 +5617,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_ {
+var quorum_WebEditor_Behaviors_WebEditorSwipeBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5792,7 +5810,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_ZoomBehavior_ {
+var quorum_WebEditor_Behaviors_ZoomBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5877,7 +5895,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_ {
+var quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_ = class {
 Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
 }
@@ -5915,7 +5933,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_EditorItemFocusPrevious_ {
+var quorum_WebEditor_Behaviors_EditorItemFocusPrevious_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -5983,7 +6001,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_EditorItemFocusNext_ {
+var quorum_WebEditor_Behaviors_EditorItemFocusNext_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -6051,7 +6069,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_WebEditorPanBehavior_ {
+var quorum_WebEditor_Behaviors_WebEditorPanBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -6185,7 +6203,7 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-class quorum_WebEditor_Behaviors_EditorItemFocusTargetBehavior_ {
+var quorum_WebEditor_Behaviors_EditorItemFocusTargetBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
 }
@@ -6261,7 +6279,7 @@ globalStaticHash = globalStaticHash + 1;
 
 var OuTpUt_$tRiNg_ = "";
 
-class quorum_WebEditor_BlockEditor_ {
+var quorum_WebEditor_BlockEditor_ = class {
 IsWindowFocused() {
      return this.Libraries_Game_Game__.IsWindowFocused();
 }
@@ -6847,8 +6865,8 @@ return true;
 CreateGame() {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
-webAccess.AddHiddenHeader$quorum_text$quorum_text("Navigation Area", "Navigation Menu, Landmark 1 of 5,\n You are on the Navigation Menu, swipe right to find buttons that will take you directly to the palette or editor. ");
-webAccess.AddHiddenButton$quorum_text("Go To Palette");
+webAccess.AddHiddenHeader$quorum_text$quorum_text("Navigation Area", "Navigation Menu, Landmark 1 of 5,\n You are on the Navigation Menu, swipe right to find buttons that will take you directly to the tray or editor. ");
+webAccess.AddHiddenButton$quorum_text("Go To Tray");
 webAccess.AddHiddenButton$quorum_text("Go To Editor");
 webAccess.AddHiddenButton$quorum_text("Exit");
 webAccess.AddHiddenHeader$quorum_text$quorum_text("Block Control Area", "Block Control Menu, Landmark 2 of 5, \nYou are on the Block Control Menu, swipe right to find buttons to move blocks around or delete them.");
@@ -6872,7 +6890,7 @@ this.Get_WebEditor_BlockEditor__editor_().SetBlockListener$quorum_Libraries_Lang
 var read = "";
 read = this.prototype.GetTextForIDE$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
 if ((read == "")) {
-read = "output true";
+read = " ";
 }
 read = this.prototype.Format$quorum_text(read);
 var size = 12;
@@ -6911,8 +6929,8 @@ this.Get_WebEditor_BlockEditor__editorPanel_().SetHorizontalLayoutMode$quorum_in
 this.Get_WebEditor_BlockEditor__editorPanel_().SetName$quorum_text("Editor Panel");
 this.Get_WebEditor_BlockEditor__editorPanel_().SetAccessibilityCode$quorum_integer(9);
 this.Get_WebEditor_BlockEditor__editorPanel_().SetFocusable$quorum_boolean(false);
-webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("paletteHeader", "Block Palette, Landmark 4 of 5, You are on the Block Palette Header, \nswipe right to find the items in the block palette, swipe left and you will find the other menus.\n Navigation by headings is recommended if you want to find other landmarks.", true);
-webAccess.AddHiddenLabel$quorum_text$quorum_text$quorum_boolean("paletteLabel", "Block Palette Help. Activate or double tap an item in the palette to insert into the text. \nLandmark 2 will point you to buttons that can help move the activated palette item in the editor.", true);
+webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("paletteHeader", "Block Tray, Landmark 4 of 5, You are on the Block Tray Header, \nswipe right to find the items in the block tray, swipe left and you will find the other menus.\n Navigation by headings is recommended if you want to find other landmarks.", true);
+webAccess.AddHiddenLabel$quorum_text$quorum_text$quorum_boolean("paletteLabel", "Block Tray Help. Activate or double tap an item in the tray to insert into the text. \nLandmark 2 will point you to buttons that can help move the activated tray item in the editor.", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__palettePanel_());
 this.Get_WebEditor_BlockEditor__palettePanel_().Add$quorum_Libraries_Interface_Item2D(palette);
 palette.IncludeSuggestions$quorum_boolean(false);
@@ -6920,7 +6938,7 @@ palette.Setup();
 var palettePartition = this.prototype.CreatePalettePartition();
 this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
-webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, \nswipe right to find the items in the code editor, swipe left and you will find the palette.\n Navigation by headings is recommended if you want to find other landmarks.", true);
+webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, \nswipe right to find the items in the code editor, swipe left and you will find the tray.\n Navigation by headings is recommended if you want to find other landmarks.", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editorPanel_());
 this.Get_WebEditor_BlockEditor__editorPanel_().Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editor_());
 var resizeListener = new quorum_WebEditor_CanvasResizeListener_();
@@ -6942,18 +6960,18 @@ var webApp = global_CheckCast(manager.GetApplication(), "Libraries.Game.WebAppli
 if (((webApp.GetWebOperatingSystem().Contains$quorum_text("Android") || webApp.GetWebOperatingSystem().Contains$quorum_text("iOS")) || webApp.GetWebOperatingSystem().Contains$quorum_text("Mobile"))) {
 var tempPalette = new quorum_WebEditor_EditorItem_();
 this.paletteItem = tempPalette;
-this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Block Editor, You are in the Block Editor.\n If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding\n to 3 menus, the block palette, and then the block editor. Swipe Left and Right to navigate item by item.\n Swipe up and down to navigate by landmarks.");
+this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Block Editor, You are in the Block Editor.\n If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding\n to 3 menus, the block tray, and then the block editor. Swipe Left and Right to navigate item by item.\n Swipe up and down to navigate by landmarks.");
 this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
 return;
 }
 var tempPalette = new quorum_WebEditor_EditorItem_();
 this.paletteItem = tempPalette;
-this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Palette, To navigate to the palette press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the palette press Shift+Enter.");
+this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Tray, To navigate to the tray press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the tray press Shift+Enter.");
 this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
 var tempBlocks = new quorum_WebEditor_EditorItem_();
 this.blocksItem = tempBlocks;
-this.Get_WebEditor_BlockEditor__blocksItem_().SetName$quorum_text("Block Editor, To navigate to the editor press Enter. To navigate to the palette use the arrow keys. To navigate back to here from the editor press Shift+Enter.");
+this.Get_WebEditor_BlockEditor__blocksItem_().SetName$quorum_text("Block Editor, To navigate to the editor press Enter. To navigate to the tray use the arrow keys. To navigate back to here from the editor press Shift+Enter.");
 this.Get_WebEditor_BlockEditor__blocksItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockEditor());
 this.Get_WebEditor_BlockEditor__paletteItem_().SetNextFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__blocksItem_());
 this.Get_WebEditor_BlockEditor__paletteItem_().SetPreviousFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__blocksItem_());
@@ -7154,7 +7172,7 @@ var paletteProperties = palettePartition.GetDefaultLayoutProperties();
 paletteProperties.SetPixelWidth$quorum_number(8 * 1.0);
 paletteProperties.SetVerticalLayoutMode$quorum_integer(paletteProperties.Get_Libraries_Interface_Layouts_LayoutProperties__FILL_());
 palettePartition.SetInputGroup$quorum_text("PalettePartition");
-palettePartition.SetName$quorum_text("Palette Pane Partition");
+palettePartition.SetName$quorum_text("Tray Pane Partition");
 palettePartition.SetZ$quorum_number(-10 * 1.0);
 return palettePartition;
 };
@@ -7183,7 +7201,7 @@ FocusChanged$quorum_Libraries_Interface_Events_WebAccessibilityEvent(event) {
 var elementName = event.Get_Libraries_Interface_Events_WebAccessibilityEvent__elementName_();
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webAccess = global_CheckCast(manager.GetAccessibility(), "Libraries.Interface.Accessibility.WebAccessibility");
-if ((elementName == "Go To Palette")) {
+if ((elementName == "Go To Tray")) {
 this.Get_WebEditor_BlockEditor__editorPalette_().Focus();
 }
 else if( (elementName == "Go To Editor")) {

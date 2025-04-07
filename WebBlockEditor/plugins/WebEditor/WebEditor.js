@@ -38,9 +38,9 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         let hidePaletteContainer = document.getElementById("HidePaletteContainer");
         if (hidePaletteContainer != null) {
           if(status) {
-            hidePaletteContainer.innerHTML = "Hide Palette";
+            hidePaletteContainer.innerHTML = "Hide Tray";
           } else {
-            hidePaletteContainer.innerHTML = "Show Palette";
+            hidePaletteContainer.innerHTML = "Show Tray";
           }
         }
     };
