@@ -16,7 +16,7 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         return "";
     }
 
-    this.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array_$quorum_Libraries_Containers_Array_ = function(containerID, fileNames, fileTexts) {
+    this.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array = function(containerID, fileNames, fileTexts) {
             let container = document.getElementById(containerID);
             if (container.dataset.codeForIde) {
                 const data = JSON.parse(container.dataset.codeForIde);
@@ -25,8 +25,8 @@ function plugins_quorum_WebEditor_BlockEditor_() {
                   const fileName = fileObj.file;
                   const fileText = fileObj.data;
 
-                  let quorumName = new quorum_Libraries_Language_Types_Text();
-                  let quorumText = new quorum_Libraries_Language_Types_Text();
+                  let quorumName = new quorum_Libraries_Language_Types_Text_();
+                  let quorumText = new quorum_Libraries_Language_Types_Text_();
                   quorumName.SetValue$quorum_text(fileName);
                   quorumText.SetValue$quorum_text(fileText);
                   fileNames.Add$quorum_Libraries_Language_Object_(quorumName);
@@ -7132,7 +7132,7 @@ ShowHelpModal() {
 return this.plugin_.ShowHelpModal();
 };
 SupportsMultipleFiles() {
-return true;
+return false;
 };
 GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts) {
 return this.plugin_.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts);
