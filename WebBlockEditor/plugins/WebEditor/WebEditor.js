@@ -15,6 +15,26 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         }
         return "";
     }
+
+    this.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array_$quorum_Libraries_Containers_Array_ = function(containerID, fileNames, fileTexts) {
+            let container = document.getElementById(containerID);
+            if (container.dataset.codeForIde) {
+                const data = JSON.parse(container.dataset.codeForIde);
+                for (let i = 0; i < data.length; i++) {
+                  const fileObj = data[i];
+                  const fileName = fileObj.file;
+                  const fileText = fileObj.data;
+
+                  let quorumName = new quorum_Libraries_Language_Types_Text();
+                  let quorumText = new quorum_Libraries_Language_Types_Text();
+                  quorumName.SetValue$quorum_text(fileName);
+                  quorumText.SetValue$quorum_text(fileText);
+                  fileNames.Add$quorum_Libraries_Language_Object_(quorumName);
+                  fileTexts.Add$quorum_Libraries_Language_Object_(quorumText);
+                }
+            }
+        }
+
     this.GetPaletteFileName$quorum_text = function(containerID) {
         let container = document.getElementById(containerID);
         if (container.dataset.paletteForIde) {
