@@ -1,0 +1,262 @@
+package WebEditor
+
+use Libraries.Interface.Events.TextChangeListener
+use Libraries.Interface.Events.TextChangeEvent
+use Libraries.Interface.Controls.Control
+use Libraries.Game.GameStateManager
+use Libraries.Interface.Options.InterfaceOptions
+use Libraries.Game.Graphics.ColorGroup
+use Libraries.Containers.Array
+use Libraries.Language.Compile.Parsing.Token
+use Libraries.Language.Compile.Parsing.TokenIterator
+use Libraries.Interface.Controls.TextStyles.TextStyle
+use Libraries.Language.Compile.Parsing.QuorumLexer
+use Libraries.Game.Graphics.Color
+use Libraries.Language.Compile.Parsing.QuorumLexerConstants
+use Libraries.Interface.Controls.Blocks.CodeEditor
+use Libraries.Interface.Controls.Blocks.EditRegion
+use Libraries.Interface.Controls.Blocks.Block
+
+class TextHighlightListener is TextChangeListener
+    
+public constant text EDITOR_KEYWORD_COLOR = "EDITOR_KEYWORD_COLOR"
+    public constant text EDITOR_STRUCTURE_COLOR = "EDITOR_STRUCTURE_COLOR"
+    public constant text EDITOR_TEXT_COLOR = "EDITOR_TEXT_COLOR"
+    public constant text EDITOR_COMMENT_COLOR = "EDITOR_COMMENT_COLOR"
+    
+    // The editor that will receive text highlighting once the timer has run out.
+    // Can potentially change if the active tab changes.
+    CodeEditor editor = undefined
+    
+Color keywordColor = undefined
+    Color structureColor = undefined
+    Color textColor = undefined
+    Color commentColor = undefined
+    
+    // Set to true when text change occurs. The timer runs while there are pending changes.
+    boolean pendingChanges = false
+    
+    // How many seconds to wait after a text change occurs to update the highlighting.
+    number timerLimit = 0.5
+number timer = 0
+    
+    action TextChanged(TextChangeEvent event)
+        Control target = event:GetControl()
+        
+        if target is CodeEditor
+            editor = cast(CodeEditor, target)
+        elseif target is EditRegion
+            EditRegion region = cast(EditRegion, target)
+            if region:GetBlockEnvironment() is CodeEditor
+                editor = cast(CodeEditor, region:GetBlockEnvironment())
+            end
+        else
+            output "Couldn't identify source of text change"
+            return now
+        end
+        
+        if editor = undefined
+            return now
+        end
+        
+        timer = 0
+        pendingChanges = true
+    end
+    
+    action Update(number seconds)
+        if pendingChanges
+            timer = timer + seconds
+            if timer >= timerLimit
+                timer = 0
+                pendingChanges = false
+                PerformHighlighting(editor)
+            end
+        end
+    end
+    
+action PerformHighlighting(CodeEditor editor)
+output "PerformHighlighting"
+        
+        if editor = undefined
+            return now
+        end
+        
+QuorumLexer lexer
+        lexer:Read(editor:GetText())
+      
+        GameStateManager gms
+        InterfaceOptions options = gms:GetInterfaceOptions()
+        ColorGroup cgK = options:GetColorProperty(EDITOR_KEYWORD_COLOR)
+        ColorGroup cgS = options:GetColorProperty(EDITOR_STRUCTURE_COLOR)
+        ColorGroup cgT = options:GetColorProperty(EDITOR_TEXT_COLOR)
+        ColorGroup cgC = options:GetColorProperty(EDITOR_COMMENT_COLOR)
+        
+        if cgK not= undefined
+            keywordColor = cast(Color, cgK)
+        else
+            keywordColor = cast(Color, editor:GetFontColor())
+        end
+
+        if cgS not= undefined
+            structureColor = cast(Color, cgS)
+        else
+structureColor = cast(Color, editor:GetFontColor())
+        end
+
+        if cgT not= undefined
+            textColor = cast(Color, cgT)
+        else
+textColor = cast(Color, editor:GetFontColor())
+        end
+
+        if cgC not= undefined
+            commentColor = cast(Color, cgC)
+        else
+commentColor = cast(Color, editor:GetFontColor())
+        end
+        
+        //reset the lexer and go forward
+        Array<Token> mainFileTokens
+        mainFileTokens:SetMaxSize(500)
+        editor:EmptyTextStyles()
+
+        TokenIterator<Token> tokenIterator = lexer:GetIterator()
+        tokenIterator:SetReadingAllChannels(true)
+        
+        Block searchBlock = editor:GetRootBlock()
+        Block foundBlock = undefined
+
+        i = 0
+        repeat while tokenIterator:HasNext()
+            Token token = tokenIterator:Next()
+            if token:category not= -1
+                if IsKeyword(token)
+                    TextStyle style = GetTextStyle(token)
+                    style:SetColor(keywordColor)
+                    foundBlock = editor:AddTextStyle("Lexer" + i, style, searchBlock)
+                    if foundBlock not= undefined
+                        searchBlock = foundBlock
+                    end
+                elseif IsStructure(token)
+                    TextStyle style = GetTextStyle(token)
+                    style:SetColor(structureColor)
+foundBlock = editor:AddTextStyle("Lexer" + i, style, searchBlock)
+                    if foundBlock not= undefined
+                        searchBlock = foundBlock
+                    end
+                elseif IsText(token)
+                    TextStyle style = GetTextStyle(token)
+                    style:SetColor(textColor)
+foundBlock = editor:AddTextStyle("Lexer" + i, style, searchBlock)
+                    if foundBlock not= undefined
+                        searchBlock = foundBlock
+                    end
+                elseif IsComment(token)
+                    TextStyle style = GetTextStyle(token)
+                    style:SetColor(commentColor)
+foundBlock = editor:AddTextStyle("Lexer" + i, style, searchBlock)
+                    if foundBlock not= undefined
+                        searchBlock = foundBlock
+                    end
+                end
+                mainFileTokens:Add(token)
+            else
+                token = undefined
+            end
+            
+            i = i + 1
+        end
+    end
+    
+private action GetTextStyle(Token token) returns TextStyle
+        TextStyle style
+        style:SetIndex(token:startIndex)
+        style:SetSize(token:endIndex - token:startIndex + 1)
+        return style
+    end
+
+    private action IsStructure(Token token) returns boolean
+        QuorumLexerConstants lexer
+        if  token:category = lexer:OUTPUT 
+            or token:category = lexer:ON
+            or token:category = lexer:CREATE
+            or token:category = lexer:BLUEPRINT
+            or token:category = lexer:NATIVE
+            or token:category = lexer:ACTION
+            or token:category = lexer:CLASS
+            or token:category = lexer:END
+            or token:category = lexer:IF
+            or token:category = lexer:REPEAT
+            or token:category = lexer:ELSE
+            or token:category = lexer:ELSE_IF
+            return true
+        end
+
+        return false
+    end
+
+    private action IsText(Token token) returns boolean
+        QuorumLexerConstants lexer
+        if  token:category = lexer:STRING 
+            return true
+        end
+        return false
+    end
+
+    private action IsComment(Token token) returns boolean
+        QuorumLexerConstants lexer
+        if  token:category = lexer:COMMENTS 
+            return true
+        end
+        return false
+    end
+
+    private action IsKeyword(Token token) returns boolean
+        QuorumLexerConstants lexer
+        if  token:category = lexer:OUTPUT 
+            or token:category = lexer:CONSTANT
+            or token:category = lexer:ME
+            or token:category = lexer:UNTIL
+            or token:category = lexer:PUBLIC
+            or token:category = lexer:PRIVATE
+            or token:category = lexer:ALERT
+            or token:category = lexer:DETECT
+            or token:category = lexer:ALWAYS
+            or token:category = lexer:CHECK
+            or token:category = lexer:PARENT
+            or token:category = lexer:CAST
+            or token:category = lexer:STATIC
+            or token:category = lexer:INPUT
+            or token:category = lexer:SAY
+            or token:category = lexer:NOW
+            or token:category = lexer:WHILE
+            or token:category = lexer:PACKAGE_NAME
+            or token:category = lexer:TIMES
+            or token:category = lexer:RETURNS
+            or token:category = lexer:RETURN
+            or token:category = lexer:AND
+            or token:category = lexer:OR
+            or token:category = lexer:NULL
+            or token:category = lexer:INTEGER_KEYWORD
+            or token:category = lexer:NUMBER_KEYWORD
+            or token:category = lexer:TEXT
+            or token:category = lexer:BOOLEAN_KEYWORD
+            or token:category = lexer:USE
+            or token:category = lexer:NOT
+            or token:category = lexer:NOT_EQUALS
+            or token:category = lexer:MODULO
+            or token:category = lexer:BOOLEAN
+            or token:category = lexer:INHERITS
+            return true
+        end
+
+        return false
+    end
+    
+    // Sets the current editor, and marks the pending changes flag.
+    action SetEditor(CodeEditor editor)
+        me:editor = editor
+        pendingChanges = true
+    end
+    
+end

@@ -63,11 +63,16 @@ use Libraries.Interface.Item
 use Libraries.Interface.Events.FocusListener
 use Libraries.Interface.Events.FocusEvent
 use Libraries.Interface.Behaviors.Blocks.BlockPickUpBehavior
+use Libraries.Interface.Options.InterfaceOptions
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Events.SelectionListener
+use Libraries.Interface.Events.SelectionEvent
+use Libraries.Interface.Selections.TabPaneSelection
 
-class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener
+class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
     constant text CONTAINER_ID = "BlockUIContainer"
-CodeEditor editor = undefined
 ParserToBlockListener listener
     WebControlPanel palettePanel
     Control palettePartition
@@ -76,6 +81,15 @@ ParserToBlockListener listener
     CodeEditor editorBlocks = undefined
     EditorItem paletteItem = undefined
     EditorItem blocksItem = undefined
+    
+    // If this editor only supports one file, this is the single editor.
+    // If it supports multiple, this is the editor for the currently active file.
+CodeEditor editor = undefined
+    
+    // A tab pane holding the editors for the different files. Only defined if the editor has multiple file support.
+    TabPane editorPane = undefined
+    
+    TextHighlightListener textHighlightListener
     
     system action GetTextForIDE(text containerID) returns text
 //    action GetTextForIDE(text containerID) returns text
@@ -91,7 +105,12 @@ ParserToBlockListener listener
     system action UpdateTogglePaletteButton(boolean status)
     system action ShowHelpModal
     
+    action SupportsMultipleFiles returns boolean
+        return true
+    end
     
+    //Get the text for all of the files associated with this IDE. Append them to the provided array. 
+    system action GetMultipleFileText(text containerID, Array<text> fileNames, Array<text> fileTexts)
     
 action Main
         WebConfiguration config = GetWebConfiguration()
@@ -102,6 +121,7 @@ action Main
         deskConfig:resizable = true
     StartGame()
 end
+    
     action OnExit returns boolean
         editor = undefined
         listener = undefined
@@ -114,6 +134,7 @@ palettePanel = undefined
     blocksItem = undefined
         return true
     end
+    
  action CreateGame
         GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
@@ -134,23 +155,24 @@ You are on the Edit Menu, swipe right to find buttons to help you Undo and Redo 
         webAccess:AddHiddenButton("Undo")
 webAccess:AddHiddenButton("Redo")
         webAccess:AddWebAccessibilityListener(me)
-LightBlockOptions options
-      //DarkBlockOptions options
-    SetInterfaceOptions(options)
+        
+        SetupInterfaceOptions()
         
 listener:startLine= 0
         
 FlowLayout layout
     SetLayout(layout)
-    CodeEditor editor2
+        
+        if SupportsMultipleFiles() = false
+        CodeEditor editor2
         editor = editor2
         
-editor:SetBlockListener(listener)
-    text read = ""
-            read = GetTextForIDE(CONTAINER_ID)
-            if read = ""
-                read = " "
-            end
+        editor:SetBlockListener(listener)
+        editor:AddTextChangeListener(textHighlightListener)
+        textHighlightListener:SetEditor(editor)
+        text read = ""
+        read = GetTextForIDE(CONTAINER_ID)
+
       read = Format(read)
     
      integer size = 12
@@ -160,6 +182,48 @@ editor:SetBlockListener(listener)
     editor:SetFontSize(size)
     editor:AddSelectionListener(listen)
         editor:SetCode(read)
+        else
+            TabPane tabPane
+            editorPane = tabPane
+            editorPane:AddSelectionListener(me)
+            
+            editorPane:SetPercentageWidth(1)
+            editorPane:SetPercentageHeight(1)
+            
+            Array<text> fileNames
+            Array<text> fileTexts
+            GetMultipleFileText(CONTAINER_ID, fileNames, fileTexts)
+            
+            integer i = 0
+            repeat while i < fileNames:GetSize()
+Tab tab
+                tab:SetName(fileNames:Get(i))
+                tab:DisplayCloseButton(false)
+                
+                CodeEditor newEditor
+newEditor:SetBlockListener(listener)
+        newEditor:AddTextChangeListener(textHighlightListener)
+    text code = fileTexts:Get(i)
+      code = Format(code)
+    
+     integer size = 12
+    BlockSelectionListener listen
+    newEditor:SetPercentageWidth(1)
+    newEditor:SetPercentageHeight(1)
+    newEditor:SetFontSize(size)
+    newEditor:AddSelectionListener(listen)
+        newEditor:SetCode(code)
+                
+                if editor = undefined
+                    editor = newEditor
+                end
+                
+                tab:SetRelatedItem(newEditor)
+                editorPane:Add(tab)
+                i = i + 1
+            end
+        end
+    
         
         BlockPalette palette
         palette:SetPercentageHeight(1)
@@ -213,7 +277,11 @@ webAccess:AddHiddenHeader("editorHeader", "Code Editor, Landmark 5 of 5, You are
 swipe right to find the items in the code editor, swipe left and you will find the tray.
  Navigation by headings is recommended if you want to find other landmarks.", true)
         Add(editorPanel)
+        if editorPane not= undefined
+            editorPanel:Add(editorPane)
+        else
 editorPanel:Add(editor)
+        end
         
         CanvasResizeListener resizeListener
         resizeListener:AddPanel(palettePanel)
@@ -227,6 +295,11 @@ editorPanel:Add(editor)
         paletteItem:Focus()
         AddFocusListener(me)
         SetColliding(false)
+        
+        if editorPane not= undefined and editorPane:IsEmpty() = false
+            // Select the first tab if we have multiple file support enabled.
+            editorPane:Select(0)
+        end
 end
     
     action SetupEditorItems
@@ -673,6 +746,62 @@ palettePanel:RequestLayout()
     end
 
 action Update(number seconds)
-    
+    if textHighlightListener not= undefined
+            textHighlightListener:Update(seconds)
+        end
 end
+    
+    // For now, only light mode is supported, so this is always true. If dark mode is supported later, then this should return false.
+    action IsLightMode returns boolean
+        return true
+    end
+    
+    action SetupInterfaceOptions
+InterfaceOptions options = undefined
+        Color color
+        number MAX = 255.0
+        if IsLightMode()
+LightBlockOptions lightOptions
+            options = lightOptions
+            
+            Color keywords = color:CustomColor(8.0 / MAX, 57.0 / MAX, 181.0 / MAX, 1)
+Color comments = color:CustomColor(68.0 / MAX, 80.0 / MAX, 91.0 / MAX, 1)
+        Color textColor = color:CustomColor(160.0 / MAX, 50.0 / MAX, 50.0 / MAX, 1)
+        Color structure = color:CustomColor(113.0 / MAX, 83.0 / MAX, 38.0 / MAX, 1)
+            
+options:SetColorProperty(textHighlightListener:EDITOR_KEYWORD_COLOR, keywords)
+        options:SetColorProperty(textHighlightListener:EDITOR_STRUCTURE_COLOR, structure)
+        options:SetColorProperty(textHighlightListener:EDITOR_TEXT_COLOR, textColor)
+        options:SetColorProperty(textHighlightListener:EDITOR_COMMENT_COLOR, comments)
+        else
+            DarkBlockOptions darkOptions
+            options = darkOptions
+            
+Color keywords = color:CustomColor(144.0 / MAX, 191.0 / MAX, 227.0 / MAX, 1)
+Color comments = color:CustomColor(175.0 / MAX, 186.0 / MAX, 255.0 / MAX, 1)
+        Color textColor = color:CustomColor(255.0 / MAX, 165.0 / MAX, 127.0 / MAX, 1)
+        Color structure = color:CustomColor(207.0 / MAX, 175.0 / MAX, 224.0 / MAX, 1)
+            
+options:SetColorProperty(textHighlightListener:EDITOR_KEYWORD_COLOR, keywords)
+        options:SetColorProperty(textHighlightListener:EDITOR_STRUCTURE_COLOR, structure)
+        options:SetColorProperty(textHighlightListener:EDITOR_TEXT_COLOR, textColor)
+        options:SetColorProperty(textHighlightListener:EDITOR_COMMENT_COLOR, comments)
+        end
+    SetInterfaceOptions(options)
+    end
+    
+action SelectionChanged(SelectionEvent event)
+if event:GetSelection() is TabPaneSelection
+            TabPaneSelection selection = cast(TabPaneSelection, event:GetSelection())
+            Tab tab = selection:GetTab()
+            if tab:GetRelatedItem() is CodeEditor
+                CodeEditor editor = cast(CodeEditor, tab:GetRelatedItem())
+                me:editor = editor
+                textHighlightListener:SetEditor(editor)
+                
+                // If any other work needs to be done in the future on tab change (such as palette updates) that can also happen here.
+            end
+        end
+    end
+    
 end
