@@ -15,6 +15,26 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         }
         return "";
     }
+
+    this.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array = function(containerID, fileNames, fileTexts) {
+            let container = document.getElementById(containerID);
+            if (container.dataset.codeForIde) {
+                const data = JSON.parse(container.dataset.codeForIde);
+                for (let i = 0; i < data.length; i++) {
+                  const fileObj = data[i];
+                  const fileName = fileObj.file;
+                  const fileText = fileObj.data;
+
+                  let quorumName = new quorum_Libraries_Language_Types_Text_();
+                  let quorumText = new quorum_Libraries_Language_Types_Text_();
+                  quorumName.SetValue$quorum_text(fileName);
+                  quorumText.SetValue$quorum_text(fileText);
+                  fileNames.Add$quorum_Libraries_Language_Object(quorumName);
+                  fileTexts.Add$quorum_Libraries_Language_Object(quorumText);
+                }
+            }
+        }
+
     this.GetPaletteFileName$quorum_text = function(containerID) {
         let container = document.getElementById(containerID);
         if (container.dataset.paletteForIde) {
@@ -45,6 +65,277 @@ function plugins_quorum_WebEditor_BlockEditor_() {
         }
     };
 }
+var quorum_WebEditor_TextHighlightListener_ = class {
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event) {
+var target = event.GetControl();
+if (global_InstanceOf(target,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+this.editor = global_CheckCast(target, "Libraries.Interface.Controls.Blocks.CodeEditor");
+}
+else if( global_InstanceOf(target,'Libraries.Interface.Controls.Blocks.EditRegion')) {
+var region = global_CheckCast(target, "Libraries.Interface.Controls.Blocks.EditRegion");
+if (global_InstanceOf(region.GetBlockEnvironment(),'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+this.editor = global_CheckCast(region.GetBlockEnvironment(), "Libraries.Interface.Controls.Blocks.CodeEditor");
+}
+}
+else { 
+global_Output_("Couldn't identify source of text change");
+return;
+}
+if ((this.Get_WebEditor_TextHighlightListener__editor_() == null)) {
+return;
+}
+global_Output_((((("Text changed for editor:" + this.Get_WebEditor_TextHighlightListener__editor_().GetName()) + " (size = ") + this.Get_WebEditor_TextHighlightListener__editor_().GetText().GetSize()) + ")"));
+this.timer = 0;
+this.pendingChanges = true;
+};
+Update$quorum_number(seconds) {
+if (this.Get_WebEditor_TextHighlightListener__pendingChanges_()) {
+this.timer = (this.Get_WebEditor_TextHighlightListener__timer_() + seconds);
+if ((this.Get_WebEditor_TextHighlightListener__timer_() >= this.Get_WebEditor_TextHighlightListener__timerLimit_())) {
+this.timer = 0;
+this.pendingChanges = false;
+this.prototype.PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(this.Get_WebEditor_TextHighlightListener__editor_());
+}
+}
+};
+PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor) {
+global_Output_((((("PerformHighlighting for editor " + editor.GetName()) + " (size = ") + editor.GetText().GetSize()) + ")"));
+if ((editor == null)) {
+return;
+}
+var lexer = new quorum_Libraries_Language_Compile_Parsing_QuorumLexer_();
+lexer.Read$quorum_text(editor.GetText());
+var gms = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+var options = gms.GetInterfaceOptions();
+var cgK = options.GetColorProperty$quorum_text(this.Get_WebEditor_TextHighlightListener__EDITOR_KEYWORD_COLOR_());
+var cgS = options.GetColorProperty$quorum_text(this.Get_WebEditor_TextHighlightListener__EDITOR_STRUCTURE_COLOR_());
+var cgT = options.GetColorProperty$quorum_text(this.Get_WebEditor_TextHighlightListener__EDITOR_TEXT_COLOR_());
+var cgC = options.GetColorProperty$quorum_text(this.Get_WebEditor_TextHighlightListener__EDITOR_COMMENT_COLOR_());
+if ((cgK != null)) {
+this.keywordColor = global_CheckCast(cgK, "Libraries.Game.Graphics.Color");
+}
+else { 
+this.keywordColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
+}
+if ((cgS != null)) {
+this.structureColor = global_CheckCast(cgS, "Libraries.Game.Graphics.Color");
+}
+else { 
+this.structureColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
+}
+if ((cgT != null)) {
+this.textColor = global_CheckCast(cgT, "Libraries.Game.Graphics.Color");
+}
+else { 
+this.textColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
+}
+if ((cgC != null)) {
+this.commentColor = global_CheckCast(cgC, "Libraries.Game.Graphics.Color");
+}
+else { 
+this.commentColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
+}
+var mainFileTokens = new quorum_Libraries_Containers_Array_();
+mainFileTokens.SetMaxSize$quorum_integer(500);
+editor.EmptyTextStyles();
+var tokenIterator = lexer.GetIterator();
+tokenIterator.SetReadingAllChannels$quorum_boolean(true);
+var searchBlock = editor.GetRootBlock();
+var foundBlock = null;
+var i = 0;
+while (tokenIterator.HasNext()) {
+var token = tokenIterator.Next();
+if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() != -1)) {
+if (this.prototype.IsKeyword$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
+var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
+style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_WebEditor_TextHighlightListener__keywordColor_());
+foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
+if ((foundBlock != null)) {
+searchBlock = foundBlock;
+}
+}
+else if( this.prototype.IsStructure$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
+var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
+style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_WebEditor_TextHighlightListener__structureColor_());
+foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
+if ((foundBlock != null)) {
+searchBlock = foundBlock;
+}
+}
+else if( this.prototype.IsText$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
+var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
+style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_WebEditor_TextHighlightListener__textColor_());
+foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
+if ((foundBlock != null)) {
+searchBlock = foundBlock;
+}
+}
+else if( this.prototype.IsComment$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
+var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
+style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_WebEditor_TextHighlightListener__commentColor_());
+foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
+if ((foundBlock != null)) {
+searchBlock = foundBlock;
+}
+}
+mainFileTokens.Add$quorum_Libraries_Language_Object(token);
+}
+else { 
+token = null;
+}
+i = (i + 1);
+}
+};
+GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token) {
+var style = new quorum_Libraries_Interface_Controls_TextStyles_TextStyle_();
+style.SetIndex$quorum_integer(token.Get_Libraries_Language_Compile_Parsing_Token__startIndex_());
+style.SetSize$quorum_integer(((token.Get_Libraries_Language_Compile_Parsing_Token__endIndex_() - token.Get_Libraries_Language_Compile_Parsing_Token__startIndex_()) + 1));
+return style;
+};
+IsStructure$quorum_Libraries_Language_Compile_Parsing_Token(token) {
+var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
+if (((((((((((((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OUTPUT_()) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ON_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CREATE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BLUEPRINT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NATIVE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ACTION_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CLASS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__END_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__IF_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__REPEAT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ELSE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ELSE_IF_()))) {
+return true;
+}
+return false;
+};
+IsText$quorum_Libraries_Language_Compile_Parsing_Token(token) {
+var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
+if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__STRING_())) {
+return true;
+}
+return false;
+};
+IsComment$quorum_Libraries_Language_Compile_Parsing_Token(token) {
+var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
+if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__COMMENTS_())) {
+return true;
+}
+return false;
+};
+IsKeyword$quorum_Libraries_Language_Compile_Parsing_Token(token) {
+var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
+if (((((((((((((((((((((((((((((((((((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OUTPUT_()) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CONSTANT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ME_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__UNTIL_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PUBLIC_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PRIVATE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ALERT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__DETECT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ALWAYS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CHECK_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PARENT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CAST_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__STATIC_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INPUT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__SAY_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOW_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__WHILE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PACKAGE_NAME_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__TIMES_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__RETURNS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__RETURN_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__AND_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OR_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NULL_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INTEGER_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NUMBER_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__TEXT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BOOLEAN_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__USE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOT_EQUALS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__MODULO_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BOOLEAN_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INHERITS_()))) {
+return true;
+}
+return false;
+};
+SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor) {
+this.editor = editor;
+this.pendingChanges = true;
+};
+Get_WebEditor_TextHighlightListener__textColor_() {
+   return this.textColor;
+};
+Set_WebEditor_TextHighlightListener__textColor_(value) {
+   this.textColor = value;
+};
+Get_WebEditor_TextHighlightListener__timerLimit_() {
+   return this.timerLimit;
+};
+Set_WebEditor_TextHighlightListener__timerLimit_(value) {
+   this.timerLimit = value;
+};
+Get_WebEditor_TextHighlightListener__EDITOR_KEYWORD_COLOR_() {
+   return this.EDITOR_KEYWORD_COLOR;
+};
+Set_WebEditor_TextHighlightListener__EDITOR_KEYWORD_COLOR_(value) {
+   this.EDITOR_KEYWORD_COLOR = value;
+};
+Get_WebEditor_TextHighlightListener__pendingChanges_() {
+   return this.pendingChanges;
+};
+Set_WebEditor_TextHighlightListener__pendingChanges_(value) {
+   this.pendingChanges = value;
+};
+Get_WebEditor_TextHighlightListener__commentColor_() {
+   return this.commentColor;
+};
+Set_WebEditor_TextHighlightListener__commentColor_(value) {
+   this.commentColor = value;
+};
+Get_WebEditor_TextHighlightListener__editor_() {
+   return this.editor;
+};
+Set_WebEditor_TextHighlightListener__editor_(value) {
+   this.editor = value;
+};
+Get_WebEditor_TextHighlightListener__keywordColor_() {
+   return this.keywordColor;
+};
+Set_WebEditor_TextHighlightListener__keywordColor_(value) {
+   this.keywordColor = value;
+};
+Get_WebEditor_TextHighlightListener__timer_() {
+   return this.timer;
+};
+Set_WebEditor_TextHighlightListener__timer_(value) {
+   this.timer = value;
+};
+Get_WebEditor_TextHighlightListener__EDITOR_STRUCTURE_COLOR_() {
+   return this.EDITOR_STRUCTURE_COLOR;
+};
+Set_WebEditor_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(value) {
+   this.EDITOR_STRUCTURE_COLOR = value;
+};
+Get_WebEditor_TextHighlightListener__structureColor_() {
+   return this.structureColor;
+};
+Set_WebEditor_TextHighlightListener__structureColor_(value) {
+   this.structureColor = value;
+};
+Get_WebEditor_TextHighlightListener__EDITOR_COMMENT_COLOR_() {
+   return this.EDITOR_COMMENT_COLOR;
+};
+Set_WebEditor_TextHighlightListener__EDITOR_COMMENT_COLOR_(value) {
+   this.EDITOR_COMMENT_COLOR = value;
+};
+Get_WebEditor_TextHighlightListener__EDITOR_TEXT_COLOR_() {
+   return this.EDITOR_TEXT_COLOR;
+};
+Set_WebEditor_TextHighlightListener__EDITOR_TEXT_COLOR_(value) {
+   this.EDITOR_TEXT_COLOR = value;
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Interface.Events.TextChangeListener', 'Libraries.Language.Object',  'WebEditor.TextHighlightListener'];
+this.Libraries_Interface_Events_TextChangeListener__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Events_TextChangeListener__ = new quorum_Libraries_Interface_Events_TextChangeListener_(false);
+   this.Libraries_Interface_Events_TextChangeListener__.prototype = this;
+}
+this.EDITOR_KEYWORD_COLOR = "EDITOR_KEYWORD_COLOR";
+this.EDITOR_STRUCTURE_COLOR = "EDITOR_STRUCTURE_COLOR";
+this.EDITOR_TEXT_COLOR = "EDITOR_TEXT_COLOR";
+this.EDITOR_COMMENT_COLOR = "EDITOR_COMMENT_COLOR";
+this.editor = null;
+this.keywordColor = null;
+this.structureColor = null;
+this.textColor = null;
+this.commentColor = null;
+this.pendingChanges = false;
+this.timerLimit = 0.5;
+this.timer = 0;
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
 var quorum_WebEditor_Behaviors_FocusEditorBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
@@ -5275,276 +5566,6 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-var quorum_Libraries_Interface_Controls_Blocks_TextHighlightListener_ = class {
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event) {
-var target = event.GetControl();
-if (global_InstanceOf(target,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
-this.editor = global_CheckCast(target, "Libraries.Interface.Controls.Blocks.CodeEditor");
-}
-else if( global_InstanceOf(target,'Libraries.Interface.Controls.Blocks.EditRegion')) {
-var region = global_CheckCast(target, "Libraries.Interface.Controls.Blocks.EditRegion");
-if (global_InstanceOf(region.GetBlockEnvironment(),'Libraries.Interface.Controls.Blocks.CodeEditor')) {
-this.editor = global_CheckCast(region.GetBlockEnvironment(), "Libraries.Interface.Controls.Blocks.CodeEditor");
-}
-}
-else { 
-global_Output_("Couldn't identify source of text change");
-return;
-}
-if ((this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__editor_() == null)) {
-return;
-}
-this.timer = 0;
-this.pendingChanges = true;
-};
-Update$quorum_number(seconds) {
-if (this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__pendingChanges_()) {
-this.timer = (this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__timer_() + seconds);
-if ((this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__timer_() >= this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__timerLimit_())) {
-this.timer = 0;
-this.pendingChanges = false;
-this.prototype.PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__editor_());
-}
-}
-};
-PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor) {
-global_Output_("PerformHighlighting");
-if ((editor == null)) {
-return;
-}
-var lexer = new quorum_Libraries_Language_Compile_Parsing_QuorumLexer_();
-lexer.Read$quorum_text(editor.GetText());
-var gms = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-var options = gms.GetInterfaceOptions();
-var cgK = options.GetColorProperty$quorum_text(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_KEYWORD_COLOR_());
-var cgS = options.GetColorProperty$quorum_text(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_STRUCTURE_COLOR_());
-var cgT = options.GetColorProperty$quorum_text(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_TEXT_COLOR_());
-var cgC = options.GetColorProperty$quorum_text(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_COMMENT_COLOR_());
-if ((cgK != null)) {
-this.keywordColor = global_CheckCast(cgK, "Libraries.Game.Graphics.Color");
-}
-else { 
-this.keywordColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
-}
-if ((cgS != null)) {
-this.structureColor = global_CheckCast(cgS, "Libraries.Game.Graphics.Color");
-}
-else { 
-this.structureColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
-}
-if ((cgT != null)) {
-this.textColor = global_CheckCast(cgT, "Libraries.Game.Graphics.Color");
-}
-else { 
-this.textColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
-}
-if ((cgC != null)) {
-this.commentColor = global_CheckCast(cgC, "Libraries.Game.Graphics.Color");
-}
-else { 
-this.commentColor = global_CheckCast(editor.GetFontColor(), "Libraries.Game.Graphics.Color");
-}
-var mainFileTokens = new quorum_Libraries_Containers_Array_();
-mainFileTokens.SetMaxSize$quorum_integer(500);
-editor.EmptyTextStyles();
-var tokenIterator = lexer.GetIterator();
-tokenIterator.SetReadingAllChannels$quorum_boolean(true);
-var searchBlock = editor.GetRootBlock();
-var foundBlock = null;
-var i = 0;
-while (tokenIterator.HasNext()) {
-var token = tokenIterator.Next();
-if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() != -1)) {
-if (this.prototype.IsKeyword$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
-var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
-style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__keywordColor_());
-foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
-if ((foundBlock != null)) {
-searchBlock = foundBlock;
-}
-}
-else if( this.prototype.IsStructure$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
-var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
-style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__structureColor_());
-foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
-if ((foundBlock != null)) {
-searchBlock = foundBlock;
-}
-}
-else if( this.prototype.IsText$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
-var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
-style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__textColor_());
-foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
-if ((foundBlock != null)) {
-searchBlock = foundBlock;
-}
-}
-else if( this.prototype.IsComment$quorum_Libraries_Language_Compile_Parsing_Token(token)) {
-var style = this.prototype.GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token);
-style.SetColor$quorum_Libraries_Game_Graphics_Color(this.Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__commentColor_());
-foundBlock = editor.AddTextStyle$quorum_text$quorum_Libraries_Interface_Controls_TextStyles_TextStyle$quorum_Libraries_Interface_Controls_Blocks_Block(("Lexer" + i), style, searchBlock);
-if ((foundBlock != null)) {
-searchBlock = foundBlock;
-}
-}
-mainFileTokens.Add$quorum_Libraries_Language_Object(token);
-}
-else { 
-token = null;
-}
-i = (i + 1);
-}
-};
-GetTextStyle$quorum_Libraries_Language_Compile_Parsing_Token(token) {
-var style = new quorum_Libraries_Interface_Controls_TextStyles_TextStyle_();
-style.SetIndex$quorum_integer(token.Get_Libraries_Language_Compile_Parsing_Token__startIndex_());
-style.SetSize$quorum_integer(((token.Get_Libraries_Language_Compile_Parsing_Token__endIndex_() - token.Get_Libraries_Language_Compile_Parsing_Token__startIndex_()) + 1));
-return style;
-};
-IsStructure$quorum_Libraries_Language_Compile_Parsing_Token(token) {
-var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
-if (((((((((((((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OUTPUT_()) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ON_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CREATE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BLUEPRINT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NATIVE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ACTION_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CLASS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__END_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__IF_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__REPEAT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ELSE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ELSE_IF_()))) {
-return true;
-}
-return false;
-};
-IsText$quorum_Libraries_Language_Compile_Parsing_Token(token) {
-var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
-if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__STRING_())) {
-return true;
-}
-return false;
-};
-IsComment$quorum_Libraries_Language_Compile_Parsing_Token(token) {
-var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
-if ((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__COMMENTS_())) {
-return true;
-}
-return false;
-};
-IsKeyword$quorum_Libraries_Language_Compile_Parsing_Token(token) {
-var lexer = (global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants") == null ? global_Add_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants", new quorum_Libraries_Language_Compile_Parsing_QuorumLexerConstants_()) : global_Get_Shared_Class("Libraries.Language.Compile.Parsing.QuorumLexerConstants"));
-if (((((((((((((((((((((((((((((((((((token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OUTPUT_()) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CONSTANT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ME_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__UNTIL_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PUBLIC_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PRIVATE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ALERT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__DETECT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__ALWAYS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CHECK_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PARENT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__CAST_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__STATIC_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INPUT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__SAY_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOW_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__WHILE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__PACKAGE_NAME_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__TIMES_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__RETURNS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__RETURN_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__AND_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__OR_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NULL_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INTEGER_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NUMBER_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__TEXT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BOOLEAN_KEYWORD_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__USE_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOT_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__NOT_EQUALS_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__MODULO_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__BOOLEAN_())) || (token.Get_Libraries_Language_Compile_Parsing_Token__category_() == lexer.Get_Libraries_Language_Compile_Parsing_QuorumLexerConstants__INHERITS_()))) {
-return true;
-}
-return false;
-};
-SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor) {
-this.editor = editor;
-this.pendingChanges = true;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__textColor_() {
-   return this.textColor;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__textColor_(value) {
-   this.textColor = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__timerLimit_() {
-   return this.timerLimit;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__timerLimit_(value) {
-   this.timerLimit = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_KEYWORD_COLOR_() {
-   return this.EDITOR_KEYWORD_COLOR;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_KEYWORD_COLOR_(value) {
-   this.EDITOR_KEYWORD_COLOR = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__pendingChanges_() {
-   return this.pendingChanges;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__pendingChanges_(value) {
-   this.pendingChanges = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__commentColor_() {
-   return this.commentColor;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__commentColor_(value) {
-   this.commentColor = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__editor_() {
-   return this.editor;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__editor_(value) {
-   this.editor = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__keywordColor_() {
-   return this.keywordColor;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__keywordColor_(value) {
-   this.keywordColor = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__timer_() {
-   return this.timer;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__timer_(value) {
-   this.timer = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_STRUCTURE_COLOR_() {
-   return this.EDITOR_STRUCTURE_COLOR;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(value) {
-   this.EDITOR_STRUCTURE_COLOR = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__structureColor_() {
-   return this.structureColor;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__structureColor_(value) {
-   this.structureColor = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_COMMENT_COLOR_() {
-   return this.EDITOR_COMMENT_COLOR;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_COMMENT_COLOR_(value) {
-   this.EDITOR_COMMENT_COLOR = value;
-};
-Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_TEXT_COLOR_() {
-   return this.EDITOR_TEXT_COLOR;
-};
-Set_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_TEXT_COLOR_(value) {
-   this.EDITOR_TEXT_COLOR = value;
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Events.TextChangeListener', 'Libraries.Language.Object',  'Libraries.Interface.Controls.Blocks.TextHighlightListener'];
-this.Libraries_Interface_Events_TextChangeListener__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Events_TextChangeListener__ = new quorum_Libraries_Interface_Events_TextChangeListener_(false);
-   this.Libraries_Interface_Events_TextChangeListener__.prototype = this;
-}
-this.EDITOR_KEYWORD_COLOR = "EDITOR_KEYWORD_COLOR";
-this.EDITOR_STRUCTURE_COLOR = "EDITOR_STRUCTURE_COLOR";
-this.EDITOR_TEXT_COLOR = "EDITOR_TEXT_COLOR";
-this.EDITOR_COMMENT_COLOR = "EDITOR_COMMENT_COLOR";
-this.editor = null;
-this.keywordColor = null;
-this.structureColor = null;
-this.textColor = null;
-this.commentColor = null;
-this.pendingChanges = false;
-this.timerLimit = 0.5;
-this.timer = 0;
-
-if(parents == null) {
-}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
 var quorum_WebEditor_Behaviors_StopGameBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
@@ -7111,7 +7132,14 @@ return this.plugin_.UpdateTogglePaletteButton$quorum_boolean(status);
 ShowHelpModal() {
 return this.plugin_.ShowHelpModal();
 };
+SupportsMultipleFiles() {
+return true;
+};
+GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts) {
+return this.plugin_.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts);
+};
 Main() {
+global_Output_("IDE: Main");
 var config = this.prototype.GetWebConfiguration();
 config.Set_Libraries_Game_WebConfiguration__title_("Block Editor");
 config.Set_Libraries_Game_WebConfiguration__containerID_(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
@@ -7122,7 +7150,6 @@ this.prototype.StartGame();
 };
 OnExit() {
 this.editor = null;
-this.listener = null;
 this.palettePanel = null;
 this.palettePartition = null;
 this.editorPanel = null;
@@ -7130,6 +7157,11 @@ this.editorPalette = null;
 this.editorBlocks = null;
 this.paletteItem = null;
 this.blocksItem = null;
+if ((this.Get_WebEditor_BlockEditor__editorPane_() != null)) {
+this.Get_WebEditor_BlockEditor__editorPane_().Empty();
+}
+this.editorPane = null;
+this.Get_WebEditor_BlockEditor__blockListeners_().Empty();
 return true;
 };
 CreateGame() {
@@ -7150,19 +7182,19 @@ webAccess.AddHiddenButton$quorum_text("Undo");
 webAccess.AddHiddenButton$quorum_text("Redo");
 webAccess.AddWebAccessibilityListener$quorum_Libraries_Interface_Events_WebAccessibilityListener(this.prototype);
 this.prototype.SetupInterfaceOptions();
-this.Get_WebEditor_BlockEditor__listener_().Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
 var layout = new quorum_Libraries_Interface_Layouts_FlowLayout_();
 this.prototype.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
+if ((this.prototype.SupportsMultipleFiles() == false)) {
 var editor2 = new quorum_Libraries_Interface_Controls_Blocks_CodeEditor_();
 this.editor = editor2;
-this.Get_WebEditor_BlockEditor__editor_().SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(this.Get_WebEditor_BlockEditor__listener_());
+var listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+listener.Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
+this.Get_WebEditor_BlockEditor__editor_().SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(listener);
+this.Get_WebEditor_BlockEditor__blockListeners_().Add$quorum_Libraries_Language_Object$quorum_Libraries_Language_Object(this.Get_WebEditor_BlockEditor__editor_(), listener);
 this.Get_WebEditor_BlockEditor__editor_().AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(this.Get_WebEditor_BlockEditor__textHighlightListener_());
 this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(this.Get_WebEditor_BlockEditor__editor_());
 var read = "";
 read = this.prototype.GetTextForIDE$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
-if ((read == "")) {
-read = "output true";
-}
 read = this.prototype.Format$quorum_text(read);
 var size = 12;
 var listen = new quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_();
@@ -7171,6 +7203,48 @@ this.Get_WebEditor_BlockEditor__editor_().SetPercentageHeight$quorum_number(1 * 
 this.Get_WebEditor_BlockEditor__editor_().SetFontSize$quorum_integer(size);
 this.Get_WebEditor_BlockEditor__editor_().AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listen);
 this.Get_WebEditor_BlockEditor__editor_().SetCode$quorum_text(read);
+}
+else { 
+var tabPane = new quorum_Libraries_Interface_Controls_TabPane_();
+this.editorPane = tabPane;
+this.Get_WebEditor_BlockEditor__editorPane_().AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(this.prototype);
+this.Get_WebEditor_BlockEditor__editorPane_().SetPercentageWidth$quorum_number(1 * 1.0);
+this.Get_WebEditor_BlockEditor__editorPane_().SetPercentageHeight$quorum_number(1 * 1.0);
+global_Output_("IDE: GetMultipleFileText (Pre)");
+var fileNames = new quorum_Libraries_Containers_Array_();
+var fileTexts = new quorum_Libraries_Containers_Array_();
+this.prototype.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(this.Get_WebEditor_BlockEditor__CONTAINER_ID_(), fileNames, fileTexts);
+global_Output_("IDE: GetMultipleFileText (Post). Iterating...");
+var i = 0;
+while ((i < fileNames.GetSize())) {
+var tab = new quorum_Libraries_Interface_Controls_Tab_();
+tab.SetName$quorum_text(global_GetValue_(fileNames.Get$quorum_integer(i), "text"));
+tab.DisplayCloseButton$quorum_boolean(false);
+var newEditor = new quorum_Libraries_Interface_Controls_Blocks_CodeEditor_();
+newEditor.SetName$quorum_text(global_GetValue_(fileNames.Get$quorum_integer(i), "text"));
+var listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+listener.Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
+newEditor.SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(listener);
+this.Get_WebEditor_BlockEditor__blockListeners_().Add$quorum_Libraries_Language_Object$quorum_Libraries_Language_Object(newEditor, listener);
+newEditor.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(this.Get_WebEditor_BlockEditor__textHighlightListener_());
+var code = global_GetValue_(fileTexts.Get$quorum_integer(i), "text");
+code = this.prototype.Format$quorum_text(code);
+var size = 12;
+var listen = new quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_();
+newEditor.SetPercentageWidth$quorum_number(1 * 1.0);
+newEditor.SetPercentageHeight$quorum_number(1 * 1.0);
+newEditor.SetFontSize$quorum_integer(size);
+newEditor.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listen);
+newEditor.SetCode$quorum_text(code);
+if ((this.Get_WebEditor_BlockEditor__editor_() == null)) {
+this.editor = newEditor;
+}
+tab.SetRelatedItem$quorum_Libraries_Interface_Item2D(newEditor);
+this.Get_WebEditor_BlockEditor__editorPane_().Add$quorum_Libraries_Interface_Controls_Tab(tab);
+i = (i + 1);
+}
+}
+global_Output_("IDE: Created editors.");
 var palette = new quorum_Libraries_Interface_Controls_Blocks_Palette_BlockPalette_();
 palette.SetPercentageHeight$quorum_number(1 * 1.0);
 palette.SetPercentageWidth$quorum_number(1 * 1.0);
@@ -7211,7 +7285,12 @@ this.prototype.Add$quorum_Libraries_Interface_Item2D(palettePartition);
 this.prototype.AddPartitionInputTable$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
 webAccess.AddHiddenHeader$quorum_text$quorum_text$quorum_boolean("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, \nswipe right to find the items in the code editor, swipe left and you will find the palette.\n Navigation by headings is recommended if you want to find other landmarks.", true);
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editorPanel_());
+if ((this.Get_WebEditor_BlockEditor__editorPane_() != null)) {
+this.Get_WebEditor_BlockEditor__editorPanel_().Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editorPane_());
+}
+else { 
 this.Get_WebEditor_BlockEditor__editorPanel_().Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__editor_());
+}
 var resizeListener = new quorum_WebEditor_CanvasResizeListener_();
 resizeListener.AddPanel$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__palettePanel_());
 resizeListener.AddPanel$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__editorPanel_());
@@ -7224,6 +7303,11 @@ this.prototype.AddDefaultKeys();
 this.Get_WebEditor_BlockEditor__paletteItem_().Focus();
 this.prototype.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(this.prototype);
 this.prototype.SetColliding$quorum_boolean(false);
+global_Output_("IDE: Selecting tab...");
+if (((this.Get_WebEditor_BlockEditor__editorPane_() != null) && (this.Get_WebEditor_BlockEditor__editorPane_().IsEmpty() == false))) {
+this.Get_WebEditor_BlockEditor__editorPane_().Select$quorum_integer(0);
+}
+global_Output_("IDE: Finished initial setup.");
 };
 SetupEditorItems() {
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
@@ -7640,10 +7724,10 @@ var keywords = color.CustomColor$quorum_number$quorum_number$quorum_number$quoru
 var comments = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((68.0 / MAX), (80.0 / MAX), (91.0 / MAX), 1 * 1.0);
 var textColor = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((160.0 / MAX), (50.0 / MAX), (50.0 / MAX), 1 * 1.0);
 var structure = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((113.0 / MAX), (83.0 / MAX), (38.0 / MAX), 1 * 1.0);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_KEYWORD_COLOR_(), keywords);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(), structure);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_TEXT_COLOR_(), textColor);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_COMMENT_COLOR_(), comments);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_KEYWORD_COLOR_(), keywords);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(), structure);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_TEXT_COLOR_(), textColor);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_COMMENT_COLOR_(), comments);
 }
 else { 
 var darkOptions = new quorum_Libraries_Interface_Options_DarkBlockOptions_();
@@ -7652,12 +7736,27 @@ var keywords = color.CustomColor$quorum_number$quorum_number$quorum_number$quoru
 var comments = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((175.0 / MAX), (186.0 / MAX), (255.0 / MAX), 1 * 1.0);
 var textColor = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((255.0 / MAX), (165.0 / MAX), (127.0 / MAX), 1 * 1.0);
 var structure = color.CustomColor$quorum_number$quorum_number$quorum_number$quorum_number((207.0 / MAX), (175.0 / MAX), (224.0 / MAX), 1 * 1.0);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_KEYWORD_COLOR_(), keywords);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(), structure);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_TEXT_COLOR_(), textColor);
-options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_Libraries_Interface_Controls_Blocks_TextHighlightListener__EDITOR_COMMENT_COLOR_(), comments);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_KEYWORD_COLOR_(), keywords);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_STRUCTURE_COLOR_(), structure);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_TEXT_COLOR_(), textColor);
+options.SetColorProperty$quorum_text$quorum_Libraries_Game_Graphics_ColorGroup(this.Get_WebEditor_BlockEditor__textHighlightListener_().Get_WebEditor_TextHighlightListener__EDITOR_COMMENT_COLOR_(), comments);
 }
 this.prototype.SetInterfaceOptions$quorum_Libraries_Interface_Options_InterfaceOptions(options);
+};
+SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent(event) {
+if (global_InstanceOf(event.GetSelection(),'Libraries.Interface.Selections.TabPaneSelection')) {
+var selection = global_CheckCast(event.GetSelection(), "Libraries.Interface.Selections.TabPaneSelection");
+var tab = selection.GetTab();
+if (((tab != null) && global_InstanceOf(tab.GetRelatedItem(),'Libraries.Interface.Controls.Blocks.CodeEditor'))) {
+global_Output_(("SelectionChanged: Tab = " + tab.GetName()));
+var editor = global_CheckCast(tab.GetRelatedItem(), "Libraries.Interface.Controls.Blocks.CodeEditor");
+this.editor = editor;
+this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor);
+}
+else { 
+global_Output_(("SelectionChanged: Tab defined = " + (tab != null)));
+}
+}
 };
 Get_WebEditor_BlockEditor__scaleAmount_() {
    return this.scaleAmount;
@@ -7676,6 +7775,12 @@ Get_WebEditor_BlockEditor__textHighlightListener_() {
 };
 Set_WebEditor_BlockEditor__textHighlightListener_(value) {
    this.textHighlightListener = value;
+};
+Get_WebEditor_BlockEditor__editorPane_() {
+   return this.editorPane;
+};
+Set_WebEditor_BlockEditor__editorPane_(value) {
+   this.editorPane = value;
 };
 Get_WebEditor_BlockEditor__palettePanel_() {
    return this.palettePanel;
@@ -7707,17 +7812,17 @@ Get_WebEditor_BlockEditor__blocksItem_() {
 Set_WebEditor_BlockEditor__blocksItem_(value) {
    this.blocksItem = value;
 };
+Get_WebEditor_BlockEditor__blockListeners_() {
+   return this.blockListeners;
+};
+Set_WebEditor_BlockEditor__blockListeners_(value) {
+   this.blockListeners = value;
+};
 Get_WebEditor_BlockEditor__paletteItem_() {
    return this.paletteItem;
 };
 Set_WebEditor_BlockEditor__paletteItem_(value) {
    this.paletteItem = value;
-};
-Get_WebEditor_BlockEditor__listener_() {
-   return this.listener;
-};
-Set_WebEditor_BlockEditor__listener_(value) {
-   this.listener = value;
 };
 Get_WebEditor_BlockEditor__editorBlocks_() {
    return this.editorBlocks;
@@ -7914,28 +8019,30 @@ Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
 
 constructor(parents) {
 this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Events.FocusListener', 'Libraries.Interface.Events.TextChangeListener', 'Libraries.Interface.Events.WebAccessibilityListener', 'Libraries.Game.Game', 'Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.BlockEditor'];
+this.parentNames_ = ['Libraries.Interface.Events.FocusListener', 'Libraries.Interface.Events.TextChangeListener', 'Libraries.Interface.Events.WebAccessibilityListener', 'Libraries.Game.Game', 'Libraries.Interface.Events.SelectionListener', 'Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.BlockEditor'];
 this.Libraries_Interface_Events_FocusListener__ = null;
 this.Libraries_Interface_Events_TextChangeListener__ = null;
 this.Libraries_Interface_Events_WebAccessibilityListener__ = null;
 this.Libraries_Game_Game__ = null;
+this.Libraries_Interface_Events_SelectionListener__ = null;
 this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Events_FocusListener__ = new quorum_Libraries_Interface_Events_FocusListener_(false);
    this.Libraries_Interface_Events_TextChangeListener__ = new quorum_Libraries_Interface_Events_TextChangeListener_(false);
    this.Libraries_Interface_Events_WebAccessibilityListener__ = new quorum_Libraries_Interface_Events_WebAccessibilityListener_(false);
    this.Libraries_Game_Game__ = new quorum_Libraries_Game_Game_(false);
+   this.Libraries_Interface_Events_SelectionListener__ = new quorum_Libraries_Interface_Events_SelectionListener_(false);
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Events_FocusListener__.prototype = this;
    this.Libraries_Interface_Events_TextChangeListener__.prototype = this;
    this.Libraries_Interface_Events_WebAccessibilityListener__.prototype = this;
    this.Libraries_Game_Game__.prototype = this;
+   this.Libraries_Interface_Events_SelectionListener__.prototype = this;
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
 }
 this.plugin_ = new plugins_quorum_WebEditor_BlockEditor_(this);
 this.CONTAINER_ID = "BlockUIContainer";
-this.editor = null;
-this.listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+this.blockListeners = new quorum_Libraries_Containers_HashTable_();
 this.palettePanel = new quorum_WebEditor_WebControlPanel_();
 this.palettePartition = new quorum_Libraries_Interface_Controls_Control_();
 this.editorPanel = new quorum_WebEditor_WebControlPanel_();
@@ -7943,7 +8050,9 @@ this.editorPalette = null;
 this.editorBlocks = null;
 this.paletteItem = null;
 this.blocksItem = null;
-this.textHighlightListener = new quorum_Libraries_Interface_Controls_Blocks_TextHighlightListener_();
+this.editor = null;
+this.editorPane = null;
+this.textHighlightListener = new quorum_WebEditor_TextHighlightListener_();
 this.scaleAmount = 0.2;
 this.lastWidth = 0;
 
