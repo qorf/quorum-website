@@ -34,6 +34,18 @@ function plugins_quorum_WebEditor_BlockEditor_() {
                 }
             }
         }
+		
+	this.SupportsMultipleFilesNative$quorum_text = function(containerID)
+	{
+		let container = document.getElementById(containerID);
+		if (container.dataset.codeForIde) 
+		{
+			const data = JSON.parse(container.dataset.codeForIde);
+			return data.length > 1;
+		}
+		
+		return false;
+	}
 
     this.GetPaletteFileName$quorum_text = function(containerID) {
         let container = document.getElementById(containerID);

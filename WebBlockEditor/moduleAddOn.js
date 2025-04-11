@@ -4,6 +4,12 @@ function GetCode(){
 function SetCode(text) {
     $starter.SetCode$quorum_text(text);
 }
+function GetFileCount() {
+	return $starter.GetFileCount();
+}
+function GetCodeAtFileIndex(index) {
+	return $starter.GetCodeAtFileIndex$quorum_integer(index);
+}
 function ScaleUp() {
     $starter.ScaleUp();
 }
@@ -57,4 +63,4 @@ function PauseBlockExecution() {
     }
     global_Empty_Shared_Classes();
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex}
