@@ -7130,7 +7130,7 @@ ShowHelpModal() {
 return this.plugin_.ShowHelpModal();
 };
 SupportsMultipleFiles() {
-return false;
+return true;
 };
 GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts) {
 return this.plugin_.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts);
