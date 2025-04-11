@@ -14,6 +14,7 @@ use Libraries.Network.NetworkRequestListener
 use Libraries.Network.NetworkResponseEvent
 use Libraries.Data.Database.Insert
 use Libraries.System.Properties
+use Libraries.Containers.Iterator
 
 class Fastrun is ResponsePage, NetworkRequestListener
 
@@ -67,8 +68,28 @@ class Fastrun is ResponsePage, NetworkRequestListener
         if params:HasKey("ideName")
             ideName = params:GetValue("ideName")
         end
+        
+codeToSave = code
+        
+HashTable<text, text> data
+        data:Add("code", codeToSave)
+        
+        integer count = 0
+boolean break = true
+codeHashKey = code
+        
+repeat while break
+            text key = "extraBuildFile" + count
+            if params:HasKey(key)
+                text extraBuildFileValue = params:GetValue(key)
+                data:Add(key, extraBuildFileValue)
+                codeHashKey = codeHashKey + extraBuildFileValue
+                count = count + 1
+            else
+                break = false
+            end
+        end
 
-        codeToSave = code
 
         redis:Connect("redis")
         codeHash = exchange:HashString("SHA-1", code)
@@ -87,8 +108,6 @@ class Fastrun is ResponsePage, NetworkRequestListener
         request:SetReadTimeout(10000)
         request:SetWebAddress("http://quorum_server:1269")
 
-        HashTable<text, text> data
-        data:Add("code", codeToSave)
         request:SetParameters(data)
 
         NetworkConnection http
