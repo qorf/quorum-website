@@ -69,11 +69,12 @@ use Libraries.Interface.Controls.Tab
 use Libraries.Interface.Events.SelectionListener
 use Libraries.Interface.Events.SelectionEvent
 use Libraries.Interface.Selections.TabPaneSelection
+use Libraries.Containers.HashTable
 
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
     constant text CONTAINER_ID = "BlockUIContainer"
-ParserToBlockListener listener
+    HashTable<CodeEditor, ParserToBlockListener> blockListeners
     WebControlPanel palettePanel
     Control palettePartition
     WebControlPanel editorPanel
@@ -92,13 +93,8 @@ CodeEditor editor = undefined
     TextHighlightListener textHighlightListener
     
     system action GetTextForIDE(text containerID) returns text
-//    action GetTextForIDE(text containerID) returns text
-//        return "output true"
-    //end
+
     system action GetPaletteFileName(text containerID) returns text
-    //action GetPaletteFileName(text containerID) returns text
-//        return "palette.xml"
-//    end
     
     system action RunGame
     system action StopGame
@@ -124,7 +120,6 @@ end
     
     action OnExit returns boolean
         editor = undefined
-        listener = undefined
 palettePanel = undefined
     palettePartition = undefined
     editorPanel = undefined
@@ -132,6 +127,11 @@ palettePanel = undefined
     editorBlocks = undefined
     paletteItem = undefined
     blocksItem = undefined
+        if editorPane not= undefined
+            editorPane:Empty()
+        end
+        editorPane = undefined
+        blockListeners:Empty()
         return true
     end
     
@@ -158,8 +158,6 @@ webAccess:AddHiddenButton("Redo")
         
         SetupInterfaceOptions()
         
-listener:startLine= 0
-        
 FlowLayout layout
     SetLayout(layout)
         
@@ -167,7 +165,11 @@ FlowLayout layout
         CodeEditor editor2
         editor = editor2
         
-        editor:SetBlockListener(listener)
+    ParserToBlockListener listener
+    listener:startLine = 0
+    editor:SetBlockListener(listener)
+    blockListeners:Add(editor, listener)
+            
         editor:AddTextChangeListener(textHighlightListener)
         textHighlightListener:SetEditor(editor)
         text read = ""
@@ -201,7 +203,13 @@ Tab tab
                 tab:DisplayCloseButton(false)
                 
                 CodeEditor newEditor
+                newEditor:SetName(fileNames:Get(i))
+                
+ParserToBlockListener listener
+            listener:startLine = 0
 newEditor:SetBlockListener(listener)
+            blockListeners:Add(newEditor, listener)
+                
         newEditor:AddTextChangeListener(textHighlightListener)
     text code = fileTexts:Get(i)
       code = Format(code)
@@ -794,7 +802,7 @@ action SelectionChanged(SelectionEvent event)
 if event:GetSelection() is TabPaneSelection
             TabPaneSelection selection = cast(TabPaneSelection, event:GetSelection())
             Tab tab = selection:GetTab()
-            if tab:GetRelatedItem() is CodeEditor
+            if tab not= undefined and tab:GetRelatedItem() is CodeEditor
                 CodeEditor editor = cast(CodeEditor, tab:GetRelatedItem())
                 me:editor = editor
                 textHighlightListener:SetEditor(editor)

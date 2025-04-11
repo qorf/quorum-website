@@ -29,8 +29,8 @@ function plugins_quorum_WebEditor_BlockEditor_() {
                   let quorumText = new quorum_Libraries_Language_Types_Text_();
                   quorumName.SetValue$quorum_text(fileName);
                   quorumText.SetValue$quorum_text(fileText);
-                  fileNames.Add$quorum_Libraries_Language_Object_(quorumName);
-                  fileTexts.Add$quorum_Libraries_Language_Object_(quorumText);
+                  fileNames.Add$quorum_Libraries_Language_Object(quorumName);
+                  fileTexts.Add$quorum_Libraries_Language_Object(quorumText);
                 }
             }
         }
@@ -87,7 +87,6 @@ this.editor = global_CheckCast(region.GetBlockEnvironment(), "Libraries.Interfac
 }
 }
 else { 
-global_Output_("Couldn't identify source of text change");
 return;
 }
 if ((this.Get_WebEditor_TextHighlightListener__editor_() == null)) {
@@ -107,7 +106,6 @@ this.prototype.PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_Co
 }
 };
 PerformHighlighting$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor) {
-global_Output_("PerformHighlighting");
 if ((editor == null)) {
 return;
 }
@@ -7148,7 +7146,6 @@ this.prototype.StartGame();
 };
 OnExit() {
 this.editor = null;
-this.listener = null;
 this.palettePanel = null;
 this.palettePartition = null;
 this.editorPanel = null;
@@ -7156,6 +7153,11 @@ this.editorPalette = null;
 this.editorBlocks = null;
 this.paletteItem = null;
 this.blocksItem = null;
+if ((this.Get_WebEditor_BlockEditor__editorPane_() != null)) {
+this.Get_WebEditor_BlockEditor__editorPane_().Empty();
+}
+this.editorPane = null;
+this.Get_WebEditor_BlockEditor__blockListeners_().Empty();
 return true;
 };
 CreateGame() {
@@ -7176,13 +7178,15 @@ webAccess.AddHiddenButton$quorum_text("Undo");
 webAccess.AddHiddenButton$quorum_text("Redo");
 webAccess.AddWebAccessibilityListener$quorum_Libraries_Interface_Events_WebAccessibilityListener(this.prototype);
 this.prototype.SetupInterfaceOptions();
-this.Get_WebEditor_BlockEditor__listener_().Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
 var layout = new quorum_Libraries_Interface_Layouts_FlowLayout_();
 this.prototype.SetLayout$quorum_Libraries_Interface_Layouts_Layout(layout);
 if ((this.prototype.SupportsMultipleFiles() == false)) {
 var editor2 = new quorum_Libraries_Interface_Controls_Blocks_CodeEditor_();
 this.editor = editor2;
-this.Get_WebEditor_BlockEditor__editor_().SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(this.Get_WebEditor_BlockEditor__listener_());
+var listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+listener.Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
+this.Get_WebEditor_BlockEditor__editor_().SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(listener);
+this.Get_WebEditor_BlockEditor__blockListeners_().Add$quorum_Libraries_Language_Object$quorum_Libraries_Language_Object(this.Get_WebEditor_BlockEditor__editor_(), listener);
 this.Get_WebEditor_BlockEditor__editor_().AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(this.Get_WebEditor_BlockEditor__textHighlightListener_());
 this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(this.Get_WebEditor_BlockEditor__editor_());
 var read = "";
@@ -7211,7 +7215,11 @@ var tab = new quorum_Libraries_Interface_Controls_Tab_();
 tab.SetName$quorum_text(global_GetValue_(fileNames.Get$quorum_integer(i), "text"));
 tab.DisplayCloseButton$quorum_boolean(false);
 var newEditor = new quorum_Libraries_Interface_Controls_Blocks_CodeEditor_();
-newEditor.SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(this.Get_WebEditor_BlockEditor__listener_());
+newEditor.SetName$quorum_text(global_GetValue_(fileNames.Get$quorum_integer(i), "text"));
+var listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+listener.Set_Libraries_Language_Compile_Blocks_ParserToBlockListener__startLine_(0);
+newEditor.SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener(listener);
+this.Get_WebEditor_BlockEditor__blockListeners_().Add$quorum_Libraries_Language_Object$quorum_Libraries_Language_Object(newEditor, listener);
 newEditor.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(this.Get_WebEditor_BlockEditor__textHighlightListener_());
 var code = global_GetValue_(fileTexts.Get$quorum_integer(i), "text");
 code = this.prototype.Format$quorum_text(code);
@@ -7730,7 +7738,7 @@ SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent(event) {
 if (global_InstanceOf(event.GetSelection(),'Libraries.Interface.Selections.TabPaneSelection')) {
 var selection = global_CheckCast(event.GetSelection(), "Libraries.Interface.Selections.TabPaneSelection");
 var tab = selection.GetTab();
-if (global_InstanceOf(tab.GetRelatedItem(),'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+if (((tab != null) && global_InstanceOf(tab.GetRelatedItem(),'Libraries.Interface.Controls.Blocks.CodeEditor'))) {
 var editor = global_CheckCast(tab.GetRelatedItem(), "Libraries.Interface.Controls.Blocks.CodeEditor");
 this.editor = editor;
 this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor);
@@ -7791,17 +7799,17 @@ Get_WebEditor_BlockEditor__blocksItem_() {
 Set_WebEditor_BlockEditor__blocksItem_(value) {
    this.blocksItem = value;
 };
+Get_WebEditor_BlockEditor__blockListeners_() {
+   return this.blockListeners;
+};
+Set_WebEditor_BlockEditor__blockListeners_(value) {
+   this.blockListeners = value;
+};
 Get_WebEditor_BlockEditor__paletteItem_() {
    return this.paletteItem;
 };
 Set_WebEditor_BlockEditor__paletteItem_(value) {
    this.paletteItem = value;
-};
-Get_WebEditor_BlockEditor__listener_() {
-   return this.listener;
-};
-Set_WebEditor_BlockEditor__listener_(value) {
-   this.listener = value;
 };
 Get_WebEditor_BlockEditor__editorBlocks_() {
    return this.editorBlocks;
@@ -8021,7 +8029,7 @@ if(parents == null) {
 }
 this.plugin_ = new plugins_quorum_WebEditor_BlockEditor_(this);
 this.CONTAINER_ID = "BlockUIContainer";
-this.listener = new quorum_Libraries_Language_Compile_Blocks_ParserToBlockListener_();
+this.blockListeners = new quorum_Libraries_Containers_HashTable_();
 this.palettePanel = new quorum_WebEditor_WebControlPanel_();
 this.palettePartition = new quorum_Libraries_Interface_Controls_Control_();
 this.editorPanel = new quorum_WebEditor_WebControlPanel_();

@@ -29,8 +29,8 @@ function plugins_quorum_WebEditor_BlockEditor_() {
                   let quorumText = new quorum_Libraries_Language_Types_Text_();
                   quorumName.SetValue$quorum_text(fileName);
                   quorumText.SetValue$quorum_text(fileText);
-                  fileNames.Add$quorum_Libraries_Language_Object_(quorumName);
-                  fileTexts.Add$quorum_Libraries_Language_Object_(quorumText);
+                  fileNames.Add$quorum_Libraries_Language_Object(quorumName);
+                  fileTexts.Add$quorum_Libraries_Language_Object(quorumText);
                 }
             }
         }
