@@ -70,6 +70,7 @@ use Libraries.Interface.Events.SelectionListener
 use Libraries.Interface.Events.SelectionEvent
 use Libraries.Interface.Selections.TabPaneSelection
 use Libraries.Containers.HashTable
+use Libraries.Interface.Item2D
 
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
@@ -82,6 +83,8 @@ class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListene
     CodeEditor editorBlocks = undefined
     EditorItem paletteItem = undefined
     EditorItem blocksItem = undefined
+    
+    boolean alwaysSupportMultipleFiles = false
     
     // If this editor only supports one file, this is the single editor.
     // If it supports multiple, this is the editor for the currently active file.
@@ -102,8 +105,15 @@ CodeEditor editor = undefined
     system action ShowHelpModal
     
     action SupportsMultipleFiles returns boolean
-        return true
+        if alwaysSupportMultipleFiles
+            return true
+        end
+        
+        // Returns true if the IDE has multiple files associated with it at this moment in time, or false otherwise.
+        return SupportsMultipleFilesNative(CONTAINER_ID)
     end
+    
+    private system action SupportsMultipleFilesNative(text containerID) returns boolean
     
     //Get the text for all of the files associated with this IDE. Append them to the provided array. 
     system action GetMultipleFileText(text containerID, Array<text> fileNames, Array<text> fileTexts)
@@ -807,9 +817,50 @@ if event:GetSelection() is TabPaneSelection
                 me:editor = editor
                 textHighlightListener:SetEditor(editor)
                 
-                // If any other work needs to be done in the future on tab change (such as palette updates) that can also happen here.
+                editorPalette:SetEditor(editor)
             end
         end
+    end
+    
+    action SetAlwaysSupportMultipleFiles(boolean support)
+alwaysSupportMultipleFiles = support
+    end
+    
+    action AlwaysSupportMultipleFiles returns boolean
+        return alwaysSupportMultipleFiles
+    end
+    
+    // Returns how many code files this IDE has. If the IDE hasn't been started yet, this will return 0.
+    action GetFileCount returns integer
+        if editorPane not= undefined
+            return editorPane:GetSize()
+        elseif editor not= undefined
+            return 1
+        else
+            return 0
+        end
+    end
+    
+    // Gets the code associated with the file at the provided index. If this IDE doesn't support multiple files, index 0 is still valid for the single editor.
+    action GetCodeAtFileIndex(integer index) returns text
+        if editorPane = undefined and editor not= undefined
+            if index not= 0
+                alert("Can't access a file at index " + index + " -- this IDE doesn't support multiple files.")
+            else
+                return editor:GetText()
+            end
+        elseif editorPane not= undefined
+            Array<Tab> tabs = editorPane:GetTabs()
+            Item2D item = tabs:Get(index):GetRelatedItem()
+            if item is CodeEditor
+                CodeEditor currentEditor = cast(CodeEditor, item)
+                return currentEditor:GetText()
+            else
+                alert("I couldn't read from index " + index + " because it wasn't a CodeEditor.")
+            end
+        end
+        
+        return ""
     end
     
 end

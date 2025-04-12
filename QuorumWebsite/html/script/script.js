@@ -575,7 +575,7 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
   runButton.disabled = true;
   window.BLOCK_EDITOR.BlockEditorStop();
   
-  let codeInput = window.BLOCK_EDITOR.GetCode();
+  let fileCount = window.BLOCK_EDITOR.GetFileCount();
   let outputRegion = document.getElementById(output);
   let pageURL = window.location.href;
   let ideName = "Block Editor";
@@ -583,7 +583,23 @@ var blockEditorRunCode = function(output, uiContainer, execute = true) {
   let tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   currentIDEOutput_$Global_ = output;
   currentUIContainer_$Global_ = uiContainer;
-  let codeData = { code: codeInput, pageURL: pageURL, ideName: ideName, build_only: button, timezone: tz };
+  let codeData = { pageURL: pageURL, ideName: ideName, build_only: button, timezone: tz };
+  
+  if (fileCount > 1)
+  {
+	  codeData.code = window.BLOCK_EDITOR.GetCodeAtFileIndex(0);
+	  for (let i = 1; i < fileCount; i++)
+	  {
+		  let fileCode = window.BLOCK_EDITOR.GetCodeAtFileIndex(i);
+		  let propertyName = "extraBuildFile" + (i - 1);
+		  codeData[propertyName] = fileCode;
+	  }
+  }
+  else
+  {
+	  codeData.code = window.BLOCK_EDITOR.GetCode();
+  }
+  
   let compileRequest = requestCompile(codeData, execute);
   compileRequest.then(
     (result) => {

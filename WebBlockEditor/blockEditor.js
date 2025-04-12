@@ -34,6 +34,18 @@ function plugins_quorum_WebEditor_BlockEditor_() {
                 }
             }
         }
+		
+	this.SupportsMultipleFilesNative$quorum_text = function(containerID)
+	{
+		let container = document.getElementById(containerID);
+		if (container.dataset.codeForIde) 
+		{
+			const data = JSON.parse(container.dataset.codeForIde);
+			return data.length > 1;
+		}
+		
+		return false;
+	}
 
     this.GetPaletteFileName$quorum_text = function(containerID) {
         let container = document.getElementById(containerID);
@@ -7130,7 +7142,13 @@ ShowHelpModal() {
 return this.plugin_.ShowHelpModal();
 };
 SupportsMultipleFiles() {
+if (this.Get_WebEditor_BlockEditor__alwaysSupportMultipleFiles_()) {
 return true;
+}
+return this.prototype.SupportsMultipleFilesNative$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
+};
+SupportsMultipleFilesNative$quorum_text(containerID) {
+return this.plugin_.SupportsMultipleFilesNative$quorum_text(containerID);
 };
 GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts) {
 return this.plugin_.GetMultipleFileText$quorum_text$quorum_Libraries_Containers_Array$quorum_Libraries_Containers_Array(containerID, fileNames, fileTexts);
@@ -7742,8 +7760,52 @@ if (((tab != null) && global_InstanceOf(tab.GetRelatedItem(),'Libraries.Interfac
 var editor = global_CheckCast(tab.GetRelatedItem(), "Libraries.Interface.Controls.Blocks.CodeEditor");
 this.editor = editor;
 this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor);
+this.Get_WebEditor_BlockEditor__editorPalette_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(editor);
 }
 }
+};
+SetAlwaysSupportMultipleFiles$quorum_boolean(support) {
+this.alwaysSupportMultipleFiles = support;
+};
+AlwaysSupportMultipleFiles() {
+return this.Get_WebEditor_BlockEditor__alwaysSupportMultipleFiles_();
+};
+GetFileCount() {
+if ((this.Get_WebEditor_BlockEditor__editorPane_() != null)) {
+return this.Get_WebEditor_BlockEditor__editorPane_().GetSize();
+}
+else if( (this.Get_WebEditor_BlockEditor__editor_() != null)) {
+return 1;
+}
+else { 
+return 0;
+}
+};
+GetCodeAtFileIndex$quorum_integer(index) {
+if (((this.Get_WebEditor_BlockEditor__editorPane_() == null) && (this.Get_WebEditor_BlockEditor__editor_() != null))) {
+if ((index != 0)) {
+var exceptionInstance_ = new quorum_Libraries_Language_Errors_Error_();
+ exceptionInstance_.SetErrorMessage$quorum_text((("Can't access a file at index " + index) + " -- this IDE doesn't support multiple files."));
+throw exceptionInstance_;
+}
+else { 
+return this.Get_WebEditor_BlockEditor__editor_().GetText();
+}
+}
+else if( (this.Get_WebEditor_BlockEditor__editorPane_() != null)) {
+var tabs = this.Get_WebEditor_BlockEditor__editorPane_().GetTabs();
+var item = tabs.Get$quorum_integer(index).GetRelatedItem();
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+var currentEditor = global_CheckCast(item, "Libraries.Interface.Controls.Blocks.CodeEditor");
+return currentEditor.GetText();
+}
+else { 
+var exceptionInstance_ = new quorum_Libraries_Language_Errors_Error_();
+ exceptionInstance_.SetErrorMessage$quorum_text((("I couldn't read from index " + index) + " because it wasn't a CodeEditor."));
+throw exceptionInstance_;
+}
+}
+return "";
 };
 Get_WebEditor_BlockEditor__scaleAmount_() {
    return this.scaleAmount;
@@ -7762,6 +7824,12 @@ Get_WebEditor_BlockEditor__textHighlightListener_() {
 };
 Set_WebEditor_BlockEditor__textHighlightListener_(value) {
    this.textHighlightListener = value;
+};
+Get_WebEditor_BlockEditor__alwaysSupportMultipleFiles_() {
+   return this.alwaysSupportMultipleFiles;
+};
+Set_WebEditor_BlockEditor__alwaysSupportMultipleFiles_(value) {
+   this.alwaysSupportMultipleFiles = value;
 };
 Get_WebEditor_BlockEditor__editorPane_() {
    return this.editorPane;
@@ -8037,6 +8105,7 @@ this.editorPalette = null;
 this.editorBlocks = null;
 this.paletteItem = null;
 this.blocksItem = null;
+this.alwaysSupportMultipleFiles = false;
 this.editor = null;
 this.editorPane = null;
 this.textHighlightListener = new quorum_WebEditor_TextHighlightListener_();
@@ -8073,6 +8142,12 @@ function GetCode(){
 }
 function SetCode(text) {
     $starter.SetCode$quorum_text(text);
+}
+function GetFileCount() {
+	return $starter.GetFileCount();
+}
+function GetCodeAtFileIndex(index) {
+	return $starter.GetCodeAtFileIndex$quorum_integer(index);
 }
 function ScaleUp() {
     $starter.ScaleUp();
@@ -8127,4 +8202,4 @@ function PauseBlockExecution() {
     }
     global_Empty_Shared_Classes();
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex}
