@@ -7209,7 +7209,6 @@ this.Get_WebEditor_BlockEditor__editor_().AddTextChangeListener$quorum_Libraries
 this.Get_WebEditor_BlockEditor__textHighlightListener_().SetEditor$quorum_Libraries_Interface_Controls_Blocks_CodeEditor(this.Get_WebEditor_BlockEditor__editor_());
 var read = "";
 read = this.prototype.GetTextForIDE$quorum_text(this.Get_WebEditor_BlockEditor__CONTAINER_ID_());
-read = this.prototype.Format$quorum_text(read);
 var size = 12;
 var listen = new quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_();
 this.Get_WebEditor_BlockEditor__editor_().SetPercentageWidth$quorum_number(1 * 1.0);
@@ -7240,7 +7239,6 @@ newEditor.SetBlockListener$quorum_Libraries_Language_Compile_Blocks_ParserToBloc
 this.Get_WebEditor_BlockEditor__blockListeners_().Add$quorum_Libraries_Language_Object$quorum_Libraries_Language_Object(newEditor, listener);
 newEditor.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(this.Get_WebEditor_BlockEditor__textHighlightListener_());
 var code = global_GetValue_(fileTexts.Get$quorum_integer(i), "text");
-code = this.prototype.Format$quorum_text(code);
 var size = 12;
 var listen = new quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_();
 newEditor.SetPercentageWidth$quorum_number(1 * 1.0);
