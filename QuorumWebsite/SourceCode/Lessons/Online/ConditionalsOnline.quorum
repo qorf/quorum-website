@@ -1,0 +1,267 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.System.File
+
+class ConditionalsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Conditionals with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 9: Conditionals", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to conditionals.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("So far, you have made programs that are sequential, meaning they always follow the same set of instructions from start to finish. In practice, programs are rarely so linear. Often, you need to do different things depending on data that a computer program has available. In this lesson, you will learn how to use conditional statements to change what code you run.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to use if statements to control program execution")
+        goalList:AddListItem("Learn how to further control code with else and elseif blocks")
+goalList:AddListItem("Learn how scope affects variables created inside “if” statements")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Traveling somewhere new can be fun, but requires planning. When you plan for a vacation or other travel, what are some factors that you consider when you start to pack your suitcase? How do you decide what to bring? Now, consider your decision making process. Can you formalize your decision making into rules (e.g. if X, then I will bring Y)? ")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Conditionals/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Conditionals/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>1B-AP-10</strong>: Create programs that include sequences,
+events, loops, and conditionals. 
+")
+standards:AddListItem("<strong>2-AP-11</strong>: Create clearly named variables that
+represent different data types and perform operations
+on their values.
+")
+standards:AddListItem("<strong>2AP-12</strong>: Design and iteratively develop programs that
+combine control structures, including nested loops and
+compound conditionals.
+")
+standards:AddListItem("<strong>3A-AP-15</strong>: Justify the selection of specific control
+structures when tradeoffs involve implementation, readability, and program performance, and explain the
+benefits and drawbacks of choices made.
+")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("You use if statements to teach the computer to make decisions on its own. Some might call this artificial intelligence (AI). This is sort of true in the sense that the computer can learn to make decisions all on its own. However, this form of artificial intelligence is primitive and not usually what an expert would mean when they say AI. At the end of the day, an if statement decides whether or not to execute another piece of code. ")
+section:AddParagraph("Imagine that you are playing a video game. For example, perhaps you are facing an enemy and you have two decisions of what your next move would be: fight or flight. You could formalize your decision making process with some rules. It might look something like this:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"if creature = " + dq + "monster" + dq + "
+     output " + dq + "run away!" + dq + "
+end
+"))
+section:AddParagraph("Using this rule would assume you have a variable somewhere named creature and that it is text. If that text happens to have the name monster, run away. Just like you can formalize rules for your decision making, you can also make rules for the computer to follow. If statements allow you to control what code the computer executes depending on the rules or conditions you set.
+")
+section:AddParagraph("There are 3 major parts of a conditional, the
+")
+        
+UnorderedList ifList
+        ifList:AddClassAttribute("list-disc list-outside pl-8")
+ifList:AddListItem("if statement (plus conditional), ")
+ifList:AddListItem("Zero or more elseif statements (plus conditional), and then an")
+ifList:AddListItem("optional else statement. ")
+        section:Add(ifList)
+        
+AddHeading(section, "Creating a Conditional Statement", 3)
+section:AddParagraph("Creating a conditional statement involves using the if structure to teach the computer to only react sometimes. In computer science, although many languages are very similar for this feature, the code for conditional statements does vary between languages. In Quorum, the code is as so:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"if conditional
+   // perform action A
+else
+  // perform action B
+end
+"))
+        
+section:AddParagraph("When you think about how to write a conditional, it is often broken down into decision making where event A happens if the condition is true and event B happens if the condition is false. 
+")
+Image flowchart = section:AddImage("/media/Blocks/Conditionals/conditional.png", "A flow chart format asking the question: Is it raining
+If true, then you play indoors
+If false, then you play outside")
+flowchart:AddText("A flow chart format asking the question: Is it raining
+If true, then you play indoors
+If false, then you play outside")
+        flowchart:AddAttribute("data-zoom","")
+        
+section:AddParagraph("The condition must be a boolean expression with only the values true or false. These conditionals again use any or all of the following boolean operators:
+")
+        
+section:Add(LoadWebTable("Equalities and Inequalities", "/html/media/BlocksOnline/Conditionals/Operators.csv"))
+section:AddParagraph("Additionally, there are logical operators that are often used with conditional operators to combine multiple conditions:
+")
+section:Add(LoadWebTable("Logical And, Or, and Not", "/html/media/BlocksOnline/Conditionals/LogicalOperators.csv"))
+section:AddParagraph("Notice that these match exactly with the kinds of operations taught in the Parsons problems for booleans. You can use different types of variables with these conditional operators. For example: 5 < 10 would result in <strong>true</strong> and 4 < 10 and 7 >= 15 would result in <strong>false</strong>.
+")
+        
+        
+AddHeading(section, "Nested Conditionals and elseif", 3)
+section:AddParagraph("It is possible (and sometimes useful) to place conditionals inside of other conditionals. Be careful when nesting them. Doing so is commonplace in programming, but some discretion to keep your code from getting confusing is warranted. Here is an example from grading, written as text in part because examples of this size tend to get hard in an alternative description:
+")
+        File file
+        file:SetPath("/html/media/BlocksOnline/Conditionals/NestedIf.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+section:AddParagraph("If statements can be tricky to grasp and easy to mess up. For example, with the previous example you have to think more carefully about what is going on in this piece of code because the testScores are nested. Thus:
+")
+        
+UnorderedList ifList2
+        ifList2:AddClassAttribute("list-disc list-outside pl-8")
+ifList2:AddListItem("If the testScore is greater than 90, it gets an A.")
+ifList2:AddListItem("Otherwise, it checks if the score is greater than 80 for a B.")
+ifList2:AddListItem("If not, it looks at scores above 70 for a C.")
+ifList2:AddListItem("Finally, anything below 70 gets a D.")
+        section:Add(ifList2)
+        
+section:AddParagraph("As a reminder, each if statement is nested, meaning inside of, the scope of others. Because of this, not all aspects of this code ever run. In terms of obtaining information about it, scoping can be determined multimodally. Visually, some multi-line blocks are inside of each other and shoved to the right. This means they are self-contained in that region. Aurally, for screen reader users, although screen readers vary slightly in what they read, they tend to say first the line of code, in addition to the nesting level and the number of top level blocks inside that region. The idea is that you can get a sense of scope in different ways.
+")
+section:AddParagraph("In this particular case, instead of nesting conditionals, you can use the elseif block to test extra conditions. Examine the revised example below:
+")
+        
+file:SetPath("/html/media/BlocksOnline/Conditionals/Elseif.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+section:AddParagraph("Lines that start with elseif statements are optional extra pieces you can add to an if statement. They act as extra conditionals that are only tested if the conditions before them were false. Conditions are always evaluated in order, from top to bottom, and the if statement will never check or run other conditionals or their code if a previous condition was true. Both approaches are used commonly and which one to use in your own code can be situational. Nested code is arguably harder to understand, but sometimes you might need that flexibility. 
+")
+        
+        AddHeading(section, "Nothing else worked, so else", 3)
+section:AddParagraph("As one final block, you can add an else block to an if statement. In text, this might be as follows:
+")
+file:SetPath("/html/media/BlocksOnline/Conditionals/Else.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("The basic idea is that the computer checks the condition in the if first. If it is true, the block executes and then jumps to the final end. If it is false, it then checks condition 2, with the same procedure. The idea is that one, and only one, of the blocks runs.
+")
+
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("Conditionals are also an extremely important skill to learn in computer science. In day to day use as a programmer, they are one of the most common pieces of code you will write. For these Parsons problems, you will practice understanding and using conditionals.
+")
+section:AddParagraph("Given that conditionals make heavy use of boolean variables and operators, if you forget the concepts, consider jumping back to those lessons or redoing the Parsons problems as practice before doing this one. 
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("You will now continue using Parsons problems. This time, you will practice using conditionals in a variety of ways. This includes using if, elseif, else, and also practicing boolean expressions. If you forget the details of boolean operations, you may want to consider going back and practicing those operations one more time. Part of the purpose in combining if with continued practice with boolean expressions is because the concept is so commonplace, and so fundamental, to programming, that practicing regularly with new examples can be helpful. These examples are in the context of conditionals, but the same applies.")
+section:AddParagraph("As before with these Parsons problems, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.")
+        
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about if","/problems/conditionals/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("The flavor of the month in computer science is often termed AI and the media often conflates seemingly any software that has been invented with it. What do you think the differences are between what a computer scientist might mean for AI and an if statement?
+")
+        return section
+    end
+    
+action GetMetaDescription returns text
+        return "Learn about conditionals."
+    end
+
+    action GetSummaryName returns text
+        return "Conditionals"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Conditionals Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to work with conditionals"
+    end
+
+    action GetLinkName returns text
+        return "Conditionals online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/conditionals.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Conditionals Online"
+    end
+end
