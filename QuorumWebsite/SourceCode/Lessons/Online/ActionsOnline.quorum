@@ -1,0 +1,326 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.System.File
+
+class ActionsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Actions with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 12: Actions", 1)
+
+        headDiv:AddParagraph("This lesson is about learning to write your own actions.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In previous lessons, you have seen how to use objects from libraries and how to call actions from those objects. In this lesson, you will learn how to make your own. Learning how to write your own actions is an important first step in making your code more reusable.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to use action blocks to create an action")
+        goalList:AddListItem("Learn about the optional properties of actions: parameters and return values")
+goalList:AddListItem("Discuss how scope impacts variables declared in and out of actions")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Actions allow programs the ability to perform a task. In the previous lesson, while you were working on Form apps, recall the kinds of actions you were calling:")
+section:Add(preformatter:GeneratePreformattedCode(
+"page:AddBanner(" + dq + "banner1" + dq + ", " + dq + "About me"+dq+", "+dq+"Welcome to my page"+dq+")
+page:AddButton("+dq+"Click me"+dq+")
+"))
+section:AddParagraph("Each of these calls is an action. What might the benefit be of learning to write your own action?")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Actions/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Actions/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>2-AP-14</strong>: Create procedures with parameters to
+organize code and make it easier to reuse. 
+")
+standards:AddListItem("<strong>3A-AP-17</strong>: Decompose problems into smaller
+components through systematic analysis, using constructs such as procedures, modules, and/or objects. 
+")
+standards:AddListItem("<strong>3A-AP-18</strong>: Create artifacts by using procedures within
+a program, combinations of data and procedures, or independent but interrelated programs.
+")
+
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("When coding, it can quickly become tedious to rewrite the same or similar code. So far, you have learned how to shorten repetitive commands by using loops and conditionals using repeat and if. This lets you reuse code inside of the loop, but does little to let you reuse more advanced code.")
+section:AddParagraph("You have already seen how useful and powerful code reuse can be when calling actions. You do not, for example, need to know how the Form class's actions work. You can just call them and hope that the person that wrote them did a reasonable job.")
+section:AddParagraph("The term action has not been standardized. In fact, although the analogy in math that is closest, while not exactly the same, is that of the function, the field of computer science never standardized its terms. In programming languages, common terms for the same or similar concepts include function, procedure, method, action, or although used in somewhat esoteric circumstances: lambda. In Quorum, they are called actions because evidence in the academic literature suggests this name is reasonable [1]. The term implies what a piece of code should do and each action is given an individual name. These names can be used to help you organize your code. Regardless of the language, this concept of actions is a core feature of modern programming. It is critical and you cannot avoid it.")
+section:AddParagraph("In colloquial words, an action is a chunk of code that has a name. Just like you saw when using objects before, you can run the code in an action by calling its name. Actions are especially useful because they allow you to write down some idea you have, then reuse that idea. They allow others to write down their ideas so that others can use them.")
+section:AddParagraph("Here are a few of the benefits of using actions:")
+        
+        
+UnorderedList columnList
+        columnList:AddClassAttribute("list-disc list-outside pl-8")
+columnList:AddListItem("Actions allow you to reuse code.")
+columnList:AddListItem("Actions can abstract code, letting you focus on what task an action performs without worrying about how it does it.")
+columnList:AddListItem("Actions can break up a program into smaller pieces, which can make it easier to divide responsibilities between different people on a team.")
+columnList:AddListItem("Actions can allow others to tap into functionality that they might not know how to write themselves.")
+        section:Add(columnList)
+        
+section:AddParagraph("Consider an example from Math. While most with a formal education are comfortable with basic operators like addition and subtraction, advanced math can sometimes require considerable education, up to a doctorate, to write accurately into a computer program. The actions for many math functions are very complex and writing them is extremely hard. However, if written correctly, calling them is very easy. ")
+section:AddParagraph("Actions are so important that you have been using them in every program you have written so far, even if it was not obvious. When you write a Quorum program that does not include any actions, one is secretly generated behind the scenes for you. This secret action is called Main and it wraps around all the code you have written. The image below shows a program and what it secretly converts to under the hood. These two programs are functionally identical.")
+
+Image i1 = section:AddImage("/media/Blocks/ActionsClasses1/SecretMainAction.png", "This is a diagram showing how an output hello style block is secretly wrapped by an action behind the scenes. Visually, "
++ "it is a flowchart with the output going to an action main wrapping the action. The visual is not a metaphor. Quorum literally does this behind the scenes.")
+        i1:AddClassAttribute("object-contain max-w-96 max-h-36 rounded overflow-hidden")
+        i1:AddAttribute("data-zoom","")
+section:AddParagraph("Although evidence in the literature is not definitive, it is at least plausible that Quorum's automatic hiding of this feature is beneficial for some [2]. Once you start to write more complex programs, though, you will need to identify where you want to start your program. This requires you to define your own Main function, which you can do with the following lines of code:")
+        
+section:Add(preformatter:GeneratePreformattedCode("action Main
+end
+"))
+section:AddParagraph("Any program that includes actions must have a Main action and a starting point for which one is the beginning of your program. While likely confusing, computer programs can have many starting points and the term Main is just a common convention. A sample program that includes a Main and another action would be the following:
+")
+section:Add(preformatter:GeneratePreformattedCode("action Main
+    SayGreeting()
+end
+
+action SayGreeting
+    say "+dq+"Hello Friend!"+dq+"
+end
+"))
+section:AddParagraph("In this code example, the program starts at the Main action and runs each command in order until the program reaches the Main action's end. Consider how this program executes, step by step:
+")
+        
+UnorderedList actionList
+        actionList:AddClassAttribute("list-disc list-outside pl-8")
+actionList:AddListItem("The program always begins on the first line inside the Main action. In this case, it starts on line 2.")
+actionList:AddListItem("The SayGreeting action is called. The program jumps to the first line inside the SayGreeting action, on line 5.")
+actionList:AddListItem("The code on line 5 executes. The program outputs Hello Friend!")
+actionList:AddListItem("The program advances to line 6. Because this is the end of the action, the program returns to where it was before the action was called, back to line 2.")
+actionList:AddListItem("The program advances to line 3. Since this is the end of the Main action. There is no more code left to run, so the program terminates.")
+        section:Add(actionList)
+        
+        
+AddHeading(section, "Actions and Arguments", 3)
+section:AddParagraph("Actions are closely tied to the concepts of <strong>arguments</strong> and <strong>parameters</strong>. An argument is a way of forcing the programming language to require special information is given to the action. A parameter is an actual piece of information passed to an action. The distinction is subtle, so consider an example.
+")
+section:Add(preformatter:GeneratePreformattedCode("action Test(integer value)
+end
+"))
+section:AddParagraph("In this action, there is a single action with the name of Test. The first line of the action is called a signature and that signature has one argument. The argument is of type integer and has the name value. Actions can have as many arguments as is desired. They can also do things. This action would add two integers, a and b, and output the value to the screen.
+")
+section:Add(preformatter:GeneratePreformattedCode("action Add(integer a, integer b)
+    output a + b
+end
+"))
+        
+        
+AddHeading(section, "Actions and Parameters", 3)
+section:AddParagraph("Arguments are special in that they tell the programming language to force the programmer to give the action information. That information is called parameters. These variables only exist in the scope of an action and their value is set to whatever value you use when you call the action.
+")
+section:AddParagraph("Parameters provide a way to give input. This is useful when the action is intended to perform a task on something that could vary. For example, if your action performs math operations, you might need a parameter to specify what value you are performing math on.
+")
+section:AddParagraph("The example below shows a program using an action with a parameter. When the code executes, it runs the PrintValue action twice. The first time, the provided parameter is 2, so the value variable is set to 2 inside of PrintValue. The second time it is run, the provided parameter is 4, so the value variable is set to 4.
+")
+        
+        
+section:Add(preformatter:GeneratePreformattedCode("action Main
+    PrintValue(2)
+    PrintValue(4)
+end
+
+action PrintValue(integer value)
+    output value
+end
+"))
+section:AddParagraph("Actions can have multiple arguments and this would require the programmer to pass multiple parameters. To do so, you need to separate each parameter with a comma, like so:
+")
+        
+section:Add(preformatter:GeneratePreformattedCode("action DefaultAction(type name1, type name2, type name3)
+    // code
+end
+"))
+section:AddParagraph("Calling that action needs the same number of parameters, separated by commas and the computer will tell you there is an error if this is wrong. The order also matters. The first provided parameter always sets the first variable, the second parameter the second variable, and so on. In the example below, the passed parameters are 10 and 6. The output of the program is 4.
+")
+section:Add(preformatter:GeneratePreformattedCode("action Main
+    PrintValue(2)
+    PrintValue(4)
+end
+
+action PrintDifference(integer value1, integer value2)
+    output value1 - value2
+end
+"))
+        
+        
+        
+AddHeading(section, "Actions with Returns", 3)
+section:AddParagraph("Actions can also give back a value and this is called <strong>returning</strong> a value. Return values can be thought of as the result of an action. If an action has a return value, you can use it to set the value of a variable, output to the console, or use the returned value in basically any way that you could use a variable.
+")
+section:AddParagraph("The code below shows an example using a return value. On line 2, the action is called, and its return value is assigned to the result variable. The return value itself is on line 6, using the return line. The return line indicates the result of the action.
+")
+section:AddParagraph("Different programming languages manage actions and returns in different ways and memorizing them all is generally not helpful. Counterintuitively, evidence in the literature suggests that forcing programmers to declare the types of the parameters, and what they return, is helpful [3]. The reason why is easy to understand. If an action is saying, hey, you have to have this input and this output to be used correctly, then the programming can check everywhere across the entire piece of code you are writing and check for errors automatically. This is called static typing and can be very helpful.
+")
+section:AddParagraph("In any case, the return type is a number in this case. This means the value in the return line must match the type in the action. When the program in the example runs, it gets the result from the action, assigns it to a variable, then outputs it. The output is 7. The point is that these types provide a constraint that you can set yourself. Here is the code, now with return values.
+")
+        
+section:Add(preformatter:GeneratePreformattedCode("action Main
+    number result = GetLuckyNumber()
+    output result
+end
+
+action GetLuckyNumber returns number
+    return 7
+end
+"))
+        
+        
+AddHeading(section, "Actions and Scope", 3)
+section:AddParagraph("In previous lessons, you have learned how multiple line blocks (like repeat and if blocks) have scope, which means that variables declared inside of them cannot be used outside of them. Action blocks also follow this rule, so variables declared inside an action block cannot be used outside of them.
+")
+section:AddParagraph("Similarly, items inside of actions obtain the scope of their parent. So, a loop inside a conditional inside an action can use the variables inside the action. These scoping rules are essentially the same throughout Quorum. If a variable is inside of lines, or a block, other things in the same space can see it. If not, they cannot. 
+")
+
+        
+AddHeading(section, "Citations", 3)
+OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("Andreas Stefik and Susanna Siebert. 2013. An Empirical Investigation into Programming Language Syntax. ACM Transactions on Computing Education 13, 4, Article 19 (November 2013), 40 pages. 
+")
+citations:AddListItem("C. L. Corritore and S. Wiedenbeck, Direction and scope of comprehension-related activities by procedural and object-oriented programmers: an empirical study, Proceedings IWPC 2000. 8th International Workshop on Program Comprehension, Limerick, Ireland, 2000, pp. 139-148, doi: 10.1109/WPC.2000.852488. 
+")
+citations:AddListItem("Stefan Endrikat, Stefan Hanenberg, Romain Robbes, and Andreas Stefik. 2014. How do API documentation and static typing affect API usability?. In Proceedings of the 36th International Conference on Software Engineering (ICSE 2014). ACM, New York, NY, USA, 632-642. 
+")
+
+        section:Add(citations)
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("While not exactly the same, actions are very similar to the concept of a function in math. The primary difference is that actions, since they are written in a programming language, often have quirky rules related to that language. Practicing writing actions, and learning the strange little rules, can help you understand how to break apart your programs in a way that is easier to follow.
+")
+section:AddParagraph("Part of the reason you are thinking about actions is because this lesson is building up to writing what is called behaviors. If a user clicks a button in your app, you have to tell it what to do and actions are the way to do it.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("In these problems, you will engage in scenarios where you need to break apart your program into collections of actions. Each action might do a different thing, like run a calculation, output something to the screen, talk, or give back a value. 
+")
+section:AddParagraph("Many operations are written as actions so that not every user of the programming language needs to reinvent the wheel. As before with these Parsons problems, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about Actions","/problems/actions/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Imagine you are a software developer creating a new app. How would you go about using actions to break apart all the pieces of your app to make it easier to write or maintain?
+")
+        return section
+    end
+    
+action GetMetaDescription returns text
+        return "Learn about actions."
+    end
+
+    action GetSummaryName returns text
+        return "Actions"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Actions Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to write your own actions"
+    end
+
+    action GetLinkName returns text
+        return "Create your own actions"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/actions.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Actions Online"
+    end
+end
+
+
+
