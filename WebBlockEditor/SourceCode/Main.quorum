@@ -80,7 +80,6 @@ class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListene
     Control palettePartition
     WebControlPanel editorPanel
     BlockPalette editorPalette = undefined
-    CodeEditor editorBlocks = undefined
     EditorItem paletteItem = undefined
     EditorItem blocksItem = undefined
     
@@ -122,6 +121,7 @@ action Main
         WebConfiguration config = GetWebConfiguration()
         config:title = "Block Editor"
         config:containerID = CONTAINER_ID
+        config:convertTouchToMouseEvents = false
         SetConfiguration(config)
         DesktopConfiguration deskConfig = GetDesktopConfiguration()
         deskConfig:resizable = true
@@ -134,7 +134,6 @@ palettePanel = undefined
     palettePartition = undefined
     editorPanel = undefined
     editorPalette = undefined
-    editorBlocks = undefined
     paletteItem = undefined
     blocksItem = undefined
         if editorPane not= undefined
@@ -146,21 +145,32 @@ palettePanel = undefined
     end
     
  action CreateGame
+        
+integer landmarkCount = 5
+        text extraNavigationText = ""
+        if SupportsMultipleFiles()
+            extraNavigationText = " or let you navigate between the code files"
+        end
+        
         GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
-webAccess:AddHiddenHeader("Navigation Area", "Navigation Menu, Landmark 1 of 5,
- You are on the Navigation Menu, swipe right to find buttons that will take you directly to the tray or editor. ")
+webAccess:AddHiddenHeader("Navigation Area", "Navigation Menu, Landmark 1 of " + landmarkCount + ",
+ You are on the Navigation Menu, swipe right to find buttons that will take you directly to the tray or editor" + extraNavigationText + ". ")
         webAccess:AddHiddenButton("Go To Tray")
 webAccess:AddHiddenButton("Go To Editor")
 webAccess:AddHiddenButton("Exit")
-webAccess:AddHiddenHeader("Block Control Area", "Block Control Menu, Landmark 2 of 5, 
+        if SupportsMultipleFiles()
+webAccess:AddHiddenButton("Open Next File")
+        webAccess:AddHiddenButton("Open Previous File")
+        end
+webAccess:AddHiddenHeader("Block Control Area", "Block Control Menu, Landmark 2 of " + landmarkCount + ", 
 You are on the Block Control Menu, swipe right to find buttons to move blocks around or delete them.")
         webAccess:AddHiddenButton("Pick Up Current")
 webAccess:AddHiddenButton("Move Placeholder Block Up")
 webAccess:AddHiddenButton("Move Placeholder Block Down")
 webAccess:AddHiddenButton("Drop Block")
         webAccess:AddHiddenButton("Delete")
-        webAccess:AddHiddenHeader("Edit Area", "Edit Menu, Landmark 3 of 5, 
+        webAccess:AddHiddenHeader("Edit Area", "Edit Menu, Landmark 3 of " + landmarkCount + ", 
 You are on the Edit Menu, swipe right to find buttons to help you Undo and Redo in the block editor")
         webAccess:AddHiddenButton("Undo")
 webAccess:AddHiddenButton("Redo")
@@ -171,6 +181,7 @@ webAccess:AddHiddenButton("Redo")
 FlowLayout layout
     SetLayout(layout)
         
+integer fontSize = 12
         if SupportsMultipleFiles() = false
         CodeEditor editor2
         editor = editor2
@@ -185,11 +196,10 @@ FlowLayout layout
         text read = ""
         read = GetTextForIDE(CONTAINER_ID)
     
-     integer size = 12
     BlockSelectionListener listen
     editor:SetPercentageWidth(1)
     editor:SetPercentageHeight(1)
-    editor:SetFontSize(size)
+    editor:SetFontSize(fontSize)
     editor:AddSelectionListener(listen)
         editor:SetCode(read)
         else
@@ -221,11 +231,10 @@ newEditor:SetBlockListener(listener)
         newEditor:AddTextChangeListener(textHighlightListener)
     text code = fileTexts:Get(i)
     
-     integer size = 12
     BlockSelectionListener listen
     newEditor:SetPercentageWidth(1)
     newEditor:SetPercentageHeight(1)
-    newEditor:SetFontSize(size)
+    newEditor:SetFontSize(fontSize)
     newEditor:AddSelectionListener(listen)
         newEditor:SetCode(code)
                 
@@ -274,7 +283,7 @@ editorPanel:SetName("Editor Panel")
 editorPanel:SetAccessibilityCode(9)
         editorPanel:SetFocusable(false)
         
-        webAccess:AddHiddenHeader("paletteHeader", "Block Tray, Landmark 4 of 5, You are on the Block Tray Header, 
+        webAccess:AddHiddenHeader("paletteHeader", "Block Tray, Landmark 4 of " + landmarkCount + ", You are on the Block Tray Header, 
 swipe right to find the items in the block tray, swipe left and you will find the other menus.
  Navigation by headings is recommended if you want to find other landmarks.", true)
         webAccess:AddHiddenLabel("paletteLabel", "Block Tray Help. Activate or double tap an item in the tray to insert into the text. 
@@ -288,7 +297,7 @@ Landmark 2 will point you to buttons that can help move the activated tray item 
         Add(palettePartition)
         AddPartitionInputTable(palettePanel)
         
-webAccess:AddHiddenHeader("editorHeader", "Code Editor, Landmark 5 of 5, You are on the Code Editor Header, 
+webAccess:AddHiddenHeader("editorHeader", "Code Editor, Landmark 5 of " + landmarkCount + ", You are on the Code Editor Header, 
 swipe right to find the items in the code editor, swipe left and you will find the tray.
  Navigation by headings is recommended if you want to find other landmarks.", true)
         Add(editorPanel)
@@ -303,7 +312,6 @@ editorPanel:Add(editor)
         resizeListener:AddPanel(editorPanel)
         AddResizeListener(resizeListener)
         me:editorPalette = palette
-        me:editorBlocks = editor
        SetInterfaceScale(1.25)
         SetupEditorItems()
         AddDefaultKeys()
@@ -609,32 +617,32 @@ GameStateManager manager
         if elementName = "Go To Tray"
             editorPalette:Focus()
         elseif elementName = "Go To Editor"
-            editorBlocks:Focus()
+            editor:Focus()
 elseif elementName = "Pick Up Current"
-if not editorBlocks:IsKeyboardMovingBlocks()
+if not editor:IsKeyboardMovingBlocks()
                 BehaviorEvent pickUpEvent
-                        pickUpEvent:SetItem(editorBlocks:GetSelectedBlocks():Get(0))
-                text blockName = editorBlocks:GetSelectedBlocks():Get(0):GetName()
+                        pickUpEvent:SetItem(editor:GetSelectedBlocks():Get(0))
+                text blockName = editor:GetSelectedBlocks():Get(0):GetName()
                 BlockPickUpBehavior pickUpBehavior
                 pickUpBehavior:Run(pickUpEvent)
-                webAccess:ModifyHiddenSlider("Block Mover", 0, editorBlocks:GetLineCount() - 1, 1)
-                webAccess:SetHiddenSliderCurrentValue("Block Mover", editorBlocks:GetSelection():GetLine())
+                webAccess:ModifyHiddenSlider("Block Mover", 0, editor:GetLineCount() - 1, 1)
+                webAccess:SetHiddenSliderCurrentValue("Block Mover", editor:GetSelection():GetLine())
                 webAccess:SetHiddenSliderValueText("Block Mover", blockName)
                 webAccess:FocusHiddenElement("Block Mover")
 end
         elseif elementName = "Move Placeholder Block Down"
-            if editorBlocks:IsKeyboardMovingBlocks()
-                editorBlocks:MoveSelectionDown()
+            if editor:IsKeyboardMovingBlocks()
+                editor:MoveSelectionDown()
                 webAccess:FocusHiddenElement("Move Placeholder Block Down")
             end
 elseif elementName = "Move Placeholder Block Up"
-if editorBlocks:IsKeyboardMovingBlocks()
-                editorBlocks:MoveSelectionUp()
+if editor:IsKeyboardMovingBlocks()
+                editor:MoveSelectionUp()
 webAccess:FocusHiddenElement("Move Placeholder Block Up")
             end
         elseif elementName = "Drop Block"
-if editorBlocks:IsKeyboardMovingBlocks()
-                editorBlocks:ConfirmKeyboardMovingBlocks()
+if editor:IsKeyboardMovingBlocks()
+                editor:ConfirmKeyboardMovingBlocks()
 end
 elseif elementName = "Delete"
             editor:DeleteSelectedBlock(false)
@@ -653,6 +661,23 @@ editor:Focus()
 elseif elementName = "Move Down"
 editor:MoveSelectionDown()
 editor:Focus()
+        elseif elementName = "Open Next File"
+            if editorPane not= undefined
+                TabPaneSelection select = editorPane:GetSelection()
+                integer index = (select:GetIndex() + 1) mod editorPane:GetSize()
+                editorPane:Select(index)
+webAccess:FocusHiddenElement("Open Next File")
+            end
+        elseif elementName = "Open Previous File"
+if editorPane not= undefined
+                TabPaneSelection select = editorPane:GetSelection()
+                integer index = select:GetIndex() - 1
+                if index < 0
+                    index = editorPane:GetSize() - 1
+                end
+                editorPane:Select(index)
+webAccess:FocusHiddenElement("Open Previous File")
+            end
         end
         
     end
@@ -662,8 +687,8 @@ editor:Focus()
 GameStateManager manager
         WebAccessibility webAccess = cast(WebAccessibility, manager:GetAccessibility())
         if elementName = "Block Mover"
-            editorBlocks:SelectBlockAtLine(event:GetSliderValue())
-text blockName = editorBlocks:GetSelectedBlocks():Get(0):GetName()
+            editor:SelectBlockAtLine(event:GetSliderValue())
+text blockName = editor:GetSelectedBlocks():Get(0):GetName()
             webAccess:SetHiddenSliderValueText("Block Mover", blockName)
 webAccess:FocusHiddenElement("Block Mover")
         end
@@ -736,7 +761,7 @@ number scale = GetInterfaceScale()
             palettePanel:SetPixelWidth(0)
             palettePanel:Hide()
             palettePartition:Hide()
-            editorBlocks:Focus()
+            editor:Focus()
 palettePanel:RequestLayout()
             return false
         else
@@ -753,7 +778,7 @@ palettePanel:RequestLayout()
     end
     
     action GetBlockEditor returns CodeEditor
-        return me:editorBlocks
+        return me:editor
     end
     
     action GetBlockPalette returns BlockPalette
@@ -855,6 +880,22 @@ alwaysSupportMultipleFiles = support
             else
                 alert("I couldn't read from index " + index + " because it wasn't a CodeEditor.")
             end
+        end
+        
+        return ""
+    end
+    
+    // Gets the name of the file at the provided index. If this IDE doesn't support multiple files, index 0 is still valid for the single editor, and always returns "Main.quorum"
+    action GetNameAtFileIndex(integer index) returns text
+if editorPane = undefined and editor not= undefined
+            if index not= 0
+                alert("Can't access a file at index " + index + " -- this IDE doesn't support multiple files.")
+            else
+                return "Main.quorum"
+            end
+        elseif editorPane not= undefined
+            Array<Tab> tabs = editorPane:GetTabs()
+            return tabs:Get(index):GetName()
         end
         
         return ""
