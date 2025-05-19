@@ -1,0 +1,298 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class WorkingWithDataOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Working with Data with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 6: Data Science 1: Working with Data", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to data science.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("Computer science is not just a thing you learn, but a practical skill that can be applied to many facets of everyday life. One of those facets is learning about and understanding data. Data is everywhere, including medical studies that teach you about your health, evidence on public policy, data in sports or even how people watch television. In this lesson, you will learn about the budding field of data science and how you can use programming to use and understand data.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about comma-separated value (CSV) files.")
+        goalList:AddListItem("Learn about the internal computer representation of a spreadsheet: the DataFrame.")
+        goalList:AddListItem("Tinker with the actions in DataFrame and explore the operations that can be used.")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("At its core, data science is the art and science of extracting meaningful insights from data. It combines techniques from statistics, computer science, and domain knowledge to make sense of complex datasets. Whether it is analyzing customer behavior, trying to improve people's health, or predicting future trends, data science empowers organizations to better make evidence-based judgments.")
+        section:AddParagraph("As data science’s role in society has grown in importance, how do you think it impacted these fields?")
+        
+        
+UnorderedList list
+        list:AddClassAttribute("list-disc list-outside pl-8")
+        list:AddListItem("Healthcare")
+        list:AddListItem("Education")
+        list:AddListItem("Finance")
+        section:Add(list)
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/BlocksOnline/DataScience1/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+WebTable codeTable = LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/DataScience1/Code.csv")
+        section:Add(codeTable)
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>3A-DA-10 </strong>: Evaluate the tradeoffs in how data
+elements are organized and where data is stored.
+")
+        standards:AddListItem("<strong>3A-DA-12</strong>: Create computational models that
+represent the relationships among different elements of
+data collected from a phenomenon or process. 
+")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+
+        section:AddParagraph("Data science is a budding and relatively young field that takes elements from computer science and statistics as part of its overall foundation. In some sense, data science is like computer science, except with a greater focus on statistics formulas and visualizations. In some sense it is a bit formal, including trying to understand complicated probabilities and equations. In another, most of the time when actually doing data science, the computer manages a great deal of the math for you and the job is more around interpretation of what the data means. As of the time of this writing, there are no unified and agreed upon standards for what data science really is, or what should be taught, although many groups are putting on their thinking caps [1].
+")
+section:AddParagraph("While learning about data science is a big and complicated topic, this lesson will give you practice in exploring some of the basics. These include some programming with the concept of a DataFrame, a concept called Tidy Data, and in the next lesson accessible visualizations. Before you can do anything in data science, however, you need to learn to load data.
+")
+
+        
+AddHeading(section, "Loading Data using Comma Separated Value (CSV) files", 3)
+section:AddParagraph("The term Comma Separated Value (CSV) is literal. While computer science often names things somewhat poorly, in this case the name of the file is what it sounds like: data separated by a comma. You can make these by hand, but it is much easier to use Excel, Google Sheets, Numbers, or any number of other applications to do so.
+")
+section:AddParagraph("This is an example of what a CSV might be like:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"daniel, seattle, purple, rocky road
+brandon, las vegas, blue, vanilla
+brianna, san francisco, black, oreo
+rebecca, reno, gold, chocolate
+kristine, washington dc, lilac, birthday cake
+"))
+section:AddParagraph("This CSV example has 5 rows and 4 columns, with each entry separated by commas. The contents of this data are arbitrary, however it is important to recognize what a common CSV file may look like. When you think of columns and rows in this context, notice that names like kristine or rebecca are text, not numbers. This fact is important and can be used by any language that supports data science to mean many sorts of things.
+")
+        
+        
+AddHeading(section, "Tidy Data", 3)
+section:AddParagraph("The concept of Tidy Data is used when trying to create consistent formats of data for analysis. Having readable and consistent data is easier for humans to understand and allows computer programs to read and interpret data similarly as well. 
+")
+section:AddParagraph("Tidy Data typically contains these properties:
+")
+        
+UnorderedList tidyList
+        tidyList:AddClassAttribute("list-disc list-outside pl-8")
+tidyList:AddListItem("Variables must be in columns.
+")
+tidyList:AddListItem("Observations must be in rows.
+")
+        tidyList:AddListItem("Individual cells must represent only one value. 
+")
+        section:Add(tidyList)
+        
+        
+section:AddParagraph("Below shows an example of what data would look like in Tidy format:
+")
+WebTable tidyTable = LoadWebTable("Tidy Data Example", "/html/media/BlocksOnline/DataScience1/Tidy.csv")
+        section:Add(tidyTable)
+section:AddParagraph("In this example, y, x1, x2, and x3 are all variables and the first row is a header representing the name of those variables. The remaining rows contain all of the data points for each variable. Each cell contains only one value.
+")
+section:AddParagraph("One important point with Tidy is that not all kinds of data can be stored this way in computer science. Sometimes the amount of data is so large that you need specialized approaches to reduce space. For example, storing the social network for all people on earth or storing temperature data at small increments for generations, takes orders of magnitude more space than is typically required for much data science work. The point is that Tidy data is useful, but the rabbit hole can go deep. It is an extremely useful approach and will work for a great deal of projects, but not all.
+")
+        
+AddHeading(section, "Data Frames", 3)
+section:AddParagraph("The key component in loading data with most programming languages is to use what is often called a DataFrame. A DataFrame is a series of rows and columns, like a table or spreadsheet, except stored in the computer's memory in a picky way. DataFrame objects can contain many kinds of things. For example, one column might contain text, another might contain numbers, and another might contain integers. DataFrames can have selections, kind of like selecting a row or column in a spreadsheet, and can do operations on top of that selection.
+")
+section:AddParagraph("While you would use them all pretty rarely, here are some examples of the types of data that you can load into a DataFrame by default:
+")
+        section:Add(LoadWebTable("Available Columns", "/html/media/BlocksOnline/DataScience1/Tidy.csv"))
+        
+        
+AddHeading(section, "Loading Data and Selecting Columns", 3)
+section:AddParagraph("When you want to use a DataFrame, you create a DataFrame object and call load. Here is an example in loading a DataFrame:
+")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"use Libraries.Compute.Statistics.DataFrame
+DataFrame frame
+"))
+section:AddParagraph("When using libraries like DataFrame, there is a key difference between offline and online editors. In the offline editor, if you place DataFrame frame, or some other name, into the editor, you can then press ALT+ENTER to have it automatically find the appropriate use statement. You can also right click, or use a keyboard shortcut for your operating system, to pull up the context menu, to have it insert the right line of code. 
+")
+section:AddParagraph("The online editor has a different purpose and thus works differently. Crucially, the kinds of automatic hints that generate the appropriate use statement are not included in the online editor, so keys like ALT+ENTER would not do anything. This is not an accident. The purpose of the online editor is for learning. Although any valid code can be used in the editor, the tray limits the options to reduce the search space of ideas to think about as you code. Keep in mind that no matter how a use statement is placed in the editor, whether through typing, a hint, or the tray, the result is the same. The use statement gives access to the library that you want.
+")
+        Image image = section:AddImage("/media/BlocksOnline/DataScience1/OnlineEditor.png","This is an example of the first Parsons problem in the data science unit. It highlights the first two lines, use Libraries.Compute.Statistics.DataFrame and DataFrame frame. The try shows a number of lines of code that are distractor blocks.")
+        image:AddText("This is an example of the first Parsons problem in the data science unit. It highlights the first two lines, use Libraries.Compute.Statistics.DataFrame and DataFrame frame. The try shows a number of lines of code that are distractor blocks.")
+        image:AddAttribute("data-zoom","")
+section:AddParagraph("In the online editor, you may have a variety of files to load from, which are stored on a server automatically for you. In such a case, the files are relative to the root of the server. For example, in the first Parsons problem, the default line given in the editor is:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"frame:Load(" + dq + "data/covid19.csv" + dq + ")
+"))
+section:AddParagraph("In this case, it means that there is a file on the Quorum server that is at the location quorumlanguage.com/data/covid19.csv. The data available on this server is free and for learning, but not extensive.
+")
+        
+        
+        
+AddHeading(section, "Select Columns", 3)
+section:AddParagraph("Once you have loaded data, you can tinker to find how to select columns. Selecting a column is kind of like clicking a column header in a spreadsheet application. It tells the system you want to do some kind of operation on an entire region. The action you want can be found by looking for words like select or column. The actual action you want would be AddSelectedColumn(n) where n is the column index you are adding.
+")
+section:AddParagraph("There are two ways to add a selected column to the selection list in DataFrame. One approach is to add it by an index, starting at 0, which is from the left hand side in a spreadsheet. The other is to use its name, which is the value in the first row of the file. As a non-obvious rule, this name may not contain spaces. You may also select a range of columns using AddSelectedColumnRange(n,n) where the n-parameters indicate the column index ranges you are trying to add.
+")
+        
+        
+AddHeading(section, "Outputting a DataFrame", 3)
+section:AddParagraph("Sometimes when using DataFrame objects, you want to get a sense for whether you have loaded it correctly. All DataFrame objects can output themselves to the console for this purpose using an action called ToText(). There are three versions, ToText and two others with parameters related to printing out only pieces of the system.
+")
+section:AddParagraph("For example, the following shows the output of 5 rows from Dogs.csv. It is important to note that although you have selected the columns, the action ToText() will output the entire DataFrame. Your selection becomes useful when you are manipulating or transforming data such as adding your data to a chart. 
+")
+        
+
+AddHeading(section, "Citations", 3)
+OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("Andrea Danyluk, Paul Leidig, Andrew McGettrick, Lillian Cassel, Maureen Doyle, Christian Servin, Karl Schmitt, and Andreas Stefik. 2021. Computing Competencies for Undergraduate Data Science Programs: an ACM Task Force Final Report. In Proceedings of the 52nd ACM Technical Symposium on Computer Science Education (SIGCSE '21). Association for Computing Machinery, New York, NY, USA, 1119-1120. DOI:https://doi.org/10.1145/3408877.3432586
+")
+        section:Add(citations)
+
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+
+        section:AddParagraph("As is the running theme of these lessons, Parsons problems are a useful mechanism to learning computer science. They isolate small aspects of programming into what are almost mini-lessons. In the Parsons problems, some of them will use the covid19.csv file online to explore the data. In it, you will load in the data, output the data, select columns, and get information from them. To summarize what is in this data, it has the following columns:
+")
+OrderedList list
+list:AddClassAttribute("list-disc list-outside pl-8")
+        list:AddListItem("Jurisdiction")
+list:AddListItem("Week of Allocations")
+list:AddListItem("1st Dose Allocations")
+list:AddListItem("2nd Dose Allocations")
+        section:Add(list)
+        
+section:AddParagraph("You may use various descriptive statistics for these problems, such as:
+")
+section:Add(LoadWebTable("Common Descriptive Statistics", "/html/media/BlocksOnline/DataScience1/Descriptives.csv"))
+        
+section:AddParagraph("As a reminder, while even these concepts are quite mathematical in nature, one big benefit of data science is the computer knows how to manage the calculations. If you understand or practice working with what they mean, it can be useful in providing understanding to a human. 
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("There is one set of Parsons problems for this lesson. In each case, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about obtaining descriptive statistics from DataFrame objects","/problems/data-science-1/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Reflect on what you have worked on in some applications of Data Science. Though you have scratched the surface, in data science you can do far more powerful operations. For example, you can calculate regression formulas, create charts, and many other things. How do you imagine you could use such libraries in your setting? How would these libraries benefit a student wanting to explore career paths in Data Science?
+")
+        return section
+    end
+    
+    
+action GetMetaDescription returns text
+        return "Learn about data science and descriptive statistics."
+    end
+
+    action GetSummaryName returns text
+        return "Data Science and Working with Data"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Working with Data Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to work with data"
+    end
+
+    action GetLinkName returns text
+        return "Working with Data online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/data-science-1.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Working with Data Online"
+    end
+end
+

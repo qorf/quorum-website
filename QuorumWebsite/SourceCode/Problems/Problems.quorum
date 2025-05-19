@@ -1,0 +1,206 @@
+package Libraries.Web
+
+use Libraries.System.File
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+
+class Problems is OrderedProblem
+    text title = undefined
+text image = undefined
+    text alt = ""
+    text folder = undefined
+    text id = undefined
+    text description = undefined
+    HashTable<text, integer> order
+Array<text> extraImages
+    Array<Problem> problemArray
+    text root = undefined
+    
+    action Load(File file)
+root = file:GetParentDirectory():GetAbsolutePath()
+        JavaScriptObjectNotation json
+        json:Read(file)
+        
+        //reset the values
+        title = undefined
+        folder = undefined
+        order:Empty()
+        problemArray:Empty()
+        
+i = 0
+        repeat while i < json:GetSize()
+            JavaScriptObjectNotation jsonKey = json:Get(i)
+            ProcessKey(jsonKey)
+            i = i + 1
+        end
+        
+        if folder not= undefined
+            ProcessFolder()
+        end
+    end
+    
+    
+action CopyTo(text folder)
+        i = 0
+        repeat while i < problemArray:GetSize()
+            Problem problem = problemArray:Get(i)
+            problem:CopyTo(folder)
+            i = i + 1
+        end
+        
+        if image not= undefined
+text wd = GetFolder()
+            text path = "problems/" + wd + "/" + image
+        File file
+        file:SetPath(path)
+        
+        File theNew
+        theNew:SetPath(folder + "/" + path)
+        file:Copy(theNew)
+        end
+        
+        if extraImages not= undefined and not extraImages:IsEmpty()
+            i = 0
+            repeat while i < extraImages:GetSize()
+                text extraImage = extraImages:Get(i)
+text wd = GetFolder()
+            text path = "problems/" + wd + "/" + extraImage
+        File file
+        file:SetPath(path)
+        
+        File theNew
+        theNew:SetPath(folder + "/" + path)
+        file:Copy(theNew)
+                i = i + 1
+            end
+        end
+end
+    
+    action Load(text path)
+        File file
+        file:SetPath(path)
+        Load(file)
+    end
+    
+    action ProcessFolder
+        File file
+        file:SetWorkingDirectory(root)
+        file:SetPath(folder)
+        if file:IsDirectory()
+            //JSON or XML files depending on what it is
+            Array<File> files = file:GetDirectoryListing()
+            i = 0
+            repeat while i < files:GetSize()
+                File file2 = files:Get(i)
+                text ext = file2:GetFileExtension()
+                if ext = "json"
+Problem problem
+                    problem:Load(file2)
+                    problem:SetProblems(me)
+                    problemArray:Add(problem)
+                elseif ext = "xml"
+                end
+                i = i + 1
+            end
+        end
+        ProblemSetSorter sorter
+        sorter:SetOrder(order)
+        problemArray:Sort(sorter)
+        
+        i = 0
+        repeat while i < problemArray:GetSize()
+            problemArray:Get(i):SetIndex(i)
+            i = i + 1
+        end
+    end
+    
+    
+action ProcessKey(JavaScriptObjectNotation json)
+        text key = json:GetKey()
+        if key = "title"
+            title = json:GetText()
+        elseif key = "folder"
+folder = json:GetText()
+elseif key = "image"
+            image = json:GetText()
+        elseif key = "alt"
+            alt = json:GetText()
+elseif key = "id"
+id = json:GetText()
+elseif key = "description"
+description = json:GetText()
+elseif key = "extra-images"
+            JavaScriptObjectNotation theArray = json:GetArray()
+            integer size = theArray:GetSize()
+            i = 0
+            repeat while i < size
+                JavaScriptObjectNotation arrayValue = theArray:Get(i)
+                text arrayKey = arrayValue:GetText()
+                
+                extraImages:Add(arrayKey)
+                i = i + 1
+            end
+        elseif key = "order"
+            JavaScriptObjectNotation theArray = json:GetArray()
+            integer size = theArray:GetSize()
+            i = 0
+            repeat while i < size
+                JavaScriptObjectNotation arrayValue = theArray:Get(i)
+                text arrayKey = arrayValue:GetText()
+                
+                order:Add(arrayKey, i + 1)
+                i = i + 1
+            end
+        end
+    end
+    action GetTitle returns text
+        return title
+    end
+
+    action GetFolder returns text
+        return folder
+    end
+
+    action GetId returns text
+        return id
+    end
+    
+    /*By default, this returns the path to either the first problem's page, if one exists, or a 
+page generated with all problems on it. In that case, since the number of problems would be zero,
+it would contain only information on the kind of problems.*/
+    action GetDefaultLink returns text
+        if GetSize() > 0
+            Problem problem = Get(0)
+            return problem:GetDefaultLink()
+        else
+            return "problems/" + GetId() + ".html"
+        end
+    end
+
+    action GetDescription returns text
+        return description
+    end
+    
+    action GetProblemIterator returns Iterator<Problem>
+        return problemArray:GetIterator()
+    end
+    
+    action Get(integer index) returns Problem
+        return problemArray:Get(index)
+    end
+    
+    action GetSize returns integer
+        return problemArray:GetSize()
+    end
+    
+    action GetImage returns text
+        return image
+    end
+
+    action GetAlternativeDescription returns text
+        return alt
+    end
+
+end

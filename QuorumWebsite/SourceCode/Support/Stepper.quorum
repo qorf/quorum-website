@@ -1,0 +1,74 @@
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Span
+use Libraries.Containers.Array
+use Libraries.Web.Page.Link
+use Libraries.Data.Formats.ScalableVectorGraphics.Path
+class Stepper is Division
+    integer selected = 0
+    Array<Link> links
+    action Setup
+        OrderedList list
+        list:SetClassAttribute("flex flex-wrap items-center w-full p-3 gap-4 
+space-x-2 text-sm font-medium text-center text-gray-500 
+bg-white rounded-lg dark:text-gray-400 sm:text-base dark:bg-gray-800 
+border border-slate-600 shadow-md  sm:p-4 sm:space-x-4 rtl:space-x-reverse")
+        
+        i = 0
+        repeat while i < links:GetSize()
+            boolean active = i = selected
+            ListItem item = GetListItem(i, active)
+            list:Add(item)
+                        i = i + 1
+        end
+        
+        Add(list)
+    end
+    
+    action GetListItem(integer i, boolean selected) returns ListItem
+ListItem item
+
+item:SetClassAttribute("flex items-center")
+        Link link = links:Get(i)
+item:Add(link)
+        
+        if i + 1 < links:GetSize()
+//This is ugly, but the Span class isn't doing what I expect here.
+item:AddText("<svg class='w-3 h-3 ms-2 sm:ms-4 rtl:rotate-180' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 12 10'>
+            <path stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m7 9 4-4-4-4M1 9l4-4-4-4'/>
+        </svg>")
+        end
+        
+        return item
+    end
+    
+    action GetSpan(text name, integer index, boolean active) returns Span
+        Span span
+        span:AddText("" + index)
+        span:SetTitle(name)
+        if active
+span:SetClassAttribute("flex items-center justify-center bg-neutral-black text-neutral-white w-5 h-5 me-2 text-xs rounded-full shrink-0 dark:border-blue-500")
+        else
+span:SetClassAttribute("flex items-center justify-center w-5 h-5 me-2 text-xs border border-quorum-blue-100 rounded-full shrink-0 dark:border-blue-500")
+        end
+        return span
+    end
+    
+    action AddStepperLink(text name, integer index, text target)
+        Link link
+        //link:AddText(value)
+        link:AddText(GetSpan(name, index + 1, index = selected):Generate())
+        link:SetAddress(target)
+        links:Add(link)
+    end
+    
+    action GetSelected returns integer
+        return selected
+    end
+
+    action SetSelected(integer selected)
+        me:selected = selected
+    end
+
+end

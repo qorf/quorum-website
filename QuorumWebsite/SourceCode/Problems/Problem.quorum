@@ -1,0 +1,167 @@
+package Libraries.Web
+
+use Libraries.System.File
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Containers.Array
+
+class Problem is OrderedProblem
+    text title = ""
+    text description = ""
+    text id = ""
+    text tray = undefined
+    Array<text> code
+Array<text> answers
+    Problems problems = undefined
+    integer index = 0
+    text hint = ""
+    
+    action Load(File file)
+text value = file:Read()
+        JavaScriptObjectNotation json
+        json:Read(value)
+        i = 0
+        repeat while i < json:GetSize()
+            JavaScriptObjectNotation jsonKey = json:Get(i)
+            ProcessKey(jsonKey)
+            i = i + 1
+        end
+        
+    end
+    
+    action Load(text path)
+        File file
+        file:SetPath(path)
+        Load(file)
+    end
+    
+    action ProcessKey(JavaScriptObjectNotation json)
+        text key = json:GetKey()
+        if key = "title"
+            title = json:GetText()
+        elseif key = "description"
+description = json:GetText()
+        elseif key = "tray"
+            tray = json:GetText()
+        elseif key = "answer"
+            JavaScriptObjectNotation answersKeys = json:GetArray()
+            i = 0
+            repeat while i < answersKeys:GetSize()
+                JavaScriptObjectNotation answer = answersKeys:Get(i)
+                answers:Add(answer:GetText())
+                i = i + 1
+            end
+        elseif key = "hint"
+            hint = json:GetText()
+elseif key = "code"
+            integer size = json:GetSize()
+            i = 0
+            repeat while i < size
+                JavaScriptObjectNotation arrayValue = json:Get(i)
+                code:Add(arrayValue:GetText())
+                i = i + 1
+            end
+        elseif key = "id"
+id = json:GetText()
+        end
+    end
+    
+    /* Copies any files associated with the problem to a particular folder.*/
+    action CopyTo(text folder)
+        if folder = undefined
+            return now
+        end
+        
+        text wd = problems:GetFolder()
+        File file
+        file:SetWorkingDirectory("problems/" + wd + "/")
+        file:SetPath(tray)
+        
+        File theNew
+        theNew:SetPath(folder + "/problems/" + wd + "/" + tray)
+        file:Copy(theNew)
+        
+    end
+    
+    action ToText returns text
+        JavaScriptObjectNotation json
+        json:Add("title", title)
+json:Add("description", description)
+json:Add("id", id)
+        return json:ToText()
+    end
+    
+    action GetTitle returns text
+        return title
+    end
+
+    action GetDescription returns text
+        return description
+    end
+
+    action GetId returns text
+        return id
+    end
+    
+action GetDefaultLink returns text
+            return "problems/" + problems:GetId() + "/" + GetId() + ".html"
+    end
+
+    action GetProblems returns Problems
+        return problems
+    end
+
+    action SetProblems(Problems problems)
+        me:problems = problems
+    end
+    
+    action GetTray returns text
+                return "problems/" + problems:GetId() + "/" + tray
+    end
+
+    action GetMainCode returns text
+        return "problems/" + problems:GetId() + "/" + code:Get(0)
+    end
+    
+    action GetCode(integer i) returns text
+        return "problems/" + problems:GetId() + "/" + code:Get(i)
+    end
+    
+    action GetCodeName(integer i) returns text
+        return code:Get(i)
+    end
+    
+    action GetCodeSize returns integer
+        return code:GetSize()
+    end
+    
+    action GetIndex returns integer
+        return index
+    end
+
+    action SetIndex(integer index)
+        me:index = index
+    end
+    
+    action GetNextProblem returns Problem
+        if index + 1 < problems:GetSize()
+            return problems:Get(index + 1)
+        end
+        return undefined
+    end
+    
+    action GetPreviousProblem returns Problem
+        if index > 0
+            return problems:Get(index - 1)
+        end
+        return undefined
+    end
+
+    action GetAnswer returns Array<text>
+        return answers
+    end
+
+    action GetHint returns text
+        return hint
+    end
+
+end

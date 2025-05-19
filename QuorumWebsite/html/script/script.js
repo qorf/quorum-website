@@ -658,9 +658,9 @@ var blockEditorTogglePalette = function() {
   let hidePaletteContainer = document.getElementById("HidePaletteContainer");
   if (hidePaletteContainer != null) {
     if(showing) {
-      hidePaletteContainer.innerHTML = "Hide Palette";
+      hidePaletteContainer.innerHTML = "Hide Tray";
     } else {
-      hidePaletteContainer.innerHTML = "Show Palette";
+      hidePaletteContainer.innerHTML = "Show Tray";
     }
   }
 }

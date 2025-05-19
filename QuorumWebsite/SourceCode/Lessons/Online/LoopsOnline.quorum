@@ -1,0 +1,286 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class LoopsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Loops with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 8: Loops", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to loops.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("Perhaps one of the most common aspects of programming is automation. Computers often excel not just at fast number crunching, but also repetition and decision making. In this lesson, you will explore how to tell computers to repeat themselves. There are many reasons for using repetition. It is a hallmark and fundamental skill in computer science. 
+")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to use repeat times statements")
+        goalList:AddListItem("Learn about repeat while and repeat until statements")
+goalList:AddListItem("Discuss how scope impacts variables defined inside loops")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("One of the benefits of computers is that they can do repetitive tasks that would be tedious or difficult for humans to do. What are some examples of repetitive tasks that technology can handle? What do you think the code for those kinds of tasks might look like?
+")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Loops/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Loops/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>1B-AP-10</strong>: Create programs that include sequences,
+events, loops, and conditionals. 
+")
+standards:AddListItem("<strong>2AP-12</strong>: Design and iteratively develop programs that
+combine control structures, including nested loops and
+compound conditionals.
+")
+standards:AddListItem("<strong>3A-DA-12</strong>: Create computational models that
+represent the relationships among different elements of
+data collected from a phenomenon or process.
+")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("When making programs, you often want to run code multiple times. Sometimes it is more convenient to run the same code over and over again instead of writing out duplicate code by hand. In other cases, you do not know ahead of time how many times the code will need to run. This can be used for a seemingly endless, pun intended, number of reasons, like counting, adding, or other operations.
+")
+section:AddParagraph("In computer science, there are many ways to accomplish this and programming languages vary in how they describe it. In Quorum specifically, the word repeat is used to imply the concept in the computer of doing something over and over again. While the exact terms vary across the discipline, sometimes these structures are known as <strong>loops</strong>.
+")
+section:AddParagraph("A <strong>loop</strong> is a section of code with a condition attached to it. That condition is usually either a number of times to run, such as 'do this code 10 times,' or it is a boolean value. If the condition is true, then the loop keeps going. If it is not, then the loop stops.
+")
+        
+        
+        
+Image flowchart = section:AddImage("/media/Blocks/Loops/LoopFlowchart.png", "A flowchart showing how loops work. It begins at the Start Loop step, goes to Initialize Expression, and then to Test Condition. Here, it has two branches: the first is IF TEST = TRUE. This branch goes to Execute Action, then ncrement, then returns to Test Condition. The second branch is IF TEST = FALSE, which goes to Stop Loop.")
+flowchart:AddText("A flowchart showing how loops work. It begins at the Start Loop step, goes to Initialize Expression, and then to Test Condition. Here, it has two branches: the first is IF TEST = TRUE. This branch goes to Execute Action, then ncrement, then returns to Test Condition. The second branch is IF TEST = FALSE, which goes to Stop Loop.")
+        flowchart:AddAttribute("data-zoom","")
+        
+        
+        
+AddHeading(section, "Repeating Yourself", 3)
+section:AddParagraph("Part of the purpose in doing Parsons problems is to minimize the amount of code a person notices, or in some cases has access to, while coding to assist in learning. In  previous lessons, each problem had a bespoke list of blocks that were available, but previously these all represented one single line of code. All of this was real code that actually works in other contexts, but now there is a new concept in the tray to be introduced: multiple line blocks. 
+")
+section:AddParagraph("Besides taking up more than one line, the important part of these blocks is that other blocks can go inside of them, between the first and the last line. The image below shows an example of a repeat times block with an output block inside of it. In computer science, this is often called a <strong>scope</strong>. The basic idea is that things inside of a scope only execute under certain conditions. Consider what these three lines of code do.
+")
+section:AddParagraph("Repeat blocks are a little different from the other kinds of blocks you have used so far. Previously, each block you have used has been a single line of code. These blocks have two parts on two different lines. There are three different kinds: the repeat times block, the repeat while block, and the repeat until block. In the tray, using multiple line blocks is the same as using single line blocks, except that both lines end up in the source code. Here is a visual example of a multiple line block for repeat times.
+")
+        
+Image repeat2TimesImage = section:AddImage("/media/BlocksOnline/Loops/RepeatTimes.png", "This is a visual image of code. The code is:
+
+repeat 2 times
+     output &quot;Hello, World!&quot;
+end")
+repeat2TimesImage:AddText("This is a visual image of code. The code is:
+
+repeat 2 times
+     output &quot;Hello, World!&quot;
+end")
+        repeat2TimesImage:AddAttribute("data-zoom","")
+repeat2TimesImage:AddClassAttribute("object-contain max-w-48 max-h-48 rounded overflow-hidden")
+        
+section:AddParagraph("The repeat times block is the simplest, but least flexible, of the loops. While the word block is being used here, remember that every part of a block is actually just a line of code. So this is three lines of code. Blocks like this will run any code inside of it as many times as requested. In the program above, for example, the block will run its code two times. This means that the output block will run twice and thus put words on the screen twice.
+")
+section:AddParagraph("In contrast, the repeat while block does not run a fixed number of times. Instead, it checks a boolean condition. If the condition is true, it runs the code. The example below shows some code using a repeat while block. This means it is very possible that this kind of loop will run forever.
+")
+        
+        
+Image repeatWhileImage = section:AddImage("/media/BlocksOnline/Loops/RepeatWhile.png", "A Quorum Studio program with 5 lines. The second and fourth line are a single repeat while block. The text of the program is:
+integer value = 1
+repeat while value < 3
+value = value + 1
+end
+output value")
+repeatWhileImage:AddText("A Quorum Studio program with 5 lines. The second and fourth line are a single repeat while block. The text of the program is:
+integer value = 1
+repeat while value < 3
+value = value + 1
+end
+output value")
+        repeatWhileImage:AddAttribute("data-zoom","")
+        repeatWhileImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+section:AddParagraph("In this example, you start with a variable called value that starts at 1. When the code reaches the repeat while block, it checks the condition. Because 1 is less than 3, the code executes, and increases the value by 1. Then it checks the condition again. Since 2 is still less than 3, it runs again, and the value increases by 1 up to 3. When it checks the condition this time, 3 is not less than 3, so it stops. It then outputs the value, which is 3.
+")
+section:AddParagraph("The repeat until block is the opposite of the repeat while block. The repeat while block will run if the condition is true, but the repeat until block runs if the condition is false. Otherwise, they work the same way. It is always possible to phrase the condition in a way that either block will work. There may be small advantages for one or the other, but generally which one to use is personal preference.
+")
+        
+        
+AddHeading(section, "Scope in a Loop", 3)
+section:AddParagraph("When working with multiple line blocks, you can move blocks in or out of the multiple line block by dragging them with the mouse. Alternatively, you can select a block and use cut (CTRL + X on Windows or CMD + X on Mac) and paste (CTRL + V on Windows or CMD + V on Mac) with the keyboard. When pasting a block, the cut block will appear directly after the currently selected block.
+")
+section:AddParagraph("Similarly, you can move blocks into the beginning of the repeat block. In fact, so long as the top part of the repeat block remains above the end portion, you can arrange code inside and outside of it however you would like, though the positioning of code will make a difference. The following code program will output the number two six times.
+")
+        
+Image repeat6TimesGoodImage = section:AddImage("/media/BlocksOnline/Loops/Repeat6Times.png", "A 5-line Quorum program. It reads:
+repeat 6 times
+integer value = 1
+value = value * 2
+output value
+end")
+repeat6TimesGoodImage:AddText("A 5-line Quorum program. It reads:
+repeat 6 times
+integer value = 1
+value = value * 2
+output value
+end")
+        repeat6TimesGoodImage:AddAttribute("data-zoom","")
+repeat6TimesGoodImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+section:AddParagraph("In the example above, the program should now output the number two 6 times. If you were to move the output back down again, out of the repeat block, it would be an error.
+")
+        
+Image repeat6TimesBadImage = section:AddImage("/media/BlocksOnline/Loops/Repeat6TimesError.png", "A 5-line Quorum program. The last line, the output block, flashes red because it is an error. The program reads:
+repeat 6 times
+integer value = 1
+value = value * 2
+end
+output value")
+repeat6TimesBadImage:AddText("A 5-line Quorum program. The last line, the output block, flashes red because it is an error. The program reads:
+repeat 6 times
+integer value = 1
+value = value * 2
+end
+output value")
+        repeat6TimesBadImage:AddAttribute("data-zoom","")
+repeat6TimesBadImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+        
+section:AddParagraph("When a variable is created inside a multiple line block like a repeat block, it only exists inside that block. The output statement is now gives the following error:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"I did not understand:
+Line 5, Column 8: Could not find the variable value
+"))
+section:AddParagraph("The reason it gives this error is because, outside of the repeat statement, there is no variable with the name value available. This method for controlling variables and how programs run, scoping, is a common and critical to practice concept in computer science. It takes time to grasp, but is used in a very wide number of programs.
+")
+        
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("Now that you have spent some time learning about loops, it is time to try them yourself. The examples in these problems will have you practice a variety of concepts. This includes loop unrolling, which is practicing what a loop does without using them directly. This also includes familiar concepts like boolean expressions and finally the loops themselves.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("In this example, you will be focusing on using loops and multiple line blocks. Like before, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. Now with multiple line blocks, you can also adjust the beginning and ending of such connected blocks. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.")
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about Repeat","/problems/loops/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Take a few minutes to consider the three kinds of loops. While it might seem on the surface important to teach or understand all three, which loop you choose is not a big deal. In fact, you can write any program using only repeat while or repeat until loops. Given that, what are the pros and cons of teaching students all three right when they are first learning the concept?
+")
+        return section
+    end
+    
+    
+action GetMetaDescription returns text
+        return "Learn about loops."
+    end
+
+    action GetSummaryName returns text
+        return "Loops"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Loops Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to work with loops"
+    end
+
+    action GetLinkName returns text
+        return "Loops online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/loops.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Loops Online"
+    end
+end
+

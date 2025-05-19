@@ -1,6 +1,9 @@
 use Libraries.System.File
 use Libraries.Web.Page.Body
 use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+use Libraries.Web.Problems
+use Libraries.Web.Problem
 
 
 /*
@@ -13,6 +16,8 @@ class Main
     constant text SITE_NAME = "https://quorumlanguage.com"
 
     action Main
+        VersionHelper helper
+        output "Loading Quorum Website. Version " + helper:GetLanguageVersion()
         output "Writing index pages"
 
         File file
@@ -113,6 +118,15 @@ class Main
         file:Write(value)
 
         Array<Lesson> blocksTeacherLessons = WriteBlocksTrack()
+        Array<Lesson> blocksTeacherOnlineLessons = WriteBlocksOnlineTrack()
+        
+        
+        OnlineBlockTrack onlineBlocksTrack
+        onlineBlocksTrack:Setup(blocksTeacherOnlineLessons)
+value = onlineBlocksTrack:Generate()
+        file:SetPath(WRITE_PATH + onlineBlocksTrack:GetLocation())
+        file:Write(value)
+        
         BlockTrack blocksTrack
         blocksTrack:Setup(blocksTeacherLessons)
         value = blocksTrack:Generate()
@@ -299,10 +313,49 @@ class Main
         WriteLessons()
         output "Website finished."
 
+        output "Writing Problems Pages"
+        WriteProblemsPages()
+        output "Finished Problems Pages"
+        
         BuildSiteMap()
 
         output "Sitemap created"
     end
+    
+    action WriteProblemsPages
+ProblemGenerator generator
+        generator:Generate()
+        
+        AllProblemsPage allProblemsPage
+        allProblemsPage:SetGenerator(generator)
+        
+allProblemsPage:Setup()
+        allProblemsPage:Write(WRITE_PATH)
+        
+        Iterator<Problems> problemsIterator = generator:GetProblemsIterator()
+        repeat while problemsIterator:HasNext()
+            Problems problems = problemsIterator:Next()
+            //generate the problems page
+            ProblemsPage problemsPage
+            problemsPage:SetProblems(problems)
+            problemsPage:Setup()
+            problemsPage:Write(WRITE_PATH)
+            File writeFolder
+            writeFolder:SetAbsolutePath(WRITE_PATH)
+            
+            //now generate all the pages for the individual problems
+            Iterator<Problem> problemIterator = problems:GetProblemIterator()
+            repeat while problemIterator:HasNext()
+                Problem problem = problemIterator:Next()
+                ProblemPage page
+                page:SetProblem(problem)
+                page:Setup()
+                page:Write(WRITE_PATH)
+            end
+problems:CopyTo(WRITE_PATH)
+        end
+    end
+    
 
     action BuildSiteMap
         File file
@@ -919,6 +972,90 @@ class Main
         widgets:Write(WRITE_PATH)
 
         return codeOrgArray
+    end
+    
+    
+action WriteBlocksOnlineTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        // blocks track
+        GettingStartedBlocksOnline getStartedBlocks
+TextAndBooleansOnline textAndBooleans
+IntegerAndNumbersOnline integerAndNumbers
+LibrariesOnline libraries
+ErrorsOnline errors
+        WorkingWithDataOnline data1
+        AccessibleVisualizationOnline charts
+        LoopsOnline loops
+        ConditionalsOnline conditionals
+        TraversalsOnline traversals
+        AppsOnline apps1
+        ActionsOnline actions
+        ClassesOnline classes
+        Apps2Online apps2
+        
+        lessons:Add(getStartedBlocks)
+lessons:Add(textAndBooleans)
+lessons:Add(integerAndNumbers)
+lessons:Add(libraries)
+lessons:Add(errors)
+lessons:Add(data1)
+lessons:Add(charts)
+lessons:Add(loops)
+lessons:Add(conditionals)
+lessons:Add(traversals)
+lessons:Add(apps1)
+lessons:Add(actions)
+lessons:Add(classes)
+lessons:Add(apps2)
+        
+        getStartedBlocks:SetNextLesson(textAndBooleans)
+textAndBooleans:SetNextLesson(integerAndNumbers)
+integerAndNumbers:SetNextLesson(libraries)
+libraries:SetNextLesson(errors)
+errors:SetNextLesson(data1)
+data1:SetNextLesson(charts)
+charts:SetNextLesson(loops)
+loops:SetNextLesson(conditionals)
+conditionals:SetNextLesson(traversals)
+traversals:SetNextLesson(apps1)
+apps1:SetNextLesson(actions)
+actions:SetNextLesson(classes)
+classes:SetNextLesson(apps2)
+apps2:SetNextLesson(undefined)
+        
+
+        getStartedBlocks:Setup()
+textAndBooleans:Setup()
+integerAndNumbers:Setup()
+libraries:Setup()
+errors:Setup()
+data1:Setup()
+charts:Setup()
+loops:Setup()
+conditionals:Setup()
+traversals:Setup()
+apps1:Setup()
+actions:Setup()
+classes:Setup()
+apps2:Setup()
+
+        getStartedBlocks:Write(WRITE_PATH)
+textAndBooleans:Write(WRITE_PATH)
+integerAndNumbers:Write(WRITE_PATH)
+libraries:Write(WRITE_PATH)
+errors:Write(WRITE_PATH)
+data1:Write(WRITE_PATH)
+charts:Write(WRITE_PATH)
+loops:Write(WRITE_PATH)
+conditionals:Write(WRITE_PATH)
+traversals:Write(WRITE_PATH)
+apps1:Write(WRITE_PATH)
+actions:Write(WRITE_PATH)
+classes:Write(WRITE_PATH)
+apps2:Write(WRITE_PATH)
+
+        return lessons
     end
 
     action WriteBlocksTrack returns Array<Lesson>

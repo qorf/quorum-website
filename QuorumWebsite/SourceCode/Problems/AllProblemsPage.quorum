@@ -1,0 +1,136 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+use Libraries.Web.Problems
+
+class AllProblemsPage is Lesson
+text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    integer ACTIVITY = 0
+    text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
+ProblemGenerator generator = undefined
+
+    Preformatter preformatter 
+    
+    
+action Setup
+        //html header stuff
+        SetWebPageTitle("Learn Quorum - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Main Region
+        ImageHeader blueSection = makeBlueHeader()
+        Add(blueSection)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
+
+                    Section problemsSection = MakeProblemsSection()
+        bodyDiv:Add(problemsSection)
+    end
+    
+    
+action MakeProblemsSection returns Section
+        Section section
+        
+        Array<Problems> allProblemsArray = generator:GetAllProblemsArray()
+        
+        if allProblemsArray:IsEmpty()
+            return section
+        end
+        
+        Division courseDiv
+        courseDiv:AddClassAttribute("my-9 space-y-4")
+        Heading courseHeader
+        courseHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        courseHeader:SetScale(2)
+        courseHeader:AddText("Practice Problems")
+            integer j = 0
+        Division courseCards
+        courseCards:AddClassAttribute("grid gap-4 grid-cols-1 auto-rows-auto md:grid-cols-2 lg:grid-cols-3")
+         repeat while j < allProblemsArray:GetSize()
+            Problems problems = allProblemsArray:Get(j)
+            //json received from /html/json/courses.json
+            text title = problems:GetTitle()
+            text courseUrl = problems:GetDefaultLink()
+             CourseCard courseCard
+            courseCard:SetButtonText("View Problems")
+            text imageSrc = ""
+            text imageAltText = ""
+            
+            if problems:GetImage() not= undefined
+imageSrc = "problems/" + problems:GetId() + "/" + problems:GetImage()
+            imageAltText = problems:GetAlternativeDescription()
+            end
+            text description = problems:GetDescription()
+            courseCard:Create(imageSrc, imageAltText, description, title, courseUrl, false)
+            courseCards:Add(courseCard)
+             //JavaScriptObjectNotation previewJson = item:GetObject("preview")
+            //CardPreview cardPreview
+            //cardPreview:Create(title, previewJson)
+            //courseCards:Add(cardPreview)
+             j = j + 1
+        end
+        
+        courseDiv:Add(courseHeader)
+        courseDiv:AddText("Work through small problems of increasing difficulty.")
+        courseDiv:Add(courseCards)
+        
+        section:Add(courseDiv)
+    return section
+end
+
+
+action makeBlueHeader returns ImageHeader
+        ImageHeader header
+        text headerHeading = "Do Practice Problems in Quorum"
+        text headerText = "Learn code through small examples."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        return header
+    end
+
+    action GetMetaDescription returns text
+        return "Try doing practice problems in the Quorum programming language."
+    end
+
+    action GetSummaryName returns text
+        return GetName()
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetName returns text
+        return "Page for working problems"
+    end
+
+    action GetShortDescription returns text
+        return "Problem page"
+    end
+    
+action GetLocation returns text
+        return "problems.html"
+    end
+    
+    action GetGenerator returns ProblemGenerator
+        return generator
+    end
+
+    action SetGenerator(ProblemGenerator generator)
+        me:generator = generator
+    end
+
+end

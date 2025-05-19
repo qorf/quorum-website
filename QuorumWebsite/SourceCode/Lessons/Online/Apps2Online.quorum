@@ -1,0 +1,277 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.System.File
+
+class Apps2Online is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Accessible Apps 2: Behaviors with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 14: Create an Accessible App, Part 2: Behaviors", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to behaviors in your user interface.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In a previous lesson, you created the interface for an app. While designing the user interface is an important part of the process, pretty apps that do nothing are not particularly useful. In this lesson, you will learn how to make an app respond when the user interacts with it. You do this by adding what is called a behavior.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to create a Behavior")
+goalList:AddListItem("Add a Behavior to a Button in your app")
+goalList:AddListItem("Think about programming in teams")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Many types of user interface types have behaviors. Buttons can be clicked. Textboxes can be typed in. Apps on tablets can use gestures like swipes, amongst other things. Speculate on how you think it might work to tell user interface items to do things like this.")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Apps2/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Apps2/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>3A-IC-27</strong>: Use tools and methods for collaboration on
+a project to increase connectivity of people in different
+cultures and career fields. 
+")
+standards:AddListItem("<strong>3A-AP-21</strong>: Evaluate and refine computational artifacts
+to make them more usable and accessible.
+")
+standards:AddListItem("<strong>3A-AP-22</strong>: Design and develop computational artifacts
+working in team roles using collaborative tools. 
+")
+
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("You have learned a variety of different concepts and techniques, including how to store and modify data, how to use conditional statements to change what code is run, and how to write actions and classes. You also learned how to design the user interface of an app. Now it is time to bring all of your knowledge together to make an app respond to your input. The trick is a concept called behaviors.")
+        
+AddHeading(section, "Using Behaviors in the Form Library", 3)
+section:AddParagraph("Recall in your previous Form app where you learned how to create an app. You developed the user interface, adding text, a banner, and buttons. The app itself showed up visually and was accessible, but did nothing. If you pressed the button on the app, for example, it would visually show a small animation related to being clicked, but would not do anything in particular.")
+section:AddParagraph("Telling your app to do things requires classes and actions, which is why these 
+concepts need to come first. Once you have the basics of them, you can create your own <strong>behavior</strong>. 
+Behaviors are special classes in Quorum that handle the actions your app takes when a user 
+interacts with it. Behaviors are an example of <strong>event-driven programming</strong>, meaning code will run when 
+users trigger an event. Behaviors have a special action called Run and this is where you write the code.")
+section:AddParagraph("Behaviors work using a concept called <strong>inheritance</strong>. In computer science, the term 
+inheritance means that a class gains the properties of a different class. The custom behaviors you 
+will write for your apps will inherit from the 
+<a href='https://quorumlanguage.com/Libraries/Interface/Forms/FormBehavior.html'>FormBehavior</a> class, 
+which handles a lot of complexity 
+for you. You do not need to know exactly how this class works. For now, you only need to know that 
+inheritance will let you use the event handling functionality of Behaviors without having to write 
+it all yourself. This is another example of abstraction.")
+section:AddParagraph("You will need Behaviors to make your app respond to user input. Like any class, your custom Behavior class will need to go in a separate file from your Main form app. Consider the following example:")
+        
+File file
+        file:SetPath("/html/media/BlocksOnline/Apps2/MyBehaviorNew.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+UnorderedList linesList
+        linesList:AddClassAttribute("list-disc list-outside pl-8")
+linesList:AddListItem("<strong>Line 1</strong>: This line contains a use statement that gives you access to the BehaviorEvent library. BehaviorEvent objects include information about the event that caused the Behavior to run.
+")
+linesList:AddListItem("<strong>Line 2</strong>: This line contains a use statement that gives you access to the FormBehavior library. Inheriting from the FormBehavior library will let your class respond to events.
+")
+linesList:AddListItem("<strong>Line 3</strong>: This line creates a custom class that inherits from 
+FormBehavior, using the <strong>is</strong> keyword. Your new behavior will gain the properties of the parent class 
+it is inheriting from.
+")
+linesList:AddListItem("<strong>Line 4</strong>: This line creates a new action. Importantly, the name must be Run, and it must take exactly one BehaviorEvent parameter. The class you are inheriting from expects an action with exactly this name and parameters to use when events occur.
+")
+linesList:AddListItem("<strong>Line 5</strong>: When the action is run, it will output the text 'When you click me I perform an action.'
+")
+linesList:AddListItem("<strong>Line 6</strong>: This line encloses the action block.
+")
+linesList:AddListItem("<strong>Line 7</strong>: This line encloses the class block.
+")
+        section:Add(linesList)
+        
+section:AddParagraph("All behaviors follow the same code format, so if you have one Behavior written, you can reuse it as a template when you want to add more functionality to your apps. The only parts you need to change are the class name and the code inside the Run action. The idea is that any button you write will use behaviors in the same way.")
+        
+        
+AddHeading(section, "FormBehavior", 3)
+section:AddParagraph("The previous Behavior that you wrote inherits from FormBehavior. This is a class in the standard library designed to make it easier for you to know what Page and Form your button or other control is interacting with. Examine this class from the standard library for a moment:")
+file:SetPath("/html/media/BlocksOnline/Apps2/FormBehavior.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("Notice that the class has three actions, GetForm, GetPage, and IsFinished. In fact, it has more than this because FormBehavior itself inherits from Behavior. In this case, creating a FormBehavior allows you to customize what a button, or another control would do. It also means that if your button is on a page or on a form, it can access that information. This provides a lot of options. ")
+section:AddParagraph("All of the various things you can do with custom behaviors is outside of scope. However, to give a few examples, you can control animation, switch pages in forms, trigger behaviors at certain times, and many other things. The simplest example is just to have a button take an action when clicked or used. Because you used the word is and told the system your class is a FormBehavior, you get all this without having to know how it all works.")
+        
+        
+        
+AddHeading(section, "Creating an App with Behaviors", 3)
+section:AddParagraph("Examine the example below. It shows the Main file of a Form program, which includes two buttons named Hi and Bye. You have already seen how to create an interface using Forms before, but there are a few important additions on lines 8 to 14.")
+section:AddParagraph("First, when the buttons are created on lines 8 and 12, they are now assigned to variables. Since you need to store the Button objects, you also need a use statement for them on line 3, use Libraries.Interface.Controls.Button. Second, on lines 9, 10, 13, and 14, the program creates new MyBehavior objects, and then associates those behaviors with the buttons. Now, when a button is clicked, the behavior will run.")
+        
+file:SetPath("/html/media/BlocksOnline/Apps2/FormMain.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("Now, examine the code for the MyBehavior class:")
+        
+file:SetPath("/html/media/BlocksOnline/Apps2/MyBehavior.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+section:AddParagraph("The code in this example is a template, and is incomplete, marked by the ADD CODE HERE comment at the end of the action. Still, there are several important things happening in the Run action. ")
+section:AddParagraph("First, the Run action uses the GetForm and GetPage actions. These return the objects that represent the Form and the currently displayed Page, respectively. These are helpful if you need to get or modify any values in the app or in the user interface.")
+section:AddParagraph("Second, the action uses GetItem from the BehaviorEvent parameter. The BehaviorEvent is a special object that contains information about the input that triggered your behavior. In this case, GetItem returns an object representing the interface element triggered the behavior. Here, this will be your Button.")
+section:AddParagraph("The action also gets the button’s name and stores it in a variable. A button’s name will be the text that you provided when you made it in the Form. In the current example, because there are only two buttons, the name will either be Hi if the first button was clicked, or Bye if the second button was clicked. You can use this information to decide how your behavior should react, depending on which button it is. The end of the template, with the comment that reads ADD CODE HERE, is where you will add more code to determine what your behavior actually does. ")
+        
+        
+        
+AddHeading(section, "Code Templates", 3)
+section:AddParagraph("Here is another set of templates for a form and its behavior file. Again, copy pasting this code turns it into blocks automatically and vice versa. If the name of the button was Hi, it would then output hello.")
+section:AddParagraph("<strong>Main.quorum</strong>")
+        
+file:SetPath("/html/media/BlocksOnline/Apps2/FormMain2.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("<strong>MyBehavior.quorum</strong>")
+file:SetPath("/html/media/BlocksOnline/Apps2/MyBehavior2.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+        
+AddHeading(section, "Code Templates", 3)
+section:AddParagraph("As code becomes more complex, collaborating with others can be helpful. When dealing with commercial software, there are often large teams of software engineers that work together on the same project. This often means splitting up work across multiple people, but team members are also often encouraged to collaborate and work together to solve difficult problems.")
+section:AddParagraph("A practice that is common among software engineers is a collaboration method known as 
+<strong>pair programming</strong>. To Pair Program means that two programmers work together on a single computer. 
+It is a similar practice in learning how to drive: one person writes the code (referred as the driver) and the 
+other person reviews the teammate’s code and offers feedback (referred as the navigator).")
+        
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("Previously, you designed the interface of an app, but it was not yet interactive. Now, you will work together with a partner to make apps that can be controlled by a user. Specifically, you will first create a lightswitch app and then move to a thermostat app. The approach for this lesson is the same as behavior, meaning you will create the apps step by step in Parsons problems. 
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("You are an app developer and you want to build some smart products that allow you to control a lightswitch or thermostat from your phone. You have created the look and feel for the app, but when you try to interact with the buttons, they do not do anything yet. Your next job is to examine the existing code with a partner and make the apps work.
+")
+        
+Image thermostatImage = section:AddImage("/media/Blocks/AccessibleAppP2/Thermostat.png","Image of a thermostat at 63 degrees")
+        thermostatImage:AddText("Image of a thermostat at 63 degrees")
+        thermostatImage:AddAttribute("data-zoom","")
+        thermostatImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded")
+        section:AddText("<center><small><a href=" + dq + "https://unsplash.com/photos/gray-nest-thermostat-displaying-at-63-RFAHj4tI37Y" + dq + ">Thermostat by Dan LeFebvre</a></small></center>")
+        
+section:AddParagraph("For these problems, you will be working through parts of the lightswitch and thermostat code one piece at a time. As before with these Parsons problems, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Practice with behaviors","/problems/apps-2/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("This completes the chapter of learning block-based Quorum Language online. Consider reflecting on the topics that you feel that are the most important. Put another way, computer science is a vast discipline with many things to be learned. Like other disciplines, though, some concepts are crucial to understand and others less so. Think through what seems important and what can be brushed aside in your context.
+")
+        return section
+    end
+    
+action GetMetaDescription returns text
+        return "Learn about behaviors."
+    end
+
+    action GetSummaryName returns text
+        return "Behaviors"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Apps2  Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to make your own apps with behaviors"
+    end
+
+    action GetLinkName returns text
+        return "Create an Accessible App, Part 2: Behaviors"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/apps-2.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Create an Accessible App, Part 2: Behaviors Online"
+    end
+end
+
+
+

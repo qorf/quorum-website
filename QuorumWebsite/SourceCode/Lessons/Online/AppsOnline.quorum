@@ -1,0 +1,310 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.System.File
+
+class AppsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Accessible Apps with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 11: Accessible Apps 1", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to creating your own apps.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In this lesson, you will bring together the concepts you have learned to build an app using the Form library. As you learn how to build apps, you will learn about user interface design and the various kinds of standard controls used by people in practice.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about creating Forms")
+        goalList:AddListItem("Learn about the different kinds of items you can add to Forms")
+goalList:AddListItem("Build the interface for an app with at least 1 button")
+goalList:AddListItem("Understand the purpose of user interface design")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think about apps or websites you have used in the past. Can you think of examples of apps or sites that were easy or hard to use? What kinds of things made the difference for you between a good or bad experience?")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Apps1/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Apps1/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>2-CS-01</strong>: Recommend improvements to the design of
+computing devices, based on an analysis of how users
+interact with the devices.
+")
+standards:AddListItem("<strong>3A-AP-16</strong>: Design and iteratively develop
+computational artifacts for practical intent, personal
+expression, or to address a societal issue by using
+events to initiate instructions.
+")
+standards:AddListItem("<strong>3A-AP-18</strong>: Create artifacts by using procedures within
+a program, combinations of data and procedures, or
+independent but interrelated programs.
+")
+standards:AddListItem("<strong>3A-AP-21</strong>: Evaluate and refine computational artifacts
+to make them more usable and accessible.
+")
+standards:AddListItem("<strong>3A-AP-23</strong>: Document design decisions using text,
+graphics, presentations, and/or demonstrations in the
+development of complex programs.
+")
+
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("When you hear terms like design you might think of the interior design of someone’s home, paintings in a gallery, or something related to art. Design is a much broader term, however, with applications that venture into technology and other areas.
+")
+section:AddParagraph("Many programmers methodically design code and programs to make the most sense to humans. A growing field is Human Computer Interaction, where the role is to plan, strategize, and design apps and physical products for consumers or ensure a product fits a business’s needs.
+")
+section:AddParagraph("Think about many of the apps you have used on your smartphone. Often, teams of developers and designers have worked together to produce a refined version of these apps which cater to what users want. This concept is called <strong>user experience</strong>, or sometimes shortened to <strong>UX</strong> design. The idea is you want the user to feel like their needs were taken into account. 
+")
+        
+
+AddHeading(section, "Accessibility in Design", 3)
+section:AddParagraph("Accessible design is an important concept for designers to make sure products can be used by everyone. A major consideration that designers should follow as applicable are the <a href = 'https://www.w3.org/WAI/standards-guidelines/wcag/'>Web Content Accessibility Guidelines (WCAG)</a>, which focuses on accessible design on digital products (especially websites). WCAG is unusual in that it dovetails ideas in design, like how a web page is structured, but also serves as legal guidelines from the U.S. Department of Justice as of 2024 [1]. The changes made by this rule are significant, arguably a sea change, in that they require accessibility to be the default under certain conditions. There is plenty of nuance to be considered, but here are some examples of the type of information related to WCAG:
+")
+        
+UnorderedList columnList
+        columnList:AddClassAttribute("list-disc list-outside pl-8")
+columnList:AddListItem("Alternative Text (Alt-Text) on images and diagrams.")
+columnList:AddListItem("Requiring appropriate color contrast for readability by anyone, but especially those with low or limited vision")
+columnList:AddListItem("Providing adequate information for screen readers and other accessibility tools, sometimes including the use of <a href = 'https://www.w3.org/TR/wai-aria/'>ARIA labels</a> or app structure.")
+columnList:AddListItem("Providing transcripts for audio resources and subtitles for video resources.")
+        section:Add(columnList)
+        
+section:AddParagraph("When you begin programming your own apps, one thing you can do to make your apps feel more accessible is to ensure that all of your labels and buttons have meaningful, clear, names. While partially subjective, this allows any user to understand what is happening in your programs, even if they are using accessibility tools like a screen reader.
+")
+section:AddParagraph("Most programming languages support libraries for accessibility, in one form or another, but they vary considerably. Sometimes, features that may not seem accessibility related are. For example, languages must support keyboard navigation, present information to screen readers, and support some method for interacting with the operating system's accessibility layer. Further, languages can make it easier or harder to make applications accessible. With color, another common issue in accessibility, if a language makes non-WCAG compatible choices with color contrast, some or many users may find an app harder to read.
+")
+        
+        
+AddHeading(section, "Creating an App", 3)
+section:AddParagraph("Most programming languages have some mechanism for creating applications or apps, but what that means varies. For Quorum, apps are coded in one language and in one way, then generated for each platform you are on. The idea is you can write an app once, then run it on desktop, on the web, or on your phone. 
+")
+section:AddParagraph("Sometimes, if you want your app to work everywhere, you might need subtle changes on one platform or another. When you think about it, this makes sense. If you are deploying an application on a phone, where there are gestures, this might have a very different design than with a keyboard or mouse.
+")
+section:AddParagraph("The library you will be focusing on for this lesson is the <strong>Form</strong> library. The Form library lets you add buttons, input fields, banners, images, etc. and program all these features so that they work with one another. In this lesson, you will learn about the structure and some basic elements within the Form library.
+")
+        
+        
+AddHeading(section, "Accessing the Form Library", 3)
+section:AddParagraph("Throughout this lesson's Parsons problems, you will be working with some common actions and objects. If you use Quorum offline, you can also generate this and other templates and obtain a wide variety of other interface choices and designs. Remember though, although there are helpers for using this offline, the code is the same. Whether you learn the code offline or online leads to the same or a similar result. Here is the an example of the type of code you will be using in the practice problems:
+")
+        section:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+Form form
+Page page = form:GetMainPage()
+
+page:AddButton(" + dq + "Hi" + dq + ")
+form:Display()
+
+"))
+        
+section:AddParagraph("This template creates a default, puts a button labeled Hi on it, and loads it. Note you do not need to embed any additional accessibility information. The application is automatically born accessible. Visually, the following shows what this would look like:
+")
+
+Image hiImage = section:AddImage("/media/BlocksOnline/Apps1/HiButton.png","This image is of the online blocks environment showing a form from a Parsons problem. There is a single blue button on the screen with white text that says Hi. The compiler has run it and this says that the build was successful.")
+        hiImage:AddText("This image is of the online blocks environment showing a form from a Parsons problem. There is a single blue button on the screen with white text that says Hi. The compiler has run it and this says that the build was successful.")
+        hiImage:AddAttribute("data-zoom","")
+        
+section:AddParagraph("The first two lines, ")
+section:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Form"))
+        
+section:AddParagraph("and")
+section:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Page"))
+        
+        
+section:AddParagraph("are the libraries that contain all the objects required to create the form app. The next line, ")
+section:Add(preformatter:GeneratePreformattedCode("Form form"))
+        
+section:AddParagraph("creates your form object. The Form object is a graphical display that will open a window for your app to run in. Forms are also in charge of storing and keeping track of the different pages in your app. Some users prefer to give an object a different name (e.g., not form to avoid it being the same). What you name it is your choice and personal preference. The next line reads ")
+section:Add(preformatter:GeneratePreformattedCode("Page page = form:GetMainPage()"))
+        
+section:AddParagraph("A Page is a single screen on your app, including all of the buttons, labels, and other elements that will be on that screen. Just like viewing people’s profiles on social media, the new displays are new pages. When you use ")
+section:Add(preformatter:GeneratePreformattedCode("form:GetMainPage()"))
+        
+section:AddParagraph("you are requesting that the system gives you the first Page that will be displayed when the app starts. The system also calls this the main Page. Any kind of interactive user interface component, like buttons, text boxes, fields, lists, trees, or other items, are added to a page, but not the form itself. The idea is that then your app can flip pages as you go to show different kinds of information to the user.")
+section:AddParagraph("Now that you have a Page, you add elements directly to it. This will make your elements appear on the screen. You can see the next line is ")
+section:Add(preformatter:GeneratePreformattedCode("page:AddButton(" + dq + "Hi" + dq + ")"))
+        
+section:AddParagraph("This will add a button with a label that says Hi on the first page of the app. Screen readers and other accessibility clients will read that the button is named Hi. If you prefer, you can change the name of the item or the description, which alters what accessibility devices would obtain. Finally, in order to actually use the app, you use ")
+section:Add(preformatter:GeneratePreformattedCode("form:Display()"))
+        
+        
+        
+section:AddParagraph("This will make the Form open the window and display the main Page. While the template is convenient for creating a Form, it is not required. You could also choose to begin with a blank project and manually type out the libraries and the objects. While this method might be more tedious, all the information is the same. The key elements you should always include in your Form programs should be:")
+section:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page 
+
+Form form 
+Page page = form:GetMainPage()
+
+form:Display()
+"))
+        
+section:AddParagraph("These five lines of code will be in most Form programs you create. All the other pieces of code are for you to explore and learn to practice creating user interfaces.")
+        
+AddHeading(section, "Accessibility in Design", 3)
+section:AddParagraph("In order to add a button to your app, you must add it using the Page object by using page:AddButton(name). The button’s label (and also the button’s name) will match the text you provide to the action.")
+section:AddParagraph("Alternatively, if you have an image file (such as one with the extension JPG or PNG), you can make a button using that image. In this case, you can use page:AddButton(name, filename), where the filename is a path to where the image is located. The path is always relative to your project’s location on your computer, so if you use this option, it is highly recommended you store your image files in your project folder. In an online system, the Quorum website includes a small collection of sample images by default. Here is a sample of some dinosaur images:")
+        
+section:Add(LoadWebTable("Sample of Images Online", "/html/media/BlocksOnline/Apps1/Dinosaurs.csv"))
+        
+        
+AddHeading(section, "Adding Labels", 3)
+section:AddParagraph("To add text labels to your app, you need to add a label to the Page by using page:AddLabel(name). The provided text will be both the label’s name as well as the text that it displays. By default, labels can be navigated by a screen reader.")
+        
+Image labelImage = section:AddImage("/media/BlocksOnline/Apps1/Label.png","This is a version of the form that has a blue button labeled Hi in white. It also has a black label that says My Label, which is on top of the grey background.")
+        labelImage:AddText("This is a version of the form that has a blue button labeled Hi in white. It also has a black label that says My Label, which is on top of the grey background.")
+        labelImage:AddAttribute("data-zoom","")
+        
+AddHeading(section, "Adding a Banner", 3)
+section:AddParagraph("A Banner is a more complex element that can include multiple parts. How many parts are present in your app depends on how much information you give the action to make it. If you provide just a single piece of information using page:AddBanner(title), the banner will have a single label with your given text.")
+section:AddParagraph("Alternatively, if you give a second piece of text using page:AddBanner(title, label), the banner will have both a title label and a secondary label beneath it.
+Finally, the third option, page:AddBanner(name, title, label) works similarly to the previous option. In this case, the first value is the name, which will be read by screen readers and other accessibility technologies. Then, the second and third values are the title text and secondary label, respectively. You can use this option if you want to fine-tune the accessibility information separate from the text of the title.")
+        
+        
+Image bannerImage = section:AddImage("/media/BlocksOnline/Apps1/Banner.png","This is a version of the form that has a blue banner that says My App. Then it has a white button labeled Hi in black. The button is white in this case because it does not have the focus. It also has a black label that says My Label, which is on top of the grey background.")
+        bannerImage:AddText("This is a version of the form that has a blue banner that says My App. Then it has a white button labeled Hi in black. The button is white in this case because it does not have the focus. It also has a black label that says My Label, which is on top of the grey background.")
+        bannerImage:AddAttribute("data-zoom","")
+        
+        
+AddHeading(section, "Citations", 3)
+OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("U.S. Department of Justice. Fact Sheet: New Rule on the Accessibility of Web Content and Mobile Apps Provided by State and Local Governments. April 2024. https://www.ada.gov/resources/2024-03-08-web-rule/ 
+")
+
+        section:Add(citations)
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("So far, you have learned about user interfaces and how to set up a basic app. There are a few challenges in managing Parsons problems with forms and the big one is that user interfaces are at least partially subjective. One person can invent what seems useless to one person, but might be very important to another. Further, because the interfaces are at least partially subjective, your code here is not automatically checked.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("Just like all of the practice problems, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about Form objects","/problems/apps-1/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("After you finish the Parsons problems, you will notice a big problem with your app. It shows up visually and is accessible, but it does nothing. You can fix this using a concept called a Behavior. Speculate with a partner on how you think that might work.
+")
+        return section
+    end
+    
+action GetMetaDescription returns text
+        return "Learn about apps."
+    end
+
+    action GetSummaryName returns text
+        return "Apps"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Apps1  Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to make your own apps"
+    end
+
+    action GetLinkName returns text
+        return "Create an Accessible App, Part 1"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/apps-1.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Create an Accessible App, Part 1 Online"
+    end
+end
+
+

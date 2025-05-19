@@ -1,6 +1,7 @@
 use Libraries.Web.Page.all
 use Libraries.System.File
 use Libraries.Containers.Array
+use Libraries.Compute.Statistics.DataFrame
 
 
 class Lesson is WebPage
@@ -891,6 +892,58 @@ googleScript2:AddText(
             end
         end
         return rowTextWithTags
+    end
+    
+    action LoadWebTable(text title, text path) returns WebTable
+File file
+        file:SetPath(path)
+        
+        DataFrame frame
+        frame:Load(file)
+        
+        WebTable table = AddWebTable(title)
+    table:Add(frame)
+        
+        TableHeader header = table:GetTableHeader()
+        header:AddClassAttribute("bg-neutral-black text-neutral-white overflow-hidden")
+        
+        integer size = header:GetNumberOfNestedTags()
+        i = 0
+        repeat while i < size
+            //rows
+            WebTag row = header:GetTag(i)
+            j = 0
+            repeat while j < row:GetNumberOfNestedTags()
+                WebTag cell = row:GetTag(j)
+cell:AddClassAttribute("text-left py-3 px-4 font-semibold break-words text-sm first:rounded-tl-lg last:rounded-tr-lg")
+            cell:AddClassAttribute("w-1/"+row:GetNumberOfNestedTags())
+                j = j + 1
+            end
+            i = i + 1
+        end
+        
+        TableBody body = table:GetTableBody()
+        body:AddClassAttribute("bg-neutral-grey-25")
+size = body:GetNumberOfNestedTags()
+        i = 0
+        repeat while i < size
+            //rows
+            WebTag row = body:GetTag(i)
+row:AddClassAttribute("border-y border-neutral-grey-40 last:border-t last:border-y-0")
+            j = 0
+            repeat while j < row:GetNumberOfNestedTags()
+                WebTag cell = row:GetTag(j)
+cell:AddClassAttribute("text-left py-3 px-4 break-words")
+            if j = 0
+                cell:AddClassAttribute("font-bold")
+            end
+                j = j + 1
+            end
+            i = i + 1
+        end
+        
+        
+        return table
     end
 
     action GetDefaultTable(text title, Array<Array<text>> values) returns WebTable
