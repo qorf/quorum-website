@@ -431,6 +431,119 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
+var quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_ = class {
+Update$quorum_number(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+SetRunOnUpdate$quorum_boolean(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+Dispose() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+IsFinished() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+IsRunningOnUpdate() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+HasBeenRun() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+SetHasRunFlag$quorum_boolean(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
+if ((event.GetGestureEvent() != null)) {
+var gesture = event.GetGestureEvent();
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+var blocks = editor.GetBlockEditor();
+if (blocks.IsKeyboardMovingBlocks()) {
+blocks.ConfirmKeyboardMovingBlocks();
+return;
+}
+}
+var layer = manager.GetGame().GetCurrentLayer2D();
+var counter = layer.GetSize();
+var temp = null;
+var result = null;
+var pointVector = layer.GetCamera().ScreenToWorldCoordinates$quorum_number$quorum_number(gesture.GetX() * 1.0, gesture.GetY() * 1.0);
+while ((counter > 0)) {
+counter = (counter - 1);
+temp = layer.Get$quorum_integer(counter).GetItemAt$quorum_number$quorum_number(pointVector.GetX(), pointVector.GetY());
+if (((temp != null) && (global_CheckCast(temp, "Libraries.Interface.Item") != manager.GetFocus()))) {
+if ((global_InstanceOf(manager.GetFocus(),'Libraries.Interface.Controls.Blocks.Palette.BlockPaletteItem') && global_InstanceOf(temp,'Libraries.Interface.Controls.ScrollPaneRendererAnchor'))) {
+return;
+}
+temp.Focus();
+}
+}
+}
+};
+IsInPalette$quorum_Libraries_Interface_Item(item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSingleTapBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
 var quorum_WebEditor_EditorItem_ = class {
 constructor_() {
 this.prototype.SetInputGroup$quorum_text("EditorItem");
@@ -2667,119 +2780,6 @@ if(parents == null) {
 this.Libraries_Interface_Item2D__.constructor_();
 }
 if (parents == null) {this.constructor_();}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
-var quorum_WebEditor_Behaviors_WebEditorSingleTapBehavior_ = class {
-Update$quorum_number(seconds) {
-     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-SetRunOnUpdate$quorum_boolean(run) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
-}
-Dispose() {
-     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
-}
-IsFinished() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
-}
-IsRunningOnUpdate() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
-}
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-HasBeenRun() {
-     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
-}
-SetHasRunFlag$quorum_boolean(hasRun) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
-}
-Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
-if ((event.GetGestureEvent() != null)) {
-var gesture = event.GetGestureEvent();
-var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
-var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
-var blocks = editor.GetBlockEditor();
-if (blocks.IsKeyboardMovingBlocks()) {
-blocks.ConfirmKeyboardMovingBlocks();
-return;
-}
-}
-var layer = manager.GetGame().GetCurrentLayer2D();
-var counter = layer.GetSize();
-var temp = null;
-var result = null;
-var pointVector = layer.GetCamera().ScreenToWorldCoordinates$quorum_number$quorum_number(gesture.GetX() * 1.0, gesture.GetY() * 1.0);
-while ((counter > 0)) {
-counter = (counter - 1);
-temp = layer.Get$quorum_integer(counter).GetItemAt$quorum_number$quorum_number(pointVector.GetX(), pointVector.GetY());
-if (((temp != null) && (global_CheckCast(temp, "Libraries.Interface.Item") != manager.GetFocus()))) {
-if ((global_InstanceOf(manager.GetFocus(),'Libraries.Interface.Controls.Blocks.Palette.BlockPaletteItem') && global_InstanceOf(temp,'Libraries.Interface.Controls.ScrollPaneRendererAnchor'))) {
-return;
-}
-temp.Focus();
-}
-}
-}
-};
-IsInPalette$quorum_Libraries_Interface_Item(item) {
-while (!((item == null))) {
-if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
-return true;
-}
-else { 
-item = item.GetAccessibleParent();
-}
-}
-return false;
-};
-IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
-while (!((item == null))) {
-if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
-return true;
-}
-else { 
-item = item.GetAccessibleParent();
-}
-}
-return false;
-};
-Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
-};
-Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorSingleTapBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
-   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
-}
-
-if(parents == null) {
-}
 this.myHash = globalStaticHash;
 globalStaticHash = globalStaticHash + 1;
 }
@@ -5107,6 +5107,73 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
+var quorum_WebEditor_Behaviors_ShowHelpModalBehavior_ = class {
+Update$quorum_number(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+SetRunOnUpdate$quorum_boolean(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+Dispose() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+IsFinished() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+IsRunningOnUpdate() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+HasBeenRun() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+SetHasRunFlag$quorum_boolean(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+editor.ShowHelpModal();
+};
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ShowHelpModalBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
 var quorum_WebEditor_Behaviors_TogglePaletteBehavior_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
@@ -5160,73 +5227,6 @@ Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
 constructor(parents) {
 this.prototype = this;
 this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.TogglePaletteBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
-   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
-}
-
-if(parents == null) {
-}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
-var quorum_WebEditor_Behaviors_ShowHelpModalBehavior_ = class {
-Update$quorum_number(seconds) {
-     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-SetRunOnUpdate$quorum_boolean(run) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
-}
-Dispose() {
-     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
-}
-IsFinished() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
-}
-IsRunningOnUpdate() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
-}
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-HasBeenRun() {
-     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
-}
-SetHasRunFlag$quorum_boolean(hasRun) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
-}
-Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
-var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
-editor.ShowHelpModal();
-};
-Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
-};
-Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.ShowHelpModalBehavior'];
 this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
@@ -5593,6 +5593,189 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
+var quorum_WebEditor_Behaviors_StopGameBehavior_ = class {
+Update$quorum_number(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+SetRunOnUpdate$quorum_boolean(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+Dispose() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+IsFinished() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+IsRunningOnUpdate() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+HasBeenRun() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+SetHasRunFlag$quorum_boolean(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+editor.StopGame();
+};
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.StopGameBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
+var quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_ = class {
+Update$quorum_number(seconds) {
+     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+SetRunOnUpdate$quorum_boolean(run) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
+}
+Dispose() {
+     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
+}
+IsFinished() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
+}
+IsRunningOnUpdate() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+HasBeenRun() {
+     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
+}
+SetHasRunFlag$quorum_boolean(hasRun) {
+     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
+}
+Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
+if ((event.GetGestureEvent() != null)) {
+var gesture = event.GetGestureEvent();
+var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
+if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
+var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
+var blocks = editor.GetBlockEditor();
+if (!blocks.IsKeyboardMovingBlocks()) {
+var focused = manager.GetFocus();
+if (global_InstanceOf(focused,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+event.SetItem$quorum_Libraries_Interface_Item(blocks.GetSelectedBlocks().Get$quorum_integer(0));
+}
+else if( global_InstanceOf(focused,'Libraries.Interface.Controls.Blocks.Block')) {
+event.SetItem$quorum_Libraries_Interface_Item(focused);
+}
+else { 
+event.SetItem$quorum_Libraries_Interface_Item(focused);
+}
+var pickUpBehavior = new quorum_Libraries_Interface_Behaviors_Blocks_BlockPickUpBehavior_();
+pickUpBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+else { 
+blocks.CancelKeyboardMovingBlocks();
+}
+}
+else { 
+event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
+var controlBehavior = new quorum_Libraries_Interface_Behaviors_Controls_ControlActivationBehavior_();
+controlBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
+}
+}
+};
+IsInPalette$quorum_Libraries_Interface_Item(item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
+while (!((item == null))) {
+if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
+return true;
+}
+else { 
+item = item.GetAccessibleParent();
+}
+}
+return false;
+};
+Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
+};
+Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
+   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
+};
+Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
+   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorDoubleTapBehavior'];
+this.Libraries_Interface_Behaviors_Behavior__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
+   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
 var quorum_WebEditor_CanvasResizeListener_ = class {
 Equals$quorum_Libraries_Language_Object(object) {
 return global_Object_Equals(this.prototype, object);
@@ -5742,189 +5925,6 @@ this.XL = "XL";
 this.X2_LARGE = 1536;
 this.X2L = "X2L";
 this.editorPanels = new quorum_Libraries_Containers_Array_();
-
-if(parents == null) {
-}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
-var quorum_WebEditor_Behaviors_WebEditorDoubleTapBehavior_ = class {
-Update$quorum_number(seconds) {
-     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-SetRunOnUpdate$quorum_boolean(run) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
-}
-Dispose() {
-     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
-}
-IsFinished() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
-}
-IsRunningOnUpdate() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
-}
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-HasBeenRun() {
-     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
-}
-SetHasRunFlag$quorum_boolean(hasRun) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
-}
-Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
-if ((event.GetGestureEvent() != null)) {
-var gesture = event.GetGestureEvent();
-var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-if (this.prototype.IsInBlockEditor$quorum_Libraries_Interface_Item(manager.GetFocus())) {
-var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
-var blocks = editor.GetBlockEditor();
-if (!blocks.IsKeyboardMovingBlocks()) {
-var focused = manager.GetFocus();
-if (global_InstanceOf(focused,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
-event.SetItem$quorum_Libraries_Interface_Item(blocks.GetSelectedBlocks().Get$quorum_integer(0));
-}
-else if( global_InstanceOf(focused,'Libraries.Interface.Controls.Blocks.Block')) {
-event.SetItem$quorum_Libraries_Interface_Item(focused);
-}
-else { 
-event.SetItem$quorum_Libraries_Interface_Item(focused);
-}
-var pickUpBehavior = new quorum_Libraries_Interface_Behaviors_Blocks_BlockPickUpBehavior_();
-pickUpBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
-}
-else { 
-blocks.CancelKeyboardMovingBlocks();
-}
-}
-else { 
-event.SetItem$quorum_Libraries_Interface_Item(manager.GetFocus());
-var controlBehavior = new quorum_Libraries_Interface_Behaviors_Controls_ControlActivationBehavior_();
-controlBehavior.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
-}
-}
-};
-IsInPalette$quorum_Libraries_Interface_Item(item) {
-while (!((item == null))) {
-if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.Palette.BlockPalette')) {
-return true;
-}
-else { 
-item = item.GetAccessibleParent();
-}
-}
-return false;
-};
-IsInBlockEditor$quorum_Libraries_Interface_Item(item) {
-while (!((item == null))) {
-if (global_InstanceOf(item,'Libraries.Interface.Controls.Blocks.CodeEditor')) {
-return true;
-}
-else { 
-item = item.GetAccessibleParent();
-}
-}
-return false;
-};
-Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
-};
-Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.WebEditorDoubleTapBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
-   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
-}
-
-if(parents == null) {
-}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
-var quorum_WebEditor_Behaviors_StopGameBehavior_ = class {
-Update$quorum_number(seconds) {
-     return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-SetRunOnUpdate$quorum_boolean(run) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetRunOnUpdate$quorum_boolean(run);
-}
-Dispose() {
-     return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
-}
-IsFinished() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
-}
-IsRunningOnUpdate() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
-}
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-HasBeenRun() {
-     return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
-}
-SetHasRunFlag$quorum_boolean(hasRun) {
-     return this.Libraries_Interface_Behaviors_Behavior__.SetHasRunFlag$quorum_boolean(hasRun);
-}
-Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
-var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
-var editor = global_CheckCast(manager.GetGame(), "WebEditor.BlockEditor");
-editor.StopGame();
-};
-Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__runOnUpdate_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__runOnUpdate_(value);
-};
-Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_() {
-   return this.Libraries_Interface_Behaviors_Behavior__.Get_Libraries_Interface_Behaviors_Behavior__hasBeenRun_();
-};
-Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value) {
-   this.Libraries_Interface_Behaviors_Behavior__.Set_Libraries_Interface_Behaviors_Behavior__hasBeenRun_(value);
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Language.Object', 'Libraries.Interface.Behaviors.Behavior',  'WebEditor.Behaviors.StopGameBehavior'];
-this.Libraries_Interface_Behaviors_Behavior__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
-   this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
-}
 
 if(parents == null) {
 }
@@ -6213,44 +6213,6 @@ globalStaticHash = globalStaticHash + 1;
 };
 
 
-var quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_ = class {
-Equals$quorum_Libraries_Language_Object(object) {
-return global_Object_Equals(this.prototype, object);
-}
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-Compare$quorum_Libraries_Language_Object(object) {
-return global_Object_Compare(this.prototype, object);
-}
-SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent(event) {
-var selection = event.GetSelection();
-if ((selection != null)) {
-var blockSelection = global_CheckCast(selection, "Libraries.Interface.Selections.CodeEditorSelection");
-var block = blockSelection.GetBlock();
-if ((block != null)) {
-}
-}
-};
-
-constructor(parents) {
-this.prototype = this;
-this.parentNames_ = ['Libraries.Interface.Events.SelectionListener', 'Libraries.Language.Object',  'Libraries.Interface.Controls.Blocks.BlockSelectionListener'];
-this.Libraries_Interface_Events_SelectionListener__ = null;
-if(parents == null) {
-   this.Libraries_Interface_Events_SelectionListener__ = new quorum_Libraries_Interface_Events_SelectionListener_(false);
-   this.Libraries_Interface_Events_SelectionListener__.prototype = this;
-}
-
-if(parents == null) {
-}
-this.myHash = globalStaticHash;
-globalStaticHash = globalStaticHash + 1;
-}
-
-};
-
-
 var quorum_WebEditor_Behaviors_EditorItemFocusPrevious_ = class {
 Update$quorum_number(seconds) {
      return this.Libraries_Interface_Behaviors_Behavior__.Update$quorum_number(seconds);
@@ -6308,6 +6270,44 @@ this.Libraries_Interface_Behaviors_Behavior__ = null;
 if(parents == null) {
    this.Libraries_Interface_Behaviors_Behavior__ = new quorum_Libraries_Interface_Behaviors_Behavior_(false);
    this.Libraries_Interface_Behaviors_Behavior__.prototype = this;
+}
+
+if(parents == null) {
+}
+this.myHash = globalStaticHash;
+globalStaticHash = globalStaticHash + 1;
+}
+
+};
+
+
+var quorum_Libraries_Interface_Controls_Blocks_BlockSelectionListener_ = class {
+Equals$quorum_Libraries_Language_Object(object) {
+return global_Object_Equals(this.prototype, object);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+Compare$quorum_Libraries_Language_Object(object) {
+return global_Object_Compare(this.prototype, object);
+}
+SelectionChanged$quorum_Libraries_Interface_Events_SelectionEvent(event) {
+var selection = event.GetSelection();
+if ((selection != null)) {
+var blockSelection = global_CheckCast(selection, "Libraries.Interface.Selections.CodeEditorSelection");
+var block = blockSelection.GetBlock();
+if ((block != null)) {
+}
+}
+};
+
+constructor(parents) {
+this.prototype = this;
+this.parentNames_ = ['Libraries.Interface.Events.SelectionListener', 'Libraries.Language.Object',  'Libraries.Interface.Controls.Blocks.BlockSelectionListener'];
+this.Libraries_Interface_Events_SelectionListener__ = null;
+if(parents == null) {
+   this.Libraries_Interface_Events_SelectionListener__ = new quorum_Libraries_Interface_Events_SelectionListener_(false);
+   this.Libraries_Interface_Events_SelectionListener__.prototype = this;
 }
 
 if(parents == null) {
