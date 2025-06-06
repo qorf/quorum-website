@@ -1,0 +1,233 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class WebAccessibilityCheckers is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Web Accessibility Checkers - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Web Accessibility Checkers", 1)
+
+        headDiv:AddParagraph("Web Accessibility Checkers may provide some insight, but are not magic")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In this lesson, you'll learn how to inspect and evaluate websites for accessibility using tools that are built directly into web browsers. You'll explore the <strong>accessibility tree</strong>, a critical structure used by assistive technologies, and learn how to use browser inspect tools to view and understand it. You’ll also run automated checks with free and built-in tools like <strong>WAVE</strong> and <strong>Lighthouse</strong> and discuss what these tools can and cannot catch when it comes to accessible design.")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Identify and use built-in browser tools to inspect the accessibility tree")
+        goalList:AddListItem("Use automated checkers (like Lighthouse on Chrome) to run accessibility audits")
+        goalList:AddListItem("Understand what automated tools can and cannot detect")
+        goalList:AddListItem("Interpret basic accessibility reports and start troubleshooting issues")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Imagine you’ve built a multi-page website filled with graphics, icons, and images. You did your best to include alternative text for the images, but with so many elements, it’s hard to be sure you caught everything. Also, checking color contrast ratios across the site is tricky, especially with custom themes and colors.")
+        section:AddParagraph("Now imagine that a screen reader user navigates your site, but they can't see your visual elements, they only have access to the information in the accessibility tree. What if the tree is missing descriptions or labels? Would you know how to check?")
+        section:AddParagraph("Consider the tool, Inspect, that allows you to manually evaluate the accessibility tree; it is available on all browsers. And for a quick overview, browser-specific automated checkers like Lighthouse, for Chrome, can quickly scan your page and highlight potential issues.")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/WebAccessibilityCheckers/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+//        UnorderedList standards
+//        standards:AddClassAttribute("list-disc list-outside pl-8")
+//        standards:AddListItem("")
+//        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+
+        AddHeading(section, "WAVE - Web Accessibility Evaluation Tool", 3)
+        section:AddParagraph("<strong>WAVE</strong> is a browser-based accessibility checker developed by WebAIM [1] at Utah State University. It overlays visual indicators directly on the web page to show potential accessibility issues, such as missing alt text, skipped headings, and low color contrast. This makes it useful for beginners or anyone looking to quickly understand how a page may be inaccessible to certain users.")
+
+        Paragraph wavePara
+        wavePara:AddText("To begin using WAVE, navigate to ")
+        Link linkWAVE = wavePara:AddLink("https://wave.webaim.org", "https://wave.webaim.org")
+        wavePara:AddText(" in your browser. Once there, enter the URL of any public website you want to evaluate and use the arrow button to run the analysis.")
+        linkWAVE:SetTarget(linkWAVE:newTab)
+        section:Add(wavePara)
+
+        Image waveImage = section:AddImage("/media/Accessibility/WebAccessibilityCheckers/WAVEImage.png","A screenshot of the WAVE website with the URL address line populated with the Quorum Language website URL.")
+        waveImage:AddText("A screenshot of the WAVE website with the URL address line populated with the Quorum Language website URL.")
+        waveImage:AddAttribute("data-zoom","")
+        waveImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+
+        section:AddParagraph("WAVE will display an interactive sidebar with a summary of potential accessibility issues, such as missing alternative text, low color contrast, and heading structure problems. It overlays icons on the webpage preview to help you locate each issue in context. Each icon is clickable and provides a brief explanation of the issue and its impact on accessibility, as well as a link to the relevant WCAG criteria.")
+        section:AddParagraph("WAVE is a potentially helpful tool for identifying common problems and learning how they appear in code and design and it provides a score of accessibility (out of 10). This lesson uses the online version for demonstration, however, WAVE is also available as a browser extension for Chrome and Firefox. Installing the extension allows you to test local or password-protected pages and makes accessibility checks more convenient during ongoing development.")
+
+        AddHeading(section, "Chrome Lighthouse", 3)
+        section:AddParagraph("<strong>Lighthouse</strong> is a built-in accessibility checker in Chrome DevTools [2] that performs a quick accessibility audit alongside other evaluations such as performance and SEO (Search Engine Optimization). It provides a score of accessibility (out of 100) and a list of common issues found on the page, such as unlabeled buttons or poor contrast.")
+        section:AddParagraph("To run a Lighthouse audit, open Chrome DevTools (F12), navigate to the Lighthouse tab, select the Accessibility category, and select Generate report. Within seconds, it provides a summary along with suggestions for improvement, often linking to the relevant WCAG criteria. While Lighthouse is convenient and easy to use, especially because it is built into Chrome and it does not require any installation, its accessibility audit has limitations. It typically catches surface-level issues and does not deeply analyze interactive behavior or screen reader compatibility. It’s best used as a first step in the accessibility testing process, offering a high-level overview that can guide further manual or automated testing.")
+        
+        AddHeading(section, "What can and cannot be caught by automated web checkers?", 3)
+        section:AddParagraph("Web accessibility checkers like WAVE and Lighthouse are great at detecting surface-level issues. These include:")
+        UnorderedList canList
+        canList:AddClassAttribute("list-disc list-outside pl-8")
+        canList:AddListItem("Text Alternatives and Semantic Info: Missing image descriptions, improper use of HTML landmarks or ARIA roles, and unlabeled buttons. (WCAG 2.2 - 1.1.1, 1.3.1, 4.1.2)")
+        canList:AddListItem("Color and Contrast: Issues with low contrast between text and background, use of color alone to convey meaning, and text spacing problems. (WCAG 2.2 - 1.4.1, 1.4.3, 1.4.11, 1.4.12)")
+        canList:AddListItem("Titles, Headings and Labels: Missing or unclear page titles and headings that are not coded properly. (WCAG 2.2 - 2.4.2, 2.4.6)")
+        canList:AddListItem("Links and Navigation: Links without context or missing skip links for keyboard navigation. (WCAG 2.2 - 2.4.1, 2.4.4)")
+        canList:AddListItem("Forms and Inputs: Unlabeled form fields, missing instructions, and inputs that don’t have accessible names. (WCAG 2.2 - 2.5.3, 3.3.1, 3.3.2)")
+        canList:AddListItem("Language and HTML Validation: Missing language declarations or code errors that impact assistive technology. (WCAG 2.2 - 3.1.1, 4.1.1)")
+        canList:AddListItem("Flashing or Motion Content: Content that might trigger seizures due to flashing more than 3 times per second. (WCAG 2.2 - 2.3.1)")
+        section:Add(canList)
+
+        section:AddParagraph("However, finding some more complex accessibility issues require manual testing or judgment based on context and are often <strong>missed</strong> by these automated web tools:")
+        UnorderedList cannotList
+        cannotList:AddClassAttribute("list-disc list-outside pl-8")
+        cannotList:AddListItem("Reading Order and Visual Flow: Whether content reads logically in screen readers or follows a sensible visual order. (WCAG 2.2 - 1.3.2, 1.3.3)")
+        cannotList:AddListItem("Purpose of Inputs and Controls: Whether input fields or buttons clearly indicate their purpose in context. (WCAG 2.2 - 1.3.5, 1.3.6)")
+        cannotList:AddListItem("Responsive Layout and Hover Content: Problems with content resizing, overlapping, or disappearing on hover/focus. (WCAG 2.2 - 1.4.10, 1.4.13, 4.1.3)")
+        cannotList:AddListItem("Keyboard Navigation and Focus Management: Whether all interactive elements are accessible by keyboard, have clear focus indicators, or maintain correct focus order. (WCAG 2.2 - 2.1.1, 2.1.2, 2.1.4, 2.4.3, 2.4.7, 2.4.11, 2.4.12, 2.4.13)")
+        cannotList:AddListItem("Touch, Drag, Gesture Controls: Complex interactions like swiping, dragging, or motion-based triggers that don’t offer alternatives. (WCAG 2.2 - 2.5.1, 2.5.2, 2.5.4, 2.5.7, 2.5.8)")
+        cannotList:AddListItem("Help, Consistency, and Error Handling: Inconsistencies in navigation, missing help features, or lack of error prevention on critical forms. (WCAG 2.2 - 3.2.3, 3.2.4, 3.2.5, 3.2.6, 3.3.3, 3.3.4, 3.3.7, 3.3.8, 3.3.9)")
+        section:Add(cannotList)
+
+        AddHeading(section, "Accessibility Tree", 3)
+        section:AddParagraph("To access the <strong>Accessibility Tree</strong>, open your browser’s Developer Tools (usually by right-clicking on the page and selecting Inspect, or pressing F12 or Ctrl+Shift+I), then navigate to the Accessibility panel, which is typically found under the Elements tab in Chrome or Firefox. If it's not immediately visible, look for it under the triple-dot menu in the developer tools panel. Once inside the Accessibility panel, you’ll see a hierarchical view of the page's semantic structure as interpreted by screen readers and other assistive technologies.")
+        section:AddParagraph("When manually exploring the Accessibility Tree, approach it with an understanding of how screen readers navigate web content. The tree displays headings, landmarks, roles, and name-value pairs in the order they are presented to assistive technology users. Start by identifying the structural regions, such as main, nav, banner, and complementary landmarks, and ensure they are appropriately labeled and nested. Examine interactive elements like buttons, links, and form fields to confirm they include descriptive roles and accessible names. Pay attention to the reading order to verify it matches the intended visual flow. Manual inspection helps detect nuanced issues that automated tools may overlook, such as misapplied ARIA attributes or missing labels that impair usability for screen reader users, and even typos or grammar issues in image alt-text.")
+                    
+        AddHeading(section, "Citations", 3)
+        OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("WebAIM. WAVE web accessibility evaluation tool. Utah State University. https://wave.webaim.org/")
+        citations:AddListItem("Google. Lighthouse. https://developer.chrome.com/docs/lighthouse/overview/")
+        citations:AddListItem("Tipainis, J. (2025, January 24). Website accessibility checkers: Use cases, pros and cons. TestDevLab. https://www.testdevlab.com/blog/website-accessibility-checkers-use-cases")
+        section:Add(citations)
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this lesson, you are going to explore how automated and manual accessibility testing on the web can complement each other. You’ll use one automated checker (WAVE or Lighthouse) and the browser's Accessibility Tree to evaluate a website and reflect on what kinds of accessibility issues are (and are not) caught by automated tools.")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("Do the following for this exercise:")
+        UnorderedList directionsList
+        directionsList:AddClassAttribute("list-disc list-outside pl-8")
+        directionsList:AddListItem("<strong>Pick a website</strong>: You may use a website you’ve built or choose any publicly available website. Try to select a page with at least a few links, headings, images, and some text or forms.")
+        directionsList:AddListItem("<strong>Run WAVE or Lighthouse</strong>: Open the tool and scan the page. Review the errors, contrast issues, structure alerts, and ARIA information. Try to understand why the issues are flagged. Click on a few issues and read explanations. Think critically about how you might fix them.")
+        Array<text> nested
+        nested:Add("Headings (are they structured and labeled correctly?)")
+        nested:Add("Buttons and links (do they have accessible names and roles?)")
+        nested:Add("Images (do they have alt text? is it actually descriptive?)")
+        nested:Add("Any important elements that are missing or not represented in the tree")
+        nested:Add("Pay attention to how the tree represents the structure and semantics of the page, not just the visual layout.")
+        directionsList:AddListItem("<strong>Open the Accessibility Tree</strong>: In your browser’s Developer Tools, find the Accessibility tab and examine the tree. Look for:"+ MakeNestedUnorderedList(nested))
+        Array<text> nested2
+        nested2:Add("What did the automated tool catch?")
+        nested2:Add("What did <i>only</i> the manual inspection reveal?")
+        nested2:Add("What might a screen reader user encounter that neither tool made obvious?")
+        directionsList:AddListItem("<strong>Compare Findings</strong>: Make note of anything the checker caught that is also visible in the tree, and anything that wasn’t caught. Ask yourself:"+ MakeNestedUnorderedList(nested2))
+        section:Add(directionsList)
+                   
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("Accessibility inspection is a powerful but imperfect skill that helps you understand how your site appears to assistive technologies. The accessibility tree is the closest approximation to what a screen reader will read. Learning to read and interpret it helps you catch missing labels, alternative text, or heading structure and color contrast issues before users encounter them. Automated checkers, like Lighthouse or WAVE, are fast and useful but not comprehensive. They may only catch about 20–30% of accessibility issues on a website [3]. Therefore, while valuable for identifying common and easily detectable issues, they cannot replace manual inspection and user experience.")
+        section:AddParagraph("It's important to incorporate these tools as part of a broader strategy to reach your accessibility goals. We will learn about some powerful Desktop Accessibility Tools in a later lesson, and discuss how they can help you catch problems that automated web tools may miss.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Learn about ways to check evaluate website accessibility criteria online"
+    end
+
+    action GetSummaryName returns text
+        return "Learn about ways to check evaluate website accessibility criteria online"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Web Accessibility Checkers"
+    end
+
+    action GetShortDescription returns text
+        return "how to inspect and evaluate websites for accessibility using built-in tools"
+    end
+
+    action GetLinkName returns text
+        return "Web Accessibility Checkers"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/webaccessibilitycheckers.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+
