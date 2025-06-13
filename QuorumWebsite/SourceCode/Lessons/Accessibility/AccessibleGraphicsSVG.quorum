@@ -1,0 +1,255 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class AccessibleGraphicsSVG is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Accessible Graphics within Scalable Vector Graphics (SVG) - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Accessible Graphics within Scalable Vector Graphics (SVG)", 1)
+
+        headDiv:AddParagraph("Accessible Graphics can be done in a canvas, but also placed into Scalable Vector Graphics, with its own unique needs")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In this lesson, you will learn how to make Scalable Vector Graphics (SVGs) accessible to assistive technologies. Whereas canvas-based drawings rely on pixel rendering, SVGs on the web are part of the DOM and can carry semantic information directly. Titles, descriptions, and even ARIA attributes can be embedded within an SVG, which means the approach to make SVGs accessible is different compared to a canvas. However, SVGs do not allow you to control the rendering pipeline and this has pros and cons. In this lesson, you will consider accessible graphics within the context of SVGs.")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Understand the difference between using "+lt+"img> tags and inline "+lt+"svg> for accessible graphics")
+goalList:AddListItem("Learn how to add meaningful text alternatives using "+lt+"title>, "+lt+"desc>, and alt attributes")
+goalList:AddListItem("Recognize common accessibility pitfalls when working with SVGs in interfaces and visualizations")
+goalList:AddListItem("Learn how to apply ARIA attributes to enhance the accessibility of complex SVGs")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think about how web pages are built. There are headings that give structure, landmarks that define regions, and buttons that announce their purpose. Now imagine drawing an entire interface using only SVG shapes. Buttons might be circles, rectangles could make up menus, and fancy paths could be icons. How might such an approach differ compared to rendering in a canvas?")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/ColorInApplication/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("WCAG 2.2 - 1.1.1 Non-text content")
+standards:AddListItem("WCAG 2.2 - 1.3.1 Info and Relationships")
+standards:AddListItem("WCAG 2.2 - 2.1.1 Keyboard")
+standards:AddListItem("WCAG 2.2 - 4.1.2 Name, Role, Value")
+        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("Accessible graphics are an essential part of creating an inclusive digital experience. Visual content such as icons, diagrams, and data visualizations often convey meaning that all users should be able to interpret. However without alt text or proper semantic labeling these visuals can be invisible or useless to users who rely on certain assistive technologies. More importantly, alternative description becomes increasingly problematic as graphics become more complex. Ultimately, graphics like charts or visualization need interactivity to make them accessible.")
+section:AddParagraph("Scalable Vector Graphics (SVGs) offer a unique advantage when it comes to visual content. Unlike other common image formats that store information for every pixel, SVGs instead use mathematical formulas to describe lines and shapes. The data of an SVG is in text-based format that makes it both machine readable and human readable. Because of this, SVGs can be embedded directly into the structure of a web page along with semantic elements and accessible names. ")
+section:AddParagraph("It is important to contrast using SVGs with drawing graphics using the canvas element. A canvas allows for complex and high performance graphics but alone is not accessible. SVGs can be inherently part of the DOM and carry semantic information within its tags at the cost of lower performance for more complex graphics. However, they give you far less control. It is important to grasp that one is not better than the other and they are used for different purposes.")
+        
+        AddHeading(section, "Using SVGs", 3)
+section:AddParagraph("There are two main ways to use SVGs in a web page. One way is using the &lt;img&gt; tag. Using an SVG as an image source works just like using a PNG or JPEG. ")
+        section:Add(preformatter:GeneratePreformattedCode("&lt;img src='icon.svg' alt='Search Icon'&gt;"))
+section:AddParagraph("When used this way the image can get an alt tag which makes it no more or less accessible like a regular image. You still get the benefit of the smoothness of SVGs since they are still calculated using mathematical formulas, but you do not have access to the internal SVGs elements. For simple or decorative images this way can be fine but so more complex images that need more markup you will have to embed the SVG inline. Take this example SVG:")
+section:Add(preformatter:GeneratePreformattedCode("&lt;svg viewBox=&#39;0 0 20 20&#39; role=&#39;img&#39; aria-labelledby=&#39;title1&#39;&gt;
+    &lt;title id=&#39;title1&#39;&gt;Search icon&lt;/title&gt;
+    &lt;circle cx=&#39;10&#39; cy=&#39;10&#39; r=&#39;8&#39; fill=&#39;blue&#39;/&gt;
+&lt;/svg&gt;"))
+section:AddParagraph("If this is added directly into HTML then you gain full control over the structure and accessibility. You can add ARIA attributes and roles, and even label individual shapes or groups. And being part of the DOM also means you can use Cascading Style Sheets (CSS) or other tools (e.g., tailwind) to animate SVGs and Javascript to add additional functionality.  Put another way, embedding and adding some tags can dramatically increase flexibility with accessibility systems.")
+        
+AddHeading(section, "Providing an Accessible Name", 3)
+section:AddParagraph("The SVG standard also includes two tags that add accessibility information. There is the &lt;title&gt; tag and the &lt;desc&gt; tag. The &lt;title&gt; tag is the accessible name of a given SVG or container SVG element. Think of the &lt;title&gt; tag as an equivalent to 'aria-label' but instead of an attribute it is also its own element in the structure. SVG renders also add a tooltip to elements of an SVG with a &lt;title&gt; so adding this tag not only adds accessibility but another visual element to enhance the graphic. The &lt;desc&gt; tag is for longer explanations or information for a given SVG element. Note that descriptions are supported across most browsers but not all screen readers consistently announce descriptions. ")
+section:AddParagraph("Here is an example SVG with titles and descriptions:")
+        
+Image exampleSVG = section:AddImage("/media/Accessibility/AccessibleGraphicsSVG/exampleSVG.svg","An example SVG that contains 3 rectangles laid out vertically. The code for this SVG also includes titles and descriptions for each rectangle.")
+        exampleSVG:AddText("An example SVG that contains 3 rectangles laid out vertically. The code for this SVG also includes titles and descriptions for each rectangle.")
+        exampleSVG:AddAttribute("data-zoom","")
+        exampleSVG:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+section:Add(preformatter:GeneratePreformattedCode("&lt;svg viewbox=&quot;0 0 150 300&quot; role=&quot;img&quot; aria-labelledby=&quot;svgTitle svgDesc&quot;&gt;
+    &lt;title id=&quot;svgTitle&quot;&gt;Three Stack&lt;/title&gt;
+    &lt;desc id=&quot;svgDesc&quot;&gt;Three vertical rectangles labeled as First, Second, and Third section from top to bottom.&lt;/desc&gt;
+
+    &lt;!-- First rectangle --&gt;
+    &lt;g&gt;
+      &lt;title&gt;First section&lt;/title&gt;
+      &lt;rect x=&quot;20&quot; y=&quot;10&quot; width=&quot;100&quot; height=&quot;80&quot; fill=&quot;#4A90E2&quot; /&gt;
+    &lt;/g&gt;
+
+    &lt;!-- Second rectangle --&gt;
+    &lt;g&gt;
+      &lt;title&gt;Second section&lt;/title&gt;
+      &lt;rect x=&quot;20&quot; y=&quot;100&quot; width=&quot;100&quot; height=&quot;80&quot; fill=&quot;#50E3C2&quot; /&gt;
+    &lt;/g&gt;
+
+    &lt;!-- Third rectangle --&gt;
+    &lt;g&gt;
+      &lt;title&gt;Third section&lt;/title&gt;
+      &lt;desc&gt;This happens to be the last rectangle&lt;/desc&gt;
+      &lt;rect x=&quot;20&quot; y=&quot;190&quot; width=&quot;100&quot; height=&quot;80&quot; fill=&quot;#B8E986&quot; /&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;"))
+section:AddParagraph("Another note about the &lt;title&gt; tag is that an element can only have a single &lt;title&gt;. Additional ones will be ignored. The entire SVG can have a title but for more than one title in one SVG each title needs to be nested within an element and one of the most common is the &lt;g&gt; tag, which groups elements together.")
+section:AddParagraph("Compared to canvas-based drawings, SVG offers a significant advantage when it comes to structure. The graphics are inherently part of the DOM and can be described semantically. The &lt;g&gt; enhances this by allowing you to individual shapes like a &lt;circle&gt; or &lt;path&gt;, many graphics are composed of multiple elements representing a single concept. Grouping shapes with the &lt;g&gt; enables you manipulate or animate them as a single unit. By adding ARIA within the groups and structure of an SVG you can make complex visual structures more understandable and navigable for assistive technologies. ")
+        
+AddHeading(section, "Adding Additional Functionality", 3)
+section:AddParagraph("As mentioned earlier in this lesson, SVGs embedded inline are part of the DOM. While SVGs are primarily for visual graphics it is important to understand the power of being part of the DOM. SVGs can be styled, scripted, and made interactive just like any other HTML element. And one of the most important ways you can enhance interactions is by making SVG elements <strong>focusable</strong>. Being focusable means a keyboard user can directly navigate to the element and easily find the added accessibility information. ")
+section:AddParagraph("By default, most SVG elements are not focusable. If you want an SVG element to be navigated to via the Tab key, you explicitly set the 'tabindex' attribute. Take this example SVG:")
+section:Add(preformatter:GeneratePreformattedCode("&lt;svg viewbox=&quot;0 0 100 100&quot;&gt;
+    &lt;g role=&quot;button&quot; tabindex=&quot;0&quot; aria-label=&quot;Zoom In&quot;&gt;
+      &lt;circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;40&quot; fill=&quot;#4A90E2&quot; /&gt;
+      &lt;text x=&quot;50&quot; y=&quot;55&quot; text-anchor=&quot;middle&quot; fill=&quot;white&quot; font-size=&quot;20&quot;&gt;+&lt;/text&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;"))
+section:AddParagraph("This example SVG acts like a button and has the attribute tabindex set to 0. This means this element is now added to the tab order and if a keyboard user is navigating the page the Tab key will stop them here and announce that there is a button labeled 'Zoom In'. With the use of JavaScript and CSS you can also:")
+UnorderedList ol
+        ol:AddClassAttribute("list-disc list-outside pl-8")
+        ol:AddListItem("Respond to keyboard events like 'Enter', 'Space', or the arrow keys.")
+ol:AddListItem("Be styled with on focus states to show visible indicators.")
+ol:AddListItem("Have ARIA roles, properties, and states, as if they were a standard control like buttons, checkboxes, and even links. ")
+        section:Add(ol)
+section:AddParagraph("Note that when using tabindex there is a risk of clutter. Having too many focusable elements using tabindex='0' can overload the tab order and make navigating through a page linearly a pain. If you are using more interactive ARIA roles like 'button' you need to make sure you provide accessible names and interaction for full semantic support.  ")
+        
+AddHeading(section, "Charts", 3)
+section:AddParagraph("As one final note, consider that very complex SVGs, like charts or visualization, will require external JavaScript to control them. ")
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this activity, you are going to practice making SVG graphics accessible by applying a semantic structure. You will label parts of a graphic, group related shapes, and use ARIA attributes to improve screen reader understanding. The goal is not just to mark things up, but to think carefully about how a graphic communicates meaning and how you can make that meaning available to users who can not see it.")
+section:AddParagraph("For this exercise, you may not rely on pre-written accessibility markup or tooling to do the work for you. You are going to write the structure and labels yourself, using what you have learned.")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("Do the following for this exercise:")
+        section:AddParagraph("<strong>Pick a Chart</strong>: Each group will receive a screenshot of a simple chart or graphic. You will not receive the SVG code, just the image. Remember that although images can be considered accessible with a simple alt tag, some graphics are complex enough that one tag simply is not enough. ")
+section:AddParagraph("<strong>Build the Structure</strong>: Using your understanding of SVG and accessibility, write the structure of an accessible inline SVG that would match the screenshot. Focus on:")
+UnorderedList ol
+        ol:AddClassAttribute("list-disc list-outside pl-8")
+        ol:AddListItem("Grouping related elements using "+lt+"g>")
+ol:AddListItem("Providing labels with "+lt+"title> or aria-label")
+ol:AddListItem("Using role='img' or role='group' appropriately")
+        section:Add(ol)
+section:AddParagraph("You do not need to recreate the visual details, but you do need to represent the structure that makes the graphic understandable.")
+section:AddParagraph("<strong>Swap with Another Group</strong>: Exchange your screenshot and your proposed markup with another group. They will review your markup and:")
+UnorderedList ol2
+        ol2:AddClassAttribute("list-disc list-outside pl-8")
+        ol2:AddListItem("Evaluate whether the labels are clear and meaningful")
+ol2:AddListItem("Check whether the grouping matches what is visually apparent")
+ol2:AddListItem("Identify any missing semantics or unnecessary verbosity")
+        section:Add(ol2)
+section:AddParagraph("After reviewing each other's work, come back together and discuss:")
+UnorderedList questions
+        questions:AddClassAttribute("list-disc list-outside pl-8")
+        questions:AddListItem("Was it easy or difficult to decide what counted as a 'group'?")
+questions:AddListItem("How much context did you feel needed to be included in a "+lt+"desc>?")
+questions:AddListItem("What decisions did you make about focusability or interactivity?")
+questions:AddListItem("If you had to rely on a screen reader to understand this graphic, would your markup work?")
+        section:Add(questions)
+        
+        
+
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("Making SVGs accessible is a powerful way to ensure that visual content is universally designed. Unlike canvas-based graphics, which require other workarounds to convey meaning, SVGs can be included directly into the DOM and carry accessible names, roles, and description directly in the markup. With careful structure and semantics, SVGs can work for everyone.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Accessible Graphics can be done in a canvas, but also placed into Scalable Vector Graphics, with its own unique needs"
+    end
+
+    action GetSummaryName returns text
+        return "Accessible Graphics can be done in a canvas, but also placed into Scalable Vector Graphics, with its own unique needs"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Accessible Graphics within Scalable Vector Graphics (SVG)"
+    end
+
+    action GetShortDescription returns text
+        return "how accessible Graphics can be done in a canvas, but also placed into Scalable Vector Graphics, with its own unique needs"
+    end
+
+    action GetLinkName returns text
+        return "Accessible Graphics within Scalable Vector Graphics (SVG)"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/accessibleGraphicsSVG.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+
+
+

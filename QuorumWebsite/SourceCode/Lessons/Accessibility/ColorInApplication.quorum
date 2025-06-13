@@ -1,0 +1,236 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class ColorInApplication is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Color In Application - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Color In Application", 1)
+
+        headDiv:AddParagraph("Using Color in Practice")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("Understanding how the equations work with color and color contrast is important because it helps you at least realize that relative luminance is the key factor. It also makes it clear that red, green, and blue do not equally contribute to luminance. While understanding this is important, in practice it would be a waste of time to calculate contrasts by hand and many aspects of color checking can be automated. This lesson covers using color in practice and interpreting the results. ")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn the contrast ratio requirements for WCAG 2.2")
+        goalList:AddListItem("Identify which color pairs are critical to test")
+        goalList:AddListItem("Learn how to use contrast testing tools and think through the results")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Color is a complex topic for many reasons. One of many is that not all people perceive color in the same way or really much at all. Another is that not all applications in practice are just single color backgrounds and text. Think about the kinds of apps you invent and how color is used. Where do you think it is crucial to consider contrast and where do you think it is less so?")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/ColorInApplication/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("WCAG 2.2 - 1.4.1 Use of Color")
+        standards:AddListItem("WCAG 2.2 - 1.4.3 Contrast (Minimum)")   
+        standards:AddListItem("WCAG 2.2 - 1.4.6 Contrast (Enhanced)")
+standards:AddListItem("WCAG 2.2 - 1.4.11 Non-text Contrast")
+        standards:AddListItem("WCAG 2.2 - 2.4.13 Focus Appearance")
+        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("Color contrast is vital to get right for accessibility. As mentioned in the previous lesson, in the most extreme case where a black background has black text on it, the material is unreadable by everyone. Even past this extreme case, poor contrast impacts many people and its impact is far reaching. ")
+section:AddParagraph("WCAG has several requirements when it comes to color contrast and there are a variety of combinations and elements to consider. In this lesson you will learn how to manually color test by finding relevant color combinations and inputting them into contrast calculators. This avoids having to do the calculations by hand, but more crucially gives you an example of how to test and automate certain parts of your process. ")
+section:AddParagraph("As a first step when testing colors, you need to know the sRGB values. There are many ways to learn this and this lesson will not cover them all. For example, on Mac there is a system application named 'Digital Color Meter' which can detect the final color on screen. These tools are sometimes called <strong>color droppers</strong>.")
+        
+Image colorMeterImage = section:AddImage("/media/Accessibility/ColorInApplication/colorMeter.png","This shows the Mac OS X color dropper with Red, Green, and Blue pixels. ")
+        colorMeterImage:AddText("This shows the Mac OS X color dropper with Red, Green, and Blue pixels. ")
+        colorMeterImage:AddAttribute("data-zoom","")
+        colorMeterImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+section:AddParagraph("Most color droppers work the same way. If you hover over a color it will give you the red, green, and blue values of the pixel. Past Mac, on the web you can also inspect an element and grab the exact color used by the styles. For example, in Chrome's DevTools, similar tools are embedded. If you find a color in the inspector the color will be highlighted and a square with color will appear next to it. If you click on the on color the color picker and dropper menu will appear. That menu looks like this: ")
+        
+Image colorPickerImage = section:AddImage("/media/Accessibility/ColorInApplication/chromeColorPicker.png","Color picker and dropper in menu in Chrome. Can be found by clicking on color that is found in the inspector menu.")
+        colorPickerImage:AddText("Color picker and dropper in menu in Chrome. Can be found by clicking on color that is found in the inspector menu.")
+        colorPickerImage:AddAttribute("data-zoom","")
+        colorPickerImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+section:AddParagraph("As for calculators, WebAIM provides a <a href='https://webaim.org/resources/contrastchecker/' target='_blank'>contrast checker</a> where you can input two colors and it will output the contrast ratio using rules from a particular standard. WebAIM also checks the contrast ratio against WCAG requirements so it can tell you if the ratio passes or fails under certain guidelines.")
+        
+Image contrastCheckerImage = section:AddImage("/media/Accessibility/ColorInApplication/contrastChecker.png","Screenshot of the free WCAG color contrast checker provided by WebAIM")
+        contrastCheckerImage:AddText("Screenshot of the free WCAG color contrast checker provided by WebAIM")
+        contrastCheckerImage:AddAttribute("data-zoom","")
+        contrastCheckerImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+        AddHeading(section, "Contrast Requirements", 3)
+        
+section:AddParagraph("The broad purpose behind WCAG's color contrast guidelines is to make sure the text is readable. Whether it succeeds is an interesting question, but it is at least true  that poor contrast does negatively impact readability. For example, 1.4.3 Contrast reads as follows:")
+        Division contrastRequirement
+        contrastRequirement:AddAttribute("style", "margin-left: 4em")
+        contrastRequirement:AddParagraph("The visual presentation of text and images has a contrast ratio of at least 4.5:1, except for the following:")
+        UnorderedList ol1
+        ol1:AddClassAttribute("list-disc list-outside pl-8")
+        ol1:AddListItem("<strong>Large Text</strong>: Large-scale text and images of large scale text have a ratio of at least 3:1;")
+ol1:AddListItem("<strong>Incidental</strong>: Text or images of text that are part of an inactive user interface component, that are pure decoration, that are not visible to anyone, or that are part of a picture that contains significant other visual content, have no contrast requirement. ")
+ol1:AddListItem("<strong>Logotypes</strong>: Text that is part of a logo or brand name has no contrast requirement.")
+        contrastRequirement:Add(ol1)
+        section:Add(contrastRequirement)
+        
+        section:AddParagraph("WCAG requires a contrast ratio of 4.5:1 for text and 3:1 for large text. Remember that it is a hard line and you can not round to 4.5:1. So 4.48:1 is still technically a failure, even if in practice the difference probably does not matter. ")
+section:AddParagraph("There are situations in WCAG that also technically do not require testing. For example, if the colors are for decoration and the text or component contains nothing required to  understand your content, you are in the clear. WHen this applies and when it does not is at least partially subjective and this underscores an important aspect of accessibility. Regulations are trying to guide you toward accessible design, but this is an active area of scientific thinking and is hardly perfect.  ")
+        section:AddParagraph("Another important guideline is WCAG is 1.4.11 Non-text Contrast which reads as follows:")
+        
+Division contrastRequirement2
+        contrastRequirement2:AddAttribute("style", "margin-left: 4em")
+        contrastRequirement2:AddParagraph("The visual presentation of the following have a contrast ratio of at least 3:1 against adjacent color(s):")
+        UnorderedList ol2
+        ol2:AddClassAttribute("list-disc list-outside pl-8")
+        ol2:AddListItem("<strong>User Interface Components</strong>: Visual information required to identify user interface components and states, except for inactive components or where the appearance of the component is determined by the user agent and not modified by the author;")
+ol2:AddListItem("<strong>Graphical Objects</strong>: Parts of graphics required to understand the content, except when a particular presentation of graphics is essential to the information being conveyed.")
+        contrastRequirement2:Add(ol2)
+        section:Add(contrastRequirement2)
+        
+section:AddParagraph("This requirement adds to WCAG that not only text should be tested but also user interface components and other graphics. The idea is that if you are using a user interface, but you made buttons with poor contrast, this could impact the user's ability to read the content or use the application. Again, this might sound trivial. Imagine though that this applies to critical applications. If you cannot use your bank, file your taxes, or sign a legal agreement because you cannot read it, this feels like a problem that should be corrected. ")
+section:AddParagraph("Finally, the requirement for contrast is a ratio of 3:1, which needs to be achieved for <em>adjacent colors</em>. This gets tricky when you have interface components with complex colors. Take a pie chart, for example. To understand a pie chart visually you have to be able to distinguish the colors of the slices. That means that not only does a slice of the piece chart have to have a 3:1 against the background but any adjacent slice should also meet that requirement. As charts scale in complexity and the number of adjacent colors increases, this can get tricky.")
+        
+AddHeading(section, "Picking Colors", 3)
+        
+section:AddParagraph("There are a variety of factors to consider when picking color combinations. Text is not always as simple as a background and text color. Sometimes there are outlines and other effects added to text for stylistic reasons.  If a text outline impacts the perceived contrast then the outline color can be used when measuring the contrast. A classic example is Closed Captioning in film, which tends to use black outlines and white on the inside.")
+section:AddParagraph("Remember that in WCAG 2.2, but not 3.0, the contrast ratio given by WCAG is the same even if you swap the background and foreground. Note that WCAG does mention situations where a color is not consistent over a given area. Take a background that has a gradient for example. The background technically has a range of colors that could be considered but the contrast ratio is between only two. In this case it is recommended that you test the area where the contrast is the lowest, but this is again an area with some subjectivity.")
+section:AddParagraph("Text and components are also sometimes dynamic. They might change color as the user interacts with it. A button might have a hover, focus, and active states. WCAG does not give extra consideration for these, so each state must meet the same requirements and be evaluated independently. ")
+section:AddParagraph("When it comes to graphical objects and other components that provide some sort of information there are some extra considerations. Consider the following icon:")
+        
+Image exampleIcon = section:AddImage("/media/Accessibility/ColorInApplication/iconExample.png","Triangle shaped icon with an exclamation mark. The exclamation mark is white, while the icon itself is red on a gray background.")
+        exampleIcon:AddText("Triangle shaped icon with an exclamation mark. The exclamation mark is white, while the icon itself is red on a gray background.")
+        exampleIcon:AddAttribute("data-zoom","")
+        exampleIcon:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+section:AddParagraph("This icon has an exclamation point that is providing information to the user. Maybe an icon like this appears when there is an error. To test an icon like this you need to test multiple colors. The icon itself is against the background so the icon color needs to be tested against the background color. However, the exclamation point is providing information to the user, so that also needs to be tested against the color it is adjacent to. ")
+section:AddParagraph("There is one notable exception here. If the icon is the only information a user receives, then these contrast issues need to be checked. If, however, there were words along with the error, which is usually a good idea anyway, then this is not the case. For example, if the image is for a game and the error has words saying, "+dq+"the rabbits come at midnight,"+dq+" then the addition of the words is more informative anyway.")
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this example, you will use color testing tools to evaluate a website. The purpose here is not just to evaluate text, but the colors on the site as a whole. For example, if there are user interface elements, graphics (e.g., charts, visualization), or other components, strategically decide which ones to evaluate.")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("Follow these directions for the activity:")
+        UnorderedList ol
+        ol:AddClassAttribute("list-disc list-outside pl-8")
+        ol:AddListItem("Split up into groups and choose a site or tool to represent your group. This may be a homepage for your product or a template for using it. ")
+ol:AddListItem("Like in previous lessons, swap with another group ")
+ol:AddListItem("Using the color droppers and contrast calculator of your choice find instances where a contrast requirement might be applied and test the colors. Remember that for regular body text the requirement is 4.5:1 and large text and graphical objects are 3:1. If there are interactive components such as hover states or active states remember to test those colors individually. ")
+ol:AddListItem("Keep a list of the errors to provide the other group")
+        section:Add(ol)
+        
+        section:AddParagraph("As a reminder, the purpose of the swapping is to help each other find problems. Even trained accessibility experts make mistakes and some subjectivity is inevitable in work like this. It is not perfect. Your goal is to help the other group find potential problems with accessibility within the spirit of good faith peer review.")
+
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("Contrast ratios and colors are crucial in product design. Poor contrast decreases readability for almost everyone and is arguably even more serious for many kinds of disabilities. No one is immune, however. Even those with excellent vision, without color blindness or other known challenges, can benefit from good color contrast. Given that accessibility issues often have to be tackled by engineering teams over time, consider what the most important aspects of color on your own products are and where changes should be targeted.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Using Color in Practice"
+    end
+
+    action GetSummaryName returns text
+        return "Using Color in Practice"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Color In Application"
+    end
+
+    action GetShortDescription returns text
+        return "how to use color contrast calculators in practice"
+    end
+
+    action GetLinkName returns text
+        return "Color In Application"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/colorInApplication.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+
+
