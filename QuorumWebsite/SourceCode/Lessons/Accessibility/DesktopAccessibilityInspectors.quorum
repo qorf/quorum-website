@@ -1,0 +1,334 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class DesktopAccessibilityInspectors is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Desktop Accessibility Inspectors - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Desktop Accessibility Inspectors", 1)
+
+        headDiv:AddParagraph("Inspectors allow you to manually examine how element accessibility properties appear to assistive technologies.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In this lesson, you will explore manual accessibility inspection tools that help you evaluate and understand accessibility issues directly from your desktop. These tools, known as accessibility inspectors, help developers by identifying barriers to accessibility and providing insight into how assistive technologies interact with applications. You will learn how to inspect live accessibility data, interpret the accessibility tree, and compare tool behavior across browsers and platforms.")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to use desktop accessibility checkers to inspect applications")
+        goalList:AddListItem("Understand the role of the accessibility tree in assistive technology")
+        goalList:AddListItem("Recognize how browser differences affect accessibility data")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Imagine you are using an app or navigating a website, and something feels off, maybe a button appears on screen but does not respond as expected, or a label is missing and you are not sure what the control does. In these situations, a desktop accessibility inspector can be incredibly useful. Unlike automated checkers, from a previous lesson, that scan for broad accessibility issues, inspectors let you examine how individual elements expose their accessibility information in real time. Before diving in, consider: what kinds of properties or behaviors would you want to check when something is not working as expected for users relying on assistive technologies?")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/DesktopAccessibilityInspectors/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("WCAG 2.2 - 1.3.1 Info and Relationships")   
+        standards:AddListItem("WCAG 2.2 - 2.1.1 Keyboard")
+        standards:AddListItem("WCAG 2.2 - 2.4.3 Focus Order")
+        standards:AddListItem("WCAG 2.2 - 2.4.7 Focus Visible")
+        standards:AddListItem("WCAG 2.2 - 3.3.2 Labels or Instructions")
+        standards:AddListItem("WCAG 2.2 - 4.1.2 Name, Role, Value")
+        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("Accessibility inspectors are tools that can help ensure that applications are usable by different assistive technologies. They often give incredibly helpful information for experts, but are not easy to use. While tools like this are often associated with web content, users do not exist only on the web and this is especially true in software development. Many products are on the web, desktop native apps, or mobile apps, and all of them should be accessible. There are several tools available but the tools you will focus on here are the <strong>Mac Accessibility Inspector</strong> and <strong>Accessibility Insights for Windows</strong>.")
+        section:AddParagraph("Windows does have another legacy inspect tool (Windows SDK) that sometimes has more information than Accessibility Insights. This tool is extremely powerful, but unbelievably confusing; and last we checked, it crashes constantly. However, sometimes, it is the only place to get certain information. As such, unless you really need Windows SDK, Accessibility Insights, although less powerful, is arguably much easier to use.")
+
+        AddHeading(section, "Setup", 3)
+        section:AddParagraph("The inspect tools are not automatically installed into your system so you will have to grab the one for your operating system. For Apple devices you will use the Mac Accessibility Inspector and for Windows you will use Accessibility Insights.")
+        section:AddParagraph("To set up Accessibility Insights:")
+        OrderedList windowsSetup
+        windowsSetup:AddClassAttribute("list-decimal list-outside pl-8")
+        Paragraph insightsPara
+        insightsPara:AddText("Download Accessibility Insights: Go to the official ")
+        Link linkInsights = insightsPara:AddLink("Accessibility Insights website", "https://accessibilityinsights.io/downloads/")
+        insightsPara:AddText(" and download the 'For Windows' version.")
+        linkInsights:SetTarget(linkInsights:newTab)   
+        windowsSetup:AddListItem(""+insightsPara:GenerateNestedTags())
+        windowsSetup:AddListItem("Follow the installation prompts and complete the installation process.")
+        windowsSetup:AddListItem("Start Inspecting: Launch the tool and it will open in the live inspect mode so you can immediately start inspecting desktop applications.")
+        section:Add(windowsSetup)
+        section:AddParagraph("To set up Mac Accessibility Inspector:")
+        OrderedList macSetup
+        macSetup:AddClassAttribute("list-decimal list-outside pl-8")
+        macSetup:AddListItem("Install Xcode: the inspector is part of the Xcode developer tools so you will need to download Xcode from the Mac App Store.")
+        macSetup:AddListItem("Enable the Inspector: Open Xcode and then navigate to <strong>Xcode > Open Developer Tool > Accessibility Inspector</strong>.")
+        macSetup:AddListItem("Start Inspecting: Once open, you can start inspecting desktop applications.")
+        section:Add(macSetup)
+        section:AddParagraph("Now that an inspector is up and running, the next step is to learn how to interpret what the inspector is trying to tell you. The Mac and Windows interfaces are unique, although they share some common features. You will learn about some of the shared features as well as some of the individual features.")
+
+        AddHeading(section, "Accessibility Insights", 3)
+        section:AddParagraph("When you open Accessibility Insights for Windows it will open in Inspect mode and there are several UI components to take note of. You will explore a few of them in this lesson.")
+        Image inspectImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InsightsInspectImage.png","A screenshot showing the Accessibility Insights for Windows application is open to the Inspect tab, showing the UI navigation buttons on the left, Live Inspect in the center pane, more property details in the right pane and toolbar options such as controls and Target Element on top.")
+        inspectImage:AddText("A screenshot showing the Accessibility Insights for Windows application is open to the Inspect tab, showing the UI navigation buttons on the left, Live Inspect in the center pane, more property details in the right pane and toolbar options such as controls and Target Element on top.")
+        inspectImage:AddAttribute("data-zoom","")
+        inspectImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("For example, the Vertical Tab toolbar, the blue-colored bar docked to the left side of the window, contains several navigation buttons:")
+        UnorderedList navbuttons
+        navbuttons:AddClassAttribute("list-disc list-outside pl-8")
+        navbuttons:AddListItem("<i><strong>Inspect</strong></i>: Selected by default and opens the Live Inspect mode to explore UI elements in real time.")   
+        navbuttons:AddListItem("<i><strong>Test</strong></i>: Access to several automated tests and checklist when inspecting elements. Note that automated tests cannot catch all accessibility problems so much of testing has to be done manually.")
+        navbuttons:AddListItem("<i><strong>Contrast</strong></i>: Accessibility Insights can also auto detect the color contrast ratio and tell you if the calculated contrast passes the requirements in WCAG 2.2.")
+        navbuttons:AddListItem("<i><strong>Settings</strong></i>: You can customize keyboard shortcuts here and also login to issue boards to file issues from the inspector. ")
+        section:Add(navbuttons)
+        section:AddParagraph("For this lesson, we will focus on the Inspect Tab and Live Inspect desktop application and see the information provided by the inspector. While the Inspect tab is open Live Inspect mode will be turned on and you will see several panes update and highlight appear as you use other applications. Open the Notepad application to follow along.")
+        Image notepadImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InsightsNotepadImage.png","Notepad menu bar open to the new file menu item with Accessibility Insights Highlight drawn on top of it.")
+        notepadImage:AddText("Notepad menu bar open to the new file menu item with Accessibility Insights Highlight drawn on top of it.")
+        notepadImage:AddAttribute("data-zoom","")
+        notepadImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("While Accessibility Insights is open you will notice a focus highlight appear around the items you click or navigate to. A box will be drawn around the object, how this box and other properties come from you will see in the properties pane later. A tooltip will appear with the control type of the item, the name of the item, and whether or not the element is keyboard focusable. There is also a beaker icon that may appear on some items that opens the Test tab for that specific element.")
+        section:AddParagraph("After you navigate to an item you want to check, you can go to the Accessibility Insights window and see more information on the element. Note that while in Live Inspect mode you can go to the Accessibility Insights window and the inspector will update with information on Accessibility Insights itself so it is safe to move to that window without worrying about the element being inspected changing.")
+        Paragraph insightsdocPara
+        insightsdocPara:AddText("As you move between elements on an application you will observe that the panels in the Live Inspect window will update. Before we move on it is important to understand that to fully understand the information provided by Accessibility Insights you need to be familiar with Microsoft’s UI Automation (UIA) framework. UIA defines how Windows applications expose different properties to assistive technologies and this lesson will only scratch the surface of the UIA model. To learn more about UIA you can read more about it in its ")
+        Link linkInsightsDoc = insightsdocPara:AddLink("official documentation", "https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-overview")
+        insightsdocPara:AddText(".")
+        linkInsightsDoc:SetTarget(linkInsightsDoc:newTab)
+        section:Add(insightsdocPara)
+
+        AddHeading(section, "Hierarchy Tree", 4)
+        section:AddParagraph("A prominent feature of the accessibility inspector is the Hierarchy Tree. The Hierarchy Tree is a visual representation of the UIA element tree. This tree reflects how the system organizes the structure of the user interface. Understanding this tree is crucial for understanding how assistive technologies navigate through desktop applications. If you open Notepad and focus on the main text area the tree will look like this:")
+        Image notepadTreeImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InsightsNotepadTreeImage.png","A screenshot of the hierarchy tree in the Live Inspect panel displays the UI structure of Notepad, with focus on the Document element nested under the main text area. This illustrates how interface elements are organized in a parent-child relationship for accessibility tools.")
+        notepadTreeImage:AddText("A screenshot of the hierarchy tree in the Live Inspect panel displays the UI structure of Notepad, with focus on the Document element nested under the main text area. This illustrates how interface elements are organized in a parent-child relationship for accessibility tools.")
+        notepadTreeImage:AddAttribute("data-zoom","")
+        notepadTreeImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("There are two ways to inspect the hierarchy tree and by default Accessibility Insights will be in Control View. Control View is a filtered version of the tree where purely decorative and non-interactive elements are omitted. This view has a focus on what is actually exposed to end users.")
+        section:AddParagraph("The hierarchy from a root element which is often the desktop window. Each node represents a UI element such as a panel or button. Nested elements show parent and child relationships. The order of the elements on the tree also matters as it can reflect reading order and focus order. You can hover over elements in the tree and the focus highlights will appear around the element. Selecting an element will then update the Details Pane which contains more information about the element.")        
+        section:AddParagraph("The reason why these structure trees are important is not obvious from the tool. Notably, and this is crucial to understand, the structure can mean different things for different kinds of accessibility devices. A classic example is a switch might have very specific navigation needs, whereas screen readers or Braille devices might have less stringent requirements.")
+
+        AddHeading(section, "Details Pane", 4)
+        section:AddParagraph("The Details Pane is where you can explore the available accessibility information for a selected element. It is presented as a table and data here tells you about how the element behaves in the UIA system.")
+        Image notepadDetailsImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InsightsNotepadDetailsImage.png","Details pane and show in the live inspect window. The inspector is focused on the menu bar of Notepad.")
+        notepadDetailsImage:AddText("Details pane and show in the live inspect window. The inspector is focused on the menu bar of Notepad.")
+        notepadDetailsImage:AddAttribute("data-zoom","")
+        notepadDetailsImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("Here is a breakdown of the key accessibility properties that you will find in the Details Pane using the menu bar of Notepad as an example:")  
+        WebTable vocabTable = LoadWebTable("Insights Details Pane for Notepad 'Menu Bar' Properties", "/html/media/Accessibility/DesktopAccessibilityInspectors/InsightsNotepadProperties.csv")
+        section:Add(vocabTable)      
+        section:AddParagraph("This information is easy to buzz by but it is crucial and weird. For example, notice that the ARIA role generally will not have many other attributes. This is because ARIA is a mapping to the UIA element, which is ultimately what accessibility technologies use under the hood on Windows. Further, some elements might seem like they do not matter for certain accessibility technologies, but this assumption should not be made. As a tangible example, a missing bounding box, while in theory a purely visual consideration, is crucially important for accessibility and will break many things if not correct. Point being, if you are examining your application and some of these properties are missing, it might not be a big deal or could be completely game breaking. It takes practice and experience to understand the difference.")
+
+        AddHeading(section, "Patterns Pane", 4)
+        section:AddParagraph("To represent and categorize the functionality of a control UI Automation uses interfaces known as <i>control patterns</i>. Control Patterns describe the properties, relationships, and methods of a specific piece of functionality for a control. Controls do not need to support only one control pattern and the full set of functionality for a control is typically described with multiple patterns. The Pattern Pane will list the patterns the control uses and you can view the values and available behaviors.")
+        Image notepadPatternsImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InsightsNotepadPatternsImage.png","Patterns pane as show in the Live Inspect window. The inspector is focused on the document element of Notepad and the ScrollPattern, ValuePattern, and TextPattern tree items are expanded.")
+        notepadPatternsImage:AddText("Patterns pane as show in the Live Inspect window. The inspector is focused on the document element of Notepad and the ScrollPattern, ValuePattern, and TextPattern tree items are expanded.")
+        notepadPatternsImage:AddAttribute("data-zoom","")
+        notepadPatternsImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        Paragraph insightsdocPara2
+        insightsdocPara2:AddText("Control patterns describe the interactivity of a control. For example a button might support the Invoke pattern which tells assistive technology that this is a control that can be clicked on and activated. A Scroll pattern is used for controls with scrollable viewports and the pattern would contain information on the direction of scrolling and how far the content is scrolled. There are many different patterns in UIA and you can refer to the ")
+        linkInsightsDoc = insightsdocPara2:AddLink("official documentation", "https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-overview")
+        insightsdocPara2:AddText(" for more patterns and what functionalities they describe.")
+        linkInsightsDoc:SetTarget(linkInsightsDoc:newTab)
+        section:Add(insightsdocPara2)
+        section:AddParagraph("Again, the above makes it sounds like this is just a property, but at the operating system level it very much so is not. Control patterns give very specific programmatic capabilities to applications at the operating system level and your application will break if these are wrong or implemented poorly. Arguably the hardest to get right are the text related patterns, but many aspects of these patterns can be challenging.")
+    
+
+        AddHeading(section, "Mac Accessibility Inspector", 3)
+        Paragraph inspectorsdocPara
+        inspectorsdocPara:AddText("The <strong>Accessibility Inspector</strong> on macOS is a tool used to examine the accessibility properties of macOS applications. This tool is provided with Xcode and allows you to audit how applications expose information to the main screen reader on Mac, VoiceOver. While on the Windows Operating System, to understand the accessibility information you need to understand UIA the equivalent API on Mac would be the <strong>Accessibility API (AX)</strong>. To get a greater understanding of the information provided by Accessibility Inspector, you can refer to the ")
+        Link linkInspectorDoc = inspectorsdocPara:AddLink("Apple Developer documentation for the Accessibility API", "https://developer.apple.com/documentation/accessibility/accessibility-api")
+        inspectorsdocPara:AddText(".")
+        linkInspectorDoc:SetTarget(linkInspectorDoc:newTab)
+        section:Add(inspectorsdocPara)
+        section:AddParagraph("When you open Accessibility Inspector for the first time it will open to the Inspection Tab as shown by the toolbar at the top which has the process being inspected and three different tabs.")
+        Image inspectorImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InspectorImage.png","A screenshot of the Mac Accessibility Inspector window with 'All Processes' selected. The window shows a section labeled 'Navigation,' displaying several icon-based controls.")
+        inspectorImage:AddText("A screenshot of the Mac Accessibility Inspector window with 'All Processes' selected. The window shows a section labeled 'Navigation,' displaying several icon-based controls.")
+        inspectorImage:AddAttribute("data-zoom","")
+        inspectorImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("You can select where it says ‘All processes’ to choose a specific application to target when inspecting. There are also three tabs that you can navigate between:")
+        UnorderedList navbuttons2
+        navbuttons2:AddClassAttribute("list-disc list-outside pl-8")
+        navbuttons2:AddListItem("<i><strong>Inspection</strong></i>: This is the default and primary view used for manually exploring accessibility properties of on-screen elements.")
+        navbuttons2:AddListItem("<i><strong>Audit</strong></i>: This tab provides automatic accessibility checks based on Apple’s Human Interface Guidelines and other best practices. Note that automated checks are not perfect and cannot catch all accessibility issues but there are some cases where automated checks can quickly point out issues such as color contrast or missing labels. In short, do not assume that this does what you want.")
+        navbuttons2:AddListItem("<i><strong>Settings</strong></i>: This tab has several options to test certain accessibility options such as inverted colors, increased contrast, or reduced motion.")
+        section:Add(navbuttons2)
+
+        AddHeading(section, "Inspection", 4)
+        section:AddParagraph("The main tab of the Mac Accessibility Inspector is the Inspection tab. This tab is where you can inspect an element and find its accessibility information.")
+        Image inspectorInspectionImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InspectorSettingsImage.png","A screenshot of the Mac Accessibility Inspector window with 'System Settings' application selected. The inspector displays a list of user interface elements grouped under headings such as 'Advanced' and 'Actions,' showing how the inspector categorizes sections for inspection.")
+        inspectorInspectionImage:AddText("A screenshot of the Mac Accessibility Inspector window with 'System Settings' application selected. The inspector displays a list of user interface elements grouped under headings such as 'Advanced' and 'Actions,' showing how the inspector categorizes sections for inspection.")
+        inspectorInspectionImage:AddAttribute("data-zoom","")
+        inspectorInspectionImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("To inspect an element the inspector does not follow where you are on your device automatically you have to toggle the inspect mode and choose a single element and then the inspector will populate several panes. To inspect an element, there is a toggle button near the top of the window known as the target picker with a crosshair icon which will trigger point inspection mode. You can also use Option + Space to toggle this mode. Your mouse cursor will now change to the inspection pointer and if you were to go to an application such as the built in System Settings app and click on an element with the pointer a green rectangle will be drawn on top of the element matching its bounds.")
+        Image inspectorHighlightImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InspectorSettingsHighlightImage.png","A screenshot of the actual General System Settings application on a Mac machine with an overlay of a green box highlighting the menu region under the 'General' header showing that this is the region being currently inspected.")
+        inspectorHighlightImage:AddText("A screenshot of the actual General System Settings application on a Mac machine with an overlay of a green box highlighting the menu region under the 'General' header showing that this is the region being currently inspected.")
+        inspectorHighlightImage:AddAttribute("data-zoom","")
+        inspectorHighlightImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("Although the green highlight might ruin the color contrast for you and does not appear to meet WCAG color contrast guidelines, it does highlight the bounding box of the element being targeted. Now the inspector will have more panes giving you more information about the element. Note that after you target an element the green highlight is now stuck to your screen and will stay in place even if the application updates or moves. Though the highlight will be removed if you move to a different tab in the inspector or close the window of the inspector temporarily.")
+        section:AddParagraph("When inspecting an element, the main pane in the inspector will update and there are several sub-panes offering information and the ability to trigger certain actions: ")
+        UnorderedList inspectorList
+        inspectorList:AddClassAttribute("list-disc list-outside pl-8")
+        Array<text> nested
+        nested:Add("The <i>Speak</i> button will speak the element's description the same way VoiceOver will. This allows you to hear what VoiceOver would say when a user focuses the element without having to open and use the screen reader.")
+        nested:Add("The <i>Previous</i> button moves the target to the element before the current one based on the focus order the inspector can find.")
+        nested:Add("The <i>Auto Navigate</i> button which looks like a play button will automatically voice the current element and then move to the next one and continue looping through the elements the inspector can find in the focus order.")
+        nested:Add("The <i>Next</i> button moves the target to the element after the current one based on the focus order the inspector can find.")
+        inspectorList:AddListItem("<strong>Navigation</strong>: This pane allows you to move through the application and mimic the speech of voiceover:"+ MakeNestedUnorderedList(nested))
+        inspectorList:AddListItem("<strong>Basic</strong>: This pane will have only a few of the properties of the element. Properties such as the name of the element given either by the Label or Title and the Value of the element which can tell you about its state.")
+        inspectorList:AddListItem("<strong>Actions</strong>: This pane has interactions available for the targeted element. For example a button that can be clicked on will have the press action and there would be a perform button which then does that action. Actions are part of Apple’s AX API and there are several such as press, increment, and decrement along with the ability to define custom actions.These are used by VoiceOver to simulate actions a non screen reader user would do but get the same interaction.")
+        inspectorList:AddListItem("<strong>Advanced</strong>: This pane displays more detailed accessibility properties of the currently focused element. The properties shown here vary depending on the selected UI element. When Xcode is installed, clicking on a property name opens the corresponding Apple API documentation. If the documentation doesn’t appear automatically, you can manually search for the property name in the search bar. These properties are part of Apple’s Accessibility (AX) API, and their formal names often begin with 'kAX'. For instance, the Hidden property shown in this pane corresponds to 'kAXHiddenAttribute' in the official documentation. Adding the 'kAX' prefix can help you locate the correct attribute more easily when searching.")
+        inspectorList:AddListItem("<strong>Element</strong>: This pane also shows more detailed information but you will usually just see the class of the element and again you can search the documentation for more information on the element’s class.")
+        inspectorList:AddListItem("<strong>Hierarchy</strong>: This pane is where you will find the accessibility tree. In the AX API the accessibility tree is made up of AXUIElements. The tree is rooted at the application level and the first child of the application is typically the window the application is in. Nested within the window are the views and elements that make up the application. This is how VoiceOver and other assistive technologies such as <strong>Switch Control</strong> determine an order to navigate through the application. This tree shows all the accessible objects exposed in the application so if something were to be missing it would be inaccessible to a user using a screen reader or Switch Control.")
+        section:Add(inspectorList)
+        section:AddParagraph("As one consideration here, consider the actions section. It might be counterintuitive that an accessibility device can take an action, but think about it. If a user has a mobility issue and plugs in a special device that is unique to them, say to avoid using their hands, then it might make sense that a particular sensor or tool could trigger an action like typing or pressing a button. This is one critical reason why accessibility is not just one group. Such APIs tend to be very general and support many different kinds of operations.")
+        section:AddParagraph("Accessibility Inspector also features a settings menu where you toggle certain modes to further test the accessibility of applications:")
+        Image inspectorOptionsImage = section:AddImage("/media/Accessibility/DesktopAccessibilityInspectors/InspectorOptionsImage.png","A screenshot of the accessibility settings options in Accessibility Inspector. It is a list of checkboxes that lets you invert colors, increase contrast, enable reduced motion and more.")
+        inspectorOptionsImage:AddText("A screenshot of the accessibility settings options in Accessibility Inspector. It is a list of checkboxes that lets you invert colors, increase contrast, enable reduced motion and more.")
+        inspectorOptionsImage:AddAttribute("data-zoom","")
+        inspectorOptionsImage:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        section:AddParagraph("In the settings menu you can toggle certain options such as <i>Invert Colors</i> which flips all the colors on the screen to their complementary colors. So white would become black and black would become white. Assistive technologies might have an <i>Invert Colors</i> option which individuals with low vision might use if they find dark background and light text easier to read. <i>Increase Contrast</i> does something similar but instead of flipping colors the colors are adjusted so darker colors become darker and lighter colors become brighter.")
+        section:AddParagraph("<i>Full Keyboard Access</i> is another option in the settings menu you can toggle. By default MacOS is not fully keyboard accessible. An example is the menu bar always present at the top of the screen. Normally you would have to click on it but to test applications that utilize that menu you can turn <i>Full Keyboard Access</i> and reach all the controls using the tab key and relevant keyboard shortcuts.")
+
+        AddHeading(section, "Citations", 3)
+        OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+//        citations:AddListItem("")
+        section:Add(citations)
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("First, make sure you have the appropriate tools installed on your computer. If you are on Windows try to use ‘Accessibility Insights’. If you are on macOS the developer tools installed with Xcode will include ‘Accessibility Inspector’.")
+        section:AddParagraph("Now you will pick a desktop application to inspect and do so again as a group. While you can use any application on your computer a good starting point to see relatively well implemented accessibility information is the system application that comes with the OS. If you’re on Mac you can inspect the System Preferences application and explore through the menus and controls. For Windows you can also look at the Settings application or another good start could be the File Explorer.")
+        section:AddParagraph("Find a visible interactive element. It could be a button, text field, or checkbox. Use the inspector to explore it in detail. Try to answer the following:")
+        UnorderedList questions1
+        questions1:AddClassAttribute("list-disc list-outside pl-8")
+        questions1:AddListItem("What is the role of this element?")
+        questions1:AddListItem("What is this element's accessible name?")
+        questions1:AddListItem("Does the name align with any text you see visually?")
+        questions1:AddListItem("Does it have any associated control patterns or actions?")
+        section:Add(questions1)
+        section:AddParagraph("Now to try to navigate through the application from that element. Use the keyboard to mimic how a keyboard user might interact with the application. This time, instead of individual elements you will be focusing on the accessibility tree. As you navigate try to find the following:")
+        UnorderedList questions2
+        questions2:AddClassAttribute("list-disc list-outside pl-8")
+        questions2:AddListItem("What is the parent of the item you are inspecting?")
+        questions2:AddListItem("Are you navigating through a meaningful grouping, like a dialog or toolbar?")
+        questions2:AddListItem("Are there any sibling items that connect visually but not through the accessibility tree?")
+        questions2:AddListItem("How does the live view of the tree change as you navigate through the application?")
+        questions2:AddListItem("What kind of disabilities do you think the particular structure would have an impact on?")
+        section:Add(questions2)
+        section:AddParagraph("When you are finished moving through the application and viewing the inspector, think about these questions:")
+        UnorderedList questions3
+        questions3:AddClassAttribute("list-disc list-outside pl-8")
+        questions3:AddListItem("Did you find any elements that were missing entirely from the accessibility tree?")
+        questions3:AddListItem("Was the information shown in the inspector what you expected based on what you saw on the screen?")
+        questions3:AddListItem("Did anything surprise you about how the application was structured? In a good way or a bad way?")
+        section:Add(questions3)
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("Desktop accessibility inspectors are valuable tools for exploring how assistive technologies interact with desktop applications. They reveal important behind-the-scenes information that supports universal design. These tools also allow you to identify and address accessibility issues early, before conducting user testing. Since it can be difficult to recruit users with disabilities for testing, inspectors offer a practical way to evaluate accessibility and simulate possible user-related issues to improve design decisions in advance.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Learn how to manually examine element accessibility properties and structure using a desktop inspector"
+    end
+
+    action GetSummaryName returns text
+        return "Learn how to manually examine element accessibility properties and structure using a desktop inspector"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Desktop Accessibility Inspectors"
+    end
+
+    action GetShortDescription returns text
+        return "how to manually examine element accessibility properties and structure using a desktop inspector"
+    end
+
+    action GetLinkName returns text
+        return "Desktop Accessibility Inspectors"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/desktopaccessibilityinspectors.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+
