@@ -38,7 +38,7 @@ action Setup
         Division bodyDiv = divs:Get(1)
         Division rightDiv = divs:Get(2)
 
-        leftDiv:SetClassAttribute("hidden")
+        //leftDiv:SetClassAttribute("hidden")
         rightDiv:SetClassAttribute("hidden")
         bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
 
@@ -70,8 +70,13 @@ bodyDiv:Add(buttonsSection)
         bodyDiv:Add(answer)
 Division hasAnswer = MakeHasAnswer()
         bodyDiv:Add(hasAnswer)
+leftDiv:Add(CreateHeadingTableOfContents())
     end
     
+action CreateLinkedArrays returns Array<Lesson>
+        DefaultTableOfContents toc
+        return toc:GetTableOfContents()
+end    
     
 action MakeHasAnswer returns Division
         Division division
@@ -176,14 +181,16 @@ previousButton:AddAttribute("aria-disabled", "true")
         
 Link nextButton
                         nextButton:SetClassAttribute(tailwind)
-nextButton:AddText("Next")
         nextButton:SetAddress("")
 Problem nextProblem = problem:GetNextProblem()
         if nextProblem not= undefined
             text address = nextProblem:GetId() + ".html"
             nextButton:SetAddress(address)
+nextButton:AddText("Next")
         else
-nextButton:AddAttribute("aria-disabled", "true")
+text address = "/problems.html"
+            nextButton:SetAddress(address)
+nextButton:AddText("Problems Page")
 end
         
         
@@ -325,6 +332,22 @@ action makeBlueHeader returns ImageHeader
         return header
     end
     
+    
+action IsLocation(text loc) returns boolean
+        Problem problem = GetProblem()
+        Problems problems = problem:GetProblems()
+        
+        Iterator<Problem> iterator = problems:GetProblemIterator()
+        repeat while iterator:HasNext()
+            Problem next = iterator:Next()
+            text link = next:GetDefaultLink()
+            if loc = link
+                return true
+            end
+        end
+        return false
+    end
+    
     action SetPaletteFileName(text paletteFileName)
         me:paletteFileName = paletteFileName
     end
@@ -353,6 +376,12 @@ action makeBlueHeader returns ImageHeader
         return problem:GetDescription()
     end
     
+action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Practice Problems"
+    end
     
 action GetLocation returns text
         text problemID = problem:GetProblems():GetId()

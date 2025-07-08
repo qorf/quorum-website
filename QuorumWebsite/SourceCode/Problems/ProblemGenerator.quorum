@@ -5,8 +5,11 @@ use Libraries.Data.Formats.JavaScriptObjectNotation
 use Libraries.Containers.HashTable
 use Libraries.Web.ProblemSetSorter
 use Libraries.Containers.Iterator
+use Libraries.Web.Problem
+
 class ProblemGenerator
     Array<Problems> allProblemsArray
+    Array<Lesson> tableOfContents
     action Generate
         File file
         file:SetPath("problems")
@@ -16,7 +19,25 @@ class ProblemGenerator
             output "Found the problems folder"
 GenerateAllProblemPages(file)
             ProcessMetaFolder(file)
+            BuildTableOfContents()
         end
+    end
+    
+    action BuildTableOfContents
+        Iterator<Problems> iterator = allProblemsArray:GetIterator()
+        repeat while iterator:HasNext()
+            Problems next = iterator:Next()
+            if next:GetSize() > 0
+                Problem problem = next:Get(0)
+TableOfContentsProblemPage page
+            page:SetName(next:GetTitle())
+                page:SetNewLocation(problem:GetDefaultLink())
+                tableOfContents:Add(page)
+            end
+        end
+        
+        DefaultTableOfContents toc
+        toc:SetTableOfContents(tableOfContents)
     end
     
     action GenerateAllProblemPages(File root)
@@ -74,5 +95,9 @@ ProblemSetSorter sorter
     
     action GetProblemsIterator returns Iterator<Problems>
         return allProblemsArray:GetIterator()
+    end
+    
+    action GetTableOfContents returns Array
+        return tableOfContents
     end
 end
