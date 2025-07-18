@@ -498,6 +498,9 @@ SetTopPadding$quorum_number(padding) {
 ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force) {
      return this.Libraries_Interface_Item2D__.ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force);
 }
+GetMouseOverBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverBorderThickness();
+}
 SetMass$quorum_number(mass) {
      return this.Libraries_Interface_Item2D__.SetMass$quorum_number(mass);
 }
@@ -879,6 +882,9 @@ GetDefaultFont() {
 GetMouseDownGlowColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseDownGlowColor();
 }
+HasMouseOverBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasMouseOverBorderThickness();
+}
 SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
      return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
 }
@@ -1131,6 +1137,9 @@ HasShadowHeight() {
 GetNumberProperty$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.GetNumberProperty$quorum_text(property);
 }
+SetMouseOverBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverBorderThickness$quorum_number(value);
+}
 HasBorderThickness() {
      return this.Libraries_Interface_Controls_Control__.HasBorderThickness();
 }
@@ -1241,6 +1250,9 @@ Focus() {
 }
 SetScale$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
+}
+SetMouseOverBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
 SetInterfaceScale$quorum_number(scale) {
      return this.Libraries_Interface_Controls_Control__.SetInterfaceScale$quorum_number(scale);
@@ -1868,6 +1880,9 @@ SetShadowHeight$quorum_number(value) {
 }
 SetPercentageWidth$quorum_number(width) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageWidth$quorum_number(width);
+}
+GetMouseOverBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverBorderColor();
 }
 GetGlobalX() {
      return this.Libraries_Interface_Item2D__.GetGlobalX();
@@ -2845,6 +2860,9 @@ SetTopPadding$quorum_number(padding) {
 ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force) {
      return this.Libraries_Interface_Item2D__.ApplyForceToCenter$quorum_Libraries_Compute_Vector2(force);
 }
+GetMouseOverBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverBorderThickness();
+}
 SetMass$quorum_number(mass) {
      return this.Libraries_Interface_Item2D__.SetMass$quorum_number(mass);
 }
@@ -3226,6 +3244,9 @@ GetDefaultFont() {
 GetMouseDownGlowColor() {
      return this.Libraries_Interface_Controls_Control__.GetMouseDownGlowColor();
 }
+HasMouseOverBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasMouseOverBorderThickness();
+}
 SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform) {
      return this.Libraries_Interface_Item2D__.SetTransform$quorum_Libraries_Game_Collision_PhysicsPosition2D(transform);
 }
@@ -3478,6 +3499,9 @@ HasShadowHeight() {
 GetNumberProperty$quorum_text(property) {
      return this.Libraries_Interface_Controls_Control__.GetNumberProperty$quorum_text(property);
 }
+SetMouseOverBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverBorderThickness$quorum_number(value);
+}
 HasBorderThickness() {
      return this.Libraries_Interface_Controls_Control__.HasBorderThickness();
 }
@@ -3588,6 +3612,9 @@ Focus() {
 }
 SetScale$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
+}
+SetMouseOverBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
+     return this.Libraries_Interface_Controls_Control__.SetMouseOverBorderColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
 SetInterfaceScale$quorum_number(scale) {
      return this.Libraries_Interface_Controls_Control__.SetInterfaceScale$quorum_number(scale);
@@ -4212,6 +4239,9 @@ SetShadowHeight$quorum_number(value) {
 }
 SetPercentageWidth$quorum_number(width) {
      return this.Libraries_Interface_Controls_Control__.SetPercentageWidth$quorum_number(width);
+}
+GetMouseOverBorderColor() {
+     return this.Libraries_Interface_Controls_Control__.GetMouseOverBorderColor();
 }
 GetGlobalX() {
      return this.Libraries_Interface_Item2D__.GetGlobalX();
@@ -5619,20 +5649,26 @@ this.prototype.ResizeControls$quorum_text(mediaSize);
 ResizeControls$quorum_text(mediaSize) {
 var palettePanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(0);
 var blockPanel = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(1);
+var paletteItem = this.Get_WebEditor_CanvasResizeListener__editorPanels_().Get$quorum_integer(2);
 if ((mediaSize == this.Get_WebEditor_CanvasResizeListener__SM_())) {
 palettePanel.SetPixelWidth$quorum_number(200 * 1.0);
+paletteItem.SetPixelWidth$quorum_number(200 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__MD_())) {
 palettePanel.SetPixelWidth$quorum_number(200 * 1.0);
+paletteItem.SetPixelWidth$quorum_number(200 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__LG_())) {
 palettePanel.SetPixelWidth$quorum_number(300 * 1.0);
+paletteItem.SetPixelWidth$quorum_number(300 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__XL_())) {
 palettePanel.SetPixelWidth$quorum_number(300 * 1.0);
+paletteItem.SetPixelWidth$quorum_number(300 * 1.0);
 }
 else if( (mediaSize == this.Get_WebEditor_CanvasResizeListener__X2L_())) {
 palettePanel.SetPixelWidth$quorum_number(350 * 1.0);
+paletteItem.SetPixelWidth$quorum_number(350 * 1.0);
 }
 };
 AddPanel$quorum_Libraries_Interface_Controls_Control(control) {
@@ -7331,41 +7367,57 @@ resizeListener.AddPanel$quorum_Libraries_Interface_Controls_Control(this.Get_Web
 resizeListener.AddPanel$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__editorPanel_());
 this.prototype.AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener(resizeListener);
 this.editorPalette = palette;
-this.prototype.SetInterfaceScale$quorum_number(1.25);
 this.prototype.SetupEditorItems();
+resizeListener.AddPanel$quorum_Libraries_Interface_Controls_Control(this.Get_WebEditor_BlockEditor__paletteItem_());
 this.prototype.AddDefaultKeys();
 this.Get_WebEditor_BlockEditor__paletteItem_().Focus();
 this.prototype.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(this.prototype);
+this.prototype.SetInterfaceScale$quorum_number(1.25);
 this.prototype.SetColliding$quorum_boolean(false);
 if (((this.Get_WebEditor_BlockEditor__editorPane_() != null) && (this.Get_WebEditor_BlockEditor__editorPane_().IsEmpty() == false))) {
 this.Get_WebEditor_BlockEditor__editorPane_().Select$quorum_integer(0);
 }
 };
 SetupEditorItems() {
+var editorItemLayer = new quorum_Libraries_Game_Layer2D_();
+var editorItemLayout = new quorum_Libraries_Interface_Layouts_FlowLayout_();
+editorItemLayer.SetLayout$quorum_Libraries_Interface_Layouts_Layout(editorItemLayout);
 var manager = (global_Get_Shared_Class("Libraries.Game.GameStateManager") == null ? global_Add_Shared_Class("Libraries.Game.GameStateManager", new quorum_Libraries_Game_GameStateManager_()) : global_Get_Shared_Class("Libraries.Game.GameStateManager"));
 var webApp = global_CheckCast(manager.GetApplication(), "Libraries.Game.WebApplication");
 if (((webApp.GetWebOperatingSystem().Contains$quorum_text("Android") || webApp.GetWebOperatingSystem().Contains$quorum_text("iOS")) || webApp.GetWebOperatingSystem().Contains$quorum_text("Mobile"))) {
 var tempPalette = new quorum_WebEditor_EditorItem_();
 this.paletteItem = tempPalette;
 this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Block Editor, You are in the Block Editor.\n If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding\n to 3 menus, the block tray, and then the block editor. Swipe Left and Right to navigate item by item.\n Swipe up and down to navigate by landmarks.");
-this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
 this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
 return;
 }
 var tempPalette = new quorum_WebEditor_EditorItem_();
 this.paletteItem = tempPalette;
 this.Get_WebEditor_BlockEditor__paletteItem_().SetName$quorum_text("Tray, To navigate to the tray press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the tray press Shift+Enter.");
-this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
+this.Get_WebEditor_BlockEditor__paletteItem_().SetPercentageX$quorum_number(0 * 1.0);
+this.Get_WebEditor_BlockEditor__paletteItem_().SetPercentageY$quorum_number(0 * 1.0);
+this.Get_WebEditor_BlockEditor__paletteItem_().SetPercentageHeight$quorum_number(1 * 1.0);
+this.Get_WebEditor_BlockEditor__paletteItem_().SetPixelWidth$quorum_number(200 * 1.0);
+this.Get_WebEditor_BlockEditor__paletteItem_().SetZ$quorum_number(100 * 1.0);
 var tempBlocks = new quorum_WebEditor_EditorItem_();
 this.blocksItem = tempBlocks;
 this.Get_WebEditor_BlockEditor__blocksItem_().SetName$quorum_text("Block Editor, To navigate to the editor press Enter. To navigate to the tray use the arrow keys. To navigate back to here from the editor press Shift+Enter.");
-this.Get_WebEditor_BlockEditor__blocksItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockEditor());
+this.Get_WebEditor_BlockEditor__blocksItem_().SetPercentageY$quorum_number(0 * 1.0);
+this.Get_WebEditor_BlockEditor__blocksItem_().SetPercentageHeight$quorum_number(1 * 1.0);
+this.Get_WebEditor_BlockEditor__blocksItem_().SetZ$quorum_number(100 * 1.0);
+var blockItemProperties = this.Get_WebEditor_BlockEditor__blocksItem_().GetDefaultLayoutProperties();
+blockItemProperties.SetHorizontalLayoutMode$quorum_integer(blockItemProperties.Get_Libraries_Interface_Layouts_LayoutProperties__FILL_());
 this.Get_WebEditor_BlockEditor__paletteItem_().SetNextFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__blocksItem_());
 this.Get_WebEditor_BlockEditor__paletteItem_().SetPreviousFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__blocksItem_());
 this.Get_WebEditor_BlockEditor__blocksItem_().SetNextFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__paletteItem_());
 this.Get_WebEditor_BlockEditor__blocksItem_().SetPreviousFocus$quorum_Libraries_Interface_Item(this.Get_WebEditor_BlockEditor__paletteItem_());
-this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
-this.prototype.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__blocksItem_());
+this.Get_WebEditor_BlockEditor__blocksItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockEditor());
+this.Get_WebEditor_BlockEditor__paletteItem_().SetTarget$quorum_Libraries_Interface_Controls_Control(this.prototype.GetBlockPalette());
+editorItemLayer.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__paletteItem_());
+editorItemLayer.Add$quorum_Libraries_Interface_Item2D(this.Get_WebEditor_BlockEditor__blocksItem_());
+this.prototype.AddLayer$quorum_integer$quorum_Libraries_Game_Layer(0, editorItemLayer);
+};
+SetupEditorItemsFocus() {
 };
 AddDefaultKeys() {
 var keys = new quorum_Libraries_Interface_Events_KeyboardEvent_();

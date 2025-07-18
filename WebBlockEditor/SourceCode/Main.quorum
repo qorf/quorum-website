@@ -71,6 +71,7 @@ use Libraries.Interface.Events.SelectionEvent
 use Libraries.Interface.Selections.TabPaneSelection
 use Libraries.Containers.HashTable
 use Libraries.Interface.Item2D
+use Libraries.Game.Layer2D
 
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
@@ -312,11 +313,12 @@ editorPanel:Add(editor)
         resizeListener:AddPanel(editorPanel)
         AddResizeListener(resizeListener)
         me:editorPalette = palette
-       SetInterfaceScale(1.25)
         SetupEditorItems()
+resizeListener:AddPanel(paletteItem)
         AddDefaultKeys()
         paletteItem:Focus()
         AddFocusListener(me)
+SetInterfaceScale(1.25)
         SetColliding(false)
         
         if editorPane not= undefined and editorPane:IsEmpty() = false
@@ -326,6 +328,9 @@ editorPanel:Add(editor)
 end
     
     action SetupEditorItems
+        Layer2D editorItemLayer
+        FlowLayout editorItemLayout
+        editorItemLayer:SetLayout(editorItemLayout)
 GameStateManager manager
         WebApplication webApp = cast(WebApplication, manager:GetApplication())
         if webApp:GetWebOperatingSystem():Contains("Android") or webApp:GetWebOperatingSystem():Contains("iOS")
@@ -336,27 +341,44 @@ EditorItem tempPalette
  If you are using a mobile screen reader navigation by headings is recommended. You will find 5 landmarks corresponding
  to 3 menus, the block tray, and then the block editor. Swipe Left and Right to navigate item by item.
  Swipe up and down to navigate by landmarks.")
-        paletteItem:SetTarget(GetBlockPalette())
             Add(paletteItem)
             return now
         end
         EditorItem tempPalette
         paletteItem = tempPalette
         paletteItem:SetName("Tray, To navigate to the tray press Enter. To navigate to the editor use the arrow keys. To navigate back to here from the tray press Shift+Enter.")
-        paletteItem:SetTarget(GetBlockPalette())
+paletteItem:SetPercentageX(0)
+        paletteItem:SetPercentageY(0)
+        paletteItem:SetPercentageHeight(1)
+        paletteItem:SetPixelWidth(200)
+        paletteItem:SetZ(100)
         
         EditorItem tempBlocks
         blocksItem = tempBlocks
         blocksItem:SetName("Block Editor, To navigate to the editor press Enter. To navigate to the tray use the arrow keys. To navigate back to here from the editor press Shift+Enter.")
-        blocksItem:SetTarget(GetBlockEditor())
+blocksItem:SetPercentageY(0)
+        blocksItem:SetPercentageHeight(1)
+        blocksItem:SetZ(100)
+        LayoutProperties blockItemProperties = blocksItem:GetDefaultLayoutProperties()
+        blockItemProperties:SetHorizontalLayoutMode(blockItemProperties:FILL)
         
-        paletteItem:SetNextFocus(blocksItem)
+        
+paletteItem:SetNextFocus(blocksItem)
         paletteItem:SetPreviousFocus(blocksItem)
         blocksItem:SetNextFocus(paletteItem)
         blocksItem:SetPreviousFocus(paletteItem)
-        Add(paletteItem)
-        Add(blocksItem)
         
+blocksItem:SetTarget(GetBlockEditor())
+paletteItem:SetTarget(GetBlockPalette())
+        
+        
+        editorItemLayer:Add(paletteItem)
+        editorItemLayer:Add(blocksItem)
+        AddLayer(0, editorItemLayer)
+    end
+    
+    action SetupEditorItemsFocus
+
     end
     
     action AddDefaultKeys
