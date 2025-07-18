@@ -8318,7 +8318,7 @@ function PauseBlockExecution() {
         game.Exit();
     }
 	
-	/*
+    /*
 	If the code makes use of ChartOptions, we'll need to preserve it here, otherwise it'll get blown away
 	and chart colors and other options won't apply.
 	
