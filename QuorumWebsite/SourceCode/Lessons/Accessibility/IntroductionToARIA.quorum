@@ -1,0 +1,330 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class IntroductionToARIA is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Introduction to ARIA - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Introduction to ARIA", 1)
+
+        headDiv:AddParagraph("This lesson introduces ARIA and explains how it helps make dynamic web content more accessible to assistive technology users.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("In this lesson, you will learn about the basics of the Accessible Rich Internet Applications (ARIA) standard. Your goal is to get a better understanding of the kinds of challenges that exist around accessibility for dynamic content, including some of the dangers of using ARIA incorrectly.")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn the most commonly used ARIA attributes")
+        goalList:AddListItem("Identify incorrect use of ARIA and its inconsistencies")
+        goalList:AddListItem("Learn about semantic HTML and the corresponding ARIA")
+        goalList:AddListItem("Learn how ARIA affects assistive technologies")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think about some interactive elements you've encountered on websites, like dropdown menus, tab panels, or star rating widgets. These components often change content or behavior dynamically. Now ask yourself: how can we ensure that users relying on screen readers or other assistive technologies can access and understand these changes?")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/IntroductionToARIA/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("WCAG 2.2 - 1.1.1 Non-text Content")
+        standards:AddListItem("WCAG 2.2 - 1.3.1 Info and Relationships")   
+        standards:AddListItem("WCAG 2.2 - 2.1.1 Keyboard")
+        standards:AddListItem("WCAG 2.2 - 4.1.2 Name, Role, Value")
+        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("Accessible Rich Internet Applications (ARIA) is a set of attributes added to elements on a page with the intent of making those elements more accessible. ARIA is not a true programming language and what attributes do depends on the browser interpreting it and the assistive technology the user has. This means that behavior varies by browser, which is a common technical frustration with the specification.")
+        section:AddParagraph("ARIA alone does not change functionality or visual appearance. A good rule of thumb is that ARIA is intended to <i>enhance</i> HTML, but it does not replace it or change what the code does programmatically. Mentioned in the WCAG 2.2 A, Section 3 and 4 Lesson, the main features of ARIA are roles, properties, and states. As a brief reminder, consider an example of what each of these are:")
+        section:AddParagraph("A <i>role</i> tells you what the element is.")
+        section:Add(preformatter:GeneratePreformattedCode(lt+"div role="+dq+"button"+dq+">Submit"+lt+"/div>"))
+        section:AddParagraph("A <i>property</i> describes a characteristic or relationship an element has.")
+        section:Add(preformatter:GeneratePreformattedCode(lt+"div role="+dq+"button"+dq+" aria-describedby="+dq+"more-info"+dq+">Copy Example"+lt+"/div>
+"+lt+"div id="+dq+"more-info"+dq+">Use this button to copy the example code into the clipboard to paste into the editor "+lt+"/div>"))        
+        section:AddParagraph("A <i>state</i> describes the current status or value of an element. ")
+        section:Add(preformatter:GeneratePreformattedCode(lt+"div role="+dq+"checkbox"+dq+" aria-checked="+dq+"false"+dq+">Remember Me"+lt+"/div>"))
+        section:AddParagraph("A crucial idea to understand is that while ARIA describes information about the HTML, at the end of the day, the words and symbols used in the specification get mapped down to the computer's operating system. However, Windows, Mac, iOS, and Android all have incompatible ways of managing these attributes, so naturally there are inconsistencies in how ARIA is used and interpreted. Unfortunately, this means developers are stuck with typing out the ARIA and hoping it works how the specification says it should, which is often wrong.")
+        section:AddParagraph("The use of ARIA attributes should be based on both their specification and real-world testing. Overuse or misuse of ARIA can degrade accessibility rather than improve it [1], particularly when roles and attributes are not used together as expected.")
+
+        AddHeading(section, "Roles", 3)
+        section:AddParagraph("<strong>ARIA roles</strong> are fundamental to making custom and complex web interfaces accessible to users who rely on assistive technologies. At their core, roles assign a specific purpose or identity to elements on a web page. These roles inform screen readers and other assistive tools how to interpret and interact with the element in question. For example, an element with a role=’textbox’ will be treated as an editable text field by a screen reader, even if it is visually styled with nothing more than a "+lt+"div> or "+lt+"span>.")
+        section:AddParagraph("It is important to remember that assigning an ARIA role does not automatically make an element interactive or functional. While roles provide semantic meaning, actual behavior must often be implemented with JavaScript. Whenever possible, native HTML elements should be used first, since they come with built-in semantics and accessibility support. For example, "+lt+"button> or "+lt+"input type=’checkbox’> have roles like ‘button’ and ‘checkbox’ baked in and already follow expected accessibility behaviors.")
+        section:AddParagraph("However, in some cases, developers build entirely custom components using "+lt+"div> or "+lt+"span> elements, applying roles and behaviors manually. This is where ARIA becomes vital. If you are replacing a native control or building something new, applying the correct role and managing its behavior and relationships becomes essential.")
+
+        AddHeading(section, "Landmark Roles", 4)
+        section:AddParagraph("Among ARIA roles, landmark roles serve to define sections of a web page. These roles allow users to navigate quickly using their assistive technology. For instance, screen reader users can skip directly to the main content or jump to the navigation bar if these areas are marked appropriately. Roles like banner, navigation, main, complementary, and contentinfo help break up the page into recognizable regions.")
+        section:AddParagraph("These roles do not change how elements appear visually, but they offer powerful structural hints that improve navigability, especially for those not using a mouse or relying on visual cues. Used correctly, they allow for a more streamlined experience when navigating pages with repetitive elements. The next lesson on Tagging and Structure in ARIA will explore Landmark Roles in more depth.")
+
+        AddHeading(section, "Widget Roles", 4)
+        section:AddParagraph("One of the subcategories of roles in ARIA are known as the <strong>widget roles</strong>. These describe interactive interface elements. They are essential when developers create custom controls that do not rely on native HTML. For example, if a developer creates a toggle switch from scratch using "+lt+"div> elements, they might assign role=’switch’ to help define how that control behaves from an accessibility standpoint.")
+        section:AddParagraph("Widget roles are broad and include types like button, checkbox, dialog, slider, and tab. These roles are typically assigned to elements that accept user input or perform an action. However, it is important to understand that assigning a role like checkbox does not make the element checkable by itself, developers must still implement the interaction logic and update relevant states using JavaScript.")
+        section:AddParagraph("When building widgets from scratch, developers need to consider not just roles but also the appropriate ARIA attributes and keyboard support to ensure the experience is accessible and usable across various devices.")
+
+        AddHeading(section, "Simple and Composite Widgets", 4)
+        section:AddParagraph("Some ARIA widgets are relatively straightforward, like button, link, or progressbar. These are often referred to as <strong>simple widgets</strong>. They typically map to a single visual control and can be handled with one ARIA role and a few supporting attributes or states.")
+        WebTable simpleRolesTable = LoadWebTable("Simple Widget Roles", "/html/media/Accessibility/IntroductionToARIA/SimpleRoles.csv")
+        section:Add(simpleRolesTable)
+        section:AddParagraph("In contrast, <strong>composite widgets</strong> are made up of multiple elements that work together to form a cohesive interactive experience. Examples include a tablist that contains multiple tab elements and a corresponding set of tabpanel sections. Similarly, a menu widget may contain multiple menuitem roles that allow users to navigate a series of choices. These widgets require careful coordination between the parent and child roles, keyboard navigation patterns, and dynamic ARIA state updates.")
+        WebTable compRolesTable = LoadWebTable("Composite Widget Roles", "/html/media/Accessibility/IntroductionToARIA/CompositeRoles.csv")
+        section:Add(compRolesTable)
+        section:AddParagraph("Composite widgets are more complex to implement accessibly, but they offer powerful functionality. Ensuring that focus management, role relationships, and state updates are correctly applied is essential. Without these, the widget might be visually usable but completely unusable for someone relying on assistive technology.")
+        section:AddParagraph("The point is to recognize that ARIA expands upon native HTML elements. However, using ARIA requires that you do some real and thorough testing. Sometimes it can be truly finicky. This lesson gives a brief overview of what is available, but is not the end of the story. Just adding a word to the HTML is often not enough for accessibility.")
+
+
+        AddHeading(section, "States And Properties", 3)
+        section:AddParagraph("ARIA also provides a rich set of attributes called <strong>states and properties</strong>, which describe the current status or behavior of an element beyond its role. These attributes can inform a user whether a checkbox is checked (aria-checked), if a section is collapsed (aria-expanded), or whether a field is required (aria-required).")
+        section:AddParagraph("<strong>States</strong> usually represent dynamic conditions, or attributes that may change over time. <strong>Properties</strong> tend to be static descriptions or associations that help define an element’s relationships or meaning, such as aria-label, which provides a textual label for elements without visible text, or aria-describedby, which references another element that offers a longer description.")
+        section:AddParagraph("While ARIA attributes are designed to improve accessibility, their real-world effectiveness can vary based on screen reader support and how each attribute is implemented. For instance, aria-describedby, introduced in ARIA 1.0, remains broadly supported and reliably interpreted. In contrast, newer attributes like aria-description, added in ARIA 1.2 to provide additional user-facing context, are still inconsistently supported across different screen readers. The impact of a given ARIA state or property also depends on context. For example some attributes like aria-label, are global and almost always announced, while others, such as aria-valuemin and aria-valuemax, may be ignored on elements like buttons where they do not apply semantically.")
+        section:AddParagraph("This might sound straightforward, but it is a key concept. One of the most common questions is: <i>Why does one screen reader respond differently than another to the same ARIA markup?</i> The answer is that ARIA is mapped to platform-specific accessibility APIs, which vary across operating systems. Additionally, each assistive technology vendor can choose how (or whether) to interpret any ARIA attribute. This leads to a somewhat inconsistent, patchwork experience across devices and browsers.")
+
+        Paragraph docPara
+        docPara:AddText("To ensure you are using ARIA attributes effectively, always consult ")
+        Link linkDoc = docPara:AddLink("documentation", "https://www.w3.org/TR/wai-aria/#states_and_properties")
+        docPara:AddText(" for the specific role you are working with. Some roles require certain properties to function properly. However, as ARIA standards continue to evolve, developers should verify support through hands-on testing rather than relying solely on documentation, especially when using newer or less widely adopted attributes. Below are examples of commonly used states and properties:")
+        linkDoc:SetTarget(linkDoc:newTab)
+        section:Add(docPara)
+        WebTable ariaPropertyTable = LoadWebTable("Common ARIA States and Properties", "/html/media/Accessibility/IntroductionToARIA/StatesAndProperties.csv")
+        section:Add(ariaPropertyTable)
+
+        AddHeading(section, "Live Regions", 3)
+        section:AddParagraph("Not all content is static, and sometimes you may need to notify the user that something has changed or requires their immediate attention. ARIA provides a way to communicate these changes to assistive technologies through live regions. However, live regions should be used with caution. If implemented incorrectly or overused, they can create a frustrating experience by repeatedly interrupting the user with constant updates. In some cases, such as for users of braille displays, the device might not even relay the notification. For these and other reasons, live regions can be very useful but must be applied carefully and thoughtfully.")
+        section:AddParagraph("With that caution in mind, ARIA live regions include several properties that control how updates are communicated to users. The aria-live property, in particular, determines how forcefully dynamic content should be announced. It can take the following values:")
+        UnorderedList liveList
+        liveList:AddClassAttribute("list-disc list-outside pl-8")
+        liveList:AddListItem("<strong>polite</strong>: Updates will only be announced when not busy. Useful when content changes are non-essential ")
+        liveList:AddListItem("<strong>assertive</strong>: Updates will be announced immediately. Screen readers might interrupt their current speech for the update. Useful for urgent information like an alert or error message.")   
+        liveList:AddListItem("<strong>off</strong>: Updates are to not be announced unless focus is on or inside the element. Useful for dynamic content that updates frequently but is not critical.")
+        section:Add(liveList)
+        WebTable liveTable = LoadWebTable("Live Region Properties", "/html/media/Accessibility/IntroductionToARIA/LiveRegions.csv")
+        section:Add(liveTable)
+            
+        AddHeading(section, "Citations", 3)
+        OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("Mozilla Developer Network. ARIA: Accessibility roles and attributes. MDN Web Docs.")
+        citations:AddListItem("W3Schools. Tryit Editor v3.7 - Default. W3Schools. https://www.w3schools.com/html/tryit.asp?filename=tryhtml_default")
+        citations:AddListItem("World Wide Web Consortium (W3C). WAI-ARIA: Accessible Rich Internet Applications. W3C Web Accessibility Initiative (WAI). https://www.w3.org/WAI/standards-guidelines/aria/")
+        section:Add(citations)
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this activity, you will explore how ARIA attributes can enhance or complicate a user's experience, especially for those using assistive technologies like screen readers or keyboard navigation.")
+        section:AddParagraph("While visually, buttons may appear identical and respond similarly to mouse input, the underlying code can cause them to behave very differently depending on how a user interacts with them. These differences can either support accessibility or unintentionally create confusion, inconsistency, or exclusion.")
+        section:AddParagraph("You will be examining several variations of buttons, some built semantically, others manually constructed using ARIA roles and properties. Your task is to investigate how these differences can impact usability and then apply what you have learned to improve them.")
+        
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("Begin by exploring the interactive buttons provided below. If possible, <strong>turn on a screen reader</strong> on your device (such as VoiceOver on Mac, NVDA or JAWS on Windows, or TalkBack on Android) before starting. This will allow you to experience how each button communicates with assistive technology in addition to how it behaves visually.")
+
+        AddHeading(section, "Investigate Challenge", 4)
+        section:AddParagraph("Your task is to investigate how each button behaves and sounds when activated using different input methods. Try selecting each button in three ways: by clicking with a mouse or trackpad, by pressing the <strong>Enter</strong> key, and by pressing the <strong>Spacebar</strong> key. Pay attention to which buttons are operable by keyboard or mouse alone, which ones produce audible feedback through the screen reader, and whether the feedback matches what sighted users receive. Do each of the buttons behave the same across methods and tools? What stands out, and why?")
+
+        section:AddParagraph("<div><!-- Button 1 -->
+<div class='btn' onclick='alert("+dq+"Settings opened"+dq+")'>
+  Activate
+</div>
+
+<!-- Button 2 -->
+<button class='btn' onclick='alert("+dq+"You have submitted the form"+dq+")' aria-label='Activate this button for important information'>
+  Activate
+</button>
+
+<!-- Button 3 -->
+<div class='btn' role='button' tabindex='0' onclick='alert("+dq+"Search started"+dq+")' onkeydown='if(event.key==="+dq+"Enter"+dq+" || event.key==="+dq+" "+dq+") this.click();'>
+  <span aria-label='Perform Search'>Activate</span>
+</div>
+
+<!-- Button 4 -->
+<div class='btn' role='checkbox' tabindex='0' aria-pressed='false' aria-label='Activate'
+     onclick='toggleClicked(this)'
+     onkeydown='if(event.key==="+dq+"Enter"+dq+" || event.key==="+dq+" "+dq+") togglePressed(this);'>
+  <span>Activate</span>
+</div>
+
+<!-- Button 5 -->
+<div class='btn' role='button' tabindex='0' onclick='alert("+dq+"Item deleted"+dq+")' onkeydown='if(event.key==="+dq+"Enter"+dq+") alert("+dq+"Deletion confirmed"+dq+");'>
+  <span aria-label='This action is discouraged'>Activate</span>
+</div>
+
+<script>
+  function togglePressed(el) {
+    const isPressed = el.getAttribute('aria-pressed') === 'true';
+    el.setAttribute('aria-pressed', isPressed ? 'false' : 'true');
+    alert(`Button is now ${isPressed ? 'off' : 'on'}`);
+  }
+</script>
+
+<script>
+function toggleClicked(el) {
+  const isPressed = el.getAttribute('aria-pressed') === 'true';
+  const newPressedState = isPressed ? 'false' : 'true';
+  el.setAttribute('aria-pressed', newPressedState);
+
+  // Update visible label
+  const label = el.querySelector('span');
+  if (label) {
+    label.textContent = newPressedState === 'true' ? 'Turn Off' : 'Turn On';
+  }
+
+  // Update aria label
+  el.setAttribute('aria-label', newPressedState === 'true' ? 'Turn Off' : 'Turn On');
+
+  alert(`Button is now ${newPressedState === 'true' ? 'selected' : 'unselected'}`);
+}
+</script>
+
+<style>
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 5px;
+    font-family: sans-serif;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn:hover {
+    outline: 5px solid #111111;
+  }
+  .btn:focus {
+    outline: 3px solid #f39c12;
+  }
+</style>
+</div>")
+        section:AddParagraph("Once you have completed your investigation, continue with the <i>Fix Challenge</i>.")
+
+        AddHeading(section, "Fix Challenge", 4)
+        Paragraph w3Para
+        w3Para:AddText("Now that you have investigated how each button behaves, copy the ")
+        Link buttonFile = w3Para:AddLink("full HTML code", "/media/Accessibility/IntroductionToARIA/ButtonHTML.txt")
+        buttonFile:SetTarget(buttonFile:newTab)
+        w3Para:AddText(" for the buttons and paste it into the ")
+        Link linkW3 = w3Para:AddLink("W3Schools TryIt Editor", "https://www.w3schools.com/html/tryit.asp?filename=tryhtml_default")
+        linkW3:SetTarget(linkW3:newTab)
+        w3Para:AddText(" or another HTML editor of your choice, your task is to fix each button individually so that its behavior is consistent, accessible, and meaningful, without simply turning every button into the same HTML structure. If time allows, try to fix all of them.")
+        section:Add(w3Para)
+        section:AddParagraph("Focus on making sure that:")
+        UnorderedList focusList
+        focusList:AddClassAttribute("list-disc list-outside pl-8")
+        focusList:AddListItem("All methods of selection (mouse click, Enter key, and Space key) work the same.")
+        focusList:AddListItem("The visual label (what the button text says) matches what the button actually appears to do (based on alerts or other feedback). For example, if the alert says a form was submitted, the button text should say something like ‘Submit Form,’ not just ‘Activate.’)")   
+        focusList:AddListItem("The auditory experience (especially for screen reader users) matches what a sighted user would experience visually.")
+        section:Add(focusList)
+        section:AddParagraph("Remember that semantic HTML elements like "+lt+"button> are generally preferred for accessibility, however for the context of this lesson, working with a variety of structures will ensure you understand how ARIA and HTML work together. Do not simply convert everything to "+lt+"button> tags. Instead, focus on improving each button's accessibility within its existing structure, ensuring that it communicates clearly and functions consistently for all users.")
+
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("ARIA is a powerful tool that enhances HTML and makes otherwise non-semantic elements accessible in a variety of ways. However, ARIA can be dangerous for accessibility if done incorrectly. Worse, what <i>incorrect</i> actually means is often less clear than the specification seems to imply. In many cases, incorrectly used ARIA can be worse than no ARIA at all. As you continue learning, remember to use ARIA thoughtfully. The effects of ARIA can vary based on platform or the assistive technology being used so test thoroughly. Consider the various places you might need to test your ARIA in your own context.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Learn the basics of ARIA and understand how it affects assistive technologies"
+    end
+
+    action GetSummaryName returns text
+        return "Learn the basics of ARIA and understand how it affects assistive technologies"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Introduction to ARIA"
+    end
+
+    action GetShortDescription returns text
+        return "the basics of ARIA and how it affects assistive technologies"
+    end
+
+    action GetLinkName returns text
+        return "Introduction to ARIA"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/introductiontoARIA.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+

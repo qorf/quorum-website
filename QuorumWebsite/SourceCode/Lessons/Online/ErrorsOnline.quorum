@@ -1,0 +1,249 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class ErrorsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Boo Boo Management with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 5: Boo Boo Management", 1)
+
+        headDiv:AddParagraph("This lesson is about managing errors in code.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("Perhaps one of the most common actions in computer programming is making mistakes. They are common and everyone makes them. In this lesson, you will learn about mistakes, which kinds are the most common, and what happens when you inevitably make them. You will then intentionally make various kinds of errors or mistakes and learn how to adjust your code to fix them in blocks.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about the different kinds of errors.")
+        goalList:AddListItem("Learn which errors are the most common and how to fix them")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Imagine people at different age ranges. There are young students in K-2 that are emerging readers. Students from 3-5, 6-8, or 9-12, all learning computer science as they go. There are also students in undergraduate through doctoral programs and professional programmers with potentially decades of experience. What kind of mistakes do you think each of these groups might commonly make and why?")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Errors/Vocabulary.csv")
+        section:Add(vocabTable)
+
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("<strong>3A-CS-03</strong>: Develop guidelines that convey systematic
+troubleshooting strategies that others can use to
+identify and fix errors. ")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+
+        section:AddParagraph("Computer programming languages can take practice to learn and an important part of that practice is learning about errors. When people think of the idea of an error, it often has a bad connotation. Perhaps a person feels subjectively bad for making an error or is frustrated in trying to fix it. 
+")
+section:AddParagraph("In practice, however, while certain kinds of mistakes are harder to fix in programming than others, the good news is that humans are quite predictable. Some errors are so commonplace that the computer can take a good reasonable guess about how to fix them on its own. As a programmer, recognizing these mistakes and understanding why they occur will strengthen your problem solving skills and help you learn to invent more complex programs.
+")
+section:AddParagraph("While the word mistake is common in English, in computer science you typically break down the concept into kinds. The most common two are compiler errors and runtime errors. Consider an example of both.
+")
+        
+        
+AddHeading(section, "Compiler Error", 3)
+section:AddParagraph("Programming languages are complicated bits of technology. You might think of them as turning human-like language into 1s and 0s, which in a literal sense they do. Programming languages are made for people to be able to do this as easily as is reasonable. The basic problem though is this: what words or symbols are precise enough for a machine, yet understandable enough for a human?
+")
+section:AddParagraph("This question observes the natural mismatch between humans and machines. Computers are perfectly fine getting 0s and 1s for their programs, but this would be incomprehensible for people. The problem is made worse by the fact that machines have to process this text for humans, interpret it, then reorganize it to be converted into those 1s and 0s. This process is known as compiling. Along the way, many kinds of errors can happen. One such category of errors, called compiler errors, are those errors that can happen before a program ever runs. 
+")
+section:AddParagraph("Intuitively, you might think compiler errors are bad or frustrating, because they stop your program from running. In practice, however, humans have a love/hate relationship with compiler errors. They represent a situation where the computer can calculate that, with mathematical certainty, your program may never run correctly and they can tell you that in advance. Because of this behind the scenes math, it also means they can often give you a reasonable guess, and location, for where the problem is. 
+")
+        
+AddHeading(section, "Common Compiler Errors", 3)
+section:AddParagraph("There are many kinds of compiler errors and one easy way to understand it is to think through which ones are common. It is tempting to just guess, but academic research has shown that the issue really needs evidence to understand. One recent overview of what is known was conducted by Becker et. al [1] and an overview of which errors are common amongst students was conducted by Altadmri and Brown [2]. One easy way to think about them is that, if you have errors in your code, to start by fixing the first and ignoring the rest [3]. Such a strategy is not perfect, but is often helpful.
+")
+section:AddParagraph("Consider an example with an output statement:
+")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"output " + dq + "Hello"))
+section:AddParagraph("First, notice that the system is being asked to output the word Hello, except that text requires a double quote on the left and the right hand side of the system. In this case, the right hand side is missing. One of the most common errors is mismatched braces [1, 2]. This is not exactly like, but is analogous to, this situation. In this system, typing this as raw text would then give the following:
+")
+
+        Image image = section:AddImage("/media/BlocksOnline/Errors/Hello.png","This is an image of the online block editor. The most important part of the image is there is an output statement that has text with a missing right double quote. The error says it is not a valid expression, which is true but confusing.")
+        image:AddText("This is an image of the online block editor. The most important part of the image is there is an output statement that has text with a missing right double quote. The error says it is not a valid expression, which is true but confusing.")
+        image:AddAttribute("data-zoom","")
+        
+section:AddParagraph("Part of the problem is that computer programming languages are not always very good at predicting what a human did wrong. In this case, the error message is stating that the word Hello with only a single left double quote is not a valid expression, which is true but confusing. How to make such messages better, and for whom, is an active line of research in computer science. 
+")
+section:AddParagraph("In addition to matching, all of us make many kinds of mistakes. The authors of this text still do. These include errors like [2]:
+")
+        
+WebTable commonErrorsTable = LoadWebTable("Common Errors", "/html/media/BlocksOnline/Errors/CommonErrors.csv")
+        section:Add(commonErrorsTable)
+section:AddParagraph("Even in block languages, it is a common misconception that no errors can be made. The errors are just shown differently and constrained in different ways. In some cases the language is constrained to the point that, while it is true some errors are impossible, many kinds of programs cannot be written. 
+")
+        
+AddHeading(section, "Runtime Errors", 3)
+section:AddParagraph("Sometimes errors can happen while the code seems to be working perfectly fine. Runtime errors are different from compiler errors. Instead of a program failing before it runs at all, the computer has identified that the source code is valid. It cannot, and in fact it is impossible to, know for sure your program is correct, but it can at least know that the source code looks like valid source in the programming language. 
+")
+section:AddParagraph("The problem is, not all source code gives useful results. Consider an example, which might look as so:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"output 5 / 0"))
+section:AddParagraph("This code, whether typed as raw text or placed into a block, is valid and correct. The computer programming language sees that it is a valid line of code. The problem is, what does a computer program do if you divide by zero? In almost all programming languages, the answer is that it crashes your program. However, when running on the web, it does something funny: it returns infinity. The reason is cryptic and historical, coming from a strange specification in the 1980s called IEEE 754-1985. Because, when you run code online, although you can kind of sort of get around it, you are stuck with this standard, when you run Quorum in the browser this is the behavior you get. 
+")
+section:AddParagraph("To make this more confusing, if you were to run Quorum offline in Quorum studio, where the environment is more strict about math, you would be given a weird looking error, like so:
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"Error: class java.lang.ArithmeticException, / by zero
+   file: Main.quorum,  class: Main,  action: Main,  line: 1
+"))
+section:AddParagraph("The details of what this means are out of scope, but the bottom line is that when a computer program is running, offline it crashes with a cryptic error. Online, it keeps running but tells you the operation was infinity, which is also cryptic. The point here is that computer science often has some pretty strange edge cases to manage.
+")
+section:AddParagraph("There are many kinds of runtime errors, for all sorts of situations, and you can even define your own. However, the crucial point to understand is that errors can happen before a program runs (compiler errors) and during a program's run (runtime error). Runtime errors are often called bugs and while not universally true, they are generally harder to find.
+")
+        
+        
+AddHeading(section, "Citations", 3)
+OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("Brett A. Becker, Paul Denny, Raymond Pettit, Durell Bouchard, Dennis J.
+Bouvier, Brian Harrington, Amir Kamil, Amey Karkare, Chris McDonald,
+Peter-Michael Osera, Janice L. Pearce, and James Prather. 2019. Compiler
+Error Messages Considered Unhelpful: The Landscape of Text-Based Pro-
+gramming Error Message Research. In 2019 ITiCSE Working Group Reports
+(ITiCSE-WGR ’19), July 15–17, 2019, Aberdeen, Scotland UK. ACM, New York,
+NY, USA, 34 pages. https://doi.org/10.1145/3344429.3372508 
+")
+citations:AddListItem("Amjad Altadmri and Neil C.C. Brown. 2015. 37 Million Compilations: Investigating Novice Programming Mistakes in Large-Scale Student Data. In SIGCSE '15. ACM, 522--527. 
+")
+citations:AddListItem("Brett A. Becker, Cormac Murray, Tianyi Tao, Changheng Song, Robert McCartney, and Kate Sanders. 2018. Fix the First, Ignore the Rest: Dealing with Multiple Compiler Error Messages. In Proceedings of the 49th ACM Technical Symposium on Computer Science Education (SIGCSE '18). Association for Computing Machinery, New York, NY, USA, 634–639. https://doi.org/10.1145/3159450.3159453 
+")
+        section:Add(citations)
+
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+
+        section:AddParagraph("In this first part of the lesson, you will continue using Parsons problems. This time, you will focus on the most common kind of errors you can run into while coding: errors. 
+")
+section:AddParagraph("Like before, the broad idea behind problems like these is to limit the number of programming options while learning, emphasizing where lines of code go in a program. In this case, you are practicing fixing the errors the literature tells us are the most common errors made by students [1]. The idea is that, at least for students, the errors made are predictable and directed practice may help. Runtime errors are more difficult to find and debug in a browser and will be left off for now.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("In this case, like before there is one set of Parsons problems on compiler errors. For each problem, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+        
+AddHeading(section, "Parsons Problems", 3)
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about compiler errors.","/problems/errors/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Studies on the mistakes people make when coding in regard to compiler errors show that some errors, like matched braces, are dramatically more common than others. Discuss with a partner why you think that might be. As in, what makes some compiler errors harder than others?")
+        return section
+    end
+    
+    
+action GetMetaDescription returns text
+        return "Learn about managing errors in programs."
+    end
+
+    action GetSummaryName returns text
+        return "Managing errors"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Boo Boo Management Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to manage errors"
+    end
+
+    action GetLinkName returns text
+        return "Boo Boo Management online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/errors.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Errors"
+    end
+end
+
+
+
+

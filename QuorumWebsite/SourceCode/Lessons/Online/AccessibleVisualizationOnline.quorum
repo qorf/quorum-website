@@ -1,0 +1,239 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class AccessibleVisualizationOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Accessible Visualization with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 7: Data Science 2: Accessible Visualization", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to data science.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("One of the most powerful tools in data science is visual representations of information. Historically, visual representations have been limited to the use of alternative descriptions, or colloquially alt text, for accessibility. In this lesson, you will explore accessible visualization, which is a way to automatically generate visualizations that are visual, but that are sent to the computer in such a way that is much more universally designed. You will use these accessible visualizations to understand a data set.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about the kinds of visualizations that are available")
+        goalList:AddListItem("Construct and explore data using accessible charts")
+goalList:AddListItem("Discuss keyboard controls in the accessible visualizations you have created")
+goalList:AddListItem("Learn how to customize the appearance of a chart")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Data visualization is an important tool for conveying information, and it can appear in your everyday lives. What kind of data visualizations have you seen before and where do you find it useful?")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/DataScience2/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/DataScience2/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>3A-DA-11</strong>: Create interactive data visualizations using
+software tools to help others better understand real-world phenomena
+")
+        standards:AddListItem("<strong>3A-AP-21</strong>: Evaluate and refine computational artifacts
+to make them more usable and accessible.
+")
+standards:AddListItem("<strong>3A-AP-23</strong>: Document design decisions using text,
+graphics, presentations, and/or demonstrations in the development of complex programs. 
+")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+
+        section:AddParagraph("There are many different kinds of data visualizations. While the term visualization is used here, all graphics have the potential to be accessible. Generating a bar or other chart type under the hood knows how to talk to accessibility systems in addition to presenting the chart visually. Just like before, you generate charts with DataFrame objects. 
+")
+section:AddParagraph("When it comes to describing data, one of the best options to showcase them is visually because people can easily detect patterns and draw conclusions based off of graphs. It provides a visual summary of data rather than having to read and understand blocks of text. From an accessibility standpoint, this still holds. When Quorum generates accessibility information for, say, a chart, you as a human do not need to additionally describe the chart. This makes sense. The computer can just as easily summarize the chart, describe the bars, and such through the math of how the chart is created in the first place. All interactions and descriptions are generated automatically by the programming language without human intervention or description. There are no, so-called, alternative descriptions, because they are not needed. The following chart types are supported:
+")
+section:Add(LoadWebTable("Chart Types", "/html/media/BlocksOnline/DataScience2/Charts.csv"))
+        
+        
+AddHeading(section, "Chart Types", 3)
+section:AddParagraph("Charts come in many types and are used in the field of data science for different purposes. For example, bar charts visualize quantitative data, so it is important that your variables within your x and y axis take discrete values and can be thought of as labels. Typically one axis should be a label or category and the other should represent something numeric. The numeric value is going to determine the length of each bar. 
+")
+section:AddParagraph("In contrast, consider box plots, while they also visualize quantitative data, have a different purpose. Box plots often present visually the median and are sometimes called box and whisker plots. The reason is because the whiskers above and below, which represent the quartiles, sometimes look like whiskers. If there are dots above or below the whiskers, which you can see visually but also obtain accessibly, these are outliers. 
+")
+section:AddParagraph("There are many other kinds of charts and within them there are a great number of features. For example, there are colors, patterns, multi-charts, labels, titles, and even statistics you can embed. In the Parsons problems for this lesson, you will explore a subset of these features.
+")
+        
+AddHeading(section, "Chart Accessibility", 3)
+section:AddParagraph("All charts are accessible by default. All can be navigated with the 
+keyboard and used with accessibility technologies, in addition to being visual. 
+You may refer to the 
+<a href='https://quorumlanguage.com/tutorials/charts/charttextnavigation.html'>Quorum keyboard controls webpage</a> 
+to find out more general chart hotkeys, but to quickly navigate through the different areas in a
+bar chart you can use the following keys:
+")
+section:Add(LoadWebTable("Chart Types", "/html/media/BlocksOnline/DataScience2/Keys.csv"))
+section:AddParagraph("You can navigate with this chart accessible controls. Feel free to test out the navigational controls with a screen reader.
+")
+        
+        
+AddHeading(section, "Creating a Bar Chart or Box Plot with DataFrames", 3)
+section:AddParagraph("While you know how to properly load in a CSV file through a DataFrame, the next step is to use that data to create a bar chart. Before you are able to create the chart, there are additional libraries and objects you will need in order to customize the bar chart.
+")
+section:Add(preformatter:GeneratePreformattedCode(
+"Libraries.Interface.Controls.Charts.BarChart
+Libraries.Interface.Controls.Charts.BoxPlot
+BarChart chart
+BoxPlot plot
+"))
+section:AddParagraph("This code adds the BarChart or BoxPlot object which allows you to customize and label your chart to your liking. When you are on your BarChart object in an offline environment, the entire list of options is available to peruse. Online, since the goal is to limit the options to assist in learning, Parsons style problems will allow you to practice using specific actions to manipulate the chart.
+")
+        
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+
+        section:AddParagraph("In this section, you will be practicing using a variety of chart types. The purpose in doing this is to highlight how you might create different kinds of accessible visualizations. You will focus on creating charts for different purposes and using customization. Note that these particular problems do not check your answers, in part because they are designed for exploration, but less so to determine an exact answer.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("In this activity, you will display information in a way that 
+makes it easier to understand. Using real data can be helpful in thinking about 
+data science, and as such consider the 
+<a href ='https://allisonhorst.github.io/palmerpenguins/articles/intro.html'>Palmer Penguins dataset</a>
+, a collection of 
+information about three different species of penguins observed on the islands of 
+the Palmer Archipelago in Antarctica. First, <a href = 'https://gist.githubusercontent.com/slopp/ce3b90b9168f2f921784de84fa445651/raw/4ecf3041f0ed4913e7c230758733948bc561f434/penguins.csv'>start by 
+downloading the Palmer Penguins dataset</a>. Examine the CSV file, specifically at the column 
+headers in the first row.
+")
+section:AddParagraph("The data contains several categorical variables. The species column indicates one of three penguin species, Chinstrap, Gentoo, or Adelie. The island column indicates which of the three islands in the Palmer Archipelago the penguin was found on. The sex column indicates if a penguin was male or female. Finally, the year column indicates what year the measurements were collected for that row of data.
+")
+
+Image imagePengu = section:AddImage("/media/Blocks/DataScience2/Penguin.png","Artwork depicting the three species of penguins in the Palmer Penguins dataset: Chinstrap, Gentoo, and Adelie.")
+        imagePengu:AddText("Artwork depicting the three species of penguins in the Palmer Penguins dataset: Chinstrap, Gentoo, and Adelie.")
+        imagePengu:AddAttribute("data-zoom","")
+        imagePengu:AddClassAttribute("object-contain max-w-96 max-h-96 rounded overflow-hidden")
+        
+        
+section:AddParagraph("There are also several quantitative measures, or in other words, several values where numbers were measured for each penguin. These include the length and depth of the penguin’s bills in millimeters, the length of their flippers in millimeters, and their body mass weighed in grams.
+")
+section:AddParagraph("It’s worth noting that a few entries in the data read NA, especially in the sex column. These are cases where that particular information could not be measured for a particular penguin. There are lots of potential questions you might ask about these penguins, and lots of potential answers you could get from the data.
+")
+section:AddParagraph("There is one set of Parsons problems for this lesson. In each case, you can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+AddHeading(section, "Parsons Problems", 3)
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about Charts","/problems/data-science-2/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Visualization, as it is sometimes called, has historically been a visual only area, with alternative descriptions created by a human to replace the visual for accessibility. This works in some cases, but fails to be effective because visualization gets more complicated or adds more dimensions. In this system, however, a visualization automatically generates many alternative descriptions automatically and lets you explore. Unlike some Artificial Intelligence (AI) systems, this does not hallucinate and is guaranteed to be a reflection of the data. Consider as a final activity, what do you think the limits of accessible visualization are?
+")
+        return section
+    end
+    
+    
+action GetMetaDescription returns text
+        return "Learn about accessible visualization."
+    end
+
+    action GetSummaryName returns text
+        return "Accessible Visualization"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Accessible Visualization Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to work with accessible visualization"
+    end
+
+    action GetLinkName returns text
+        return "Accessible Visualization online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/data-science-2.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Accessible Visualization Online"
+    end
+end
+

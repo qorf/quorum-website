@@ -4,6 +4,15 @@ function GetCode(){
 function SetCode(text) {
     $starter.SetCode$quorum_text(text);
 }
+function GetFileCount() {
+	return $starter.GetFileCount();
+}
+function GetCodeAtFileIndex(index) {
+	return $starter.GetCodeAtFileIndex$quorum_integer(index);
+}
+function GetNameAtFileIndex(index) {
+	return $starter.GetNameAtFileIndex$quorum_integer(index);
+}
 function ScaleUp() {
     $starter.ScaleUp();
 }
@@ -43,9 +52,19 @@ function BlockEditorStop() {
     }
 }
 var code = null;
+var cachedCodeFiles = null;
 function PauseBlockExecution() {
     let gameMap = plugins_quorum_Libraries_Game_GameStateManager_.registeredGames
     code = GetCode();
+	if (GetFileCount() > 1)
+	{
+		cachedCodeFiles = [];
+		for (var i = 0; i < GetFileCount(); i++)
+		{
+			cachedCodeFiles[i] = {fileName: GetNameAtFileIndex(i), code: GetCodeAtFileIndex(i)};
+		}
+	}
+	
     let game = null;
     for (let [key, value] of gameMap) {
         if (key instanceof quorum_WebEditor_BlockEditor_) {
@@ -57,4 +76,4 @@ function PauseBlockExecution() {
     }
     global_Empty_Shared_Classes();
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex}

@@ -1,0 +1,128 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+use Libraries.Web.Problems
+use Libraries.Containers.Iterator
+use Libraries.Web.Problem
+
+class ProblemsPage is Lesson
+text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    integer ACTIVITY = 0
+    text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
+
+    Preformatter preformatter 
+    Problems problems = undefined
+    
+action Setup
+        //html header stuff
+        SetWebPageTitle("Learn Quorum - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Main Region
+        ImageHeader blueSection = makeBlueHeader()
+        Add(blueSection)
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
+
+
+        Section problemsSection = MakeProblemsSection()
+        bodyDiv:Add(problemsSection)
+    end
+    
+    
+action MakeProblemsSection returns Section
+        Section section
+        if problems = undefined
+            return section
+        end
+        
+        Iterator<Problem> problemIterator = problems:GetProblemIterator()
+        
+        Division courseDiv
+        courseDiv:AddClassAttribute("my-9 space-y-4")
+        Heading courseHeader
+        courseHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        courseHeader:SetScale(2)
+        courseHeader:AddText(problems:GetTitle())
+        
+        Division courseCards
+        courseCards:AddClassAttribute("grid gap-4 grid-cols-1 auto-rows-auto md:grid-cols-2 lg:grid-cols-3")
+         repeat while problemIterator:HasNext()
+Problem problem = problemIterator:Next()
+            //json received from /html/json/courses.json
+            text title = problem:GetTitle()
+            text courseUrl = problems:GetId() + "/" + problem:GetId() + ".html"
+             LongCourseCard courseCard
+            courseCard:SetButtonText("Practice")
+            text imageSrc = ""
+            text imageAltText = "Image Alt"
+            text description = problem:GetDescription()
+            courseCard:Create(imageSrc, imageAltText, description, title, courseUrl, false)
+            courseCards:Add(courseCard)
+        end
+        
+        courseDiv:Add(courseHeader)
+        courseDiv:AddText(problems:GetDescription())
+        courseDiv:Add(courseCards)
+        
+        section:Add(courseDiv)
+    return section
+end
+
+
+action makeBlueHeader returns ImageHeader
+        ImageHeader header
+        text headerHeading = "Do Practice Problems in Quorum"
+        text headerText = "Learn code through small examples."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        return header
+    end
+
+    action GetMetaDescription returns text
+        return problems:GetDescription()
+    end
+
+    action GetSummaryName returns text
+        return problems:GetTitle()
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetName returns text
+        return problems:GetTitle()
+    end
+
+    action GetShortDescription returns text
+        return problems:GetDescription()
+    end
+    
+action GetLocation returns text
+        text id = problems:GetId()
+        return "problems/" + id + ".html"
+    end
+    
+    action GetProblems returns Problems
+        return problems
+    end
+
+    action SetProblems(Problems problems)
+        me:problems = problems
+    end
+
+end

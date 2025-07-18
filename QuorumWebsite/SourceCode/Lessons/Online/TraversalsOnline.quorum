@@ -1,0 +1,252 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+use Libraries.System.File
+
+class TraversalsOnline is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Traversals with Quorum Blocks Online - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Hour 10: Traversals", 1)
+
+        headDiv:AddParagraph("This lesson is to introduce you to traversals.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("One of the most enduring reasons why loops and conditionals are useful in computer science is that they offer a way to repeat behavior and make decisions. That combination together provides an incredibly useful technique you can apply over and over again to create algorithms. In this lesson, you will practice applying these techniques together to traverse a data structure. ")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn about data structures and how to traverse them")
+        goalList:AddListItem("Learn how to create your own algorithm")
+goalList:AddListItem("Practice using loops and conditionals together")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Imagine you are looking for information in a book that contains the phone number of every cell phone in the world. This book contained every person's name, their address, and phone number and it was not sorted. How many steps would it take a human to flip through the book and find the phone number you want? ")
+        
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        section:Add(LoadWebTable("Vocabulary", "/html/media/BlocksOnline/Traversals/Vocabulary.csv"))
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+        section:Add(LoadWebTable("New Code to Learn", "/html/media/BlocksOnline/Traversals/Code.csv"))
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>3A-AP-12</strong>: Create computational models that
+represent the relationships among different elements of
+data collected from a phenomenon or process.
+")
+standards:AddListItem("<strong>3A-AP-13</strong>: Create prototypes that use algorithms to
+solve computational problems by leveraging prior
+student knowledge and personal interests.
+")
+standards:AddListItem("<strong>3A-AP-14</strong>: Use lists to simplify solutions, generalizing
+computational problems instead of repeatedly using
+simple variables.
+")
+standards:AddListItem("<strong>3A-AP-15</strong>: Justify the selection of specific control
+structures when tradeoffs involve implementation,
+readability, and program performance, and explain the
+benefits and drawbacks of choices made.
+")
+standards:AddListItem("<strong>3A-AP-16</strong>: Design and iteratively develop
+computational artifacts for practical intent, personal
+expression, or to address a societal issue by using events to initiate instructions. 
+")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("While you can write computer programs that store individual variables to gather information, this quickly becomes impractical or impossible. For example, in the warm-up, you considered the idea of a book that contains the phone numbers of all people on earth. If such a book existed, it would be impractical to write down a variable for every person. In fact, even if you wrote such a program for a small city of 10,000 people, writing new code and recompiling your software every time a new person came to town would not be particularly sound engineering.
+")
+section:AddParagraph("How to manage data is a massive topic in the field of computer science. In a college sequence, for example, just to manage storage in memory is a one year college sequence. Once you get to storing items outside of memory on a hard disk, on other people's computers like the cloud, or in other ways, it takes even more practice. The good news is, you do not need to know all of these to make apps. Knowing about them, or abstracting, can still let you meaningfully write apps.
+")
+        
+        
+AddHeading(section, "Data Structures", 3)
+section:AddParagraph("Consider a few examples. You may have heard words like array, list, linked list, or other names, all of which store data in memory. You may have even heard of the seemingly magical approach called the hash table. This extremely commonly used structure has the peculiar property of being able to access disconnected data extremely quickly. Overall, storage mechanisms like these are typically called <strong>data structures</strong>. With data structures, they are often not necessarily better than each other. Instead, data structures have mathematical properties, like how fast they can read or write, or details on how they store, which make them situationally better or worse.
+")
+section:AddParagraph("There are many ways to interact with data structures and over time it can be helpful to learn a variety of them, but one crucial method is called traversal. Generally, the idea in traversal is to teach a computer program to either process every single value in a structure or at least to keep searching until it finds a particular one. You have already used the DataFrame object, which is one kind of such structure. There is nothing special about DataFrame, but it has its own type because it processes data in a very specific way related to data science.
+")
+section:AddParagraph("Examine again the <a href = 'http://quorumlanguage.com/data/Dogs.csv'>Dogs.csv</a> comma separated value file mentioned in a previous lesson, but this time consider how you might go about doing the kinds of calculations it can with your own algorithm. The first point to recognize is that, while not true for all, many kinds of data structures have what is called an index. The idea is to label each item in the structure with a number that you can reference. For example, the first four columns in the Dog.csv file are:
+")
+        
+        
+UnorderedList columnList
+        columnList:AddClassAttribute("list-disc list-outside pl-8")
+columnList:AddListItem("id")
+columnList:AddListItem("Name")
+columnList:AddListItem("Breed Group")
+columnList:AddListItem("Bred For")
+        section:Add(columnList)
+        
+AddHeading(section, "Indexing", 3)
+section:AddParagraph("Historically, it would be rational to assume that computer scientists got together, wrote a standard, and decided what the labels should be. Sadly, the community is not so lucky. As such, today, different programming languages sometimes use what is called 0-based indexing and sometimes use 1-based indexing. 
+")
+section:AddParagraph("The difference here is important and the idea in 0-based is the first label is 0 (arguably, weirdly) and in 1-based the first is 1 (arguably less weirdly). While the word weird is hard to quantify, the point is that for every programming language you use, you need to know what the designer chose and they are not all the same. Some chose both (e.g., Java's arrays versus their database libraries). 
+")
+section:AddParagraph("That said, the most common choice is probably 0-based. The reason is because under the hood, the computer can do the calculations just slightly faster with that choice. Children's products sometimes choose 1, as does the College Board in AP Computer Science, but this is arguably rare and especially so for professional tools. Evidence on the choice is not definitive in the literature as of the time of this writing.
+")
+        
+        
+AddHeading(section, "Traversing in a DataFrame", 3)
+section:AddParagraph("In any case, in the Quorum programming language, the choice is 0-based indexing. This means the above list would start at 0 instead of 1. With that information in hand, you can get any of the columns in the data frame. The following code does this:
+")
+        
+File file
+        file:SetPath("/html/media/BlocksOnline/Traversals/GetColumn.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+        
+section:AddParagraph("Notice that DataFrame has an action you have not encountered before: GetColumn. The GetColumn action takes one parameter, which is the index. This indicates which column to get. Once you have the column, it contains all of the raw data from the DataFrame in memory, stored in whatever way the designer chose to store it. For the first column, how this storage works is outside the scope. While not the complete story, the easiest way to think about it is the storage used by DataFrame was optimized for statistics. Here is an abridged list of column actions in DataFrameColumn and what they do:
+")
+section:Add(LoadWebTable("Sample Actions in DataFrameColumn", "/html/media/BlocksOnline/Traversals/DataFrameColumn.csv"))
+section:AddParagraph("There are many other actions, like those for adding and removing data, getting the name of the column, and others. However, imagine you want to add up all of the items in the column or calculate the average. Now, with traversals and indices, you can do just that. Here is an example of code that adds up all of the values:
+")
+file:SetPath("/html/media/BlocksOnline/Traversals/SumColumn.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("The key here is to notice that once you have a column, you can use loops to get each value, referenced by its index, and calculate the total. To do so you first create an integer variable for sum and set it to 0. Next, while you can use any loop type, repeat while allows you to set a condition that the loop should stop once it has traversed through the entire column. On each iteration of the loop, you get the value of the column, starting from the top and going down. You then add the value to the sum and crucially increment a counter variable by 1. That counter variable tells the loop when to stop and forgetting it would cause your program to never stop. This is often called an infinite loop.
+")
+        
+AddHeading(section, "Creating Custom Algorithms", 3)
+section:AddParagraph("The real power of algorithms, though, is in creating your own for any specialized needs you have. For example, suppose you needed to count in the total only every other item in the column. To do this, you would nest an if statement inside of the loop. That might change the loop to something like this:
+")
+file:SetPath("/html/media/BlocksOnline/Traversals/EveryOtherColumn.quorum")
+section:Add(preformatter:GeneratePreformattedCode(file:Read()))
+        
+section:AddParagraph("In this case, recall that the mod operator is the remainder of a division. If i is 0, then 0 mod 2 is also 0. If it is 1, then 1 mod 2 is 1. It goes on with every even value being 0 and every odd one being 1, which allows the program to count every other. Algorithms and traversals are very common and writing them is the type of activity a programmer in practice would do every day. They are an essential part of computer science that you will practice next.
+")
+section:AddParagraph("Perhaps this lesson might appear as very abstract, leaving you wondering why traversals would matter. However, traversals are exceedingly common. So common, in fact, that for professionals they might show up in a significant majority of programs they ever write. This might include counting parts of data, calculating information, retrieving the settings a user has, loading a configuration file, talking to collections of web servers, sending information to many players in a game, saving information from a list, or so many other things. Traversals, at the end of the day, are a skill worth practicing.
+")
+
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("Learning to combine iteration and decision making, loops and conditionals, into algorithms is a core and extremely important skill to practice. Computer scientists do these kinds of activities every day and being able to do them fluently makes it easier to grasp later concepts.
+")
+section:AddParagraph("For these problems, consider that each is a bit of a puzzle. It is normal to run the program often, get stuck, and tweak as you go. Sometimes it helps to add extra output statements as you debug to try and learn the behavior of the loop. 
+")
+section:AddParagraph("As one final point, do not forget that if you accidentally tell your web browser to run a loop that would run forever, you can crash it. This is not scary and not a big deal. In fact, any developer from any website could have accidentally put an infinite loop on a webpage you already visit. If this happens in your code, just refresh the page.
+")
+
+        AddHeading(section, "Directions", 3)
+section:AddParagraph("You will practice algorithms again using Parsons problems on traversal. You can drag and drop, use the keyboard, or even just write in the editor the solution to the problem and run the code. As a reminder, the hotkey to run the code is ALT + SHIFT + R on Windows and CTRL + SHIFT + R on Mac.
+")
+        
+
+AddHeading(section, "Parsons Problems", 3)
+OrderedList parsons
+        parsons:AddClassAttribute("list-disc list-outside pl-8")
+        parsons:AddListItemLink("Learn about Traversals in DataFrameColumn objects","/problems/traversals/start.html")
+        section:Add(parsons)
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("While traversals are very powerful, they have one big downside. As the amount of data you have to process grows, it takes the computer longer and longer to process. How much data do you think the computer can process before it starts to struggle? In fact, what does it even mean for a computer to struggle with large amounts of data?
+")
+        return section
+    end
+    
+action GetMetaDescription returns text
+        return "Learn about traversals."
+    end
+
+    action GetSummaryName returns text
+        return "Traversals"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Traversals Online"
+    end
+
+    action GetShortDescription returns text
+        return "how to work with traversals"
+    end
+
+    action GetLinkName returns text
+        return "Traversals online"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/online/traversals.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Traversals Online"
+    end
+end
+

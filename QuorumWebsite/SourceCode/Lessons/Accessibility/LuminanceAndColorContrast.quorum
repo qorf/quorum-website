@@ -1,0 +1,350 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class LuminanceAndColorContrast is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text lt = "&lt"
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Luminance and Color Contrast - Quorum Programming Language")
+        AddDefaultHeaders()
+AddMathHeader()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Luminance and Color Contrast", 1)
+
+        headDiv:AddParagraph("Understanding Luminance, Color Contrast, and how the Rules are Changing in WCAG 3")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("All too often, software engineers rely on tools called color contrast checkers to check for compliance. Checkers are important, but understanding the concepts of luminance and contrast can help increase your intuition about what works and what does not. In this lesson, you learn how color contrast is calculated. You will examine the mathematical equations used in Web Content Accessibility Guidelines (WCAG) 2.2 to calculate contrast by hand. You will also learn some of the limitations of the equations in WCAG 2.2 and how WCAG 3’s new algorithm might change things.")
+
+        AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn the calculation for relative luminance")
+        goalList:AddListItem("Learn the equation for contrast ratio in WCAG 2.2")
+        goalList:AddListItem("Learn how to calculate contrast using the Accessible Perceptual Contrast Algorithm (APCA) algorithm")
+        goalList:AddListItem("Calculate color contrast by hand to gain an intuition on how it works")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+   
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think about how color is found and used in different technologies. Maybe there is a red error message, a blue link, a purple link, or a yellow warning. Do the different colors mean anything to you? If you removed color entirely like say removed the red from an error message consider whether you lose information. Consider the use of color in an application and its various uses.")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/Accessibility/LuminanceAndColorContrast/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Web Content Accessibility Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://www.w3.org/WAI/standards-guidelines/wcag/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("WCAG 2.2 - 1.4.1 Use of Color")
+        standards:AddListItem("WCAG 2.2 - 1.4.3 Contrast (Minimum)")
+        standards:AddListItem("WCAG 2.2 - 1.4.6 Contrast (Enhanced)")
+        standards:AddListItem("WCAG 2.2 - 1.4.11 Non-text Contrast")
+        standards:AddListItem("WCAG 2.2 - 2.4.13 Focus Appearance")
+        section:Add(standards)
+        return section
+    end
+   
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(section, "Explore", 2)
+        section:AddParagraph("The concept of color sounds simple, but is often poorly understood and incredibly complex. On the surface, in computer science, color is usually thought of as three colors: red, green and blue. While this broad idea is important, when colors are combined things can get tricky. One especially important idea in color is that the WCAG standard tries to balance the idea of allowing full freedom in the design process with issues like making text easier to read.")
+        section:AddParagraph("Consider an example where you have a background color of black and a text color of black. No human, regardless of disability, would be able to read the text visually because it is the same color. By definition, this situation has the lowest possible color contrast. The hard question becomes though, what is color contrast anyway and how do you calculate it? The story of contrast inside of WCAG is not just complicated, but some might argue wrong. To even understand the debate, however, <strong>requires</strong> some math.")
+        section:AddParagraph("Past contrast, part of the reason color plays an important role in WCAG is because it is related to how information is often presented or conveyed. Color can improve aesthetics and sometimes can even improve usability, but its use requires thought. For example, it is common to attach meaning to certain colors, but when and why matters. ")
+        section:AddParagraph("Because people may perceive color differently, WCAG provides guidelines about it. For example, WCAG 1.4.1 Use of Color states that color should not be the only way of visually conveying information. For example, consider if there was an error in the form if the bad input turns red, but no message is displayed. This would fail 1.4.1 because color was the <i>only</i> means to show the error. The fix is simple: add some words.")
+        section:AddParagraph("Although it is good to try to use other means to convey information, the reality is that color should also not be ignored. People use color for many reasons, including simple ones like making interfaces feel warm or fun. Thus, one common sense way to think about color is to use it however you see fit, so long as the text is readable and that color is not the only way information is presented. For readability, to understand what that means, you first need to grasp the concept of relative luminance.")
+
+        AddHeading(section, "Relative Luminance", 3)
+        section:AddParagraph("To be able to compare colors you have to be able to describe how well a person can perceive a color. It is generally understood that the human visual system is more perceptive to brightness (luminance) than the differences in hue. Brightness in this context can be thought of as how light or dark the color is, whereas hue is sort of like its angle on a color wheel. WCAG uses relative luminance to calculate a brightness from a given color.")
+        section:AddParagraph("The following calculation will give you the relative luminance of a color (<i>L</i>). Note that it is not the actual physical brightness of the color in physics, but closer to how bright the human eye perceives it. The relative luminance of a color is defined in the context of a particular color standard, IEC 61966-2-1:1999 [1] and is typically called <strong>sRGB</strong> color space is calculated as follows:")
+        Division luminanceDiv
+        AddMath(luminanceDiv, "/html/media/Accessibility/LuminanceAndColorContrast/RelativeLuminance.xml")
+        section:AddParagraph(luminanceDiv:ToText())
+        section:AddParagraph("where <i>R</i>, <i>G</i>, and <i>B</i> are defined as:")
+        Division conditionalDiv
+        AddMath(conditionalDiv, "/html/media/Accessibility/LuminanceAndColorContrast/LinearRGBDefinitions.xml")
+        section:AddParagraph(conditionalDiv:ToText())
+        section:AddParagraph("and <i>R<sub>sRGB</sub></i>, <i>G<sub>sRGB</sub></i>, and <i>B<sub>sRGB</sub></i> are defined as:")
+        Division definitionDiv
+        AddMath(definitionDiv, "/html/media/Accessibility/LuminanceAndColorContrast/sRGBDefinitions.xml")
+        section:AddParagraph(definitionDiv:ToText())
+        
+        AddHeading(section, "Example", 4)
+        section:AddParagraph("To help understand, consider a tangible example with a worked example going through the following calculation of the luminance of a color. Take <strong style="+dq+"color: royalblue;"+dq+">royal blue</strong> which in 8 bit RGB is (65, 105, 225). The first step is to normalize the colors. You do this by using the equations for the sRGB colors:")
+        Division srgbDiv
+        AddMath(srgbDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ColorSpaceExample_sRGB.xml")
+        section:AddParagraph(srgbDiv:ToText())        
+        section:AddParagraph("Note that results are truncated here for simplicity.")
+        section:AddParagraph("Now that you have the normalized values, you find the R, G, and B values for the luminance equation. The relative luminance equation expects the color values to be in a format that is proportional to light intensity. This is sometimes referred to as lacking <strong>gamma correction</strong>, meaning it is taking into account physics but not human perception. In computer science, the technical name for this is <strong>linear RGB</strong>, which means the above numbers must be converted. All 3 values are greater than 0.03928 so you use the equations with the exponent as follows:")
+        Division rgbDiv
+        AddMath(rgbDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ColorSpaceExample_RGB.xml")
+        section:AddParagraph(rgbDiv:ToText())   
+        section:AddParagraph("Now you plug into the relative luminance equation as follows:")
+        Division lumDiv
+        AddMath(lumDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ColorSpaceExample_Luminance.xml")
+        section:AddParagraph(lumDiv:ToText())  
+        section:AddParagraph("So the luminance of the color royal blue is about 0.167. Looking back on the calculations, there are some things to note. First of all, of the 3 color components, the largest of the components was blue. The final value for B was 0.75293 which is larger than the next largest component (green). However, if you look at the luminance equation, each color component has a coefficient and the largest is green by far. Essentially, there is a lot of blue, but blue does not impact luminance very much. Next, consider contrast.")
+
+        AddHeading(section, "Contrast Ratio", 3)
+        section:AddParagraph("While luminance tells you how bright a color is, <strong>contrast ratio</strong> tells you how different the brightness of two colors are and different versions of WCAG have different approaches. The two colors could come from a text and its background and the contrast ratio describes how well you can distinguish between both colors.")
+        section:AddParagraph("WCAG 2.2 gives the following formula for contrast ratio:")
+        Division contrastDiv
+        AddMath(contrastDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ContrastRatio.xml")
+        section:AddParagraph(contrastDiv:ToText())
+        section:AddParagraph("Where <i>L<sub>1</sub></i> is the relative luminance of the lighter of the colors and <i>L<sub>2</sub></i> is the darker of the colors.")
+        section:AddParagraph("Since luminance can only range from 0 to 1 that means with this equation the maximum ratio comes out to 21:1.")
+
+        AddHeading(section, "Example", 4)
+        section:AddParagraph("Now take the luminance of <strong style="+dq+"color: royalblue;"+dq+">royal blue</strong> that you calculated earlier, which was 0.167 and calculate the contrast ratio when compared to white which has a luminance of 1.")
+        Division crDiv
+        AddMath(crDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ColorSpaceExample_CR.xml")
+        section:AddParagraph(crDiv:ToText())  
+        section:AddParagraph("The contrast ratio between royal blue and white would be considered to be 4.84:1.")
+        section:AddParagraph("The required ratio for normal text is 4.5:1 so this color combination would pass. For large text and graphic objects the required ratio is 3:1 so this color combination would also pass in those cases. Note that WCAG defines large text to be 18pt, or 14pt bold font or bigger to be considered large. ")
+        section:AddParagraph("Note how to calculate contrast using this method the only variables were the luminance of the colors. It did not take into account which color is the background. It also largely did not take into account the size of the text, except for big or small. While WCAG 3.0 is still being drafted, there is reasonable skepticism that WCAG 2.2's approach makes sense. As such, a new approach is being considered and thinking through the mathematical differences is interesting. This is called the Accessible Perceptual Contrast Algorithm [2].")
+
+
+        AddHeading(section, "Accessible Perceptual Contrast Algorithm", 3)
+        section:AddParagraph("The <strong>Accessible Perceptual Contrast Algorithm</strong> (APCA) is a method for calculating color contrast which puts more emphasis on readability. APCA aims to improve over the older and traditional methods of calculating contrast. Instead of producing a ratio, APCA gives a score to a color combination and then based on the font size and weight there are thresholds where the combination is considered to have a sufficient contrast.")
+        section:AddParagraph("In the APCA, contrast is calculated based on screen luminance while accounting for human perception. This begins with computing the luminance of each color involved in the contrast comparison. APCA defines two ways to calculate luminance: the <strong>exact screen luminance</strong> (<i>Y</i>), and an <strong>estimated screen luminance</strong> (<i>Y<sub>S</sub></i>) used for performance optimization.")
+        section:AddParagraph("Exact Screen Luminance (Y) is calculated similarly to the relative luminance defined in WCAG 2, but with two key differences. First, APCA uses a slightly higher linearization threshold for sRGB values, 0.04045 instead of 0.03928. Second, the weights for R, G, and B have greater precision: 0.2126729, 0.7151522, and 0.0721750, respectively, rather than the rounded 0.2126, 0.7152, and 0.0722 used in WCAG 2. These differences provide a more perceptually accurate measure of screen luminance for contrast calculations.")
+            
+        Division screenLuminanceDiv
+        AddMath(screenLuminanceDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ScreenLuminance.xml")
+        section:AddParagraph(screenLuminanceDiv:ToText()) 
+        section:AddParagraph("where <i>R</i>, <i>G</i>, and <i>B</i> are now defined as:")
+        Division apcaRGBDiv
+        AddMath(apcaRGBDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCALinearRGBDefinitions.xml")
+        section:AddParagraph(apcaRGBDiv:ToText())
+        section:AddParagraph("and <i>R<sub>sRGB</sub></i>, <i>G<sub>sRGB</sub></i>, and <i>B<sub>sRGB</sub></i> are the same as previously defined, under Relative Luminance.")
+        section:AddParagraph("Estimated Screen Luminance (<i>Y<sub>S</sub></i>) avoids full gamma correction and instead estimates luminance directly from the 8-bit sRGB values, it still includes the higher precision weights for R, G and B. While this method is computationally faster and suitable for real-time environments, it is less precise and may not capture subtle luminance differences as effectively as the full version.")
+        Division estScreenLuminanceDiv
+        AddMath(estScreenLuminanceDiv, "/html/media/Accessibility/LuminanceAndColorContrast/EstimatedScreenLuminance.xml")
+        section:AddParagraph(estScreenLuminanceDiv:ToText()) 
+        section:AddParagraph("Now, this is where APCA starts to set itself apart from the Relative Luminance calculations in WCAG 2.0. APCA considered the fact that for certain colors that are near black, those dark shades of colors become indistinguishable on most displays. To take those dark shades into account after you get the screen luminance you are going to clamp those values. The constants <i>B<sub>thresh</sub></i> = 0.022 and <i>B<sub>exp</sub></i> = 1.414 are used in the clamping function for these dark shades. The threshold marks where luminance is too low for linear behavior, and the exponent adjusts contrast to better match human perception. These values are fixed in standard APCA and can be used as-is for most applications.")
+        
+        section:AddParagraph("The clamp function for a given screen luminance (Y) is defined as:")
+        Division clampDiv
+        AddMath(clampDiv, "/html/media/Accessibility/LuminanceAndColorContrast/ScreenLuminanceClamp.xml")
+        section:AddParagraph(clampDiv:ToText())         
+        section:AddParagraph("APCA was designed to account for how humans perceive text on the screen. Relative Luminance does not account for which color is the foreground, and which was in the background. The next step here for APCA is to differentiate the text color and background color and you will be using the clamped screen luminance for those:")
+        Division clamptextDiv
+        AddMath(clamptextDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCATextLuminance.xml")
+        section:AddParagraph(clamptextDiv:ToText()) 
+        section:AddParagraph("where <i>Y</i> is the screen luminance derived from the color of the text or object.")
+        Division clampbgDiv
+        AddMath(clampbgDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCABackgroundLuminance.xml")
+        section:AddParagraph(clampbgDiv:ToText()) 
+        section:AddParagraph("where <i>Y</i> is the screen luminance derived from the color used for the background.")
+
+        section:AddParagraph("Once you have the clamped screen luminance values for both the text and background colors, the next step is to determine the contrast polarity. If the background is lighter than the text, this is known as <strong>normal polarity</strong> (dark text on a light background, often called light mode). If the background is darker, it is called <strong>reverse polarity</strong> (light text on a dark background or dark mode). Polarity is determined by comparing the luminance values, whichever color has the higher luminance is considered the lighter one.")
+        section:AddParagraph("To compute the raw contrast signal (S) in APCA, a power function is applied to the clamped luminance values of the text and background. This step accounts for the non-linear way the human eye perceives brightness [3], our visual system does not interpret a 50% drop in light intensity as a 50% drop in brightness. APCA uses different exponents based on polarity to better align with this perceptual curve. If the absolute difference between the luminance values is smaller than the perceptual input threshold (<i>P<sub>in</sub></i>) of 0.0005, the contrast is considered imperceptible and treated as zero to prevent false contrast detection.")
+        Division sapcaDiv
+        AddMath(sapcaDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCARawContrastSignal.xml")
+        section:AddParagraph(sapcaDiv:ToText()) 
+        section:AddParagraph("Up to this point you have been using the raw contrast values, but APCA found it more helpful to develop a contrast score (C) by scaling the raw signal to more easily gauge differences in contrast. The scale factor (<i>R<sub>scale</sub></i>) is simply 1.14 and the equation is as follows.")
+        Division capcaDiv
+        AddMath(capcaDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCAContrastScore.xml")
+        section:AddParagraph(capcaDiv:ToText()) 
+        section:AddParagraph("To further reduce contrast values that are mathematically present but imperceptible to the human eye, APCA applies a small offset (0.027) to the contrast value, producing the Scaled Absolute Perceptual Contrast (S<sub>apc</sub>). This offset, often referred to as W<sub>offset</sub>, helps discount faint differences that do not meaningfully impact legibility. Additionally, any S<sub>apc</sub> value below the perceptual output threshold (P<sub>out</sub>) of 0.1 is considered too weak to be useful and is set to zero. Using these constants directly simplifies the logic while still aligning with APCA’s perceptual goals.")
+        Division apcapcaDiv
+        AddMath(apcapcaDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCAAbsolutePercievedContrast.xml")
+        section:AddParagraph(apcapcaDiv:ToText()) 
+        section:AddParagraph("Now the final score is calculated by multiplying the absolute perceived contrast by 100:")
+        Division lapcaDiv
+        AddMath(lapcaDiv, "/html/media/Accessibility/LuminanceAndColorContrast/APCAFinalScore.xml")
+        section:AddParagraph(lapcaDiv:ToText()) 
+
+        section:AddParagraph("The following information is subject to change as WCAG 3.0 is still being written, so do not take the exact values to heart. With contrast scores, instead of a hard requirement of 3:1 like WCAG 2.0, the idea is to take the score and see what thresholds the score meets based on the context, size, and weight of the text.")
+        section:AddParagraph("Note that if the color pair has a normal polarity the value will be positive, and if the polarity was reversed the score will be negative. But for the next step of testing the score for pass/fail purposes you will ignore the sign on the score and just consider the absolute value.")
+        section:AddParagraph("Here are some example thresholds to keep in mind for the final contrast score (<i>L<sub>C</sub></i>):")
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        standards:AddListItem("<i>L<sub>C</sub></i> 90 - Preferred level for fluent text and columns of body text with a font no smaller than 14px/weight 400.")
+        standards:AddListItem("<i>L<sub>C</sub></i> 75 - The minimum level for columns of body text with a font no smaller than 18px/400. Consider <i>L<sub>C</sub></i> 75 as a minimum for text where readability is important.")
+        standards:AddListItem("<i>L<sub>C</sub></i> 60 - The minimum level recommended for content text that is not body, column, or block text. In other words, text you want people to read. The minimums: 24px normal weight (400) or 16px/700 (bold).")
+        standards:AddListItem("<i>L<sub>C</sub></i> 45 - The minimum for larger, heavier text (36px normal weight or 24px bold) such as headlines. This is also the minimum for pictograms with fine details.")
+        standards:AddListItem("<i>L<sub>C</sub></i> 30 - The absolute minimum for any text not listed above. This includes placeholder text and disabled element text. This is also the minimum for large/solid semantic & understandable non-text elements.")
+        standards:AddListItem("<i>L<sub>C</sub></i> 15 - The absolute minimum for any non-text that needs to be discernible and differentiable, and is no less than 5px in its smallest dimension. This may include disabled large buttons. Designers should treat anything below this level as invisible. Less than <i>L<sub>C</sub></i> 15 will not be visible for many users. Avoid less than <i>L<sub>C</sub></i> 30 for anything important for the use, understanding, or interaction of the site.")
+        section:Add(standards)
+
+        section:AddParagraph("With the score there are either ranges that are acceptable based on context and there are also lookup tables to use based on the font size and font weight being used. Here is an example of a lookup table:")
+        WebTable apcaTable = LoadWebTable("APCA Font to Contrast Table", "/html/media/Accessibility/LuminanceAndColorContrast/APCATable.csv")
+        section:Add(apcaTable)
+        section:AddParagraph("For this table if there is B next to the score that means that value is appropriate for body text at the given score. The +15 represents a safety buffer. So if the cell is 45+15 that means the 45 is the minimum but 60 would be the preferred to account for other variations. An Ø means there is no contrast score where that pair would be distinguishable.")
+        section:AddParagraph("For APCA instead of giving a contrast requirement as a ratio the context of the text and its size and weight is factored in rather than a hard cutoff at one specific size like in WCAG. This is one of the ways that APCA aims to better represent human perception over the traditional method.")
+
+        AddHeading(section, "Example", 4)
+        section:AddParagraph("Now you will walk through a real example using the same colors from earlier, <strong style="+dq+"color: royalblue;"+dq+">royal blue</strong> text with RGB values (65, 105, 225) on a white background (255, 255, 255) which has a screen luminance of 1.0. You will compare how the contrast is calculated using the older WCAG 2.0 method versus the new WCAG 3.0 APCA method. You will see just how much more nuanced and accurate APCA is when it comes to modeling human visual perception—especially for color and brightness!")
+        section:AddParagraph("To follow the APCA exact screen luminance method, you will first convert the sRGB values to linear light using a gamma correction step based on a threshold of 0.04045. However, you can use the estimated screen luminance method if you wish. Then you will determine contrast polarity and raw contrast, apply perceptual modeling, and finally scale it into a meaningful contrast score.")
+        section:AddParagraph("Before you calculate exact screen luminance, you need to normalize and linearize the 8-bit RGB values. This accounts for gamma correction, since human vision doesn’t perceive brightness linearly.")
+        
+        Division srgbDivAPCA
+        AddMath(srgbDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_sRGB.xml")
+        section:AddParagraph(srgbDivAPCA:ToText())  
+        section:AddParagraph("You can see that each of the normalized sRGB values is greater than the linearization threshold of 0.04045 so R, G, and B are calculated as:")
+        Division rgbDivAPCA
+        AddMath(rgbDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_RGB.xml")
+        section:AddParagraph(rgbDivAPCA:ToText())  
+        section:AddParagraph("You may have noticed that up to this point in the example, the values are essentially the same as in the earlier luminance example. In fact, for this color combination, if you chose the estimated screen luminance method you would get a result of about 0.167, which is the same result as the exact method.")
+        Division yDivAPCA
+        AddMath(yDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_ScreenLuminance.xml")
+        section:AddParagraph(yDivAPCA:ToText()) 
+        section:AddParagraph("Now you can move on to the next steps of APCA. First, you will need to clamp the dark shades. The text luminance (0.167) and the background luminance (1.0) are both above the threshold of 0.022, which means they do not require clamping. Therefore, you can now evaluate the polarity and compute the raw contrast signal for the two luminances. To do this, first check if the absolute value of the difference is above the perceptual input threshold of 0.0005. It is, so now you can check the polarity; remember if the luminance of the background is greater than the luminance of the text, it is considered normal polarity:")
+        section:AddParagraph("Because it has normal polarity, the raw contrast signal (<i>S</i>) is computed as:")
+        Division sDivAPCA
+        AddMath(sDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_RawContrastSignal.xml")
+        section:AddParagraph(sDivAPCA:ToText()) 
+        section:AddParagraph("Next, you will scale the raw signal to get a contrast score:")       
+        Division cDivAPCA
+        AddMath(cDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_ContrastScore.xml")
+        section:AddParagraph(cDivAPCA:ToText()) 
+        section:AddParagraph("Now, you want to reduce the values that are not perceptible to the human eye by applying the offset. First you must check that your contrast score (<i>C</i>) is greater than the perceptual output threshold of 0.1, then you can apply the offset according to the polarity. You will notice that for this color combination, <i>C</i> is positive (normal polarity) so the <i>S<sub>apc</sub></i> is computed as:")
+        Division sapcDivAPCA
+        AddMath(sapcDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_AbsolutePercievedContrast.xml")
+        section:AddParagraph(sapcDivAPCA:ToText()) 
+        section:AddParagraph("Finally, multiply your Scaled Absolute Perceptual Contrast (<i>S<sub>apc</sub></i>) by 100 to get the final contrast score:")
+        Division lcDivAPCA
+        AddMath(lcDivAPCA, "/html/media/Accessibility/LuminanceAndColorContrast/APCAExample_FinalScore.xml")
+        section:AddParagraph(lcDivAPCA:ToText()) 
+
+        AddHeading(section, "Citations", 3)
+        OrderedList citations
+        citations:AddClassAttribute("list-decimal list-outside pl-8")
+        citations:AddListItem("IEC 61966-2-1 Multimedia systems and equipment - Colour measurement and management - Part 2-1: Colour management - Default RGB colour space - sRGB. International Electrotechnical Commission https://webstore.iec.ch/en/publication/6169")
+        citations:AddListItem("Accessible Perceptual Contrast Algorithm SAPC-APCA. Myndex Technologies https://github.com/Myndex/SAPC-APCA")
+        citations:AddListItem("Thomas Norton, David Corliss, James Bailey (2020). The Psychophysical Measurement of Visual Function. 1st edition. Butterworth-Heinemann. Pages 29-30")
+        section:Add(citations)
+
+        return section
+    end
+   
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("Now that you have seen how color contrast is calculated you will by hand find the contrast ratio between various sets of two colors.")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("For each of the color pairs below you will work out the contrast using Relative Luminance and get a Contrast Ratio as described by WCAG 2.2. And then you will also for that same color pair find the contrast score using the APCA method.")
+        section:AddParagraph("<strong>DO NOT PLUG THESE PAIRS INTO A COLOR CONTRAST CALCULATOR.</strong>")
+        section:AddParagraph("Doing these by hand will allow better understanding of how these equations work and how colors are evaluated. Now that does not mean all the way by hand you can still use a normal calculator for your math.")
+        section:AddParagraph("After you get a contrast ratio using the WCAG 2.2 method check if that ratio meets the requirements as set by WCAG 2.2. For the APCA contrast score check what threshold the score meets and find what the appropriate size and font weight would be for the score if there is one.")
+        section:AddParagraph("The color pairs are given as foreground first and background second:")
+        OrderedList colorsList
+        colorsList:AddClassAttribute("list-decimal list-outside pl-8")
+        colorsList:AddListItem("(0, 0, 0) – (255,255,255)")
+        colorsList:AddListItem("(255,255,255) – (0,0,0)")
+        colorsList:AddListItem("(119,119,119) – (255,255,255)")
+        colorsList:AddListItem("(0,120, 215) – (255,255,255)")
+        colorsList:AddListItem("(0,128,0) – (255,255,255)")
+        colorsList:AddListItem("(255,20,147) – (255,255,255)")
+        colorsList:AddListItem("(0,255, 255) – (0,0,0)")
+        colorsList:AddListItem("(255, 215, 0) – (0,0, 128)")
+        colorsList:AddListItem("(199,21,133) – (230,230,250)")
+        colorsList:AddListItem("(0,255, 127) – (25,25,112)")
+        colorsList:AddListItem("(255,165, 0) – (255,255,255)")
+        colorsList:AddListItem("(127, 255, 0) – (0,0,0)")
+        colorsList:AddListItem("(30,144,255) – (255,255,255)")
+        colorsList:AddListItem("(50, 205, 50) – (255,250,250)")
+        colorsList:AddListItem("(218, 112, 214)– (0,0,0)")
+        section:Add(colorsList)
+                   
+        return section
+    end
+   
+    action AddWrapup returns Section
+        Section section
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("This lesson explored how luminance is calculated and how that relates to contrast ratio. This lesson also goes further and explores the APCA method of calculating contrast and how that takes a different approach. Understanding how these methods work gives insight on how color affects your perception of different types of content. Getting contrast right helps make better and more accessible design choices and creates better content for as many people as possible.")
+        return section
+    end
+    
+    
+    action GetMetaDescription returns text
+        return "Learn about luminance, color contrast, and how the rules will change for WCAG 3.0"
+    end
+
+    action GetSummaryName returns text
+        return "Learn about ways to check evaluate website accessibility criteria online"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Luminance and Color Contrast"
+    end
+
+    action GetShortDescription returns text
+        return "how to calculate luminance and color contrast in order to adhere to color rules in WCAG"
+    end
+
+    action GetLinkName returns text
+        return "Luminance and Color Contrast"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/accessibility/luminanceandcolorcontrast.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Technical Accessibility"
+    end
+end
+

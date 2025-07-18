@@ -1,0 +1,341 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Italic
+use Libraries.Containers.Array
+use Libraries.Web.Page.Image
+
+class PettingZooHero1 is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter 
+
+    action Setup
+        LineBreak break 
+        
+        SetWebPageTitle("Puzzles, Variables, and Loops - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2 ")
+        AddHeading(headDiv, "Puzzles, Variables, and Loops", 1)
+
+        headDiv:AddParagraph("Make a puzzle. Make it fun.")
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+bodyDiv:Add(AddWrapup())
+
+        Section nextSection
+        WriteNextTutorial(nextSection)
+        bodyDiv:Add(nextSection)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+    action AddOverview returns Section
+        Section sectionOverview
+        sectionOverview:SetClassAttribute("flex flex-col gap-y-2")
+
+        AddHeading(sectionOverview, "Overview", 2)
+        sectionOverview:AddParagraph("When writing programs, you give the computer a set of instructions to perform. As part of these instructions, you can give it specific data, called variables, at each step. When you hear the term variables, you might relate this topic to saving information. Your computer might save items you download, data you are keeping track of, or information about how you login to a website. In this lesson, you will learn about two core concepts in programming that you will use for your game: variables and loops. Notably, you will learn about the integer type and how to make the computer repeat itself. You will use these concepts in a turn-based puzzle game called Petting Zoo Hero.")
+        
+AddHeading(sectionOverview, "Goals", 3)
+        sectionOverview:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goalList
+        goalList:AddClassAttribute("list-disc list-outside pl-8")
+        goalList:AddListItem("Learn how to store information in integers")
+        goalList:AddListItem("Use operators to modify variables")
+        goalList:AddListItem("Learn about loops")
+        sectionOverview:Add(goalList)
+        return sectionOverview
+    end
+    
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Games can become very large. You might have played a game with a vast virtual world with many characters and creatures. Developers do some of this creation by hand, but offload what they can to the computer. What parts of game creation do you think can be automated through concepts like repetition and what parts do you think a human would need to do by hand?")
+        
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words: ")
+        WebTable vocabTable = LoadWebTable("Vocabulary", "/html/media/GamesLessons/Grid/Vocabulary.csv")
+        section:Add(vocabTable)
+
+        AddHeading(section, "Code", 3)
+        section:AddParagraph("You will be using the following new pieces of code: ")
+WebTable codeTable = LoadWebTable("New Code to Learn", "/html/media/GamesLessons/Grid/Code.csv")
+        section:Add(codeTable)
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph cstaPara
+        cstaPara:AddText("This lesson covers the following ")
+        Link linkStandards = cstaPara:AddLink("standards", "https://csteachers.org/k12standards/interactive/")
+        cstaPara:AddText(":")
+        linkStandards:SetTarget(linkStandards:newTab)
+        section:Add(cstaPara)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+standards:AddListItem("<strong>2-AP-11</strong>: Create clearly named variables that
+represent different data types and perform operations on their values.")
+standards:AddListItem("<strong>3A-DA-09</strong>: Translate between different bit
+representations of real-world phenomena, such as
+characters, numbers, and images. ")
+standards:AddListItem("<strong>3A-DA-10</strong>: Evaluate the tradeoffs in how data
+elements are organized and where data is stored. ")
+        standards:AddListItem("<strong>3A-DA-11</strong>: Create interactive data visualizations using
+software tools to help others better understand real-world phenomena. ")
+standards:AddListItem("<strong>3A-DA-12</strong>: Create computational models that
+represent the relationships among different elements of
+data collected from a phenomenon or process. ")
+        section:Add(standards)
+        return section
+    end
+    
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+
+        section:AddParagraph("In this lesson, you will learn about several programming techniques that will make building games easier. As part of this, you will also explore a new game.")
+        
+AddHeading(section, "Petting Zoo Hero", 3)
+section:AddParagraph("For this lesson, you will learn about a second game called 
+Petting Zoo Hero. The game can be obtained from the 
+<a href='https://github.com/qorf/PettingZooHero'>Github repository for Petting Zoo Hero</a>
+in the same way as Sky Hopper. This is a puzzle game where you imagine that 
+animals are escaping the zoo. The only way to stop them is to throw them 
+delicious treats that satiate their insatiable hunger.")
+section:AddParagraph("Once you have the game, you can observe the new code in the Main.quorum file. The code is as follows:")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"use Templates.PettingZooHero.all
+
+Application myGame
+Level level1
+level1:AddSheep(2, 3)
+
+myGame:AddLevel(level1)
+myGame:Run()"))
+        
+section:AddParagraph("The code for this game looks similar to Sky Hopper in some ways. Like Sky Hopper, it contains an Application and uses Levels. As you will see, however, the Application and Levels in Petting Zoo Hero are not the same. If you look at them with the Advice pane, you will see different actions are available to them than in the previous game. This is because the first line of code, use Templates.PettingZooHero.all, loads different background code than Sky Hopper does. This situation is common in computer science, where the same name can be reused in different apps in different ways.")
+section:AddParagraph("If you run the game, you will see it looks very different from Sky Hopper.")
+        
+Image zooDefaultImage = section:AddImage("/media/GamesLessons/Grid/PettingZooHeroDefault.png","This image shows Petting Zoo Hero. There is a sheep, a truck ready to throw treats, a hitpoint monitor, and a budget monitor. An apple can be thrown in this version.")
+        zooDefaultImage:AddText("This image shows Petting Zoo Hero. There is a sheep, a truck ready to throw treats, a hitpoint monitor, and a budget monitor. An apple can be thrown in this version.")
+        zooDefaultImage:AddAttribute("data-zoom","")
+        
+AddHeading(section, "How to Play", 3)
+section:AddParagraph("In Petting Zoo Hero, you are the last line of defense between the town and a series of hungry, escaping animals. Animals appear at the top of a grid and move toward the bottom. You must feed them treats to fill their bellies and calm them down before they can escape. Whether you will simply lose your job or something more ominous is yours to decide.")
+section:AddParagraph("The game is made up of several sections: the animal grid in the center, the player row just below the grid, the status area beneath that, and the player stats and treat options at the bottom. If you are playing with a keyboard, you can use Tab and the up/down arrows to move between regions. Players using a screen reader or other accessibility technologies will get information and extra directions for the keyboard in each area.")
+section:AddParagraph("The player is the pick-up truck in a row below the grid. If you are playing with a mouse, you can click on the cells of the player row to move the truck there. If you are playing with the keyboard, you can move the truck while it is selected by using the left and right arrows.")
+section:AddParagraph("Below the player row is a status area that gives information about game elements, and a GO! button to throw a treat. The available treats are shown in a row at the bottom of the screen. In the starting game, there is only one available treat: apples.")
+section:AddParagraph("In the bottom right corner, the budget bar shows how much money you have for treats. Apples are free, but other treats you will add later have a cost to use. In the bottom left corner, the red bar shows your HP. Whenever an animal escapes, this goes down, and if it hits 0, you lose the level.")
+        
+        
+AddHeading(section, "Real-Time and Turn-Based Games", 3)
+section:AddParagraph("Although parts of the code for Sky Hopper and Petting Zoo Hero are similar, the games themselves are very different. One of the core differences is the timing in gameplay. Sky Hopper is what is known as a real-time game. The player actively controls the character and the game immediately reacts. The game does not wait for the player, but is always moving. For example, gravity is always pulling the player, whether the player is acting or not.")
+section:AddParagraph("Petting Zoo Hero is a turn-based game. Like a board game, the players (or in this case, the player and the computer) take turns doing things in the game. The player can take as much time as they want to figure out their next move, and the computer will wait patiently. ")
+section:AddParagraph("Because of this difference, the two games play very differently, and they test different skills. A real-time game is often a test of reflexes and quick thinking. Making the game fun is about presenting obstacles and challenges that will make the player think on their feet and react. Meanwhile, turn-based games are more like puzzles. The player has all the time in the world to make their decisions, so the fun comes from finding the right decisions to make. ")
+section:AddParagraph("This also means the games might appeal to different players for different reasons. One player might enjoy turn-based games because they have time to stop and think, while another player might dislike them because they feel they are slow.")
+section:AddParagraph("These differences also have big impacts on accessibility. In order to make a real-time game accessible, information must be presented quickly enough it can be reacted to. For a turn-based game, the player has more time to consider the information. That does not mean that the turn-based game is automatically more accessible, though. A good puzzle might need lots of pieces, which might be harder to navigate or understand. Exactly what accessibility means for games is sometimes not entirely obvious. If the game is too easy then you have an I win button. If it is too hard, this may not be fun either.")
+        
+        
+        
+AddHeading(section, "Grid Coordinates", 3)
+section:AddParagraph("One other big difference between the two games is the coordinate systems they use. In Sky Hopper, the game code relied on pixel coordinates, where distances in the game matched distances on your monitor. Petting Zoo Hero, on the other hand, uses grid coordinates.")
+section:AddParagraph("Grid coordinates are a system where positions map to cells of a grid. Grid coordinates are measured from the bottom left corner, just like pixel coordinates. Importantly, in computer science, items are often zero-indexed, a fancy way of saying that counting begins at 0, not at 1. That means the first cell in a row or column is at position 0.")
+        
+Image gridExplainImage = section:AddImage("/media/GamesLessons/Grid/GridExplain.png","This image shows the grid coordinates of the default game. For a 5x5 grid, the cells are at positions 0 through 4 on the x-axis and y-axis. This also shows a sheep 2, 3. Baahhhh.")
+        gridExplainImage:AddText("This image shows the grid coordinates of the default game. For a 5x5 grid, the cells are at positions 0 through 4 on the x-axis and y-axis. This also shows a sheep 2, 3. Baahhhh.")
+        gridExplainImage:AddAttribute("data-zoom","")
+        
+section:AddParagraph("The image above shows the grid coordinates of the default game. For a 5x5 grid, the cells are at positions 0 through 4 on the x-axis and y-axis. For example, the sheep in this image is located at position 2, 3.")
+section:AddParagraph("In Petting Zoo Hero, the default grid is 5 cells tall and 5 cells wide, but you can change that for your own games. For example, this code will set the grid to be 10x10:")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"level1:SetGridSize(10, 10)"))
+        
+AddHeading(section, "Variables", 3)
+section:AddParagraph("Computer games often have to store information. They might need to know the stats for an item, or health and magic bars in a game. To do this, you need a new concept called variables. ")
+section:AddParagraph("A variable is a container for information. You can think of it like a box. The box has a label on it that describes what can go inside. The box also has a name written on it, so you can tell different boxes apart. This name works kind of like a shape, where not all shapes can fit in all boxes.")
+section:AddParagraph("In the Basic category of the Blocks pane, there are several blocks for variables. To start, think about one:")
+        
+Image blockIntegerImage = section:AddImage("/media/GamesLessons/Grid/Block.png","This is a block for integer a = 0")
+        blockIntegerImage:AddText("This is a block for integer a = 0")
+        blockIntegerImage:AddAttribute("data-zoom","")
+        
+        
+section:AddParagraph("The above is exactly, mathematically, identical to the line of code:")
+section:Add(preformatter:GeneratePreformattedCode(
+"integer a = 0"))
+section:AddParagraph("From left to right, the code and the block represent the type, the name, and the value. While you can memorize what each of these fields are, the blocks can also remind you what each piece is. To get these values, you can press tab to move the cursor inside one of the fields. Alternatively, you can use the mouse and click inside. When you do so, the visuals of the blocks change:")
+        
+Image blockIntegerExpandedImage = section:AddImage("/media/GamesLessons/Grid/BlockExpanded.png","This is a block for integer a = 0. This time, however, the block is visually expanded to show the type, name, and value attributes.")
+        blockIntegerExpandedImage:AddText("This is a block for integer a = 0. This time, however, the block is visually expanded to show the type, name, and value attributes.")
+        blockIntegerExpandedImage:AddAttribute("data-zoom","")
+        
+section:AddParagraph("To describe in more detail, the block creates a variable that has four parts. The first box reads integer, which describes the type of information that can be stored in the variable. The second box reads a, which is the variable’s name. After the second box is an equal sign, which indicates assignment (a fancy term for putting something in the variable box). The last box reads 0, which is the value of the variable, or in other words, the data being put in the box. For screen reader users, note that this type, name, value terminology is embedded into the screen reader cues, but varies slightly depending on platform and which screen reader is used. In the image above it is also displayed, which only occurs if the cursor is in a field and not the block. Integers are whole numbers without a decimal point. ")
+        
+        
+        
+AddHeading(section, "Integer Operators", 3)
+section:AddParagraph("While programming, you often need to use math to run calculations. Fortunately, the operators typically taught in school are largely very similar to what programming languages do. The kind of operators you can use, and what they do depends on the data type. ")
+section:AddParagraph("The operators described here all work in the same way. One value is placed on the left, another on the right, and an operator is placed in the middle. For integers, consider that 1 + 2 is a mathematical expression with the plus operator placed between the integers 1 and 2. The expression calculates how you might expect, with an answer of 3.")
+section:AddParagraph("For <strong>integers</strong>, you can use the five basic operations of math: addition (+), subtraction (-), multiplication (*), division (/). Integers also have modulus (mod), which calculates the remainder after integer division.")
+section:AddParagraph("In the problems for this lesson, you will do operations like changing the values of your integer variables or making math expressions in each using operators to calculate a new value. It might be as follows:")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"integer wholeNumber = 7 + 5
+number decimalNumber = 10.0 / 4.0"))
+        
+section:AddParagraph("Perhaps the trickiest detail to understand about integers and numbers is how they manage their answers. With integer values, since they do not have decimal points, an equation like 5 / 4 would have a result of 1, not 1.25, and a remainder (called mod) of 1. This might sound like a mistake, but being able to obtain the number of times the divisor goes into the numerator is important in computer science for many kinds of apps. Chopping off the end of the value here is sometimes called truncating. Another word for the same idea is taking the floor.")
+        
+AddHeading(section, "Loops", 3)
+section:AddParagraph("When making programs, you often want to run code multiple times. Sometimes it is more convenient to run the same code over and over again instead of writing out duplicate code by hand. In other cases, you do not know ahead of time how many times the code will need to run. This can be used for a seemingly endless, pun intended, number of reasons, like counting, adding, or other operations. For example, in Petting Zoo Hero, you might find that manually adding animals to many cells in the grid quickly gets tedious – the ability to run code repeatedly could make this faster and easier. ")
+section:AddParagraph("In computer science, there are many ways to accomplish this, and programming languages vary in how they describe it. In Quorum specifically, the word repeat is used to imply the concept in the computer of doing something over and over again. While the exact terms vary across the discipline, sometimes these structures are known as loops.")
+section:AddParagraph("A <strong>loop</strong> is a section of code with a condition attached to it. That condition is usually either a number of times to run, such as 'do this code 10 times,' or it is a boolean value. If the condition is true, then the loop keeps going. If it is not, then the loop stops.")
+        
+        
+Image flowchart = section:AddImage("/media/Blocks/Loops/LoopFlowchart.png", "A flowchart showing how loops work. It begins at the Start Loop step, goes to Initialize Expression, and then to Test Condition. Here, it has two branches: the first is IF TEST = TRUE. This branch goes to Execute Action, then ncrement, then returns to Test Condition. The second branch is IF TEST = FALSE, which goes to Stop Loop.")
+flowchart:AddText("A flowchart showing how loops work. It begins at the Start Loop step, goes to Initialize Expression, and then to Test Condition. Here, it has two branches: the first is IF TEST = TRUE. This branch goes to Execute Action, then ncrement, then returns to Test Condition. The second branch is IF TEST = FALSE, which goes to Stop Loop.")
+        flowchart:AddAttribute("data-zoom","")
+        
+AddHeading(section, "Repeat Times Loops", 3)
+section:AddParagraph("Besides taking up more than one line, one important 
+part of loops is that other blocks can go inside of them, between the 
+first and the last line. The image below shows an example of a 
+<strong>repeat times</strong> block with an output block inside of it. 
+In computer science, this is often called a <strong>scope</strong>. 
+The basic idea is that things inside of a scope only 
+execute under certain conditions. Consider what these three 
+lines of code do.")
+section:AddParagraph("Repeat blocks are a little different from the other kinds of blocks you have used so far. Previously, each block you have used has been a single line of code. These blocks have two parts on two different lines. In this case, the statement that says output places something on the screen and you can use this for debugging.")
+        
+Image repeatTimesImage = section:AddImage("/media/GamesLessons/Grid/RepeatTimes.png", "repeat 2 times
+     output &quot;Hello, World!&quot;
+end")
+repeatTimesImage:AddText("repeat 2 times
+     output &quot;Hello, World!&quot;
+end")
+        repeatTimesImage:AddAttribute("data-zoom","")
+        
+section:AddParagraph("The repeat times block is the simplest, but least flexible, of the loops. While the word block is being used here, remember that every part of a block is actually just a line of code. So this is three lines of code. Blocks like this will run any code inside of it as many times as requested. In the program above, for example, the block will run its code two times. This means that the output block will run twice and thus put words on the screen twice.")
+section:AddParagraph("In contrast, the repeat while block does not run a fixed number of times. Instead, it checks a boolean condition. If the condition is true, it runs the code. The example below shows some code using a repeat while block.")
+        
+        
+Image repeatWhileImage = section:AddImage("/media/GamesLessons/Grid/RepeatWhile.png", "integer value = 1
+repeat while value < 3
+    value = value + 1
+end
+output value")
+repeatTimesImage:AddText("integer value = 1
+repeat while value < 3
+    value = value + 1
+end
+output value")
+        repeatTimesImage:AddAttribute("data-zoom","")
+        
+section:AddParagraph("In this example, you start with a variable called value that starts at 1. When the code reaches the repeat while block, it checks the condition. Because 1 is less than 3, the code executes, and increases the value by 1. Then it checks the condition again. Since 2 is still less than 3, it runs again, and the value increases by 1 up to 3. When it checks the condition this time, 3 is not less than 3, so it stops. It then outputs the value, which is 3.")
+section:AddParagraph("This strategy, where a loop is used to increment a value, is useful for lots of applications. One such application is in Petting Zoo Hero, where you can use it to fill in large areas of the grid with animals. Consider this modified level of Petting Zoo Hero:")
+        
+section:Add(preformatter:GeneratePreformattedCode(
+"use Templates.PettingZooHero.all
+
+Application myGame
+Level level1
+
+integer width = 10
+level1:SetGridWidth(width)
+integer x = 0
+repeat while x < width
+    level1:AddSheep(x, 4)
+    x = x + 1
+end
+
+myGame:AddLevel(level1)
+myGame:Run()
+"))
+        
+section:AddParagraph("In this example, two variables are used: width and x. The width variable is used to control how wide the grid is, and is used as part of the condition for the loop. The x variable is used to track an x coordinate in the grid. In this example, the loop will run a total of 10 times. The first time, it will add a sheep at the coordinates 0, 4. Then the value of the x variable is increased by 1, and on the next loop, it will add a sheep at 1, 4. This continues until the whole row is filled.")
+        
+        return section
+    end
+    
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+
+        section:AddParagraph("In the previous lessons, you had the opportunity to explore Sky Hopper. Now, you will have the chance to examine a different game and to practice new programming skills. During this time, you will consider how to design a turn-based game like a puzzle. Consider how to manage the level of difficulty in your puzzle. For example, your grid could hypothetically have an animal on each space, but this would be too hard. In contrast, a grid with no animals on it would make the player automatically win. Spend time designing your levels, focusing on trying to make interesting and fun puzzles to try and defeat.")
+
+        AddHeading(section, "Directions", 3)
+        section:AddParagraph("To begin, open the Petting Zoo Hero game, and explore the available actions in the Advice pane. Your goal is to create puzzles using the mechanics of the game, but first you need to identify what the game can do.")
+        
+section:AddParagraph("Using the Advice pane and by testing things in the game, try to answer these questions:")
+OrderedList steps
+        steps:AddClassAttribute("list-disc list-outside pl-8")
+        steps:AddListItem("What other kinds of animals, besides sheep, can be added to the game?")
+steps:AddListItem("How do the different kinds of animals behave in the game?")
+steps:AddListItem("What kind of treats can be added to the levels?")
+steps:AddListItem("What other properties can be adjusted in the levels?")
+        section:Add(steps)
+        
+section:AddParagraph("Once you have explored some of these, try adding many animals to the game at once using a loop. As you try each of these, keep in mind anything you find interesting and try to plan ahead for future puzzles and levels.")
+        
+        return section
+    end
+    
+    action AddWrapup returns Section
+        Section section
+AddHeading(section, "Wrap up", 3)
+        section:AddParagraph("Puzzle games have a very different feel than platformer games. Both can be fun, but in a different way. With puzzle games, consider what you think you need to do in your levels to make the game as fun to other players as possible?")
+        return section
+    end
+    
+    
+action GetMetaDescription returns text
+        return "Puzzles, Variables, and Loops"
+    end
+
+    action GetSummaryName returns text
+        return "Puzzles, Variables, and Loops"
+    end
+
+    action GetImageLocation returns text
+        return "/media/gettingStarted.png"
+    end
+
+    action GetName returns text
+        return "Puzzles, Variables, and Loops"
+    end
+
+    action GetShortDescription returns text
+        return "how to create your own puzzle game with integers and loops"
+    end
+
+    action GetLinkName returns text
+        return "Puzzles, Variables, and Loops"
+    end
+
+    action GetLocation returns text
+        if GetNewLocation() not= ""
+          return GetNewLocation()
+        end
+        return "tutorials/GameTemplates/PettingZooHero1.html"
+    end
+
+    action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Puzzles, Variables, and Loops"
+    end
+end

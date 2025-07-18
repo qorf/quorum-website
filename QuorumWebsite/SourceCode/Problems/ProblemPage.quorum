@@ -1,0 +1,400 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.System.File
+use Libraries.Web.Problem
+use Libraries.Web.Problems
+use Libraries.Containers.Iterator
+
+class ProblemPage is Lesson
+text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    integer ACTIVITY = 0
+    text ACTIVITY_NAME = ""
+    text paletteFileName = ""
+    text codeForBlocks = ""
+
+    Preformatter preformatter
+    Problem problem = undefined
+ //helper
+    text answerElement = "answerElement"
+text hasAnswerElement = "hasAnswerElement"
+    text hintElement = "hintElement"
+    
+action Setup
+        //html header stuff
+        SetWebPageTitle("Learn Quorum - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //Main Region
+        ImageHeader blueSection = makeBlueHeader()
+        Add(blueSection)
+
+        Stepper stepper = MakeStepper()
+        
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        //leftDiv:SetClassAttribute("hidden")
+        rightDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 pl-5% lg:pl-5%")
+
+        
+        text stepperLabel = "Problems"
+        if problem not= undefined
+            Problems problems = problem:GetProblems()
+            text title = problems:GetTitle()
+            text firstChar = title:GetSubtext(0,1)
+            firstChar = firstChar:ToUpperCase()
+            title = firstChar + title:GetSubtext(1)
+            stepperLabel = title + " Problems"
+        end
+Heading trackHeader
+        trackHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        trackHeader:SetScale(2)
+        trackHeader:AddText(stepperLabel)
+        bodyDiv:Add(trackHeader)
+        
+        Section buttonsSection = MakeButtonsSection()
+        
+bodyDiv:Add(stepper)
+        Section problemSection = MakeProblemSection()
+        bodyDiv:Add(problemSection)
+        Division hint = MakeHint()
+        bodyDiv:Add(hint)
+bodyDiv:Add(buttonsSection)
+        Division answer = MakeAnswer()
+        bodyDiv:Add(answer)
+Division hasAnswer = MakeHasAnswer()
+        bodyDiv:Add(hasAnswer)
+leftDiv:Add(CreateHeadingTableOfContents())
+    end
+    
+action CreateLinkedArrays returns Array<Lesson>
+        DefaultTableOfContents toc
+        return toc:GetTableOfContents()
+end    
+    
+action MakeHasAnswer returns Division
+        Division division
+        division:SetIdentifier(hasAnswerElement)
+        division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        Array<text> answers = problem:GetAnswer()
+        if answers:IsEmpty()
+            division:AddText("false")
+        else
+division:AddText("true")
+        end
+        
+        return division
+    end
+    
+    action MakeHint returns Division
+        Division division
+division:SetIdentifier(hintElement)
+division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        division:AddAttribute("tabindex","0")
+        
+        Division heading
+heading:SetClassAttribute("overflow-hidden rounded-t-lg bg-quorum-blue-150 px-6 py-2 font-bold text-neutral-white")
+        heading:AddHeading("Hint", 2)
+        division:Add(heading)
+        
+        
+Division hintDivision
+        Paragraph right = hintDivision:AddParagraph("<strong>Great job!</strong>")
+        right:SetIdentifier("rightAnswerElement")
+right:SetStyle("display: none;")
+        right:AddAttribute("aria-disabled", "true")
+        
+        Paragraph wrong = hintDivision:AddParagraph("<strong>Try again</strong>")
+wrong:SetIdentifier("wrongAnswerElement")
+wrong:SetStyle("display: none;")
+        wrong:AddAttribute("aria-disabled", "true")
+        
+        hintDivision:SetClassAttribute("rounded-b-lg bg-neutral-white px-6 py-2")
+text hint = problem:GetHint()
+        Paragraph hintParagraph = hintDivision:AddParagraph(hint)
+        
+        division:Add(hintDivision)
+        return division
+    end
+    
+    action MakeAnswer returns Division
+        Division division
+        division:SetIdentifier(answerElement)
+        division:SetStyle("display: none;")
+        division:AddAttribute("aria-disabled", "true")
+        Array<text> answers = problem:GetAnswer()
+        i = 0
+        repeat while i < answers:GetSize()
+            text answer = answers:Get(i)
+            answer = answer + answer:GetLineFeed()
+division:AddText(answer)
+            i = i + 1
+        end
+        return division
+    end
+    
+    action MakeStepper returns Stepper
+        Stepper stepper
+integer index = problem:GetIndex()
+        stepper:SetSelected(index)
+        
+        Problems problems = problem:GetProblems()
+        i = 0
+        Iterator<Problem> iterator = problems:GetProblemIterator()
+        repeat while iterator:HasNext()
+            Problem problem = iterator:Next()
+            stepper:AddStepperLink(problem:GetId(), i, problem:GetId() + ".html")
+            i = i + 1
+        end
+        
+                stepper:Setup()
+return stepper
+    end
+    
+    action MakeButtonsSection returns Section
+        Section section
+        section:SetClassAttribute("flex justify-between items-center w-full p-4")
+if problem = undefined
+            return section
+        end
+        text tailwind = "py-2.5 px-4 text-center rounded-2xl w-36 text-sm font-bold bg-quorum-blue-50 aria-disabled:bg-neutral-grey-25 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
+        
+        Link previousButton
+        previousButton:SetClassAttribute(tailwind)
+        previousButton:AddText("Previous")
+        previousButton:SetAddress("")
+        Problem prevProblem = problem:GetPreviousProblem()
+        if prevProblem not= undefined
+            text address = prevProblem:GetId() + ".html"
+            previousButton:SetAddress(address)
+else
+previousButton:AddAttribute("aria-disabled", "true")
+        end
+        
+Link nextButton
+                        nextButton:SetClassAttribute(tailwind)
+        nextButton:SetAddress("")
+Problem nextProblem = problem:GetNextProblem()
+        if nextProblem not= undefined
+            text address = nextProblem:GetId() + ".html"
+            nextButton:SetAddress(address)
+nextButton:AddText("Next")
+        else
+text address = "/problems.html"
+            nextButton:SetAddress(address)
+nextButton:AddText("Problems Page")
+end
+        
+        
+Button checkButton
+        checkButton:SetClassAttribute(tailwind)
+Array<text> answers = problem:GetAnswer()
+        if answers:IsEmpty()
+checkButton:AddText("Hint")
+        else
+                    checkButton:AddText("Check")
+        end
+        checkButton:SetOnClick("
+var hint = document.getElementById('hintElement');
+hint.style.display = 'block';
+hint.setAttribute('aria-disabled', 'false');
+
+const element = document.getElementById('hasAnswerElement');
+const value = element.textContent.trim().toLowerCase(); 
+
+const hasAnswer = value === 'true';
+
+var remove = 'Build Successful';
+var console = document.getElementById('QuorumUIOutput').textContent;
+if(console !== null) {
+    console = console.substring(remove.length);
+}
+var correct = document.getElementById('answerElement').textContent;
+
+var wrong = document.getElementById('wrongAnswerElement');
+var right = document.getElementById('rightAnswerElement');
+
+if(hasAnswer) {
+    if(console === correct) {
+        wrong.style.display = 'none';
+        wrong.setAttribute('aria-disabled', 'true');
+
+        right.style.display = 'block';
+        right.setAttribute('aria-disabled', 'false');
+    } else {
+        wrong.style.display = 'block';
+        wrong.setAttribute('aria-disabled', 'false');
+
+        right.style.display = 'none';
+        right.setAttribute('aria-disabled', 'true');
+    }
+}
+")
+        
+        
+        section:Add(previousButton)
+section:Add(checkButton)
+section:Add(nextButton)
+        
+        return section
+    end
+    
+action MakeProblemSection returns Section
+        Section section
+        if problem = undefined
+            return section
+        end
+        
+        text title = problem:GetTitle()
+        text description = problem:GetDescription()
+        
+        Division courseDiv
+        courseDiv:AddClassAttribute("space-y-4")
+        Heading courseHeader
+        courseHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
+        courseHeader:SetScale(2)
+        courseHeader:AddText(problem:GetTitle())
+        
+        
+Section section_instructions
+        AddHeading(section_instructions, "Instructions:", 2)
+        section_instructions:Add(GetInstructions())
+
+        Section section_activity
+        AddHeading(section_activity, "Coding:", 2)
+        BlockIDE ide = GetBlockIDE()
+        ide:Setup(me)
+        section_activity:Add(ide)
+        
+        
+        
+        courseDiv:Add(courseHeader)
+        courseDiv:AddText(description)
+courseDiv:Add(section_activity)
+        
+        section:Add(courseDiv)
+    return section
+end
+    
+    
+action GetInstructions returns Division
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+        Division instructions
+        
+text title = problem:GetTitle()
+        text description = problem:GetDescription()
+
+        instructions:AddHeading(title, 3)
+        instructions:AddParagraph(description)
+
+        return instructions
+    end
+    
+    
+action GetBlockIDE() returns BlockIDE
+        CodeForIDE code
+        text file = problem:GetMainCode()
+        // blocks only support a single file for now so call it main
+        code:AddFileUrl("Main.quorum", file)
+        
+            i = 1
+            repeat while i < problem:GetCodeSize()
+code:AddFileUrl(problem:GetCodeName(i), problem:GetCode(i))
+            i = i + 1
+            end
+        
+        BlockIDE ide
+        ide:SetNoCanvasMode(false)
+        ide:SetFillDivision(true)
+        text value = code:GetJsonArray()
+        ide:SetCodeForIDE(code:GetJsonArray())
+        text tray = problem:GetTray()
+        ide:SetPaletteFile(tray)
+        return ide
+    end
+
+
+action makeBlueHeader returns ImageHeader
+        ImageHeader header
+        text headerHeading = "Do Practice Problems in Quorum"
+        text headerText = "Learn code through small examples."
+        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
+        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
+        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
+        return header
+    end
+    
+    
+action IsLocation(text loc) returns boolean
+        Problem problem = GetProblem()
+        Problems problems = problem:GetProblems()
+        
+        Iterator<Problem> iterator = problems:GetProblemIterator()
+        repeat while iterator:HasNext()
+            Problem next = iterator:Next()
+            text link = next:GetDefaultLink()
+            if loc = link
+                return true
+            end
+        end
+        return false
+    end
+    
+    action SetPaletteFileName(text paletteFileName)
+        me:paletteFileName = paletteFileName
+    end
+    
+    action SetCodeForBlocks(text fileName)
+        me:codeForBlocks = fileName
+    end
+
+    action GetMetaDescription returns text
+        return problem:GetTitle()
+    end
+
+    action GetSummaryName returns text
+        return problem:GetTitle()
+    end
+
+    action GetImageLocation returns text
+        return ""
+    end
+
+    action GetName returns text
+        return problem:GetTitle()
+    end
+
+    action GetShortDescription returns text
+        return problem:GetDescription()
+    end
+    
+action GetSectionName returns text
+        if GetNewSectionName() not= ""
+          return GetNewSectionName()
+        end
+        return "Practice Problems"
+    end
+    
+action GetLocation returns text
+        text problemID = problem:GetProblems():GetId()
+        text id = problem:GetId()
+        return "problems/" + problemID + "/" + id + ".html"
+    end
+    
+    action GetProblem returns Problem
+        return problem
+    end
+
+    action SetProblem(Problem problem)
+        me:problem = problem
+    end
+end

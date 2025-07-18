@@ -22,6 +22,7 @@ use Libraries.Data.Database.DatabaseMetaData
 use Libraries.Containers.Iterator
 use Libraries.Data.Database.DatabaseTable
 use Libraries.Data.Database.DatabaseColumn
+use Libraries.Containers.Iterator
 
 class Fastrun is ResponsePage, NetworkRequestListener
 
@@ -88,12 +89,33 @@ class Fastrun is ResponsePage, NetworkRequestListener
         if params:HasKey("experiment_key")
             experiment_key = params:GetValue("experiment_key")
         end
-        codeToSave = code
+		codeToSave = code
+        
+		HashTable<text, text> data
+        data:Add("code", codeToSave)
+        
+        integer count = 0
+		boolean break = true
+		codeHashKey = code
+        
+		repeat while break
+            text key = "extraBuildFile" + count
+            if params:HasKey(key)
+                text extraBuildFileValue = params:GetValue(key)
+                data:Add(key, extraBuildFileValue)
+                codeHashKey = codeHashKey + extraBuildFileValue
+                count = count + 1
+            else
+                break = false
+            end
+        end
+
 
         redis:Connect("redis")
-        codeHash = exchange:HashString("SHA-1", code)
+        codeHash = exchange:HashString("SHA-1", codeHashKey)
         output "IS IT ALREADY HASHED?"
         output codeHash
+		
         if redis:Exists(codeHash)
             output "NOPE, HASH IT"
             response = redis:Get(codeHash)
@@ -111,8 +133,6 @@ class Fastrun is ResponsePage, NetworkRequestListener
         request:SetReadTimeout(10000)
         request:SetWebAddress("http://quorum_server:1269")
 
-        HashTable<text, text> data
-        data:Add("code", codeToSave)
         request:SetParameters(data)
 
         NetworkConnection http
