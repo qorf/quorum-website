@@ -74,6 +74,21 @@ function PauseBlockExecution() {
     if ((game != null)) {
         game.Exit();
     }
+	
+    /*
+	If the code makes use of ChartOptions, we'll need to preserve it here, otherwise it'll get blown away
+	and chart colors and other options won't apply.
+	
+	We have to handle this as a special case because the chart options are typically generated in the code immediately
+	before a game would be loaded, purging the shared classes.
+	*/
+	var chartOptions = global_Get_Shared_Class("Libraries.Interface.Controls.Charts.ChartOptions");
+	
     global_Empty_Shared_Classes();
+	
+	if (chartOptions != null)
+	{
+		global_Add_Shared_Class("Libraries.Interface.Controls.Charts.ChartOptions", chartOptions);
+	}
 }
 export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex}
