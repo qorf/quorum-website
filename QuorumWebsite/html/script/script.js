@@ -665,12 +665,12 @@ var blockEditorTogglePalette = function() {
   }
 }
 
+var blockEditorParentDiv = null;
 var blockEditorFullscreen = function() {
   const editorDiv = document.getElementById("BlockEditor");
   if(editorDiv.hasAttribute('style')) {
     editorDiv.removeAttribute('style');
-    const codingDiv = document.getElementById("coding:").parentNode;
-    codingDiv.append(editorDiv);
+    blockEditorParentDiv.append(editorDiv);
     const mainDiv = document.getElementById("main");
     const footerDiv = document.getElementById("footer");
     const navBar = document.getElementById("navbar");
@@ -708,6 +708,7 @@ var blockEditorFullscreen = function() {
     const minimizeIcon = document.getElementById("minimizeIcon");
     const fullscreenButton = document.getElementById("blockEditorFullscreenButton");
     const fullscreenLabel = document.getElementById("blockFullscreenLabel");
+    blockEditorParentDiv = editorDiv.parentNode;
     mainDiv.ariaHidden = true;
     mainDiv.inert = true;
     footerDiv.ariaHidden = true;
