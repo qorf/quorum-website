@@ -178,6 +178,10 @@ function logEvent(eventType, extraData = {}) {
 
 // ✅ Function to send batched logs to the server
 function flushLogs(forceSync = false) {
+    if (sessionStorage.getItem("experiment_key") != undefined && sessionStorage.getItem("experiment_key") == "quorum") {
+	console.log("Not logging.");
+	return;
+    }
     if (logQueue.length === 0) return; // ✅ Nothing to send
 
     const batchedLogs = [...logQueue]; // Copy queue contents
