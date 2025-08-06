@@ -72,6 +72,7 @@ use Libraries.Interface.Selections.TabPaneSelection
 use Libraries.Containers.HashTable
 use Libraries.Interface.Item2D
 use Libraries.Game.Layer2D
+use Libraries.Interface.Views.ControlShaderView
 
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
@@ -274,15 +275,22 @@ palettePanel:SetLayout(panelFlow)
         palettePanel:SetName("Palette Panel")
         palettePanel:SetAccessibilityCode(9)
         palettePanel:SetFocusable(false)
+ControlShaderView palettePanelView
+        palettePanelView:Initialize()
+        palettePanel:SetView2D(palettePanelView)
         
         FlowLayout flow
         editorPanel:SetLayout(flow)
 editorPanel:SetPercentageY(0)
         editorPanel:SetPercentageHeight(1)
+        editorPanel:SetPercentageOriginX(-0.01)
         editorPanel:SetHorizontalLayoutMode(editorPanel:parent:Control:FILL)
 editorPanel:SetName("Editor Panel")
 editorPanel:SetAccessibilityCode(9)
         editorPanel:SetFocusable(false)
+ControlShaderView editorPanelView
+        editorPanelView:Initialize()
+        editorPanel:SetView2D(editorPanelView)
         
         webAccess:AddHiddenHeader("paletteHeader", "Block Tray, Landmark 4 of " + landmarkCount + ", You are on the Block Tray Header, 
 swipe right to find the items in the block tray, swipe left and you will find the other menus.
@@ -369,16 +377,14 @@ paletteItem:SetNextFocus(blocksItem)
         blocksItem:SetPreviousFocus(paletteItem)
         
 blocksItem:SetTarget(GetBlockEditor())
+        blocksItem:SetPanel(editorPanel)
 paletteItem:SetTarget(GetBlockPalette())
+        paletteItem:SetPanel(palettePanel)
         
         
         editorItemLayer:Add(paletteItem)
         editorItemLayer:Add(blocksItem)
         AddLayer(0, editorItemLayer)
-    end
-    
-    action SetupEditorItemsFocus
-
     end
     
     action AddDefaultKeys
@@ -602,7 +608,7 @@ Color bgColor
         
         palettePartition:SetInputGroup("PalettePartition")
         palettePartition:SetName("Tray Pane Partition")
-        palettePartition:SetZ(-10)
+        palettePartition:SetZ(10)
         return palettePartition
     end
     
