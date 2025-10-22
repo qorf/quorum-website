@@ -1990,10 +1990,14 @@ FocusTarget() {
 this.Get_WebEditor_EditorItem__target_().Focus();
 };
 GainedFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
+if ((this.Get_WebEditor_EditorItem__panel_() != null)) {
 this.Get_WebEditor_EditorItem__panel_().UpdateBorder$quorum_boolean(true);
+}
 };
 LostFocus$quorum_Libraries_Interface_Events_FocusEvent(event) {
+if ((this.Get_WebEditor_EditorItem__panel_() != null)) {
 this.Get_WebEditor_EditorItem__panel_().UpdateBorder$quorum_boolean(false);
+}
 };
 Get_WebEditor_EditorItem__target_() {
    return this.target;
