@@ -6891,6 +6891,9 @@ GetCamera3D() {
 RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
 }
+CreateGraphicsManager() {
+     return this.Libraries_Game_Game__.CreateGraphicsManager();
+}
 RemoveAmbientLight() {
      return this.Libraries_Game_Game__.RemoveAmbientLight();
 }
