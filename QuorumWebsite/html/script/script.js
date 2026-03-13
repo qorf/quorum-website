@@ -787,6 +787,30 @@ var showBlockSettingsModal = function() {
 
 };
 
+var blockEditorMoreToggle = function (open = null) {
+  const moreButton = document.getElementById("blockEditorMoreButton");
+  const moreMenu = moreButton.ariaControlsElements[0];
+  const moreIcon = document.getElementById("moreIcon");
+  const moreIconClose = document.getElementById("upArrowIcon");
+  if (moreButton.ariaExpanded === "true" || open == true) {
+    moreMenu.style.display = "none";
+    moreIcon.style.display = "block";
+    moreIconClose.style.display = "none";
+    moreButton.ariaExpanded = "false";
+  } else if (moreButton.ariaExpanded === "false" || open == false) {
+    moreMenu.style.display = "block";
+    moreIcon.style.display = "none";
+    moreIconClose.style.display = "block";
+    moreButton.ariaExpanded = "true";
+    const firstItem = moreMenu.querySelector('button');
+    firstItem?.focus();
+  }
+};
+
+var blockEditorMoreActions = function(action) {
+  window.BLOCK_EDITOR.BlockEditorExtraActions(action);
+};
+
 //this is for testing only
 var validate = function(output) {
   var outputRegion = document.getElementById(output);

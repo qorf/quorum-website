@@ -73,6 +73,9 @@ use Libraries.Containers.HashTable
 use Libraries.Interface.Item2D
 use Libraries.Game.Layer2D
 use Libraries.Interface.Views.ControlShaderView
+use Libraries.Interface.Behaviors.Blocks.CodeEditorCutToClipboardBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorCopyToClipboardBehavior
+use Libraries.Interface.Behaviors.Blocks.CodeEditorPasteFromClipboardBehavior
 
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
@@ -807,6 +810,74 @@ palettePanel:RequestLayout()
             palettePanel:SetPixelWidth(lastWidth)
 palettePanel:RequestLayout()
             return true
+        end
+    end
+    
+    /* This action resolves the action triggered by the 'More' Menu in the editor*/
+    action TriggerExtraAction(text event)
+        if event = "freeform"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent freeformEvent
+freeformEvent:SetItem(GetFocus())
+CodeEditorFreeformEditingBehavior freeformBehavior
+                            freeformBehavior:SetForceEditing(true)
+                        freeformBehavior:Run(freeformEvent)
+                    end
+        elseif event = "pickUp"
+BehaviorEvent pickUpEvent
+                        pickUpEvent:SetItem(editor:GetSelectedBlocks():Get(0))
+                BlockPickUpBehavior pickUpBehavior
+                pickUpBehavior:Run(pickUpEvent)
+elseif event = "drop"
+if editor:IsKeyboardMovingBlocks()
+                editor:ConfirmKeyboardMovingBlocks()
+end
+elseif event = "delete"
+editor:DeleteSelectedBlock(false)
+            editor:Focus()
+elseif event = "moveUp"
+if editor:IsKeyboardMovingBlocks()
+                editor:MoveSelectionUp()
+            end
+elseif event = "moveDown"
+if editor:IsKeyboardMovingBlocks()
+                editor:MoveSelectionDown()
+            end
+elseif event = "undo"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent undoEvent
+undoEvent:SetItem(GetFocus())
+                            CodeEditorUndoBehavior undo
+                            undo:Run(undoEvent)
+                    end
+elseif event = "redo"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent redoEvent
+redoEvent:SetItem(GetFocus())
+                            CodeEditorRedoBehavior redo
+                            redo:Run(redoEvent)
+                    end
+elseif event = "cut"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent cutEvent
+cutEvent:SetItem(editor)
+                            CodeEditorCutToClipboardBehavior cut
+                            cut:Run(cutEvent)
+                    end
+elseif event = "copy"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent copyEvent
+copyEvent:SetItem(editor)
+                            CodeEditorCopyToClipboardBehavior copy
+                            copy:Run(copyEvent)
+                    end
+elseif event = "paste"
+if not editor:IsKeyboardMovingBlocks()
+                BehaviorEvent pasteEvent
+pasteEvent:SetItem(editor)
+                            CodeEditorPasteFromClipboardBehavior paste
+                            paste:Run(pasteEvent)
+                    end
         end
     end
     

@@ -22,6 +22,9 @@ function ScaleDown() {
 function TogglePalette() {
     return $starter.TogglePalette();
 }
+function BlockEditorExtraActions(event) {
+    return $starter.TriggerExtraAction$quorum_text(event);
+}
 function BlockEditorStop() {
     var manager = new quorum_Libraries_Game_GameStateManager_();
     let gameMap = plugins_quorum_Libraries_Game_GameStateManager_.registeredGames
@@ -91,4 +94,4 @@ function PauseBlockExecution() {
 		global_Add_Shared_Class("Libraries.Interface.Controls.Charts.ChartOptions", chartOptions);
 	}
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, BlockEditorExtraActions, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex}

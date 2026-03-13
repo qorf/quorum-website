@@ -119,6 +119,27 @@ fullscreenDiv:SetStyle("text-wrap: nowrap;")
         fullscreenButton:AddNestedTag(fullscreenDiv)
         fullscreenButton:SetOnClick("blockEditorFullscreen()")
         
+Button moreButton
+        moreButton:SetIdentifier("blockEditorMoreButton")
+        moreButton:SetClassAttribute(toolbarButtonStyle)
+        moreButton:AddAttribute("aria-label", "More")
+        File moreIcon
+        moreIcon:SetPath("icons/moreIcon.svg")
+        moreButton:AddText(moreIcon:Read())
+        File moreIconClose
+        moreIconClose:SetPath("icons/moreIconClose.svg")
+        moreButton:AddText(moreIconClose:Read())
+Division moreDiv
+moreDiv:SetIdentifier("blockMoreLabel")
+        moreDiv:AddClassAttribute("text-center mt-1")
+moreDiv:SetStyle("text-wrap: nowrap;")
+        moreDiv:AddText("More")
+        moreButton:AddNestedTag(moreDiv)
+        moreButton:SetOnClick("blockEditorMoreToggle()")
+        moreButton:AddAttribute("aria-haspopup","true")
+        moreButton:AddAttribute("aria-controls", "moreActionsMenu")
+        moreButton:AddAttribute("aria-expanded", "false")
+        
         Button runButton
         runButton:SetIdentifier("blockRunButton")
         runButton:SetClassAttribute("bg-quorum-blue-50 group disabled:bg-neutral-grey-50 disabled:text-neutral-white rounded-2xl px-4 py-2 w-fit h-6 text-xs font-semibold flex items-center justify-center")
@@ -148,10 +169,13 @@ stopButton:AddText(" &nbsp;Stop")
 buttonDiv:Add(zoomOutButton)
         buttonDiv:Add(helpButton)
         buttonDiv:Add(fullscreenButton)
+        buttonDiv:Add(moreButton)
+        buttonDiv:Add(AddMoreActionsMenu())
         buttonDiv:Add(runButton)
         buttonDiv:Add(stopButton)
         editorHeaderDiv:Add(buttonDiv)
         Add(editorHeaderDiv)
+        //Add(AddMoreActionsMenu())
         
         Division outerEditorDiv
         outerEditorDiv:SetClassAttribute("flex grow min-h-128 divide-x")
@@ -251,6 +275,96 @@ helpModalContent:Add(helpModalSection3)
         return centerHelpModal
     end
     
+    action AddMoreActionsMenu() returns Division
+        Division moreActionsDiv
+        text menuStyle = "hidden absolute flex top-full right-2 -mt-2 bg-neutral-grey-10 z-10 w-auto h-auto rounded-md shadow-md overflow-y-auto p-2"
+        moreActionsDiv:SetIdentifier("moreActionsMenu")
+        moreActionsDiv:SetClassAttribute(menuStyle)
+        
+        
+text buttonStyle = "flex flex-col text-left w-full p-2 text-base rounded-2xl hover:bg-quorum-blue-25 hover:shadow-md hover:shadow-accent-hover active:bg-quorum-blue-50 focus:bg-quorum-blue-25"
+        
+        Button freeformButton
+        freeformButton:SetIdentifier("freeformButton")
+        freeformButton:SetClassAttribute(buttonStyle)
+        freeformButton:AddText("Convert to Freeform")
+        freeformButton:SetOnClick("blockEditorMoreActions('freeform')")
+        
+        Button pickupButton
+        pickupButton:SetIdentifier("pickUpButton")
+        pickupButton:SetClassAttribute(buttonStyle)
+        pickupButton:AddText("Pick Up Block")
+        pickupButton:SetOnClick("blockEditorMoreActions('pickUp')")
+        
+        Button dropButton
+dropButton:SetIdentifier("dropButton")
+        dropButton:SetClassAttribute(buttonStyle)
+        dropButton:AddText("Drop Block")
+        dropButton:SetOnClick("blockEditorMoreActions('drop')")
+        
+        Button deleteButton
+deleteButton:SetIdentifier("deleteButton")
+        deleteButton:SetClassAttribute(buttonStyle)
+        deleteButton:AddText("Delete Block")
+        deleteButton:SetOnClick("blockEditorMoreActions('delete')")
+        
+        Button moveUpButton
+moveUpButton:SetIdentifier("moveUpButton")
+        moveUpButton:SetClassAttribute(buttonStyle)
+        moveUpButton:AddText("Move Placeholder Up")
+        moveUpButton:SetOnClick("blockEditorMoreActions('moveUp')")
+        
+        Button moveDownButton
+moveDownButton:SetIdentifier("moveDownButton")
+        moveDownButton:SetClassAttribute(buttonStyle)
+        moveDownButton:AddText("Move Placeholder Down")
+        moveDownButton:SetOnClick("blockEditorMoreActions('moveDown')")
+        
+        Button undoButton
+        undoButton:SetIdentifier("undoButton")
+        undoButton:SetClassAttribute(buttonStyle)
+        undoButton:AddText("Undo")
+        undoButton:SetOnClick("blockEditorMoreActions('undo')")
+        
+        Button redoButton
+        redoButton:SetIdentifier("redoButton")
+        redoButton:SetClassAttribute(buttonStyle)
+        redoButton:AddText("Redo")
+        redoButton:SetOnClick("blockEditorMoreActions('redo')")
+        
+        Button cutButton
+        cutButton:SetIdentifier("cutButton")
+        cutButton:SetClassAttribute(buttonStyle)
+        cutButton:AddText("Cut")
+        cutButton:SetOnClick("blockEditorMoreActions('cut')")
+        
+        Button copyButton
+        copyButton:SetIdentifier("copyButton")
+        copyButton:SetClassAttribute(buttonStyle)
+        copyButton:AddText("Copy")
+        copyButton:SetOnClick("blockEditorMoreActions('copy')")
+        
+        Button pasteButton
+        pasteButton:SetIdentifier("pasteButton")
+        pasteButton:SetClassAttribute(buttonStyle)
+        pasteButton:AddText("Paste")
+        pasteButton:SetOnClick("blockEditorMoreActions('paste')")
+        
+        moreActionsDiv:Add(freeformButton)
+        moreActionsDiv:Add(pickupButton)
+        moreActionsDiv:Add(dropButton)
+        moreActionsDiv:Add(deleteButton)
+        moreActionsDiv:Add(moveUpButton)
+        moreActionsDiv:Add(moveDownButton)
+        moreActionsDiv:Add(undoButton)
+        moreActionsDiv:Add(redoButton)
+        moreActionsDiv:Add(cutButton)
+        moreActionsDiv:Add(copyButton)
+        moreActionsDiv:Add(pasteButton)
+        
+        return moreActionsDiv
+    end
+    
     action GetHotkeySpan(text keyName) returns text
         return GetHotkeySpan(keyName, "")
     end
@@ -329,6 +443,26 @@ const observer = new MutationObserver(callback);
 observer.observe(observerUIContainer, {childList: true});
 ")
         Add(canvasObserver)
+        
+Script moreMenuFocusOutScript
+        moreMenuFocusOutScript:SetCode("
+  const container = document.getElementById('moreActionsMenu');
+  const triggerButton = document.getElementById('moreButton');
+
+  container.addEventListener('focusout', e => {
+    if (e.relatedTarget === triggerButton) return;
+    if (!container.contains(e.relatedTarget)) {
+      blockEditorMoreToggle(false);
+    }
+  });
+
+  container.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      blockEditorMoreToggle(false);
+      triggerButton.focus();
+    }
+  });")
+        Add(moreMenuFocusOutScript)
         
 Script startEditorScript
         startEditorScript:SetCode("Module['onRuntimeInitialized'] = function() {
