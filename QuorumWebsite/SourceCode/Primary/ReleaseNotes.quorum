@@ -25,6 +25,230 @@ class ReleaseNotes is Lesson
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
     
+    action QuorumStudio8_0Notes(Section bodyDiv)
+        AddHeading(bodyDiv, "Quorum 14.0 and Quorum Studio 8.0: June 19th, 2026", 2)
+        bodyDiv:AddParagraph("Quorum 14.0 and Quorum Studio 8.0 have a very large number of changes, the biggest of which is that we have rewritten the graphics system from the ground up. This alone has been in progress for 2 years. This new graphics pipeline gives us access to 3D animation and potentially many more modern graphics features, all while maintaining or improving accessibility support. We are incredibly excited to get these features out to the community to play with and explore.")
+        
+        AddHeading(bodyDiv, "Accessible Graphics Version 2 and 3D Animation",3)
+        bodyDiv:AddParagraph("We have reimagined how accessible graphics can be achieved from first principles. We did not originally plan to do that, but the short version of a long story is that on Mac, the OpenGL pipeline Quorum used for years has been deprecated by Apple. This forced us to either switch to Metal or something else on that platform. The problem is that we have no idea if Apple will maintain Metal long term and it has some downsides anyway. Worse, graphics seems increasingly splintered across platforms right now. Even the web, starting with Web GPU seems to want to be magically different because the devs felt like it. On Desktop, however, because OpenGL needed to go, we had to make a choice for the backend. We chose Vulkan overall, using MoltenVK as the version we use on Mac. This translates to Metal anyway, but we do not have to maintain the translation.")
+        bodyDiv:AddParagraph("There are a lot of pros and cons in this choice. The good news is that Vulkan seems to be the up and coming standard, at least on Desktop platforms and mobile. The web is magically different, sigh, but this means we have redesigned the system to be backward compatible for users of Quorum, while doing some magical things under the hood. In other words, the pro of this choice is that while it was a lot of work for us, users do not have to change almost anything.")
+        bodyDiv:AddParagraph("One other big pro is that switching to Vulkan forced us rethink everything in large part because the system is so different than OpenGL. This meant we now had so much control over the internal systems, that we could use it to tie things to the accessibility system. As such, we took the change time to add special 3D modeling libraries, animation, many changes to lighting, compute shaders, and so many other things. Not everything is yet hooked up, but it paves the way to do things from an accessibility lens we thought were impossible just a few years ago. This includes being able to use professional grade tools to manage Quorum's output, like RenderDoc.")
+        bodyDiv:AddParagraph("One big con, however, is that Vulkan is not just hard to use. It is hard to use to the point of being absurd. APIs like this often get described as close to the metal, which is true but not the problem. Vulkan is, as far as we can tell, just plain old messy. It has gross naming conventions (e.g., DescriptorSets, SwapChains), weird organization, and needs a serious facelift in the API design. Thus, while it gives us a lot of control, the complexity level would make it incredibly hard to use if we wanted users to touch it. This meant we wanted to expose it so we could use it, but hide it as much as we could for more reasonable abstractions. In any case, Vulkan's complexity had the benefit of forcing us to rethink, but the downside of taking forever because it is so hard to use.")
+        bodyDiv:AddParagraph("The bottom line of all this is we took the opportunity of changing engines to completely reimagine what accessibility might even mean in graphics. There is more work to do, but this release puts in just an incredible framework for making that possible in this release and beyond. One final point to note is that Vulkan mode is experimental in this release, so it is off by default as we test with the community, but easily turned on. More specific notes on some of the features follow:")
+        
+
+        //The list of the items for Accessible Graphics
+        Array<text> graphicsList
+        graphicsList:Add("Accessible graphics now exists in the Vulkan API in Quorum")
+        graphicsList:Add("Added a vast, and we mean vast, new architecture around graphics in Quorum. There are way too many classes and helpers and details to mention here, but those interested can dig as they see fit. The entire Vulkan spec is not covered, but this opens up an absolutely massive amount of options for what can be done with accessible graphics in the future.")
+        graphicsList:Add("Quorum can now load a wide variety of 3D models from different sources through the integration of the Assimp API (we didn't name it). This only works on Quorum desktop in this release when in Vulkan mode")
+        graphicsList:Add("Animation and Animated 3D models are now supported, including what we call accessibility support. Now, what does accessibility even mean for animated 3D models? Isn't that a fun question to try and answer! We have taken a first crack at it, but suspect we will need feedback from the community on what they actually want. Even here though, you can control what happens in real-time in a wide variety of ways, both graphically and from an accessibility lens.")
+        graphicsList:Add("Quorum graphics are now much faster in Vulkan mode.")
+        graphicsList:Add("Vulkan is now an option when loading a game. It is turned off by default in Quorum Studio as we beta test over the summer. For any examples using Animation, the setting to turn it on is listed in the template file.")
+        graphicsList:Add("Compute shaders can now be used within Quorum. Compute shaders let you use code on the graphics chip and could do a variety of specialized operations very quickly. We are using them for accessible 3D animation, but they could be used for AI, machine learning, data science, and many other things. Compute shaders are only available in Desktop mode with Vulkan.")
+        graphicsList:Add("Quorum graphics can now be used from within tools like RenderDoc. These tools are never required to use Quorum, but users can load them up now if they choose. This lets industry folks use it using standard tools if they wish.")
+        bodyDiv:Add(GenerateList(graphicsList))
+        
+        //Blocks
+        AddHeading(bodyDiv, "Blocks",3)
+        bodyDiv:AddParagraph("We made a wide variety of quality of life changes to the blocks in this release. These changes are dedicated to Neil Brown in the UK, who provided us a great deal of feedback and testing. We want to say thanks especially because it forced us to rethink a bunch of design decisions that we hadn't considered in a while. These changes highlight all of them over the last year and are as follows:")
+        
+        Array<text> blocksList
+        blocksList:Add("The left and right arrow keys still take you into blank block editing. However, the right arrow key no longer moves you over one character.")
+        blocksList:Add("Home key on a block now takes you to the beginning in blank block mode")
+        blocksList:Add("Similarly, the end key now takes you to the end of a block in blank block mode")
+        blocksList:Add("COMMAND or CONTROL plus the home or end keys now take you to the start or end of the document as a whole.: Beginning of document as a whole")
+        blocksList:Add("COMMAND + END: End of document as a whole")
+        blocksList:Add("Quorum has long had smart navigation keys for moving around in the editor. We have kept the behavior the same, but changed which keys do it. Now, COMMAND or CONTROL + UP/DOWN now moves you to the next or previous action. Further, COMMAND or CONTROL + LEFT/RIGHT up/down now moves to the next or previous scope")
+        blocksList:Add("Fixed a bug where the blocks would flicker when a placeholder was in the mix and at the bottom of a list of blocks")
+        blocksList:Add("Fixed a bug where the notch was not draggable in the tray")
+        blocksList:Add("Fixed a bug where the text cursor would not go away. We noticed this was especially a problem with selection highlights")
+        blocksList:Add("Quorum's system of blocks is a 1 to 1 mapping to actual source code. There are many reasons for this related to accessibility, but also because then you are guaranteed that if you are learning in blocks you are learning the real code. No transfer of learning is needed because it is the same information. However, there were a few cases where the system would become confused and all of the blocks would change to blank blocks. We have reduced the circumstances under which this happened")
+        blocksList:Add("When copy pasting, Quorum is now smart enough to understand that when pasting, it could just be the pasted code that causes the problem. Only that block will flash")
+        blocksList:Add("Use statements are very picky in their location in the language. If they are at the wrong location, now only this block will flash instead of the whole page turning to blank blocks")
+        blocksList:Add("When multiple blocks were pasted, there could sometimes be strange behavior we did not intend, as opposed to the strange behavior we did intend! ")
+        blocksList:Add("Fixed an issue where a single block would turn red even if there was no compiler error")
+        blocksList:Add("Fixed a weird crash with the line number gutter that only seemed to happen on the web")
+        blocksList:Add("Fixed an issue when trying to undo/redo a block drag that required the undo to be initiated twice instead of just once")
+        blocksList:Add("Fixed an issue where navigating to the end of a file in the blocks system would leave you with a placeholder. This caused shenanigans")
+        blocksList:Add("Fixed an issue with the block turning red on an empty line in online block examples. You know, shenanigans")
+        blocksList:Add("Fixed an issue where multi-line comments would cause a crash")
+        blocksList:Add("Fixed several issues with copy paste and blocks")
+        blocksList:Add("Fixed several issues with the parsing of freeform blocks that were causing minor shenanigans")
+        bodyDiv:Add(GenerateList(blocksList))
+        
+        //Charts
+        AddHeading(bodyDiv, "Charts",3)
+        bodyDiv:AddParagraph("For years we have worked with users on our accessible charting system. While the accessibility support in Quorum is pretty much always written first, users have had a variety of suggestions for a long time now about the visual display in charting. The visual side of charts is also important for accessibility and thus, this release, we decided to do a serious re-thinking of the system as a whole. This included refactoring across many of the systems and a total overhaul of the visual look and feel. Generally, the system is more colorful, less busy, more interactive, and should be more visually informative than before. As this is the largest overhaul of the visualization system we have ever done, we placed the changes into a few categories. Note that these changes were completed before Quorum Studio 8.0 and thus were pushed online in February 2026 for the online mode of Quorum. We document them here and put them out in OpenGL and Vulkan modes on Desktop.")
+        
+        AddHeading(bodyDiv, "Color",4)
+        bodyDiv:AddParagraph("One major point we have persistently heard in focus groups is that the color palettes chosen for the charts could use adjustment. Reverse engineering why this is has been difficult, but in focus groups over a long period of time, we eventually settled on quite a few changes. We detail some of the big ones here.")
+        
+        Array<text> chartColorList
+        chartColorList:Add("Historically we have used a paper called Colorgorical for our color palettes. After a re-examination of some math related to color, and hints from users that they want more variation in color hue, we have adjusted the default color palettes. What accessibility means mathematically for color in charts is a tricky question, but we think the new system is much nicer and more accessible")
+        chartColorList:Add("We integrated a new algorithm related to perceptual contrast of colors that is under consideration for WCAG 3.0 called the Accessible Perceptual Contrast Algorithm. We do not use the algorithm for anything yet, because we want compliance to still work under WCAG 2.1 AA as 3.0 is still being discussed, but we received permission to put the algorithm in there and are experimenting. In the charts, it is off by default, but in our view they look nicer and are easier to read using those equations instead")
+        chartColorList:Add("Many colors in our design are now soft, not hard. As such, visually there are more shades of grey and far less hard black or white colors.  They are still used in some cases for contrast, however")
+        chartColorList:Add("The grid lines are now a new color, which is a light grey (#E3DDDD)")
+        chartColorList:Add("Elements in the key have a different border color, grey (#999999)")
+        chartColorList:Add("We changed most border colors to grey (#999999)")
+        bodyDiv:Add(GenerateList(chartColorList))
+        
+        AddHeading(bodyDiv, "Bar Charts",4)
+        Array<text> barChartList
+        barChartList:Add("Bars now have rounded corners by default")
+        barChartList:Add("The selection for bar charts has changed colors and now is around a different region. ")
+        barChartList:Add("The bar chart selection now has rounded corners")
+        barChartList:Add("The bar chart selection now has new bounded regions, which makes it collide less with the rest of the system")
+        barChartList:Add("The previous arrow selection with bar charts has been changed to new graphics that represent the selection")
+        barChartList:Add("For single bar selections, there is a small, but thick, line with rounded corners that hovers above or below the item (or right/left in other modes)")
+        barChartList:Add("When a bar is selected, the value is visually displayed. Ironically enough, this has been always exposed to screen reader and Braille users. Traditionally, it was not exposed visually in most charting systems, but was a popular request in focus groups")
+        barChartList:Add("The value for a bar is shown visually on selection or mouse over. Typically this has a white background and black text to maximize contrast. Its location changes depending on a wide variety of factors (e.g., orientation, layout concerns)")
+        barChartList:Add("We changed the rendering approach for bar charts in SVG mode to better account for rounding")
+        barChartList:Add("Fixed an issue where the edges of bar charts were off by a few pixels")
+        barChartList:Add("Highlighting the individual bars now provides visual information about the bar")
+        bodyDiv:Add(GenerateList(barChartList))
+        
+        
+        AddHeading(bodyDiv, "Pie Charts",4)
+        Array<text> pieChartList
+        pieChartList:Add("Pie charts now have white space in between each slice")
+        pieChartList:Add("Pie charts now integrate information (e.g., numbers or labels) visually inside of the slide")
+        pieChartList:Add("The pie chart labels now change between black or white, depending on the color contrast compared to white.")
+        pieChartList:Add("Wedges of a pie chart now pop out if the wedge is selected")
+        pieChartList:Add("Wedges of a pie chart now have a crust when selected, which means there is a thick border at the end, in the selection color, that indicates selection. This in combination with the popout should make it much more obvious which wedge is selected visually")
+        pieChartList:Add("Fixed an issue where the pie chart slices could be off by a few pixels")
+        bodyDiv:Add(GenerateList(pieChartList))
+        
+        AddHeading(bodyDiv, "Line Charts and Scatterplots",4)
+        Array<text> lineChartList
+        lineChartList:Add("Line charts and Scatterplots now have a more reasonable default dot size at each point")
+        lineChartList:Add("Line charts and Scatterplots now have vertical and horizontal lines that are dashed")
+        lineChartList:Add("Lines in line charts and Scatterplots are now thicker by default")
+        lineChartList:Add("Highlighting over pieces of the line now provides visual information. This is true with the keyboard or the mouse.")
+        bodyDiv:Add(GenerateList(lineChartList))
+        
+        AddHeading(bodyDiv, "Violin Plots",4)
+        Array<text> violinChartList
+        violinChartList:Add("Like bar charts, violin plots use a rectangle with rounded corners as the selection")
+        violinChartList:Add("Fixed a gross bug in violin plots that causes them to not draw properly in OpenGL or WebGL mode. ")
+        bodyDiv:Add(GenerateList(violinChartList))
+        
+        AddHeading(bodyDiv, "Box Plots",4)
+        Array<text> boxPlotList
+        boxPlotList:Add("Changed the line in the middle of box plots (the median line) to be either black or white depending on the color and contrast.")
+        boxPlotList:Add("Like other plots, we changed the selection for box plots to account for how it was changed elsewhere")
+        boxPlotList:Add("Fixed an issue where the box plot selection could go past the edge of a chart")
+        boxPlotList:Add("Highlighting regions of the box plot now gives visual information")
+        bodyDiv:Add(GenerateList(boxPlotList))
+        
+        AddHeading(bodyDiv, "Mouse",4)
+        bodyDiv:AddParagraph("Focus groups consistently told us they want different mouse support for the charts. Many, many ideas and design iterations were tossed around the watercooler, but big picture the charts should now look and feel more responsive with the mouse. This might sound like a minor thing, but you really need to do this thoughtfully to make sure everything stays bright, visible, and accessible. ")
+        Array<text> mouseChartList
+        mouseChartList:Add("Added mouse controls more robustly across charts. Many regions now highlight or change when the mouse is used")
+        mouseChartList:Add("Made the mouse controls and the keyboard controls keep in sync (not NSYNC, sorry to disappoint) ")
+        mouseChartList:Add("Added support for mouse hover across the charts. We decided not to do these as tooltips for a whole bunch of reasons and instead moved to strategic hovering")
+        mouseChartList:Add("Added selections and labels across many places when the mouse is over components. As an example, if you mouse over a bar in a bar chart, you observe the values. In other chart types, what is shown varies")
+        bodyDiv:Add(GenerateList(mouseChartList))
+        
+        AddHeading(bodyDiv, "Selection",4)
+        bodyDiv:AddParagraph("Overall we re-imagined what it meant for parts of a chart to be selected (accessibly). We took feedback and made quite a few changes")
+        Array<text> selectionChartList
+        selectionChartList:Add("Border selection around the key and variable should be smaller and try to encapsulate only the region better")
+        selectionChartList:Add("We removed many arrows and other custom shapes and tried to make selection look customized for each type of chart")
+        selectionChartList:Add("The cursor for charts now only shows up if a key of some kind has been pressed. This prevents users from taking screenshots with it on by default, which we've noticed seemed to be common")
+        bodyDiv:Add(GenerateList(selectionChartList))
+        
+        AddHeading(bodyDiv, "Other Visual Design Changes in Charts",4)
+        bodyDiv:AddParagraph("For this release we created a new design language for the charts overall. The goal was to make them look nice, crisp, clean, and simple. Our goal was to make everything feel unified across the board, but also custom where appropriate. In all cases, we took accessibility into account.")
+        Array<text> visualChartList
+        visualChartList:Add("We rounded corners on many interface components, including bars in bar charts. This can be adjusted by the user. Not all components are rounded, especially box plots and stacked bar charts, but many are. Our thinking was that rounding should not be universal, but we use it heavily")
+        visualChartList:Add("Changed the X-axis to be just slightly thicker")
+        visualChartList:Add("Made the ticks and axis lines line up better")
+        visualChartList:Add("Elements in the key now have a rounded border")
+        visualChartList:Add("The grid lines are now dashed, not solid")
+        visualChartList:Add("We removed the Y-Axis line as part of our new design language. We also double checked that this worked in flipped orientations so the correct line turns off")
+        visualChartList:Add("When the chart has lots of options the ticks were too aggressive by default. They now space out more reasonably")
+        visualChartList:Add("Tick font sizes have been adjusted to make them look nicer")
+        visualChartList:Add("In multi-charts, ticks and fonts have been adjusted to make the defaults look nicer")
+        visualChartList:Add("Fixed an issue with artifacts showing with zero frequency bins in histograms")
+        bodyDiv:Add(GenerateList(visualChartList))
+        
+        AddHeading(bodyDiv, "Scalable Vector Graphics ",4)
+        bodyDiv:AddParagraph("We made a variety of changes related to how Quorum renders to SVG. This was inspired in part by wanting to make it easier to use the SVG renders. One major factor we adjusted was that there were slight inconsistencies in how you rendered in each mode, which we removed. Now, at least as much as we were able, once you make your chart and export it, you are pretty much done.")
+        Array<text> svgChartList
+        svgChartList:Add("Previously, you could create a custom CSS file for manipulating charts. This worked, but the problem was that if you generated a bunch of charts online, there were pieces in CSS and other programmatic places. These did not all match, making some kinds of customizations more difficult. We removed the CSS from the system and now each chart manages these details on its own")
+        svgChartList:Add("Rounding in SVG is not very robust. As such, we changed internal rendering properties, especially Rect to Path. This ensures we get a consistent look and feel across modalities")
+        svgChartList:Add("We fixed a variety of positioning and layout issues, including one where the labels in the SVG rendering were off")
+        svgChartList:Add("Added a hover feature in the SVG mode so that people can see, or have accessible alternatives to, the values more clearly")
+        bodyDiv:Add(GenerateList(svgChartList))
+        
+        AddHeading(bodyDiv, "Technical Chart Refactors ",4)
+        bodyDiv:AddParagraph("While most in the community will not be interested in the behind the scenes engineering required to make the changes happen, it was considerable for this release. We highlight a few major internal changes that needed to happen to make all of the other material work.")
+        Array<text> refactorChartList
+        refactorChartList:Add("Internally, there was a shared Quorum class called ChartOptions. This class was created around the time of the look and feel classes, but was shared in an odd way across the system that was inconsistent with everything else. We removed the class.")
+        refactorChartList:Add("We did an edit pass across the whole system to ensure charts render the same in SVG mode with the new system. This was way more work than this sounds")
+        refactorChartList:Add("In OpenGL/Vulkan modes, the charts use a variety of graphics shaders in GLSL to render. For Bar Charts, the Signed Distance Function was incorrect and we readjusted it to make the bar charts render differently. If we had not done that, in the new system, the little bar charts would all look like daggers. That of course, led to jokes about dangerous bar charts, which shall not be repeated here")
+        bodyDiv:Add(GenerateList(refactorChartList))
+        
+        AddHeading(bodyDiv, "User Interface Improvements",3)
+        bodyDiv:AddParagraph("In addition to the charts, we did a significant edit pass of the visuals Quorum produces to make them look nicer and feel more responsive. These included at least")
+        Array<text> uiList
+        uiList:Add("Integrated rounded corners in dialogs")
+        uiList:Add("Fixed a variety of issues with colors across components")
+        uiList:Add("Integrated a new design for checkboxes and radio buttons")
+        uiList:Add("Fixed a variety of issues with inconsistent borders in components")
+        uiList:Add("Fixed a variety of graphics glitches around dialogs")
+        uiList:Add("Changed dialogs to now use pages, similar to the form library. This makes it easier to make them look nice and layout reasonably. ")
+        bodyDiv:Add(GenerateList(uiList))
+        
+        AddHeading(bodyDiv, "Quorum Studio Interface Changes",3)
+        bodyDiv:AddParagraph("We made a variety of changes to the interface in Quorum Studio to try and make it easier to understand and use. These included at least:")
+        Array<text> qsList
+        qsList:Add("Redesigned basically all of the dialogs to include the new visual changes")
+        qsList:Add("Redid the find/replace dialog to not be so ugly in general")
+        qsList:Add("Changed the New Project dialog to move back to a tree structure, but now more visual and we hope easier to understand")
+        qsList:Add("Reorganized the Quorum Studio properties dialog and the Project Properties dialog. ")
+        qsList:Add("Removed banners from many of the dialogs. They were not really adding any information and looked super lame, dude.")
+        qsList:Add("Added a copy button to the project path in the project properties dialog so you can get the location easily")
+        qsList:Add("Moved plugins in the project properties dialog. This feature is important to keep, but not used by many people in practice. Thus, we moved it to a separate tab to use only if you really need it")
+        qsList:Add("Greatly improved mouse support in the 2D scene editor")
+        qsList:Add("Added mouse support to the 3D scene editor")
+        qsList:Add("Added orbit, panning, and click controls with the mouse to the 3D scene editor")
+        qsList:Add("Fixed several crash bugs in the scene editor")
+        qsList:Add("Fixed a variety of issues related to drag and drop in the scene editor. It should work much better now.")
+        qsList:Add("Fixed a variety of issues with ghost items in the 2D scene editor")
+        qsList:Add("Rewrote or updated a number of tutorials around the 3D scene editor.")
+        qsList:Add("Added a new project template for SkyHopper")
+        qsList:Add("Added a new project template for PettingZooHero")
+        qsList:Add("Added a new project template for a basic animation trigger")
+        qsList:Add("Added a new project template for a more advanced animation example.")
+        bodyDiv:Add(GenerateList(qsList))
+        
+        AddHeading(bodyDiv, "Small general bug fixes",3)
+        Array<text> bugsList
+        bugsList:Add("In rare circumstances in the Parson Problems online, the side scroll bar was causing nauseating jumping on the screen when you scrolled to the bottom of the page. We fixed that.")
+        bugsList:Add("Fixed an issue with numpad enter not being accounted for in the Enter and Shift + Enter hotkeys online")
+        bugsList:Add("Fixed a bug in the hotkey list online for Windows, which was showing the wrong key in the online editor")
+        bugsList:Add("Fixed an online typo in data science 1. The type was that Data Science 1 Problems number 5 said 'Over then next' instead of 'Over the next.'")
+        bugsList:Add("Closed and fixed an old bug related to histograms and look and feel")
+        bugsList:Add("Fixed a bug in the online block editor where mobile versions would crash after border changes to the online block editor")
+        bugsList:Add("Fixed an issue where styling could be applied to both a rectangle and a group, which caused strange artifacts")
+        bugsList:Add("Fixed an issue with incorrect chart labels in some cases")
+        bugsList:Add("Fixed an issue on the chart gallery page where one of the multi-charts looked off. This wasn't a bug, just a choice in the chart that people wanted us to change.")
+        bodyDiv:Add(GenerateList(bugsList))
+        
+        AddHeading(bodyDiv, "Known Issues",3)
+        Array<text> issuesList
+        issuesList:Add("The scene editor in Vulkan mode has some kind of race condition where it will not load all the time. This is the core reason OpenGL mode is still the default in Quorum Studio. ")
+        issuesList:Add("While we think we have fixed all the known crash bugs in Vulkan, Vulkan is finicky and we have fixed many crashes in dogfooding over the last few months. We do not have a specific crash we are currently aware of, but fair warning that this mode is still quite experimental.")
+        issuesList:Add("We have tested with only a small selection of 3D animation files. We expect there to be some issues with some files grabbed from the Internet and could use a hand from the community in finding models that do or do not work")
+        issuesList:Add("Frames of animation are currently baked in on the GPU without linear interpolation. This is not a hard fix, but not yet finished. Thus, you might see this as a stutter in slow animation rates or those with few frames.")
+        issuesList:Add("There is a dark spot in lighting in Vulkan mode. We have no idea why. It's almost adorable. There is some funky math error somewhere that we haven't found yet.")
+        issuesList:Add("Shadows are not yet finished in the lighting system. Yes, a dark shadow looms.")
+        issuesList:Add("There is some kind of strange transformation issue in the scene editor in Vulkan mode. We need a bit more time to work through this one before we make Vulkan the default in Quorum Studio.")
+        bodyDiv:Add(GenerateList(issuesList))
+    end
+    
     action QuorumStudio7_3Notes(Section bodyDiv)
         AddHeading(bodyDiv, "Quorum Studio 7.3 and Quorum 13.4", 2)
         bodyDiv:AddParagraph("This is a bug fix release for both the offline environment with Quorum Studio and Quorum. The most important change in this one is we have fixed an important issue related to specifically the JAWS screen reader. A variety of smaller fixes are also included. ")
@@ -3212,6 +3436,10 @@ list6:Add("Signed the installer on Windows. We plan to sign the installer on Mac
 
         text sectionStyle = "flex flex-col gap-y-2"
         
+        Section section8_0
+        section8_0:AddClassAttribute(sectionStyle)
+        QuorumStudio8_0Notes(section8_0)
+        
         
 Section section7_3
         section7_3:AddClassAttribute(sectionStyle)
@@ -3354,6 +3582,7 @@ Section section7_1
         Quorum_1(section1)
 
         //newer Quorum Studio Notes
+        bodyDiv:Add(section8_0)
         bodyDiv:Add(section7_3)
 bodyDiv:Add(section7_2)
 bodyDiv:Add(section7_1)
