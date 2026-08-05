@@ -80,6 +80,8 @@ use Libraries.Interface.Behaviors.Blocks.CodeEditorPasteFromClipboardBehavior
 class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListener, FocusListener, SelectionListener
 
     constant text CONTAINER_ID = "BlockUIContainer"
+    // used for projects
+    constant integer FILE_COUNT_LIMIT = 5
     HashTable<CodeEditor, ParserToBlockListener> blockListeners
     WebControlPanel palettePanel
     Control palettePartition
@@ -89,6 +91,7 @@ class BlockEditor is Game, Behavior, TextChangeListener, WebAccessibilityListene
     EditorItem blocksItem = undefined
     
     boolean alwaysSupportMultipleFiles = false
+    boolean projectMode = false
     
     // If this editor only supports one file, this is the single editor.
     // If it supports multiple, this is the editor for the currently active file.
@@ -130,6 +133,9 @@ action Main
         SetConfiguration(config)
         DesktopConfiguration deskConfig = GetDesktopConfiguration()
         deskConfig:resizable = true
+        if IsInProjectMode()
+            SetToProjectMode()
+        end
     StartGame()
 end
     
@@ -192,7 +198,8 @@ integer fontSize = 12
         editor = editor2
         
     ParserToBlockListener listener
-    listener:startLine = 0
+            
+    listener:SetStartLine(0)
     editor:SetBlockListener(listener)
     blockListeners:Add(editor, listener)
             
@@ -220,16 +227,50 @@ integer fontSize = 12
             GetMultipleFileText(CONTAINER_ID, fileNames, fileTexts)
             
             integer i = 0
+            if fileNames:GetSize() = 0 and projectMode
+                Tab tab
+                tab:SetName("Main.quorum")
+                tab:DisplayCloseButton(false)
+            
+                CodeEditor newEditor
+                newEditor:SetName("Main.quorum")
+                
+ParserToBlockListener listener
+            listener:SetStartLine(0)
+newEditor:SetBlockListener(listener)
+            blockListeners:Add(newEditor, listener)
+                
+        newEditor:AddTextChangeListener(textHighlightListener)
+    text code = ""
+    
+    BlockSelectionListener listen
+    newEditor:SetPercentageWidth(1)
+    newEditor:SetPercentageHeight(1)
+    newEditor:SetFontSize(fontSize)
+    newEditor:AddSelectionListener(listen)
+        newEditor:SetCode(code)
+                
+                if editor = undefined
+                    editor = newEditor
+                end
+                
+                tab:SetRelatedItem(newEditor)
+                editorPane:Add(tab)
+            end
+            
             repeat while i < fileNames:GetSize()
 Tab tab
                 tab:SetName(fileNames:Get(i))
                 tab:DisplayCloseButton(false)
+if projectMode = true and fileNames:Get(i) not= "Main.quorum"
+                    tab:DisplayCloseButton(true)
+                end
                 
                 CodeEditor newEditor
                 newEditor:SetName(fileNames:Get(i))
                 
 ParserToBlockListener listener
-            listener:startLine = 0
+            listener:SetStartLine(0)
 newEditor:SetBlockListener(listener)
             blockListeners:Add(newEditor, listener)
                 
@@ -253,7 +294,6 @@ newEditor:SetBlockListener(listener)
             end
         end
     
-        
         BlockPalette palette
         palette:SetPercentageHeight(1)
 palette:SetPercentageWidth(1)
@@ -1007,6 +1047,52 @@ if editorPane = undefined and editor not= undefined
         end
         
         return ""
+    end
+    
+    action SetToProjectMode
+        me:projectMode = true
+        me:alwaysSupportMultipleFiles = true
+    end
+    
+    system action IsInProjectMode returns boolean
+    
+    action AddNewFile(text fileName)
+        if editorPane:GetSize() >= FILE_COUNT_LIMIT
+            return now
+        end
+        
+        Tab tab
+                tab:SetName(fileName)
+                tab:DisplayCloseButton(true)
+        tab:SetInterfaceScale(GetInterfaceScale())
+        
+                CodeEditor newEditor
+                newEditor:SetName(fileName)
+    
+        ParserToBlockListener listener
+            listener:SetStartLine(0)
+newEditor:SetBlockListener(listener)
+            blockListeners:Add(newEditor, listener)
+        
+        newEditor:AddTextChangeListener(textHighlightListener)
+    text code = "class NewClass
+
+end"
+    
+    BlockSelectionListener listen
+    newEditor:SetPercentageWidth(1)
+    newEditor:SetPercentageHeight(1)
+    newEditor:SetFontSize(12)
+    newEditor:AddSelectionListener(listen)
+        newEditor:SetCode(code)
+        newEditor:SetInterfaceScale(GetInterfaceScale())
+        
+                if editor = undefined
+                    editor = newEditor
+                end
+                
+                tab:SetRelatedItem(newEditor)
+                editorPane:Add(tab)
     end
     
 end

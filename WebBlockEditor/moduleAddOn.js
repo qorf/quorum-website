@@ -13,6 +13,13 @@ function GetCodeAtFileIndex(index) {
 function GetNameAtFileIndex(index) {
 	return $starter.GetNameAtFileIndex$quorum_integer(index);
 }
+var projectMode = false;
+function SetToProjectMode() {
+    projectMode = true;
+}
+function AddNewFile(fileName) {
+    $starter.AddNewFile$quorum_text(fileName);
+}
 function ScaleUp() {
     $starter.ScaleUp();
 }
@@ -94,4 +101,4 @@ function PauseBlockExecution() {
 		global_Add_Shared_Class("Libraries.Interface.Controls.Charts.ChartOptions", chartOptions);
 	}
 }
-export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, BlockEditorExtraActions, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex}
+export{Start, Stop, GetCode, SetCode, ScaleUp, ScaleDown, TogglePalette, BlockEditorStop, BlockEditorExtraActions, PauseBlockExecution, GetFileCount, GetCodeAtFileIndex, GetNameAtFileIndex, SetToProjectMode, AddNewFile}

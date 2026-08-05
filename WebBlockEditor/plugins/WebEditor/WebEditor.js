@@ -72,7 +72,10 @@ function plugins_quorum_WebEditor_BlockEditor_() {
             return container.dataset.paletteForIde;
         }
         return "";
-    }
+    };
+    this.IsInProjectMode = function() {
+        return projectMode;
+    };
 
     this.RunGame = function() {
         blockEditorRunCode('QuorumUIOutput','QuorumUIContainer');
