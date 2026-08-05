@@ -10,6 +10,7 @@ use Libraries.Data.Database.QueryResult
 use Libraries.Data.Database.Update
 use Libraries.Data.Database.Insert
 use Libraries.Containers.Iterator
+use Libraries.Data.Formats.JavaScriptObjectNotation
 
 class ProjectSave is ResponsePage
     action ResponseReceived(NetworkExchange exchange)
@@ -18,6 +19,7 @@ class ProjectSave is ResponsePage
         SharedConnection con
         HashTable<text,text> params = exchange:GetParameters()
         HashTable<text, List<text>> headers = exchange:GetHeaders()
+        
 
         text username = con:GetUserFromCookie(exchange)
         if username = undefined or username = ""
@@ -26,9 +28,13 @@ class ProjectSave is ResponsePage
         end
         text projectName = ""
         boolean overwrite = false
+        boolean multipleFiles = false
         text code = ""
         text ide = ""
         text url = ""
+        HashTable<text,text> codeData
+        Array<text> fileNames
+        integer fileCount = 0
         if params:HasKey("project_name")
         and params:HasKey("overwrite")
         and params:HasKey("code")
@@ -39,6 +45,28 @@ class ProjectSave is ResponsePage
             code = params:GetValue("code")
             ide = params:GetValue("ide")
             url = params:GetValue("url")
+            if params:HasKey("multiple_files") and params:HasKey("file_count")
+                if params:GetValue("multiple_files") = "true"
+                    multipleFiles = true
+                    fileCount = cast(integer, params:GetValue("file_count"))
+                    
+                        codeData:Add("Main", code)
+                        fileNames:Add("Main")
+                    integer i = 1
+repeat while i < fileCount
+fileName = params:GetValue("file_name"+i)
+codeText = params:GetValue("extra_file"+i)
+                        codeData:Add(fileName, codeText)
+fileNames:Add(fileName)
+                        i = i + 1
+                    end
+                else
+                    fileCount = 1
+                end
+            else
+                fileCount =1
+            end
+            
         else
             Failure(exchange)
             return now
@@ -86,7 +114,6 @@ class ProjectSave is ResponsePage
         end
         // save new project
         // if there was an overwrite then the old one was deleted so save as if it was new
-        fileHash = exchange:HashString("SHA-1", code)
 
         Connection connect = con:GetConnection()
         Database database
@@ -102,23 +129,44 @@ class ProjectSave is ResponsePage
         database:Insert(projectInsert)
         integer lastID = database:GetLastInsertedID()
 
-        // For now provide a default but when multiple files is on the frontend the names will
-        // be provided
-        text defaultFileName = "Main"
-        Insert projectFileInsert
-        projectFileInsert:SetTable("project_files")
-        projectFileInsert:Add("id", lastID)
-        projectFileInsert:Add("filename", defaultFileName)
-        projectFileInsert:Add("hash", fileHash)
-        database:Insert(projectFileInsert)
-
-        // save file with hash
-        Insert fileInsert
-        fileInsert:SetIgnore(true)
-        fileInsert:SetTable("files")
-        fileInsert:Add("hash", fileHash)
-        fileInsert:Add("code", code)
-        database:Insert(fileInsert)
+        if multipleFiles = false
+    text defaultFileName = "Main"
+        fileHash = exchange:HashString("SHA-1", code)
+    Insert projectFileInsert
+    projectFileInsert:SetTable("project_files")
+    projectFileInsert:Add("id", lastID)
+    projectFileInsert:Add("filename", defaultFileName)
+    projectFileInsert:Add("hash", fileHash)
+    database:Insert(projectFileInsert)
+     // save file with hash
+    Insert fileInsert
+    fileInsert:SetIgnore(true)
+    fileInsert:SetTable("files")
+    fileInsert:Add("hash", fileHash)
+    fileInsert:Add("code", code)
+    database:Insert(fileInsert)
+        else
+            integer i = 0
+            repeat while i < fileCount
+                text fileName = fileNames:Get(i)
+        fileHash = exchange:HashString("SHA-1", codeData:GetValue(fileName))
+    Insert projectFileInsert
+    projectFileInsert:SetTable("project_files")
+    projectFileInsert:Add("id", lastID)
+    projectFileInsert:Add("filename", fileName)
+    projectFileInsert:Add("hash", fileHash)
+    database:Insert(projectFileInsert)
+     // save file with hash
+    Insert fileInsert
+    fileInsert:SetIgnore(true)
+    fileInsert:SetTable("files")
+    fileInsert:Add("hash", fileHash)
+    fileInsert:Add("code", codeData:GetValue(fileName))
+    database:Insert(fileInsert)
+                i = i + 1
+            end
+            
+end
 
         database:Close()
 

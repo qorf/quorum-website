@@ -1,0 +1,348 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.System.File
+
+
+class BlockProjectPage is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    text scriptsLocation = "/script/"
+    boolean IdeScriptSet = false
+
+
+    text username = ""
+    boolean isPublic = false
+    // if multiple files the code will be in the form of a JSON array
+    text code = ""
+    text projectName = ""
+
+    constant text PUBLIC_PROJECT = "This is a public project. Anyone can view it."
+    constant text PRIVATE_PROJECT = "This is a private project. Only you can view it."
+
+    action SetPublic(boolean isPublic)
+        me:isPublic = isPublic
+    end
+
+    action SetUsername(text username)
+        me:username = username
+    end
+
+    action SetCode(text code)
+        me:code = code
+    end
+
+    action SetProjectName(text projectName)
+        me:projectName = projectName
+    end
+
+    action Setup
+        //html header stuff
+        Add(AddSaveDialog())
+
+        SetWebPageTitle("Quorum Project Page - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Division headDiv
+        headDiv:SetClassAttribute("flex w-full h-fit p-10 flex-col gap-4")
+        text header = "Run Quorum Online test"
+        if projectName not= ""
+        header = dq+SanitizeForHTML(projectName)+dq + " by " + username
+        end
+        Heading h1 = headDiv:AddHeading(header, 1)
+        h1:AddClassAttribute("text-3xl font-bold")
+
+        text subheading = "This is a page for running Quorum online."
+        if isPublic and projectName not= ""
+        subheading = PUBLIC_PROJECT
+        elseif not isPublic and projectName not= ""
+        subheading = PRIVATE_PROJECT
+        end
+        Paragraph para_head = headDiv:AddParagraph(subheading)
+        para_head:AddClassAttribute("text-xl")
+
+        Add(headDiv)
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division leftDiv = divs:Get(0)
+        Division bodyDiv = divs:Get(1)
+        Division rightDiv = divs:Get(2)
+
+        leftDiv:SetClassAttribute("hidden")
+        bodyDiv:SetClassAttribute("flex flex-col w-full mx-4 overflow-auto gap-y-4")
+        rightDiv:SetClassAttribute("hidden")
+
+
+        text ideName = "Quorum Online"
+        if projectName not= undefined and projectName not= ""
+            ideName = projectName
+        end
+
+        AddIDE(bodyDiv, "writeCodeIde", ideName, code)
+        Link textModeLink
+        textModeLink:SetAddress("/Project.quorum?user="+SanitizeForHTML(username)+"&file="+SanitizeForHTML(projectName)+"&text_mode=true")
+        textModeLink:AddText("Swap to Text Mode")
+        textModeLink:SetClassAttribute("h-full py-2 block w-full group font-normal sm:font-bold px-0 sm:px-2")
+        bodyDiv:Add(textModeLink)
+    end
+
+    action GetName returns text
+        return "Project"
+    end
+
+    action GetShortDescription returns text
+        return "Project"
+    end
+
+    action SanitizeForHTML(text string) returns text
+        string = string:Replace("&", "&amp;")
+        string = string:Replace(dq, "&quot;")
+        string = string:Replace("'", "&#039;")
+        string = string:Replace("<", "&lt;")
+        string = string:Replace(">", "&gt;")
+        return string
+    end
+
+    action AddIDE(Division div, text ideName, text title, text code)
+        BlockIDE ide
+        ide:SetFillDivision(true)
+        ide:SetNoCanvasMode(false)
+        ide:SetCodeForIDE(code)
+        ide:SetProjectMode(true)
+        //text tray = "/palette/frontPage.xml"
+        //ide:SetPaletteFile(tray)
+        
+ide:Setup(me)
+        div:Add(ide)
+    end
+
+    action AddDefaultHeaders
+        //add language headers
+        me:AddAttribute("xml:lang", "en")
+        me:SetLanguage("en")
+
+        //add the meta-data character set
+        MetaData charset
+        charset:SetCharacterSet("UTF-8")
+        AddMetaData(charset)
+
+        MetaData viewport
+        viewport:SetContent("width=device-width, initial-scale=1")
+        viewport:SetName("viewport")
+        AddMetaData(viewport)
+
+        text metaDescriptionContent = GetMetaDescription()
+        if metaDescriptionContent not= undefined
+            MetaData description
+            description:SetContent(metaDescriptionContent)
+            description:SetName("description")
+            AddMetaData(description)
+        end
+
+        // The VersionHelper has up-to-date query strings for the source files.
+        // The query strings don't modify the file at all, but will prevent the cache from returning an old version of the file.
+        VersionHelper versions
+
+        AddKeywords()
+        AddScript("/script/jquery-1.8.3.min.js")
+        AddScript("/script/QuorumStandardLibrary.js" + versions:GetLanguageVersionQuery())
+        AddScript("/script/script.js" + versions:GetScriptVersionQuery())
+        AddScript("/script/prism-quorum.js" + versions:GetPrismVersionQuery())
+        Script moduleLocateFile
+        moduleLocateFile:SetCode("        var Module = {
+            locateFile: function(path, prefix) {
+                if (path.endsWith("+dq+".data"+dq+")) return "+dq+scriptsLocation+dq+" + path;
+                return prefix + path;
+            }
+        };")
+        GetWebPageHeader():Add(moduleLocateFile)
+        AddScript("/script/load.js" + versions:GetLoadVersionQuery())
+
+        //add style sheet tags
+        //AddStylesheet("/style/style.css" + versions:GetCSSVersionQuery())
+        //AddStylesheet("/style/style.css")
+        AddStylesheet("/style/google.css")
+        AddStylesheet("/style/output.css")
+        AddIcon("/media/favicon.ico")
+
+        //Add Responsive Stylesheets
+        WebPageHeader webHeader = me:GetWebPageHeader()
+
+        //Add the navigation bar
+        NavigationBar navigation
+        Add(navigation)
+    end
+
+    action AdjustMain(MainContent mainRegion)
+        mainRegion:AddAttribute("role","main")
+        mainRegion:SetIdentifier("main")
+        mainRegion:SetTabIndex("-1")
+    end
+
+    action GetMediaStyleSheet(text name, text media) returns HeaderLink
+        HeaderLink link
+        link:SetAddress(name)
+        link:SetType("text/css")
+        link:SetRelationship("stylesheet")
+        link:SetMedia(media)
+        return link
+    end
+
+    action AddKeywords
+        MetaData keywords
+        keywords:AddAttribute("name", "keywords")
+        keywords:AddAttribute("content", "programming for beginners, game programming, 
+        lego programming, computer courses, programming 3D, programming,
+        animation, graphics, multimedia, games, accessibility, computer science for all,
+        computer science, computer languages, Quorum programming language, robot programming,
+        online programming")
+        AddMetaData(keywords)
+    end
+
+    action GetMetaDescription returns text
+        return "Create, edit, share, and delete projects."
+    end
+
+    action AddIDEScript
+        if IdeScriptSet not= true
+            VersionHelper versions
+            AddScript("/script/widgets/widget-js/IDE-"+ versions:GetWidgetVersion() +".js")
+            IdeScriptSet = true
+        end
+    end
+
+    action AddIDE() returns IDE
+        AddIDEScript()
+        IDE ide
+        ide:Init()
+        return ide
+    end
+
+    private action AddSaveDialog returns Division
+        Division saveDiv
+        text id = "writeCodeIde"
+
+        saveDiv:SetClassAttribute("z-10 hidden fixed  w-screen h-screen bg-modal-black-50")
+        saveDiv:SetIdentifier("SaveModal")
+        saveDiv:AddAttribute("role", "dialog")
+        saveDiv:AddAttribute("aria-labelledby", id + "SaveTitleDiv")
+
+        Division innerDiv
+        innerDiv:SetClassAttribute("flex flex-col h-full w-full bg-transparent items-center justify-center")
+        Division modalDialog
+        modalDialog:SetClassAttribute("z-20 relative h-fit w-3/4 lg:w-[750px] p-10 bg-neutral-white rounded-2xl shadow-lg flex flex-col gap-6")
+
+        Division saveTitleDiv
+        saveTitleDiv:SetClassAttribute("text-3xl font-bold")
+        saveTitleDiv:SetIdentifier(id + "SaveTitleDiv")
+        saveTitleDiv:AddText("Save this Project")
+        modalDialog:Add(saveTitleDiv)
+
+        Form saveForm
+        saveForm:AddClassAttribute("saveProjectForm")
+        saveForm:AddAttribute("method", "post")
+
+        Division fieldContainerDiv
+        
+        Division projectNameDiv
+        projectNameDiv:AddClassAttribute("flex flex-col gap-2")
+
+        Label projectNameLabel
+        projectNameLabel:AddText("Project Name: ")
+        projectNameLabel:AddAttribute("for", id + "projectNameInput")
+        projectNameDiv:Add(projectNameLabel)
+        
+        Input projectNameInput
+        projectNameInput:SetType("text")
+        projectNameInput:SetName("projectname")
+        projectNameInput:SetIdentifier("projectNameInput")
+        projectNameInput:AddAttribute("data-prefix", id)
+        projectNameInput:AddClassAttribute("p-2 rounded-md border border-neutral-grey-50 mt-1")
+        //input is required
+        projectNameInput:AddAttribute("required", "true")
+        projectNameInput:SetRequired(true)
+        //make the submitButton disabled until the input has text
+        projectNameInput:AddAttribute("oninput", "
+           (function(){
+            let submitButton = document.getElementById('"+id+"saveProjectButton');
+            let input = document.getElementById('projectNameInput');
+            if (input.value.length > 0) {
+                submitButton.removeAttribute('disabled');
+                submitButton.classList.remove('disabled:opacity-50');
+                submitButton.classList.remove('disabled:cursor-not-allowed');
+            } else {
+                submitButton.setAttribute('disabled', 'true');
+                submitButton.classList.add('disabled:opacity-50');
+                submitButton.classList.add('disabled:cursor-not-allowed');
+            }
+        })(); ")
+        
+        projectNameDiv:Add(projectNameInput)
+
+        fieldContainerDiv:Add(projectNameDiv)
+
+        Division footbar
+        footbar:SetClassAttribute("footbar")
+
+        
+        Button submitButton
+        submitButton:SetType("button")
+        submitButton:SetClassAttribute("px-16 py-2 rounded-xl bg-quorum-blue-100 w-fit text-neutral-black font-bold text-xl mt-4 cursor-pointer hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed")
+        submitButton:AddText("Save Project")
+        submitButton:AddAttribute("disabled", "true")
+        submitButton:SetIdentifier(id + "saveProjectButton")
+        submitButton:SetType("submit")
+        submitButton:SetTabIndex("0")
+        //submitButton:SetOnClick("(function(){
+//          saveBlockProject('BlockEditor', 'BlockUIContainer', 'QuorumUIOutput', 'projectNameInput', 'false');
+//})();
+//")
+
+        saveForm:Add(fieldContainerDiv)
+
+        Division buttonContainerDiv
+
+
+        buttonContainerDiv:Add(submitButton)
+
+        footbar:Add(buttonContainerDiv)
+
+        saveForm:Add(footbar)
+
+        modalDialog:Add(saveForm)
+         // Add Close or Exit Button
+        
+        Button closeButton = addExitButton()
+        closeButton:SetIdentifier("closeSaveModal")
+        modalDialog:Add(closeButton)
+innerDiv:Add(modalDialog)
+        saveDiv:Add(innerDiv)
+
+        return saveDiv
+    end
+    
+    action addExitButton() returns Button
+      Button exitButton
+      exitButton:SetClassAttribute("flex items-center justify-center absolute top-0 right-0 m-4 text-3xl font-bold text-quorum-blue-100 hover:text-quorum-blue-150")
+
+      //cross icon start
+      HtmlFileLoader crossIconFile
+      File file
+      file:SetPath("html/media/userInterface/SVG/exit-cross.svg")
+      crossIconFile:SetLoaded(file:Read())
+      exitButton:AddText(crossIconFile:ToText())
+      //cross icon end
+
+      exitButton:SetOnClick("
+        let saveModal = document.getElementById('SaveModal');
+        saveModal.style.display = 'none';
+      ")
+      return exitButton
+    end
+
+end
