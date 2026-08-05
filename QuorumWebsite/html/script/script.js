@@ -38,42 +38,42 @@ $(document).ready(function() {
   });
 
   // sign in modal keyboard navigation
-  document.getElementById('usernameInput').addEventListener("keydown", function(event) {
+  document.getElementById('usernameInput')?.addEventListener("keydown", function(event) {
     if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('submitSignInForm').addEventListener("keydown", function(event) {
+  document.getElementById('submitSignInForm')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
       document.getElementById('closeSignInModal').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('closeSignInModal').addEventListener("keydown", function(event) {
+  document.getElementById('closeSignInModal')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
       document.getElementById('usernameInput').focus();
       event.preventDefault();
     }
   });
   //forgot password modal keyboard navigation
-  document.getElementById('emailForgotInput').addEventListener("keydown", function(event) {
+  document.getElementById('emailForgotInput')?.addEventListener("keydown", function(event) {
     if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('submitForgotPasswordForm').addEventListener("keydown", function(event) {
+  document.getElementById('submitForgotPasswordForm')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
       document.getElementById('closeForgotPasswordModal').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('closeForgotPasswordModal').addEventListener("keydown", function(event) {
+  document.getElementById('closeForgotPasswordModal')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
       document.getElementById('emailForgotInput').focus();
       event.preventDefault();
@@ -81,21 +81,21 @@ $(document).ready(function() {
   });
 
   //Create An Account modal keyboard navigation
-  document.getElementById('userNameInput').addEventListener("keydown", function(event) {
+  document.getElementById('userNameInput')?.addEventListener("keydown", function(event) {
     if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('submitRegistrationForm').addEventListener("keydown", function(event) {
+  document.getElementById('submitRegistrationForm')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
       document.getElementById('closeSignUpModal').focus();
       event.preventDefault();
     }
   });
 
-  document.getElementById('closeSignUpModal').addEventListener("keydown", function(event) {
+  document.getElementById('closeSignUpModal')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
       document.getElementById('userNameInput').focus();
       event.preventDefault();
@@ -149,6 +149,11 @@ $(document).ready(function() {
     return false;
   });
 
+  $(".saveProjectForm").submit(function(event) {
+    saveBlockProject('BlockEditor', 'BlockUIContainer', 'QuorumUIOutput', 'projectNameInput', 'false');;
+    return false;
+  });
+
   if (typeof jQuery != 'undefined') {
     jQuery(document).ready(function($) {
       var filetypes = /\.(zip|exe|pdf|doc*|xls*|ppt*|mp3)$/i;
@@ -193,7 +198,8 @@ $(document).ready(function() {
 var lastModalID = "";
 
 function hideModals() {
-  if (document.getElementById('loginModal').style.display === 'block') {
+  let loginModal = document.getElementById('loginModal');
+  if (loginModal != null && loginModal.style.display === 'block') {
     hideLoginModal();
   }
 
@@ -205,6 +211,10 @@ function hideModals() {
   var loadModal = document.getElementById(lastModalID + 'LoadModal');
   if (loadModal != null && loadModal.style.display === 'block') {
     hideLoadModal(lastModalID);
+  }
+  let saveProjectModal = document.getElementById('SaveModal');
+  if (saveModal != null && saveModal.style.display === 'block') {
+    hideProjectSaveModal();
   }
 }
 
@@ -553,8 +563,12 @@ document.addEventListener('GameStarted', (event) => {
     let runButton = document.getElementById('blockRunButton');
     let stopButton = document.getElementById('blockStopButton');
     gameRunning = true;
-    runButton.disabled = true;
-    stopButton.disabled = false;
+    if(runButton != null) {
+      runButton.disabled = true;
+    }
+    if(stopButton != null) {
+      stopButton.disabled = false;
+    }
     window.BLOCK_EDITOR.PauseBlockExecution();
   }
 });
@@ -562,8 +576,12 @@ document.addEventListener('GameClosed', (event) => {
   if (event.detail.title !== 'Block Editor') {
     let runButton = document.getElementById('blockRunButton');
     let stopButton = document.getElementById('blockStopButton');
-    runButton.disabled = false;
-    stopButton.disabled = true;
+    if(runButton != null) {
+      runButton.disabled = false;
+    }
+    if(stopButton != null) {
+      stopButton.disabled = true;
+    }
     currentUIContainer_$Global_ = "BlockUIContainer";
     window.BLOCK_EDITOR.Start();
   }
@@ -895,9 +913,53 @@ var showSaveModal = function(id) {
   });
 };
 
+var blockShowSaveModal = function(id) {
+  $.ajax({
+    type: "GET",
+    url: "/SessionValid.quorum",
+    success: function(result) {
+      if (result === "success") {
+        document.getElementById('SaveModal').style.display = 'block';
+        document.getElementById('projectNameInput').focus();
+      } else {
+        
+      }
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert("I could not connect to the server at quorumlanguage.com");
+    }
+  });
+};
+
+var hideProjectSaveModal = function() {
+  let saveModal = document.getElementById('SaveModal');
+  let inputField = document.getElementById('projectNameInput');
+  let saveButton = document.getElementById('saveBlockProjectButton');
+  let submitButton = document.getElementById('writeCodeIdesaveProjectButton');
+  if(inputField != null) {
+    inputField.value = '';
+  }
+  if (submitButton != null) {
+    submitButton.setAttribute('disabled', 'true');
+    if( !(submitButton.classList.contains('disabled:opacity-50')) ) {
+      submitButton.classList.add('disabled:opacity-50');
+      submitButton.classList.add('disabled:cursor-not-allowed');
+    }
+  }
+  if(saveModal != null) { 
+    saveModal.style.display = 'none';
+  }
+  if(saveButton != null) {
+    saveButton.focus();
+  }
+}
+
 var hideSaveModal = function(id) {
-  document.getElementById("outerContentModal").classList.add("hidden");
-  document.getElementById("outerContentModal").classList.remove("flex");
+  let outerContentModal = document.getElementById('outerContentModal');
+  if(outerContentModal != null) {
+    outerContentModal.classList.add("hidden");
+    outerContentModal.getElementById("outerContentModal").classList.remove("flex");
+  }
 };
 
 var showLoadModal = function(id) {
@@ -966,6 +1028,7 @@ var showShareModal = function(value) {
   document.getElementById('shareModal').style.display = 'block';
   document.getElementById('shareText').value = value;
   document.getElementById('shareText').focus();
+  document.getElementById('shareRunningCheckbox').checked = false;
 
   try {
     document.getElementById('shareText').select();
@@ -1032,6 +1095,69 @@ var logout = function() {
   });
 };
 
+var saveBlockProject  = function(id, input, output, namefield, overwrite) {
+  $.ajax({
+    type: "GET",
+    url: "/SessionValid.quorum",
+    success: function(result) {
+      if (result === "success") {
+        console.log(`id: ${id}, input: ${input}, output: ${output}, namefield: ${namefield}, overwrite: ${overwrite}`);
+        var projectName = document.getElementById(namefield).value;
+        var pageURL = window.location.href;
+        var codeData = {project_name: projectName, overwrite: overwrite, ide: id, url: pageURL };
+        let fileCount = window.BLOCK_EDITOR.GetFileCount();
+        if (fileCount > 1)
+        {
+          for (let i = 0; i < fileCount; i++)
+          {
+            let fileCode = window.BLOCK_EDITOR.GetCodeAtFileIndex(i);
+            let fileName = window.BLOCK_EDITOR.GetNameAtFileIndex(i);
+            
+            if(i == 0) {
+              codeData.code = fileCode;
+            } else {
+              codeData["file_name"+i] = fileName;
+              codeData["extra_file"+i] = fileCode;
+            }
+          }
+          codeData.multiple_files = "true";
+          codeData.file_count = fileCount;
+        }
+        else
+        {
+          codeData.code = window.BLOCK_EDITOR.GetCode();
+        }
+        $.ajax({
+          type: "POST",
+          url: "/ProjectSave.quorum",
+          data: codeData,
+          success: function(result) {
+            if (result === "A file already exists with that name.") {
+              if (confirm("A file already exists with this name. Do you want to overwrite it?")) {
+                saveBlockProject(id, input, output, namefield, true);
+              }
+            }
+            else {
+              hideProjectSaveModal();
+              document.getElementById(output).innerHTML = result;
+            }
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError) {
+            alert("Your code could not be saved at this time: " + thrownError);
+          }
+        });
+      } else {
+        showLoginModal();
+        hideSaveModal(id);
+      }
+      return false;
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert("I could not connect to the server at quorumlanguage.com: " + thrownError);
+    }
+  });
+};
 
 var saveProject = function(id, input, output, namefield, overwrite) {
   $.ajax({
@@ -1982,8 +2108,8 @@ function deleteRow(button) {
   if (confirm("Are you sure you want to permanently delete " + button.value + "?")) {
     $.ajax({
       type: "POST",
-      url: "/delete_project.php",
-      data: { project: button.value },
+      url: "/Delete.quorum",
+      data: { project_name: button.value },
       success: function(result) {
         if (result === "success") {
           var row = button.parentNode.parentNode;
