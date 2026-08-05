@@ -1,0 +1,72 @@
+package Libraries.Database.Server
+use Libraries.Network.NetworkExchange
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
+use Libraries.Data.Database.Find
+use Libraries.Data.Database.Connection
+use Libraries.Data.Database.Database
+use Libraries.Data.Database.QueryResult
+use Libraries.Data.Database.Update
+
+
+class Delete is ResponsePage
+
+    action ResponseReceived(NetworkExchange exchange)
+        text response = ""
+        text dq = response:GetDoubleQuote()
+        SharedConnection con
+        HashTable<text,text> params = exchange:GetParameters()
+        HashTable<text, List<text>> headers = exchange:GetHeaders()
+
+        text username = con:GetUserFromCookie(exchange)
+        if username = undefined or username = ""
+            Failure(exchange, "User not logged in")
+            return now
+        end
+        text projectName = ""
+        if params:HasKey("project_name")
+            projectName = params:GetValue("project_name")
+        else
+            output "key was missing"
+            Failure(exchange)
+            return now
+        end
+        Connection connect = con:GetConnection()
+        Database database
+        database:Connect(connect)
+
+        Find projectIDQuery
+        projectIDQuery:SetTable("projects")
+        projectIDQuery:AddColumn("id")
+        projectIDQuery:Filter("username = "+dq+username+dq+" and project_name ="+dq+projectName+dq+" and deleted = false")
+        QueryResult result = database:Find(projectIDQuery)
+
+        // assumes there will only be one matching project
+if result:HasNext()
+result:Next()
+            id = result:GetText(0)
+            Update projectUpdate
+                projectUpdate:SetTable("projects")
+                projectUpdate:Add("deleted", true)
+                projectUpdate:Filter("id = "+id)
+                database:Update(projectUpdate)
+
+                Update fileUpdate
+                fileUpdate:SetTable("project_files")
+                fileUpdate:Add("deleted", true)
+                fileUpdate:Filter("id = "+id)
+                database:Update(fileUpdate)
+                database:Close()
+            text successResponse = con:SUCCESS
+            exchange:SendResponseHeaders(200, successResponse)
+            exchange:SendResponse(successResponse)
+            return now
+        end
+        database:Close()
+        Failure(exchange, "Could not find project")
+    end
+
+    action GetPath returns text
+        return "/Delete.quorum"
+    end
+end
