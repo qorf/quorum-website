@@ -246,6 +246,10 @@ function hideModals() {
   if (saveModal != null && saveModal.style.display === 'block') {
     hideProjectSaveModal();
   }
+  let shareProjectModal = document.getElementById('shareModal');
+  if (shareProjectModal != null && shareProjectModal.style.display === 'block') {
+    hideShareModal();
+  }
 }
 
 $(function() {
