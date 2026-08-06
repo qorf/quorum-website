@@ -921,6 +921,7 @@ var blockShowSaveModal = function(id) {
       if (result === "success") {
         document.getElementById('SaveModal').style.display = 'block';
         document.getElementById('projectNameInput').focus();
+        document.getElementById('projectNameInput').value = document.getElementById('projectNameInput').dataset.projectname;
       } else {
         
       }
