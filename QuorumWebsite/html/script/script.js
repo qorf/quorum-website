@@ -38,12 +38,12 @@ $(document).ready(function() {
   });
 
   // sign in modal keyboard navigation
-  document.getElementById('usernameInput')?.addEventListener("keydown", function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
-      document.getElementById('registerAccountLink').focus();
-      event.preventDefault();
-    }
-  });
+  // document.getElementById('usernameInput')?.addEventListener("keydown", function(event) {
+  //   if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+  //     document.getElementById('closeSignInModal').focus();
+  //     event.preventDefault();
+  //   }
+  // });
 
   document.getElementById('submitSignInForm')?.addEventListener("keydown", function(event) {
     if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
@@ -53,8 +53,8 @@ $(document).ready(function() {
   });
 
   document.getElementById('closeSignInModal')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
-      document.getElementById('usernameInput').focus();
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+      document.getElementById('submitSignInForm').focus();
       event.preventDefault();
     }
   });
@@ -109,6 +109,32 @@ $(document).ready(function() {
 
 
   $('#submitRegistrationForm').prop('disabled', true);
+
+  var trapFocus = function trapFocus(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    modal.addEventListener('keydown', function(event) {
+      if (event.key !== "Tab" && event.keyCode !== 9) return;
+      if (modal.style.display === 'none') return;
+
+      const focusableEls = Array.from(modal.querySelectorAll(focusableSelector))
+        .filter(el => el.offsetParent !== null);
+      if (focusableEls.length === 0) return;
+      const first = focusableEls[0];
+      const last = focusableEls[focusableEls.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        last.focus();
+        event.preventDefault();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        first.focus();
+        event.preventDefault();
+      }
+    });
+}
 
   //end login modal keyboard navigations
 
@@ -192,7 +218,11 @@ $(document).ready(function() {
       });
     });
   }
-});
+
+trapFocus('shareModal');
+trapFocus('SaveModal');
+}
+);
 
 // Stores the last ID used to open a load/save modal so it can be closed easily.
 var lastModalID = "";
@@ -1030,7 +1060,6 @@ var showShareModal = function(value) {
   document.getElementById('shareText').value = value;
   document.getElementById('shareText').focus();
   document.getElementById('shareRunningCheckbox').checked = false;
-
   try {
     document.getElementById('shareText').select();
     var success = document.execCommand('copy');
