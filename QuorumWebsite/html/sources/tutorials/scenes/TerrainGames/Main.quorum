@@ -1,0 +1,188 @@
+use Libraries.Game.Game
+use Libraries.Game.InputMonitor
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Worlds.TerrainItem
+use Libraries.Game.Physics.Vehicles.Vehicle
+use Libraries.Game.Physics.Vehicles.Suspension
+use Libraries.Game.Collision.Shapes.Box
+use Libraries.Interface.Behaviors.Games.VehicleMovementBehavior
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Interface.Item3D
+use Libraries.Containers.Iterator
+use Libraries.Compute.Vector3
+use Libraries.System.File
+
+class Main is Game
+    Model chassis
+    Vehicle vehicle
+    VehicleMovementBehavior movement
+    TerrainItem terrain = undefined
+    InputMonitor monitor
+    KeyboardEvent keys
+
+    // How far above the ground the car starts, and how far below it the
+    // car may fall before it is put back.
+    number dropHeight = 1.4
+    number fallLimit = 30
+
+    // How the car handles. See "Why cars tip and skid".
+    number wheelSide = 1.6
+    number rollInfluence = 0
+    number frictionSlip = 6
+    number maximumSteering = 0.35
+
+    action Main
+        UseVulkan(true)
+        StartGame()
+    end
+
+    action CreateGame
+        File file
+        file:SetPath("Scenes/Scene.qs")
+        LoadScene(file)
+
+        EnablePhysics3D(true)
+        SetGravity3D(0, -9.8, 0)
+
+        terrain = FindTerrain()
+        if terrain = undefined
+            output "The scene has no terrain to drive on."
+        else
+            output "Driving on " + terrain:GetName() + "."
+        end
+
+        BuildChassis()
+        BuildVehicle()
+        ResetVehicle()
+        GetCamera3D():Follow(chassis, 12, 5)
+    end
+
+    action Update(number seconds)
+        if monitor:IsKeyPressed(keys:R)
+            ResetVehicle()
+        end
+        if chassis:GetY() < GetGroundHeight(0, 0) - fallLimit
+            ResetVehicle()
+        end
+    end
+
+    // Returns the first terrain in the scene's 3D layer, or undefined.
+    action FindTerrain returns TerrainItem
+        Iterator<Item3D> items = GetCurrentLayer3D():GetIterator()
+        repeat while items:HasNext()
+            Item3D item = items:Next()
+            if item is TerrainItem
+                return cast(TerrainItem, item)
+            end
+        end
+        return undefined
+    end
+
+    // Returns the ground's height at a place, or 0 with no terrain.
+    action GetGroundHeight(number x, number z) returns number
+        if terrain = undefined
+            return 0
+        end
+        return terrain:GetWorldTerrain():GetData():GetSurfaceHeight(x, z)
+    end
+
+    // Makes Car/ToyCarCentered.gltf from Car/ToyCar.gltf, the first time
+    // the game runs. The copy leaves out the blanket, and moves the body
+    // and glass down so the middle of the body is the model's center.
+    action MakeCenteredCar
+        File centered
+        centered:SetPath("Car/ToyCarCentered.gltf")
+        if centered:Exists()
+            return now
+        end
+
+        File original
+        original:SetPath("Car/ToyCar.gltf")
+        text car = original:Read()
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        text mesh = quote + "mesh" + quote + ": "
+        text move = quote + "translation" + quote + ": [0, -0.00752, 0.000215], "
+
+        // Piece 0 is the car's body and piece 2 is its glass. Move both.
+        car = car:Replace(mesh + "0,", mesh + "0, " + move)
+        car = car:Replace(mesh + "2,", mesh + "2, " + move)
+
+        // Piece 1 is the blanket. Without a shape, it draws nothing.
+        car = car:Replace(mesh + "1,", "")
+
+        centered:Write(car)
+        output "Made Car/ToyCarCentered.gltf"
+    end
+
+    // The car's body: the toy car model, with a physics box and a mass.
+    action BuildChassis
+        MakeCenteredCar()
+        chassis:Load("Car/ToyCarCentered.gltf")
+        chassis:SetScale(152, 152, 152)
+        chassis:SetDimensions(0.019, 0.0135, 0.0385)
+        Box shape
+        shape:Set(2.82, 1.2, 5.2)
+        chassis:SetShape(shape)
+        chassis:EnablePhysics(true)
+        chassis:SetResponsive()
+        chassis:SetMass(800)
+        chassis:SetFriction(0.6)
+        chassis:SetRestitution(0)
+        chassis:SetLinearDamping(0.05)
+        chassis:SetAngularDamping(0.9)
+        chassis:SetName("Car")
+        Add(chassis)
+    end
+
+    // The vehicle: four wheels under the body, and a controller.
+    action BuildVehicle
+        vehicle:SetChassis(chassis)
+        vehicle:Add(AddWheel(MakeVector(-wheelSide, -0.31, 2.06), true))
+        vehicle:Add(AddWheel(MakeVector(wheelSide, -0.31, 2.06), true))
+        vehicle:Add(AddWheel(MakeVector(-wheelSide, -0.31, -1.58), false))
+        vehicle:Add(AddWheel(MakeVector(wheelSide, -0.31, -1.58), false))
+        GetCurrentLayer3D():Add(vehicle)
+
+        movement:SetVehicle(vehicle)
+        movement:SetEngineForce(5000)
+        movement:SetReverseForce(3000)
+        movement:SetMaximumSteering(maximumSteering)
+        chassis:AddBehavior(movement)
+    end
+
+    // One wheel: a ray under the body, with a spring.
+    action AddWheel(Vector3 connection, boolean frontWheel) returns Suspension
+        Suspension wheel
+        wheel:SetConnectionPoint(connection)
+        wheel:SetDirection(MakeVector(0, -1, 0))
+        wheel:SetAxle(MakeVector(1, 0, 0))
+        wheel:SetRestLength(0.4)
+        wheel:SetRadius(0.4)
+        wheel:SetSteeringEnabled(frontWheel)
+        wheel:SetSuspensionStiffness(20)
+        wheel:SetDampingCompression(2.5)
+        wheel:SetDampingRelaxation(2.0)
+        wheel:SetFrictionSlip(frictionSlip)
+        wheel:SetRollInfluence(rollInfluence)
+        return wheel
+    end
+
+    // Puts the car upright in the middle of the terrain, and stops it.
+    action ResetVehicle
+        Vector3 stop
+        chassis:SetYawPitchRoll(0, 0, 0)
+        chassis:SetPosition(0, GetGroundHeight(0, 0) + dropHeight, 0)
+        chassis:SetLinearVelocity(stop)
+        chassis:SetAngularVelocity(stop)
+        chassis:Simulate(true)
+        GetCamera3D():JumpToFollowPosition()
+    end
+
+    action MakeVector(number x, number y, number z) returns Vector3
+        Vector3 result
+        result:Set(x, y, z)
+        return result
+    end
+end

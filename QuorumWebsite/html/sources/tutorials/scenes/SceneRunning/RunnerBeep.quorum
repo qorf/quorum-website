@@ -1,0 +1,58 @@
+use Libraries.Game.Game
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Interface.Events.CollisionEvent3D
+use Libraries.Sound.Audio
+use Libraries.Sound.AudioSamples
+use Libraries.Compute.Math
+
+class Main is Game, CollisionListener3D
+    Audio touchSound
+    Audio leaveSound
+
+    action Main
+        UseVulkan(true)
+        StartGame()
+    end
+
+    action CreateGame
+        LoadScene("Scenes/Scene.qs")
+        EnablePhysics3D(true)
+        SetGravity3D(0, -10, 0)
+
+        MakeBeep(touchSound, 880)
+        MakeBeep(leaveSound, 440)
+        AddCollisionListener(me)
+    end
+
+    /*
+    Fills an Audio with a short beep: a tenth of a second of one tone.
+    The pitch is in hertz: 880 is high, and 440 is lower.
+    */
+    action MakeBeep(Audio sound, number pitch)
+        Math math
+        AudioSamples samples
+        samples:SetChannels(1)
+        samples:SetSamplesPerSecond(44100)
+        samples:SetSizeInSeconds(0.1)
+        integer i = 0
+        repeat while i < samples:GetSize()
+            number time = i / 44100.0
+            samples:Set(i, 0.5 * math:Sine(2 * math:pi * pitch * time))
+            i = i + 1
+        end
+        sound:Load(samples)
+    end
+
+    // Two items have started touching, such as the ball landing.
+    action BeginCollision(CollisionEvent3D event)
+        touchSound:Play()
+    end
+
+    // Two items have stopped touching, such as the ball bouncing up.
+    action FinishCollision(CollisionEvent3D event)
+        leaveSound:Play()
+    end
+
+    action Update(number seconds)
+    end
+end

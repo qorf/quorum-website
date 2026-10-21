@@ -1,0 +1,673 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class SceneTerrainGenerate is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Generating Terrain - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Generating Terrain", 1)
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Overview", 2)
+        Paragraph paragraph1
+        paragraph1:AddText("Shaping every hill by hand takes a long time, especially in a large world. Many games instead ")
+        AddBold(paragraph1, "generate")
+        paragraph1:AddText(" their landscapes: a program follows rules to make the ground, then a designer changes the parts that 
+matter. In this tutorial, you will generate whole landscapes in Quorum Studio from a preset and a 
+seed, learn how the computer makes " + dq + "random" + dq + " numbers that can be repeated, wear the land down with erosion, press shapes such as hills and 
+craters into it, and make a terrain bigger by adding regions.")
+        section:Add(paragraph1)
+        AddHeading(section, "Goals", 3)
+        UnorderedList list1
+        list1:AddClassAttribute("list-disc list-outside pl-8")
+        list1:AddListItem("Generate terrain from a preset, a seed and a height")
+        list1:AddListItem("Describe how each preset makes its kind of land")
+        list1:AddListItem("Explain the difference between random and pseudo-random numbers, and why the same seed always gives 
+the same world")
+        list1:AddListItem("Use erosion and stamps to change a terrain, and add and remove regions")
+        section:Add(list1)
+        return section
+    end
+
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Suppose you rolled dice to decide the height of every square of a map, one roll per square. Would 
+the result look like real land? What would be wrong with it? What rules could you add so that it 
+looks more like hills, or mountains, or canyons?")
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words:")
+        WebTable table1 = LoadWebTable("Vocabulary", "/html/media/scenes/Terrain/Generating/Vocabulary.csv")
+        section:Add(table1)
+        AddHeading(section, "New Code to Learn", 3)
+        section:AddParagraph("You will be using the following new pieces of code:")
+        WebTable table2 = LoadWebTable("New Code to Learn", "/html/media/scenes/Terrain/Generating/Code.csv")
+        section:Add(table2)
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph paragraph2
+        paragraph2:AddText("This lesson covers the following ")
+        AddLink(paragraph2, "standards", "https://csteachers.org/pk12standards/view/")
+        paragraph2:AddText(":")
+        section:Add(paragraph2)
+        UnorderedList list2
+        list2:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item1
+        AddBold(item1, "HS-ALG-PS-04")
+        item1:AddText(": Describe the differences between deterministic and probabilistic algorithms.")
+        list2:Add(item1)
+        ListItem item2
+        AddBold(item2, "HS-DAT-DC-21")
+        item2:AddText(": Use a computational tool to generate simulated data that fits certain parameters for use in a 
+simulation.")
+        list2:Add(item2)
+        ListItem item3
+        AddBold(item3, "HS-DAT-DI-26")
+        item3:AddText(": Evaluate a data simulation or visualization to answer a data question, inform decision-making, and 
+identify potential limitations.")
+        list2:Add(item3)
+        ListItem item4
+        AddBold(item4, "HS-PRO-PD-13")
+        item4:AddText(": Use documentation, libraries, application programming interfaces (APIs), and other tools in 
+program development.")
+        list2:Add(item4)
+        ListItem item5
+        AddBold(item5, "MS-ALG-PS-04")
+        item5:AddText(": Justify whether a problem is best solved using procedural instructions, rule-based logic, 
+data-driven methods, or a combination of these approaches.")
+        list2:Add(item5)
+        section:Add(list2)
+        return section
+    end
+
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        Paragraph paragraph3
+        paragraph3:AddText("The tools on this page are in the ")
+        AddBold(paragraph3, "Generate")
+        paragraph3:AddText(" section of the Properties panel, after the Brush section. Select the terrain, then press ")
+        AddCode(paragraph3, "Cmd+P")
+        paragraph3:AddText(" on Mac or ")
+        AddCode(paragraph3, "Ctrl+P")
+        paragraph3:AddText(" on Windows to move into the panel, and ")
+        AddCode(paragraph3, "Tab")
+        paragraph3:AddText(" to reach the Generate section, or click in it with the mouse. Press ")
+        AddCode(paragraph3, "Escape")
+        paragraph3:AddText(" to go back to the scene. The top of the section remakes the ")
+        AddBold(paragraph3, "whole terrain")
+        paragraph3:AddText(" at once; the ")
+        AddBold(paragraph3, "At the brush")
+        paragraph3:AddText(" part below it changes only the ground under the brush.")
+        section:Add(paragraph3)
+        AddExploreGeneratingAWholeTerrain(section)
+        AddExploreThePresets(section)
+        AddExploreRandomNumbersAndWhyTheSeedMatters(section)
+        AddExploreErosion(section)
+        AddExploreStamps(section)
+        AddExploreRegions(section)
+        return section
+    end
+
+    action AddExploreGeneratingAWholeTerrain(Section section)
+        AddHeading(section, "Generating a whole terrain", 3)
+        Paragraph paragraph4
+        paragraph4:AddText("Generating fills the whole terrain with new land, following one of five recipes called ")
+        AddBold(paragraph4, "presets")
+        paragraph4:AddText(". Three settings decide what you get: the ")
+        AddBold(paragraph4, "preset")
+        paragraph4:AddText(", the kind of land; the ")
+        AddBold(paragraph4, "seed")
+        paragraph4:AddText(", a number that picks which of the many possible lands of that kind you get; and the ")
+        AddBold(paragraph4, "height")
+        paragraph4:AddText(", the tallest the ground can be, in world units. Generating replaces every height on the terrain, 
+including anything you shaped by hand.")
+        section:Add(paragraph4)
+        OrderedList list3
+        list3:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem item6
+        item6:AddText("In the Generate section, choose a ")
+        AddBold(item6, "Preset")
+        item6:AddText(": ")
+        AddBold(item6, "Rolling hills")
+        item6:AddText(", ")
+        AddBold(item6, "Mountains")
+        item6:AddText(", ")
+        AddBold(item6, "Plateaus")
+        item6:AddText(", ")
+        AddBold(item6, "Canyons")
+        item6:AddText(" or ")
+        AddBold(item6, "Flat")
+        item6:AddText(". With the keyboard, ")
+        AddCode(item6, "Tab")
+        item6:AddText(" to the Preset group and use the arrow keys; with the mouse, click one.")
+        list3:Add(item6)
+        ListItem item7
+        item7:AddText("Type a ")
+        AddBold(item7, "Seed")
+        item7:AddText(", or press ")
+        AddBold(item7, "New seed")
+        item7:AddText(" to pick one at random, from 1 to")
+        OrderedList list4
+        list4:AddClassAttribute("list-decimal list-outside pl-8")
+        list4:AddListItem("It starts at 7.")
+        item7:AddNestedTag(list4)
+        list3:Add(item7)
+        ListItem item8
+        item8:AddText("Type a ")
+        AddBold(item8, "Height")
+        item8:AddText(". It starts at 32.")
+        list3:Add(item8)
+        ListItem item9
+        item9:AddText("Press ")
+        AddBold(item9, "Generate")
+        item9:AddText(": ")
+        AddCode(item9, "Tab")
+        item9:AddText(" to it and press ")
+        AddCode(item9, "Space")
+        item9:AddText(" or ")
+        AddCode(item9, "Enter")
+        item9:AddText(", or click it.")
+        list3:Add(item9)
+        section:Add(list3)
+        section:AddParagraph("A large terrain can take a few seconds, and Quorum Studio may pause while it works. When it is done, 
+screen reader users might hear a phrase such as " + dq + "Generated rolling hills, seed 7, heights 0.4 to 30.1." + dq + " The Terrain section's " + dq + "Ground height" + dq + " line changes to match.")
+    end
+
+    action AddExploreThePresets(Section section)
+        AddHeading(section, "The presets", 3)
+        Paragraph paragraph5
+        paragraph5:AddText("Every preset except Flat starts from ")
+        AddBold(paragraph5, "Perlin noise")
+        paragraph5:AddText(", a formula invented by Ken Perlin in the 1983 when working on the movie Tron for making 
+natural-looking textures in films. Perlin noise turns a position on the ground into a value that 
+rises and falls smoothly, like gentle waves, and it uses the seed to decide where the waves go. Each 
+preset then uses that noise in its own way.")
+        section:Add(paragraph5)
+        AddHeading(section, "Rolling hills", 4)
+        Paragraph paragraph6
+        paragraph6:AddText("Rolling hills uses ")
+        AddBold(paragraph6, "fractal noise")
+        paragraph6:AddText(": five layers, or ")
+        AddBold(paragraph6, "octaves")
+        paragraph6:AddText(", of Perlin noise added together. The first octave makes the broad shape of the land, and each one 
+after it is smaller and finer, adding bumps on the bumps. Together they make soft, rounded hills of 
+many sizes, like farmland or a park.")
+        section:Add(paragraph6)
+        AddHeading(section, "Mountains", 4)
+        Paragraph paragraph7
+        paragraph7:AddText("Mountains uses ")
+        AddBold(paragraph7, "ridged noise")
+        paragraph7:AddText(": the noise is folded at the middle of each wave, so every place it crosses the middle becomes a 
+sharp crest. Six octaves of it make crests on crests, which look like mountain ridges. The heights 
+are then pushed down, so the valleys between the mountains are wide and the peaks stand out above 
+them.")
+        section:Add(paragraph7)
+        AddHeading(section, "Plateaus", 4)
+        Paragraph paragraph8
+        paragraph8:AddText("Plateaus starts with the same fractal noise as rolling hills, then applies ")
+        AddBold(paragraph8, "terracing")
+        paragraph8:AddText(": the heights are cut into five flat steps, with most of each step level and a steep rise up to the 
+next one. The result is flat-topped land with cliffs between the levels, like a mesa or a stepped 
+hillside.")
+        section:Add(paragraph8)
+        AddHeading(section, "Canyons", 4)
+        Paragraph paragraph9
+        paragraph9:AddText("Canyons uses ")
+        AddBold(paragraph9, "ridged multifractal noise")
+        paragraph9:AddText(", the opposite of the mountains' ridged noise: instead of raising sharp crests out of low ground, it 
+cuts sharp valleys into high ground, with the land between them left smooth. The result looks like a 
+high plain with canyons carved into it.")
+        section:Add(paragraph9)
+        AddHeading(section, "Flat", 4)
+        section:AddParagraph("Flat sets every height to 0. It is a quick way to start over with a level terrain.")
+    end
+
+    action AddExploreRandomNumbersAndWhyTheSeedMatters(Section section)
+        AddHeading(section, "Random numbers and why the seed matters", 3)
+        Paragraph paragraph10
+        paragraph10:AddText("A truly ")
+        AddBold(paragraph10, "random")
+        paragraph10:AddText(" result, like a fair dice roll, can't be predicted. A computer, though, follows instructions exactly, 
+so it can't roll real dice. Instead, it uses a formula that makes a long string of numbers that ")
+        AddEmphasis(paragraph10, "look")
+        paragraph10:AddText(" random: ")
+        AddBold(paragraph10, "pseudo-random numbers")
+        paragraph10:AddText(". The formula has to start somewhere, and that starting point is the ")
+        AddBold(paragraph10, "seed")
+        paragraph10:AddText(". Start from the same seed, and the formula makes exactly the same numbers, in the same order, every 
+time.")
+        section:Add(paragraph10)
+        Paragraph paragraph11
+        paragraph11:AddText("Quorum's ")
+        AddCode(paragraph11, "Random")
+        paragraph11:AddText(" class is a pseudo-random number generator. This program rolls a six-sided die five times:")
+        section:Add(paragraph11)
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/SceneTerrainGenerate/Dice.quorum"))))
+        Paragraph paragraph12
+        paragraph12:AddText("Run it twice: the five rolls are the same both times, because the seed is 7 both times. Now delete 
+the ")
+        AddCode(paragraph12, "SetSeed")
+        paragraph12:AddText(" line and run it twice more. Without a seed, ")
+        AddCode(paragraph12, "Random")
+        paragraph12:AddText(" starts from the computer's clock, which is different every time, so the rolls change.")
+        section:Add(paragraph12)
+        Paragraph paragraph13
+        paragraph13:AddText("Terrain generation works the same way. The noise uses the seed to decide where its waves go, so the 
+result is ")
+        AddBold(paragraph13, "deterministic")
+        paragraph13:AddText(": generate with the same preset, seed and height, and you get exactly the same land, every time, on 
+every computer. Change the seed, and you get a different land of the same kind. Games use this: a 
+seed is one small number, but it can stand for a whole world. Players can share a seed to play the 
+same map, and a game can make the same world again instead of storing every height.")
+        section:Add(paragraph13)
+    end
+
+    action AddExploreErosion(Section section)
+        AddHeading(section, "Erosion", 3)
+        section:AddParagraph("Generated land can look too smooth or too even. Real ground is shaped by rain: water runs downhill, 
+picks up soil where it speeds up and drops it where it slows, carving channels and filling hollows. 
+Quorum Studio's erosion simulates this, following a method by Hans Theobald Beyer: it drops 
+thousands of imaginary raindrops onto the ground, one at a time, and lets each one run downhill, 
+picking up and dropping soil as it goes. Erosion moves ground around; it doesn't add or remove it. 
+It uses a pseudo-random generator, seeded with the terrain's seed, to decide where each drop lands, 
+so it is repeatable too.")
+        UnorderedList list5
+        list5:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item10
+        item10:AddText("To erode the whole terrain, press ")
+        AddBold(item10, "Erode whole terrain")
+        item10:AddText(" in the Generate section. For a new 128 by 128 terrain, it uses 2048 drops of rain, one for every 
+eight samples.")
+        list5:Add(item10)
+        ListItem item11
+        item11:AddText("To erode only part of it, choose any terrain tool, such as Raise with ")
+        AddCode(item11, "Alt+1")
+        item11:AddText(" (")
+        AddCode(item11, "Option+1")
+        item11:AddText(" on Mac), move the brush over the area with the arrow keys or the mouse, and press ")
+        AddBold(item11, "Erode here")
+        item11:AddText(" in the ")
+        AddBold(item11, "At the brush")
+        item11:AddText(" part of the section.")
+        list5:Add(item11)
+        section:Add(list5)
+        Paragraph paragraph14
+        paragraph14:AddText("Erode more than once for a more worn look. Erosion is a ")
+        AddBold(paragraph14, "simulation")
+        paragraph14:AddText(": a simplified model of something real. Ask yourself what it leaves out. Real erosion takes 
+thousands of years and depends on rock, plants and weather.")
+        section:Add(paragraph14)
+    end
+
+    action AddExploreStamps(Section section)
+        AddHeading(section, "Stamps", 3)
+        Paragraph paragraph15
+        paragraph15:AddText("A ")
+        AddBold(paragraph15, "stamp")
+        paragraph15:AddText(" presses a whole shape into the ground at once, as big as the brush, instead of building it up stroke 
+by stroke. It is the quickest way to put one particular feature exactly where you want it: a 
+mountain in the middle of a plain, a crater, or a ridge along the edge of a valley. Stamps are in 
+the ")
+        AddBold(paragraph15, "At the brush")
+        paragraph15:AddText(" part of the Generate section, and they have these settings:")
+        section:Add(paragraph15)
+        UnorderedList list6
+        list6:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item12
+        AddBold(item12, "Stamp:")
+        item12:AddText(" the shape: ")
+        AddBold(item12, "Hill")
+        item12:AddText(", ")
+        AddBold(item12, "Mountain")
+        item12:AddText(", ")
+        AddBold(item12, "Mesa")
+        item12:AddText(" (a flat-topped hill), ")
+        AddBold(item12, "Crater")
+        item12:AddText(" or ")
+        AddBold(item12, "Ridge")
+        item12:AddText(".")
+        list6:Add(item12)
+        ListItem item13
+        AddBold(item13, "Stamp mode:")
+        item13:AddText(" how the shape meets the ground already there:")
+        UnorderedList list7
+        list7:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item14
+        AddBold(item14, "Usual for the shape")
+        item14:AddText(", the default, adds a crater's shape onto the ground and raises the ground up to the other shapes;")
+        list7:Add(item14)
+        ListItem item15
+        AddBold(item15, "Add")
+        item15:AddText(" puts the shape on top of the ground;")
+        list7:Add(item15)
+        ListItem item16
+        AddBold(item16, "Subtract")
+        item16:AddText(" digs the shape into the ground;")
+        list7:Add(item16)
+        ListItem item17
+        AddBold(item17, "Raise to the shape")
+        item17:AddText(" lifts the ground up to the shape, and leaves ground that is already higher alone.")
+        list7:Add(item17)
+        item13:AddNestedTag(list7)
+        list6:Add(item13)
+        ListItem item18
+        AddBold(item18, "Stamp height:")
+        item18:AddText(" how tall the shape is, in world units. It starts at 15.")
+        list6:Add(item18)
+        ListItem item19
+        AddBold(item19, "Turn:")
+        item19:AddText(" how far to turn the shape, in degrees. This matters for a ridge.")
+        list6:Add(item19)
+        section:Add(list6)
+        Paragraph paragraph16
+        AddBold(paragraph16, "With the keyboard:")
+        section:Add(paragraph16)
+        OrderedList list8
+        list8:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem item20
+        item20:AddText("With the terrain selected, choose any terrain tool to place the brush, such as Raise with ")
+        AddCode(item20, "Alt+1")
+        item20:AddText(" (")
+        AddCode(item20, "Option+1")
+        item20:AddText(" on Mac).")
+        list8:Add(item20)
+        ListItem item21
+        item21:AddText("Move the brush with the arrow keys to where the stamp should go, and size it with ")
+        AddCode(item21, "Alt+=")
+        item21:AddText(" and ")
+        AddCode(item21, "Alt+-")
+        item21:AddText(" (")
+        AddCode(item21, "Option+=")
+        item21:AddText(" and ")
+        AddCode(item21, "Option+-")
+        item21:AddText(" on Mac).")
+        list8:Add(item21)
+        ListItem item22
+        item22:AddText("Press ")
+        AddCode(item22, "Ctrl+P")
+        item22:AddText(" (")
+        AddCode(item22, "Cmd+P")
+        item22:AddText(" on Mac) to move into the Properties panel, and ")
+        AddCode(item22, "Tab")
+        item22:AddText(" to the ")
+        AddBold(item22, "At the brush")
+        item22:AddText(" part of the Generate section.")
+        list8:Add(item22)
+        ListItem item23
+        item23:AddText("In the ")
+        AddBold(item23, "Stamp")
+        item23:AddText(" group, use the arrow keys to choose a shape, then ")
+        AddCode(item23, "Tab")
+        item23:AddText(" to ")
+        AddBold(item23, "Stamp mode")
+        item23:AddText(" and choose one the same way.")
+        list8:Add(item23)
+        ListItem item24
+        AddCode(item24, "Tab")
+        item24:AddText(" to ")
+        AddBold(item24, "Stamp height")
+        item24:AddText(" and ")
+        AddBold(item24, "Turn")
+        item24:AddText(", and type values if you want to change them.")
+        list8:Add(item24)
+        ListItem item25
+        AddCode(item25, "Tab")
+        item25:AddText(" to ")
+        AddBold(item25, "Stamp here")
+        item25:AddText(" and press ")
+        AddCode(item25, "Space")
+        item25:AddText(" or ")
+        AddCode(item25, "Enter")
+        item25:AddText(".")
+        list8:Add(item25)
+        ListItem item26
+        item26:AddText("Press ")
+        AddCode(item26, "Escape")
+        item26:AddText(" to go back to the scene.")
+        list8:Add(item26)
+        section:Add(list8)
+        Paragraph paragraph17
+        AddBold(paragraph17, "With the mouse:")
+        section:Add(paragraph17)
+        OrderedList list9
+        list9:AddClassAttribute("list-decimal list-outside pl-8")
+        list9:AddListItem("With the terrain selected, choose any terrain tool, such as Raise, in the Brush section's Tool 
+group.")
+        list9:AddListItem("Move the pointer over the ground to where the stamp should go; the brush follows it.")
+        ListItem item27
+        item27:AddText("In the Generate section, click a shape in the ")
+        AddBold(item27, "Stamp")
+        item27:AddText(" group and a mode in ")
+        AddBold(item27, "Stamp mode")
+        item27:AddText(", and type a ")
+        AddBold(item27, "Stamp height")
+        item27:AddText(" and ")
+        AddBold(item27, "Turn")
+        item27:AddText(" if you want.")
+        list9:Add(item27)
+        ListItem item28
+        item28:AddText("Move the brush back over the spot if needed, then click ")
+        AddBold(item28, "Stamp here")
+        item28:AddText(".")
+        list9:Add(item28)
+        section:Add(list9)
+    end
+
+    action AddExploreRegions(Section section)
+        AddHeading(section, "Regions", 3)
+        section:AddParagraph("A terrain is made of square regions, 64 by 64 units for a new terrain. Adding regions makes the 
+world bigger, and removing them makes it smaller. New regions are flat, at height 0, so generate 
+again to fill them with land. Regions sit on a fixed grid, from -16 to 15 along each side.")
+        Paragraph paragraph18
+        AddBold(paragraph18, "Adding a region with the keyboard:")
+        section:Add(paragraph18)
+        OrderedList list10
+        list10:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem item29
+        item29:AddText("With the terrain selected, press ")
+        AddCode(item29, "Alt+8")
+        item29:AddText(" (")
+        AddCode(item29, "Option+8")
+        item29:AddText(" on Mac) to choose ")
+        AddBold(item29, "Add region")
+        item29:AddText(".")
+        list10:Add(item29)
+        list10:AddListItem("Move the brush with the arrow keys past the edge of the ground, to where the new region should be.")
+        ListItem item30
+        item30:AddText("Press ")
+        AddCode(item30, "Space")
+        item30:AddText(".")
+        list10:Add(item30)
+        section:Add(list10)
+        Paragraph paragraph19
+        AddBold(paragraph19, "Adding a region with the mouse:")
+        section:Add(paragraph19)
+        OrderedList list11
+        list11:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem item31
+        item31:AddText("Choose ")
+        AddBold(item31, "Add region")
+        item31:AddText(" in the Brush section's Tool group.")
+        list11:Add(item31)
+        list11:AddListItem("Move the pointer past the edge of the ground, to where the new region should be, and click.")
+        section:Add(list11)
+        Paragraph paragraph20
+        AddBold(paragraph20, "Removing a region:")
+        paragraph20:AddText(" choose ")
+        AddBold(paragraph20, "Remove region")
+        paragraph20:AddText(" with ")
+        AddCode(paragraph20, "Alt+9")
+        paragraph20:AddText(" (")
+        AddCode(paragraph20, "Option+9")
+        paragraph20:AddText(" on Mac) or in the Tool group, move the brush over the region, and press ")
+        AddCode(paragraph20, "Space")
+        paragraph20:AddText(" or click.")
+        section:Add(paragraph20)
+        Paragraph paragraph21
+        AddBold(paragraph21, "Growing on every side:")
+        paragraph21:AddText(" in the Terrain section, press ")
+        AddBold(paragraph21, "Grow by one region on every side")
+        paragraph21:AddText(", with ")
+        AddCode(paragraph21, "Space")
+        paragraph21:AddText(" or ")
+        AddCode(paragraph21, "Enter")
+        paragraph21:AddText(" or a click, to add a ring of regions all the way around the terrain.")
+        section:Add(paragraph21)
+        Paragraph paragraph22
+        paragraph22:AddText("When you save, a removed region is left out of ")
+        AddCode(paragraph22, "terrain.json")
+        paragraph22:AddText(", so it won't load again. Its image stays in the terrain's folder, unused: Quorum Studio never 
+deletes files from your project.")
+        section:Add(paragraph22)
+    end
+
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        Paragraph paragraph23
+        paragraph23:AddText("In this activity, you and a partner test whether " + dq + "random" + dq + " worlds really are random, first in code and then with the terrain generator. The goal is to 
+understand what a seed does, and to compare a generated world before and after erosion. Start with 
+the dice program from this page: each of you runs it with ")
+        AddCode(paragraph23, "SetSeed(7)")
+        paragraph23:AddText(" and writes down the five rolls, then compares lists. Then delete the ")
+        AddCode(paragraph23, "SetSeed")
+        paragraph23:AddText(" line, run it again, and compare once more.")
+        section:Add(paragraph23)
+        Paragraph paragraph24
+        paragraph24:AddText("Next, each of you adds a new terrain to your own scene. In the Generate section, both choose ")
+        AddBold(paragraph24, "Mountains")
+        paragraph24:AddText(", set the seed to ")
+        AddBold(paragraph24, "7")
+        paragraph24:AddText(" and the height to ")
+        AddBold(paragraph24, "32")
+        paragraph24:AddText(", and press ")
+        AddBold(paragraph24, "Generate")
+        paragraph24:AddText(". Compare your two worlds: put the screens side by side, or choose Raise so the brush appears, move 
+it the same number of arrow-key steps from the middle on both computers, and compare the heights 
+reported. Then each of you presses ")
+        AddBold(paragraph24, "New seed")
+        paragraph24:AddText(", generates again, and compares once more. Finally, one partner presses ")
+        AddBold(paragraph24, "Erode whole terrain")
+        paragraph24:AddText(" three times, and you compare that terrain with the other at the same few points. Write down what you 
+noticed at each stage, then discuss:")
+        section:Add(paragraph24)
+        UnorderedList list12
+        list12:AddClassAttribute("list-disc list-outside pl-8")
+        list12:AddListItem("Is a generated world random? What exactly did the seed make repeatable?")
+        list12:AddListItem("Why would a game want the same world from the same seed? When would it want a new one?")
+        list12:AddListItem("What does the erosion simulation get right about real land? What does it leave out?")
+        section:Add(list12)
+        return section
+    end
+
+    action AddWrapup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Wrap up", 2)
+        Paragraph paragraph25
+        paragraph25:AddText("Procedural generation turns a few settings (a preset, a seed and a height) into a whole landscape, 
+and the same settings always give the same land. Stamps and erosion then let you change parts of it, 
+and regions let the world grow. In your own games, which parts of a world would you generate by 
+rules, and which would you still make by hand? Why? In the next tutorial, ")
+        AddLink(paragraph25, "Terrain in a Game", "/tutorials/Scenes/terrainGames.html")
+        paragraph25:AddText(", you will load your terrain in a game and walk or drive on it.")
+        section:Add(paragraph25)
+        return section
+    end
+
+    private action AddBold(WebTag tag, text value)
+        StrongText strong
+        strong:AddText(value)
+        tag:AddNestedTag(strong)
+    end
+
+    private action AddCode(WebTag tag, text value)
+        CodeBlock code
+        code:AddClassAttribute("break-words")
+        code:AddText(value)
+        tag:AddNestedTag(code)
+    end
+
+    private action AddEmphasis(WebTag tag, text value)
+        Emphasize emphasis
+        emphasis:AddText(value)
+        tag:AddNestedTag(emphasis)
+    end
+
+    private action AddLink(WebTag tag, text name, text address)
+        Link link
+        link:AddText(name)
+        link:SetAddress(address)
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        tag:AddNestedTag(link)
+    end
+
+    //wraps long lines, so code never scrolls sideways on a narrow screen (WCAG 1.4.10, reflow)
+    private action AllowWrapping(PreformattedText code) returns PreformattedText
+        code:AddClassAttribute("whitespace-pre-wrap break-words")
+        return code
+    end
+
+    action GetMetaDescription returns text
+        return "Learn to generate terrain in Quorum Studio from presets and seeds, how pseudo-random numbers work, 
+and how to change terrain with erosion, stamps and regions."
+    end
+
+    action GetSummaryName returns text
+        return "Generating Terrain"
+    end
+
+    action GetName returns text
+        return "Generating Terrain"
+    end
+
+    action GetShortDescription returns text
+        return "generating terrain in Quorum Studio"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Scenes/terrainGenerate.html"
+    end
+
+    action GetLinkName returns text
+        return "Generating Terrain"
+    end
+
+    action GetSectionName returns text
+        return "Scene Editing"
+    end
+end

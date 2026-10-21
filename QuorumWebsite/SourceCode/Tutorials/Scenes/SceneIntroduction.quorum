@@ -6,72 +6,280 @@ class SceneIntroduction is Lesson
     dq = dq:GetDoubleQuote()
     text cr = ""
     cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
 
     action Setup
         //html header stuff
-        SetWebPageTitle("Introduction to Scene Editor - Quorum Programming Language")
+        SetWebPageTitle("Introduction to Scene Editing - Quorum Programming Language")
         AddDefaultHeaders()
 
-        
-         //page header
+        //page header
         Array<Division> divs = InitializeTutorialPage()
         Division bodyDiv = divs:Get(1)
         Division onPageDiv = divs:Get(2)
 
         Header headDiv
         headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("What is a Scene Editor?", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Introduction to Scene Editor")
-        AddToHeadingArray(h_heading)
-
-        headDiv:AddText("In this tutorial, we learn about scene editing. In it, we will examine how to make scenes, use them,
-load them, and make games with them.")
+        AddHeading(headDiv, "Introduction to Scene Editing", 1)
         bodyDiv:Add(headDiv)
 
-        //the section on general information
-        Section section_overview
-        section_overview:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_overview)
-        AddHeading(section_overview, "Scene Editor Overview", 2)
-        
-        section_overview:AddParagraph("Making computer games can be hard for many reasons. 
-One more innovation over decades has been the creation of so-called scene editors. 
-Examples of such editors include those in Unity3D, Unreal, and many other engines. 
-The basic idea is to allow visual, or hopefully accessible, manipulation of pictures, 
-sounds, and the like without having to write code for everything. This kind of visual 
-approach is common all throughout computer science. In 3D modeling, for example, tools like 
-Maya or Blender can be used to let users manipulate one 3D object. Scene libraries tend to manipulate more.")
-       section_overview:AddParagraph("Beyond 3D, scene editing is also used in 2D games. The most famous is 
-likely the one used in Scratch. Instead of coding everything, the visual aspect of the system can be 
-manipulated directly and the code then changes what it does. Others like Tiled have made it easier 
-to create 2D map layouts for games, again using visual metaphors. Libraries for scientific computing, 
-3D printing, and many other applications have followed a similar path of development in using graphics to 
-better afford ease of use. Quorum Studio’s approach here is in the tradition of many of these tools, 
-except we obsess about trying to make it all accessible to people with disabilities.")
-        
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
         Section nextLesson
         nextLesson:AddClassAttribute("flex flex-col gap-y-2")
         bodyDiv:Add(nextLesson)
-        WriteNextTutorial(nextLesson)    
+        WriteNextTutorial(nextLesson)
         onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
+    action AddOverview returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Overview", 2)
+        section:AddParagraph("In this tutorial, we learn about scene editing. Across this series, we will
+look at how to make scenes, use them, load them, and make games with them. This first page explains
+what a scene editor is and where the idea came from. It also covers how 2D and 3D scenes are used, how
+positions in a scene are described with x, y and z coordinates, and why Quorum Studio's scene editor
+can be used with a screen reader, a keyboard or a mouse.")
+
+        AddHeading(section, "Goals", 3)
+        section:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goals
+        goals:AddClassAttribute("list-disc list-outside pl-8")
+        goals:AddListItem("Explain what a scene editor is and where scene editors came from.")
+        goals:AddListItem("Compare what 2D and 3D scenes are used for.")
+        goals:AddListItem("Describe the position of an object using x, y and z coordinates.")
+        section:Add(goals)
+        return section
+    end
+
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think of a game you know well. Pick one level or one room. How many things
+are in it: walls, trees, coins, enemies, lights? Now imagine you had to type the exact position of every
+one of them, as numbers. How long would that take, and how would you check you got them right?")
+
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words:")
+        WebTable vocabularyTable = LoadWebTable("Vocabulary", "/html/media/scenes/Introduction/Vocabulary.csv")
+        section:Add(vocabularyTable)
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph standardsParagraph
+        standardsParagraph:AddText("This lesson covers the following standards, from the ")
+        standardsParagraph:AddLink("2026 CSTA K–12 Computer Science Standards", "https://csteachers.org/pk12standards/view/")
+        standardsParagraph:AddText(":")
+        section:Add(standardsParagraph)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        AddStandard(standards, "HS-SOC-HI-38", "Analyze the historical trajectory of a specific computing technology and how its development is linked to societal and environmental factors.")
+        AddStandard(standards, "S1-GMD-DD-02", "Create a storyboard to plan and communicate a game's narrative and interactive experience.")
+        section:Add(standards)
+        return section
+    end
+
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+
+        //what a scene editor is, and its history
+        AddHeading(section, "What is a scene editor?", 3)
+        section:AddParagraph("Most games are made by teams of people with different jobs:")
+        UnorderedList jobs
+        jobs:AddClassAttribute("list-disc list-outside pl-8")
+        jobs:AddListItem("artists make the assets: pictures, 3D models and sounds;")
+        jobs:AddListItem("programmers write the code that decides how things behave;")
+        jobs:AddListItem("level designers put it all together into the places a player explores.")
+        section:Add(jobs)
+        section:AddParagraph("A scene editor is the level designer's tool. Instead of typing the position
+of every wall and tree in code, a designer places them directly, moves them until they look right, and
+saves the result as a scene that the game loads.")
+        section:AddParagraph("Scene editors grew out of the tools game studios built for themselves, and
+some of the best known were given to players. StarCraft (1998) shipped with a map editor, and Warcraft III
+(2002) shipped with its World Editor. Players used these to make thousands of their own maps, and some of
+those maps grew into new kinds of games. Defense of the Ancients (DotA), which made the " + dq + "battle arena" + dq + "
+genre popular, began as a map built in the Warcraft III World Editor. Today, scene editors are at the center
+of general-purpose game engines such as Unity, Unreal Engine and Godot, which professional studios, students
+and hobbyists all use. Making these tools available to everyone has changed who gets to make games.")
+        section:AddParagraph("This visual approach is common throughout computer science. In 3D modeling,
+for example, tools like Maya or Blender let people shape one 3D object. Scene editors work with many
+objects at once: a whole level, with everything in it.")
+
+        //2D and 3D
+        AddHeading(section, "2D and 3D scenes", 3)
+        section:AddParagraph("Scenes come in two kinds.")
+        Paragraph twoD
+        twoD:AddText("A ")
+        AddBold(twoD, "2D")
+        twoD:AddText(" scene is flat, like a page or a board. Items have a width and a height, but no depth.
+2D scenes are common in:")
+        section:Add(twoD)
+        UnorderedList twoDUses
+        twoDUses:AddClassAttribute("list-disc list-outside pl-8")
+        twoDUses:AddListItem("platform and puzzle games, and many phone games;")
+        twoDUses:AddListItem("top-down maps, such as an adventure game seen from above;")
+        twoDUses:AddListItem("board and card games;")
+        twoDUses:AddListItem("educational apps, animations and interactive stories.")
+        section:Add(twoDUses)
+        Paragraph tiles
+        tiles:AddText("2D scenes are often built from ")
+        AddBold(tiles, "tiles")
+        tiles:AddText(": small square pictures, such as grass, water or walls, laid out on a grid like
+floor tiles. Tools such as Tiled are used to lay out 2D maps this way.")
+        section:Add(tiles)
+
+        Paragraph threeD
+        threeD:AddText("A ")
+        AddBold(threeD, "3D")
+        threeD:AddText(" scene has depth, so a camera can move through it and look around. 3D scenes are
+used for:")
+        section:Add(threeD)
+        UnorderedList threeDUses
+        threeDUses:AddClassAttribute("list-disc list-outside pl-8")
+        threeDUses:AddListItem("games set in worlds a player walks, drives or flies through;")
+        threeDUses:AddListItem("simulations, such as training to drive or fly;")
+        threeDUses:AddListItem("virtual reality;")
+        threeDUses:AddListItem("architecture, where people tour a building before it's built;")
+        threeDUses:AddListItem("science, where people explore a model of a molecule, a planet or a city.")
+        section:Add(threeDUses)
+        section:AddParagraph("Neither kind is better. A 2D scene is often simpler to build and easier to
+understand at a glance. A 3D scene can show the world the way we see it, but takes more work to build and
+to explore. Quorum Studio's scene editor makes both.")
+
+        //coordinates
+        AddHeading(section, "Positions: x, y and z", 3)
+        Paragraph positions
+        positions:AddText("Every item in a scene has a position, written as ")
+        AddBold(positions, "coordinates")
+        positions:AddText(": one number for each direction.")
+        section:Add(positions)
+
+        Paragraph twoDPositions
+        twoDPositions:AddText("In a ")
+        AddBold(twoDPositions, "2D")
+        twoDPositions:AddText(" scene, a position has two coordinates, ")
+        AddBold(twoDPositions, "x")
+        twoDPositions:AddText(" and ")
+        AddBold(twoDPositions, "y")
+        twoDPositions:AddText(":")
+        section:Add(twoDPositions)
+        UnorderedList twoDAxes
+        twoDAxes:AddClassAttribute("list-disc list-outside pl-8")
+        twoDAxes:AddListItem("x is how far to the right;")
+        twoDAxes:AddListItem("y is how far up.")
+        section:Add(twoDAxes)
+        section:AddParagraph("In Quorum, (0, 0) is the bottom-left corner. An item at (100, 50) is 100
+units to the right of that corner and 50 units up. In a 2D scene, a unit is one pixel.")
+
+        Paragraph threeDPositions
+        threeDPositions:AddText("A ")
+        AddBold(threeDPositions, "3D")
+        threeDPositions:AddText(" scene adds a third coordinate, ")
+        AddBold(threeDPositions, "z")
+        threeDPositions:AddText(", for depth:")
+        section:Add(threeDPositions)
+        UnorderedList threeDAxes
+        threeDAxes:AddClassAttribute("list-disc list-outside pl-8")
+        threeDAxes:AddListItem("x is still left and right;")
+        threeDAxes:AddListItem("y is still up and down;")
+        threeDAxes:AddListItem("z is toward and away from you. In Quorum, larger z values are farther away.")
+        section:Add(threeDAxes)
+        Paragraph origin
+        origin:AddText("The point (0, 0, 0) is called the ")
+        AddBold(origin, "origin")
+        origin:AddText(". In a 3D scene, one unit is one meter, the same as in the real world. A box at
+(2, 0, 5) sits on the ground 2 meters to the right of the origin and 5 meters away from you.")
+        section:Add(origin)
+        section:AddParagraph("You'll use these coordinates throughout this series, both in the scene
+editor and in code.")
+
+        //Quorum Studio
+        AddHeading(section, "Scene editing in Quorum Studio", 3)
+        section:AddParagraph("Quorum Studio's scene editor is in the tradition of these tools, except that
+we obsess about making it all accessible to people with disabilities. Every part of it can be used from
+the keyboard, and it tells a screen reader what is happening. For example, when you add an item, Quorum
+Studio reports " + dq + "Placed" + dq + " followed by the item's name. You will see this throughout the series.")
+        section:AddParagraph("In this series, you will:")
+        UnorderedList series
+        series:AddClassAttribute("list-disc list-outside pl-8")
+        series:AddListItem("create a project with a scene in it;")
+        series:AddListItem("learn the parts of the scene editor;")
+        series:AddListItem("add, remove, move and change items;")
+        series:AddListItem("run a scene and change it from code;")
+        series:AddListItem("add terrain, the ground of a 3D world.")
+        section:Add(series)
+        return section
+    end
+
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this activity, you and a partner build a real scene on a tabletop and
+describe it with coordinates, the same way a scene editor does. You'll need a sheet of graph paper (or a
+sheet of plain paper with a grid drawn on it), a ruler, and a handful of small objects, such as coins,
+erasers, blocks, cups or game pieces. Pick one corner of the paper to be the origin, and mark it. Agree on
+a unit: one square of graph paper, or one centimeter. The edge of the paper running right from the origin
+is the x-axis, the edge running away from you is the z-axis, and straight up from the table is the y-axis.
+If you don't have graph paper, mark the units along two edges with tape or a marker.")
+        section:AddParagraph("Together, place four to six objects on the paper to make a small scene, such
+as a park, a room or a game level. Stack at least one object on another, so something sits above the
+table. Then write down each object's name and its coordinates (x, y, z), measuring from the origin to the
+center of its base. An object resting on the table has a y of 0. A coin on top of a block that is 3 units
+tall has a y of 3. Next, test your description. One partner reads the list aloud while the other, with the
+objects cleared away, rebuilds the scene from the coordinates alone. Compare the rebuilt scene with a photo
+or sketch of the original. Wherever they differ, decide together whether the coordinate was wrong or
+something was missing, such as which way an object faces or how big it is, and fix your list. Then swap roles.")
+        return section
+    end
+
+    action AddWrapup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("A scene editor turns a slow, error-prone job, typing the position of every
+item, into one you can do directly. Behind the scenes, it is still keeping a list like the one you made in
+Engage: every item, with its coordinates. What did your list need besides x, y and z to rebuild the scene
+correctly?")
+        return section
+    end
+
+    private action AddStandard(UnorderedList list, text identifier, text standard)
+        ListItem item
+        StrongText strong
+        strong:AddText(identifier)
+        item:Add(strong)
+        item:AddText(": " + standard)
+        list:Add(item)
+    end
+
+    private action AddBold(Paragraph paragraph, text value)
+        StrongText strong
+        strong:AddText(value)
+        paragraph:Add(strong)
+    end
+
     action GetMetaDescription returns text
-        return "What is a Scene Editor?"
+        return "An introduction to scene editing: what a scene editor is, where it came from, 2D and 3D scenes, and x, y and z coordinates."
     end
 
     action GetSummaryName returns text
-        return "Scene Editor"
+        return "Scene Editing"
     end
 
     action GetName returns text
-        return "Introduction to Scene Editor"
+        return "Introduction to Scene Editing"
     end
 
     action GetShortDescription returns text
-        return "development of Scene Editor in Quorum Studio"
+        return "what a scene editor is, 2D and 3D scenes, and coordinates"
     end
 
     action GetLocation returns text

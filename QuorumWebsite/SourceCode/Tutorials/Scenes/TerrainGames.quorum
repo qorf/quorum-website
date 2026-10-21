@@ -1,0 +1,551 @@
+use Libraries.Web.Page.all
+use Libraries.Containers.Array
+
+class TerrainGames is Lesson
+    text dq = ""
+    dq = dq:GetDoubleQuote()
+    text cr = ""
+    cr = cr:GetCarriageReturn()
+    Preformatter preformatter //helper
+
+    action Setup
+        //html header stuff
+        SetWebPageTitle("Driving on Terrain: Vehicles and Physics - Quorum Programming Language")
+        AddDefaultHeaders()
+
+        //page header
+        Array<Division> divs = InitializeTutorialPage()
+        Division bodyDiv = divs:Get(1)
+        Division onPageDiv = divs:Get(2)
+
+        Header headDiv
+        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+        AddHeading(headDiv, "Driving on Terrain: Vehicles and Physics", 1)
+        bodyDiv:Add(headDiv)
+
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
+
+        Section nextLesson
+        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
+        bodyDiv:Add(nextLesson)
+        WriteNextTutorial(nextLesson)
+        onPageDiv:Add(CreateHeadingTableOfContents())
+    end
+
+    action AddOverview returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Overview", 2)
+        section:AddParagraph("Racing games, delivery games and open-world adventures all have one thing in common: something with 
+wheels moving over the ground. In this tutorial, you will load a toy car into a scene with a terrain 
+and drive it over the hills you made. Along the way you will see how a game turns a car into 
+physics: a body with weight, four wheels on springs, an engine that pushes and brakes that hold, and 
+tires that grip until they slide. The car comes from AllTerrainVehicle, a Quorum test project for 
+driving over large terrains.")
+        AddHeading(section, "Goals", 3)
+        UnorderedList list1
+        list1:AddClassAttribute("list-disc list-outside pl-8")
+        list1:AddListItem("Explain how a game models a car: a body, wheels on springs, an engine, steering and brakes")
+        list1:AddListItem("Load the toy car into a scene with a terrain, and drive it with the keyboard")
+        list1:AddListItem("Describe how mass, springs, grip and the width between the wheels change the way a car drives")
+        list1:AddListItem("Read a program built from small actions, and change one setting at a time to see what it does")
+        section:Add(list1)
+        return section
+    end
+
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("Think about riding in a car or on a bike over a bumpy road. What keeps you from feeling every single 
+bump? What makes a car skid on ice, or tip over on a sharp turn? Make a list of the parts of a real 
+car that matter for how it moves.")
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words:")
+        WebTable table1 = LoadWebTable("Vocabulary", "/html/media/scenes/Terrain/Vehicles/Vocabulary.csv")
+        section:Add(table1)
+        AddHeading(section, "New Code to Learn", 3)
+        section:AddParagraph("You will be using the following new pieces of code:")
+        WebTable table2 = LoadWebTable("New Code to Learn", "/html/media/scenes/Terrain/Vehicles/Code.csv")
+        section:Add(table2)
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph paragraph1
+        paragraph1:AddText("This lesson covers the following ")
+        AddLink(paragraph1, "standards", "https://csteachers.org/pk12standards/view/")
+        paragraph1:AddText(":")
+        section:Add(paragraph1)
+        UnorderedList list2
+        list2:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item1
+        AddBold(item1, "HS-PRO-PD-12")
+        item1:AddText(": Create a modular program that uses procedures, external libraries, or objects to improve 
+reusability and readability.")
+        list2:Add(item1)
+        ListItem item2
+        AddBold(item2, "HS-PRO-PD-13")
+        item2:AddText(": Use documentation, libraries, application programming interfaces (APIs), and other tools in 
+program development.")
+        list2:Add(item2)
+        ListItem item3
+        AddBold(item3, "HS-DAT-DI-26")
+        item3:AddText(": Evaluate a data simulation or visualization to answer a data question, inform decision-making, and 
+identify potential limitations.")
+        list2:Add(item3)
+        ListItem item4
+        AddBold(item4, "MS-PRO-TR-19")
+        item4:AddText(": Use systematic strategies to test, refine, and document changes to a computing technology to meet 
+the intended purpose.")
+        list2:Add(item4)
+        section:Add(list2)
+        return section
+    end
+
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        Paragraph paragraph2
+        paragraph2:AddText("A car in a game is a physics simulation, built from the same ideas as the falling ball in ")
+        AddLink(paragraph2, "Properties", "/tutorials/Scenes/properties.html")
+        paragraph2:AddText(": mass, forces, gravity and friction. What makes a car special is how those ideas are put together. 
+A heavy body sits on four springs, each spring rests on a wheel, the engine pushes the wheels, the 
+brakes hold them, and the tires grip the ground until they are pushed too hard. Quorum has classes 
+for each of these parts. In this tutorial you will load the toy car from AllTerrainVehicle, a Quorum 
+project for testing cars on large terrains, and look at how its program builds the car piece by 
+piece.")
+        section:Add(paragraph2)
+        AddExploreHowAGameCarWorks(section)
+        AddExploreGettingTheCar(section)
+        AddExploreTheProgram(section)
+        AddExploreDriving(section)
+        AddExploreHowTheProgramBuildsTheCar(section)
+        AddExploreWhyCarsTipAndSkid(section)
+        return section
+    end
+
+    action AddExploreHowAGameCarWorks(Section section)
+        AddHeading(section, "How a game car works", 3)
+        Paragraph paragraph3
+        paragraph3:AddText("A real car's wheels are round, and they roll. Simulating every wheel as a real round object, 
+touching the ground at just the right point and rolling without slipping, is hard for a physics 
+engine to do well, so many games use a shortcut called a ")
+        AddBold(paragraph3, "raycast vehicle")
+        paragraph3:AddText(". Quorum's ")
+        AddCode(paragraph3, "Vehicle")
+        paragraph3:AddText(" class is one.")
+        section:Add(paragraph3)
+        Paragraph paragraph4
+        paragraph4:AddText("In a raycast vehicle, the wheels aren't physics objects at all. Each wheel is an invisible line, a ")
+        AddBold(paragraph4, "raycast")
+        paragraph4:AddText(", sent straight down from the car's body on every physics step. The line finds out how far away the 
+ground is under that corner of the car. A ")
+        AddBold(paragraph4, "spring")
+        paragraph4:AddText(" then pushes the body up: the closer the ground, the more the spring is squeezed, and the harder it 
+pushes. This is the car's ")
+        AddBold(paragraph4, "suspension")
+        paragraph4:AddText(", and it is why the body rides smoothly over bumps instead of bouncing off them. ")
+        AddBold(paragraph4, "Damping")
+        paragraph4:AddText(" slows the spring down, the way a shock absorber does, so the car settles after a bump instead of 
+bouncing on and on.")
+        section:Add(paragraph4)
+        Paragraph paragraph5
+        paragraph5:AddText("The wheels also push the car along and turn it. The engine's force is applied where each driving 
+wheel touches the ground, the front wheels turn to steer, and each tire grips the ground sideways. 
+If a tire is pushed sideways harder than its grip, which Quorum calls its ")
+        AddBold(paragraph5, "friction slip")
+        paragraph5:AddText(", it slides, and the car skids. The body you see is the car's model, moving with the physics body; 
+the wheels drawn on it are part of the model.")
+        section:Add(paragraph5)
+    end
+
+    action AddExploreGettingTheCar(Section section)
+        AddHeading(section, "Getting the car", 3)
+        Paragraph paragraph6
+        paragraph6:AddText("The car is the ")
+        AddBold(paragraph6, "Toy Car")
+        paragraph6:AddText(", one of the free sample models the Khronos Group shares so that people can test 3D programs. The 
+Khronos Group is the same group that looks after OpenGL, WebGL and Vulkan, and they also created ")
+        AddBold(paragraph6, "glTF")
+        paragraph6:AddText(", the file format the car is saved in. The car model was made by Guido Odendahl, and its materials 
+and scene by Eric Chadwick, and they released it under the ")
+        AddBold(paragraph6, "CC0")
+        paragraph6:AddText(" license, so anyone may use it in any project.")
+        section:Add(paragraph6)
+        Paragraph paragraph7
+        paragraph7:AddText("The car's files are on GitHub, in the ")
+        AddLink(paragraph7, "Toy Car folder of glTF-Sample-Assets", "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar")
+        paragraph7:AddText(". That folder holds the model in more than one form; this tutorial uses the one in its ")
+        AddBold(paragraph7, "glTF")
+        paragraph7:AddText(" folder, which is a ")
+        AddCode(paragraph7, ".gltf")
+        paragraph7:AddText(" text file, a ")
+        AddCode(paragraph7, ".bin")
+        paragraph7:AddText(" file of shapes, and the images that color the car.")
+        section:Add(paragraph7)
+        OrderedList list3
+        list3:AddClassAttribute("list-decimal list-outside pl-8")
+        ListItem item5
+        item5:AddText("In your project's folder, make a folder named ")
+        AddCode(item5, "Car")
+        item5:AddText(" at the top of the project.")
+        list3:Add(item5)
+        ListItem item6
+        item6:AddText("Open the ")
+        AddLink(item6, "glTF folder", "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar/glTF")
+        item6:AddText(" in a web browser. It lists ten files:")
+        UnorderedList list4
+        list4:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item7
+        AddCode(item7, "ToyCar.gltf")
+        item7:AddText(" and ")
+        AddCode(item7, "ToyCar.bin")
+        item7:AddText(";")
+        list4:Add(item7)
+        ListItem item8
+        AddCode(item8, "ToyCar_basecolor.png")
+        item8:AddText(", ")
+        AddCode(item8, "ToyCar_clearcoat.png")
+        item8:AddText(", ")
+        AddCode(item8, "ToyCar_emissive.png")
+        item8:AddText(", ")
+        AddCode(item8, "ToyCar_normal.png")
+        item8:AddText(" and ")
+        AddCode(item8, "ToyCar_occlusion_roughness_metallic.png")
+        item8:AddText(";")
+        list4:Add(item8)
+        ListItem item9
+        AddCode(item9, "Fabric_baseColor.png")
+        item9:AddText(", ")
+        AddCode(item9, "Fabric_normal.png")
+        item9:AddText(" and ")
+        AddCode(item9, "Fabric_occlusion.png")
+        item9:AddText(".")
+        list4:Add(item9)
+        item6:AddNestedTag(list4)
+        list3:Add(item6)
+        ListItem item10
+        item10:AddText("For each file, open it on GitHub and use its ")
+        AddBold(item10, "Download raw file")
+        item10:AddText(" button, then move the file into your ")
+        AddCode(item10, "Car")
+        item10:AddText(" folder. All ten files must be in the same folder, because ")
+        AddCode(item10, "ToyCar.gltf")
+        item10:AddText(" finds the others by name.")
+        list3:Add(item10)
+        ListItem item11
+        item11:AddText("Also download the folder's ")
+        AddCode(item11, "LICENSE.md")
+        item11:AddText(", from the ")
+        AddLink(item11, "Toy Car folder", "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar")
+        item11:AddText(", into ")
+        AddCode(item11, "Car")
+        item11:AddText(", so the license stays with the model.")
+        list3:Add(item11)
+        section:Add(list3)
+        AddHeading(section, "Centering the car", 4)
+        section:AddParagraph("The toy car sits on a small blanket, and the model's center is not in the middle of the car's body. 
+For driving, the car needs a copy with the blanket left out and its center moved to the middle of 
+the body, because a physics box is centered on its item.")
+        Paragraph paragraph8
+        paragraph8:AddText("You don't make this copy by hand. The program on this page does it for you: the first time it runs, 
+its ")
+        AddCode(paragraph8, "MakeCenteredCar")
+        paragraph8:AddText(" action reads ")
+        AddCode(paragraph8, "ToyCar.gltf")
+        paragraph8:AddText(", changes it, and saves the result as ")
+        AddCode(paragraph8, "ToyCarCentered.gltf")
+        paragraph8:AddText(" in the same folder. " + dq + "How the program builds the car" + dq + " explains how.")
+        section:Add(paragraph8)
+        Paragraph paragraph9
+        paragraph9:AddText("Finally, use a scene with a terrain, such as one you shaped and painted in the earlier tutorials, 
+saved as ")
+        AddCode(paragraph9, "Scenes/Scene.qs")
+        paragraph9:AddText(".")
+        section:Add(paragraph9)
+        AddHeading(section, "Giving credit", 4)
+        Paragraph paragraph10
+        paragraph10:AddText("The car is CC0, so credit isn't required, but it is good practice, as in ")
+        AddLink(paragraph10, "Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html")
+        paragraph10:AddText(". Add the car to your project's ")
+        AddCode(paragraph10, "Credits.txt")
+        paragraph10:AddText(":")
+        section:Add(paragraph10)
+        AddPlainText(section, "/html/sources/tutorials/scenes/TerrainGames/Credits.txt")
+    end
+
+    action AddExploreTheProgram(Section section)
+        AddHeading(section, "The program", 3)
+        Paragraph paragraph11
+        paragraph11:AddText("Replace the code in ")
+        AddCode(paragraph11, "Main.quorum")
+        paragraph11:AddText(" with this program. It is QuincyWorld's program, a small version of a driving demo, with one action 
+added, ")
+        AddCode(paragraph11, "MakeCenteredCar")
+        paragraph11:AddText(", to prepare the car:")
+        section:Add(paragraph11)
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/TerrainGames/Main.quorum"))))
+        section:AddParagraph("Run it. The car drops onto the middle of the terrain, settles on its springs, and the camera follows 
+from behind and above.")
+    end
+
+    action AddExploreDriving(Section section)
+        AddHeading(section, "Driving", 3)
+        WebTable table3 = LoadWebTable("Driving", "/html/media/scenes/Terrain/Vehicles/DrivingKeys.csv")
+        section:Add(table3)
+        Paragraph paragraph12
+        paragraph12:AddText("The ")
+        AddCode(paragraph12, "VehicleMovementBehavior")
+        paragraph12:AddText(" turns these keys into three commands for the car: ")
+        AddBold(paragraph12, "throttle")
+        paragraph12:AddText(", from full reverse to full forward; ")
+        AddBold(paragraph12, "steering")
+        paragraph12:AddText(", from full left to full right; and ")
+        AddBold(paragraph12, "braking")
+        paragraph12:AddText(". Every key can be changed. For example, to drive with the arrow keys, add these lines in ")
+        AddCode(paragraph12, "BuildVehicle")
+        paragraph12:AddText(", before ")
+        AddCode(paragraph12, "AddBehavior")
+        paragraph12:AddText(":")
+        section:Add(paragraph12)
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/TerrainGames/ArrowKeys.quorum"))))
+    end
+
+    action AddExploreHowTheProgramBuildsTheCar(Section section)
+        AddHeading(section, "How the program builds the car", 3)
+        section:AddParagraph("The program is made of small actions, each building one part, which makes it easier to read and to 
+change one thing at a time.")
+        UnorderedList list5
+        list5:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item12
+        AddBoldCode(item12, "BuildChassis")
+        item12:AddText(" makes the body. It loads the toy car model and scales it up: the toy is about 4 centimeters long, 
+and a scale of 152 makes it about car-sized, with wheels about 0.4 meters in radius. It gives the 
+body a ")
+        AddBold(item12, "box")
+        item12:AddText(" for physics, a little smaller than the model so it doesn't catch on hills, and a mass of ")
+        AddBold(item12, "800 kilograms")
+        item12:AddText(". Its angular damping of 0.9 makes a tilt die down before it grows into a roll.")
+        list5:Add(item12)
+        ListItem item13
+        AddBoldCode(item13, "MakeCenteredCar")
+        item13:AddText(" prepares the model, once. A ")
+        AddCode(item13, ".gltf")
+        item13:AddText(" file is plain text, written in JSON, like the scene and material files in ")
+        AddLink(item13, "Creating a Scene", "/tutorials/Scenes/create.html")
+        item13:AddText(". It lists the model's pieces, and each piece names its shape with a line such as ")
+        AddCode(item13, dq + "mesh" + dq + ": 0,")
+        item13:AddText(". The action reads the file as text and uses ")
+        AddCode(item13, "Replace")
+        item13:AddText(" to change three of those lines. It adds a ")
+        AddBold(item13, "translation")
+        item13:AddText(", a move along x, y and z, to the body (piece 0) and the glass (piece 2), lowering them a little 
+less than a centimeter in the model's own tiny units. It also takes the shape away from the blanket 
+(piece 1), so the blanket draws nothing. Then it writes the result to ")
+        AddCode(item13, "ToyCarCentered.gltf")
+        item13:AddText(", which still uses the same ")
+        AddCode(item13, "ToyCar.bin")
+        item13:AddText(" and images. If that file is already there, the action does nothing, so it only works once. To make 
+it again, delete ")
+        AddCode(item13, "ToyCarCentered.gltf")
+        item13:AddText(".")
+        list5:Add(item13)
+        ListItem item14
+        AddBoldCode(item14, "BuildVehicle")
+        item14:AddText(" joins the body to four wheels. Each wheel is attached 1.6 meters to the side of the body's center, 
+2.06 meters ahead for the front wheels and 1.58 meters behind for the back ones. Only the front 
+wheels steer. It then adds the vehicle to the 3D layer, so the layer updates it on every physics 
+step, and gives the body the ")
+        AddCode(item14, "VehicleMovementBehavior")
+        item14:AddText(", with an engine force of 5,000 newtons forward and 3,000 in reverse.")
+        list5:Add(item14)
+        ListItem item15
+        AddBoldCode(item15, "AddWheel")
+        item15:AddText(" makes one wheel. The ray points straight down, the spring is 0.4 meters long at rest, and the 
+wheel's radius is 0.4 meters. Its ")
+        AddBold(item15, "stiffness")
+        item15:AddText(" of 20 decides how far the springs sag under the car's weight; its ")
+        AddBold(item15, "damping")
+        item15:AddText(" settles the car after a bump; and its ")
+        AddBold(item15, "friction slip")
+        item15:AddText(" of 6 is its grip.")
+        list5:Add(item15)
+        ListItem item16
+        AddBoldCode(item16, "ResetVehicle")
+        item16:AddText(" puts the car upright in the middle of the terrain, a little above the ground, and stops it. ")
+        AddCode(item16, "Update")
+        item16:AddText(" calls it when you press R, or when the car falls off the edge of the world.")
+        list5:Add(item16)
+        ListItem item17
+        AddBoldCode(item17, "FindTerrain")
+        item17:AddText(" and ")
+        AddBoldCode(item17, "GetGroundHeight")
+        item17:AddText(" find the scene's terrain and ask how high the ground is at a place, so the car can start just above 
+it.")
+        list5:Add(item17)
+        section:Add(list5)
+    end
+
+    action AddExploreWhyCarsTipAndSkid(Section section)
+        AddHeading(section, "Why cars tip and skid", 3)
+        Paragraph paragraph13
+        paragraph13:AddText("When a car turns, its tires pull it sideways, toward the inside of the turn. That pull happens at 
+the ground, but the car's weight is centered higher up, at its ")
+        AddBold(paragraph13, "center of mass")
+        paragraph13:AddText(". The higher the center of mass, and the faster the turn, the more that sideways pull tries to roll 
+the car over its outside wheels. What holds it down is its weight, resting on those outside wheels. 
+The farther apart the wheels are, the harder the weight resists tipping.")
+        section:Add(paragraph13)
+        section:AddParagraph("The program's settings near the top are tuned for this:")
+        UnorderedList list6
+        list6:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem item18
+        AddBoldCode(item18, "wheelSide")
+        item18:AddText(", 1.6, sets the wheels well out to each side. The test car in AllTerrainVehicle had them at 1.12, 
+and the wider track resists tipping about 40 percent harder.")
+        list6:Add(item18)
+        ListItem item19
+        AddBoldCode(item19, "rollInfluence")
+        item19:AddText(", 0, applies the tires' sideways pull at the height of the body's center instead of at the ground, 
+so turning doesn't roll the car at all. Real cars aren't that lucky; this is one of the places a 
+game makes driving easier than real life.")
+        list6:Add(item19)
+        ListItem item20
+        AddBoldCode(item20, "frictionSlip")
+        item20:AddText(", 6, lets the tires slide a little sooner, so a turn that is too hard makes the car skid rather than 
+flip.")
+        list6:Add(item20)
+        ListItem item21
+        AddBoldCode(item21, "maximumSteering")
+        item21:AddText(", 0.35, keeps the front wheels from turning too sharply.")
+        list6:Add(item21)
+        section:Add(list6)
+    end
+
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        Paragraph paragraph14
+        paragraph14:AddText("In this activity, you and a partner load the toy car into a scene with a terrain and drive it 
+around. The goal is to get a working vehicle running in your own scene and feel how the physics 
+settings change the way it drives. Use a scene with a terrain that has some hills and valleys, such 
+as one you made in ")
+        AddLink(paragraph14, "Shaping Terrain", "/tutorials/Scenes/terrainShape.html")
+        paragraph14:AddText(" or ")
+        AddLink(paragraph14, "Generating Terrain", "/tutorials/Scenes/terrainGenerate.html")
+        paragraph14:AddText(". Follow " + dq + "Getting the car" + dq + " to download the car from GitHub into a ")
+        AddCode(paragraph14, "Car")
+        paragraph14:AddText(" folder and credit it, replace ")
+        AddCode(paragraph14, "Main.quorum")
+        paragraph14:AddText(" with the program on this page, and run it. Take turns driving: one partner drives while the other 
+gives directions, such as " + dq + "drive to the top of the nearest hill" + dq + ", " + dq + "go down into the valley and back up" + dq + ", or " + dq + "make a full circle without tipping over" + dq + ". Press R whenever the car needs a fresh start.")
+        section:Add(paragraph14)
+        section:AddParagraph("When you've both had a turn, try changing one setting at a time, running the game again after each 
+change and writing down what you notice. For example:")
+        UnorderedList list7
+        list7:AddClassAttribute("list-disc list-outside pl-8")
+        list7:AddListItem("halve the engine force, from 5000 to 2500: can the car still climb the same hill?")
+        ListItem item22
+        item22:AddText("set ")
+        AddCode(item22, "wheelSide")
+        item22:AddText(" back to 1.12, or ")
+        AddCode(item22, "rollInfluence")
+        item22:AddText(" to 0.5: does the car tip more easily on sharp turns?")
+        list7:Add(item22)
+        ListItem item23
+        item23:AddText("set ")
+        AddCode(item23, "frictionSlip")
+        item23:AddText(" to 2, then to 20: what happens to turning and skidding?")
+        list7:Add(item23)
+        list7:AddListItem("double the suspension stiffness, from 20 to 40: does the ride over bumps feel different?")
+        section:Add(list7)
+        section:AddParagraph("Put each setting back before trying the next, so you know which change did what.")
+        return section
+    end
+
+    action AddWrapup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Wrap up", 2)
+        section:AddParagraph("A game car is a physics simulation built from parts: a heavy body, springs on invisible rays, an 
+engine, steering and tires with limited grip. Many of its numbers were chosen to make driving fun 
+rather than perfectly real, such as a roll influence of 0. Which of the settings you tried made the 
+car feel most realistic, and which made it most fun to drive? When would a game choose fun over 
+realism?")
+        return section
+    end
+
+    private action AddBold(WebTag tag, text value)
+        StrongText strong
+        strong:AddText(value)
+        tag:AddNestedTag(strong)
+    end
+
+    private action AddBoldCode(WebTag tag, text value)
+        StrongText strong
+        CodeBlock code
+        code:AddText(value)
+        strong:AddNestedTag(code)
+        tag:AddNestedTag(strong)
+    end
+
+    private action AddCode(WebTag tag, text value)
+        CodeBlock code
+        code:AddClassAttribute("break-words")
+        code:AddText(value)
+        tag:AddNestedTag(code)
+    end
+
+    private action AddLink(WebTag tag, text name, text address)
+        Link link
+        link:AddText(name)
+        link:SetAddress(address)
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        tag:AddNestedTag(link)
+    end
+
+    private action AddPlainText(Section section, text path)
+        Preformatter plain
+        plain:SetIsQuorumCode(false)
+        plain:SetShowLineNumbers(false)
+        section:Add(AllowWrapping(plain:GeneratePreformattedCode(GetTextFromSource(path))))
+    end
+
+    //wraps long lines, so code never scrolls sideways on a narrow screen (WCAG 1.4.10, reflow)
+    private action AllowWrapping(PreformattedText code) returns PreformattedText
+        code:AddClassAttribute("whitespace-pre-wrap break-words")
+        return code
+    end
+
+    action GetMetaDescription returns text
+        return "Learn how a game car works as a physics simulation, and drive a toy car on a Quorum Studio terrain."
+    end
+
+    action GetSummaryName returns text
+        return "Driving on Terrain"
+    end
+
+    action GetName returns text
+        return "Driving on Terrain: Vehicles and Physics"
+    end
+
+    action GetShortDescription returns text
+        return "driving a vehicle on terrain with physics"
+    end
+
+    action GetLocation returns text
+        return "tutorials/Scenes/terrainGames.html"
+    end
+
+    action GetLinkName returns text
+        return "Driving on Terrain"
+    end
+
+    action GetSectionName returns text
+        return "Scene Editing"
+    end
+end

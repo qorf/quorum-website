@@ -13,74 +13,360 @@ class SceneManipulation is Lesson
         SetWebPageTitle("Manipulating a Running Scene - Quorum Programming Language")
         AddDefaultHeaders()
 
+        //page header
         Array<Division> divs = InitializeTutorialPage()
         Division bodyDiv = divs:Get(1)
         Division onPageDiv = divs:Get(2)
 
-
-        //page header
-            Header headDiv
+        Header headDiv
         headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("Manipulating a Running Scene", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Manipulating a Running Scene")
-        AddToHeadingArray(h_heading)
-
-        headDiv:AddText("This tutorial shows how to change a scene after running it")
+        AddHeading(headDiv, "Manipulating a Running Scene", 1)
         bodyDiv:Add(headDiv)
 
-        
-        Section section_new
-        section_new:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_new)
-        AddHeading(section_new, "Scene Manipulation", 2)
-
-        section_new:AddParagraph("Loading a scene created in the visual editor creates a visual overlay graphically, but intentionally does nothing else. The objects in view match the scene editor's camera region and the graphics loaded match as well. 
-            However, to actually adjust and manipulate a game, add logic, and other ideas require computer code.")
-        section_new:AddParagraph("Because making an application do what is wanted in code is a complicated topic, this tutorial does not go into detail here how everything works and instead will focus on the features that are related to getting items from a scene, to be used for movement or other actions. 
-            Users who want more instruction on coding parts of an application should reference the various tutorials on the topic on the Quorum site. Here is a template for moving a character in a 2D game:")
-        
-        text source = GetTextFromSource("/html/sources/tutorials/scenes/ManipulateScene.quorum")
-        section_new:Add(preformatter:GeneratePreformattedCode(source))
-        section_new:AddParagraph("The most crucial point to notice is that when items are given a name, they can be located in a game using the following action:")
-        
-        source = GetTextFromSource("/html/sources/tutorials/scenes/FindGirl.quorum")
-        section_new:Add(preformatter:GeneratePreformattedCode(source))
-
-        section_new:AddParagraph("Here is a template for moving a character in a 3D game:")
-        
-        text source2 = GetTextFromSource("/html/sources/tutorials/scenes/Manipulate3DScene.quorum")
-        section_new:Add(preformatter:GeneratePreformattedCode(source2))
-        section_new:AddParagraph("The most crucial point to notice is that when items are given a name, they can be located in a game using the following action:")
-        
-        source2 = GetTextFromSource("/html/sources/tutorials/scenes/Find3DGirl.quorum")
-        section_new:Add(preformatter:GeneratePreformattedCode(source2))
-
-        section_new:AddParagraph("This action provides access to items created and loaded in a scene, allowing manipulations by keyboard, mouse, or however else makes sense for the product we are creating. In the above example, the Boy object is found and manipulated with keypresses. 
-            Note that potentially, all objects in the scene could have the same name. In such a case, this action would return the first object it finds with the given name, but not all of them. In such a case, other actions in the Game class can be used.")
-           
+        bodyDiv:Add(AddOverview())
+        bodyDiv:Add(AddWarmup())
+        bodyDiv:Add(AddExplore())
+        bodyDiv:Add(AddEngage())
+        bodyDiv:Add(AddWrapup())
 
         Section nextLesson
         nextLesson:AddClassAttribute("flex flex-col gap-y-2")
         bodyDiv:Add(nextLesson)
-        WriteNextTutorial(nextLesson)    
+        WriteNextTutorial(nextLesson)
         onPageDiv:Add(CreateHeadingTableOfContents())
     end
 
+    action AddOverview returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Overview", 2)
+        section:AddParagraph("Loading a scene made in the scene editor draws it, but intentionally does nothing
+else. The items in view match the scene editor's camera, and the graphics match as well. To move a character,
+add game logic or respond to the player takes code. This page shows how a program finds an item from the scene
+by its name, and then moves it with the keyboard, in 2D and in 3D: first by hand, so you can see how movement
+works, and then the easy way, with a ready-made movement controller and a camera that follows.")
+
+        AddHeading(section, "Goals", 3)
+        section:AddParagraph("You have the following goals for this lesson:")
+        UnorderedList goals
+        goals:AddClassAttribute("list-disc list-outside pl-8")
+        ListItem find
+        find:AddText("Find an item from a loaded scene with ")
+        AddCode(find, "FindItem2DByName")
+        find:AddText(" or ")
+        AddCode(find, "FindItem3DByName")
+        find:AddText(".")
+        goals:Add(find)
+        goals:AddListItem("Check whether an item was found before using it.")
+        goals:AddListItem("Move a found item when the player presses keys, by hand.")
+        goals:AddListItem("Move a found item with a movement controller, and make the camera follow it.")
+        section:Add(goals)
+        return section
+    end
+
+    action AddWarmup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Warm up", 2)
+        section:AddParagraph("In a crowded room, how do you get one particular person's attention? Now imagine a
+game with a hundred items in its scene. How could a program pick out the one it wants to move?")
+
+        AddHeading(section, "Vocabulary", 3)
+        section:AddParagraph("You will be learning about the following vocabulary words:")
+        WebTable vocabularyTable = LoadWebTable("Vocabulary", "/html/media/scenes/Manipulating/Vocabulary.csv")
+        section:Add(vocabularyTable)
+
+        AddHeading(section, "New Code to Learn", 3)
+        section:AddParagraph("You will be using the following new pieces of code:")
+        WebTable codeTable = LoadWebTable("New Code to Learn", "/html/media/scenes/Manipulating/Code.csv")
+        section:Add(codeTable)
+
+        AddHeading(section, "CSTA Standards", 3)
+        Paragraph standardsParagraph
+        standardsParagraph:AddText("This lesson covers the following standards, from the ")
+        AddLink(standardsParagraph, "2026 CSTA K–12 Computer Science Standards", "https://csteachers.org/pk12standards/view/")
+        standardsParagraph:AddText(":")
+        section:Add(standardsParagraph)
+
+        UnorderedList standards
+        standards:AddClassAttribute("list-disc list-outside pl-8")
+        AddStandard(standards, "HS-PRO-PD-12", "Create a modular program that uses procedures, external libraries, or objects to improve reusability and readability.")
+        AddStandard(standards, "HS-PRO-PD-13", "Use documentation, libraries, application programming interfaces (APIs), and other tools in program development.")
+        AddStandard(standards, "S1-GMD-DD-03", "Develop an interactive experience to support gameplay.")
+        section:Add(standards)
+        return section
+    end
+
+    action AddExplore returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Explore", 2)
+        AddSceneManipulation(section)
+        AddMoving2D(section)
+        AddMoving3D(section)
+        AddControllers(section)
+        AddNames(section)
+        AddTerrainIsAnItem(section)
+        return section
+    end
+
+    action AddSceneManipulation(Section section)
+        AddHeading(section, "Scene Manipulation", 3)
+        Paragraph intro
+        intro:AddText("Because making an application do what is wanted in code is a big topic, this page
+doesn't explain how everything works. It focuses on getting items from a scene so they can be moved or used in
+other ways. For more on coding games, see the games tutorials, such as ")
+        AddLink(intro, "Keyboard Events", "/tutorials/games/keyboardEvents.html")
+        intro:AddText(" and ")
+        AddLink(intro, "Getting Started with Games", "/tutorials/games/gamesStarted.html")
+        intro:AddText(".")
+        section:Add(intro)
+
+        Paragraph runner
+        runner:AddText("The programs below start from the runner on ")
+        AddLink(runner, "Running a Scene", "/tutorials/Scenes/running.html")
+        runner:AddText(" and add a few lines.")
+        section:Add(runner)
+    end
+
+    action AddMoving2D(Section section)
+        AddHeading(section, "Moving a Character in 2D", 3)
+        section:AddParagraph("In a 2D scene, place the boy from the palette: Characters 2D, then Boy, then 1:
+Boy. The editor names him " + dq + "1: Boy" + dq + ", the name from the palette, and announces " + dq
++ "Placed 1: Boy" + dq + ". Save the scene, then use this program:")
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/ManipulateScene.quorum"))))
+
+        Paragraph find
+        find:AddText("The most important line is the one that finds the boy: ")
+        AddCode(find, "player = FindItem2DByName(" + dq + "1: Boy" + dq + ")")
+        find:AddText(". When an item has a name in the scene, this action finds it in the running game.")
+        section:Add(find)
+        section:AddParagraph("In 2D, x grows to the right and y grows upward, so the up arrow adds to y.")
+    end
+
+    action AddMoving3D(Section section)
+        AddHeading(section, "Moving an Item in 3D", 3)
+        section:AddParagraph("In a 3D scene, place a Cube from the Basic 3D section of the palette. The first
+cube is named " + dq + "Cube" + dq + ". Save the scene, then use this program:")
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/Manipulate3DScene.quorum"))))
+
+        Paragraph find
+        find:AddText("Here the line that matters is ")
+        AddCode(find, "player = FindItem3DByName(" + dq + "Cube" + dq + ")")
+        find:AddText(". In 3D, y is up, so the arrows move the cube along the ground (x and z), and Page Up and
+Page Down move it up and down. With the camera where a new scene puts it, the up arrow moves the cube away
+from the camera.")
+        section:Add(find)
+    end
+
+    action AddControllers(Section section)
+        AddHeading(section, "The Easy Way: Movement Controllers", 3)
+        Paragraph intro
+        intro:AddText("Writing a ")
+        AddCode(intro, "PressedKey")
+        intro:AddText(" action for every key works, but most games need the same things: move smoothly while a
+key is held, turn, jump, and bump into walls instead of passing through them. Quorum has ready-made ")
+        AddBold(intro, "movement controllers")
+        intro:AddText(" that do all of this. A controller is a ")
+        AddBold(intro, "behavior")
+        intro:AddText(": code you give to an item, which then runs on every frame. To use one, make it, give it
+to the item with ")
+        AddCode(intro, "AddBehavior")
+        intro:AddText(", and run.")
+        section:Add(intro)
+
+        section:AddParagraph("Here is the 3D cube from above, moved by a controller, with the camera following it:")
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/SceneManipulation/Controller3D.quorum"))))
+
+        Paragraph lines
+        lines:AddText("The three lines that matter are ")
+        AddCode(lines, "MovementBehavior3D movement")
+        lines:AddText(", ")
+        AddCode(lines, "player:AddBehavior(movement)")
+        lines:AddText(" and ")
+        AddCode(lines, "GetCamera3D():Follow(player)")
+        lines:AddText(". Hold W or the up arrow and the cube moves forward, the way it faces; A and D, or the
+left and right arrows, turn it; S or the down arrow backs it up. The camera follows from behind and above,
+turning as the cube turns.")
+        section:Add(lines)
+
+        section:AddParagraph("The 2D version works the same way. Here is the boy, moved by a 2D controller, with
+the camera keeping him in the middle of the screen:")
+        section:Add(AllowWrapping(preformatter:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/SceneManipulation/Controller2D.quorum"))))
+        section:AddParagraph("The arrow keys, or W, A, S and D, move the boy up, down, left and right.")
+
+        AddHeading(section, "Changing How It Feels", 4)
+        section:AddParagraph("Each controller has settings you can change with one line, after making it:")
+        WebTable settingsTable = LoadWebTable("Movement controller settings", "/html/media/scenes/Manipulating/ControllerSettings.csv")
+        section:Add(settingsTable)
+
+        AddHeading(section, "Controllers and Physics", 4)
+        section:AddParagraph("A controller looks at the item's physics settings in the Properties panel and
+moves it the right way:")
+        UnorderedList kinds
+        kinds:AddClassAttribute("list-disc list-outside pl-8")
+        AddBoldItem(kinds, "", "No physics:", " the item moves straight through anything in its way.")
+        ListItem responsive
+        AddBold(responsive, "Responsive:")
+        responsive:AddText(" the item bumps into walls, falls with gravity, and can jump when it's standing on
+something. Turn on physics in the program with ")
+        AddCode(responsive, "EnablePhysics3D(true)")
+        responsive:AddText(" and ")
+        AddCode(responsive, "SetGravity3D(0, -10, 0)")
+        responsive:AddText(" after ")
+        AddCode(responsive, "LoadScene")
+        responsive:AddText(", as on ")
+        AddLink(responsive, "Running a Scene", "/tutorials/Scenes/running.html")
+        responsive:AddText(".")
+        kinds:Add(responsive)
+        AddBoldItem(kinds, "", "Nonresponsive:", " the item pushes other things out of its way, but nothing
+pushes it back.")
+        AddBoldItem(kinds, "", "Unmovable:", " the item can't move. The controller says so in the output, so you
+know to change it.")
+        section:Add(kinds)
+        section:AddParagraph("A 3D controller also keeps its item upright, so a character doesn't tip over when
+it bumps into something. Forward is the way the item faces. If a model walks sideways or backward, its front
+isn't facing the way Quorum expects; turn it in the scene editor so it faces along z.")
+    end
+
+    action AddNames(Section section)
+        AddHeading(section, "Names, and When Nothing Is Found", 3)
+        section:AddParagraph("These actions give access to items created and loaded in a scene, so they can be
+moved by keyboard, mouse or whatever makes sense for the game being made.")
+        UnorderedList rules
+        rules:AddClassAttribute("list-disc list-outside pl-8")
+        AddBoldItem(rules, "", "Names are exact.", " " + dq + "1: Boy" + dq + " and " + dq + "1: boy" + dq
++ " are different names. The scene tree shows each item's name, and the Name field in the Properties panel
+(Cmd+P on Mac, Ctrl+P on Windows) changes it. A short, clear name, like " + dq + "Player" + dq + ", makes code
+easier to read.")
+        ListItem copies
+        AddBold(copies, "Copies get numbers.")
+        copies:AddText(" The editor names a second cube " + dq + "Cube 1" + dq + ", a third " + dq + "Cube 2"
++ dq + ", and so on. Items can still end up with the same name, for example by renaming them. Then the action
+gives back the first item it finds with that name, not all of them. To reach every item, a program can go
+through a layer's items one by one, with ")
+        AddCode(copies, "GetCurrentLayer3D():GetIterator()")
+        copies:AddText(".")
+        rules:Add(copies)
+        ListItem nothing
+        AddBold(nothing, "Nothing found means undefined.")
+        nothing:AddText(" If no item has the name, the action gives back ")
+        AddCode(nothing, "undefined")
+        nothing:AddText(". Using an undefined item stops the program with an error, which is why both programs
+check first and write out what happened.")
+        rules:Add(nothing)
+        section:Add(rules)
+    end
+
+    action AddTerrainIsAnItem(Section section)
+        AddHeading(section, "Terrain Is an Item Too", 3)
+        Paragraph terrain
+        terrain:AddText("A terrain placed in a 3D scene is also an item, named " + dq + "Terrain" + dq + " (then "
++ dq + "Terrain 1" + dq + ", and so on), so ")
+        AddCode(terrain, "FindItem3DByName(" + dq + "Terrain" + dq + ")")
+        terrain:AddText(" finds it. The terrain pages start with ")
+        AddLink(terrain, "Terrain in a Scene", "/tutorials/Scenes/terrain.html")
+        terrain:AddText("; ")
+        AddLink(terrain, "Terrain in a Game", "/tutorials/Scenes/terrainGames.html")
+        terrain:AddText(" shows how to find the ground and ask how high it is.")
+        section:Add(terrain)
+    end
+
+    action AddEngage returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Engage", 2)
+        section:AddParagraph("In this activity, you and a partner connect a scene built in the editor to code
+that controls it, first by hand and then with a movement controller. The goal is to find items by their names
+in code, move them, and then tune a controller until it feels right. Partner A builds a small 3D obstacle
+course on a flat floor: a few walls to steer around, a ramp, and a block to jump onto, with a cube named " + dq
++ "Player" + dq + " at the start and a sphere named " + dq + "Goal" + dq + " at the end. Give the floor, walls
+and ramp Physics Enabled and set them to Unmovable, and give the player Physics Enabled and set it to
+Responsive. Partner A tells Partner B only the names, not where things are.")
+
+        Paragraph second
+        second:AddText("Partner B writes a program that loads the scene, turns on physics and gravity, finds "
++ dq + "Player" + dq + " and " + dq + "Goal" + dq + " by name, gives the player a ")
+        AddCode(second, "MovementBehavior3D")
+        second:AddText(", and makes the camera follow it. When Space is pressed, the program should also output
+how far the player is from the goal. Then take turns running the course, and tune the controller: try at least
+three changes, such as the speed, the jump height and the acceleration, and for each one write down the
+setting, its value, and how the course felt afterwards. Finally, try a name with a spelling mistake, such as "
++ dq + "Playr" + dq + ": what happens, and what appears in the output window? Swap roles with a new course.")
+        section:Add(second)
+        return section
+    end
+
+    action AddWrapup returns Section
+        Section section
+        section:AddClassAttribute("flex flex-col gap-y-2")
+        AddHeading(section, "Wrap up", 2)
+        Paragraph wrap
+        wrap:AddText("Naming items in the scene editor is a promise to the code: the code finds items by those
+names. Once found, an item can be moved by hand, one key at a time, or handed a controller that does the work
+every frame. What could go wrong if someone renames an item after the code is written? How would the ")
+        AddCode(wrap, "output")
+        wrap:AddText(" lines in these programs help find the problem?")
+        section:Add(wrap)
+        return section
+    end
+
+    private action AddStandard(UnorderedList list, text identifier, text standard)
+        ListItem item
+        AddBold(item, identifier)
+        item:AddText(": " + standard)
+        list:Add(item)
+    end
+
+    private action AddBoldItem(UnorderedList list, text before, text bold, text after)
+        ListItem item
+        item:AddText(before)
+        AddBold(item, bold)
+        item:AddText(after)
+        list:Add(item)
+    end
+
+    private action AddBold(WebTag tag, text value)
+        StrongText strong
+        strong:AddText(value)
+        tag:AddNestedTag(strong)
+    end
+
+    private action AddCode(WebTag tag, text value)
+        CodeBlock code
+        code:AddClassAttribute("break-words")
+        code:AddText(value)
+        tag:AddNestedTag(code)
+    end
+
+    private action AddLink(WebTag tag, text name, text address)
+        Link link
+        link:AddText(name)
+        link:SetAddress(address)
+        link:SetClassAttribute("underline text-quorum-blue-150")
+        tag:AddNestedTag(link)
+    end
+
+    //wraps long lines, so code never scrolls sideways on a narrow screen (WCAG 1.4.10, reflow)
+    private action AllowWrapping(PreformattedText code) returns PreformattedText
+        code:AddClassAttribute("whitespace-pre-wrap break-words")
+        return code
+    end
+
     action GetMetaDescription returns text
-        return "Learn about manipulating scenes in Quorum Studio."
+        return "Learn to find items from a running scene by name and move them with the keyboard or a movement controller."
     end
 
     action GetSummaryName returns text
-        return "Introduction to Scene Manipulation"
+        return "Manipulating a Running Scene"
     end
 
     action GetName returns text
-        return "Introduction to Manipulating Scenes in the scene editor."
+        return "Manipulating a Running Scene"
     end
 
     action GetShortDescription returns text
-        return "scene manipulation in Quorum Studio."
+        return "scene manipulation in Quorum Studio"
     end
 
     action GetLocation returns text
