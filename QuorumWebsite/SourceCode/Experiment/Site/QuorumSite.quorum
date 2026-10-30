@@ -1,12 +1,11 @@
+package Libraries.Web
+
 use Libraries.Containers.Array
 use Libraries.Containers.HashTable
 use Libraries.Containers.Iterator
 use Libraries.Data.Formats.JavaScriptObjectNotation
 use Libraries.Web.WebSite
-use Libraries.Web.PageSeries
-use Libraries.Web.PageSeriesEntry
 use Libraries.Web.Page.WebTag
-use Libraries.Web.Page.WebLocations
 use Libraries.Web.Page.RichText
 use Libraries.Web.Page.Division
 use Libraries.Web.Page.NavigationDivision
@@ -22,14 +21,20 @@ use Libraries.Web.Page.Image
 use Libraries.Web.Styles.WebTextStyle
 use Libraries.Web.Styles.StyleSheetConstants
 use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.Script
-use Libraries.Web.Page.WebTextEscaper
 use Libraries.Web.Page.Standards.Standard
 use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
 use Libraries.Web.Page.Standards.StandardsReport
 use Libraries.Web.Page.Standards.StandardsListEntry
+use Libraries.Web.Page.QuorumLoginForm
+use Libraries.Web.Page.QuorumNavigationBar
+use Libraries.Web.Series.CourseOverview
+use Libraries.Web.Series.PageSeries
+use Libraries.Web.Series.PageSeriesEntry
+use Libraries.Web.Styles.QuorumFrameLooks
+use Libraries.Web.Styles.QuorumSiteOptions
 
 /*
     QuorumSite is the Quorum website. It is a WebSite with what only this
@@ -123,7 +128,14 @@ class QuorumSite is WebSite
     // main site's, with its Tailwind classes.
     QuorumFrameLooks frame
     StyleSheetConstants constants
-    VersionHelper versions
+    // The version queries for the site's scripts (such as "?version=14.0.4"),
+    // so browsers fetch a script again when it changes. The site's
+    // VersionHelper knows them; whatever builds the site hands them over
+    // with SetScriptVersions.
+    text languageVersion = ""
+    text scriptVersion = ""
+    text highlighterVersion = ""
+    text loadVersion = ""
     // The site's font, Montserrat, from Google Fonts, as output.css
     // imported it (style/google.css only declares Open Sans, which no
     // page uses).
@@ -155,6 +167,27 @@ class QuorumSite is WebSite
     // page has it) and hides the rest; with no course named, or an
     // unknown one, the home course's navigation stays.
     constant text COURSE_CHOOSER_SCRIPT = "(function(){var c=new URLSearchParams(window.location.search).get('course');if(!c){return;}var all=document.querySelectorAll('[data-course]');var found=false;all.forEach(function(e){if(e.getAttribute('data-course')===c){found=true;}});if(!found){return;}all.forEach(function(e){e.hidden=e.getAttribute('data-course')!==c;});})();"
+
+    /*
+        Sets the version queries added to the addresses of the scripts the
+        frame loads, so browsers fetch a script again when it changes.
+
+        Attribute: Parameter language The query for the Quorum standard library's script.
+        Attribute: Parameter script The query for the site's own script.
+        Attribute: Parameter highlighter The query for the code highlighter's script.
+        Attribute: Parameter load The query for the script that loads Quorum programs.
+
+        Attribute: Example
+        VersionHelper versions
+        QuorumSite site
+        site:SetScriptVersions(versions:GetLanguageVersionQuery(), versions:GetScriptVersionQuery(), versions:GetPrismVersionQuery(), versions:GetLoadVersionQuery())
+    */
+    action SetScriptVersions(text language, text script, text highlighter, text load)
+        languageVersion = language
+        scriptVersion = script
+        highlighterVersion = highlighter
+        loadVersion = load
+    end
 
     /*
         Asks the site to build a report page for a set of standards: every
@@ -210,9 +243,9 @@ class QuorumSite is WebSite
         // Course navigation for every page in a course, and structured
         // data: breadcrumbs for pages in a course, and a description of
         // every lesson (every page that covers a standard).
-        Iterator<WebPage2> allPages = GetPageIterator()
+        Iterator<WebPage> allPages = GetPageIterator()
         repeat while allPages:HasNext()
-            WebPage2 page = allPages:Next()
+            WebPage page = allPages:Next()
             Array<PageSeries> pageCourses = GetSeriesOf(page)
             if pageCourses:GetSize() > 0
                 AddCourseNavigation(page, pageCourses, GetHomeSeries(page))
@@ -229,7 +262,7 @@ class QuorumSite is WebSite
         // above sits inside the page's content column.
         allPages = GetPageIterator()
         repeat while allPages:HasNext()
-            WebPage2 framed = allPages:Next()
+            WebPage framed = allPages:Next()
             AddFrame(framed, GetSeriesOf(framed))
         end
     end
@@ -241,7 +274,7 @@ class QuorumSite is WebSite
         standard's report. Search engines and other tools read it; people
         don't see it.
     */
-    private action AddStructuredData(WebPage2 page, Array<PageSeries> pageCourses)
+    private action AddStructuredData(WebPage page, Array<PageSeries> pageCourses)
         Array<Standard> recorded = tracker:GetRecorded(page)
 
         JavaScriptObjectNotation lesson
@@ -333,7 +366,7 @@ class QuorumSite is WebSite
         the address instead, so a reader following another course stays in
         it. With scripts off, the home course's version stays, and works.
     */
-    private action AddCourseNavigation(WebPage2 page, Array<PageSeries> courses, PageSeries home)
+    private action AddCourseNavigation(WebPage page, Array<PageSeries> courses, PageSeries home)
         Division opening
         Division closing
         integer i = 0
@@ -353,7 +386,7 @@ class QuorumSite is WebSite
     end
 
     // Home › Course › Lesson, for one course, in one row (design B).
-    private action GetBreadcrumbs(WebPage2 page, PageSeries course, boolean shown) returns NavigationDivision
+    private action GetBreadcrumbs(WebPage page, PageSeries course, boolean shown) returns NavigationDivision
         NavigationDivision navigation
         navigation:AddAttribute(LABEL_ATTRIBUTE, BREADCRUMB_LABEL)
         MarkForCourse(navigation, course, shown)
@@ -376,7 +409,7 @@ class QuorumSite is WebSite
     end
 
     // One step in the breadcrumbs: a link without an underline.
-    private action GetBreadcrumb(WebPage2 page, text words, text address) returns ListItem
+    private action GetBreadcrumb(WebPage page, text words, text address) returns ListItem
         ListItem item
         item:AddNestedTag(GetLink(page, words, address, quorumOptions:GetBreadcrumbLink()))
         return item
@@ -384,7 +417,7 @@ class QuorumSite is WebSite
 
     // The mark between two steps. It sits in its own item, hidden from
     // screen readers, which announce the list's steps themselves.
-    private action GetSeparator(WebPage2 page) returns ListItem
+    private action GetSeparator(WebPage page) returns ListItem
         ListItem item
         item:AddAttribute(HIDDEN_FROM_READERS, ARIA_TRUE)
         page:SetStyle(item, quorumOptions:GetBreadcrumbSeparator())
@@ -393,7 +426,7 @@ class QuorumSite is WebSite
     end
 
     // A link with its own look, its words and address made safe.
-    private action GetLink(WebPage2 page, text words, text address, WebTextStyle style) returns Link
+    private action GetLink(WebPage page, text words, text address, WebTextStyle style) returns Link
         Link link
         link:SetAddress(escaper:EscapeAttribute(address))
         link:AddText(escaper:Escape(words))
@@ -416,7 +449,7 @@ class QuorumSite is WebSite
         lesson) and the other courses the lesson is in. On a course's last
         lesson, the box says the course is done and links its overview.
     */
-    private action GetCourseLinks(WebPage2 page, PageSeries course, Array<PageSeries> courses, boolean shown) returns NavigationDivision
+    private action GetCourseLinks(WebPage page, PageSeries course, Array<PageSeries> courses, boolean shown) returns NavigationDivision
         NavigationDivision navigation
         navigation:AddAttribute(LABEL_ATTRIBUTE, escaper:EscapeAttribute(course:GetName() + NEXT_LABEL_ENDING))
         MarkForCourse(navigation, course, shown)
@@ -498,7 +531,7 @@ class QuorumSite is WebSite
         integer i = 0
         repeat while i < lists:GetSize()
             StandardsListEntry entry = lists:Get(i)
-            WebPage2 page = entry:GetPage()
+            WebPage page = entry:GetPage()
             StandardSet set = entry:GetSet()
             WebTag container = entry:GetList()
             text reportAddress = locations:FromSiteTop(set:GetReportLocation())
@@ -530,7 +563,7 @@ class QuorumSite is WebSite
     // One standard's card: its identifier, linked to its place on the
     // report; its level and concept; its words; and how many other
     // lessons cover it.
-    private action GetStandardCard(WebPage2 page, Standard standard, text reportAddress) returns Division
+    private action GetStandardCard(WebPage page, Standard standard, text reportAddress) returns Division
         Division card
         page:SetStyle(card, quorumOptions:GetStandardCard())
 
@@ -571,7 +604,7 @@ class QuorumSite is WebSite
         end
     end
 
-    private action WriterFor(WebTag element, WebPage2 page) returns RichText
+    private action WriterFor(WebTag element, WebPage page) returns RichText
         RichText writer
         writer:SetTarget(element, page)
         return writer
@@ -582,7 +615,7 @@ class QuorumSite is WebSite
         it is in: Home, the course, the page. Search engines accept several
         trails for one page.
     */
-    private action AddBreadcrumbData(WebPage2 page, Array<PageSeries> courses)
+    private action AddBreadcrumbData(WebPage page, Array<PageSeries> courses)
         integer i = 0
         repeat while i < courses:GetSize()
             PageSeries course = courses:Get(i)
@@ -615,7 +648,7 @@ class QuorumSite is WebSite
         Adds a Course to a course overview page's structured data: its
         name, description, address, provider, and its lessons in order.
     */
-    private action AddCourseData(WebPage2 page, PageSeries course)
+    private action AddCourseData(WebPage page, PageSeries course)
         JavaScriptObjectNotation data
         data:SetObject()
         data:Add("@context", SCHEMA_CONTEXT)
@@ -661,17 +694,17 @@ class QuorumSite is WebSite
         on wider screens. The navigation bar and sign-in forms are still
         the main site's.
     */
-    private action AddFrame(WebPage2 page, Array<PageSeries> pageCourses)
+    private action AddFrame(WebPage page, Array<PageSeries> pageCourses)
         // What every page loads.
         page:AddStylesheet(FONTS_STYLE_SHEET)
         page:AddScript(locations:FromSiteTop(JQUERY_SCRIPT))
-        page:AddScript(locations:FromSiteTop(LIBRARY_SCRIPT) + versions:GetLanguageVersionQuery())
-        page:AddScript(locations:FromSiteTop(SITE_SCRIPT) + versions:GetScriptVersionQuery())
-        page:AddScript(locations:FromSiteTop(HIGHLIGHT_SCRIPT) + versions:GetPrismVersionQuery())
+        page:AddScript(locations:FromSiteTop(LIBRARY_SCRIPT) + languageVersion)
+        page:AddScript(locations:FromSiteTop(SITE_SCRIPT) + scriptVersion)
+        page:AddScript(locations:FromSiteTop(HIGHLIGHT_SCRIPT) + highlighterVersion)
         Script locateFiles
         locateFiles:SetCode(GetLocateFilesScript())
         page:GetWebPageHeader():Add(locateFiles)
-        page:AddScript(locations:FromSiteTop(LOAD_SCRIPT) + versions:GetLoadVersionQuery())
+        page:AddScript(locations:FromSiteTop(LOAD_SCRIPT) + loadVersion)
         page:AddIcon(locations:FromSiteTop(ICON))
 
         // The page's content, with everything it already has (breadcrumbs,
@@ -743,7 +776,7 @@ class QuorumSite is WebSite
         to the contributors. It is the page's footer for screen readers
         (the contentinfo landmark), as PageFooter's footer element was.
     */
-    private action GetFooter(WebPage2 page) returns Division
+    private action GetFooter(WebPage page) returns Division
         Division footer
         footer:SetIdentifier(FOOTER_IDENTIFIER)
         footer:AddAttribute(ROLE_ATTRIBUTE, FOOTER_ROLE)
@@ -764,7 +797,7 @@ class QuorumSite is WebSite
     // Lets readers zoom in on the page's pictures, if it has any. Only
     // pictures with a description are marked: a decorative picture has
     // nothing to say when zoomed.
-    private action AddZoom(WebPage2 page)
+    private action AddZoom(WebPage page)
         Array<Image> pictures = page:GetImages()
         boolean any = false
         integer i = 0
@@ -789,7 +822,7 @@ class QuorumSite is WebSite
 
     // The left column for one course: its name, then its lessons, with
     // this page marked. Hidden unless it is the course shown first.
-    private action GetCourseContents(WebPage2 page, PageSeries course, boolean shown) returns NavigationDivision
+    private action GetCourseContents(WebPage page, PageSeries course, boolean shown) returns NavigationDivision
         NavigationDivision navigation
         navigation:AddAttribute(LABEL_ATTRIBUTE, course:GetName())
         MarkForCourse(navigation, course, shown)
@@ -824,7 +857,7 @@ class QuorumSite is WebSite
     end
 
     // The right column: links to the page's sections and subsections.
-    private action GetOnThisPage(WebPage2 page) returns NavigationDivision
+    private action GetOnThisPage(WebPage page) returns NavigationDivision
         NavigationDivision navigation
         navigation:AddAttribute(LABEL_ATTRIBUTE, ON_THIS_PAGE_WORDS)
 
@@ -869,7 +902,7 @@ class QuorumSite is WebSite
         return "var Module = {locateFile: function(path, prefix) {if (path.endsWith(" + quote + ".data" + quote + ")) return " + quote + locations:FromSiteTop(SCRIPTS_FOLDER) + quote + " + path; return prefix + path;}};"
     end
 
-    private action AddStructuredDataScript(WebPage2 page, JavaScriptObjectNotation data)
+    private action AddStructuredDataScript(WebPage page, JavaScriptObjectNotation data)
         Script script
         script:SetGenerateType(false)
         script:SetType(STRUCTURED_DATA_TYPE)

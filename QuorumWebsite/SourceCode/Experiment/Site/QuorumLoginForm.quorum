@@ -1,11 +1,15 @@
+package Libraries.Web.Page
+
 use Libraries.Web.Page.all
 use Libraries.Web.Styles.StyleSheetConstants
 use Libraries.Web.Styles.WebBoxStyle
 use Libraries.Web.Styles.WebTextStyle
 use Libraries.Web.Styles.WebColor
-use Libraries.Web.Page.Layouts.WebStackLayout
-use Libraries.Web.Page.Layouts.WebRowLayout
 use Libraries.System.File
+use Libraries.Web.Layouts.WebRowLayout
+use Libraries.Web.Layouts.WebStackLayout
+use Libraries.Web.Styles.QuorumSiteOptions
+use Libraries.Web.WebTextEscaper
 
 /*
     QuorumLoginForm is the Quorum website's sign-in dialog, as LoginForm
@@ -192,7 +196,7 @@ class QuorumLoginForm
         Attribute: Parameter page The page it goes on.
         Attribute: Returns The dialog's backdrop, with everything in it.
     */
-    action Build(WebPage2 page) returns Division
+    action Build(WebPage page) returns Division
         Division modal
         modal:SetIdentifier("loginModal")
         modal:AddAttribute("aria-labelledby", "loginTitleDiv")
@@ -218,7 +222,7 @@ class QuorumLoginForm
         return modal
     end
 
-    private action GetSignIn(WebPage2 page) returns Division
+    private action GetSignIn(WebPage page) returns Division
         Division box = GetDialog(page, "signInModal", false)
         Division titleWords
         titleWords:SetIdentifier("loginTitleDiv")
@@ -261,7 +265,7 @@ class QuorumLoginForm
         return box
     end
 
-    private action GetForgotPassword(WebPage2 page) returns Division
+    private action GetForgotPassword(WebPage page) returns Division
         Division box = GetDialog(page, "forgotPasswordModal", true)
         Heading heading
         heading:SetScale(2)
@@ -300,7 +304,7 @@ class QuorumLoginForm
         return box
     end
 
-    private action GetSignUp(WebPage2 page) returns Division
+    private action GetSignUp(WebPage page) returns Division
         Division box = GetDialog(page, "signUpModal", true)
         Heading heading
         heading:SetScale(2)
@@ -346,7 +350,7 @@ class QuorumLoginForm
 
     // A dialog's box, hidden at first unless it is the first one shown.
     // A click inside it doesn't reach the backdrop, which closes it.
-    private action GetDialog(WebPage2 page, text identifier, boolean hidden) returns Division
+    private action GetDialog(WebPage page, text identifier, boolean hidden) returns Division
         Division box
         box:SetIdentifier(identifier)
         box:AddAttribute("role", "dialog")
@@ -363,7 +367,7 @@ class QuorumLoginForm
 
     // A dialog's title beside its close button, which closes the whole
     // dialog and puts sign in back as the first one shown.
-    private action GetTopRow(WebPage2 page, WebTag titleElement, text identifier, text name) returns Division
+    private action GetTopRow(WebPage page, WebTag titleElement, text identifier, text name) returns Division
         Division row
         page:SetLayout(row, topRow)
         row:AddNestedTag(titleElement)
@@ -377,7 +381,7 @@ class QuorumLoginForm
         return row
     end
 
-    private action GetFieldList(WebPage2 page) returns Division
+    private action GetFieldList(WebPage page) returns Division
         Division list
         page:SetLayout(list, fields)
         page:SetStyleFromWidth(list, constants:SMALL_SCREEN_WIDTH, fieldsSmall)
@@ -385,14 +389,14 @@ class QuorumLoginForm
     end
 
     // A label and its field.
-    private action GetPlainField(WebPage2 page, text words, text identifier, text labelIdentifier, text type, text name) returns Division
+    private action GetPlainField(WebPage page, text words, text identifier, text labelIdentifier, text type, text name) returns Division
         return GetCheckedField(page, words, identifier, labelIdentifier, type, name, "", "")
     end
 
     // A label and its field; if it has a check, the site's script runs it
     // when the reader leaves the field, and the problem is shown under the
     // field while the check fails.
-    private action GetCheckedField(WebPage2 page, text words, text identifier, text labelIdentifier, text type, text name, text checkScript, text problem) returns Division
+    private action GetCheckedField(WebPage page, text words, text identifier, text labelIdentifier, text type, text name, text checkScript, text problem) returns Division
         Division box
         page:SetLayout(box, field)
         Label fieldLabel
@@ -427,7 +431,7 @@ class QuorumLoginForm
         return box
     end
 
-    private action GetLinkButton(WebPage2 page, text words, text identifier, WebBoxStyle style) returns Button
+    private action GetLinkButton(WebPage page, text words, text identifier, WebBoxStyle style) returns Button
         Button button
         button:SetIdentifier(identifier)
         button:SetType("button")
@@ -436,7 +440,7 @@ class QuorumLoginForm
         return button
     end
 
-    private action GetButtonRow(WebPage2 page) returns Division
+    private action GetButtonRow(WebPage page) returns Division
         Division row
         page:SetLayout(row, buttonRow)
         return row
@@ -444,7 +448,7 @@ class QuorumLoginForm
 
     // A message the site's script shows: an icon beside a heading and
     // words. Hidden from everyone until shown.
-    private action GetMessage(WebPage2 page, text heading, text icon, WebBoxStyle look, text identifier, text headingIdentifier, text textIdentifier) returns Division
+    private action GetMessage(WebPage page, text heading, text icon, WebBoxStyle look, text identifier, text headingIdentifier, text textIdentifier) returns Division
         Division message
         message:SetIdentifier(identifier)
         message:AddAttribute("aria-hidden", "true")

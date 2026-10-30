@@ -2,7 +2,7 @@ package Libraries.Web.Page.Standards
 
 use Libraries.Containers.Array
 use Libraries.Containers.HashTable
-use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.WebTag
 use Libraries.Web.Page.ListItem
 use Libraries.Web.Page.RichText
@@ -21,11 +21,11 @@ use Libraries.Web.Page.RichText
     Attribute: Example
     use Libraries.Web.Page.Standards.StandardsTracker
     use Libraries.Web.Page.Standards.ComputerScienceStandards2026
-    use Libraries.Web.Page.WebPage2
+    use Libraries.Web.Page.WebPage
 
     StandardsTracker tracker
     ComputerScienceStandards2026 standards
-    WebPage2 page
+    WebPage page
     page:SetLocation("lessons/one.html")
     tracker:Record(page, standards:GetStandard(standards:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12))
 */
@@ -36,7 +36,7 @@ shared class StandardsTracker
 
     // The pages that recorded each standard, by the standard's set and
     // identifier, in the order recorded.
-    HashTable<text, Array<WebPage2>> byStandard
+    HashTable<text, Array<WebPage>> byStandard
 
     constant text KEY_SEPARATOR = " "
 
@@ -49,7 +49,7 @@ shared class StandardsTracker
         Attribute: Parameter page The page.
         Attribute: Parameter standard The standard.
     */
-    action Record(WebPage2 page, Standard standard)
+    action Record(WebPage page, Standard standard)
         text location = page:GetLocation()
         if not byPage:HasKey(location)
             Array<Standard> newStandards
@@ -59,7 +59,7 @@ shared class StandardsTracker
 
         text key = GetKey(standard)
         if not byStandard:HasKey(key)
-            Array<WebPage2> newPages
+            Array<WebPage> newPages
             byStandard:Set(key, newPages)
         end
         byStandard:GetValue(key):Add(page)
@@ -74,7 +74,7 @@ shared class StandardsTracker
         Attribute: Parameter list The list, already on the page.
         Attribute: Parameter set The set of standards to list.
     */
-    action AddList(WebPage2 page, WebTag list, StandardSet set)
+    action AddList(WebPage page, WebTag list, StandardSet set)
         StandardsListEntry entry
         entry:Setup(page, list, set)
         lists:Add(entry)
@@ -121,7 +121,7 @@ shared class StandardsTracker
         Attribute: Parameter page The page.
         Attribute: Returns The standards it recorded.
     */
-    action GetRecorded(WebPage2 page) returns Array<Standard>
+    action GetRecorded(WebPage page) returns Array<Standard>
         text location = page:GetLocation()
         if byPage:HasKey(location)
             return byPage:GetValue(location)
@@ -139,7 +139,7 @@ shared class StandardsTracker
         Attribute: Parameter set The set.
         Attribute: Returns The page's standards from that set.
     */
-    action GetStandardsOn(WebPage2 page, StandardSet set) returns Array<Standard>
+    action GetStandardsOn(WebPage page, StandardSet set) returns Array<Standard>
         Array<Standard> result
         HashTable<text, boolean> seen
         Array<Standard> recorded = GetRecorded(page)
@@ -163,17 +163,17 @@ shared class StandardsTracker
         Attribute: Parameter standard The standard.
         Attribute: Returns The pages that cover it, or none.
     */
-    action GetPagesFor(Standard standard) returns Array<WebPage2>
-        Array<WebPage2> result
+    action GetPagesFor(Standard standard) returns Array<WebPage>
+        Array<WebPage> result
         text key = GetKey(standard)
         if not byStandard:HasKey(key)
             return result
         end
         HashTable<text, boolean> seen
-        Array<WebPage2> recorded = byStandard:GetValue(key)
+        Array<WebPage> recorded = byStandard:GetValue(key)
         integer i = 0
         repeat while i < recorded:GetSize()
-            WebPage2 page = recorded:Get(i)
+            WebPage page = recorded:Get(i)
             if not seen:HasKey(page:GetLocation())
                 seen:Set(page:GetLocation(), true)
                 result:Add(page)
