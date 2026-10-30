@@ -1,0 +1,441 @@
+package Libraries.Web.Page.Standards
+
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.WebLocations
+use Libraries.Web.Page.WebTextEscaper
+use Libraries.Web.Page.WebTag
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.RichText
+use Libraries.Web.Page.Heading
+use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableHeader
+use Libraries.Web.Page.TableBody
+use Libraries.Web.Page.TableRow
+use Libraries.Web.Page.TableHeaderCell
+use Libraries.Web.Page.TableData
+
+/*
+    StandardsReport is a page listing every standard in one set and the
+    pages on the website that cover it. It opens with a summary: how many
+    standards are covered, by how many lessons, and a map of coverage by
+    level and concept, each cell linking to its group below. Groups that
+    don't fit the map, such as specialties with their own concepts, follow
+    as a row of links. Then come the standards themselves, by level and
+    concept, one card each, with the lessons that cover it.
+
+    A QuorumSite builds one for each set it is asked to report, at the
+    set's report location, so the report has a permanent address that can
+    be shared. Each standard's card has the standard's identifier, so a
+    lesson can link straight to it: CSTA2026.html#HS-SOC-HI-38.
+
+    Attribute: Example
+    QuorumSite site
+    QuorumStandards standards
+    site:AddStandardsReport(standards:GetComputerScience2026())
+*/
+class StandardsReport is WebPage2
+    WebLocations locations
+    WebTextEscaper escaper
+    StandardsReportLooks looks
+    text otherGroupsLabel = "Other groups"
+
+    // The standards, grouped: levels in the order they first appear, the
+    // concepts inside each level, and the standards in each concept.
+    // Concepts are keyed with their level in front, since the same
+    // concept appears at many levels.
+    Array<text> levels
+    HashTable<text, Array<text>> conceptsInLevel
+    HashTable<text, text> conceptNames
+    HashTable<text, Array<Standard>> standardsInConcept
+    HashTable<text, integer> coveredInGroup
+
+    // Links in the summary to parts of the page not yet written, by the
+    // group they go to; their addresses are set when the part is.
+    HashTable<text, Array<Link>> waitingLinks
+
+    constant text GROUP_SEPARATOR = " / "
+    constant text OUT_OF = " of "
+    constant text COVERED_LABEL = "Standards covered"
+    constant text LESSONS_LABEL = "Lessons mapped"
+    constant text MAP_LABEL = "Coverage by level and concept"
+    constant text ALL_COLUMN = "All"
+    constant text LEVEL_COLUMN = "Level"
+    constant text TAUGHT_IN = "Taught in: "
+    constant text NO_LESSONS = "No lessons yet"
+    constant text SCOPE_ATTRIBUTE = "scope"
+    constant text COLUMN_SCOPE = "col"
+    constant text ROW_SCOPE = "row"
+
+    /*
+        Sets the look of the report's parts. Without this, the report uses
+        plain defaults.
+
+        Attribute: Parameter value The looks to use.
+    */
+    action SetLooks(StandardsReportLooks value)
+        looks = value
+    end
+
+    /*
+        Sets the label above the groups that don't fit the coverage map,
+        such as "Specialties". The default is "Other groups".
+
+        Attribute: Parameter label The label.
+    */
+    action SetOtherGroupsLabel(text label)
+        otherGroupsLabel = label
+    end
+
+    /*
+        Writes the report for one set, from what the tracker recorded. The
+        page must already be on its site, with its style options.
+
+        Attribute: Parameter set The set to report.
+        Attribute: Parameter tracker What every page on the site recorded.
+    */
+    action Build(StandardSet set, StandardsTracker tracker)
+        Array<Standard> all = set:GetStandards()
+        SetDescription("Every standard in the " + set:GetName() + ", with the lessons that cover it.")
+        Title(set:GetName())
+        Paragraph("Every standard in the "):Link(set:GetName(), set:GetAddress()):Text(", and the lessons on this site that cover it.")
+
+        // Group the standards, and count what is covered.
+        integer covered = 0
+        HashTable<text, boolean> lessons
+        integer i = 0
+        repeat while i < all:GetSize()
+            Standard standard = all:Get(i)
+            text level = standard:GetLevel()
+            text concept = level + GROUP_SEPARATOR + standard:GetConcept()
+            if not conceptsInLevel:HasKey(level)
+                levels:Add(level)
+                Array<text> newConcepts
+                conceptsInLevel:Set(level, newConcepts)
+                coveredInGroup:Set(level, 0)
+            end
+            if not conceptNames:HasKey(concept)
+                conceptsInLevel:GetValue(level):Add(concept)
+                conceptNames:Set(concept, standard:GetConcept())
+                Array<Standard> newStandards
+                standardsInConcept:Set(concept, newStandards)
+                coveredInGroup:Set(concept, 0)
+            end
+            standardsInConcept:GetValue(concept):Add(standard)
+
+            Array<WebPage2> pages = tracker:GetPagesFor(standard)
+            if pages:GetSize() > 0
+                covered = covered + 1
+                coveredInGroup:Set(level, coveredInGroup:GetValue(level) + 1)
+                coveredInGroup:Set(concept, coveredInGroup:GetValue(concept) + 1)
+                integer j = 0
+                repeat while j < pages:GetSize()
+                    lessons:Set(pages:Get(j):GetLocation(), true)
+                    j = j + 1
+                end
+            end
+            i = i + 1
+        end
+
+        // The summary's tiles.
+        Division tiles
+        SetLayout(tiles, looks:GetTiles())
+        tiles:AddNestedTag(GetTile(COVERED_LABEL, "" + covered, OUT_OF + all:GetSize()))
+        tiles:AddNestedTag(GetTile(LESSONS_LABEL, "" + lessons:GetSize(), ""))
+        Include(tiles)
+
+        // The map's columns are the first level's concepts. A level whose
+        // concepts are all among them is a row; the rest go in the row of
+        // other groups.
+        Array<text> columns
+        HashTable<text, boolean> isColumn
+        if levels:GetSize() > 0
+            Array<text> firstConcepts = conceptsInLevel:GetValue(levels:Get(0))
+            i = 0
+            repeat while i < firstConcepts:GetSize()
+                text name = conceptNames:GetValue(firstConcepts:Get(i))
+                columns:Add(name)
+                isColumn:Set(name, true)
+                i = i + 1
+            end
+        end
+        Array<text> mapLevels
+        Array<text> otherLevels
+        i = 0
+        repeat while i < levels:GetSize()
+            text level = levels:Get(i)
+            if FitsColumns(level, isColumn)
+                mapLevels:Add(level)
+            else
+                otherLevels:Add(level)
+            end
+            i = i + 1
+        end
+
+        Include(GetLabel(MAP_LABEL))
+        Include(GetMap(columns, mapLevels))
+        if otherLevels:GetSize() > 0
+            Include(GetLabel(otherGroupsLabel))
+            Include(GetOtherGroups(otherLevels))
+        end
+
+        // The standards, by level and concept.
+        integer levelIndex = 0
+        repeat while levelIndex < levels:GetSize()
+            text level = levels:Get(levelIndex)
+            Section(level)
+            ConnectWaitingLinks(level)
+            Array<text> concepts = conceptsInLevel:GetValue(level)
+            integer conceptIndex = 0
+            repeat while conceptIndex < concepts:GetSize()
+                text concept = concepts:Get(conceptIndex)
+                Subsection(conceptNames:GetValue(concept))
+                ConnectWaitingLinks(concept)
+                Division grid
+                SetLayout(grid, looks:GetCards())
+                Array<Standard> standards = standardsInConcept:GetValue(concept)
+                integer standardIndex = 0
+                repeat while standardIndex < standards:GetSize()
+                    grid:AddNestedTag(GetCard(standards:Get(standardIndex), tracker))
+                    standardIndex = standardIndex + 1
+                end
+                Include(grid)
+                conceptIndex = conceptIndex + 1
+            end
+            levelIndex = levelIndex + 1
+        end
+    end
+
+    // True if every concept in a level is one of the map's columns.
+    private action FitsColumns(text level, HashTable<text, boolean> isColumn) returns boolean
+        Array<text> concepts = conceptsInLevel:GetValue(level)
+        integer i = 0
+        repeat while i < concepts:GetSize()
+            if not isColumn:HasKey(conceptNames:GetValue(concepts:Get(i)))
+                return false
+            end
+            i = i + 1
+        end
+        return true
+    end
+
+    // One summary tile: a label, then a number, then any words after it,
+    // such as " of 331".
+    private action GetTile(text label, text amount, text after) returns Division
+        Division tile
+        SetStyle(tile, looks:GetTile())
+        Paragraph labelWords
+        SetStyle(labelWords, looks:GetTileLabel())
+        labelWords:AddText(escaper:Escape(label))
+        tile:AddNestedTag(labelWords)
+        Paragraph value
+        SetStyle(value, looks:GetTileNumber())
+        value:AddText(escaper:Escape(amount))
+        if not after:IsEmpty()
+            Span outOf
+            SetStyle(outOf, looks:GetTileOutOf())
+            outOf:AddText(escaper:Escape(after))
+            value:AddNestedTag(outOf)
+        end
+        tile:AddNestedTag(value)
+        return tile
+    end
+
+    private action GetLabel(text words) returns Paragraph
+        Paragraph label
+        SetStyle(label, looks:GetSectionLabel())
+        label:AddText(escaper:Escape(words))
+        return label
+    end
+
+    // The coverage map: a row for each level, a column for each concept,
+    // and a last column for the level as a whole. Each cell says how many
+    // of its standards are covered, and links to its group if any are.
+    private action GetMap(Array<text> columns, Array<text> mapLevels) returns WebTable
+        WebTable table
+        SetStyle(table, looks:GetMap())
+        TableHeader head
+        TableRow names
+        names:AddNestedTag(GetColumnName(LEVEL_COLUMN))
+        integer i = 0
+        repeat while i < columns:GetSize()
+            names:AddNestedTag(GetColumnName(columns:Get(i)))
+            i = i + 1
+        end
+        names:AddNestedTag(GetColumnName(ALL_COLUMN))
+        head:Add(names)
+        table:Add(head)
+
+        TableBody rows
+        i = 0
+        repeat while i < mapLevels:GetSize()
+            text level = mapLevels:Get(i)
+            TableRow row
+            TableHeaderCell levelName
+            levelName:AddAttribute(SCOPE_ATTRIBUTE, ROW_SCOPE)
+            SetStyle(levelName, looks:GetMapName())
+            levelName:AddNestedTag(GetWaitingLink(level, level))
+            row:AddNestedTag(levelName)
+
+            integer column = 0
+            repeat while column < columns:GetSize()
+                text concept = level + GROUP_SEPARATOR + columns:Get(column)
+                if standardsInConcept:HasKey(concept)
+                    row:AddNestedTag(GetMapCell(concept, standardsInConcept:GetValue(concept):GetSize()))
+                else
+                    TableData empty
+                    SetStyle(empty, looks:GetMapCell())
+                    row:AddNestedTag(empty)
+                end
+                column = column + 1
+            end
+            row:AddNestedTag(GetMapCell(level, CountStandards(level)))
+            rows:Add(row)
+            i = i + 1
+        end
+        table:Add(rows)
+        return table
+    end
+
+    private action GetColumnName(text name) returns TableHeaderCell
+        TableHeaderCell cell
+        cell:AddAttribute(SCOPE_ATTRIBUTE, COLUMN_SCOPE)
+        SetStyle(cell, looks:GetMapName())
+        cell:AddText(escaper:Escape(name))
+        return cell
+    end
+
+    // One map cell: how many of a group's standards are covered, linked to
+    // the group when any are.
+    private action GetMapCell(text group, integer total) returns TableData
+        TableData cell
+        integer coveredHere = coveredInGroup:GetValue(group)
+        text words = coveredHere + OUT_OF + total
+        if coveredHere > 0
+            SetStyle(cell, looks:GetCoveredMapCell())
+            cell:AddNestedTag(GetWaitingLink(group, words))
+        else
+            SetStyle(cell, looks:GetMapCell())
+            cell:AddText(escaper:Escape(words))
+        end
+        return cell
+    end
+
+    // A link for each group outside the map, such as "Game Development,
+    // Specialty I: 1 of 6".
+    private action GetOtherGroups(Array<text> otherLevels) returns Division
+        Division row
+        SetLayout(row, looks:GetOtherGroups())
+        integer i = 0
+        repeat while i < otherLevels:GetSize()
+            text level = otherLevels:Get(i)
+            Array<text> concepts = conceptsInLevel:GetValue(level)
+            integer j = 0
+            repeat while j < concepts:GetSize()
+                text concept = concepts:Get(j)
+                text words = conceptNames:GetValue(concept) + ", " + level + ": " + coveredInGroup:GetValue(concept) + OUT_OF + standardsInConcept:GetValue(concept):GetSize()
+                Link link = GetWaitingLink(concept, words)
+                if coveredInGroup:GetValue(concept) > 0
+                    SetStyle(link, looks:GetCoveredOtherGroup())
+                else
+                    SetStyle(link, looks:GetOtherGroup())
+                end
+                row:AddNestedTag(link)
+                j = j + 1
+            end
+            i = i + 1
+        end
+        return row
+    end
+
+    // One standard's card, with the standard's identifier so lessons can
+    // link to it: its identifier, its subconcept, its words, and the
+    // lessons that cover it.
+    private action GetCard(Standard standard, StandardsTracker tracker) returns Division
+        Array<WebPage2> pages = tracker:GetPagesFor(standard)
+        Division card
+        card:SetIdentifier(standard:GetIdentifier())
+        if pages:GetSize() > 0
+            SetStyle(card, looks:GetCoveredCard())
+        else
+            SetStyle(card, looks:GetUncoveredCard())
+        end
+
+        Paragraph code
+        SetStyle(code, looks:GetCardCode())
+        code:AddText(escaper:Escape(standard:GetIdentifier()))
+        card:AddNestedTag(code)
+        Paragraph details
+        SetStyle(details, looks:GetCardDetails())
+        details:AddText(escaper:Escape(standard:GetSubconcept()))
+        card:AddNestedTag(details)
+        Paragraph words
+        SetStyle(words, looks:GetCardWords())
+        words:AddText(escaper:Escape(standard:GetText()))
+        card:AddNestedTag(words)
+
+        Paragraph taught
+        SetStyle(taught, looks:GetCardDetails())
+        card:AddNestedTag(taught)
+        if pages:GetSize() = 0
+            taught:AddText(NO_LESSONS)
+        else
+            RichText writer = WriterFor(taught)
+            writer:Text(TAUGHT_IN)
+            integer i = 0
+            repeat while i < pages:GetSize()
+                WebPage2 page = pages:Get(i)
+                if i > 0
+                    writer:Text(", ")
+                end
+                writer:Link(page:GetTitleText(), locations:FromSiteTop(page:GetLocation()))
+                i = i + 1
+            end
+        end
+        return card
+    end
+
+    private action CountStandards(text level) returns integer
+        integer count = 0
+        Array<text> concepts = conceptsInLevel:GetValue(level)
+        integer i = 0
+        repeat while i < concepts:GetSize()
+            count = count + standardsInConcept:GetValue(concepts:Get(i)):GetSize()
+            i = i + 1
+        end
+        return count
+    end
+
+    // A link to a part of the page not yet written. Its address is set
+    // when the part is, by ConnectWaitingLinks.
+    private action GetWaitingLink(text group, text words) returns Link
+        Link link
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, looks:GetMapLink())
+        if not waitingLinks:HasKey(group)
+            Array<Link> newLinks
+            waitingLinks:Set(group, newLinks)
+        end
+        waitingLinks:GetValue(group):Add(link)
+        return link
+    end
+
+    // Points every link waiting for a group at the heading just added.
+    private action ConnectWaitingLinks(text group)
+        if not waitingLinks:HasKey(group)
+            return now
+        end
+        Heading heading = GetLastHeading()
+        text address = "#" + heading:GetIdentifier():GetValue()
+        Array<Link> links = waitingLinks:GetValue(group)
+        integer i = 0
+        repeat while i < links:GetSize()
+            links:Get(i):SetAddress(escaper:EscapeAttribute(address))
+            i = i + 1
+        end
+    end
+end

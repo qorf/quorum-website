@@ -1,0 +1,78 @@
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Web.PageSeries
+use Libraries.Web.PageSeriesEntry
+use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.Standards.Standard
+use Libraries.Web.Page.Standards.StandardsTracker
+
+/*
+    CourseOverview is the page for one course on the Quorum website: its
+    name and description, its lessons in order (each linked so the reader
+    stays in this course), and every standard its lessons cover. A
+    QuorumSite builds one for each course, at the course's overview
+    location.
+*/
+class CourseOverview is WebPage2
+    /*
+        Writes the overview for a course. The page must already be on its
+        site, with its style options.
+
+        Attribute: Parameter course The course.
+        Attribute: Parameter tracker What every page on the site recorded.
+        Attribute: Parameter quorumSite The site, for links that keep the reader in the course.
+    */
+    action Build(PageSeries course, StandardsTracker tracker, QuorumSite quorumSite)
+        text courseDescription = course:GetDescription()
+        if not courseDescription:IsEmpty()
+            SetDescription(courseDescription)
+        end
+        Title(course:GetName())
+        if not courseDescription:IsEmpty()
+            Paragraph(courseDescription)
+        end
+
+        Section("Lessons")
+        NumberedList()
+        integer i = 0
+        repeat while i < course:GetSize()
+            PageSeriesEntry entry = course:GetEntry(i)
+            ListItem():Link(entry:GetTitle(), quorumSite:GetCourseAddress(entry:GetLocation(), course))
+            i = i + 1
+        end
+
+        // Every standard the course's lessons cover, each once, in the
+        // order the lessons cover them.
+        Array<Standard> covered
+        HashTable<text, boolean> seen
+        i = 0
+        repeat while i < course:GetSize()
+            WebPage2 lesson = course:GetEntry(i):GetPage()
+            if lesson not= undefined
+                Array<Standard> recorded = tracker:GetRecorded(lesson)
+                integer j = 0
+                repeat while j < recorded:GetSize()
+                    Standard standard = recorded:Get(j)
+                    text key = standard:GetSet():GetName() + " " + standard:GetIdentifier()
+                    if not seen:HasKey(key)
+                        seen:Set(key, true)
+                        covered:Add(standard)
+                    end
+                    j = j + 1
+                end
+            end
+            i = i + 1
+        end
+        if covered:GetSize() > 0
+            Section("Standards")
+            Paragraph("The lessons in this course cover these standards:")
+            BulletList()
+            i = 0
+            repeat while i < covered:GetSize()
+                Standard standard = covered:Get(i)
+                ListItem():Strong(standard:GetIdentifier()):Text(": " + standard:GetText())
+                i = i + 1
+            end
+        end
+    end
+end

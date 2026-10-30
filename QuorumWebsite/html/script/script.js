@@ -922,8 +922,11 @@ var hideLoginModal = function() {
   document.getElementById('birthdayInput').removeAttribute('aria-invalid');
 
   document.getElementById('alertMessage').ariaHidden = true;
+  document.getElementById('alertMessage').hidden = true;
   document.getElementById('feedbackMessage').ariaHidden = true;
+  document.getElementById('feedbackMessage').hidden = true;
   document.getElementById('successMessage').ariaHidden = true;
+  document.getElementById('successMessage').hidden = true;
 };
 
 var showSaveModal = function(id) {
@@ -1811,11 +1814,11 @@ function successMessageOn(text) {
     $('#successMessageHeader').text(header);
   if (text)
     $('#successMessageText').text(text);
-  $('#successMessage').attr("aria-hidden", "false");
+  $('#successMessage').attr("aria-hidden", "false").prop('hidden', false);
 }
 
 function successMessageOff() {
-  $('#successMessage').attr("aria-hidden", "true");
+  $('#successMessage').attr("aria-hidden", "true").prop('hidden', true);
 }
 
 function feedbackMessageOn(text) {
@@ -1835,11 +1838,11 @@ function feedbackMessageOn(text) {
     $('#feedbackMessageHeader').text(header);
   if (text)
     $('#feedbackMessageText').text(text);
-  $('#feedbackMessage').attr("aria-hidden", "false");
+  $('#feedbackMessage').attr("aria-hidden", "false").prop('hidden', false);
 }
 
 function feedbackMessageOff() {
-  $('#feedbackMessage').attr("aria-hidden", "true");
+  $('#feedbackMessage').attr("aria-hidden", "true").prop('hidden', true);
 }
 
 function alertMessageOn(text) {
@@ -1899,17 +1902,17 @@ function alertMessageOn(text) {
     $('#alertMessageHeader').text(header);
   if (text)
     $('#alertMessageText').text(text);
-  $('#alertMessage').attr("aria-hidden", "false");
+  $('#alertMessage').attr("aria-hidden", "false").prop('hidden', false);
 }
 
 function alertMessageOff(aMsg) {
   if (aMsg && aMsg.length > 0) {
     if ($('#alertMessage').text() === aMsg) {
-      $('#alertMessage').attr("aria-hidden", "true");
+      $('#alertMessage').attr("aria-hidden", "true").prop('hidden', true);
     }
   }
   else {
-    $('#alertMessage').attr("aria-hidden", "true");
+    $('#alertMessage').attr("aria-hidden", "true").prop('hidden', true);
   }
 }
 
@@ -1997,9 +2000,12 @@ function ResetSignInModal() {
   signInModal.classList.remove('flex');
   //focus on username input
   document.getElementById('alertMessage').ariaHidden = true;
+  document.getElementById('alertMessage').hidden = true;
   document.getElementById('feedbackMessage').ariaHidden = true;
+  document.getElementById('feedbackMessage').hidden = true;
   setTimeout(function() {
     document.getElementById('successMessage').ariaHidden = true;
+    document.getElementById('successMessage').hidden = true;
   }, 3000);
 }
 

@@ -1,0 +1,143 @@
+package Libraries.Web.Page.Standards
+
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Web.Page.WebLocations
+
+/*
+    StandardSet is one body of standards, such as the 2026 CSTA K–12
+    Computer Science Standards. It holds every standard by identifier, in
+    the order they were added, with the set's name, the address of its
+    official site, and where on a website its report page goes.
+
+    A set is a subclass that adds its standards in its "on create", one
+    Add per standard, usually converted once from whatever form the
+    standards were published in. The subclass also gives each standard a
+    constant whose name spells out where it sits (level, subconcept,
+    number), with no abbreviations, so a mistyped standard fails to
+    compile.
+
+    Attribute: Example
+    use Libraries.Web.Page.Standards.StandardSet
+
+    class ExampleStandards is StandardSet
+        public constant text HIGH_SCHOOL_PROGRAM_DEVELOPMENT_1 = "EX-HS-PD-01"
+
+        on create
+            SetName("Example Standards")
+            SetAddress("https://example.com/standards")
+            SetReportLocation("standards/Example.html")
+            Add(HIGH_SCHOOL_PROGRAM_DEVELOPMENT_1, "Write a program.", "High School", "Programming", "Program Development")
+        end
+    end
+*/
+class StandardSet
+    text name = ""
+    text address = ""
+    text reportLocation = ""
+    WebLocations locations
+
+    // Every standard by identifier, and in the order they were added.
+    HashTable<text, Standard> standards
+    Array<Standard> ordered
+
+    /*
+        Sets the set's name, as readers see it.
+
+        Attribute: Parameter name The name, such as "2026 CSTA K–12 Computer Science Standards".
+    */
+    action SetName(text name)
+        me:name = name
+    end
+
+    /*
+        Returns the set's name, as readers see it.
+
+        Attribute: Returns The name.
+    */
+    action GetName returns text
+        return name
+    end
+
+    /*
+        Sets the address of the set's official site.
+
+        Attribute: Parameter address The address, such as "https://csteachers.org/pk12standards/view/".
+    */
+    action SetAddress(text address)
+        me:address = address
+    end
+
+    /*
+        Returns the address of the set's official site.
+
+        Attribute: Returns The address.
+    */
+    action GetAddress returns text
+        return address
+    end
+
+    /*
+        Sets where, on a website, the report for this set goes: the page
+        listing every standard and the lessons that cover it.
+
+        Attribute: Parameter location The report's location in the site, with no leading slash, such as "standards/CSTA2026.html".
+    */
+    action SetReportLocation(text location)
+        locations:Check(location)
+        reportLocation = location
+    end
+
+    /*
+        Returns where, on a website, the report for this set goes.
+
+        Attribute: Returns The report's location.
+    */
+    action GetReportLocation returns text
+        return reportLocation
+    end
+
+    /*
+        Adds one standard to the set. A set's subclass calls this in its
+        "on create", once for each standard.
+
+        Attribute: Parameter identifier The standard's identifier.
+        Attribute: Parameter words What the standard says.
+        Attribute: Parameter level Who it is for.
+        Attribute: Parameter concept Its concept or specialty.
+        Attribute: Parameter subconcept Its subconcept.
+    */
+    action Add(text identifier, text words, text level, text concept, text subconcept)
+        if standards:HasKey(identifier)
+            alert("The set " + name + " has two standards with the identifier " + identifier + ".")
+        end
+        Standard standard
+        standard:Setup(identifier, words, level, concept, subconcept, me)
+        standards:Set(identifier, standard)
+        ordered:Add(standard)
+    end
+
+    /*
+        Returns the standard with an identifier. Use the set's constants
+        for identifiers, so a mistyped one fails to compile; an identifier
+        not in the set stops the build.
+
+        Attribute: Parameter identifier The standard's identifier.
+        Attribute: Returns The standard.
+    */
+    action GetStandard(text identifier) returns Standard
+        if not standards:HasKey(identifier)
+            alert("The set " + name + " has no standard with the identifier " + identifier + ".")
+        end
+        return standards:GetValue(identifier)
+    end
+
+    /*
+        Returns every standard in the set, in the order they were added.
+
+        Attribute: Returns The standards.
+    */
+    action GetStandards returns Array<Standard>
+        return ordered
+    end
+end

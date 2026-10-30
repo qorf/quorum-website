@@ -1,0 +1,107 @@
+use Libraries.Web.PageSeries
+
+/*
+    Builds the experiment's page with the new styling system, apart from
+    the main website, writes it into html/, then serves it. To run it, set
+    "Main" in Project/Project.qp to
+    "/SourceCode/Experiment/ExperimentMain.quorum", run, then set it back
+    to "/SourceCode/main.quorum". Stop the run to stop the server.
+*/
+class ExperimentMain
+    constant integer PORT = 8080
+    constant text SITE_FOLDER = "html"
+    constant text STYLE_SHEET = "style/experiment.css"
+    constant text ADDRESS = "https://quorumlanguage.com"
+    constant text SITE_NAME = "Quorum Programming Language"
+    constant text TITLE_ENDING = " - Quorum Programming Language"
+
+    // The picture shown when a page without its own is shared, in the
+    // site's relative folder (media): Quincy, 1200 by 630, the shape link
+    // previews use.
+    constant text DEFAULT_SHARE_IMAGE = "userInterface/quorumAssets/bunnyShare.jpg"
+    constant text DEFAULT_SHARE_IMAGE_DESCRIPTION = "Tech-savvy bunny named Quincy with glasses working on a laptop"
+
+    // The real site's sitemap.xml lives at the top of html/, so the
+    // experiment writes its own elsewhere and never replaces it.
+    constant text SITEMAP = "experiment/sitemap.xml"
+    constant text ROBOTS = "experiment/robots.txt"
+
+    action Main
+        // The global look, handed to every page before it's set up.
+        QuorumSiteOptions options
+
+        QuorumSite site
+        site:SetFolder(SITE_FOLDER)
+        site:SetStyleSheetLocation(STYLE_SHEET)
+
+        // Search and sharing: every page's canonical address and sharing
+        // tags come from the site's address; tab titles get the ending.
+        site:SetAddress(ADDRESS)
+        site:SetSiteName(SITE_NAME)
+        site:SetTitleEnding(TITLE_ENDING)
+        site:SetDefaultShareImage(DEFAULT_SHARE_IMAGE, DEFAULT_SHARE_IMAGE_DESCRIPTION)
+        site:SetSitemapLocation(SITEMAP)
+        site:SetRobotsLocation(ROBOTS)
+
+        // Pages the site builds itself (the standards report) use the same
+        // look, and the site reports on the 2026 CSTA standards, at
+        // standards/CSTA2026.html.
+        site:SetStyleOptions(options)
+
+        // Set to true to check every page for accessibility problems before
+        // the site is written; the build stops and lists any it finds.
+        site:SetAccessibilityChecks(false)
+
+        QuorumStandards standards
+        site:AddStandardsReport(standards:GetComputerScience2026())
+
+        // Each page: its options, then the site, then set up, so it can
+        // find the site's files (such as its table's data) while it's built.
+        SceneIntroduction2 sceneIntroduction
+        sceneIntroduction:SetStyleOptions(options)
+        site:AddPage(sceneIntroduction)
+        sceneIntroduction:Setup()
+
+        // Courses. Scene Editing is the real series of 14 lessons: the
+        // introduction is built here, and the other 13 are listed by their
+        // real titles and locations, since the main site still builds them.
+        PageSeries scenes
+        scenes:SetName("Scene Editing")
+        scenes:SetKey("scenes")
+        scenes:SetDescription("Make scenes in Quorum Studio's scene editor, use them from code, and build terrain.")
+        scenes:SetOverviewLocation("experiment/Scenes/index.html")
+        scenes:Add(sceneIntroduction)
+        scenes:AddOutsidePage("Creating a scene project", "tutorials/Scenes/create.html", "Learn to create a new scene project in Quorum Studio, and what its scene, terrain and material files hold.")
+        scenes:AddOutsidePage("What does a Scene have in it?", "tutorials/Scenes/components.html", "Tour the parts of Quorum Studio's scene editor: the palette, the editor and its grids, the Properties panel and the terrain editor.")
+        scenes:AddOutsidePage("Add and Remove Items in Scenes", "tutorials/Scenes/items.html", "Learn about cameras, and how to add, select and remove items in 2D and 3D scenes in Quorum Studio.")
+        scenes:AddOutsidePage("Navigation and Keyboard shortcuts in Quorum Studio", "tutorials/Scenes/navigate.html", "Learn the mouse and keyboard controls of the scene editor in Quorum Studio.")
+        scenes:AddOutsidePage("Properties and Physics", "tutorials/Scenes/properties.html", "Learn about physics, the Properties panel, and causing chaos with properties and physics in Quorum Studio.")
+        scenes:AddOutsidePage("Running a Scene", "tutorials/Scenes/running.html", "Learn how Quorum draws graphics with OpenGL, WebGL and Vulkan, load and run a scene, and test physics hypotheses.")
+        scenes:AddOutsidePage("Manipulating a Running Scene", "tutorials/Scenes/manipulate.html", "Learn to find items from a running scene by name and move them with the keyboard or a movement controller.")
+        scenes:AddOutsidePage("Terrain in a Scene", "tutorials/Scenes/terrain.html", "Learn to add a terrain to a 3D scene in Quorum Studio, select it, read its properties, and find the files it is saved in.")
+        scenes:AddOutsidePage("Terrain Materials and Painting", "tutorials/Scenes/terrainMaterials.html", "Learn to give a terrain materials in Quorum Studio, paint them onto the ground, and credit the textures you use.")
+        scenes:AddOutsidePage("Shaping Terrain", "tutorials/Scenes/terrainShape.html", "Learn to shape a terrain in Quorum Studio with brush tools, using the keyboard or the mouse.")
+        scenes:AddOutsidePage("Generating Terrain", "tutorials/Scenes/terrainGenerate.html", "Learn to generate terrain in Quorum Studio from presets and seeds, how pseudo-random numbers work, and how to change terrain with erosion, stamps and regions.")
+        scenes:AddOutsidePage("Driving on Terrain: Vehicles and Physics", "tutorials/Scenes/terrainGames.html", "Learn how a game car works as a physics simulation, and drive a toy car on a Quorum Studio terrain.")
+        scenes:AddOutsidePage("Changing the Palette", "tutorials/Scenes/palette.html", "Learn about changing the Palette in Quorum Studio")
+        site:AddSeries(scenes)
+
+        // An example second course, only to show a lesson in two courses:
+        // try the introduction with ?course=example-game-worlds.
+        PageSeries gameWorlds
+        gameWorlds:SetName("Example Course: Building Game Worlds")
+        gameWorlds:SetKey("example-game-worlds")
+        gameWorlds:SetDescription("An example course for trying course navigation. Not a real course.")
+        gameWorlds:SetOverviewLocation("experiment/Courses/game-worlds.html")
+        gameWorlds:Add(sceneIntroduction)
+        gameWorlds:AddOutsidePage("Driving on Terrain: Vehicles and Physics", "tutorials/Scenes/terrainGames.html", "Learn how a game car works as a physics simulation, and drive a toy car on a Quorum Studio terrain.")
+        site:AddSeries(gameWorlds)
+
+        // The introduction is in two courses, so it names its home: the
+        // one its navigation follows when a reader arrives from search.
+        sceneIntroduction:SetHomeSeries(scenes)
+
+        site:Write()
+        //site:Serve(PORT)
+    end
+end

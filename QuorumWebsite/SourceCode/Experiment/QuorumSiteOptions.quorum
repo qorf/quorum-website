@@ -1,0 +1,579 @@
+use Libraries.Web.Styles.StyleOptions
+use Libraries.Web.Styles.StyleSheetConstants
+use Libraries.Web.Styles.WebListStyle
+use Libraries.Web.Styles.WebTableStyle
+use Libraries.Web.Styles.WebTextStyle
+use Libraries.Web.Styles.WebBoxStyle
+use Libraries.Web.Styles.WebColor
+use Libraries.Web.Page.Layouts.WebRowLayout
+use Libraries.Web.Page.Layouts.WebStackLayout
+use Libraries.Web.Page.Layouts.WebGridLayout
+use Libraries.Web.Page.Standards.StandardsReportLooks
+
+/*
+    QuorumSiteOptions is the Quorum website's global look. It changes the
+    plain defaults in StyleOptions to the values the site uses today, so
+    pages look the same as they did with Tailwind. Every size is a
+    constant from StyleSheetConstants, named as Tailwind names it, and
+    every color is one of the site's colors below, named as the site's
+    Tailwind settings name it.
+
+    It adds roles only this site has: its two kinds of callout, and the
+    parts of its course navigation. It is a shared class, so a Quorum page
+    and the site reach the same options without being handed them.
+*/
+shared class QuorumSiteOptions is StyleOptions
+    // A parent's fields aren't visible here, so the shared constants are
+    // named again. A shared class: still one copy.
+    StyleSheetConstants constants
+
+    // The code highlighter's theme: its colors for keywords and the like,
+    // and its line numbers. It belongs to the highlighter, as its script
+    // does.
+    constant text HIGHLIGHTER_STYLE_SHEET = "style/prism-quorum.css"
+
+    // The site's font.
+    constant text FONT = "Montserrat"
+
+    // The site's colors (tailwind.config.js).
+    WebColor black            // neutral-black
+    WebColor white            // neutral-white
+    WebColor grey25           // neutral-grey-25
+    WebColor grey40           // neutral-grey-40
+    WebColor grey50           // neutral-grey-50
+    WebColor quorumBlue25     // quorum-blue-25
+    WebColor quorumBlue100    // quorum-blue-100
+    WebColor quorumBlue150    // quorum-blue-150
+    WebColor quorumBlue50     // quorum-blue-50
+    WebColor grey10           // neutral-grey-10
+    WebColor grey65           // neutral-grey-65
+    WebColor grey95           // neutral-grey-95
+    WebColor pageBackground   // website-bg
+    WebColor textColor        // the body's text color
+
+    // A lesson's goals (design A): a white box with a dark blue bar on
+    // its left and a small grey label. Only goals look this way, not
+    // every list.
+    WebBoxStyle goals
+    WebTextStyle goalsLabel
+
+    // The two kinds of callout in lessons.
+    WebBoxStyle teachingTipLabel
+    WebBoxStyle discussionGoalLabel
+
+    // Course navigation: the breadcrumb row, its links, the marks between
+    // them and the current page; then the "Up next" box at the end of a
+    // lesson, its parts, and the line under it.
+    WebRowLayout breadcrumbs
+    WebListStyle breadcrumbList
+    WebTextStyle breadcrumbLink
+    WebTextStyle breadcrumbSeparator
+    WebTextStyle breadcrumbCurrent
+    WebBoxStyle upNext
+    WebTextStyle upNextLabel
+    WebTextStyle upNextLink
+    WebTextStyle upNextDescription
+    WebTextStyle courseLine
+
+    // A lesson's standards, for teachers (design 2): a small label, a
+    // grid of cards, one for each standard, and a link to every standard.
+    WebTextStyle standardsLabel
+    WebGridLayout standardsGrid
+    WebBoxStyle standardCard
+    WebTextStyle standardCode
+    WebTextStyle standardDetails
+    WebTextStyle standardWords
+    WebTextStyle standardsLink
+
+    // The standards report (design 1): summary tiles, the coverage map,
+    // the specialties, and a card for every standard.
+    StandardsReportLooks standardsReport
+
+    on create
+        AddStyleSheet(HIGHLIGHTER_STYLE_SHEET)
+
+        black:SetColor(0, 0, 0)
+        white:SetColor(255, 255, 255)
+        grey25:SetColor(215, 215, 215)
+        grey40:SetColor(114, 114, 114)
+        grey50:SetColor(101, 101, 101)
+        quorumBlue25:SetColor(172, 209, 223)
+        quorumBlue100:SetColor(6, 149, 208)
+        quorumBlue150:SetColor(18, 90, 119)
+        quorumBlue50:SetColor(117, 189, 219)
+        grey10:SetColor(246, 246, 247)
+        grey65:SetColor(64, 64, 64)
+        grey95:SetColor(32, 32, 32)
+        pageBackground:SetColor(243, 243, 243)
+        textColor:SetColor(37, 37, 37)
+
+        // The page: Montserrat, dark grey on light grey, lines one and a
+        // half times the text's size (input.css's body).
+        WebTextStyle pageWords
+        pageWords:SetFont(FONT)
+        pageWords:SetColor(textColor)
+        pageWords:SetFontSize(constants:BASE_FONT_SIZE)
+        pageWords:SetLineHeight(constants:BASE_LINE_HEIGHT)
+        WebBoxStyle page = GetPage()
+        page:SetBackground(pageBackground)
+        page:SetTextStyle(pageWords)
+
+        // Links in the text: dark blue and underlined (input.css's
+        // "#content p a").
+        WebTextStyle link = GetLink()
+        link:SetUnderline(true)
+        link:SetColor(quorumBlue150)
+
+        // The site's scripts show and hide parts of the frame by adding
+        // and removing "hidden".
+        WebBoxStyle hidden
+        hidden:SetDisplayed(false)
+        AddScriptClass("hidden", hidden)
+
+        // On phones, the navigation bar's menu button opens the menu by
+        // adding "menu-open": the menu shows, its links centered.
+        WebRowLayout openMenu
+        openMenu:SetCenteredHorizontally(true)
+        AddScriptClass("menu-open", openMenu)
+
+        // "flex flex-col gap-y-2"
+        GetStack():SetGap(constants:SPACING_2)
+
+        // "list-disc list-outside pl-8"
+        WebListStyle bullets = GetBulletList()
+        bullets:UseDiscs()
+        bullets:MarkersOutside()
+        bullets:SetLeftPadding(constants:SPACING_8)
+
+        // "list-decimal list-outside pl-8"
+        WebListStyle numbers = GetNumberedList()
+        numbers:UseNumbers()
+        numbers:MarkersOutside()
+        numbers:SetLeftPadding(constants:SPACING_8)
+
+        // Lesson's tables: "border-collapse table-fixed w-full"
+        WebTableStyle tables = GetTable()
+        tables:SetFullWidth(true)
+        tables:SetEvenColumns(true)
+        // Lesson rounded and shaded its tables: "rounded-lg shadow
+        // overflow-hidden". Corners only round cells when cells don't
+        // share borders, so cells keep their own, with no space between.
+        tables:SetSharedBorders(false)
+        tables:RemoveCellSpacing()
+        WebBoxStyle tableBox
+        tableBox:SetRoundedCorners(constants:SPACING_2)
+        tableBox:SetShadow(true)
+        tableBox:SetClipContent(true)
+        tables:SetBox(tableBox)
+
+        // Caption: "text-xl font-bold p-4"
+        WebTextStyle captionWords
+        captionWords:SetFontSize(constants:EXTRA_LARGE_FONT_SIZE)
+        captionWords:SetLineHeight(constants:EXTRA_LARGE_LINE_HEIGHT)
+        captionWords:SetBold(true)
+        WebBoxStyle caption = GetTableCaption()
+        caption:SetTextStyle(captionWords)
+        caption:SetPadding(constants:SPACING_4, constants:SPACING_4)
+
+        // Column names: "bg-neutral-black text-neutral-white text-left
+        // py-3 px-4 font-semibold break-words text-sm". Bold stands in
+        // for semibold until text styles have more weights.
+        WebTextStyle headerWords
+        headerWords:SetColor(white)
+        headerWords:SetFontSize(constants:SMALL_FONT_SIZE)
+        headerWords:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        headerWords:SetBold(true)
+        headerWords:AlignLeft()
+        headerWords:SetBreakLongWords(true)
+        WebBoxStyle header = GetTableHeaderCell()
+        header:SetBackground(black)
+        header:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        header:SetTextStyle(headerWords)
+
+        // Other cells: "bg-neutral-grey-25 border-y border-neutral-grey-40
+        // text-left py-3 px-4 break-words", with the first column bold.
+        WebTextStyle cellWords
+        cellWords:AlignLeft()
+        cellWords:SetBreakLongWords(true)
+        WebBoxStyle cell = GetTableCell()
+        cell:SetBackground(grey25)
+        cell:SetTopBorder(constants:SPACING_PIXEL, grey40)
+        cell:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        cell:SetTextStyle(cellWords)
+        WebTextStyle rowNameWords = cellWords:Copy()
+        rowNameWords:SetBold(true)
+        WebBoxStyle rowName = GetTableRowHeaderCell()
+        rowName:SetBackground(grey25)
+        rowName:SetTopBorder(constants:SPACING_PIXEL, grey40)
+        rowName:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        rowName:SetTextStyle(rowNameWords)
+
+        // Callouts: a white body, "rounded-b-lg bg-neutral-white px-6
+        // py-2", under a label bar, "rounded-t-lg px-6 py-2 font-bold
+        // text-neutral-white", dark blue for teaching tips and discussion
+        // goals alike (Lesson used green for discussion goals), the same
+        // blue as the standards cards.
+        WebBoxStyle calloutBody = GetCallout()
+        calloutBody:SetBackground(white)
+        calloutBody:SetRoundedBottom(constants:SPACING_2)
+        calloutBody:SetPadding(constants:SPACING_2, constants:SPACING_6)
+        WebTextStyle labelWords
+        labelWords:SetBold(true)
+        labelWords:SetColor(white)
+        WebBoxStyle label = GetCalloutLabel()
+        label:SetTextStyle(labelWords)
+        label:SetRoundedTop(constants:SPACING_2)
+        label:SetPadding(constants:SPACING_2, constants:SPACING_6)
+        label:SetClipContent(true)
+        label:SetBackground(quorumBlue150)
+        teachingTipLabel = label:Copy()
+        discussionGoalLabel = label:Copy()
+
+        // Labeled description lists (design C): a white box with a dark
+        // blue bar on its left, a small grey label in capitals, and the
+        // terms in dark blue, each beside its description.
+        WebBoxStyle labeledPairs = GetLabeledDescriptionList()
+        labeledPairs:SetBackground(white)
+        labeledPairs:SetLeftBorder(constants:SPACING_1, quorumBlue150)
+        labeledPairs:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        WebTextStyle pairsLabel = GetDescriptionListLabel()
+        pairsLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        pairsLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        pairsLabel:SetUppercase(true)
+        pairsLabel:SetBold(true)
+        pairsLabel:SetColor(grey50)
+        GetDescriptionTerm():SetColor(quorumBlue150)
+
+        goals:SetBackground(white)
+        goals:SetLeftBorder(constants:SPACING_1, quorumBlue150)
+        goals:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        goalsLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        goalsLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        goalsLabel:SetUppercase(true)
+        goalsLabel:SetBold(true)
+        goalsLabel:SetColor(grey50)
+
+        // Figures: the caption small and grey, under the picture.
+        WebTextStyle figureWords = GetFigureCaption()
+        figureWords:SetItalic(false)
+        figureWords:SetFontSize(constants:SMALL_FONT_SIZE)
+        figureWords:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        figureWords:SetColor(grey50)
+
+        // Breadcrumbs (design B): one wrapping row, links without
+        // underlines, grey marks between, the current page in bold.
+        breadcrumbs:SetGap(constants:SPACING_2)
+        breadcrumbs:SetWrap(true)
+        breadcrumbs:SetCenteredVertically(true)
+        breadcrumbList:UseNoMarker()
+        breadcrumbList:SetLeftPadding(constants:SPACING_0)
+        breadcrumbLink:SetUnderline(false)
+        breadcrumbLink:SetColor(quorumBlue150)
+        breadcrumbSeparator:SetColor(grey40)
+        breadcrumbCurrent:SetBold(true)
+
+        // "Up next" (design F): a white box with a blue bar on its left,
+        // a small grey label, the next lesson's name large and bold, its
+        // description, and a grey line under the box.
+        upNext:SetBackground(white)
+        upNext:SetLeftBorder(constants:SPACING_1, quorumBlue100)
+        upNext:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        upNextLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        upNextLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        upNextLabel:SetUppercase(true)
+        upNextLabel:SetBold(true)
+        upNextLabel:SetColor(grey50)
+        upNextLink:SetFontSize(constants:LARGE_FONT_SIZE)
+        upNextLink:SetLineHeight(constants:LARGE_LINE_HEIGHT)
+        upNextLink:SetBold(true)
+        upNextLink:SetUnderline(false)
+        upNextLink:SetColor(quorumBlue150)
+        upNextDescription:SetFontSize(constants:SMALL_FONT_SIZE)
+        upNextDescription:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        courseLine:SetFontSize(constants:SMALL_FONT_SIZE)
+        courseLine:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        courseLine:SetColor(grey50)
+
+        // Standards (design 2): white cards with a dark blue bar on top,
+        // side by side when there's room.
+        standardsLabel = upNextLabel:Copy()
+        standardsGrid:SetGap(constants:SPACING_2_5)
+        standardsGrid:SetSmallestColumnWidth(constants:SPACING_56)
+        standardCard:SetBackground(white)
+        standardCard:SetTopBorder(constants:SPACING_1, quorumBlue150)
+        standardCard:SetRoundedBottom(constants:SPACING_2)
+        standardCard:SetPadding(constants:SPACING_3, constants:SPACING_4)
+        standardCode:SetBold(true)
+        standardCode:SetUnderline(false)
+        standardCode:SetColor(quorumBlue150)
+        standardDetails:SetFontSize(constants:SMALL_FONT_SIZE)
+        standardDetails:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        standardDetails:SetColor(grey50)
+        standardWords:SetFontSize(constants:SMALL_FONT_SIZE)
+        standardWords:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        standardsLink:SetFontSize(constants:SMALL_FONT_SIZE)
+        standardsLink:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        standardsLink:SetBold(true)
+        standardsLink:SetUnderline(false)
+        standardsLink:SetColor(quorumBlue150)
+
+        // The standards report (design 1). Tiles: white, rounded, a small
+        // grey label in capitals over a large bold number.
+        WebBoxStyle reportTile = standardsReport:GetTile()
+        reportTile:SetBackground(white)
+        reportTile:SetRoundedCorners(constants:SPACING_2)
+        reportTile:SetPadding(constants:SPACING_2_5, constants:SPACING_3_5)
+        WebTextStyle reportTileLabel = standardsReport:GetTileLabel()
+        reportTileLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        reportTileLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        reportTileLabel:SetUppercase(true)
+        reportTileLabel:SetBold(true)
+        reportTileLabel:SetColor(grey50)
+        WebTextStyle reportTileNumber = standardsReport:GetTileNumber()
+        reportTileNumber:SetFontSize(constants:EXTRA_LARGE_2_FONT_SIZE)
+        reportTileNumber:SetLineHeight(constants:EXTRA_LARGE_2_LINE_HEIGHT)
+        reportTileNumber:SetBold(true)
+        WebTextStyle reportOutOf = standardsReport:GetTileOutOf()
+        reportOutOf:SetFontSize(constants:SMALL_FONT_SIZE)
+        reportOutOf:SetBold(false)
+        reportOutOf:SetColor(grey50)
+        WebTextStyle reportLabel = standardsReport:GetSectionLabel()
+        reportLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        reportLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        reportLabel:SetUppercase(true)
+        reportLabel:SetBold(true)
+        reportLabel:SetColor(grey50)
+
+        // The map: small text, white cells with a little space between
+        // them, light blue where there are lessons.
+        standardsReport:GetMap():SetSharedBorders(false)
+        WebTextStyle mapWords
+        mapWords:SetFontSize(constants:SMALL_FONT_SIZE)
+        mapWords:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        mapWords:AlignLeft()
+        WebTextStyle mapNameWords = mapWords:Copy()
+        mapNameWords:SetBold(true)
+        standardsReport:GetMapName():SetTextStyle(mapNameWords)
+        WebBoxStyle reportMapCell = standardsReport:GetMapCell()
+        reportMapCell:SetBackground(white)
+        reportMapCell:SetRoundedCorners(constants:SPACING_1)
+        reportMapCell:SetTextStyle(mapWords)
+        WebBoxStyle reportCoveredCell = standardsReport:GetCoveredMapCell()
+        reportCoveredCell:SetBackground(quorumBlue25)
+        reportCoveredCell:SetRoundedCorners(constants:SPACING_1)
+        reportCoveredCell:SetTextStyle(mapNameWords:Copy())
+        WebTextStyle reportMapLink = standardsReport:GetMapLink()
+        reportMapLink:SetColor(quorumBlue150)
+        reportMapLink:SetUnderline(false)
+
+        // Specialties: white chips with a pale blue edge; dark blue edge
+        // and bold where there are lessons.
+        WebTextStyle chipWords
+        chipWords:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        chipWords:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        chipWords:SetColor(quorumBlue150)
+        chipWords:SetUnderline(false)
+        WebBoxStyle chip = standardsReport:GetOtherGroup()
+        chip:SetBackground(white)
+        chip:SetBorder(constants:SPACING_PIXEL, quorumBlue25)
+        chip:SetRoundedCorners(constants:SPACING_96)
+        chip:SetTextStyle(chipWords)
+        WebBoxStyle coveredChip = standardsReport:GetCoveredOtherGroup()
+        coveredChip:SetBackground(white)
+        coveredChip:SetBorder(constants:SPACING_PIXEL, quorumBlue150)
+        coveredChip:SetRoundedCorners(constants:SPACING_96)
+        WebTextStyle coveredChipWords = chipWords:Copy()
+        coveredChipWords:SetBold(true)
+        coveredChip:SetTextStyle(coveredChipWords)
+
+        // Cards, as on the lessons: white with a dark blue bar on top when
+        // a lesson covers the standard, a grey bar when none does yet.
+        WebBoxStyle reportCovered = standardsReport:GetCoveredCard()
+        reportCovered:SetBackground(white)
+        reportCovered:SetTopBorder(constants:SPACING_1, quorumBlue150)
+        reportCovered:SetRoundedBottom(constants:SPACING_2)
+        reportCovered:SetPadding(constants:SPACING_2_5, constants:SPACING_3_5)
+        WebBoxStyle reportUncovered = standardsReport:GetUncoveredCard()
+        reportUncovered:SetBackground(white)
+        reportUncovered:SetTopBorder(constants:SPACING_1, grey25)
+        reportUncovered:SetRoundedBottom(constants:SPACING_2)
+        reportUncovered:SetPadding(constants:SPACING_2_5, constants:SPACING_3_5)
+        WebTextStyle reportCardDetails = standardsReport:GetCardDetails()
+        reportCardDetails:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        reportCardDetails:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        reportCardDetails:SetColor(grey50)
+        WebTextStyle reportCardWords = standardsReport:GetCardWords()
+        reportCardWords:SetFontSize(constants:SMALL_FONT_SIZE)
+        reportCardWords:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+
+        // Lesson made every bold word <strong>, which Tailwind's reset
+        // shows as "font-weight: bolder". Terms keep that look: bold, not
+        // italic.
+        WebTextStyle terms = GetTerm()
+        terms:SetBold(true)
+        terms:SetItalic(false)
+        GetStrong():SetBold(true)
+
+        // Variables (x, y, z) were bold words too: bold, not italic.
+        WebTextStyle variables = GetVariable()
+        variables:SetBold(true)
+        variables:SetItalic(false)
+
+        // Program output ("Placed") was plain text: keep the page's own
+        // font instead of the reset's code font.
+        GetOutput():UseSurroundingFont()
+
+        // Lesson's headings, all bold: "text-3xl" for level 1 down to
+        // "text-sm" for level 6.
+        SetHeading(1, constants:EXTRA_LARGE_3_FONT_SIZE, constants:EXTRA_LARGE_3_LINE_HEIGHT)
+        SetHeading(2, constants:EXTRA_LARGE_2_FONT_SIZE, constants:EXTRA_LARGE_2_LINE_HEIGHT)
+        SetHeading(3, constants:EXTRA_LARGE_FONT_SIZE, constants:EXTRA_LARGE_LINE_HEIGHT)
+        SetHeading(4, constants:LARGE_FONT_SIZE, constants:LARGE_LINE_HEIGHT)
+        SetHeading(5, constants:BASE_FONT_SIZE, constants:BASE_LINE_HEIGHT)
+        SetHeading(6, constants:SMALL_FONT_SIZE, constants:SMALL_LINE_HEIGHT)
+    end
+
+    // A lesson's goals.
+    action GetGoals returns WebBoxStyle
+        return goals
+    end
+
+    action GetGoalsLabel returns WebTextStyle
+        return goalsLabel
+    end
+
+    // The label bars for the site's two kinds of callout.
+    action GetTeachingTipLabel returns WebBoxStyle
+        return teachingTipLabel
+    end
+
+    action GetDiscussionGoalLabel returns WebBoxStyle
+        return discussionGoalLabel
+    end
+
+    // Course navigation, as the site's frame draws it.
+    action GetBreadcrumbs returns WebRowLayout
+        return breadcrumbs
+    end
+
+    action GetBreadcrumbList returns WebListStyle
+        return breadcrumbList
+    end
+
+    action GetBreadcrumbLink returns WebTextStyle
+        return breadcrumbLink
+    end
+
+    action GetBreadcrumbSeparator returns WebTextStyle
+        return breadcrumbSeparator
+    end
+
+    action GetBreadcrumbCurrent returns WebTextStyle
+        return breadcrumbCurrent
+    end
+
+    action GetUpNext returns WebBoxStyle
+        return upNext
+    end
+
+    action GetUpNextLabel returns WebTextStyle
+        return upNextLabel
+    end
+
+    action GetUpNextLink returns WebTextStyle
+        return upNextLink
+    end
+
+    action GetUpNextDescription returns WebTextStyle
+        return upNextDescription
+    end
+
+    action GetCourseLine returns WebTextStyle
+        return courseLine
+    end
+
+    // A lesson's standards, for teachers.
+    action GetStandardsLabel returns WebTextStyle
+        return standardsLabel
+    end
+
+    action GetStandardsGrid returns WebGridLayout
+        return standardsGrid
+    end
+
+    action GetStandardCard returns WebBoxStyle
+        return standardCard
+    end
+
+    action GetStandardCode returns WebTextStyle
+        return standardCode
+    end
+
+    action GetStandardDetails returns WebTextStyle
+        return standardDetails
+    end
+
+    action GetStandardWords returns WebTextStyle
+        return standardWords
+    end
+
+    action GetStandardsLink returns WebTextStyle
+        return standardsLink
+    end
+
+    action GetStandardsReport returns StandardsReportLooks
+        return standardsReport
+    end
+
+    // The site's colors, for the frame's looks.
+    action GetBlack returns WebColor
+        return black
+    end
+
+    action GetWhite returns WebColor
+        return white
+    end
+
+    action GetGrey25 returns WebColor
+        return grey25
+    end
+
+    action GetGrey40 returns WebColor
+        return grey40
+    end
+
+    action GetGrey50 returns WebColor
+        return grey50
+    end
+
+    action GetGrey65 returns WebColor
+        return grey65
+    end
+
+    action GetGrey95 returns WebColor
+        return grey95
+    end
+
+    action GetQuorumBlue25 returns WebColor
+        return quorumBlue25
+    end
+
+    action GetQuorumBlue50 returns WebColor
+        return quorumBlue50
+    end
+
+    action GetQuorumBlue100 returns WebColor
+        return quorumBlue100
+    end
+
+    action GetQuorumBlue150 returns WebColor
+        return quorumBlue150
+    end
+
+    private action SetHeading(integer level, number fontSize, number lineHeight)
+        WebTextStyle heading = GetHeading(level)
+        heading:SetFontSize(fontSize)
+        heading:SetLineHeight(lineHeight)
+        heading:SetBold(true)
+    end
+end

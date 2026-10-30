@@ -1,0 +1,190 @@
+package Libraries.Web.Page.Standards
+
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.WebTag
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.RichText
+
+/*
+    StandardsTracker records which standards each page on a website
+    covers, for any number of sets of standards. It only records: it takes
+    no position on what a page uses, how many, or how often, and never
+    stops the build over them. Pages and reports ask it what was recorded.
+
+    It is a shared class, so there is one tracker for every page on the
+    site. A page records a standard with Record, and hands over a list of
+    its standards with AddList; the lists are filled in from here once
+    every page is set up.
+
+    Attribute: Example
+    use Libraries.Web.Page.Standards.StandardsTracker
+    use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+    use Libraries.Web.Page.WebPage2
+
+    StandardsTracker tracker
+    ComputerScienceStandards2026 standards
+    WebPage2 page
+    page:SetLocation("lessons/one.html")
+    tracker:Record(page, standards:GetStandard(standards:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12))
+*/
+shared class StandardsTracker
+    // What each page recorded, by the page's location, in the order
+    // recorded (a standard recorded twice is there twice).
+    HashTable<text, Array<Standard>> byPage
+
+    // The pages that recorded each standard, by the standard's set and
+    // identifier, in the order recorded.
+    HashTable<text, Array<WebPage2>> byStandard
+
+    constant text KEY_SEPARATOR = " "
+
+    // Standards lists to fill in once every page is set up.
+    Array<StandardsListEntry> lists
+
+    /*
+        Records that a page covers a standard.
+
+        Attribute: Parameter page The page.
+        Attribute: Parameter standard The standard.
+    */
+    action Record(WebPage2 page, Standard standard)
+        text location = page:GetLocation()
+        if not byPage:HasKey(location)
+            Array<Standard> newStandards
+            byPage:Set(location, newStandards)
+        end
+        byPage:GetValue(location):Add(standard)
+
+        text key = GetKey(standard)
+        if not byStandard:HasKey(key)
+            Array<WebPage2> newPages
+            byStandard:Set(key, newPages)
+        end
+        byStandard:GetValue(key):Add(page)
+    end
+
+    /*
+        Takes a list to fill in, once every page is set up, with the
+        standards from one set that a page covers. A page calls this when
+        it adds its standards list.
+
+        Attribute: Parameter page The page the list is on.
+        Attribute: Parameter list The list, already on the page.
+        Attribute: Parameter set The set of standards to list.
+    */
+    action AddList(WebPage2 page, WebTag list, StandardSet set)
+        StandardsListEntry entry
+        entry:Setup(page, list, set)
+        lists:Add(entry)
+    end
+
+    /*
+        Returns every list taken with AddList, for a site that fills them
+        in its own way instead of with FinishLists.
+
+        Attribute: Returns The lists waiting to be filled.
+    */
+    action GetLists returns Array<StandardsListEntry>
+        return lists
+    end
+
+    /*
+        Fills in every list taken with AddList: each standard the page
+        covers from that set, once, as its identifier in bold and its
+        words. The site calls this once every page is set up.
+    */
+    action FinishLists
+        integer i = 0
+        repeat while i < lists:GetSize()
+            StandardsListEntry entry = lists:Get(i)
+            Array<Standard> covered = GetStandardsOn(entry:GetPage(), entry:GetSet())
+            integer j = 0
+            repeat while j < covered:GetSize()
+                Standard standard = covered:Get(j)
+                ListItem item
+                entry:GetList():AddNestedTag(item)
+                RichText writer
+                writer:SetTarget(item, entry:GetPage())
+                writer:Strong(standard:GetIdentifier()):Text(": " + standard:GetText())
+                j = j + 1
+            end
+            i = i + 1
+        end
+    end
+
+    /*
+        Returns every standard a page recorded, from every set, in the
+        order recorded, including any recorded more than once.
+
+        Attribute: Parameter page The page.
+        Attribute: Returns The standards it recorded.
+    */
+    action GetRecorded(WebPage2 page) returns Array<Standard>
+        text location = page:GetLocation()
+        if byPage:HasKey(location)
+            return byPage:GetValue(location)
+        end
+        Array<Standard> none
+        return none
+    end
+
+    /*
+        Returns the standards from one set that a page covers, each once,
+        in the order first recorded. A page's list of standards is made
+        from this.
+
+        Attribute: Parameter page The page.
+        Attribute: Parameter set The set.
+        Attribute: Returns The page's standards from that set.
+    */
+    action GetStandardsOn(WebPage2 page, StandardSet set) returns Array<Standard>
+        Array<Standard> result
+        HashTable<text, boolean> seen
+        Array<Standard> recorded = GetRecorded(page)
+        integer i = 0
+        repeat while i < recorded:GetSize()
+            Standard standard = recorded:Get(i)
+            text identifier = standard:GetIdentifier()
+            if not seen:HasKey(identifier) and standard:GetSet() = set
+                seen:Set(identifier, true)
+                result:Add(standard)
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    /*
+        Returns the pages that cover a standard, each once, in the order
+        they first recorded it.
+
+        Attribute: Parameter standard The standard.
+        Attribute: Returns The pages that cover it, or none.
+    */
+    action GetPagesFor(Standard standard) returns Array<WebPage2>
+        Array<WebPage2> result
+        text key = GetKey(standard)
+        if not byStandard:HasKey(key)
+            return result
+        end
+        HashTable<text, boolean> seen
+        Array<WebPage2> recorded = byStandard:GetValue(key)
+        integer i = 0
+        repeat while i < recorded:GetSize()
+            WebPage2 page = recorded:Get(i)
+            if not seen:HasKey(page:GetLocation())
+                seen:Set(page:GetLocation(), true)
+                result:Add(page)
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    // Two sets could share an identifier, so the key names the set too.
+    private action GetKey(Standard standard) returns text
+        return standard:GetSet():GetName() + KEY_SEPARATOR + standard:GetIdentifier()
+    end
+end

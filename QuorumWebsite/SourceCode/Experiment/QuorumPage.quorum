@@ -1,0 +1,184 @@
+use Libraries.Web.Page.WebPage2
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.MathML
+use Libraries.Web.Page.WebLocations
+use Libraries.Web.Page.WebTextEscaper
+use Libraries.Web.Page.Standards.StandardSet
+use Libraries.Web.Page.Standards.StandardsTracker
+
+/*
+    QuorumPage is a page on the Quorum website. It is a WebPage2 with what
+    only this site needs: recording which standards a lesson covers, and
+    listing them; teaching tips and discussion goals; live code editors;
+    and math. Everything general stays in WebPage2.
+
+    Attribute: Example
+    use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+
+    class MyLesson is QuorumPage
+        QuorumStandards standards
+
+        on create
+            SetLocation("lessons/mine.html")
+        end
+
+        action Setup
+            Title("My Lesson")
+            ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+            CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+            Section("Standards")
+            StandardsList(computerScience)
+        end
+    end
+*/
+class QuorumPage is WebPage2
+    // The one tracker for every page on the site (a shared class).
+    StandardsTracker tracker
+
+    // The site's look (a shared class), for its own kinds of callout.
+    QuorumSiteOptions quorumOptions
+    VersionHelper versions
+    WebLocations locations
+    WebTextEscaper escaper
+
+    // Scripts a page loads once, only if it uses them.
+    boolean editorScriptAdded = false
+    boolean mathScriptAdded = false
+    integer editorCount = 0
+
+    constant text TEACHING_TIP = "Teaching Tip"
+    constant text GOALS_LABEL = "By the end of this lesson, you can"
+    constant text DISCUSSION_GOAL = "Discussion Goal"
+    constant text EDITOR_IDENTIFIER_START = "editor-"
+    constant text EDITOR_FILE_NAME = "Main.quorum"
+    constant text EDITOR_SCRIPT_START = "script/widgets/widget-js/IDE-"
+    constant text SCRIPT_ENDING = ".js"
+    constant text MATH_SCRIPT = "script/load-mathjax.js"
+
+    /*
+        Records that this page covers a standard. It writes nothing on the
+        page; the site's tracker remembers it, and StandardsList shows it.
+        Use the set's constants for identifiers, so a mistyped one fails
+        to compile.
+
+        Attribute: Parameter set The set the standard belongs to.
+        Attribute: Parameter identifier The standard's identifier.
+    */
+    action CoversStandard(StandardSet set, text identifier)
+        tracker:Record(me, set:GetStandard(identifier))
+    end
+
+    /*
+        Adds the standards from one set that this page covers, for
+        teachers: a label, a card for each standard (its identifier,
+        linked to the set's report; its level and concept; its words; and
+        how many other lessons cover it), and a link to every standard.
+        The site fills it in once every page is set up, so it doesn't
+        matter whether it comes before or after the CoversStandard calls.
+
+        Attribute: Parameter set The set to list.
+    */
+    /*
+        Starts the lesson's goals: a bulleted list in a box, labeled "By
+        the end of this lesson, you can". Add each goal with ListItem,
+        starting with what the reader will do, such as "Explain".
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Subsection("Goals")
+                Goals()
+                ListItem("Explain what a scene editor is.")
+            end
+        end
+    */
+    action Goals
+        BulletList(GOALS_LABEL, quorumOptions:GetGoals(), quorumOptions:GetGoalsLabel())
+    end
+
+    /*
+        Opens a teaching tip: advice for teachers, in a box with a dark
+        blue label. Everything added after it goes inside, until the next
+        part starts or EndCallout is called.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Engage")
+                TeachingTip()
+                Paragraph("Pairs work best for this activity.")
+                EndCallout()
+            end
+        end
+    */
+    action TeachingTip
+        Callout(TEACHING_TIP, quorumOptions:GetTeachingTipLabel())
+    end
+
+    /*
+        Opens a discussion goal: what a class discussion should reach, in
+        a box with a dark blue label, as teaching tips have. Everything added after it goes inside,
+        until the next part starts or EndCallout is called.
+    */
+    action DiscussionGoal
+        Callout(DISCUSSION_GOAL, quorumOptions:GetDiscussionGoalLabel())
+    end
+
+    /*
+        Adds a live code editor, where readers can change code and run it,
+        with code from a file in the site's relative folder. The editor's
+        script is added to the page once.
+
+        Attribute: Parameter editorTitle The editor's title.
+        Attribute: Parameter location The code's location inside the relative folder.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Try it")
+                CodeEditor("Place a box", "scenes/Introduction/Box.quorum")
+            end
+        end
+    */
+    action CodeEditor(text editorTitle, text location)
+        if not GetWebSite():GetRelativeFile(location):Exists()
+            alert("There's no code for the editor at " + location + ".")
+        end
+        if not editorScriptAdded
+            AddScript(locations:FromSiteTop(EDITOR_SCRIPT_START + versions:GetWidgetVersion() + SCRIPT_ENDING))
+            editorScriptAdded = true
+        end
+        editorCount = editorCount + 1
+        CodeForIDE code
+        code:AddFileUrl(EDITOR_FILE_NAME, locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), location)))
+        IDE editor
+        editor:Init()
+        editor:SetIdentifier(EDITOR_IDENTIFIER_START + editorCount)
+        editor:SetLightTheme()
+        editor:SetCodeForIDE(code:GetJsonArray())
+        editor:SetIdeTitle(escaper:Escape(editorTitle))
+        Include(editor)
+    end
+
+    /*
+        Adds math, written in MathML in a file in the site's relative
+        folder. The script that draws math is added to the page once.
+
+        Attribute: Parameter location The file's location inside the relative folder.
+    */
+    action Math(text location)
+        if not mathScriptAdded
+            AddScript(locations:FromSiteTop(MATH_SCRIPT))
+            mathScriptAdded = true
+        end
+        MathML math
+        math:AddSource(GetWebSite():GetRelativeFile(location):GetPath())
+        Include(math)
+    end
+
+    action StandardsList(StandardSet set)
+        Division cards
+        Include(cards)
+        tracker:AddList(me, cards, set)
+    end
+end
