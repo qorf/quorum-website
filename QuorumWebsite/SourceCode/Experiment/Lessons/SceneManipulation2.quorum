@@ -1,0 +1,199 @@
+package Lessons
+
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+class SceneManipulation2 is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("experiment/Scenes/manipulate.html")
+    end
+
+    action Setup
+        // For search engines and link previews. An experiment, so it stays
+        // out of search: the real lesson is the one to find.
+        SetDescription("Learn to find items from a running scene by name and move them with the keyboard or a movement controller.")
+        SetSearchable(false)
+
+        Title("Manipulating a Running Scene")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Loading a scene made in the scene editor draws it, but intentionally does nothing
+else. The items in view match the scene editor's camera, and the graphics match as well. To move a character,
+add game logic or respond to the player takes code. This page shows how a program finds an item from the scene
+by its name, and then moves it with the keyboard, in 2D and in 3D: first by hand, so you can see how movement
+works, and then the easy way, with a ready-made movement controller and a camera that follows.")
+
+        Subsection("Goals")
+        Goals()
+        ListItem("Find an item from a loaded scene with "):Code("FindItem2DByName"):Text(" or "):Code("FindItem3DByName"):Text(".")
+        ListItem("Check whether an item was found before using it.")
+        ListItem("Move a found item when the player presses keys, by hand.")
+        ListItem("Move a found item with a movement controller, and make the camera follow it.")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("In a crowded room, how do you get one particular person's attention? Now imagine a
+game with a hundred items in its scene. How could a program pick out the one it wants to move?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Manipulating/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/scenes/Manipulating/Code.csv")
+
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_13)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_DESIGN_AND_DEVELOPMENT_3)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_DESIGN_AND_DEVELOPMENT_4)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_READING_AND_DOCUMENTING_17)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        ManipulatingTheScene()
+        Moving2D()
+        Moving3D()
+        Controllers()
+        Names()
+        TerrainIsAnItem()
+    end
+
+    private action ManipulatingTheScene
+        Subsection("Scene Manipulation")
+        Paragraph("Because making an application do what is wanted in code is a big topic, this page
+doesn't explain how everything works. It focuses on getting items from a scene so they can be moved or used in
+other ways. For more on coding games, see the games tutorials, such as "):Link("Keyboard Events", "/tutorials/games/keyboardEvents.html"):Text(" and "):Link("Getting Started with Games", "/tutorials/games/gamesStarted.html"):Text(".")
+        Paragraph("The programs below start from the runner on "):Link("Running a Scene", "/experiment/Scenes/running.html"):Text(" and add a few lines.")
+    end
+
+    private action Moving2D
+        // A double quote, for code that has one.
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+
+        Subsection("Moving a Character in 2D")
+        Paragraph("In a 2D scene, place the boy from the palette: Characters 2D, then Boy, then 1:
+Boy. The editor names him "):Quoted("1: Boy"):Text(", the name from the palette, and announces "):DoubleQuote():Output("Placed 1: Boy"):DoubleQuote():Text(". Save the scene, then use this program:")
+        CodeExampleFromFile("sources/tutorials/scenes/ManipulateScene.quorum")
+
+        Paragraph("The most important line is the one that finds the boy: "):Code("player = FindItem2DByName(" + quote + "1: Boy" + quote + ")"):Text(". When an item has a name in the scene, this action finds it in the running game.")
+        Paragraph("In 2D, x grows to the right and y grows upward, so the up arrow adds to y.")
+    end
+
+    private action Moving3D
+        // A double quote, for code that has one.
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+
+        Subsection("Moving an Item in 3D")
+        Paragraph("In a 3D scene, place a Cube from the Basic 3D section of the palette. The first
+cube is named "):Quoted("Cube"):Text(". Save the scene, then use this program:")
+        CodeExampleFromFile("sources/tutorials/scenes/Manipulate3DScene.quorum")
+
+        Paragraph("Here the line that matters is "):Code("player = FindItem3DByName(" + quote + "Cube" + quote + ")"):Text(". In 3D, y is up, so the arrows move the cube along the ground (x and z), and Page Up and
+Page Down move it up and down. With the camera where a new scene puts it, the up arrow moves the cube away
+from the camera.")
+    end
+
+    private action Controllers
+        Subsection("The Easy Way: Movement Controllers")
+        Paragraph("Writing a "):Code("PressedKey"):Text(" action for every key works, but most games need the same things: move smoothly while a
+key is held, turn, jump, and bump into walls instead of passing through them. Quorum has ready-made "):Term("movement controllers"):Text(" that do all of this. A controller is a "):Term("behavior"):Text(": code you give to an item, which then runs on every frame. To use one, make it, give it
+to the item with "):Code("AddBehavior"):Text(", and run.")
+
+        Paragraph("Here is the 3D cube from above, moved by a controller, with the camera following it:")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneManipulation/Controller3D.quorum")
+
+        Paragraph("The three lines that matter are "):Code("MovementBehavior3D movement"):Text(", "):Code("player:AddBehavior(movement)"):Text(" and "):Code("GetCamera3D():Follow(player)"):Text(". Hold W or the up arrow and the cube moves forward, the way it faces; A and D, or the
+left and right arrows, turn it; S or the down arrow backs it up. The camera follows from behind and above,
+turning as the cube turns.")
+
+        Paragraph("The 2D version works the same way. Here is the boy, moved by a 2D controller, with
+the camera keeping him in the middle of the screen:")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneManipulation/Controller2D.quorum")
+        Paragraph("The arrow keys, or W, A, S and D, move the boy up, down, left and right.")
+
+        Subsubsection("Changing How It Feels")
+        Paragraph("Each controller has settings you can change with one line, after making it:")
+        Table("Movement controller settings", "media/scenes/Manipulating/ControllerSettings.csv")
+
+        Subsubsection("Controllers and Physics")
+        Paragraph("A controller looks at the item's physics settings in the Properties panel and
+moves it the right way:")
+        BulletList()
+        ListItem():Strong("No physics:"):Text(" the item moves straight through anything in its way.")
+        ListItem():Strong("Responsive:"):Text(" the item bumps into walls, falls with gravity, and can jump when it's standing on
+something. Turn on physics in the program with "):Code("EnablePhysics3D(true)"):Text(" and "):Code("SetGravity3D(0, -10, 0)"):Text(" after "):Code("LoadScene"):Text(", as on "):Link("Running a Scene", "/experiment/Scenes/running.html"):Text(".")
+        ListItem():Strong("Nonresponsive:"):Text(" the item pushes other things out of its way, but nothing
+pushes it back.")
+        ListItem():Strong("Unmovable:"):Text(" the item can't move. The controller says so in the output, so you
+know to change it.")
+        Paragraph("A 3D controller also keeps its item upright, so a character doesn't tip over when
+it bumps into something. Forward is the way the item faces. If a model walks sideways or backward, its front
+isn't facing the way Quorum expects; turn it in the scene editor so it faces along z.")
+    end
+
+    private action Names
+        Subsection("Names, and When Nothing Is Found")
+        Paragraph("These actions give access to items created and loaded in a scene, so they can be
+moved by keyboard, mouse or whatever makes sense for the game being made.")
+        BulletList()
+        ListItem():Strong("Names are exact."):Text(" "):Quoted("1: Boy"):Text(" and "):Quoted("1: boy"):Text(" are different names. The scene tree shows each item's name, and the Name field in the Properties panel
+(Cmd+P on Mac, Ctrl+P on Windows) changes it. A short, clear name, like "):Quoted("Player"):Text(", makes code
+easier to read.")
+        ListItem():Strong("Copies get numbers."):Text(" The editor names a second cube "):Quoted("Cube 1"):Text(", a third "):Quoted("Cube 2"):Text(", and so on. Items can still end up with the same name, for example by renaming them. Then the action
+gives back the first item it finds with that name, not all of them. To reach every item, a program can go
+through a layer's items one by one, with "):Code("GetCurrentLayer3D():GetIterator()"):Text(".")
+        ListItem():Strong("Nothing found means undefined."):Text(" If no item has the name, the action gives back "):Code("undefined"):Text(". Using an undefined item stops the program with an error, which is why both programs
+check first and write out what happened.")
+    end
+
+    private action TerrainIsAnItem
+        // A double quote, for code that has one.
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+
+        Subsection("Terrain Is an Item Too")
+        Paragraph("A terrain placed in a 3D scene is also an item, named "):Quoted("Terrain"):Text(" (then "):Quoted("Terrain 1"):Text(", and so on), so "):Code("FindItem3DByName(" + quote + "Terrain" + quote + ")"):Text(" finds it. The terrain pages start with "):Link("Terrain in a Scene", "/experiment/Scenes/terrain.html"):Text("; "):Link("Terrain in a Game", "/experiment/Scenes/terrainGames.html"):Text(" shows how to find the ground and ask how high it is.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner connect a scene built in the editor to code
+that controls it, first by hand and then with a movement controller. The goal is to find items by their names
+in code, move them, and then tune a controller until it feels right. Partner A builds a small 3D obstacle
+course on a flat floor: a few walls to steer around, a ramp, and a block to jump onto, with a cube named "):Quoted("Player"):Text(" at the start and a sphere named "):Quoted("Goal"):Text(" at the end. Give the floor, walls
+and ramp Physics Enabled and set them to Unmovable, and give the player Physics Enabled and set it to
+Responsive. Partner A tells Partner B only the names, not where things are.")
+
+        Paragraph("Partner B writes a program that loads the scene, turns on physics and gravity, finds "):Quoted("Player"):Text(" and "):Quoted("Goal"):Text(" by name, gives the player a "):Code("MovementBehavior3D"):Text(", and makes the camera follow it. When Space is pressed, the program should also output
+how far the player is from the goal. Then take turns running the course, and tune the controller: try at least
+three changes, such as the speed, the jump height and the acceleration, and for each one write down the
+setting, its value, and how the course felt afterwards. Finally, try a name with a spelling mistake, such as "):Quoted("Playr"):Text(": what happens, and what appears in the output window? Swap roles with a new course.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Naming items in the scene editor is a promise to the code: the code finds items by those
+names. Once found, an item can be moved by hand, one key at a time, or handed a controller that does the work
+every frame. What could go wrong if someone renames an item after the code is written? How would the "):Code("output"):Text(" lines in these programs help find the problem?")
+    end
+end

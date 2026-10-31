@@ -2,6 +2,7 @@ package Libraries.Web.Page
 
 use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.Division
+use Libraries.Web.Page.Script
 use Libraries.Web.Page.MathML
 use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
@@ -60,6 +61,12 @@ class QuorumPage is WebPage
     constant text EDITOR_SCRIPT_START = "script/widgets/widget-js/IDE-"
     constant text SCRIPT_ENDING = ".js"
     constant text MATH_SCRIPT = "script/load-mathjax.js"
+
+    // The code highlighter's JSON grammar, from the same release Lesson
+    // uses, added to a page once if it shows JSON.
+    constant text JSON_HIGHLIGHTER = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"
+    constant text JSON = "json"
+    boolean jsonScriptAdded = false
 
     /*
         Records that this page covers a standard. It writes nothing on the
@@ -181,6 +188,33 @@ class QuorumPage is WebPage
         MathML math
         math:AddSource(GetWebSite():GetRelativeFile(location):GetPath())
         Include(math)
+    end
+
+    /*
+        Adds a JSON file from the site's relative folder, shown exactly as
+        written, with JSON highlighting. The highlighter's JSON grammar is
+        added to the page once.
+
+        Attribute: Parameter location The file's location inside the relative folder.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("The scene file")
+                JsonExampleFromFile("sources/tutorials/scenes/SceneFile.json")
+            end
+        end
+    */
+    action JsonExampleFromFile(text location)
+        // Deferred, so it runs after the highlighter itself, which the
+        // site's frame adds later, and before the highlighter colors the
+        // page.
+        if not jsonScriptAdded
+            Script grammar = AddScript(JSON_HIGHLIGHTER)
+            grammar:SetDefer(true)
+            jsonScriptAdded = true
+        end
+        CodeExampleFromFile(location, JSON)
     end
 
     action StandardsList(StandardSet set)

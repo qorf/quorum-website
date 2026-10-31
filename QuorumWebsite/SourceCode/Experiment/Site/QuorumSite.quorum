@@ -242,18 +242,21 @@ class QuorumSite is WebSite
 
         // Course navigation for every page in a course, and structured
         // data: breadcrumbs for pages in a course, and a description of
-        // every lesson (every page that covers a standard).
+        // every lesson (every page that covers a standard). Plain pages
+        // (the old site's) keep their own navigation and frame.
         Iterator<WebPage> allPages = GetPageIterator()
         repeat while allPages:HasNext()
             WebPage page = allPages:Next()
             Array<PageSeries> pageCourses = GetSeriesOf(page)
-            if pageCourses:GetSize() > 0
+            if IsPlainPage(page)
+                // Nothing added.
+            elseif pageCourses:GetSize() > 0
                 AddCourseNavigation(page, pageCourses, GetHomeSeries(page))
                 if not GetAddress():IsEmpty()
                     AddBreadcrumbData(page, pageCourses)
                 end
             end
-            if tracker:GetRecorded(page):GetSize() > 0
+            if tracker:GetRecorded(page):GetSize() > 0 and not IsPlainPage(page)
                 AddStructuredData(page, pageCourses)
             end
         end
@@ -263,7 +266,9 @@ class QuorumSite is WebSite
         allPages = GetPageIterator()
         repeat while allPages:HasNext()
             WebPage framed = allPages:Next()
-            AddFrame(framed, GetSeriesOf(framed))
+            if not IsPlainPage(framed)
+                AddFrame(framed, GetSeriesOf(framed))
+            end
         end
     end
 

@@ -1,0 +1,257 @@
+package Lessons
+
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+class SceneRunning2 is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("experiment/Scenes/running.html")
+    end
+
+    action Setup
+        // For search engines and link previews. An experiment, so it stays
+        // out of search: the real lesson is the one to find.
+        SetDescription("Learn how Quorum draws graphics with OpenGL, WebGL and Vulkan, load and run a scene, and test physics hypotheses.")
+        SetSearchable(false)
+
+        Title("Running a Scene")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A scene made in Quorum Studio is a picture of a game's world: where things are,
+what they look like and what they are called. It doesn't do anything yet. This page starts with how Quorum
+draws graphics at all, through one of three graphics systems: OpenGL, WebGL and Vulkan. It then shows how a
+small program loads a scene and starts it in a game window, and what more that program needs for 3D physics
+and terrain. Finally, you'll test the hypotheses about physics that you wrote in the last tutorial.")
+
+        Subsection("Goals")
+        Goals()
+        ListItem("Describe what a graphics engine does, and how OpenGL, WebGL and Vulkan differ.")
+        ListItem():Text("Load a scene from a program with "):Code("LoadScene"):Text(", using Vulkan.")
+        ListItem("Run a scene from Quorum Studio, and set it up for 3D physics and terrain.")
+        ListItem("Test hypotheses about physics, one change at a time, by sight, by sound and by timing, and record the results.")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of a stage set for a play before the actors arrive. The scenery is all in
+place, but nothing happens. What has to be added before the play can start? Which parts of a game are like
+the scenery, and which are like the actors and the script?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Running/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/scenes/Running/Code.csv")
+
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_INVESTIGATION_26)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_X_PLUS_COMPUTER_SCIENCE_X_PLUS_COMPUTER_SCIENCE_5)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_13)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_ARCHITECTURE_7)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        GraphicsEngines()
+        WhatVulkanAdds()
+        MakeItReal()
+        LoadingProgram()
+        RunningTheScene()
+        PhysicsAndGravity()
+        HearingWhatHappens()
+        ScenesWithTerrain()
+    end
+
+    private action GraphicsEngines
+        Subsection("How Quorum draws: graphics engines")
+        Paragraph("Everything you see in a game, from a cube to a mountain to a shadow, has to be drawn on
+the screen, many times every second. The part of a game system that does this is called a "):Term("graphics engine"):Text(". It takes everything in the scene, works out what the camera can see, and sends drawing
+instructions to the computer's graphics hardware, often called the graphics card or GPU. Quorum's games have a
+graphics engine built in, so you don't have to write those instructions yourself.")
+
+        Paragraph("Graphics hardware is made by many companies, so programs talk to it through
+shared standards, a bit like how every country's power outlets need plugs that fit. Quorum's engine can use
+three of them, under the hood:")
+        BulletList()
+        ListItem():Strong("OpenGL"):Text(" came first. It was released in 1992 by Silicon Graphics, a company
+that made powerful computers for 3D graphics, and it is now looked after by a group of companies called the
+Khronos Group. For more than twenty years, it was the way most programs drew 3D graphics on Windows, Mac and
+Linux. Quorum uses OpenGL unless you ask for something else.")
+        ListItem():Strong("WebGL"):Text(" brought OpenGL to the web. Released in 2011, also by the Khronos
+Group, it lets a web page draw 3D graphics without installing anything. When a Quorum game runs inside a web
+browser, it draws with WebGL.")
+        ListItem():Strong("Vulkan"):Text(" is the newest. The Khronos Group released it in 2016 as a modern
+replacement for OpenGL. It is faster and gives programs much more control over the graphics hardware, which
+makes newer effects possible. On a Mac, Vulkan runs on top of Apple's own graphics system through a translator
+called MoltenVK.")
+
+        Paragraph("Because Vulkan is the newest, Quorum's newest graphics features need it. To use
+everything in the rest of these tutorials, turn Vulkan on in the program that runs your scene, with one line
+before "):Code("StartGame()"):Text(":")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneRunning/UseVulkan.quorum")
+        Paragraph("If a computer can't run Vulkan, Quorum quietly falls back to OpenGL.")
+    end
+
+    private action WhatVulkanAdds
+        Subsection("What Vulkan adds in Quorum")
+        Paragraph("Turning on Vulkan gives your scenes features that OpenGL in Quorum doesn't have:")
+        BulletList()
+        ListItem():Strong("Terrain"):Text(": the ground of a 3D world, with hills and valleys you shape in
+the scene editor. A scene with a terrain won't load without Vulkan.")
+        ListItem():Strong("Shadows"):Text(": lights such as the sun can cast shadows, so objects look like
+they're really sitting on the ground.")
+        ListItem():Strong("Spotlights"):Text(": cone-shaped lights, like a flashlight or a car's headlights.
+Under OpenGL they aren't drawn at all.")
+        ListItem():Strong("Realistic materials"):Text(": surfaces made from texture sets, with bumps,
+roughness and other details, such as the grass and rock on a terrain.")
+        ListItem():Strong("Smoother edges"):Text(": an option called multisampling that softens the jagged "):Quoted("staircase"):Text(" edges on 3D shapes.")
+        Paragraph("When Quorum Studio itself runs with Vulkan, its scene editor shows these features
+while you build. Your game only shows them if its own program turns Vulkan on too.")
+    end
+
+    private action MakeItReal
+        Subsection("Make it Real")
+        Paragraph("It's complete. The perfect scene. It's cool. It's clever. It's got monsters. They're
+amazing! Publish it! Hold on. Scenes are cool, but static. Just because there are images in the application
+does not mean the game is ready to be published on an app store. The application needs movement, game logic
+and much more. Every item placed in a scene can be found and changed later in code; the next page, "):Link("Manipulating a Running Scene", "/experiment/Scenes/manipulate.html"):Text(", shows how.")
+        Paragraph("The first step is to get the scene into a running program.")
+    end
+
+    private action LoadingProgram
+        Subsection("A Program That Loads a Scene")
+        Paragraph("To load a scene, use the following template:")
+        CodeExampleFromFile("sources/tutorials/scenes/Runner.quorum")
+
+        Paragraph("This template looks like a normal game template, as described in the games tutorials.
+The first difference is "):Code("UseVulkan(true)"):Text(" in "):Code("Main"):Text(", which turns on Vulkan before the game starts. The second is one action, "):Code("LoadScene"):Text(". It reads a scene file, works out what is inside it, and adds each item, camera and
+light to the game. The path is relative to the project's folder, so "):Code("Scenes/Scene.qs"):Text(" is the scene file in the project's Scenes folder. If the scene has a different name,
+change the path to match.")
+
+        Paragraph("A new scene project in Quorum Studio already has a program like this in "):Code("SourceCode/Main.quorum"):Text(". Quorum Studio's version makes a "):Code("File"):Text(" and gives it the path first, then calls "):Code("LoadScene"):Text(" with the file. Both do the same thing. Quorum Studio's version doesn't turn on Vulkan
+yet, so add the "):Code("UseVulkan(true)"):Text(" line to "):Code("Main"):Text(" yourself. For this reason, running a new scene project straight away loads whatever
+was placed in its scene and starts the game.")
+    end
+
+    private action RunningTheScene
+        Subsection("Running the Scene")
+        Paragraph("To run the scene, use any of these:")
+        BulletList()
+        ListItem("the green Run button on the toolbar;")
+        ListItem("the Run menu, then Run;")
+        ListItem("the keys for Run.")
+        Table("Keys for running a project", "media/scenes/Running/RunKeys.csv")
+        Paragraph("Quorum Studio builds the project, then the game window opens with the scene
+loaded. The camera in the game starts where the scene's camera was saved, so the view matches the scene
+editor's.")
+
+        Paragraph():Strong("A note on focus:"):Text(" in the scene editor itself, Cmd+R or Ctrl+R sets the selected item's scale back to 1.
+If an item is selected and nothing runs, use the Run button or the Run menu instead.")
+    end
+
+    private action PhysicsAndGravity
+        Subsection("3D Scenes: Physics and Gravity")
+        Paragraph("A 3D scene can be set up in the editor so items fall or roll, but the template above
+doesn't turn physics on. Quorum Studio's 3D scene template adds two lines after "):Code("LoadScene"):Text(":")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneRunning/RunnerPhysics3D.quorum")
+
+        Paragraph():Strong("Order matters."):Text(" A scene file remembers whether physics was on in each layer, and the editor saves it
+as off. Loading the scene sets it again, so "):Code("EnablePhysics3D(true)"):Text(" goes after "):Code("LoadScene"):Text(". Gravity starts at zero, so without "):Code("SetGravity3D"):Text(" nothing falls.")
+
+        Paragraph("Physics only moves the items that ask for it. In the Properties panel, an item that
+should fall needs Physics Enabled checked and Responsiveness set to Responsive. Ground that should hold things
+up needs Physics Enabled and Unmovable. "):Link("Properties", "/experiment/Scenes/properties.html"):Text(" explains these, and "):Link("Gravity in 3D", "/tutorials/physics/gravity3D.html"):Text(" explains gravity in code.")
+    end
+
+    private action HearingWhatHappens
+        Subsection("Hearing What Happens: A Beep on Every Bounce")
+        Paragraph("Watching a ball fall only works if you can see the screen. A game can also tell
+you what happened with sound, so anyone can follow along, including people who use a screen reader. The
+program below plays a short high beep whenever two items start touching, such as the ball hitting the floor,
+and a lower beep when they stop touching, such as the ball leaving the floor on a bounce:")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneRunning/RunnerBeep.quorum")
+
+        Paragraph():Code("Main is Game, CollisionListener3D"):Text(" means this game also listens for collisions, and "):Code("AddCollisionListener(me)"):Text(" tells the 3D layer to send them to it. Each time two items with Physics Enabled start
+touching, Quorum calls "):Code("BeginCollision"):Text(", and each time they stop, "):Code("FinishCollision"):Text(". "):Code("MakeBeep"):Text(" builds each sound from numbers instead of loading a sound file: a tenth of a second
+of a smooth wave, 880 times a second for the high beep and 440 for the low one.")
+
+        Paragraph("Listen to a bouncing ball and you'll hear high, low, high, low, with the gaps
+between the beeps getting shorter as the bounces get smaller. No beeps at all means nothing touched. That
+makes sound a useful way to test a physics scene.")
+    end
+
+    private action ScenesWithTerrain
+        Subsection("Scenes with Terrain")
+        Paragraph("A scene can have a terrain: the ground of a 3D world, with hills and valleys. Terrain
+is drawn with Vulkan, and it is also solid ground for physics, so the program above, with "):Code("UseVulkan(true)"):Text(" in "):Code("Main"):Text(" and physics turned on after "):Code("LoadScene"):Text(", is exactly what a scene with terrain needs.")
+
+        Paragraph("If you forget "):Code("UseVulkan(true)"):Text(", the program stops while loading the scene and says: "):DoubleQuote():Output("This scene has a
+terrain, and a terrain needs Vulkan for now."):DoubleQuote():Text(" The fix is to add that line to "):Code("Main"):Text(" and run again.")
+
+        Paragraph("Terrain has its own pages, starting with "):Link("Terrain in a Scene", "/experiment/Scenes/terrain.html"):Text(". Loading terrain in a game, and asking it questions, is in "):Link("Terrain in a Game", "/experiment/Scenes/terrainGames.html"):Text(".")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("This activity is the second half of the experiment you started in "):Link("Properties", "/experiment/Scenes/properties.html"):Text(". There, you and your partner wrote a "):Strong("hypothesis"):Text(" for each physics change: what you thought the ball or cube would do, and why. Now that
+you can run a scene, it's time to "):Strong("test"):Text(" those hypotheses. The goal is to test each hypothesis fairly, one change at a time,
+record what really happens, and decide whether the evidence supports it. Don't write new predictions: use the
+list you already made. Get it out, and make a table with four columns: the change, your hypothesis, what
+actually happened, and whether the result "):Strong("supports"):Text(" or "):Strong("doesn't support"):Text(" the hypothesis.")
+
+        Paragraph("Set up the same scene as before: an Unmovable floor (a Cube scaled to 10, 0.2 and 10)
+and a Responsive Sphere 3 meters above it, both with Physics Enabled. Use the beeping program from "):Quoted("Hearing What Happens"):Text(", so every test can be heard as well as seen: a high beep when the ball
+lands, and a low beep when it leaves the floor. Run it once without changing anything, so you know what normal
+looks and sounds like. Then test your hypotheses one at a time, changing "):Strong("only one thing"):Text(" for each test and putting it back before the next:")
+
+        BulletList()
+        ListItem():Strong("Responsiveness:"):Text(" Unmovable, then Nonresponsive, then Responsive.")
+        ListItem():Strong("Restitution:"):Text(" 0, then 0.5, then 1, then 1.5, with the floor's at 0.")
+        ListItem():Strong("Mass:"):Text(" 1, then 100.")
+        ListItem():Strong("Friction:"):Text(" a cube on the floor tilted to 20 degrees, with friction 0, then
+0.5, then 1.")
+        ListItem():Strong("Gravity:"):Text(" "):Code("0, -1.6, 0"):Text(", then "):Code("0, -25, 0"):Text(", then "):Code("0, 10, 0"):Text(".")
+        ListItem():Strong("Physics Enabled:"):Text(" turned off on the floor.")
+        ListItem():Strong("A value that doesn't make sense:"):Text(" a negative mass or restitution.")
+
+        Paragraph("To measure instead of guessing, use a "):Strong("stopwatch"):Text(", such as the one on a phone; most phones' stopwatches can be used with a screen reader
+too. Base each measurement on timing. One partner starts the stopwatch the moment the game window opens and
+stops it at the first high beep: that's how long the ball took to fall. For bounces, use the lap button at each
+high beep, and compare the times between beeps: a higher bounce takes longer to come back down, so longer gaps
+mean bouncier. For the friction test, time how long the cube takes from landing until its last beep, when it
+slides off the end of the floor. Run each test three times and use the middle time, since starting and
+stopping a stopwatch by hand is never exact. If you hear no beep at all, that's a result too: write down that
+nothing touched.")
+
+        Paragraph("Write every time and sound in your table. When you're done, count how many
+hypotheses the tests supported. For each one they didn't support, explain what you now think is going on.
+Finally, choose one result where the simulation behaves differently from the real world, and explain whether
+that's a mistake in your hypothesis or a limit of the simulation.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A scene is data: a file that says what is in the world and where. A program brings
+it to life, and a graphics engine draws it, with Vulkan for the newest features. Testing your hypotheses one
+change at a time is how scientists, and programmers, find out whether their ideas about a system are right.
+Which of your results surprised you most, and what would you test next? So far the program only loads the
+scene. What would a game need to know about the items in the scene to make one of them move when a key is
+pressed?")
+    end
+end

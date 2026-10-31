@@ -1,0 +1,430 @@
+package Lessons
+
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+class TerrainMaterials2 is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("experiment/Scenes/terrainMaterials.html")
+    end
+
+    action Setup
+        // For search engines and link previews. An experiment, so it stays
+        // out of search: the real lesson is the one to find.
+        SetDescription("Learn to give a terrain materials in Quorum Studio, paint them onto the ground, and credit the textures you use.")
+        SetSearchable(false)
+
+        Title("Terrain Materials and Painting")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A new terrain in Quorum Studio is plain gray ground. Real ground is grass,
+rock, dirt, sand or snow, often all in one place. In this tutorial you give a
+terrain "):Term("materials"):Text(": descriptions of how a surface looks, made from a set
+of images. A terrain can have up to four materials, called "):Term("layers"):Text(", and
+you "):Term("paint"):Text(" them onto the ground with a brush, the way you would paint a
+picture. Along the way you will see how the painting is stored, in images
+called splat maps, where to find free materials, and why the people who
+made them get a say in how they are used.")
+
+        Subsection("Goals")
+        Goals()
+        ListItem("Explain what a material is and what its images do.")
+        ListItem("Explain what a splat map is and how it stores painting.")
+        ListItem("Download free CC0 materials, add them to a terrain as layers, and paint
+them onto the ground.")
+        ListItem("Give credit for the textures you use, and know what their licenses allow.")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("List everything that makes real ground look the way it does: its color, its
+bumps, how shiny or dull it is, whether it is wet. Which of these could a
+computer fake with a picture? Which would need more than one picture?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Terrain/Materials/Vocabulary.csv")
+
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_14)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_PROFESSIONAL_PRACTICE_8)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_ARCHITECTURE_7)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_22)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        Paragraph("Painting a terrain works much like painting a picture, except that the
+paint is made of materials. You choose up to four materials, such as grass,
+dirt, rock and gravel, and brush them onto the ground wherever you want
+them. Quorum Studio doesn't change the terrain's shape when you paint.
+Instead, it keeps a second set of images, one for each region of the
+ground, called "):Term("splat maps"):Text(", that record how much of each material shows
+at every point. When the terrain is drawn, each point mixes its materials in
+the amounts its splat map says. This tutorial explains each part in turn:
+materials, splat maps, where to get materials, adding them as layers, and
+painting.")
+        Materials()
+        SplatMaps()
+        WhereGetMaterials()
+        TexturesCostMemory()
+        AddingMaterialsTerrain()
+        DetailsMaterial()
+        Painting()
+        Files()
+        LicensesGivingCredit()
+    end
+
+    private action Materials
+        Subsection("Materials")
+        Paragraph("A "):Term("material"):Text(" describes how a surface looks. A simple material is one
+image, a "):Term("plain texture"):Text(", that gives the ground its color. Real ground has
+more than color, though: bumps, cracks, shiny wet spots and dull dry ones.
+So most materials use a "):Term("texture set"):Text(": several images of the same
+surface, made to work together.")
+        BulletList()
+        ListItem("The "):Term("color map"):Text(" is the surface's colors, like a photo of it taken in
+flat, even light.")
+        ListItem("The "):Term("normal map"):Text(" stores which way each tiny bit of the surface faces,
+so bumps and cracks catch the light even though the ground is really
+flat.")
+        ListItem("The "):Term("roughness map"):Text(" says which parts are rough and dull and which are
+smooth and shiny.")
+        ListItem("The "):Term("ambient occlusion map"):Text(" darkens the gaps and corners that light has
+trouble reaching.")
+        ListItem("The "):Term("height map"):Text(" says which parts stick up and which sink down. On a
+terrain, it helps two materials blend where they meet: the higher one
+shows, so stones poke up through grass instead of the two just fading
+into each other.")
+        Paragraph("A material also has settings, such as its "):Term("tile size"):Text(": how many meters of
+ground one copy of the images covers before it repeats. Quorum Studio keeps
+each material in a small JSON file beside its images, which names the
+images and lists the settings. "):Link("Creating a Scene", "/experiment/Scenes/create.html"):Text("
+shows what one looks like.")
+    end
+
+    private action SplatMaps
+        Subsection("Splat maps")
+        Paragraph("A terrain is split into square regions (see
+"):Link("Terrain in a Scene", "/experiment/Scenes/terrain.html"):Text("). Each region you
+paint gets its own "):Term("splat map"):Text(", an image saved beside the region's
+heights, named like "):Code("region_0_0_splat.png"):Text(". Each pixel of a splat map
+matches one point on the ground. An image pixel has four numbers: red,
+green, blue and alpha (how see-through it is). A splat map uses those four
+numbers to store how much of layers 1, 2, 3 and 4 show at that point. A
+pixel that is all red shows only layer 1; half red and half green shows an
+even mix of layers 1 and 2.")
+        Paragraph("This is why a terrain can have at most four layers: a pixel has only four
+numbers. It is also why the order of the layers matters. The splat map
+remembers "):Quoted("layer 2 here"):Text(", not "):Quoted("rock here"):Text(", so if you swap two layers, the
+painting stays where it was but shows the other material. A region you
+haven't painted has no splat map at all, which saves space: it simply shows
+layer 1 everywhere.")
+    end
+
+    private action WhereGetMaterials
+        Subsection("Where to get materials")
+        Paragraph("Many websites give texture sets away for free. Two that Quorum Studio
+knows especially well are:")
+        BulletList()
+        ListItem():Strong("ambientCG"):Text(" (ambientcg.com). Its sets are named like "):Code("Ground037_1K-PNG"):Text(",
+and the images inside end in "):Code("_Color"):Text(", "):Code("_NormalGL"):Text(", "):Code("_Roughness"):Text(",
+"):Code("_AmbientOcclusion"):Text(" and "):Code("_Displacement"):Text(".")
+        ListItem():Strong("Poly Haven"):Text(" (polyhaven.com). Its sets are named like "):Code("rock_wall"):Text(", and
+the images end in "):Code("_diff_1k"):Text(", "):Code("_nor_gl_1k"):Text(", "):Code("_rough_1k"):Text(", "):Code("_ao_1k"):Text(" and
+"):Code("_disp_1k"):Text(".")
+        Paragraph("Other free libraries work too, such as "):Strong("ShareTextures"):Text("
+(sharetextures.com), "):Strong("cgbookcase"):Text(" (cgbookcase.com) and "):Strong("3D Textures"):Text("
+(3dtextures.me). Their color maps often end in "):Code("_BaseColor"):Text(" or "):Code("_Albedo"):Text(",
+which Quorum Studio also recognizes, along with "):Code("_Diffuse"):Text(". Every texture on
+these five sites is offered under the "):Term("CC0"):Text(" license, which means you can
+use it in any project, even one you sell, without asking. Licenses can
+change, though, so check the license on the page you download from, and
+keep a note of where each texture came from for your game's credits.")
+        Paragraph():Strong("Download PNG or JPG images,"):Text(" not EXR: Quorum Studio reads "):Code(".png"):Text(" and
+"):Code(".jpg"):Text(" files. "):Strong("1K"):Text(" (1024 by 1024 pixels) is plenty for ground that
+repeats. Unzip each set into its own folder inside a folder named
+"):Code("Textures"):Text(" at the top of your project.")
+        Paragraph("A plain image, such as a photo of grass you took yourself, works too, as a
+plain texture.")
+    end
+
+    private action TexturesCostMemory
+        Subsection("Textures cost memory")
+        Paragraph("Each texture set is loaded into the graphics card's memory, and some
+graphics cards have much less than others. A 1K set uses about ten megabytes;
+a 4K set uses sixteen times as much. Four 4K sets on one terrain can be more
+than a small laptop or a phone can handle. Choosing the smallest images
+that look good is part of making a game run well on more computers.")
+    end
+
+    private action AddingMaterialsTerrain
+        Subsection("Adding materials to a terrain")
+        Paragraph("Select the terrain, then move into the Properties panel with
+"):Keys("Ctrl", "P"):Text(" ("):Keys("Cmd", "P"):Text(" on Mac). The panel's sections for a terrain are
+Terrain, Materials, Brush, Generate and Physics. A new terrain's Materials
+section says:")
+        Paragraph():DoubleQuote():Output("No materials. The ground is plain."):DoubleQuote()
+        Paragraph("Below that is the "):Strong("Add material..."):Text(" button.")
+
+        Subsubsection("Adding the first layer")
+        NumberedList()
+        ListItem("Activate "):Strong("Add material..."):Text(".")
+        ListItem("In the file chooser, choose a texture set's "):Strong("color map"):Text(", such as
+"):Code("Ground037_1K-PNG_Color.png"):Text(" or "):Code("rock_wall_diff_1k.png"):Text(". You can also
+choose a plain image, or a material file ("):Code(".json"):Text(") you already have.")
+        ListItem("Quorum Studio guesses the set's other maps by their names, writes a material file
+beside the images, and gives the terrain its first layer. You can change these later. It says what
+it did, for example:")
+        // The old page put these two paragraphs inside the last step. A
+        // list item here holds only text, so they follow the list.
+        Paragraph():DoubleQuote():Output("Added Ground037 as layer 1, tiles 3 units. It covers the whole ground.
+Add another material to paint with. Found normal, roughness, ambient
+occlusion and height maps."):DoubleQuote()
+        Paragraph("If a map was not found, it says so: "):DoubleQuote():Output("No height map found."):DoubleQuote():Text(" That is fine.
+A set works without some of its maps, and you can choose them later in
+Details.")
+        Paragraph("The first layer covers all of the ground. Each layer after it shows only
+where you paint it.")
+
+        Subsubsection("Layers")
+        Paragraph("A "):Term("layer"):Text(" is one of the terrain's materials, in a numbered slot from 1 to 4. The layers are like paint pots: adding a material fills the next empty pot, and painting decides where on the ground each pot's paint goes. Layer
+1 is special. It is the ground's starting color, so it covers everywhere
+that hasn't been painted with something else. Every other layer shows only
+where you paint it. The number of a layer matters because the splat maps
+store painting by number, so choose your layers in an order that makes
+sense, such as grass first and then the materials you'll add on top of it.")
+        Paragraph("Add up to four layers the same way as the first. A new layer shows nowhere
+until it is painted, and it becomes the layer the Paint tool paints next:")
+        Paragraph():DoubleQuote():Output("Added rock_wall as layer 2, tiles 3 units. Paint it with the Paint tool."):DoubleQuote()
+        Paragraph("A fifth is refused: "):DoubleQuote():Output("This terrain has four materials, which is the most it
+can have."):DoubleQuote()
+
+        Subsubsection("Each layer's row in the panel")
+        Paragraph("Each layer has a row with:")
+        BulletList()
+        ListItem("its name, such as "):DoubleQuote():Output("Layer 2: rock_wall"):DoubleQuote():Text(";")
+        ListItem("its file, such as "):DoubleQuote():Output("File: rock_wall.json, a texture set"):DoubleQuote():Text(";")
+        ListItem():Strong("Tile size"):Text(": how many meters of ground one copy of the texture covers.
+A texture set starts at 3 and a plain texture at 4. Smaller numbers make
+the pattern smaller and repeat more often; larger numbers stretch it;")
+        ListItem():Strong("Choose..."):Text(": give this layer a different material. Where it was painted
+stays the same;")
+        ListItem():Strong("Remove"):Text(": take the layer away. Where it was painted, layer 1 shows
+instead: "):DoubleQuote():Output("rock_wall removed. Where it was painted, Ground037 shows."):DoubleQuote():Text("
+Removing the last layer makes the ground plain again;")
+        ListItem():Strong("Details..."):Text(": see and change the material's images and values (below).")
+        Paragraph("Under the rows is "):Strong("Blend softness"):Text(", from 0.01 to 1: how softly texture set
+layers fade into each other where they meet. Small numbers give sharp edges,
+such as rocks poking through grass; larger numbers blend more gently.")
+        Paragraph("Adding, choosing and removing layers can be undone with "):Keys("Ctrl", "Z"):Text(" ("):Keys("Cmd", "Z"):Text("
+on Mac). Changes to the tile size and blend softness can't be undone yet.")
+    end
+
+    private action DetailsMaterial
+        Subsection("Details: what is inside a material")
+        Paragraph("Activate "):Strong("Details..."):Text(" on a layer. A group named "):Quoted("Material details"):Text(", with
+the layer's number and name, opens under the rows. Only one layer's details
+show at a time; "):Strong("Close details"):Text(" closes them.")
+        Paragraph("It shows:")
+        BulletList()
+        ListItem():Strong("Name"):Text(": a field. The layer's row uses this name.")
+        ListItem():Strong("File"):Text(": where the material file is in the project.")
+        ListItem("Whether other layers use the same file, such as "):DoubleQuote():Output("Also used by 2 other
+layers in this scene. Changes here change it everywhere."):DoubleQuote()
+        ListItem():Strong("Kind"):Text(": "):Quoted("texture set"):Text(" or "):Quoted("plain texture"):Text(".")
+        ListItem():Strong("One line per map"):Text(", each with "):Strong("Choose..."):Text(" and "):Strong("Clear"):Text(":")
+        NestedBulletList()
+        ListItem("for a texture set: color, normal, roughness, ambient occlusion and
+height maps;")
+        ListItem("each line names its file, or says "):Quoted("none"):Text(".")
+        EndNestedList()
+        ListItem():Strong("Normal map convention"):Text(": OpenGL or DirectX. Normal maps come in two
+styles that store "):Quoted("up"):Text(" in opposite ways. If the bumps on the ground look
+lit from the wrong side, switch this. Files ending in "):Code("_NormalGL"):Text(" or
+"):Code("_nor_gl"):Text(" are OpenGL; "):Code("_NormalDX"):Text(" and "):Code("_nor_dx"):Text(" are DirectX.")
+        ListItem():Strong("Find maps by name"):Text(": looks again in the color map's folder for any map
+that is "):Quoted("none"):Text(".")
+        ListItem():Strong("Make plain"):Text(": turns a texture set into a plain texture, keeping its
+color map.")
+        ListItem():Strong("Roughness"):Text(" and "):Strong("Metallic"):Text(", from 0 to 1. Roughness is only used when
+there is no roughness map; if there is one, Quorum Studio says "):DoubleQuote():Output("Not used: the
+roughness map sets it."):DoubleQuote()
+        Paragraph("When you change a map, Quorum Studio repacks the set, which takes about a second,
+and says so: "):DoubleQuote():Output("Packing the texture set... Normal map is now
+rock_wall_nor_gl_1k.png."):DoubleQuote():Text(" Every map in a set must be the same size. If it
+isn't, Quorum Studio refuses and says both sizes, for example "):DoubleQuote():Output("rock_wall_rough_2k.png
+is 2048 by 2048, but the color map is 1024 by 1024. Maps in a set must be the
+same size."):DoubleQuote()
+        Paragraph("A number field takes its new value when you leave it with "):Key("Tab"):Text(" or click
+somewhere else. ("):Key("Enter"):Text(" doesn't take the value yet.)")
+        Paragraph("Every change in Details can be undone.")
+    end
+
+    private action Painting
+        Subsection("Painting")
+        Paragraph("Painting is how you decide where each layer shows. You choose the "):Strong("Paint"):Text("
+tool and a layer, and a circle called the "):Term("brush"):Text(" appears on the ground.
+Wherever you move the brush and paint, the chosen layer soaks in: a little
+at first, and more the longer you paint, with the brush's middle painting
+more than its edge. Under the hood, each stroke changes the splat maps of
+the regions the brush touches. Painting needs "):Strong("two or more layers"):Text(",
+because layer 1 is already everywhere. With only one, the Paint tool says
+"):DoubleQuote():Output("Paint needs two or more materials. Add them in the Materials section."):DoubleQuote()
+
+        Subsubsection("Painting, step by step")
+        NumberedList()
+        ListItem("Select the terrain and press "):Keys("Alt", "6"):Text(" ("):Keys("Option", "6"):Text(" on Mac) to choose the
+Paint tool. A ring on the ground shows the brush.")
+        ListItem("Choose which layer to paint, in either of two ways:")
+        NestedBulletList()
+        ListItem("in the Brush section, the "):Strong("Paint layer"):Text(" buttons, each named with its
+layer, such as "):DoubleQuote():Output("Layer 2, rock_wall"):DoubleQuote():Text(";")
+        ListItem("press "):Keys("Alt", "L"):Text(" ("):Keys("Option", "L"):Text(" on Mac) to move to the next layer.")
+        EndNestedList()
+        ListItem("Move the brush with the mouse or the arrow keys. Change its size with
+"):Keys("Alt", "="):Text(" and "):Keys("Alt", "-"):Text(", and how fast it paints with "):Keys("Alt", "]"):Text(" and "):Keys("Alt", "["):Text(".")
+        ListItem("Hold "):Key("Space"):Text(", or hold the left mouse button and drag, to paint. Let go to
+finish the stroke.")
+        ListItem():Key("Escape"):Text(" during a stroke cancels it and puts the ground back. "):Key("Escape"):Text("
+again leaves the tool.")
+        Paragraph("Each stroke is one step for "):Keys("Ctrl", "Z"):Text(" and "):Keys("Ctrl", "Y"):Text(" ("):Keys("Cmd", "Z"):Text(" and "):Keys("Cmd", "Y"):Text(" on
+Mac). Saving the scene with "):Keys("Ctrl", "S"):Text(" ("):Keys("Cmd", "S"):Text(") saves the painting.")
+        Table("Keys for painting", "media/scenes/Terrain/Materials/Keys.csv")
+        Paragraph("All of these keys can be changed in Quorum Studio's key map.")
+
+        Subsubsection("Screen reader conventions")
+        Paragraph("Quorum Studio tells a screen reader what the brush is doing as you work, so
+you can paint without seeing the screen:")
+        BulletList()
+        ListItem():Strong("Choosing the tool"):Text(" says the tool and where the brush is, such as
+"):DoubleQuote():Output("Paint tool. Paint brush at 0.0, 0.0, ground height 0.0, slope 0 degrees,
+Ground037, size 5.0"):DoubleQuote():Text(". The name at the end, here Ground037, is the layer
+that shows most under the brush's middle.")
+        ListItem():Strong("Each press of an arrow key"):Text(" moves the brush and says the height of the
+ground under it, such as "):DoubleQuote():Output("Height 1.2"):DoubleQuote():Text(", or "):DoubleQuote():Output("Off the ground"):DoubleQuote():Text(" if the brush
+has moved past the terrain's edge.")
+        ListItem():Strong("Letting go of an arrow key"):Text(" says the brush's full description again,
+with its place, height, slope and the main layer under it. Moving the
+brush across a painted area and listening for the layer name is how you
+find where each layer is.")
+        ListItem():Strong("Choosing a layer"):Text(" with "):Keys("Alt", "L"):Text(" says it, such as "):DoubleQuote():Output("Paint layer 2,
+rock_wall"):DoubleQuote():Text(".")
+        ListItem():Strong("Finishing a stroke"):Text(" says what you did, such as "):DoubleQuote():Output("Painted rock_wall.
+Height 2.1"):DoubleQuote():Text(". A canceled stroke says "):DoubleQuote():Output("Stroke canceled"):DoubleQuote():Text(".")
+    end
+
+    private action Files
+        // A JSON key is shown in code with its quotes.
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+
+        Subsection("The files")
+        Paragraph("Materials are saved as files in your project, so you can open and read them.
+Every one is a plain "):Code(".json"):Text(" text file, and its "):Code(quote + "Format" + quote):Text(" says what kind of
+file it is. Paths inside a file are written relative to that file's own
+folder, so a texture set's folder can be copied to another project with its
+material file inside it.")
+        CodeExampleFromFile("sources/tutorials/scenes/TerrainMaterials/ProjectFiles.txt", "")
+        Paragraph():Strong("A material"):Text(" (one layer's look) is written beside its images:")
+        JsonExampleFromFile("sources/tutorials/scenes/TerrainMaterials/Material.json")
+        Paragraph("A plain texture has "):Code(quote + "Texture" + quote):Text(" instead of the maps.")
+        Paragraph():Strong("A terrain material"):Text(" (the whole ground's look) is in "):Code("Scenes/Materials"):Text(",
+named after the terrain's folder. It lists the layers in order, by their
+material files:")
+        JsonExampleFromFile("sources/tutorials/scenes/TerrainMaterials/TerrainMaterial.json")
+        Paragraph():Strong("The splat maps"):Text(" are the "):Code("region_X_Z_splat.png"):Text(" images beside the
+terrain's heights, one for each region you have painted (see "):Quoted("Splat maps"):Text("
+above).")
+        Paragraph("Saving never deletes files. If you remove a layer or a whole material, the
+old files stay in the project until you delete them yourself.")
+    end
+
+    private action LicensesGivingCredit
+        Subsection("Licenses and giving credit")
+        Paragraph("Every image was made by someone, and they decide how others may use it. That
+decision is the image's "):Term("license"):Text(". Before you use a texture, find its
+license.")
+        BulletList()
+        ListItem():Strong("AmbientCG"):Text(" and "):Strong("Poly Haven"):Text(" share their textures under
+"):Strong("CC0"):Text(" (Creative Commons Zero). CC0 means the creator gave up their
+rights: you can use, change and share the images, even in a game you
+sell, without asking.")
+        ListItem():Strong("Other sites"):Text(" may only allow personal use, or require you to credit
+the creator, or forbid selling. Read the license on the page you
+download from, and keep a copy of it with the textures.")
+        ListItem():Strong("An image you found with a web search"):Text(" is usually not yours to use.
+Being easy to download doesn't make it free to use.")
+        Paragraph("Even when credit isn't required, giving it is good practice. It tells
+players where the art came from, thanks the people who made it, and lets
+others find it. A simple way is a "):Code("Credits.txt"):Text(" file in your project, and a
+credits screen in your game:")
+        CodeExampleFromFile("sources/tutorials/scenes/TerrainMaterials/Credits.txt", "")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner download free materials, add them to a
+terrain, and paint a small landscape with the brush. The goal is to go
+through the whole process a game artist uses: finding materials with a
+license that allows your use, bringing them into a project, and painting
+them where they belong. Here are four CC0 materials from ambientCG that
+work well together:")
+        BulletList()
+        ListItem():Link("Grass 001", "https://ambientcg.com/view?id=Grass001"):Text(": short green grass,
+for layer 1;")
+        ListItem():Link("Ground 037", "https://ambientcg.com/view?id=Ground037"):Text(": damp earth with
+moss;")
+        ListItem():Link("Rock 030", "https://ambientcg.com/view?id=Rock030"):Text(": gray rock;")
+        ListItem():Link("Gravel 022", "https://ambientcg.com/view?id=Gravel022"):Text(": small gray
+pebbles, good for a path.")
+        Paragraph("Bring them into your project like this:")
+        NumberedList()
+        ListItem("On each material's page, download the "):Strong("1K-JPG"):Text(" file, such as
+"):Code("Grass001_1K-JPG.zip"):Text(". It is about 10 megabytes.")
+        ListItem("In your project's folder, make a folder named "):Code("Textures"):Text(" if there isn't
+one, and unzip each download into its own folder inside it, such as
+"):Code("Textures/Grass001_1K-JPG"):Text(".")
+        ListItem("In Quorum Studio, select the terrain, press "):Keys("Ctrl", "P"):Text(" ("):Keys("Cmd", "P"):Text(" on Mac)
+to move into the Properties panel, and go to the Materials section.")
+        ListItem("Activate "):Strong("Add material..."):Text(" and choose the color map, the image whose
+name ends in "):Code("_Color"):Text(", such as "):Code("Grass001_1K-JPG_Color.jpg"):Text(". Quorum Studio
+finds the other images in the folder by their names.")
+        ListItem("Add the other three the same way, in the order above, so grass is layer
+1.")
+        Paragraph("Now paint. Together, sketch a plan for a small area: for example, a gravel
+path running across the grass, a patch of earth around it, and a rocky spot
+in one corner. One partner paints the path and the earth, and the other
+paints the rock, using the Paint tool and "):Keys("Alt", "L"):Text(" to switch layers. As you
+paint, the partner who isn't painting checks the work against the plan,
+either by watching or by moving the brush across the area and listening for
+the layer under it. Save the scene, then write a "):Code("Credits.txt"):Text(" in your
+project that lists all four materials, their creator, ambientCG, their
+addresses and their license, CC0.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        BulletList()
+        ListItem("A material is not a picture. It is a small file of settings that names
+several pictures. Why do you think Quorum Studio keeps materials as separate
+files instead of putting everything into the scene?")
+        ListItem("A texture you can download for free is not always free to use. What
+would you do if a texture you loved had a license that didn't allow your
+game?")
+    end
+end

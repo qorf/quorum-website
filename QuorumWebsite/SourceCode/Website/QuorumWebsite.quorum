@@ -1,0 +1,3124 @@
+use Libraries.System.File
+use Libraries.Containers.Array
+use Libraries.Containers.Iterator
+use Libraries.Containers.HashTable
+use Libraries.Web.Problems
+use Libraries.Web.Problem
+use Libraries.Web.VersionHelper
+use Libraries.Web.QuorumSite
+use Libraries.Web.Page.WebPage
+
+/*
+    The whole Quorum website: every page, in one place. WebsiteMain writes
+    it into html/; ServerMain writes it and then serves the pages that
+    answer requests (signing in, saving projects, and so on).
+
+    The pages are still the old site's, built as main.quorum builds them,
+    with each track's lessons chained in order. Each page is added once,
+    and the site sets it up and writes it; the old pages are written
+    exactly as they make themselves.
+*/
+class QuorumWebsite
+    constant text WRITE_PATH = "html/"
+    constant text SITE_FOLDER = "html"
+    constant text SITE_NAME = "https://quorumlanguage.com"
+
+    QuorumSite site
+
+    // The old site's pages by location. A lesson in more than one track is
+    // made once for each, and the last one added is the one written, as in
+    // main.quorum.
+    HashTable<text, WebPage> oldPages
+
+    /*
+        Builds every page, writes the site into html/, then writes the
+        practice problems and the sitemap, which are read from files.
+    */
+    action Write
+        VersionHelper helper
+        output "Loading Quorum Website. Version " + helper:GetLanguageVersion()
+        output "Writing index pages"
+        HomePages()
+        output "Writing Tutorials"
+        TutorialPages()
+        output "Writing Lessons"
+        AddLessons()
+
+        Iterator<text> locations = oldPages:GetKeyIterator()
+        repeat while locations:HasNext()
+            text location = locations:Next()
+            site:AddPlainPage(oldPages:GetValue(location), location)
+        end
+        site:SetFolder(SITE_FOLDER)
+        site:Write()
+        output "Website finished."
+
+        output "Writing Problems Pages"
+        WriteProblemsPages()
+        output "Finished Problems Pages"
+
+        BuildSiteMap()
+        output "Sitemap created"
+    end
+
+    action GetSite returns QuorumSite
+        return site
+    end
+
+    // The site's main pages, and the track pages listing the lessons
+    // each track teaches.
+    private action HomePages
+        Index index
+        Add(index, "index.html")
+
+        Quorum404 quorum404
+        Add(quorum404, "Quorum404.html")
+
+        Teach teach
+        Add(teach)
+
+        LessonsOverview lessonsOverview
+        Add(lessonsOverview)
+
+        Partners partners
+        Add(partners)
+
+        Contributions contributions
+        Add(contributions)
+
+        //EpiqLetter2017
+        EpiqLetter2017 epiqLetter2017
+        Add(epiqLetter2017)
+
+        Download download
+        Add(download, "download.html")
+
+        DownloadStudioBeta downloadStudioBeta
+        Add(downloadStudioBeta)
+
+        Bugs bugs
+        Add(bugs, "bugs.html")
+
+        Array<Lesson> audioTrackArray = AddAudioTrack()
+        AudioTrack audioTrack
+        audioTrack:SetTrackLessons(audioTrackArray)
+        Add(audioTrack, "lessons/audio.html")
+
+        CodeOrgWidgetTutorial codeOrgWidgetTutorial
+        Add(codeOrgWidgetTutorial)
+
+        Array<Lesson> gamingTeacherLessons = AddGamingTeacherTrackLessons()
+        EpiqTrack epiqTrack
+        epiqTrack:SetTrackLessons(gamingTeacherLessons)
+        Add(epiqTrack, "lessons/epiq.html")
+
+        Array<Lesson> dataTeacherLessons = AddDataScienceTeacherTrack()
+        EpiqDataScienceTrack epiqDataScienceTrack
+        epiqDataScienceTrack:SetTrackLessons(dataTeacherLessons)
+        Add(epiqDataScienceTrack, "lessons/epiqDataScience.html")
+
+        Array<Lesson> blocksTeacherLessons = AddBlocksTrack()
+        Array<Lesson> blocksTeacherOnlineLessons = AddBlocksOnlineTrack()
+        Array<Lesson> accessibilityLessons = AddAccessibilityTrack()
+
+        AccessibilityTrack accessibilityTrack
+        accessibilityTrack:SetTrackLessons(accessibilityLessons)
+        Add(accessibilityTrack)
+
+        OnlineBlockTrack onlineBlocksTrack
+        onlineBlocksTrack:SetTrackLessons(blocksTeacherOnlineLessons)
+        Add(onlineBlocksTrack)
+
+        BlockTrack blocksTrack
+        blocksTrack:SetTrackLessons(blocksTeacherLessons)
+        Add(blocksTrack, "lessons/quorumBlocks.html")
+
+        Array<Lesson> gameTemplateLessons = AddGameTemplateTrack()
+        GameTemplateTrack gameTemplateTrack
+        gameTemplateTrack:SetTrackLessons(gameTemplateLessons)
+        Add(gameTemplateTrack)
+
+        ReleaseNotes release
+        Add(release, "release.html")
+
+        StandaloneCompilerPage standalone
+        Add(standalone)
+
+        IdeasPage ideas
+        Add(ideas, "ideas.html")
+
+        Advanced advanced
+        Add(advanced, "advanced.html")
+
+        Developers developers
+        Add(developers, "developers.html")
+
+        Community community
+        Add(community, "community.html")
+
+        Evidence evidence
+        Add(evidence, "evidence.html")
+
+        Epiq epiq
+        EpiqCommittees committees
+        AboutEpiq aboutEpiq
+        EpiqEvent event
+        EpiqAward awards
+        epiq:SetNextLesson(committees)
+        committees:SetNextLesson(awards)
+
+        Add(epiq, "epiq.html")
+
+        Add(committees, "committees.html")
+
+        Add(awards, "awards.html")
+
+        Add(aboutEpiq, "aboutEpiq.html")
+
+        Add(event, "eventEpiq.html")
+
+        Learn learn
+        Add(learn, "learn.html")
+
+        HourOfCodeSelection selection
+        Add(selection, "selection.html")
+
+        ResetPassword resetPassword
+        Add(resetPassword)
+
+        Sink sink
+        Add(sink)
+
+        BlockPage blockEditor
+        Add(blockEditor)
+
+        Charts charts
+        Add(charts)
+
+        Presentation presentation
+        Add(presentation)
+
+        Activity activity
+        Add(activity)
+
+        Feedback feedback
+        Add(feedback)
+
+        CodeorgCharts codeorg
+        Add(codeorg)
+
+        CompilerErrorChallenge compilerErrorChallenge
+        Add(compilerErrorChallenge)
+    end
+
+    // The reference page listing every tutorial, and the track pages
+    // that come after it.
+    private action TutorialPages
+        Array<Lesson> startingLessonArray = AddTutorials()
+        Reference reference
+        reference:SetTrackLessons(startingLessonArray)
+        Add(reference, "reference.html")
+
+        Array<Lesson> coreTrackArray = AddCoreTrack()
+        CoreTrack coreTrack
+        coreTrack:SetTrackLessons(coreTrackArray)
+        Add(coreTrack, "lessons/core.html")
+
+        Array<Lesson> visualTrackArray = AddVisualTrack()
+        VisualTrack visualTrack
+        visualTrack:SetTrackLessons(visualTrackArray)
+        Add(visualTrack, "lessons/visual.html")
+
+        Array<Lesson> roboticsTrackArray = AddRoboticsTrack()
+        RoboticsTrack roboticsTrack
+        roboticsTrack:SetTrackLessons(roboticsTrackArray)
+        Add(roboticsTrack, "lessons/robotics.html")
+
+        AccessChartsPage accessChartsPage
+        Add(accessChartsPage, "widgets/accessCharts.html")
+
+        Array<Lesson> codeOrgArray = AddCodeOrgLessons()
+        CodeOrgTrack codeOrgTrack
+        codeOrgTrack:SetTrackLessons(codeOrgArray)
+        Add(codeOrgTrack, "lessons/code.html")
+    end
+
+    // Adds one of the old site's pages at its own location.
+    private action Add(WebPage page)
+        Add(page, page:GetLocation())
+    end
+
+    // Adds one of the old site's pages at a location. A few old pages give
+    // theirs with a leading slash, which the site leaves out.
+    private action Add(WebPage page, text location)
+        if location:StartsWith("/")
+            location = location:GetSubtext(1)
+        end
+        oldPages:Set(location, page)
+    end
+
+    private action WriteProblemsPages
+        ProblemGenerator generator
+        generator:Generate()
+
+        AllProblemsPage allProblemsPage
+        allProblemsPage:SetGenerator(generator)
+
+        allProblemsPage:Setup()
+        allProblemsPage:Write(WRITE_PATH)
+
+        Iterator<Problems> problemsIterator = generator:GetProblemsIterator()
+        repeat while problemsIterator:HasNext()
+            Problems problems = problemsIterator:Next()
+            //generate the problems page
+            ProblemsPage problemsPage
+            problemsPage:SetProblems(problems)
+            problemsPage:Setup()
+            problemsPage:Write(WRITE_PATH)
+            File writeFolder
+            writeFolder:SetAbsolutePath(WRITE_PATH)
+
+            //now generate all the pages for the individual problems
+            Iterator<Problem> problemIterator = problems:GetProblemIterator()
+            repeat while problemIterator:HasNext()
+                Problem problem = problemIterator:Next()
+                ProblemPage page
+                page:SetProblem(problem)
+                page:Setup()
+                page:Write(WRITE_PATH)
+            end
+        problems:CopyTo(WRITE_PATH)
+        end
+    end
+
+    private action BuildSiteMap
+        File file
+        file:SetPath("html")
+        text result = ""
+        text DQ = result:GetDoubleQuote()
+        text NL = result:GetCarriageReturn() + result:GetLineFeed()
+        result = "<?xml version="+DQ+"1.0"+DQ+" encoding="+DQ+"UTF-8"+DQ+"?>" + NL
+        result = result + "<urlset xmlns="+DQ+"http://www.sitemaps.org/schemas/sitemap/0.9"+DQ+">" + NL
+        text root = file:GetAbsolutePath()
+        integer size = root:GetSize()
+        Array<File> pages = file:GetDirectoryListing()
+        i = 0
+        repeat while i < pages:GetSize()
+            File page = pages:Get(i)
+            if page:IsDirectory()
+                result = result + GetDirectoryMap(file, page)
+            elseif page:IsFile() and page:GetFileExtension() = "html"
+                text path = page:GetAbsolutePath()
+                text newPath = SITE_NAME + path:GetSubtext(size)
+                text url = "<url><loc>" + newPath + "</loc></url>" + NL
+                result = result + url
+            end
+            i = i + 1
+        end
+
+        result = result + "</urlset>"
+        File map
+        map:SetPath("html/sitemap.xml")
+        map:Write(result)
+        map:Close()
+    end
+
+    private action GetDirectoryMap(File root, File file) returns text
+        text result = ""
+        text DQ = result:GetDoubleQuote()
+        text NL = result:GetCarriageReturn() + result:GetLineFeed()
+        integer size = root:GetAbsolutePath():GetSize()
+        Array<File> pages = file:GetDirectoryListing()
+        i = 0
+        repeat while i < pages:GetSize()
+            File page = pages:Get(i)
+            if page:IsDirectory()
+                result = result + GetDirectoryMap(root, page)
+            elseif page:IsFile() and page:GetFileExtension() = "html"
+                text path = page:GetAbsolutePath()
+                text newPath = SITE_NAME + path:GetSubtext(size)
+                text url = "<url><loc>" + newPath + "</loc></url>" + NL
+                result = result + url
+            end
+            i = i + 1
+        end
+        return result
+    end
+
+    private action AddCodeOrgLessons returns Array<Lesson>
+
+    //Unit 1  The Internet
+        CodeOrgUnit1Overview u1O
+        CodeOrgUnit1L01 u1L01
+        CodeOrgUnit1L02 u1L02
+        CodeOrgUnit1L03 u1L03
+        CodeOrgUnit1L04 u1L04
+        CodeOrgUnit1L05 u1L05
+        CodeOrgUnit1L06 u1L06
+        CodeOrgUnit1L07 u1L07
+        CodeOrgUnit1L08 u1L08
+        CodeOrgUnit1L09 u1L09
+        CodeOrgUnit1L10 u1L10
+        CodeOrgUnit1L11 u1L11
+        CodeOrgUnit1L12 u1L12
+        CodeOrgUnit1L13 u1L13
+        CodeOrgUnit1L14 u1L14
+
+    //Unit 2 Digital Information
+        CodeOrgUnit2Overview u2O
+        CodeOrgDigitalInfoLesson1 dil1
+        CodeOrgDigitalInfoLesson2 dil2
+        CodeOrgDigitalInfoLesson3 dil3
+        CodeOrgDigitalInfoLesson4 dil4
+        CodeOrgDigitalInfoLesson5 dil5
+        CodeOrgDigitalInfoLesson6 dil6
+        CodeOrgDigitalInfoLesson7 dil7
+        CodeOrgDigitalInfoLesson8 dil8
+//        CodeOrgDigitalInfoLesson9 dil9
+//        CodeOrgDigitalInfoLesson10 dil10
+//        CodeOrgDigitalInfoLesson11 dil11
+//        CodeOrgDigitalInfoLesson12 dil12
+//        CodeOrgDigitalInfoLesson13 dil13
+//        CodeOrgDigitalInfoLesson14 dil14
+//       CodeOrgDigitalInfoLesson15 dil15
+
+    //Unit 3 Intro to Programming
+        CodeOrgUnit3Lesson1 unit3lesson1
+        CodeOrgUnit3Lesson2 unit3lesson2
+        CodeOrgUnit3Lesson3 unit3lesson3
+        CodeOrgUnit3Lesson4 unit3lesson4
+        CodeOrgUnit3Lesson5 unit3lesson5
+        CodeOrgUnit3Lesson6 unit3lesson6
+        CodeOrgUnit3Lesson7 unit3lesson7
+        CodeOrgUnit3Lesson8 unit3lesson8
+        CodeOrgUnit3Lesson9 unit3lesson9
+        CodeOrgUnit3Lesson10 unit3lesson10
+        CodeOrgUnit3Overview unit3Overview
+
+    //Unit 4 Big Data and Privacy
+        CodeOrgUnit4Overview u4O
+        CodeOrgUnit4Lesson1 bdl1
+        CodeOrgUnit4Lesson2 bdl2
+        CodeOrgUnit4Lesson3 bdl3
+        CodeOrgUnit4Lesson4 bdl4
+        CodeOrgUnit4Lesson5 bdl5
+        CodeOrgUnit4Lesson6 bdl6
+        CodeOrgUnit4Lesson7 bdl7
+        CodeOrgUnit4Lesson8 bdl8
+        CodeOrgUnit4Lesson9 bdl9
+        CodeOrgUnit4Lesson10 bdl10
+        CodeOrgUnit4Lesson11 bdl11
+        CodeOrgUnit4Lesson12 bdl12
+        CodeOrgUnit4Lesson13 bdl13
+        CodeOrgUnit4Lesson14 bdl14
+
+    //Unit 5 Building Apps
+        CodeOrgUnit5Overview u5O
+        CodeOrgUnit5Lesson1 unit5Lesson1
+        CodeOrgUnit5Lesson2 unit5Lesson2
+        CodeOrgUnit5Lesson3 unit5Lesson3
+        CodeOrgUnit5Lesson4 unit5Lesson4
+        CodeOrgUnit5Lesson5 unit5Lesson5
+        CodeOrgUnit5Lesson6 unit5Lesson6
+        CodeOrgUnit5Lesson7 unit5Lesson7
+        CodeOrgUnit5Lesson8 unit5Lesson8
+        CodeOrgUnit5Lesson9 unit5Lesson9
+        CodeOrgUnit5Lesson10 unit5Lesson10
+        CodeOrgUnit5Lesson11 unit5Lesson11
+        CodeOrgUnit5Lesson12 unit5Lesson12
+        CodeOrgUnit5Lesson13 unit5Lesson13
+        CodeOrgUnit5Lesson14 unit5Lesson14
+        CodeOrgUnit5Lesson15 unit5Lesson15
+        CodeOrgUnit5Lesson16 unit5Lesson16
+        CodeOrgUnit5Lesson17 unit5Lesson17
+        CodeOrgUnit5Lesson18 unit5Lesson18
+
+    //Unit 6 Explore AP Task
+        CodeOrgUnit6Overview u6O
+        CodeOrgUnit6L01 u6L01
+        //CodeOrgUnit6L01o1 u6L01o1
+        CodeOrgUnit6L02 u6L02
+        CodeOrgUnit6L03 u6L03
+        //CodeOrgUnit6L03o1 u6L03o1
+
+    //Unit 6 Algorithms
+        CodeOrgUnit6Lesson1 unit6lesson1
+        CodeOrgUnit6Lesson2 unit6lesson2
+        CodeOrgUnit6Lesson3 unit6lesson3
+        CodeOrgUnit6Lesson4 unit6lesson4
+        CodeOrgUnit6Lesson5 unit6lesson5
+
+    // Unit 7 Parameters, Return, and Libraries
+        CodeOrgUnit7Lesson1 unit7lesson1
+        CodeOrgUnit7Lesson2 unit7lesson2
+        CodeOrgUnit7Lesson3 unit7lesson3
+        CodeOrgUnit7Lesson4 unit7lesson4
+        CodeOrgUnit7Lesson5 unit7lesson5
+        CodeOrgUnit7Lesson6 unit7lesson6
+        CodeOrgUnit7Lesson7 unit7lesson7
+        CodeOrgUnit7Lesson8 unit7lesson8
+        CodeOrgUnit7Lesson9 unit7lesson9
+        CodeOrgUnit7Lesson10 unit7lesson10
+
+    //Unit 8 Create PT Prep
+        CodeOrgUnit8Lesson1 unit8lesson1
+        CodeOrgUnit8Lesson2 unit8lesson2
+        CodeOrgUnit8Lesson3 unit8lesson3
+        CodeOrgUnit8Lesson4 unit8lesson4
+
+    //Unit 9 Data
+        CodeOrgUnit9L01 unit9Lesson1
+        CodeOrgUnit9L02 unit9Lesson2
+        CodeOrgUnit9L03 unit9Lesson3
+        CodeOrgUnit9L04 unit9Lesson4
+        CodeOrgUnit9L05 unit9Lesson5
+        CodeOrgUnit9L06 unit9Lesson6
+        CodeOrgUnit9L07 unit9Lesson7
+        CodeOrgUnit9L08 unit9Lesson8
+
+    //Unit 10 Cybersecurity
+        CodeOrgUnit10Lesson1 unit10lesson1
+        CodeOrgUnit10Lesson2 unit10lesson2
+        CodeOrgUnit10Lesson3 unit10lesson3
+        CodeOrgUnit10Lesson4 unit10lesson4
+        CodeOrgUnit10Lesson5 unit10lesson5
+        CodeOrgUnit10Lesson6 unit10lesson6
+        CodeOrgUnit10Lesson7 unit10lesson7
+        CodeOrgUnit10Lesson8 unit10lesson8
+        CodeOrgUnit10Lesson9 unit10lesson9
+        CodeOrgUnit10Lesson10 unit10lesson10
+        CodeOrgUnit10Lesson11 unit10lesson11
+        CodeOrgUnit10Lesson12 unit10lesson12
+        CodeOrgUnit10Lesson13 unit10lesson13
+    Array<Lesson> codeOrgArray
+    // setting lessons
+    //u1O:SetNextLesson(u1L01)
+    u1L01:SetNextLesson(u1L02)
+    u1L02:SetNextLesson(u1L03)
+    u1L03:SetNextLesson(u1L04)
+    u1L04:SetNextLesson(u1L05)
+    u1L05:SetNextLesson(u1L06)
+    u1L06:SetNextLesson(u1L07)
+    u1L07:SetNextLesson(u1L08)
+    u1L08:SetNextLesson(u1L09)
+    u1L09:SetNextLesson(u1L10)
+    u1L10:SetNextLesson(u1L11)
+    u1L11:SetNextLesson(u1L12)
+    u1L12:SetNextLesson(u1L13)
+    u1L13:SetNextLesson(undefined)
+
+    // the internet
+    dil1:SetNextLesson(dil2)
+    dil2:SetNextLesson(dil3)
+    dil3:SetNextLesson(dil4)
+    dil4:SetNextLesson(dil5)
+    dil5:SetNextLesson(dil6)
+    dil6:SetNextLesson(dil7)
+    dil7:SetNextLesson(dil8)
+    dil8:SetNextLesson(undefined)
+
+    // intro to app design
+   // unit3Overview:SetNextLesson(unit3lesson1)
+    unit3lesson1:SetNextLesson(unit3lesson2)
+    unit3lesson2:SetNextLesson(unit3lesson3)
+    unit3lesson3:SetNextLesson(unit3lesson4)
+    unit3lesson4:SetNextLesson(unit3lesson5)
+    unit3lesson5:SetNextLesson(unit3lesson6)
+    unit3lesson6:SetNextLesson(unit3lesson7)
+    unit3lesson7:SetNextLesson(unit3lesson8)
+    unit3lesson8:SetNextLesson(unit3lesson9)
+    unit3lesson9:SetNextLesson(unit3lesson10)
+    unit3lesson10:SetNextLesson(undefined)
+
+    // variables conitionals and functions
+    //u4O:SetNextLesson(bdl1)
+    bdl1:SetNextLesson(bdl2)
+    bdl2:SetNextLesson(bdl3)
+    bdl3:SetNextLesson(bdl4)
+    bdl4:SetNextLesson(bdl5)
+    bdl5:SetNextLesson(bdl6)
+    bdl6:SetNextLesson(bdl7)
+    bdl7:SetNextLesson(bdl8)
+    bdl8:SetNextLesson(bdl9)
+    bdl9:SetNextLesson(bdl10)
+    bdl10:SetNextLesson(bdl11)
+    bdl11:SetNextLesson(bdl12)
+    bdl12:SetNextLesson(bdl13)
+    bdl13:SetNextLesson(bdl14)
+    bdl14:SetNextLesson(undefined)
+
+    // list loops traversals
+    //u5O:SetNextLesson(unit5Lesson1)
+    unit5Lesson1:SetNextLesson(unit5Lesson2)
+    unit5Lesson2:SetNextLesson(unit5Lesson3)
+    unit5Lesson3:SetNextLesson(unit5Lesson4)
+    unit5Lesson4:SetNextLesson(unit5Lesson5)
+    unit5Lesson5:SetNextLesson(unit5Lesson6)
+    unit5Lesson6:SetNextLesson(unit5Lesson7)
+    unit5Lesson7:SetNextLesson(unit5Lesson8)
+    unit5Lesson8:SetNextLesson(unit5Lesson9)
+    unit5Lesson9:SetNextLesson(unit5Lesson10)
+    unit5Lesson10:SetNextLesson(unit5Lesson11)
+    unit5Lesson11:SetNextLesson(unit5Lesson12)
+    unit5Lesson12:SetNextLesson(unit5Lesson13)
+    unit5Lesson13:SetNextLesson(unit5Lesson14)
+    unit5Lesson14:SetNextLesson(unit5Lesson15)
+    unit5Lesson15:SetNextLesson(unit5Lesson16)
+    unit5Lesson16:SetNextLesson(unit5Lesson17)
+    unit5Lesson17:SetNextLesson(undefined)
+
+    //codeOrgArray:Add(u6L01)
+    //u6O:SetNextLesson(u6L01)
+    u6L01:SetNextLesson(u6L02)
+    u6L02:SetNextLesson(u6L03)
+    u6L03:SetNextLesson(undefined)
+
+    unit6lesson1:SetNextLesson(unit6lesson2)
+    unit6lesson2:SetNextLesson(unit6lesson3)
+    unit6lesson3:SetNextLesson(unit6lesson4)
+    unit6lesson4:SetNextLesson(unit6lesson5)
+    unit6lesson5:SetNextLesson(undefined)
+
+    unit7lesson1:SetNextLesson(unit7lesson2)
+    unit7lesson2:SetNextLesson(unit7lesson3)
+    unit7lesson3:SetNextLesson(unit7lesson4)
+    unit7lesson4:SetNextLesson(unit7lesson5)
+    unit7lesson5:SetNextLesson(unit7lesson6)
+    unit7lesson6:SetNextLesson(unit7lesson7)
+    unit7lesson7:SetNextLesson(unit7lesson8)
+    unit7lesson8:SetNextLesson(unit7lesson9)
+    unit7lesson9:SetNextLesson(unit7lesson10)
+    unit7lesson10:SetNextLesson(undefined)
+
+    unit8lesson1:SetNextLesson(unit8lesson2)
+    unit8lesson2:SetNextLesson(unit8lesson3)
+    unit8lesson3:SetNextLesson(unit8lesson4)
+    unit8lesson4:SetNextLesson(undefined)
+
+    unit9Lesson1:SetNextLesson(unit9Lesson2)
+    unit9Lesson2:SetNextLesson(unit9Lesson3)
+    unit9Lesson3:SetNextLesson(unit9Lesson4)
+    unit9Lesson4:SetNextLesson(unit9Lesson5)
+    unit9Lesson5:SetNextLesson(unit9Lesson6)
+    unit9Lesson6:SetNextLesson(unit9Lesson7)
+    unit9Lesson7:SetNextLesson(unit9Lesson8)
+    unit9Lesson8:SetNextLesson(undefined)
+
+    unit10lesson1:SetNextLesson(unit10lesson2)
+    unit10lesson2:SetNextLesson(unit10lesson3)
+    unit10lesson3:SetNextLesson(unit10lesson4)
+    unit10lesson4:SetNextLesson(unit10lesson5)
+    unit10lesson5:SetNextLesson(unit10lesson6)
+    unit10lesson6:SetNextLesson(unit10lesson7)
+    unit10lesson7:SetNextLesson(unit10lesson8)
+    unit10lesson8:SetNextLesson(unit10lesson9)
+    unit10lesson9:SetNextLesson(unit10lesson10)
+    unit10lesson10:SetNextLesson(unit10lesson11)
+    unit10lesson11:SetNextLesson(unit10lesson12)
+    unit10lesson12:SetNextLesson(unit10lesson13)
+    unit10lesson13:SetNextLesson(undefined)
+
+    codeOrgArray:Add(u1L01)//digital information
+    codeOrgArray:Add(dil1)//internet
+    codeOrgArray:Add(unit3lesson1)//intro to app design
+    codeOrgArray:Add(bdl1)//variables conditionals and functions
+    codeOrgArray:Add(unit9Lesson1)//Data
+    codeOrgArray:Add(unit5Lesson1)//List Loops Traversals
+    codeOrgArray:Add(unit7lesson1)//Parameters
+    codeOrgArray:Add(unit10lesson1)//Cybersecurity
+    codeOrgArray:Add(unit8lesson1)//Create PT Prep
+    codeOrgArray:Add(unit6lesson1)//algorithms
+
+    //Widgets Page
+        CodeOrgWidgets widgets
+
+    //Unit 1 The Internet
+        Add(u1O)
+        Add(u1L01)
+        Add(u1L02)
+        Add(u1L03)
+        Add(u1L04)
+        Add(u1L05)
+        Add(u1L06)
+        Add(u1L07)
+        Add(u1L08)
+        Add(u1L09)
+        Add(u1L10)
+        Add(u1L11)
+        Add(u1L12)
+        Add(u1L13)
+        Add(u1L14)
+
+    //Unit 2 Digital Information
+        Add(u2O)
+        Add(dil1)
+        Add(dil2)
+        Add(dil3)
+        Add(dil4)
+        Add(dil5)
+        Add(dil6)
+        Add(dil7)
+        Add(dil8)
+//        dil9:Setup()
+//        dil9:Write(WRITE_PATH)
+//        dil10:Setup()
+//        dil10:Write(WRITE_PATH)
+//        dil11:Setup()
+//        dil11:Write(WRITE_PATH)
+//        dil12:Setup()
+//        dil12:Write(WRITE_PATH)
+//        dil13:Setup()
+//        dil13:Write(WRITE_PATH)
+//        dil14:Setup()
+//        dil14:Write(WRITE_PATH)
+ //       dil15:Setup()
+ //       dil15:Write(WRITE_PATH)
+
+    //Unit 3 Intro to Programming
+        Add(unit3lesson1)
+        Add(unit3lesson2)
+        Add(unit3lesson3)
+        Add(unit3lesson4)
+        Add(unit3lesson5)
+        Add(unit3lesson6)
+        Add(unit3lesson7)
+        Add(unit3lesson8)
+        Add(unit3lesson9)
+        Add(unit3lesson10)
+        Add(unit3Overview)
+
+    //Unit 4 Big Data and Privacy
+        Add(u4O)
+        Add(bdl1)
+        Add(bdl2)
+        Add(bdl3)
+        Add(bdl4)
+        Add(bdl5)
+        Add(bdl6)
+        Add(bdl7)
+        Add(bdl8)
+        Add(bdl9)
+        Add(bdl10)
+        Add(bdl11)
+        Add(bdl12)
+        Add(bdl13)
+        Add(bdl14)
+
+    //Unit 5 Building Apps
+        Add(u5O)
+        Add(unit5Lesson1)
+        Add(unit5Lesson2)
+        Add(unit5Lesson3)
+        Add(unit5Lesson4)
+        Add(unit5Lesson5)
+        Add(unit5Lesson6)
+        Add(unit5Lesson7)
+        Add(unit5Lesson8)
+        Add(unit5Lesson9)
+        Add(unit5Lesson10)
+        Add(unit5Lesson11)
+        Add(unit5Lesson12)
+        Add(unit5Lesson13)
+        Add(unit5Lesson14)
+        Add(unit5Lesson15)
+        Add(unit5Lesson16)
+        Add(unit5Lesson17)
+        Add(unit5Lesson18)
+
+    //Unit 6 Explore AP Task
+        Add(u6O)
+        Add(u6L01)
+        //u6L01o1:Setup()
+        //u6L01o1:Write(WRITE_PATH)
+        Add(u6L02)
+        Add(u6L03)
+        //u6L03o1:Setup()
+        //u6L03o1:Write(WRITE_PATH)
+
+    // Unit 6 Algorithms
+        Add(unit6lesson1)
+        Add(unit6lesson2)
+        Add(unit6lesson3)
+        Add(unit6lesson4)
+        Add(unit6lesson5)
+
+    // Unit 7 Parameters, Return, and Libraries
+        Add(unit7lesson1)
+        Add(unit7lesson2)
+        Add(unit7lesson3)
+        Add(unit7lesson4)
+        Add(unit7lesson5)
+        Add(unit7lesson6)
+        Add(unit7lesson7)
+        Add(unit7lesson8)
+        Add(unit7lesson9)
+        Add(unit7lesson10)
+
+  // Unit 8 Create PT Prep
+        Add(unit8lesson1)
+        Add(unit8lesson2)
+        Add(unit8lesson3)
+        Add(unit8lesson4)
+
+  //Unit 9 Data
+        Add(unit9Lesson1)
+        Add(unit9Lesson2)
+        Add(unit9Lesson3)
+        Add(unit9Lesson4)
+        Add(unit9Lesson5)
+        Add(unit9Lesson6)
+        Add(unit9Lesson7)
+        Add(unit9Lesson8)
+
+    //Unit 10 Cybersecurity
+        Add(unit10lesson1)
+        Add(unit10lesson2)
+        Add(unit10lesson3)
+        Add(unit10lesson4)
+        Add(unit10lesson5)
+        Add(unit10lesson6)
+        Add(unit10lesson7)
+        Add(unit10lesson8)
+        Add(unit10lesson9)
+        Add(unit10lesson10)
+        Add(unit10lesson11)
+        Add(unit10lesson12)
+        Add(unit10lesson13)
+
+    //Widgets Page
+        Add(widgets)
+
+        return codeOrgArray
+    end
+
+    private action AddAccessibilityTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        WCAG12A wcag12A
+        WCAG34A wcag34A
+        WCAG12AA wcag12AA
+        WCAG34AA wcag34AA
+        NoMousePractice noMousePractice
+        WebAccessibilityCheckers webCheckers
+        LuminanceAndColorContrast luminanceAndContrast
+        ColorInApplication colorInApplication
+        DesktopScreenReaderPractice desktopScreenReader
+        MobileScreenReaderPractice mobileScreenReader
+        IntroductionToARIA introARIA
+        TaggingAndStructureInARIA structureARIA
+        DesktopAccessibilityInspectors desktopInspectors
+        AccessibleGraphicsWebGL accessibleGraphicsWebGL
+        AccessibleGraphicsSVG accessibleGraphicsSVG
+
+        lessons:Add(wcag12A)
+        lessons:Add(wcag34A)
+        lessons:Add(wcag12AA)
+        lessons:Add(wcag34AA)
+        lessons:Add(noMousePractice)
+        lessons:Add(webCheckers)
+        lessons:Add(luminanceAndContrast)
+        lessons:Add(colorInApplication)
+        lessons:Add(desktopScreenReader)
+        lessons:Add(mobileScreenReader)
+        lessons:Add(introARIA)
+        lessons:Add(structureARIA)
+        lessons:Add(desktopInspectors)
+        lessons:Add(accessibleGraphicsWebGL)
+        lessons:Add(accessibleGraphicsSVG)
+
+        wcag12A:SetNextLesson(wcag34A)
+        wcag34A:SetNextLesson(wcag12AA)
+        wcag12AA:SetNextLesson(wcag34AA)
+        wcag34AA:SetNextLesson(noMousePractice)
+        noMousePractice:SetNextLesson(webCheckers)
+        webCheckers:SetNextLesson(luminanceAndContrast)
+        luminanceAndContrast:SetNextLesson(colorInApplication)
+        colorInApplication:SetNextLesson(desktopScreenReader)
+        desktopScreenReader:SetNextLesson(mobileScreenReader)
+        mobileScreenReader:SetNextLesson(introARIA)
+        introARIA:SetNextLesson(structureARIA)
+        structureARIA:SetNextLesson(desktopInspectors)
+        desktopInspectors:SetNextLesson(accessibleGraphicsWebGL)
+        accessibleGraphicsWebGL:SetNextLesson(accessibleGraphicsSVG)
+        accessibleGraphicsSVG:SetNextLesson(undefined)
+
+        Add(wcag12A)
+        Add(wcag34A)
+        Add(wcag12AA)
+        Add(wcag34AA)
+        Add(noMousePractice)
+        Add(webCheckers)
+        Add(luminanceAndContrast)
+        Add(colorInApplication)
+        Add(desktopScreenReader)
+        Add(mobileScreenReader)
+        Add(introARIA)
+        Add(structureARIA)
+        Add(desktopInspectors)
+        Add(accessibleGraphicsWebGL)
+        Add(accessibleGraphicsSVG)
+
+        return lessons
+end
+
+    private action AddGameTemplateTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        SkyHopper1 skyhopper1
+        SkyHopper2 skyhopper2
+        PettingZooHero1 pettingZooHero1
+        PettingZooHero2 pettingZooHero2
+
+        lessons:Add(skyhopper1)
+        lessons:Add(skyhopper2)
+        lessons:Add(pettingZooHero1)
+        lessons:Add(pettingZooHero2)
+
+        skyhopper1:SetNextLesson(skyhopper2)
+        skyhopper2:SetNextLesson(pettingZooHero1)
+        pettingZooHero1:SetNextLesson(pettingZooHero2)
+        pettingZooHero2:SetNextLesson(undefined)
+
+                Add(skyhopper1)
+        Add(skyhopper2)
+        Add(pettingZooHero1)
+        Add(pettingZooHero2)
+
+        return lessons
+    end
+
+    private action AddBlocksOnlineTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        // blocks track
+        GettingStartedBlocksOnline getStartedBlocks
+        TextAndBooleansOnline textAndBooleans
+        IntegerAndNumbersOnline integerAndNumbers
+        LibrariesOnline libraries
+        ErrorsOnline errors
+        WorkingWithDataOnline data1
+        AccessibleVisualizationOnline charts
+        LoopsOnline loops
+        ConditionalsOnline conditionals
+        TraversalsOnline traversals
+        AppsOnline apps1
+        ActionsOnline actions
+        ClassesOnline classes
+        Apps2Online apps2
+
+        lessons:Add(getStartedBlocks)
+        lessons:Add(textAndBooleans)
+        lessons:Add(integerAndNumbers)
+        lessons:Add(libraries)
+        lessons:Add(errors)
+        lessons:Add(data1)
+        lessons:Add(charts)
+        lessons:Add(loops)
+        lessons:Add(conditionals)
+        lessons:Add(traversals)
+        lessons:Add(apps1)
+        lessons:Add(actions)
+        lessons:Add(classes)
+        lessons:Add(apps2)
+
+        getStartedBlocks:SetNextLesson(textAndBooleans)
+        textAndBooleans:SetNextLesson(integerAndNumbers)
+        integerAndNumbers:SetNextLesson(libraries)
+        libraries:SetNextLesson(errors)
+        errors:SetNextLesson(data1)
+        data1:SetNextLesson(charts)
+        charts:SetNextLesson(loops)
+        loops:SetNextLesson(conditionals)
+        conditionals:SetNextLesson(traversals)
+        traversals:SetNextLesson(apps1)
+        apps1:SetNextLesson(actions)
+        actions:SetNextLesson(classes)
+        classes:SetNextLesson(apps2)
+        apps2:SetNextLesson(undefined)
+
+        Add(getStartedBlocks)
+        Add(textAndBooleans)
+        Add(integerAndNumbers)
+        Add(libraries)
+        Add(errors)
+        Add(data1)
+        Add(charts)
+        Add(loops)
+        Add(conditionals)
+        Add(traversals)
+        Add(apps1)
+        Add(actions)
+        Add(classes)
+        Add(apps2)
+
+        return lessons
+    end
+
+    private action AddBlocksTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        // blocks track
+        GettingStartedBlocks getStartedBlocks
+        ScaffoldedBlocks scaffoldedBlocks
+        VariablesAndOperators variablesAndOperators
+        LibariesAndObjects librariesAndObjects
+        BooBooManagementP1 booBooP1
+        DataScienceP1 ds1
+        DataScienceP2 ds2
+        BlocksLoops bLoops
+        BlocksConditionals bConditionals
+        AccessibleAppP1 aaP1
+        ActionsAndClassesP1 acP1
+        BooBooManagementP2 booBooP2
+        ActionsAndClassesP2 acP2
+        AccessibleAppP2 aaP2
+        BlocksSolutions bSol
+
+        lessons:Add(getStartedBlocks)
+        getStartedBlocks:SetNextLesson(scaffoldedBlocks)
+        scaffoldedBlocks:SetNextLesson(variablesAndOperators)
+        variablesAndOperators:SetNextLesson(librariesAndObjects)
+        librariesAndObjects:SetNextLesson(booBooP1)
+        booBooP1:SetNextLesson(ds1)
+        ds1:SetNextLesson(ds2)
+        ds2:SetNextLesson(bLoops)
+        bLoops:SetNextLesson(bConditionals)
+        bConditionals:SetNextLesson(aaP1)
+        aaP1:SetNextLesson(acP1)
+        acP1:SetNextLesson(booBooP2)
+        booBooP2:SetNextLesson(acP2)
+        acP2:SetNextLesson(aaP2)
+        aaP2:SetNextLesson(bSol)
+        bSol:SetNextLesson(undefined)
+
+        Add(getStartedBlocks)
+        Add(scaffoldedBlocks)
+        Add(variablesAndOperators)
+        Add(librariesAndObjects)
+        Add(booBooP1)
+        Add(ds1)
+        Add(ds2)
+        Add(bLoops)
+        Add(bConditionals)
+        Add(aaP1)
+        Add(acP1)
+        Add(booBooP2)
+        Add(acP2)
+        Add(aaP2)
+        Add(bSol)
+
+        return lessons
+
+    end
+
+    private action AddDataScienceTeacherTrack returns Array<Lesson>
+        Array<Lesson> lessons
+
+        // data science track
+        SpreadSheetsAndQuorumStudio spreadSheetsAndQuorumStudio
+        IntroProgramming introProgramming
+        TidyDataFrames tidyDataFrames
+        DescriptiveStatisticsEPIQ descriptiveStatisticsEPIQ
+        FilteringDataEPIQ filteringDataEPIQ
+        ColumnCalculationsActivity columnCalculationsActivity
+        OverviewOfChartTypesAndExamples overviewOfChartTypesAndExamples
+        BarCharts barCharts
+        PieCharts pieCharts
+        Histograms histograms
+        BoxViolinDispersion boxViolinDispersion
+        ScatterPlotsR2 scatterPlotsR2
+        MultiChartsColorsOptions multiChartsColorsOptions
+        Regression regression
+        SVGExportingEPIQ svgExporting
+
+        //add to the array
+        lessons:Add(spreadSheetsAndQuorumStudio)
+
+        spreadSheetsAndQuorumStudio:SetNextLesson(introProgramming)
+        introProgramming:SetNextLesson(tidyDataFrames)
+        tidyDataFrames:SetNextLesson(overviewOfChartTypesAndExamples)
+        overviewOfChartTypesAndExamples:SetNextLesson(barCharts)
+
+        barCharts:SetNextLesson(descriptiveStatisticsEPIQ)
+        descriptiveStatisticsEPIQ:SetNextLesson(histograms)
+        histograms:SetNextLesson(pieCharts)
+        pieCharts:SetNextLesson(filteringDataEPIQ)
+        filteringDataEPIQ:SetNextLesson(columnCalculationsActivity)
+        columnCalculationsActivity:SetNextLesson(scatterPlotsR2)
+        scatterPlotsR2:SetNextLesson(multiChartsColorsOptions)
+        multiChartsColorsOptions:SetNextLesson(boxViolinDispersion)
+        boxViolinDispersion:SetNextLesson(regression)
+        regression:SetNextLesson(svgExporting)
+        svgExporting:SetNextLesson(undefined)
+
+        Add(spreadSheetsAndQuorumStudio)
+        Add(introProgramming)
+        Add(tidyDataFrames)
+        Add(descriptiveStatisticsEPIQ)
+        Add(filteringDataEPIQ)
+        Add(columnCalculationsActivity)
+        Add(overviewOfChartTypesAndExamples)
+        Add(barCharts)
+        Add(pieCharts)
+        Add(histograms)
+        Add(boxViolinDispersion)
+        Add(scatterPlotsR2)
+        Add(multiChartsColorsOptions)
+        Add(regression)
+        Add(svgExporting)
+
+        return lessons
+    end
+
+    private action AddGamingTeacherTrackLessons returns Array<Lesson>
+        Array<Lesson> lessons
+        HandsOnWithQuorumStudio handsOnWithQuorumStudio
+        BuildRoleplaying buildRoleplaying
+        PlacingCharacters placingCharacters
+        PhysicsProperties physicsProperties
+        SceneInput sceneInput
+        SceneMoveCharacter sceneMoveCharacter
+        PlaceObjects placeObjects
+        ObjectsGoodEvil objectsGoodEvil
+        ScenesBackgroundMusic scenesBackgroundMusic
+        TriggerObjects triggerObjects
+        TriggerSoundsFromObjects triggerSoundsFromObjects
+        SpatialSounds spatialSounds
+        VoiceOvers voiceOvers
+        CompleteQuest completeQuest
+
+        lessons:Add(handsOnWithQuorumStudio)
+
+handsOnWithQuorumStudio:SetNextLesson(buildRoleplaying)
+        buildRoleplaying:SetNextLesson(placingCharacters)
+        placingCharacters:SetNextLesson(physicsProperties)
+        physicsProperties:SetNextLesson(sceneInput)
+        sceneInput:SetNextLesson(sceneMoveCharacter)
+        sceneMoveCharacter:SetNextLesson(placeObjects)
+        placeObjects:SetNextLesson(objectsGoodEvil)
+        objectsGoodEvil:SetNextLesson(scenesBackgroundMusic)
+        scenesBackgroundMusic:SetNextLesson(triggerObjects)
+        triggerObjects:SetNextLesson(triggerSoundsFromObjects)
+triggerSoundsFromObjects:SetNextLesson(spatialSounds)
+        spatialSounds:SetNextLesson(voiceOvers)
+        voiceOvers:SetNextLesson(completeQuest)
+        completeQuest:SetNextLesson(undefined)
+
+        Add(handsOnWithQuorumStudio)
+        Add(buildRoleplaying)
+        Add(placingCharacters)
+        Add(physicsProperties)
+        Add(sceneInput)
+        Add(sceneMoveCharacter)
+        Add(placeObjects)
+        Add(objectsGoodEvil)
+        Add(scenesBackgroundMusic)
+        Add(triggerObjects)
+        Add(triggerSoundsFromObjects)
+        Add(spatialSounds)
+        Add(voiceOvers)
+        Add(completeQuest)
+
+        return lessons
+    end
+
+    private action AddLessons
+
+        Chapter2VariablesTypes chapter2VariablesTypes
+        Chapter3ControlStructures chapter3ControlStructures
+        Chapter4Actions chapter4Actions
+        Chapter5Classes chapter5Classes
+        Chapter6Inheritance chapter6Inheritance
+
+        chapter2VariablesTypes:SetNextLesson(chapter3ControlStructures)
+        chapter3ControlStructures:SetNextLesson(chapter4Actions)
+        chapter4Actions:SetNextLesson(chapter5Classes)
+        chapter5Classes:SetNextLesson(chapter6Inheritance)
+
+        Add(chapter2VariablesTypes)
+        Add(chapter3ControlStructures)
+        Add(chapter4Actions)
+        Add(chapter5Classes)
+        Add(chapter6Inheritance)
+
+        Lab2_1 lab2_1
+        Lab2_2 lab2_2
+        Lab2_3 lab2_3
+        Lab2_4 lab2_4
+        Lab2_5 lab2_5
+        Lab2_6 lab2_6
+        Assignment2_1 assignment2_1
+        Assignment2_2 assignment2_2
+        Assignment2_3 assignment2_3
+        Assignment2_4 assignment2_4
+        Assignment2_5 assignment2_5
+        Assignment2_6 assignment2_6
+        Challenge2_1 challenge2_1
+        Challenge2_2 challenge2_2
+        Challenge2_3 challenge2_3
+        Challenge2_4 challenge2_4
+        Lab3_1 lab3_1
+        Lab3_2 lab3_2
+        Lab3_3 lab3_3
+        Lab3_4 lab3_4
+        Lab3_5 lab3_5
+        Lab3_6 lab3_6
+        Assignment3_1 assignment3_1
+        Assignment3_2 assignment3_2
+        Assignment3_3 assignment3_3
+        Assignment3_4 assignment3_4
+        Assignment3_5 assignment3_5
+        Challenge3_1 challenge3_1
+        Challenge3_2 challenge3_2
+        Challenge3_3 challenge3_3
+        Challenge3_4 challenge3_4
+
+        //Chapter 4
+        Lab4_1 lab4_1
+        Lab4_2 lab4_2
+        Lab4_3 lab4_3
+        Lab4_4 lab4_4
+        Lab4_5 lab4_5
+        Assignment4_1 assignment4_1
+        Assignment4_2 assignment4_2
+        Assignment4_3 assignment4_3
+        Challenge4_1 challenge4_1
+
+        //Chapter 5
+        Lab5_1 lab5_1
+        Lab5_2 lab5_2
+        Lab5_3 lab5_3
+        Assignment5_1 assignment5_1
+        Assignment5_2 assignment5_2
+        Assignment5_3 assignment5_3
+        Challenge5_1 challenge5_1
+        Challenge5_2 challenge5_2
+
+        //Chapter 6
+        Lab6_1 lab6_1
+        Lab6_2 lab6_2
+        Lab6_3 lab6_3
+        Lab6_4 lab6_4
+        Lab6_5 lab6_5
+        Assignment6_1 assignment6_1
+        Assignment6_2 assignment6_2
+        Assignment6_3 assignment6_3
+        Challenge6_1 challenge6_1
+
+        lab2_1:SetNextLesson(lab2_2)
+        lab2_2:SetNextLesson(lab2_3)
+        lab2_3:SetNextLesson(lab2_4)
+        lab2_4:SetNextLesson(lab2_5)
+        lab2_5:SetNextLesson(lab2_6)
+        lab2_6:SetNextLesson(assignment2_1)
+        assignment2_1:SetNextLesson(assignment2_2)
+        assignment2_2:SetNextLesson(assignment2_3)
+        assignment2_3:SetNextLesson(assignment2_4)
+        assignment2_4:SetNextLesson(assignment2_5)
+        assignment2_5:SetNextLesson(assignment2_6)
+        assignment2_6:SetNextLesson(challenge2_1)
+        challenge2_1:SetNextLesson(challenge2_2)
+        challenge2_2:SetNextLesson(challenge2_3)
+        challenge2_3:SetNextLesson(challenge2_4)
+        challenge2_4:SetNextLesson(chapter3ControlStructures)
+        lab3_1:SetNextLesson(lab3_2)
+        lab3_2:SetNextLesson(lab3_3)
+        lab3_3:SetNextLesson(lab3_4)
+        lab3_4:SetNextLesson(lab3_5)
+        lab3_5:SetNextLesson(lab3_6)
+        lab3_6:SetNextLesson(assignment3_1)
+        assignment3_1:SetNextLesson(assignment3_2)
+        assignment3_2:SetNextLesson(assignment3_3)
+        assignment3_3:SetNextLesson(assignment3_4)
+        assignment3_4:SetNextLesson(assignment3_5)
+        assignment3_5:SetNextLesson(challenge3_1)
+        challenge3_1:SetNextLesson(challenge3_2)
+        challenge3_2:SetNextLesson(challenge3_3)
+        challenge3_3:SetNextLesson(challenge3_4)
+        challenge3_4:SetNextLesson(chapter4Actions)
+
+        //Chapter 4
+        lab4_1:SetNextLesson(lab4_2)
+        lab4_2:SetNextLesson(lab4_3)
+        lab4_3:SetNextLesson(lab4_4)
+        lab4_4:SetNextLesson(lab4_5)
+        lab4_5:SetNextLesson(assignment4_1)
+        assignment4_1:SetNextLesson(assignment4_2)
+        assignment4_2:SetNextLesson(assignment4_3)
+        assignment4_3:SetNextLesson(challenge4_1)
+        challenge4_1:SetNextLesson(undefined)
+
+        //Chapter 5
+        lab5_1:SetNextLesson(lab5_2)
+        lab5_2:SetNextLesson(lab5_3)
+        lab5_3:SetNextLesson(assignment5_1)
+        assignment5_1:SetNextLesson(assignment5_2)
+        assignment5_2:SetNextLesson(assignment5_3)
+        assignment5_3:SetNextLesson(challenge5_1)
+        challenge5_1:SetNextLesson(challenge5_2)
+        challenge5_2:SetNextLesson(undefined)
+
+        //Chapter 6
+        lab6_1:SetNextLesson(lab6_2)
+        lab6_2:SetNextLesson(lab6_3)
+        lab6_3:SetNextLesson(lab6_4)
+        lab6_4:SetNextLesson(lab6_5)
+        lab6_5:SetNextLesson(assignment6_1)
+        assignment6_1:SetNextLesson(assignment6_2)
+        assignment6_2:SetNextLesson(assignment6_3)
+        assignment6_3:SetNextLesson(challenge6_1)
+        challenge6_1:SetNextLesson(undefined)
+
+        // Linking a chapter's last challenge to the next chapter also made
+        // that chapter's previous lesson the challenge. The chapter pages
+        // list only the chapters, as they did when main.quorum wrote them
+        // before the labs were linked, so they get the chapters back.
+        chapter3ControlStructures:SetPreviousLesson(chapter2VariablesTypes)
+        chapter4Actions:SetPreviousLesson(chapter3ControlStructures)
+
+        Add(lab2_1)
+        Add(lab2_2)
+        Add(lab2_3)
+        Add(lab2_4)
+        Add(lab2_5)
+        Add(lab2_6)
+        Add(assignment2_1)
+        Add(assignment2_2)
+        Add(assignment2_3)
+        Add(assignment2_4)
+        Add(assignment2_5)
+        Add(assignment2_6)
+        Add(challenge2_1)
+        Add(challenge2_2)
+        Add(challenge2_3)
+        Add(challenge2_4)
+        Add(lab3_1)
+        Add(lab3_2)
+        Add(lab3_3)
+        Add(lab3_4)
+        Add(lab3_5)
+        Add(lab3_6)
+        Add(assignment3_1)
+        Add(assignment3_2)
+        Add(assignment3_3)
+        Add(assignment3_4)
+        Add(assignment3_5)
+        Add(challenge3_1)
+        Add(challenge3_2)
+        Add(challenge3_3)
+        Add(challenge3_4)
+
+        //Chapter 4
+        Add(lab4_1)
+        Add(lab4_2)
+        Add(lab4_3)
+        Add(lab4_4)
+        Add(lab4_5)
+        Add(assignment4_1)
+        Add(assignment4_2)
+        Add(assignment4_3)
+        Add(challenge4_1)
+
+        //Chapter 5
+        Add(lab5_1)
+        Add(lab5_2)
+        Add(lab5_3)
+        Add(assignment5_1)
+        Add(assignment5_2)
+        Add(assignment5_3)
+        Add(challenge5_1)
+        Add(challenge5_2)
+
+        //Chapter 6
+        Add(lab6_1)
+        Add(lab6_2)
+        Add(lab6_3)
+        Add(lab6_4)
+        Add(lab6_5)
+        Add(assignment6_1)
+        Add(assignment6_2)
+        Add(assignment6_3)
+        Add(challenge6_1)
+
+        HoCPart1 part1
+        Add(part1)
+
+        HoCPart2 part2
+        Add(part2)
+
+        HoCPart3 part3
+        Add(part3)
+
+        HoCPart4 part4
+        Add(part4)
+
+        HoCPart5 part5
+        Add(part5)
+
+        HoCPart6 part6
+        Add(part6)
+
+        HoCPart7 part7
+        Add(part7)
+
+        AddAstronomyHourOfCode()
+        AddDataScienceHourOfCode()
+        AddCodeWithMary()
+    end
+
+    private action AddAudioTrack returns Array<Lesson>
+        //A. Types and Variables
+        text track = "audio"
+        text section = "Types and Variables"
+        TypesTutorial u1l1
+        u1l1:SetNewLocation(track + "/types.html")
+        u1l1:SetNewSectionName(section)
+        OperatorsTutorial u1l2
+        u1l2:SetNewLocation(track + "/operators.html")
+        u1l2:SetNewSectionName(section)
+        Lab2_4 u1l3
+        u1l3:SetNewLocation(track + "/lab2_4.html")
+        u1l3:SetNewSectionName(section)
+
+        //Deleted one
+        GettingStartedTutorial u1l4
+        u1l4:SetNewLocation(track + "/gettingStarted.html")
+        u1l4:SetNewSectionName(section)
+        TypeCastingTutorial u1l5
+        u1l5:SetNewLocation(track + "/typeCasting.html")
+        u1l5:SetNewSectionName(section)
+        Assignment2_1 u1l6
+        u1l6:SetNewLocation(track + "/assignment2_1.html")
+        u1l6:SetNewSectionName(section)
+        CommentsTutorial u1l7
+        u1l7:SetNewLocation(track + "/comments.html")
+        u1l7:SetNewSectionName(section)
+        Assignment2_3 u1l8
+        u1l8:SetNewLocation(track + "/assignment2_3.html")
+        u1l8:SetNewSectionName(section)
+        Assignment2_6 u1l9
+        u1l9:SetNewLocation(track + "/assignment2_6.html")
+        u1l9:SetNewSectionName(section)
+        Chapter2VariablesTypes u1l10
+        u1l10:SetNewLocation(track + "/chapter2.html")
+        u1l10:SetNewSectionName(section)
+
+        //B. Control Structures
+        section = "Control Structures"
+        IfTutorial u2l1
+        u2l1:SetNewLocation(track + "/if.html")
+        u2l1:SetNewSectionName(section)
+        Lab3_1 u2l2
+        u2l2:SetNewLocation(track + "/lab3_1.html")
+        u2l2:SetNewSectionName(section)
+        Lab3_4 u2l3
+        u2l3:SetNewLocation(track + "/lab3_4.html")
+        u2l3:SetNewSectionName(section)
+        RepeatTutorial u2l4
+        u2l4:SetNewLocation(track + "/repeat.html")
+        u2l4:SetNewSectionName(section)
+        Lab3_2 u2l5
+        u2l5:SetNewLocation(track + "/lab3_2.html")
+        u2l5:SetNewSectionName(section)
+        Assignment3_3 u2l6
+        u2l6:SetNewLocation(track + "/assignment3_3.html")
+        u2l6:SetNewSectionName(section)
+        LibrariesTutorial u2l7
+        u2l7:SetNewLocation(track + "/libraries.html")
+        u2l7:SetNewSectionName(section)
+        Chapter3ControlStructures u2l8
+        u2l8:SetNewLocation(track + "/chapter3.html")
+        u2l8:SetNewSectionName(section)
+
+        //C. Actions
+        section = "Actions"
+        ActionsTutorial u3l1
+        u3l1:SetNewLocation(track + "/actions.html")
+        u3l1:SetNewSectionName(section)
+        Lab4_1 u3l2
+        u3l2:SetNewLocation(track + "/lab4_1.html")
+        u3l2:SetNewSectionName(section)
+        Lab4_4 u3l3
+        u3l3:SetNewLocation(track + "/lab4_4.html")
+        u3l3:SetNewSectionName(section)
+        Lab4_2 u3l4
+        u3l4:SetNewLocation(track + "/lab4_2.html")
+        u3l4:SetNewSectionName(section)
+        Lab4_5 u3l5
+        u3l5:SetNewLocation(track + "/lab4_5.html")
+        u3l5:SetNewSectionName(section)
+        GamesDrawing3DTutorial u3l6
+        u3l6:SetNewLocation(track + "/drawing3D.html")
+        u3l6:SetNewSectionName(section)
+        GamesAnimation3DTutorial u3l7
+        u3l7:SetNewLocation(track + "/animation3D.html")
+        u3l7:SetNewSectionName(section)
+        Assignment4_1 u3l8
+        u3l8:SetNewLocation(track + "/assignment4_1.html")
+        u3l8:SetNewSectionName(section)
+        Assignment4_2 u3l9
+        u3l9:SetNewLocation(track + "/assignment4_2.html")
+        u3l9:SetNewSectionName(section)
+        Chapter4Actions u3l10
+        u3l10:SetNewLocation(track + "/chapter4.html")
+        u3l10:SetNewSectionName(section)
+
+        //D. Classes
+        section = "Classes"
+        ClassesTutorial u4l1
+        u4l1:SetNewLocation(track + "/classes.html")
+        u4l1:SetNewSectionName(section)
+        Lab5_1 u4l2
+        u4l2:SetNewLocation(track + "/lab5_1.html")
+        u4l2:SetNewSectionName(section)
+        Lab5_2 u4l3
+        u4l3:SetNewLocation(track + "/lab5_2.html")
+        u4l3:SetNewSectionName(section)
+        GenericsTutorial u4l4
+        u4l4:SetNewLocation(track + "/generics.html")
+        u4l4:SetNewSectionName(section)
+        ArraysTutorial u4l5
+        u4l5:SetNewLocation(track + "/arrays.html")
+        u4l5:SetNewSectionName(section)
+        Lab5_3 u4l6
+        u4l6:SetNewLocation(track + "/lab5_3.html")
+        u4l6:SetNewSectionName(section)
+
+        AutoboxingTutorial u4l7
+        u4l7:SetNewLocation(track + "/autoboxing.html")
+        u4l7:SetNewSectionName(section)
+        Assignment5_1 u4l8
+        u4l8:SetNewLocation(track + "/assignment5_1.html")
+        u4l8:SetNewSectionName(section)
+        Assignment5_2 u4l9
+        u4l9:SetNewLocation(track + "/assignment5_2.html")
+        u4l9:SetNewSectionName(section)
+        Assignment5_3 u4l10
+        u4l10:SetNewLocation(track + "/assignment5_3.html")
+        u4l10:SetNewSectionName(section)
+        Chapter5Classes u4l11
+        u4l11:SetNewLocation(track + "/chapter5.html")
+        u4l11:SetNewSectionName(section)
+
+        Array<Lesson> coreTrackArray
+
+        coreTrackArray:Add(u1l1)
+        u1l1:SetNextLesson(u1l2)
+        u1l2:SetNextLesson(u1l3)
+        u1l3:SetNextLesson(u1l4)
+        u1l4:SetNextLesson(u1l5)
+        u1l5:SetNextLesson(u1l6)
+        u1l6:SetNextLesson(u1l7)
+        u1l7:SetNextLesson(u1l8)
+        u1l8:SetNextLesson(u1l9)
+        u1l9:SetNextLesson(u1l10)
+        u1l10:SetNextLesson(undefined)
+
+        coreTrackArray:Add(u2l1)
+        u2l1:SetNextLesson(u2l2)
+        u2l2:SetNextLesson(u2l3)
+        u2l3:SetNextLesson(u2l4)
+        u2l4:SetNextLesson(u2l5)
+        u2l5:SetNextLesson(u2l6)
+        u2l6:SetNextLesson(u2l7)
+        u2l7:SetNextLesson(u2l8)
+        u2l8:SetNextLesson(undefined)
+
+        coreTrackArray:Add(u3l1)
+        u3l1:SetNextLesson(u3l2)
+        u3l2:SetNextLesson(u3l3)
+        u3l3:SetNextLesson(u3l4)
+        u3l4:SetNextLesson(u3l5)
+        u3l5:SetNextLesson(u3l6)
+        u3l6:SetNextLesson(u3l7)
+        u3l7:SetNextLesson(u3l8)
+        u3l8:SetNextLesson(u3l9)
+        u3l9:SetNextLesson(u3l10)
+        u3l10:SetNextLesson(undefined)
+
+        coreTrackArray:Add(u4l1)
+        u4l1:SetNextLesson(u4l2)
+        u4l2:SetNextLesson(u4l3)
+        u4l3:SetNextLesson(u4l4)
+        u4l4:SetNextLesson(u4l5)
+        u4l5:SetNextLesson(u4l6)
+        u4l6:SetNextLesson(u4l7)
+        u4l7:SetNextLesson(u4l8)
+        u4l8:SetNextLesson(u4l9)
+        u4l9:SetNextLesson(u4l10)
+        u4l10:SetNextLesson(u4l11)
+        u4l11:SetNextLesson(undefined)
+
+        Add(u1l1)
+        Add(u1l2)
+        Add(u1l3)
+        Add(u1l4)
+        Add(u1l5)
+        Add(u1l6)
+        Add(u1l7)
+        Add(u1l8)
+        Add(u1l9)
+        Add(u1l10)
+
+        Add(u2l1)
+        Add(u2l2)
+        Add(u2l3)
+        Add(u2l4)
+        Add(u2l5)
+        Add(u2l6)
+        Add(u2l7)
+        Add(u2l8)
+
+        Add(u3l1)
+        Add(u3l2)
+        Add(u3l3)
+        Add(u3l4)
+        Add(u3l5)
+        Add(u3l6)
+        Add(u3l7)
+        Add(u3l8)
+        Add(u3l9)
+        Add(u3l10)
+
+        Add(u4l1)
+        Add(u4l2)
+        Add(u4l3)
+        Add(u4l4)
+        Add(u4l5)
+        Add(u4l6)
+        Add(u4l7)
+        Add(u4l8)
+        Add(u4l9)
+        Add(u4l10)
+        Add(u4l11)
+
+        return coreTrackArray
+    end
+
+    private action AddCoreTrack returns Array<Lesson>
+    //A. Types and Variables
+    text track = "core"
+    text section = "Types and Variables"
+     TypesTutorial u1l1
+     u1l1:SetNewLocation(track + "/types.html")
+     u1l1:SetNewSectionName(section)
+     OperatorsTutorial u1l2
+     u1l2:SetNewLocation(track + "/operators.html")
+     u1l2:SetNewSectionName(section)
+     Lab2_2 u1l3
+     u1l3:SetNewLocation(track + "/lab2_2.html")
+     u1l3:SetNewSectionName(section)
+     Assignment2_2 u1l4
+     u1l4:SetNewLocation(track + "/assignment2_2.html")
+     u1l4:SetNewSectionName(section)
+     GettingStartedTutorial u1l5
+     u1l5:SetNewLocation(track + "/gettingStarted.html")
+     u1l5:SetNewSectionName(section)
+     TypeCastingTutorial u1l6
+     u1l6:SetNewLocation(track + "/typeCasting.html")
+     u1l6:SetNewSectionName(section)
+     Assignment2_1 u1l7
+     u1l7:SetNewLocation(track + "/assignment2_1.html")
+     u1l7:SetNewSectionName(section)
+     CommentsTutorial u1l8
+     u1l8:SetNewLocation(track + "/comments.html")
+     u1l8:SetNewSectionName(section)
+     Assignment2_6 u1l9
+     u1l9:SetNewLocation(track + "/assignment2_6.html")
+     u1l9:SetNewSectionName(section)
+     Chapter2VariablesTypes u1l10
+     u1l10:SetNewLocation(track + "/chapter2.html")
+     u1l10:SetNewSectionName(section)
+
+     //B. Control Structures
+     section = "Control Structures"
+     IfTutorial u2l1
+     u2l1:SetNewLocation(track + "/if.html")
+     u2l1:SetNewSectionName(section)
+     Lab3_1 u2l2
+     u2l2:SetNewLocation(track + "/lab3_1.html")
+     u2l2:SetNewSectionName(section)
+     Assignment3_1 u2l3
+     u2l3:SetNewLocation(track + "/assignment3_1.html")
+     u2l3:SetNewSectionName(section)
+     RepeatTutorial u2l4
+     u2l4:SetNewLocation(track + "/repeat.html")
+     u2l4:SetNewSectionName(section)
+     Lab3_2 u2l5
+     u2l5:SetNewLocation(track + "/lab3_2.html")
+     u2l5:SetNewSectionName(section)
+     Assignment3_2 u2l6
+     u2l6:SetNewLocation(track + "/assignment3_2.html")
+     u2l6:SetNewSectionName(section)
+     LibrariesTutorial u2l7
+     u2l7:SetNewLocation(track + "/libraries.html")
+     u2l7:SetNewSectionName(section)
+     Chapter3ControlStructures u2l8
+     u2l8:SetNewLocation(track + "/chapter3.html")
+     u2l8:SetNewSectionName(section)
+
+     //C. Actions
+     section = "Actions"
+     ActionsTutorial u3l1
+     u3l1:SetNewLocation(track + "/actions.html")
+     u3l1:SetNewSectionName(section)
+     Lab4_1 u3l2
+     u3l2:SetNewLocation(track + "/lab4_1.html")
+     u3l2:SetNewSectionName(section)
+     Lab4_4 u3l3
+     u3l3:SetNewLocation(track + "/lab4_4.html")
+     u3l3:SetNewSectionName(section)
+     Lab4_2 u3l4
+     u3l4:SetNewLocation(track + "/lab4_2.html")
+     u3l4:SetNewSectionName(section)
+     Assignment4_2 u3l5
+     u3l5:SetNewLocation(track + "/assignment4_2.html")
+     u3l5:SetNewSectionName(section)
+     Chapter4Actions u3l6
+     u3l6:SetNewLocation(track + "/chapter4.html")
+     u3l6:SetNewSectionName(section)
+
+     //D. Classes
+     section = "Classes"
+     ClassesTutorial u4l1
+     u4l1:SetNewLocation(track + "/classes.html")
+     u4l1:SetNewSectionName(section)
+     Lab5_1 u4l2
+     u4l2:SetNewLocation(track + "/lab5_1.html")
+     u4l2:SetNewSectionName(section)
+     Lab5_2 u4l3
+     u4l3:SetNewLocation(track + "/lab5_2.html")
+     u4l3:SetNewSectionName(section)
+     GenericsTutorial u4l4
+     u4l4:SetNewLocation(track + "/generics.html")
+     u4l4:SetNewSectionName(section)
+     ArraysTutorial u4l5
+     u4l5:SetNewLocation(track + "/arrays.html")
+     u4l5:SetNewSectionName(section)
+     AutoboxingTutorial u4l6
+     u4l6:SetNewLocation(track + "/autoboxing.html")
+     u4l6:SetNewSectionName(section)
+     Assignment5_1 u4l7
+     u4l7:SetNewLocation(track + "/assignment5_1.html")
+     u4l7:SetNewSectionName(section)
+     Assignment5_2 u4l8
+     u4l8:SetNewLocation(track + "/assignment5_2.html")
+     u4l8:SetNewSectionName(section)
+     Assignment5_3 u4l9
+     u4l9:SetNewLocation(track + "/assignment5_3.html")
+     u4l9:SetNewSectionName(section)
+     Chapter5Classes u4l10
+     u4l10:SetNewLocation(track + "/chapter5.html")
+     u4l10:SetNewSectionName(section)
+
+     Array<Lesson> coreTrackArray
+
+     coreTrackArray:Add(u1l1)
+     u1l1:SetNextLesson(u1l2)
+     u1l2:SetNextLesson(u1l3)
+     u1l3:SetNextLesson(u1l4)
+     u1l4:SetNextLesson(u1l5)
+     u1l5:SetNextLesson(u1l6)
+     u1l6:SetNextLesson(u1l7)
+     u1l7:SetNextLesson(u1l8)
+     u1l8:SetNextLesson(u1l9)
+     u1l9:SetNextLesson(u1l10)
+     u1l10:SetNextLesson(undefined)
+
+     coreTrackArray:Add(u2l1)
+     u2l1:SetNextLesson(u2l2)
+     u2l2:SetNextLesson(u2l3)
+     u2l3:SetNextLesson(u2l4)
+     u2l4:SetNextLesson(u2l5)
+     u2l5:SetNextLesson(u2l6)
+     u2l6:SetNextLesson(u2l7)
+     u2l7:SetNextLesson(u2l8)
+     u2l8:SetNextLesson(undefined)
+
+     coreTrackArray:Add(u3l1)
+     u3l1:SetNextLesson(u3l2)
+     u3l2:SetNextLesson(u3l3)
+     u3l3:SetNextLesson(u3l4)
+     u3l4:SetNextLesson(u3l5)
+     u3l5:SetNextLesson(u3l6)
+     u3l6:SetNextLesson(undefined)
+
+     coreTrackArray:Add(u4l1)
+     u4l1:SetNextLesson(u4l2)
+     u4l2:SetNextLesson(u4l3)
+     u4l3:SetNextLesson(u4l4)
+     u4l4:SetNextLesson(u4l5)
+     u4l5:SetNextLesson(u4l6)
+     u4l6:SetNextLesson(u4l7)
+     u4l7:SetNextLesson(u4l8)
+     u4l8:SetNextLesson(u4l9)
+     u4l9:SetNextLesson(u4l10)
+     u4l10:SetNextLesson(undefined)
+
+     Add(u1l1)
+     Add(u1l2)
+     Add(u1l3)
+     Add(u1l4)
+     Add(u1l5)
+     Add(u1l6)
+     Add(u1l7)
+     Add(u1l8)
+     Add(u1l9)
+     Add(u1l10)
+
+     Add(u2l1)
+     Add(u2l2)
+     Add(u2l3)
+     Add(u2l4)
+     Add(u2l5)
+     Add(u2l6)
+     Add(u2l7)
+     Add(u2l8)
+
+     Add(u3l1)
+     Add(u3l2)
+     Add(u3l3)
+     Add(u3l4)
+     Add(u3l5)
+     Add(u3l6)
+
+     Add(u4l1)
+     Add(u4l2)
+     Add(u4l3)
+     Add(u4l4)
+     Add(u4l5)
+     Add(u4l6)
+     Add(u4l7)
+     Add(u4l8)
+     Add(u4l9)
+     Add(u4l10)
+
+     return coreTrackArray
+    end
+
+    private action AddRoboticsTrack returns Array<Lesson>
+
+    //A. Types and Variables
+    text track = "robotics"
+    text section = "Types and Variables"
+     TypesTutorial u1l1
+     u1l1:SetNewLocation(track + "/types.html")
+     u1l1:SetNewSectionName(section)
+     OperatorsTutorial u1l2
+     u1l2:SetNewLocation(track + "/operators.html")
+     u1l2:SetNewSectionName(section)
+     Lab2_2 u1l3
+     u1l3:SetNewLocation(track + "/lab2_2.html")
+     u1l3:SetNewSectionName(section)
+     GettingStartedTutorial u1l4
+     u1l4:SetNewLocation(track + "/gettingStarted.html")
+     u1l4:SetNewSectionName(section)
+     Assignment2_1 u1l5
+     u1l5:SetNewLocation(track + "/assignment2_1.html")
+     u1l5:SetNewSectionName(section)
+     CommentsTutorial u1l6
+     u1l6:SetNewLocation(track + "/comments.html")
+     u1l6:SetNewSectionName(section)
+     LegoGettingStartedTutorial u1l7
+     u1l7:SetNewLocation(track + "/legoGettingStarted.html")
+     u1l7:SetNewSectionName(section)
+     LegoMotorsTutorial u1l8
+     u1l8:SetNewLocation(track + "/legoMotors.html")
+     u1l8:SetNewSectionName(section)
+     Lab2_6 u1l9
+     u1l9:SetNewLocation(track + "/lab2_6.html")
+     u1l9:SetNewSectionName(section)
+
+     Assignment2_5 u1l10
+     u1l10:SetNewLocation(track + "/assignment2_5.html")
+     u1l10:SetNewSectionName(section)
+
+       Assignment2_6 u1l11
+     u1l11:SetNewLocation(track + "/assignment2_6.html")
+     u1l11:SetNewSectionName(section)
+
+      Lab2_1 u1l12
+     u1l12:SetNewLocation(track + "/lab2_1.html")
+     u1l12:SetNewSectionName(section)
+
+    Lab2_3 u1l13
+     u1l13:SetNewLocation(track + "/lab2_3.html")
+     u1l13:SetNewSectionName(section)
+
+    Challenge2_4 u1l14
+     u1l14:SetNewLocation(track + "/challenge2_4.html")
+     u1l14:SetNewSectionName(section)
+
+    Chapter2VariablesTypes u1l15
+     u1l15:SetNewLocation(track + "/chapter2.html")
+     u1l15:SetNewSectionName(section)
+
+     //B. Control Structures
+     section = "Control Structures"
+     IfTutorial u2l1
+     u2l1:SetNewLocation(track + "/if.html")
+     u2l1:SetNewSectionName(section)
+     Lab3_1 u2l2
+     u2l2:SetNewLocation(track + "/lab3_1.html")
+     u2l2:SetNewSectionName(section)
+     RepeatTutorial u2l3
+     u2l3:SetNewLocation(track + "/repeat.html")
+     u2l3:SetNewSectionName(section)
+
+    Lab3_2 u2l4
+     u2l4:SetNewLocation(track + "/lab3_2.html")
+     u2l4:SetNewSectionName(section)
+
+    Lab3_6 u2l5
+     u2l5:SetNewLocation(track + "/lab3_6.html")
+     u2l5:SetNewSectionName(section)
+
+     Assignment3_5 u2l6
+     u2l6:SetNewLocation(track + "/assignment3_5.html")
+     u2l6:SetNewSectionName(section)
+
+     LibrariesTutorial u2l7
+     u2l7:SetNewLocation(track + "/libraries.html")
+     u2l7:SetNewSectionName(section)
+
+     Chapter3ControlStructures u2l8
+     u2l8:SetNewLocation(track + "/chapter3.html")
+     u2l8:SetNewSectionName(section)
+
+     //C. Actions
+     section = "Actions"
+     ActionsTutorial u3l1
+     u3l1:SetNewLocation(track + "/actions.html")
+     u3l1:SetNewSectionName(section)
+     Lab4_1 u3l2
+     u3l2:SetNewLocation(track + "/lab4_1.html")
+     u3l2:SetNewSectionName(section)
+     Lab4_4 u3l3
+     u3l3:SetNewLocation(track + "/lab4_4.html")
+     u3l3:SetNewSectionName(section)
+     Lab4_2 u3l4
+     u3l4:SetNewLocation(track + "/lab4_2.html")
+     u3l4:SetNewSectionName(section)
+
+     Lab4_3 u3l5
+     u3l5:SetNewLocation(track + "/lab4_3.html")
+     u3l5:SetNewSectionName(section)
+
+     Assignment4_2 u3l6
+     u3l6:SetNewLocation(track + "/assignment4_2.html")
+     u3l6:SetNewSectionName(section)
+
+     Challenge4_1 u3l7
+     u3l7:SetNewLocation(track + "/challenge4_1.html")
+     u3l7:SetNewSectionName(section)
+
+     Chapter4Actions u3l8
+     u3l8:SetNewLocation(track + "/chapter4.html")
+     u3l8:SetNewSectionName(section)
+
+     //D. Classes
+     section = "Classes"
+     ClassesTutorial u4l1
+     u4l1:SetNewLocation(track + "/classes.html")
+     u4l1:SetNewSectionName(section)
+     Lab5_1 u4l2
+     u4l2:SetNewLocation(track + "/lab5_1.html")
+     u4l2:SetNewSectionName(section)
+     Lab5_2 u4l3
+     u4l3:SetNewLocation(track + "/lab5_2.html")
+     u4l3:SetNewSectionName(section)
+     GenericsTutorial u4l4
+     u4l4:SetNewLocation(track + "/generics.html")
+     u4l4:SetNewSectionName(section)
+     ArraysTutorial u4l5
+     u4l5:SetNewLocation(track + "/arrays.html")
+     u4l5:SetNewSectionName(section)
+     AutoboxingTutorial u4l6
+     u4l6:SetNewLocation(track + "/autoboxing.html")
+     u4l6:SetNewSectionName(section)
+     Assignment5_1 u4l7
+     u4l7:SetNewLocation(track + "/assignment5_1.html")
+     u4l7:SetNewSectionName(section)
+     Assignment5_2 u4l8
+     u4l8:SetNewLocation(track + "/assignment5_2.html")
+     u4l8:SetNewSectionName(section)
+     Assignment5_3 u4l9
+     u4l9:SetNewLocation(track + "/assignment5_3.html")
+     u4l9:SetNewSectionName(section)
+     Chapter5Classes u4l10
+     u4l10:SetNewLocation(track + "/chapter5.html")
+     u4l10:SetNewSectionName(section)
+
+     // E. Optional
+     section = "Optional Lessons"
+     DevelopmentTutorial u5l1
+     u5l1:SetNewLocation(track + "/codingGuidelines.html")
+     u5l1:SetNewSectionName(section)
+
+     LegoSoundTutorial u5l2
+     u5l2:SetNewLocation(track + "/legoSound.html")
+     u5l2:SetNewSectionName(section)
+
+     LegoScreenTutorial u5l3
+     u5l3:SetNewLocation(track + "/legoScreen.html")
+     u5l3:SetNewSectionName(section)
+
+     TeamsTutorial u5l4
+     u5l4:SetNewLocation(track + "/teamsAndVersionControl.html")
+     u5l4:SetNewSectionName(section)
+
+     Array<Lesson> robotTrackArray
+
+     robotTrackArray:Add(u1l1)
+     u1l1:SetNextLesson(u1l2)
+     u1l2:SetNextLesson(u1l3)
+     u1l3:SetNextLesson(u1l4)
+     u1l4:SetNextLesson(u1l5)
+     u1l5:SetNextLesson(u1l6)
+     u1l6:SetNextLesson(u1l7)
+     u1l7:SetNextLesson(u1l8)
+     u1l8:SetNextLesson(u1l9)
+     u1l9:SetNextLesson(u1l10)
+     u1l10:SetNextLesson(u1l11)
+     u1l11:SetNextLesson(u1l12)
+     u1l12:SetNextLesson(u1l13)
+     u1l13:SetNextLesson(u1l14)
+     u1l14:SetNextLesson(u1l15)
+     u1l15:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u2l1)
+     u2l1:SetNextLesson(u2l2)
+     u2l2:SetNextLesson(u2l3)
+     u2l3:SetNextLesson(u2l4)
+     u2l4:SetNextLesson(u2l5)
+     u2l5:SetNextLesson(u2l6)
+     u2l6:SetNextLesson(u2l7)
+     u2l7:SetNextLesson(u2l8)
+     u2l8:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u3l1)
+     u3l1:SetNextLesson(u3l2)
+     u3l2:SetNextLesson(u3l3)
+     u3l3:SetNextLesson(u3l4)
+     u3l4:SetNextLesson(u3l5)
+     u3l5:SetNextLesson(u3l6)
+     u3l6:SetNextLesson(u3l7)
+     u3l7:SetNextLesson(u3l8)
+     u3l8:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u4l1)
+     u4l1:SetNextLesson(u4l2)
+     u4l2:SetNextLesson(u4l3)
+     u4l3:SetNextLesson(u4l4)
+     u4l4:SetNextLesson(u4l5)
+     u4l5:SetNextLesson(u4l6)
+     u4l6:SetNextLesson(u4l7)
+     u4l7:SetNextLesson(u4l8)
+     u4l8:SetNextLesson(u4l9)
+     u4l9:SetNextLesson(u4l10)
+     u4l10:SetNextLesson(undefined)
+
+     robotTrackArray:Add(u5l1)
+     u5l1:SetNextLesson(u5l2)
+     u5l2:SetNextLesson(u5l3)
+     u5l3:SetNextLesson(u5l4)
+     u5l4:SetNextLesson(undefined)
+
+     Add(u1l1)
+     Add(u1l2)
+     Add(u1l3)
+     Add(u1l4)
+     Add(u1l5)
+     Add(u1l6)
+     Add(u1l7)
+     Add(u1l8)
+     Add(u1l9)
+     Add(u1l10)
+     Add(u1l11)
+     Add(u1l12)
+     Add(u1l13)
+     Add(u1l14)
+     Add(u1l15)
+
+     Add(u2l1)
+     Add(u2l2)
+     Add(u2l3)
+     Add(u2l4)
+     Add(u2l5)
+     Add(u2l6)
+     Add(u2l7)
+     Add(u2l8)
+
+     Add(u3l1)
+     Add(u3l2)
+     Add(u3l3)
+     Add(u3l4)
+     Add(u3l5)
+     Add(u3l6)
+     Add(u3l7)
+     Add(u3l8)
+
+     Add(u4l1)
+     Add(u4l2)
+     Add(u4l3)
+     Add(u4l4)
+     Add(u4l5)
+     Add(u4l6)
+     Add(u4l7)
+     Add(u4l8)
+     Add(u4l9)
+     Add(u4l10)
+
+     Add(u5l1)
+     Add(u5l2)
+     Add(u5l3)
+     Add(u5l4)
+
+     return robotTrackArray
+    end
+
+    private action AddVisualTrack returns Array<Lesson>
+
+    //       tableDiv:SetTableHeading("A. Types and Variables")
+        text track = "visual"
+        text section = "Types and Variables"
+        TypesTutorial u1l1
+        u1l1:SetNewLocation(track + "/types.html")
+        u1l1:SetNewSectionName(section)
+        OperatorsTutorial u1l2
+        u1l2:SetNewLocation(track + "/operators.html")
+        u1l2:SetNewSectionName(section)
+        Lab2_2 u1l3
+        u1l3:SetNewLocation(track + "/lab2_2.html")
+        u1l3:SetNewSectionName(section)
+        GamesStartedTutorial u1l4
+        u1l4:SetNewLocation(track + "/gamesGettingStarted.html")
+        u1l4:SetNewSectionName(section)
+        Lab2_5 u1l5
+        u1l5:SetNewLocation(track + "/lab2_5.html")
+        u1l5:SetNewSectionName(section)
+        GettingStartedTutorial u1l6
+        u1l6:SetNewLocation(track + "/gettingStarted.html")
+        u1l6:SetNewSectionName(section)
+        TypeCastingTutorial u1l7
+        u1l7:SetNewLocation(track + "/typeCasting.html")
+        u1l7:SetNewSectionName(section)
+        Assignment2_1 u1l8
+        u1l8:SetNewLocation(track + "/assignment2_1.html")
+        u1l8:SetNewSectionName(section)
+        CommentsTutorial u1l9
+        u1l9:SetNewLocation(track + "/comments.html")
+        u1l9:SetNewSectionName(section)
+        Assignment2_4 u1l10
+        u1l10:SetNewLocation(track + "/assignment2_4.html")
+        u1l10:SetNewSectionName(section)
+        Assignment2_6 u1l11
+        u1l11:SetNewLocation(track + "/assignment2_6.html")
+        u1l11:SetNewSectionName(section)
+        Chapter2VariablesTypes u1l12
+        u1l12:SetNewLocation(track + "/chapter2.html")
+        u1l12:SetNewSectionName(section)
+
+//        tableDiv2:SetTableHeading("B. Control Structures")
+
+        section = "Control Structures"
+        IfTutorial u2l1
+        u2l1:SetNewLocation(track + "/if.html")
+        u2l1:SetNewSectionName(section)
+        Lab3_1 u2l2
+        u2l2:SetNewLocation(track + "/lab3_1.html")
+        u2l2:SetNewSectionName(section)
+        RepeatTutorial u2l3
+        u2l3:SetNewLocation(track + "/repeat.html")
+        u2l3:SetNewSectionName(section)
+        Lab3_2 u2l4
+        u2l4:SetNewLocation(track + "/lab3_2.html")
+        u2l4:SetNewSectionName(section)
+        Lab3_5 u2l5
+        u2l5:SetNewLocation(track + "/lab3_5.html")
+        u2l5:SetNewSectionName(section)
+        Assignment3_4 u2l6
+        u2l6:SetNewLocation(track + "/assignment3_4.html")
+        u2l6:SetNewSectionName(section)
+        Assignment3_5 u2l7
+        u2l7:SetNewLocation(track + "/assignment3_5.html")
+        u2l7:SetNewSectionName(section)
+        Chapter3ControlStructures u2l8
+        u2l8:SetNewLocation(track + "/chapter3.html")
+        u2l8:SetNewSectionName(section)
+
+       // tableDiv3:SetTableHeading("C. Actions")
+
+        section = "Actions"
+        ActionsTutorial u3l1
+        u3l1:SetNewLocation(track + "/actions.html")
+        u3l1:SetNewSectionName(section)
+        Lab4_1 u3l2
+        u3l2:SetNewLocation(track + "/lab4_1.html")
+        u3l2:SetNewSectionName(section)
+        Lab4_4 u3l3
+        u3l3:SetNewLocation(track + "/lab4_4.html")
+        u3l3:SetNewSectionName(section)
+        Lab4_2 u3l4
+        u3l4:SetNewLocation(track + "/lab4_2.html")
+        u3l4:SetNewSectionName(section)
+        GamesDrawing3DTutorial u3l5
+        u3l5:SetNewLocation(track + "/drawing3D.html")
+        u3l5:SetNewSectionName(section)
+        GamesAnimation3DTutorial u3l6
+        u3l6:SetNewLocation(track + "/animation3D.html")
+        u3l6:SetNewSectionName(section)
+        Assignment4_1 u3l7
+        u3l7:SetNewLocation(track + "/assignment4_1.html")
+        u3l7:SetNewSectionName(section)
+        Assignment4_2 u3l8
+        u3l8:SetNewLocation(track + "/assignment4_2.html")
+        u3l8:SetNewSectionName(section)
+        Chapter4Actions u3l9
+        u3l9:SetNewLocation(track + "/chapter4.html")
+        u3l9:SetNewSectionName(section)
+
+      //  tableDiv4:SetTableHeading("D. Classes")
+
+        section = "Classes"
+        ClassesTutorial u4l1
+        u4l1:SetNewLocation(track + "/classes.html")
+        u4l1:SetNewSectionName(section)
+        Lab5_1 u4l2
+        u4l2:SetNewLocation(track + "/lab5_1.html")
+        u4l2:SetNewSectionName(section)
+        Lab5_2 u4l3
+        u4l3:SetNewLocation(track + "/lab5_2.html")
+        u4l3:SetNewSectionName(section)
+        GamesCamerasTutorial u4l4
+        u4l4:SetNewLocation(track + "/cameras.html")
+        u4l4:SetNewSectionName(section)
+        GamesLightingTutorial u4l5
+        u4l5:SetNewLocation(track + "/lighting.html")
+        u4l5:SetNewSectionName(section)
+        GenericsTutorial u4l6
+        u4l6:SetNewLocation(track + "/generics.html")
+        u4l6:SetNewSectionName(section)
+        ArraysTutorial u4l7
+        u4l7:SetNewLocation(track + "/arrays.html")
+        u4l7:SetNewSectionName(section)
+        Lab5_3 u4l8
+        u4l8:SetNewLocation(track + "/lab5_3.html")
+        u4l8:SetNewSectionName(section)
+        AutoboxingTutorial u4l9
+        u4l9:SetNewLocation(track + "/autoboxing.html")
+        u4l9:SetNewSectionName(section)
+        Assignment5_1 u4l10
+        u4l10:SetNewLocation(track + "/assignment5_1.html")
+        u4l10:SetNewSectionName(section)
+        Assignment5_2 u4l11
+        u4l11:SetNewLocation(track + "/assignment5_2.html")
+        u4l11:SetNewSectionName(section)
+        Assignment5_3 u4l12
+        u4l12:SetNewLocation(track + "/assignment5_3.html")
+        u4l12:SetNewSectionName(section)
+        Chapter5Classes u4l13
+        u4l13:SetNewLocation(track + "/chapter5.html")
+        u4l13:SetNewSectionName(section)
+
+             // Initialize the visualTrackArray
+        Array<Lesson> visualTrackArray
+
+        // Add lessons to visualTrackArray and link them
+        visualTrackArray:Add(u1l1)
+        u1l1:SetNextLesson(u1l2)
+        u1l2:SetNextLesson(u1l3)
+        u1l3:SetNextLesson(u1l4)
+        u1l4:SetNextLesson(u1l5)
+        u1l5:SetNextLesson(u1l6)
+        u1l6:SetNextLesson(u1l7)
+        u1l7:SetNextLesson(u1l8)
+        u1l8:SetNextLesson(u1l9)
+        u1l9:SetNextLesson(u1l10)
+        u1l10:SetNextLesson(u1l11)
+        u1l11:SetNextLesson(u1l12)
+        u1l12:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u2l1)
+        u2l1:SetNextLesson(u2l2)
+        u2l2:SetNextLesson(u2l3)
+        u2l3:SetNextLesson(u2l4)
+        u2l4:SetNextLesson(u2l5)
+        u2l5:SetNextLesson(u2l6)
+        u2l6:SetNextLesson(u2l7)
+        u2l7:SetNextLesson(u2l8)
+        u2l8:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u3l1)
+        u3l1:SetNextLesson(u3l2)
+        u3l2:SetNextLesson(u3l3)
+        u3l3:SetNextLesson(u3l4)
+        u3l4:SetNextLesson(u3l5)
+        u3l5:SetNextLesson(u3l6)
+        u3l6:SetNextLesson(u3l7)
+        u3l7:SetNextLesson(u3l8)
+        u3l8:SetNextLesson(u3l9)
+        u3l9:SetNextLesson(undefined)
+
+        visualTrackArray:Add(u4l1)
+        u4l1:SetNextLesson(u4l2)
+        u4l2:SetNextLesson(u4l3)
+        u4l3:SetNextLesson(u4l4)
+        u4l4:SetNextLesson(u4l5)
+        u4l5:SetNextLesson(u4l6)
+        u4l6:SetNextLesson(u4l7)
+        u4l7:SetNextLesson(u4l8)
+        u4l8:SetNextLesson(u4l9)
+        u4l9:SetNextLesson(u4l10)
+        u4l10:SetNextLesson(u4l11)
+        u4l11:SetNextLesson(u4l12)
+        u4l12:SetNextLesson(u4l13)
+        u4l13:SetNextLesson(undefined)
+
+        // Setup each lesson
+
+        // Write each lesson
+        Add(u1l1)
+        Add(u1l2)
+        Add(u1l3)
+        Add(u1l4)
+        Add(u1l5)
+        Add(u1l6)
+        Add(u1l7)
+        Add(u1l8)
+        Add(u1l9)
+        Add(u1l10)
+        Add(u1l11)
+        Add(u1l12)
+
+        Add(u2l1)
+        Add(u2l2)
+        Add(u2l3)
+        Add(u2l4)
+        Add(u2l5)
+        Add(u2l6)
+        Add(u2l7)
+        Add(u2l8)
+
+        Add(u3l1)
+        Add(u3l2)
+        Add(u3l3)
+        Add(u3l4)
+        Add(u3l5)
+        Add(u3l6)
+        Add(u3l7)
+        Add(u3l8)
+        Add(u3l9)
+
+        Add(u4l1)
+        Add(u4l2)
+        Add(u4l3)
+        Add(u4l4)
+        Add(u4l5)
+        Add(u4l6)
+        Add(u4l7)
+        Add(u4l8)
+        Add(u4l9)
+        Add(u4l10)
+        Add(u4l11)
+        Add(u4l12)
+        Add(u4l13)
+
+        // Return the visualTrackArray
+        return visualTrackArray
+    end
+
+    private action AddAstronomyHourOfCode
+        HoCAstro1 astro1
+        HoCAstro2 astro2
+        HoCAstro3 astro3
+        HoCAstro4 astro4
+        HoCAstro5 astro5
+        HoCAstro6 astro6
+        HoCAstro7 astro7
+        HoCAstro8 astro8
+        HoCAstro9 astro9
+        HoCAstro10 astro10
+        HoCAstro11 astro11
+        HoCAstro12 astro12
+        HoCAstro13 astro13
+        HoCAstro14 astro14
+        HoCAstro15 astro15
+        HoCAstro16 astro16
+        HoCAstro17 astro17
+        HoCAstro18 astro18
+        HoCAstro19 astro19
+        HoCAstro20 astro20
+
+        astro1:SetNextLesson(astro2)
+        astro2:SetNextLesson(astro3)
+        astro3:SetNextLesson(astro4)
+        astro4:SetNextLesson(astro5)
+        astro5:SetNextLesson(astro6)
+        astro6:SetNextLesson(astro7)
+        astro7:SetNextLesson(astro8)
+        astro8:SetNextLesson(astro9)
+        astro9:SetNextLesson(astro10)
+        astro10:SetNextLesson(astro11)
+        astro11:SetNextLesson(astro12)
+        astro12:SetNextLesson(astro13)
+        astro13:SetNextLesson(astro14)
+        astro14:SetNextLesson(astro15)
+        astro15:SetNextLesson(astro16)
+        astro16:SetNextLesson(astro17)
+        astro17:SetNextLesson(astro18)
+        astro18:SetNextLesson(astro19)
+        astro19:SetNextLesson(astro20)
+        astro20:SetNextLesson(undefined)
+
+        Add(astro1)
+        Add(astro2)
+        Add(astro3)
+        Add(astro4)
+        Add(astro5)
+        Add(astro6)
+        Add(astro7)
+        Add(astro8)
+        Add(astro9)
+        Add(astro10)
+        Add(astro11)
+        Add(astro12)
+        Add(astro13)
+        Add(astro14)
+        Add(astro15)
+        Add(astro16)
+        Add(astro17)
+        Add(astro18)
+        Add(astro19)
+        Add(astro20)
+    end
+
+    private action AddDataScienceHourOfCode
+        HoCDataScience1 datascience1
+        HoCDataScience2 datascience2
+        HoCDataScience3 datascience3
+        HoCDataScience4 datascience4
+        HoCDataScience5 datascience5
+        HoCDataScience6 datascience6
+        HoCDataScience7 datascience7
+
+        datascience1:SetNextLesson(datascience2)
+        datascience2:SetNextLesson(datascience3)
+        datascience3:SetNextLesson(datascience4)
+        datascience4:SetNextLesson(datascience5)
+        datascience5:SetNextLesson(datascience6)
+        datascience6:SetNextLesson(datascience7)
+        datascience7:SetNextLesson(undefined)
+
+        Add(datascience1)
+        Add(datascience2)
+        Add(datascience3)
+        Add(datascience4)
+        Add(datascience5)
+        Add(datascience6)
+        Add(datascience7)
+    end
+
+    private action AddCodeWithMary
+        HoCPart1 cwm1
+        HoCPart2 cwm2
+        HoCPart3 cwm3
+        HoCPart4 cwm4
+        HoCPart5 cwm5
+        HoCPart6 cwm6
+        HoCPart7 cwm7
+
+        cwm1:SetNextLesson(cwm2)
+        cwm2:SetNextLesson(cwm3)
+        cwm3:SetNextLesson(cwm4)
+        cwm4:SetNextLesson(cwm5)
+        cwm5:SetNextLesson(cwm6)
+        cwm6:SetNextLesson(cwm7)
+        cwm7:SetNextLesson(undefined)
+
+        Add(cwm1)
+        Add(cwm2)
+        Add(cwm3)
+        Add(cwm4)
+        Add(cwm5)
+        Add(cwm6)
+        Add(cwm7)
+    end
+
+    private action AddTutorials returns Array<Lesson>
+        GettingStartedTutorial gettingStarted
+        Hotkeys hotkeys
+        TypesTutorial types
+        OperatorsTutorial ops
+        TypeCastingTutorial casting
+        CommentsTutorial comments
+        RepeatTutorial repetition
+        IfTutorial conditionals
+        ActionsTutorial actions
+        ClassesTutorial classes
+        InheritanceTutorial inheritance
+        GenericsTutorial generics
+        AutoboxingTutorial autobox
+        HandlingErrorsTutorial errors
+
+        LibrariesTutorial libraries
+        ArraysTutorial  arrays
+        ContainersTutorial containers
+
+        GamesStartedTutorial gamesStarted
+        GamesDrawing2DTutorial gamesDrawing2D
+        GamesDrawing2DImages gamesDrawing2DImages
+        GamesImageSheets gamesImageSheets
+        GamesAnimation2DTutorial gamesAnimation2D
+        GamesEventsTutorial gamesEvents
+        MouseEventsTutorial mouseEventsTutorial
+        KeyboardEventsTutorial keyboardEventsTutorial
+        CollisionEventsTutorial collisionEventsTutorial
+        GamesDrawing3DTutorial gamesDrawing3D
+        GamesAnimation3DTutorial gamesAnimation3D
+        GamesModels3DTutorial gamesModels3D
+        GamesCamerasTutorial gamesCameras
+        GamesLightingTutorial gamesLighting
+        GamesLayersTutorial gamesLayers
+        GamesResolutionTutorial gamesResolution
+        GamesExamples gamesTutorials
+
+        Physics2DGravityTutorial physicsGravity2D
+        Physics2DForceAndVelocityTutorial physicsForce2D
+        Physics2DMassAndFrictionTutorial physicsMass2D
+        Physics2DJointsTutorial physicsJoints2D
+        Physics3DGravityTutorial physicsGravity3D
+        Physics3DForceAndVelocityTutorial physicsForce3D
+        Physics3DMassAndFrictionTutorial physicsMass3D
+
+        LegoGettingStartedTutorial legoGettingStarted
+        LegoMotorsTutorial legoMotors
+        LegoSensorsTutorial legoSensors
+        LegoButtonTutorial legoButtons
+        LegoSoundTutorial legoSound
+        LegoScreenTutorial legoScreen
+
+        AudioIntroTutorial audioIntro
+        AudioChangingAudioTutorial audioChange
+        AudioChangeWhereSoundPlayedTutorial audioChangeWhere
+        Audio3DPositionalAudioTutorial audioPositional
+        AudioPlayLongerAudioTutorial audioLonger
+        AudioDSPTutorial audioDSPTutorial
+        AudioWhiteNoiseTutorial audioWhiteNoise
+        AudioWaveGeneratorTutorial audioWaveGenerator
+        AudioSynthesisTutorial audioSynthesis
+        AudioMixerTutorial audioMixer
+
+        MobileAndroidTutorial mobileAndroidTutorial
+        MobileAndroidVibrationTutorial mobileAndroidVibrationTutorial
+
+        SoundTutorial sound
+        PluginsTutorial plugins
+        CodingGuidelinesTutorial codingGuidelines
+        TeamsTutorial teams
+        DevelopmentTutorial development
+        MobileAppleTutorial mobileAppleTutorial
+        EmbedTutorial embed
+
+        UserInterfacesOverview userInterfacesOverview
+        UserInterfacesBehavior userInterfacesBehavior
+        UserInterfacesButton userInterfacesButton
+        UserInterfacesLayout userInterfacesLayout
+        UserInterfacesCheckbox userInterfacesCheckbox
+        UserInterfacesRadioButton userInterfacesRadioButton
+        UserInterfacesList userInterfacesList
+        UserInterfacesTree userInterfacesTree
+        UserInterfacesTextBox userInterfacesTextBox
+        UserInterfacesTabPane userInterfacesTabPane
+        UserInterfacesMenu userInterfacesMenu
+        UserInterfacesScrollPane userInterfacesScrollPane
+        UserInterfacesFocus userInterfacesFocus
+        UserInterfacesDialog userInterfacesDialog
+        UserInterfacesFileChooser userInterfacesFileChooser
+        UserInterfacesSpreadsheet userInterfacesSpreadsheet
+        UserInterfacesTreeTable userInterfacesTreeTable
+        UserInterfacesInputSet userInterfacesInputSet
+        UserInterfacesAccessibility userInterfacesAccessibility
+
+        DataOverview dataOverview
+        DataPrimitives dataPrimitives
+        DataNesting dataNesting
+        DataArrays  dataArrays
+        DataReading dataReading
+        DataWriting dataWriting
+        DataNamesAndValues  dataNamesAndValues
+
+        IntroToDataScience introToDataScience
+        IntroDataFrames introDataFrames
+        TidyData        tidyData
+        ExportCSV       exportCSV
+        LoadFile        loadFile
+        LoadFileByHand    loadFileByHand
+        SavingData      savingData
+
+        TransformationOverview transformationOverview
+        RemoveUndefined removeUndefined
+        ReplaceUndefined replaceUndefined
+        FilterRows filterRows
+        Mutate mutate
+        FilterColumns filterColumns
+        ColumnSplitting columnSplitting
+
+        FilteringData   filteringData
+
+        SummaryOverview summaryDataOverview
+        SummaryLoading summaryLoading
+        DescriptiveStatistics descriptiveStatistics
+        SummaryMean summaryMean
+        SummaryMedian summaryMedian
+        SummaryMode   summaryMode
+        SummaryVarAndSD summaryVarAndSD
+        SummaryIQR      summaryIQR
+        SummarySDMean   summarySDMean
+        SummarySkew     summarySkew
+        SummaryKurtosis summaryKurtosis
+
+        ChartsOverview chartsOverview
+        ChartsAccessibility chartsAccessibility
+        ChartsAccessibilityColor chartsAccessibilityColor
+        ChartsAccessibilityText chartsAccessibilityText
+        ChartsGoodCharts    chartsGoodCharts
+        ChartsBarCharts     chartsBarCharts
+        ChartsLineCharts    chartsLineCharts
+        ChartsPieCharts     chartsPieCharts
+        ChartsHistograms    chartsHistograms
+        ChartsScatterPlots  chartsScatterPlots
+        ChartsViolinPlots   chartsViolinPlots
+        ChartsBoxPlots      chartsBoxPlots
+        ChartsAdditionalFunctions chartsAdditionalFunctions
+        ChartsSaving        chartsSaving
+        ChartSeparation     chartSeparation
+        ChartsDownloading   chartsDownloading
+        ChartsChartGallery chartsGallery
+
+        // add stats here
+        StatisticalTestsOverview statisticalTestsOverview
+        CompareGroupsTests compareGroupsTests
+        CompareDistributeTests compareDistributeTests
+        CompareVarianceTest compareVarianceTests
+        CompareCountsTests  compareCountsTests
+        PostHocTests        postHocTests
+        CorrelateTests      correlateTests
+        ReducibilityTest    reducibilityTest
+        ReducibilityStrengthTest  reducibilityStrengthTest
+        PCA pca
+        RegressionTest regression
+
+        DatabaseOverview databaseOverview
+        SQLSetup    sqlSetup
+        CreateDatabase createDatabase
+        ConnectDatabaseQuorum connectDatabase
+        CreateDatabaseTable createDatabaseTable
+        DatabaseModifyingTables databaseModifyTables
+        DatabaseDroppingTables databaseDroppingTables
+        DatabaseInsertingData databaseInsertingData
+        DatabasesUpdating databasesUpdating
+        DatabasesCommittingData databasesCommittingData
+        DatabasesFindingSingle databasesFindingSingle
+        DatabasesFindMulti databasesFindMulti
+        DatabasesDataframe databasesDataframe
+        DatabasesDeleteRow databasesDeleteRow
+        DatabasesEmpty databasesEmpty
+        DatabasesJoins databasesJoins
+        DatabasesLeftRightJoins databasesLeftRightJoins
+        DatabasesInnerJoins databasesInnerJoins
+        DatabasesViews databasesViews
+        DatabasesSummary databasesSummary
+        DatabasesCharts databasesCharts
+
+        NetworkOverview networkOverview
+        NetworkGetMethod    networkGetMethod
+        NetworkPostMethod   networkPostMethod
+        NetworkRequestMessage   networkRequestMessage
+        NetworkAuthentication   networkAuthentication
+        NetworkSkynet networkSkynet
+
+        SceneIntroduction sceneIntroduction
+        SceneComponents sceneComponents
+        SceneCreation sceneCreation
+        SceneManipulation sceneManipulation
+        SceneProperties sceneProperties
+        SceneNavigation sceneNavigation
+        SceneRunning sceneRunning
+        SceneItems sceneItems
+        ScenePalette scenePalette
+        SceneTerrain sceneTerrain
+        TerrainMaterials terrainMaterials
+        SceneTerrainShape sceneTerrainShape
+        SceneTerrainGenerate sceneTerrainGenerate
+        TerrainGames terrainGames
+
+        Array<Lesson> startingLessonArray
+
+        //set the next flags
+        startingLessonArray:Add(gettingStarted)
+        gettingStarted:SetNextLesson(hotkeys)
+        hotkeys:SetNextLesson(types)
+        types:SetNextLesson(ops)
+        ops:SetNextLesson(casting)
+        casting:SetNextLesson(comments)
+        comments:SetNextLesson(repetition)
+        repetition:SetNextLesson(conditionals)
+        conditionals:SetNextLesson(actions)
+        actions:SetNextLesson(classes)
+        classes:SetNextLesson(codingGuidelines)
+        codingGuidelines:SetNextLesson(undefined)
+
+        startingLessonArray:Add(libraries)
+        libraries:SetNextLesson(inheritance)
+        inheritance:SetNextLesson(generics)
+        generics:SetNextLesson(autobox)
+        autobox:SetNextLesson(arrays)
+        arrays:SetNextLesson(containers)
+        containers:SetNextLesson(errors)
+        errors:SetNextLesson(plugins)
+        plugins:SetNextLesson(undefined)
+
+        // 2d graphics
+        startingLessonArray:Add(gamesStarted)
+        gamesStarted:SetNextLesson(gamesDrawing2D)
+        gamesDrawing2D:SetNextLesson(gamesDrawing2DImages)
+        gamesDrawing2DImages:SetNextLesson(gamesImageSheets)
+        gamesImageSheets:SetNextLesson(gamesAnimation2D)
+        gamesAnimation2D:SetNextLesson(undefined)
+
+        // user interaction and events
+        startingLessonArray:Add(gamesEvents)
+        gamesEvents:SetNextLesson(keyboardEventsTutorial)
+        keyboardEventsTutorial:SetNextLesson(mouseEventsTutorial)
+        mouseEventsTutorial:SetNextLesson(collisionEventsTutorial)
+        collisionEventsTutorial:SetNextLesson(undefined)
+
+        // 3d graphics
+        startingLessonArray:Add(gamesDrawing3D)
+        gamesDrawing3D:SetNextLesson(gamesAnimation3D)
+        gamesAnimation3D:SetNextLesson(gamesModels3D)
+        gamesModels3D:SetNextLesson(gamesCameras)
+        gamesCameras:SetNextLesson(gamesLighting)
+        gamesLighting:SetNextLesson(undefined)
+
+        // physics
+        startingLessonArray:Add(physicsGravity2D)
+        physicsGravity2D:SetNextLesson(physicsForce2D)
+        physicsForce2D:SetNextLesson(physicsMass2D)
+        physicsMass2D:SetNextLesson(physicsJoints2D)
+        physicsJoints2D:SetNextLesson(physicsGravity3D)
+        physicsGravity3D:SetNextLesson(physicsForce3D)
+        physicsForce3D:SetNextLesson(physicsMass3D)
+        physicsMass3D:SetNextLesson(undefined)
+
+        // games
+        startingLessonArray:Add(gamesLayers)
+        gamesLayers:SetNextLesson(gamesResolution)
+        gamesResolution:SetNextLesson(gamesTutorials)
+        gamesTutorials:SetNextLesson(undefined)
+
+        // lego
+        startingLessonArray:Add(legoGettingStarted)
+        legoGettingStarted:SetNextLesson(legoMotors)
+        legoMotors:SetNextLesson(legoSensors)
+        legoSensors:SetNextLesson(legoButtons)
+        legoButtons:SetNextLesson(legoSound)
+        legoSound:SetNextLesson(legoScreen)
+        legoScreen:SetNextLesson(undefined)
+
+        // audio
+        startingLessonArray:Add(audioIntro)
+        audioIntro:SetNextLesson(audioChange)
+        audioChange:SetNextLesson(audioChangeWhere)
+        audioChangeWhere:SetNextLesson(audioPositional)
+        audioPositional:SetNextLesson(audioLonger)
+        audioLonger:SetNextLesson(audioDSPTutorial)
+        audioDSPTutorial:SetNextLesson(audioWhiteNoise)
+        audioWhiteNoise:SetNextLesson(audioWaveGenerator)
+        audioWaveGenerator:SetNextLesson(audioSynthesis)
+        audioSynthesis:SetNextLesson(audioMixer)
+        audioMixer:SetNextLesson(undefined)
+//      audioMixer:SetNextLesson(teams)
+
+        // user interface
+        startingLessonArray:Add(userInterfacesOverview)
+        userInterfacesOverview:SetNextLesson(userInterfacesBehavior)
+        userInterfacesBehavior:SetNextLesson(userInterfacesButton)
+        userInterfacesButton:SetNextLesson(userInterfacesLayout)
+        userInterfacesLayout:SetNextLesson(userInterfacesCheckbox)
+        userInterfacesCheckbox:SetNextLesson(userInterfacesRadioButton)
+        userInterfacesRadioButton:SetNextLesson(userInterfacesList)
+        userInterfacesList:SetNextLesson(userInterfacesTree)
+        userInterfacesTree:SetNextLesson(userInterfacesTextBox)
+        userInterfacesTextBox:SetNextLesson(userInterfacesTabPane)
+        userInterfacesTabPane:SetNextLesson(userInterfacesMenu)
+        userInterfacesMenu:SetNextLesson(userInterfacesScrollPane)
+        userInterfacesScrollPane:SetNextLesson(userInterfacesFocus)
+        userInterfacesFocus:SetNextLesson(userInterfacesDialog)
+        userInterfacesDialog:SetNextLesson(userInterfacesFileChooser)
+        userInterfacesFileChooser:SetNextLesson(userInterfacesSpreadsheet)
+        userInterfacesSpreadsheet:SetNextLesson(userInterfacesInputSet)
+        userInterfacesTreeTable:SetNextLesson(undefined)//TODO
+        userInterfacesInputSet:SetNextLesson(undefined)
+        userInterfacesAccessibility:SetNextLesson(undefined)//TODO
+
+        // data
+        startingLessonArray:Add(dataOverview)
+        dataOverview:SetNextLesson(dataPrimitives)
+        dataPrimitives:SetNextLesson(dataNesting)
+        dataNesting:SetNextLesson(dataArrays)
+        dataArrays:SetNextLesson(dataReading)
+        dataReading:SetNextLesson(dataWriting)
+        dataWriting:SetNextLesson(dataNamesAndValues)
+        dataNamesAndValues:SetNextLesson(undefined)
+
+        // data science
+        startingLessonArray:Add(introToDataScience)
+        introToDataScience:SetNextLesson(introDataFrames)
+        introDataFrames:SetNextLesson(tidyData)
+        tidyData:SetNextLesson(exportCSV)
+        exportCSV:SetNextLesson(loadFile)
+        loadFile:SetNextLesson(loadFileByHand)
+        loadFileByHand:SetNextLesson(savingData)
+        savingData:SetNextLesson(undefined)
+
+        // data transformation
+        startingLessonArray:Add(transformationOverview)
+        transformationOverview:SetNextLesson(removeUndefined)
+        removeUndefined:SetNextLesson(replaceUndefined)
+        replaceUndefined:SetNextLesson(filterRows)
+        filterRows:SetNextLesson(mutate)
+        mutate:SetNextLesson(filterColumns)
+        filterColumns:SetNextLesson(columnSplitting)
+        columnSplitting:SetNextLesson(undefined)
+
+        // data filtering
+        startingLessonArray:Add(filteringData)
+        filteringData:SetNextLesson(undefined)
+
+        // data summary
+        startingLessonArray:Add(summaryDataOverview)
+        summaryDataOverview:SetNextLesson(summaryLoading)
+        summaryLoading:SetNextLesson(descriptiveStatistics)
+        descriptiveStatistics:SetNextLesson(summaryMean)
+        summaryMean:SetNextLesson(summaryMedian)
+        summaryMedian:SetNextLesson(summaryMode)
+        summaryMode:SetNextLesson(summaryVarAndSD)
+        summaryVarAndSD:SetNextLesson(summaryIQR)
+        summaryIQR:SetNextLesson(summarySDMean)
+        summarySDMean:SetNextLesson(summarySkew)
+        summarySkew:SetNextLesson(summaryKurtosis)
+        summaryKurtosis:SetNextLesson(undefined)
+
+        // charts
+        startingLessonArray:Add(chartsOverview)
+        chartsOverview:SetNextLesson(chartsAccessibilityColor)
+        chartsAccessibilityColor:SetNextLesson(chartsAccessibilityText)
+        chartsAccessibilityText:SetNextLesson(chartsGoodCharts)
+        chartsGoodCharts:SetNextLesson(chartsDownloading)
+        chartsDownloading:SetNextLesson(chartsBarCharts)
+        chartsBarCharts:SetNextLesson(chartsHistograms)
+        chartsHistograms:SetNextLesson(chartsPieCharts)
+        chartsPieCharts:SetNextLesson(chartsLineCharts)
+        chartsLineCharts:SetNextLesson(chartsScatterPlots)
+        chartsScatterPlots:SetNextLesson(chartsBoxPlots)
+        chartsBoxPlots:SetNextLesson(chartsViolinPlots)
+        chartsViolinPlots:SetNextLesson(chartsSaving)
+        chartsSaving:SetNextLesson(chartSeparation)
+        chartSeparation:SetNextLesson(chartsAdditionalFunctions)
+        chartsAdditionalFunctions:SetNextLesson(chartsGallery)
+        chartsGallery:SetNextLesson(undefined)
+
+        // add stats next lesson here
+        startingLessonArray:Add(statisticalTestsOverview)
+        statisticalTestsOverview:SetNextLesson(compareGroupsTests)
+        compareGroupsTests:SetNextLesson(compareDistributeTests)
+        compareDistributeTests:SetNextLesson(compareVarianceTests)
+        compareVarianceTests:SetNextLesson(compareCountsTests)
+        compareCountsTests:SetNextLesson(postHocTests)
+        postHocTests:SetNextLesson(correlateTests)
+        correlateTests:SetNextLesson(reducibilityTest)
+        reducibilityTest:SetNextLesson(reducibilityStrengthTest)
+        reducibilityStrengthTest:SetNextLesson(pca)
+        pca:SetNextLesson(regression)
+        regression:SetNextLesson(undefined)
+
+        // database
+        startingLessonArray:Add(databaseOverview)
+        databaseOverview:SetNextLesson(sqlSetup)
+        sqlSetup:SetNextLesson(createDatabase)
+        createDatabase:SetNextLesson(connectDatabase)
+        connectDatabase:SetNextLesson(createDatabaseTable)
+        createDatabaseTable:SetNextLesson(databaseModifyTables)
+        databaseModifyTables:SetNextLesson(databaseDroppingTables)
+        databaseDroppingTables:SetNextLesson(databaseInsertingData)
+        databaseInsertingData:SetNextLesson(databasesUpdating)
+        databasesUpdating:SetNextLesson(databasesCommittingData)
+        databasesCommittingData:SetNextLesson(databasesFindingSingle)
+        databasesFindingSingle:SetNextLesson(databasesFindMulti)
+        databasesFindMulti:SetNextLesson(databasesDataframe)
+        databasesDataframe:SetNextLesson(databasesDeleteRow)
+        databasesDeleteRow:SetNextLesson(databasesEmpty)
+        databasesEmpty:SetNextLesson(databasesJoins)
+        databasesJoins:SetNextLesson(databasesLeftRightJoins)
+        databasesLeftRightJoins:SetNextLesson(databasesInnerJoins)
+        databasesInnerJoins:SetNextLesson(databasesViews)
+        databasesViews:SetNextLesson(databasesSummary)
+        databasesSummary:SetNextLesson(databasesCharts)
+        databasesCharts:SetNextLesson(undefined)
+
+        // network
+        startingLessonArray:Add(networkOverview)
+        networkOverview:SetNextLesson(networkGetMethod)
+        networkGetMethod:SetNextLesson(networkPostMethod)
+        networkPostMethod:SetNextLesson(networkRequestMessage)
+        networkRequestMessage:SetNextLesson(networkAuthentication)
+        networkAuthentication:SetNextLesson(networkSkynet)
+        networkSkynet:SetNextLesson(undefined)
+
+        // mobile
+        startingLessonArray:Add(mobileAndroidTutorial)
+        mobileAndroidTutorial:SetNextLesson(mobileAppleTutorial)
+        mobileAppleTutorial:SetNextLesson(mobileAndroidVibrationTutorial)
+        mobileAndroidVibrationTutorial:SetNextLesson(undefined)
+
+        //teams
+        startingLessonArray:Add(teams)
+        teams:SetNextLesson(development)
+        //teams:SetNextLesson(mobileAppleTutorial)
+        teams:SetNextLesson(undefined)
+
+        //Scenes
+        startingLessonArray:Add(sceneIntroduction)
+        sceneIntroduction:SetNextLesson(sceneCreation)
+        sceneCreation:SetNextLesson(sceneComponents)
+        sceneComponents:SetNextLesson(sceneItems)
+        sceneItems:SetNextLesson(sceneNavigation)
+        sceneNavigation:SetNextLesson(sceneProperties)
+        sceneProperties:SetNextLesson(sceneRunning)
+        sceneRunning:SetNextLesson(sceneManipulation)
+        sceneManipulation:SetNextLesson(sceneTerrain)
+        sceneTerrain:SetNextLesson(terrainMaterials)
+        terrainMaterials:SetNextLesson(sceneTerrainShape)
+        sceneTerrainShape:SetNextLesson(sceneTerrainGenerate)
+        sceneTerrainGenerate:SetNextLesson(terrainGames)
+        terrainGames:SetNextLesson(scenePalette)
+
+        scenePalette:SetNextLesson(undefined)
+
+        // add stats here
+
+        //write all of the tutorials
+
+        Add(sceneIntroduction)
+        Add(sceneComponents)
+        Add(sceneCreation)
+        Add(sceneManipulation)
+        Add(sceneProperties)
+        Add(sceneNavigation)
+        Add(sceneRunning)
+        Add(sceneItems)
+        Add(scenePalette)
+        Add(sceneTerrain)
+        Add(terrainMaterials)
+        Add(sceneTerrainShape)
+        Add(sceneTerrainGenerate)
+        Add(terrainGames)
+
+        Add(gettingStarted)
+        Add(types)
+        Add(hotkeys)
+        Add(ops)
+        Add(casting)
+        Add(comments)
+        Add(repetition)
+        Add(conditionals)
+        Add(actions)
+        Add(classes)
+        Add(inheritance)
+        Add(generics)
+        Add(autobox)
+        Add(errors)
+
+        Add(libraries)
+        Add(arrays)
+        Add(containers)
+
+        Add(gamesStarted)
+        Add(gamesDrawing2D)
+        Add(gamesDrawing2DImages)
+        Add(gamesImageSheets)
+        Add(gamesAnimation2D)
+        Add(gamesEvents)
+        Add(mouseEventsTutorial)
+        Add(keyboardEventsTutorial)
+        Add(collisionEventsTutorial)
+        Add(gamesDrawing3D)
+        Add(gamesAnimation3D)
+        Add(gamesModels3D)
+        Add(gamesCameras)
+        Add(gamesLighting)
+        Add(gamesLayers)
+        Add(gamesResolution)
+        Add(gamesTutorials)
+
+        Add(physicsGravity2D)
+        Add(physicsForce2D)
+        Add(physicsMass2D)
+        Add(physicsJoints2D)
+        Add(physicsGravity3D)
+        Add(physicsForce3D)
+        Add(physicsMass3D)
+
+        Add(legoGettingStarted)
+        Add(legoMotors)
+        Add(legoSensors)
+        Add(legoButtons)
+        Add(legoSound)
+        Add(legoScreen)
+
+        Add(audioIntro)
+        Add(audioChange)
+        Add(audioChangeWhere)
+        Add(audioPositional)
+        Add(audioLonger)
+        Add(audioDSPTutorial)
+        Add(audioWhiteNoise)
+        Add(audioWaveGenerator)
+        Add(audioSynthesis)
+        Add(audioMixer)
+
+        Add(mobileAndroidTutorial)
+        Add(mobileAndroidVibrationTutorial)
+
+        Add(sound)
+        Add(plugins)
+        Add(codingGuidelines)
+        Add(teams)
+        Add(development)
+        Add(mobileAppleTutorial)
+        Add(embed)
+
+        Add(userInterfacesOverview)
+        Add(userInterfacesBehavior)
+        Add(userInterfacesButton)
+        Add(userInterfacesLayout)
+        Add(userInterfacesCheckbox)
+        Add(userInterfacesRadioButton)
+        Add(userInterfacesList)
+        Add(userInterfacesTree)
+        Add(userInterfacesTextBox)
+        Add(userInterfacesTabPane)
+        Add(userInterfacesMenu)
+        Add(userInterfacesScrollPane)
+        Add(userInterfacesFocus)
+        Add(userInterfacesDialog)
+        Add(userInterfacesFileChooser)
+        Add(userInterfacesSpreadsheet)
+        Add(userInterfacesTreeTable)
+        Add(userInterfacesInputSet)
+        Add(userInterfacesAccessibility)
+
+        Add(dataOverview)
+        Add(dataPrimitives)
+        Add(dataNesting)
+        Add(dataArrays)
+        Add(dataReading)
+        Add(dataWriting)
+        Add(dataNamesAndValues)
+
+        Add(introToDataScience)
+        Add(introDataFrames)
+        Add(tidyData)
+        Add(exportCSV)
+        Add(loadFile)
+        Add(loadFileByHand)
+        Add(savingData)
+
+        Add(transformationOverview)
+        Add(removeUndefined)
+        Add(replaceUndefined)
+        Add(filterRows)
+        Add(mutate)
+        Add(filterColumns)
+        Add(columnSplitting)
+
+        Add(filteringData)
+
+        Add(summaryDataOverview)
+        Add(summaryLoading)
+        Add(descriptiveStatistics)
+        Add(summaryMean)
+        Add(summaryMedian)
+        Add(summaryMode)
+        Add(summaryVarAndSD)
+        Add(summaryIQR)
+        Add(summarySDMean)
+        Add(summarySkew)
+        Add(summaryKurtosis)
+
+        Add(chartsOverview)
+        Add(chartsAccessibility)
+        Add(chartsAccessibilityColor)
+        Add(chartsAccessibilityText)
+        Add(chartsGoodCharts)
+        Add(chartsDownloading)
+        Add(chartsBarCharts)
+        Add(chartsLineCharts)
+        Add(chartsPieCharts)
+        Add(chartsHistograms)
+        Add(chartsScatterPlots)
+        Add(chartsAdditionalFunctions)
+        Add(chartsViolinPlots)
+        Add(chartsBoxPlots)
+        Add(chartsSaving)
+        Add(chartSeparation)
+        Add(chartsGallery)
+
+        // add stats here
+        Add(statisticalTestsOverview)
+        Add(compareGroupsTests)
+        Add(compareDistributeTests)
+        Add(compareDistributeTests)
+        Add(compareVarianceTests)
+        Add(compareCountsTests)
+        Add(postHocTests)
+        Add(correlateTests)
+        Add(reducibilityTest)
+        Add(reducibilityStrengthTest)
+        Add(pca)
+        Add(regression)
+
+        Add(databaseOverview)
+        Add(sqlSetup)
+        Add(createDatabase)
+        Add(connectDatabase)
+        Add(createDatabaseTable)
+        Add(databaseModifyTables)
+        Add(databaseDroppingTables)
+        Add(databaseInsertingData)
+        Add(databasesUpdating)
+        Add(databasesCommittingData)
+        Add(databasesFindingSingle)
+        Add(databasesFindMulti)
+        Add(databasesDataframe)
+        Add(databasesDeleteRow)
+        Add(databasesEmpty)
+        Add(databasesJoins)
+        Add(databasesLeftRightJoins)
+        Add(databasesInnerJoins)
+        Add(databasesViews)
+        Add(databasesSummary)
+        Add(databasesCharts)
+
+        Add(networkOverview)
+        Add(networkGetMethod)
+        Add(networkPostMethod)
+        Add(networkRequestMessage)
+        Add(networkAuthentication)
+        Add(networkSkynet)
+
+        return startingLessonArray
+    end
+end
