@@ -69,6 +69,9 @@ class QuorumSite is WebSite
     // SetOnThisPageOnLeft).
     HashTable<WebPage, boolean> onThisPageOnLeft
 
+    // Pages with no "On this page" at all (see HideOnThisPage).
+    HashTable<WebPage, boolean> onThisPageHidden
+
     // Structured data, in the shared schema.org vocabulary.
     constant text SCHEMA_CONTEXT = "https://schema.org"
     constant text STRUCTURED_DATA_TYPE = "application/ld+json"
@@ -220,6 +223,17 @@ class QuorumSite is WebSite
     end
 
     /*
+        Leaves out a page's "On this page", for a page too short to need
+        it, such as a track page with a single section. Its text takes
+        the room instead.
+
+        Attribute: Parameter page A page on the site.
+    */
+    action HideOnThisPage(WebPage page)
+        onThisPageHidden:Set(page, true)
+    end
+
+    /*
         Answers a request as WebSite does, and logs it to the console: its
         path, who asked, when, and how long it took. If answering fails,
         it logs the stack trace and answers with an error (500), so one
@@ -275,12 +289,14 @@ class QuorumSite is WebSite
             i = i + 1
         end
 
-        // An overview page for every course.
+        // An overview page for every course, unless the site already has a
+        // page there (a track page written for the course).
         Array<PageSeries> courses = GetSeriesList()
         i = 0
         repeat while i < courses:GetSize()
             PageSeries course = courses:Get(i)
-            if not course:GetOverviewLocation():IsEmpty()
+            text overviewLocation = course:GetOverviewLocation()
+            if not overviewLocation:IsEmpty() and GetPage(overviewLocation) = undefined
                 CourseOverview overview
                 overview:SetLocation(course:GetOverviewLocation())
                 overview:SetStyleOptions(GetStyleOptions())
@@ -772,10 +788,13 @@ class QuorumSite is WebSite
         page:SetLayout(content, frame:GetContent())
         page:SetStyle(content, frame:GetContentBox())
         page:SetStyleFromWidth(content, constants:SMALL_SCREEN_WIDTH, frame:GetContentSmall())
-        // A page whose "On this page" is on the left has no right column,
-        // so its text keeps the wider width on wide screens too.
+        // A page whose "On this page" is on the left, or left out, has no
+        // right column, so its text keeps the wider width on wide screens
+        // too.
         boolean onLeft = onThisPageOnLeft:HasKey(page)
-        if not onLeft
+        boolean hidden = onThisPageHidden:HasKey(page)
+        boolean rightColumn = not (onLeft or hidden)
+        if rightColumn
             page:SetStyleFromWidth(content, constants:MEDIUM_SCREEN_WIDTH, frame:GetContentMedium())
         end
         page:MoveContentInto(content)
@@ -796,7 +815,7 @@ class QuorumSite is WebSite
         page:SetStyleFromWidth(onThisPage, constants:MEDIUM_SCREEN_WIDTH, frame:GetOnThisPageColumnMedium())
         if onLeft
             courseContents:AddNestedTag(GetOnThisPage(page))
-        else
+        elseif rightColumn
             onThisPage:AddNestedTag(GetOnThisPage(page))
         end
 
@@ -805,7 +824,7 @@ class QuorumSite is WebSite
         page:SetLayout(columns, frame:GetColumns())
         columns:AddNestedTag(courseContents)
         columns:AddNestedTag(content)
-        if not onLeft
+        if rightColumn
             columns:AddNestedTag(onThisPage)
         end
 

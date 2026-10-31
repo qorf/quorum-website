@@ -38,6 +38,20 @@ use Lessons.SceneTerrainShape
 use Lessons.SceneTerrainGenerate
 use Lessons.TerrainGames
 use Lessons.ScenePalette
+use Lessons.GettingStartedBlocksOnline
+use Lessons.TextAndBooleansOnline
+use Lessons.IntegerAndNumbersOnline
+use Lessons.LibrariesOnline
+use Lessons.ErrorsOnline
+use Lessons.WorkingWithDataOnline
+use Lessons.AccessibleVisualizationOnline
+use Lessons.LoopsOnline
+use Lessons.ConditionalsOnline
+use Lessons.TraversalsOnline
+use Lessons.AppsOnline
+use Lessons.ActionsOnline
+use Lessons.ClassesOnline
+use Lessons.Apps2Online
 
 /*
     The whole Quorum website: every page, in one place. Main writes it into
@@ -253,16 +267,17 @@ class QuorumWebsite
         Add(epiqDataScienceTrack, "lessons/epiqDataScience.html")
 
         Array<PageSeries> blocksTeacherLessons = AddBlocksTrack()
-        Array<Lesson> blocksTeacherOnlineLessons = AddBlocksOnlineTrack()
+        OnlineBlockTrack onlineBlocksTrack
+        AddBlocksOnlineTrack(onlineBlocksTrack)
         Array<Lesson> accessibilityLessons = AddAccessibilityTrack()
 
         AccessibilityTrack accessibilityTrack
         accessibilityTrack:SetTrackLessons(accessibilityLessons)
         Add(accessibilityTrack)
 
-        OnlineBlockTrack onlineBlocksTrack
-        onlineBlocksTrack:SetTrackLessons(blocksTeacherOnlineLessons)
-        Add(onlineBlocksTrack)
+        AddStyled(onlineBlocksTrack)
+        // One section, so no "On this page".
+        site:HideOnThisPage(onlineBlocksTrack)
 
         BlockTrack blocksTrack
         blocksTrack:SetTrackSeries(blocksTeacherLessons)
@@ -1095,9 +1110,11 @@ end
         return GetLessons(introductionToPlatformerGames)
     end
 
-    private action AddBlocksOnlineTrack returns Array<Lesson>
-
-        // blocks track
+    /*
+        The Blocks Online course: each lesson goes in the course's series,
+        on the site, and on the course page.
+    */
+    private action AddBlocksOnlineTrack(OnlineBlockTrack track)
         GettingStartedBlocksOnline getStartedBlocks
         TextAndBooleansOnline textAndBooleans
         IntegerAndNumbersOnline integerAndNumbers
@@ -1114,42 +1131,33 @@ end
         Apps2Online apps2
 
         PageSeries quorumBlocksOnline = Series("quorum-blocks-online")
-        Add(quorumBlocksOnline, getStartedBlocks)
-        Add(quorumBlocksOnline, textAndBooleans)
-        Add(quorumBlocksOnline, integerAndNumbers)
-        Add(quorumBlocksOnline, libraries)
-        Add(quorumBlocksOnline, errors)
-        Add(quorumBlocksOnline, data1)
-        Add(quorumBlocksOnline, charts)
-        Add(quorumBlocksOnline, loops)
-        Add(quorumBlocksOnline, conditionals)
-        Add(quorumBlocksOnline, traversals)
-        Add(quorumBlocksOnline, apps1)
-        Add(quorumBlocksOnline, actions)
-        Add(quorumBlocksOnline, classes)
-        Add(quorumBlocksOnline, apps2)
+        AddCourseLesson(quorumBlocksOnline, track, getStartedBlocks)
+        AddCourseLesson(quorumBlocksOnline, track, textAndBooleans)
+        AddCourseLesson(quorumBlocksOnline, track, integerAndNumbers)
+        AddCourseLesson(quorumBlocksOnline, track, libraries)
+        AddCourseLesson(quorumBlocksOnline, track, errors)
+        AddCourseLesson(quorumBlocksOnline, track, data1)
+        AddCourseLesson(quorumBlocksOnline, track, charts)
+        AddCourseLesson(quorumBlocksOnline, track, loops)
+        AddCourseLesson(quorumBlocksOnline, track, conditionals)
+        AddCourseLesson(quorumBlocksOnline, track, traversals)
+        AddCourseLesson(quorumBlocksOnline, track, apps1)
+        AddCourseLesson(quorumBlocksOnline, track, actions)
+        AddCourseLesson(quorumBlocksOnline, track, classes)
+        AddCourseLesson(quorumBlocksOnline, track, apps2)
 
-        Add(getStartedBlocks)
-        Add(textAndBooleans)
-        Add(integerAndNumbers)
-        Add(libraries)
-        Add(errors)
-        Add(data1)
-        Add(charts)
-        Add(loops)
-        Add(conditionals)
-        Add(traversals)
-        Add(apps1)
-        Add(actions)
-        Add(classes)
-        Add(apps2)
+        // Named after the course page, which is its overview, so the
+        // converted lessons' breadcrumbs lead back to it.
+        quorumBlocksOnline:SetName("Quorum Blocks Online Programming Track")
+        quorumBlocksOnline:SetOverviewLocation(track:GetLocation())
+    end
 
-        // A bug, kept for now so the site comes out the same: this track's
-        // page shows every lesson as its own card, all with the track's
-        // name, each previewing every lesson after it, and the previews
-        // share one id. To fix, list the track as units, as the other
-        // tracks do.
-        return GetLessons(quorumBlocksOnline)
+    // Adds a Blocks Online lesson to the series,
+    // the site, and the course page, under its short title.
+    private action AddCourseLesson(PageSeries series, OnlineBlockTrack track, QuorumPage lesson)
+        series:Add(lesson)
+        AddStyled(lesson)
+        track:AddLesson(lesson:GetTitleText(), "/" + lesson:GetLocation(), lesson:GetDescription())
     end
 
     private action AddBlocksTrack returns Array<PageSeries>

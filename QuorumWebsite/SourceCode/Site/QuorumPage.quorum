@@ -2,6 +2,13 @@ package Libraries.Web.Page
 
 use Libraries.Web.Page.WebPage
 use Libraries.Web.Page.Division
+use Libraries.Web.Page.Span
+use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.ListItem
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.Image
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Header
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.MathML
 use Libraries.Web.Page.Standards.StandardSet
@@ -44,6 +51,20 @@ class QuorumPage is WebPage
 
     // The site's look (a shared class), for its own kinds of callout.
     QuorumSiteOptions quorumOptions
+
+    // The list LessonList started, for LessonEntry.
+    OrderedList lessonList = undefined
+
+    // The name links and lists use for this page, if not its title.
+    text shortTitle = ""
+
+    // The grid ProblemSets started, for ProblemSet, and how many sets it
+    // has so far (each card is labelled "Set 1", "Set 2", ...).
+    Division problemSetGrid = undefined
+    integer problemSetCount = 0
+    constant text PROBLEM_SET_LABEL = "Set "
+    constant text PROBLEM_SET_START = "Start "
+    constant text PROBLEM_SET_ARROW = "→"
     VersionHelper versions
     WebLocations locations
     WebTextEscaper escaper
@@ -153,6 +174,187 @@ class QuorumPage is WebPage
     */
     action Card
         SetStyle(GetCurrentPart(), quorumOptions:GetCard())
+    end
+
+    /*
+        Sets a shorter name for the page, which its course's lists,
+        breadcrumbs and "Up next" show; the page's heading stays its
+        title. For a lesson titled "Hour 8: Loops" listed in its course
+        as "Loops Online".
+
+        Attribute: Parameter value The short name.
+    */
+    action SetShortTitle(text value)
+        shortTitle = value
+    end
+
+    /*
+        Returns the name links to this page show: its short title, if it
+        has one, or else its title.
+
+        Attribute: Returns The page's name for links.
+    */
+    action GetTitleText returns text
+        if not shortTitle:IsEmpty()
+            return shortTitle
+        end
+        return parent:WebPage:GetTitleText()
+    end
+
+    /*
+        Starts the page with a banner: the page's title, with words and a
+        picture beside it, in a white box with a yellow bar on its left, as
+        the track pages have. The title is the page's title (as Title).
+
+        Attribute: Parameter title The page's title.
+        Attribute: Parameter words A sentence or two under the title.
+        Attribute: Parameter picture The picture's location, from the top of the site.
+        Attribute: Parameter pictureDescription What the picture shows, for readers who can't see it.
+
+        Attribute: Example
+        class MyTrack is QuorumPage
+            action Setup
+                Banner("Quorum Blocks Online Programming Track", "A professional development workshop ...", "media/userInterface/quorumAssets/BlocksOnline.png", "An image showing block language blocks in various sizes")
+            end
+        end
+    */
+    action Banner(text title, text words, text picture, text pictureDescription)
+        Title(title)
+        Header header = GetTitleHeader()
+        SetStyle(header, quorumOptions:GetBanner())
+
+        Division row
+        SetLayout(row, quorumOptions:GetBannerLayout())
+        Paragraph paragraph
+        SetStyle(paragraph, quorumOptions:GetBannerWords())
+        paragraph:AddText(escaper:Escape(words))
+        row:AddNestedTag(paragraph)
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetBannerPicture())
+        row:AddNestedTag(image)
+        header:AddNestedTag(row)
+    end
+
+    /*
+        Starts the cards for a lesson's practice problem sets, such as its
+        Parsons problems. Add each set with ProblemSet.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Engage")
+                Subsection("Parsons Problems")
+                ProblemSets()
+                ProblemSet("Learn about output statements", "/problems/output/start.html")
+                ProblemSet("Learn about say statements", "/problems/say/start.html")
+            end
+        end
+    */
+    action ProblemSets
+        Division grid
+        SetLayout(grid, quorumOptions:GetProblemSets())
+        Include(grid)
+        problemSetGrid = grid
+        problemSetCount = 0
+    end
+
+    /*
+        Adds a problem set to the cards ProblemSets started: a card,
+        numbered in order ("Set 1"), with the set's name and "Start". The
+        whole card is one link to the set.
+
+        Attribute: Parameter words The set's name, such as "Learn about output statements".
+        Attribute: Parameter address Where the set starts, such as "/problems/output/start.html".
+    */
+    action ProblemSet(text words, text address)
+        if problemSetGrid = undefined
+            alert("A problem set needs cards to go in. Start them with ProblemSets.")
+        end
+        problemSetCount = problemSetCount + 1
+
+        Link card
+        card:SetAddress(escaper:EscapeAttribute(address))
+        SetLayout(card, quorumOptions:GetProblemSetCardLayout())
+        SetStyle(card, quorumOptions:GetProblemSetCard())
+
+        Span label
+        SetStyle(label, quorumOptions:GetProblemSetLabel())
+        // Each part ends with a space, so the link's name reads "Set 1 Learn
+        // about ... Start" to screen readers, not "Set 1Learn about ...".
+        label:AddText(escaper:Escape(PROBLEM_SET_LABEL + problemSetCount + " "))
+        card:AddNestedTag(label)
+
+        Span name
+        SetStyle(name, quorumOptions:GetProblemSetName())
+        name:AddText(escaper:Escape(words + " "))
+        card:AddNestedTag(name)
+
+        // "Start", with an arrow screen readers skip.
+        Span start
+        SetStyle(start, quorumOptions:GetProblemSetStart())
+        start:AddText(escaper:Escape(PROBLEM_SET_START))
+        Span arrow
+        arrow:AddAttribute("aria-hidden", "true")
+        arrow:AddText(PROBLEM_SET_ARROW)
+        start:AddNestedTag(arrow)
+        card:AddNestedTag(start)
+
+        problemSetGrid:AddNestedTag(card)
+    end
+
+    /*
+        Starts a numbered list of lessons, as a track page lists its
+        course. Add each lesson with LessonEntry.
+
+        Attribute: Example
+        class MyTrack is QuorumPage
+            action Setup
+                Section("About the Course")
+                LessonList()
+                LessonEntry("Loops Online", "/tutorials/online/loops.html", "Learn about loops.")
+            end
+        end
+    */
+    action LessonList
+        OrderedList list
+        SetStyle(list, GetStyleOptions():GetNumberedList())
+        SetLayout(list, quorumOptions:GetLessonList())
+        Include(list)
+        lessonList = list
+    end
+
+    /*
+        Adds a lesson to the list LessonList started: its title, linked to
+        it, above its description.
+
+        Attribute: Parameter title The lesson's title.
+        Attribute: Parameter address The lesson's address, such as "/tutorials/online/loops.html".
+        Attribute: Parameter description What the lesson teaches, in a line.
+    */
+    action LessonEntry(text title, text address, text description)
+        if lessonList = undefined
+            alert("A lesson entry needs a list to go in. Start one with LessonList.")
+        end
+        ListItem item
+        Paragraph name
+        SetStyle(name, quorumOptions:GetLessonTitle())
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(title))
+        // The site's link look, as links in the text have, so it reads as
+        // a link and not only as bold text.
+        SetStyle(link, GetStyleOptions():GetLink())
+        name:AddNestedTag(link)
+        item:AddNestedTag(name)
+
+        Paragraph words
+        SetStyle(words, quorumOptions:GetLessonDescription())
+        words:AddText(escaper:Escape(description))
+        item:AddNestedTag(words)
+        lessonList:AddNestedTag(item)
     end
 
     /*

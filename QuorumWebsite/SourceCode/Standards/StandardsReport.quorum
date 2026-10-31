@@ -11,6 +11,8 @@ use Libraries.Web.Page.Link
 use Libraries.Web.Page.RichText
 use Libraries.Web.Page.Heading
 use Libraries.Web.Page.WebTable
+use Libraries.Web.Page.TableCaption
+use Libraries.Web.Page.NavigationDivision
 use Libraries.Web.Page.TableHeader
 use Libraries.Web.Page.TableBody
 use Libraries.Web.Page.TableRow
@@ -70,6 +72,8 @@ class StandardsReport is WebPage
     constant text SCOPE_ATTRIBUTE = "scope"
     constant text COLUMN_SCOPE = "col"
     constant text ROW_SCOPE = "row"
+    constant text LABELLED_BY_ATTRIBUTE = "aria-labelledby"
+    constant text OTHER_GROUPS_LABEL_IDENTIFIER = "other-groups-label"
 
     /*
         Sets the look of the report's parts. Without this, the report uses
@@ -176,11 +180,16 @@ class StandardsReport is WebPage
             i = i + 1
         end
 
-        Include(GetLabel(MAP_LABEL))
         Include(GetMap(columns, mapLevels))
         if otherLevels:GetSize() > 0
-            Include(GetLabel(otherGroupsLabel))
-            Include(GetOtherGroups(otherLevels))
+            // The label names the row of links for screen readers, too.
+            Paragraph label = GetLabel(otherGroupsLabel)
+            label:SetIdentifier(OTHER_GROUPS_LABEL_IDENTIFIER)
+            Include(label)
+            NavigationDivision navigation
+            navigation:AddAttribute(LABELLED_BY_ATTRIBUTE, OTHER_GROUPS_LABEL_IDENTIFIER)
+            navigation:AddNestedTag(GetOtherGroups(otherLevels))
+            Include(navigation)
         end
 
         // The standards, by level and concept.
@@ -258,6 +267,10 @@ class StandardsReport is WebPage
     private action GetMap(Array<text> columns, Array<text> mapLevels) returns WebTable
         WebTable table
         SetStyle(table, looks:GetMap())
+        TableCaption caption
+        caption:AddText(escaper:Escape(MAP_LABEL))
+        SetStyle(caption, looks:GetMapCaption())
+        table:Add(caption)
         TableHeader head
         TableRow names
         names:AddNestedTag(GetColumnName(LEVEL_COLUMN))

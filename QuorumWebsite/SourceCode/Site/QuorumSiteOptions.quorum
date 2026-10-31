@@ -10,6 +10,7 @@ use Libraries.Web.Styles.WebColor
 use Libraries.Web.Page.Standards.StandardsReportLooks
 use Libraries.Web.Layouts.WebGridLayout
 use Libraries.Web.Layouts.WebRowLayout
+use Libraries.Web.Layouts.WebStackLayout
 
 /*
     QuorumSiteOptions is the Quorum website's global look. It changes the
@@ -51,11 +52,39 @@ shared class QuorumSiteOptions is StyleOptions
     WebColor grey95           // neutral-grey-95
     WebColor pageBackground   // website-bg
     WebColor textColor        // the body's text color
+    WebColor trackYellow      // header-yellow-100
 
     // A lesson's goals (design A): a white box with a dark blue bar on
     // its left and a small grey label. Only goals look this way, not
     // every list.
     WebBoxStyle goals
+
+    // A page's banner (banner 4, for the track pages): a white box with a
+    // yellow bar on its left, the page's title and words beside its
+    // picture. Text colors are set, not inherited, so the contrast holds
+    // (15.33:1).
+    WebBoxStyle banner
+    WebRowLayout bannerLayout
+    WebTextStyle bannerTitle
+    WebTextStyle bannerWords
+    WebBoxStyle bannerPicture
+
+    // A track's lessons, in order: each lesson's title (a link) above its
+    // one-line description, with room between lessons.
+    WebStackLayout lessonList
+    WebTextStyle lessonTitle
+    WebTextStyle lessonDescription
+
+    // A lesson's practice problem sets (design A): a card for each set, a
+    // white box with a dark blue bar on its top, holding a small grey
+    // label ("Set 1"), the set's name as a link, and "Start".
+    WebGridLayout problemSets
+    WebBoxStyle problemSetCard
+    WebTextStyle problemSetCardWords
+    WebStackLayout problemSetCardLayout
+    WebTextStyle problemSetLabel
+    WebTextStyle problemSetName
+    WebTextStyle problemSetStart
     WebTextStyle goalsLabel
 
     // The two kinds of callout in lessons.
@@ -108,6 +137,7 @@ shared class QuorumSiteOptions is StyleOptions
         grey95:SetColor(32, 32, 32)
         pageBackground:SetColor(243, 243, 243)
         textColor:SetColor(37, 37, 37)
+        trackYellow:SetColor(228, 184, 25)
 
         // The page: Montserrat, dark grey on light grey, lines one and a
         // half times the text's size (input.css's body).
@@ -249,6 +279,49 @@ shared class QuorumSiteOptions is StyleOptions
         goals:SetBackground(white)
         goals:SetLeftBorder(constants:SPACING_1, quorumBlue150)
         goals:SetPadding(constants:SPACING_3, constants:SPACING_4)
+
+        banner:SetBackground(white)
+        banner:SetBorder(constants:SPACING_PIXEL, grey25)
+        banner:SetLeftBorder(constants:SPACING_1_5, trackYellow)
+        banner:SetPadding(constants:SPACING_4, constants:SPACING_6)
+        bannerLayout:SetGap(constants:SPACING_6)
+        bannerLayout:SetWrap(true)
+        bannerLayout:SetCenteredVertically(true)
+        bannerTitle:SetFontSize(constants:EXTRA_LARGE_3_FONT_SIZE)
+        bannerTitle:SetLineHeight(constants:EXTRA_LARGE_3_LINE_HEIGHT)
+        bannerTitle:SetBold(true)
+        bannerTitle:SetColor(textColor)
+        bannerWords:SetFontSize(constants:EXTRA_LARGE_FONT_SIZE)
+        bannerWords:SetLineHeight(constants:EXTRA_LARGE_LINE_HEIGHT)
+        bannerWords:SetColor(textColor)
+        bannerPicture:SetWidth(constants:SPACING_72)
+
+        lessonList:SetGap(constants:SPACING_4)
+        lessonTitle:SetBold(true)
+        lessonDescription:SetColor(textColor)
+
+        problemSets:SetGap(constants:SPACING_2_5)
+        problemSets:SetSmallestColumnWidth(constants:SPACING_56)
+        problemSetCardWords:SetColor(textColor)
+        problemSetCardWords:SetUnderline(false)
+        problemSetCard:SetBackground(white)
+        problemSetCard:SetBorder(constants:SPACING_PIXEL, grey25)
+        problemSetCard:SetTopBorder(constants:SPACING_1, quorumBlue150)
+        problemSetCard:SetRoundedBottom(constants:SPACING_2)
+        problemSetCard:SetPadding(constants:SPACING_2_5, constants:SPACING_3)
+        problemSetCard:SetTextStyle(problemSetCardWords)
+        problemSetCardLayout:SetGap(constants:SPACING_1)
+        problemSetLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
+        problemSetLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
+        problemSetLabel:SetBold(true)
+        problemSetLabel:SetUppercase(true)
+        problemSetLabel:SetColor(grey50)
+        problemSetName:SetBold(true)
+        problemSetName:SetColor(quorumBlue150)
+        problemSetName:SetUnderline(true)
+        problemSetStart:SetFontSize(constants:SMALL_FONT_SIZE)
+        problemSetStart:SetLineHeight(constants:SMALL_LINE_HEIGHT)
+        problemSetStart:SetColor(textColor)
         goalsLabel:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
         goalsLabel:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
         goalsLabel:SetUppercase(true)
@@ -349,6 +422,10 @@ shared class QuorumSiteOptions is StyleOptions
         reportLabel:SetUppercase(true)
         reportLabel:SetBold(true)
         reportLabel:SetColor(grey50)
+        // The map's caption looks like the other labels.
+        WebTextStyle reportCaptionWords = reportLabel:Copy()
+        reportCaptionWords:AlignLeft()
+        standardsReport:GetMapCaption():SetTextStyle(reportCaptionWords)
 
         // The map: small text, white cells with a little space between
         // them, light blue where there are lessons.
@@ -370,7 +447,7 @@ shared class QuorumSiteOptions is StyleOptions
         reportCoveredCell:SetTextStyle(mapNameWords:Copy())
         WebTextStyle reportMapLink = standardsReport:GetMapLink()
         reportMapLink:SetColor(quorumBlue150)
-        reportMapLink:SetUnderline(false)
+        reportMapLink:SetUnderline(true)
 
         // Specialties: white chips with a pale blue edge; dark blue edge
         // and bold where there are lessons.
@@ -378,7 +455,7 @@ shared class QuorumSiteOptions is StyleOptions
         chipWords:SetFontSize(constants:EXTRA_SMALL_FONT_SIZE)
         chipWords:SetLineHeight(constants:EXTRA_SMALL_LINE_HEIGHT)
         chipWords:SetColor(quorumBlue150)
-        chipWords:SetUnderline(false)
+        chipWords:SetUnderline(true)
         WebBoxStyle chip = standardsReport:GetOtherGroup()
         chip:SetBackground(white)
         chip:SetBorder(constants:SPACING_PIXEL, quorumBlue25)
@@ -442,6 +519,65 @@ shared class QuorumSiteOptions is StyleOptions
     // A lesson's goals.
     action GetGoals returns WebBoxStyle
         return goals
+    end
+
+    // A page's banner (see the fields above).
+    action GetBanner returns WebBoxStyle
+        return banner
+    end
+
+    action GetBannerLayout returns WebRowLayout
+        return bannerLayout
+    end
+
+    action GetBannerTitle returns WebTextStyle
+        return bannerTitle
+    end
+
+    action GetBannerWords returns WebTextStyle
+        return bannerWords
+    end
+
+    action GetBannerPicture returns WebBoxStyle
+        return bannerPicture
+    end
+
+    // A track's list of lessons.
+    action GetLessonList returns WebStackLayout
+        return lessonList
+    end
+
+    action GetLessonTitle returns WebTextStyle
+        return lessonTitle
+    end
+
+    action GetLessonDescription returns WebTextStyle
+        return lessonDescription
+    end
+
+    // A lesson's practice problem sets (see the fields above).
+    action GetProblemSets returns WebGridLayout
+        return problemSets
+    end
+
+    action GetProblemSetCard returns WebBoxStyle
+        return problemSetCard
+    end
+
+    action GetProblemSetCardLayout returns WebStackLayout
+        return problemSetCardLayout
+    end
+
+    action GetProblemSetLabel returns WebTextStyle
+        return problemSetLabel
+    end
+
+    action GetProblemSetName returns WebTextStyle
+        return problemSetName
+    end
+
+    action GetProblemSetStart returns WebTextStyle
+        return problemSetStart
     end
 
     action GetGoalsLabel returns WebTextStyle
