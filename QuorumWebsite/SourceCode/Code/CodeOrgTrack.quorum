@@ -1,73 +1,34 @@
+use Libraries.Web.Page.QuorumPage
 use Libraries.Web.Series.PageSeries
-use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.System.File
 
-class CodeOrgTrack is Lesson
-    action SetupTrack(Array<PageSeries> units)
-        //html header stuff
-        SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
-        AddDefaultHeaders()
+/*
+    The Computer Science Principles page: a banner, then "About the Course"
+    and a card for each unit (design B, plan 13 phase 5): its name, linked
+    to its first lesson, its description, and what its lessons teach.
+*/
+class CodeOrgTrack is QuorumPage
+    // The track's units, in order, from the builder.
+    Array<PageSeries> units = undefined
 
-        ImageHeader header
-        text headerHeading = "Computer Science Principles"
-        text headerText = "The AP CSP Quorum course is adaptation of code.org's online curriculum for the College Board's Computer Science Principles Course."
-        text headerImage = "/media/userInterface/quorumAssets/csp-logos.png"
-        text headerImageAlt = "Reference Page"
-        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
-        header:AddClassAttribute("!bg-neutral-white h-80")
-        Add(header)
-
-        //page header
-        Array<Division> divs = InitializeTutorialPage()
-        Division leftDiv = divs:Get(0)
-        Division bodyDiv = divs:Get(1)
-        Division rightDiv = divs:Get(2)
-
-        leftDiv:SetClassAttribute("hidden")
-        rightDiv:SetClassAttribute("hidden")
-        //center everything
-        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
-
-
-        Section section_csp
-        section_csp:SetClassAttribute("flex flex-col gap-y-3")
-        Heading h_csp = section_csp:AddHeading("About the Course", 1)
-        h_csp:SetClassAttribute("text-2xl font-bold")
-
-        Paragraph p_csp
-        p_csp:AddText("This AP Course is designed to expose students to the multidisciplinary concepts of computer science with a goal to attract future leaders in the field and engage students who are underrepresented in computer science. This course has been been adapted and made accessible based off of Code.org’s AP Computer Science curriculum.")
-        section_csp:Add(p_csp)
-        
-
-
-        Division card_div_csp
-        card_div_csp:AddClassAttribute("flex flex-col gap-y-3")
-
-        integer i = 0
-        repeat while i < units:GetSize()
-          PageSeries unit = units:Get(i)
-          LongCourseCard card
-            text image_src = unit:GetImage()
-            text image_alt = ""
-            text description = unit:GetDescription()
-            text title = "Unit " + (i+1) + ": " + unit:GetName()
-            text url = "/"+unit:GetEntry(0):GetLocation()
-          card:Create(image_src, image_alt, description, title, url, true)
-
-          TutorialPreview preview
-          preview:Create(title, unit)
-          card_div_csp:Add(preview)
-
-          card_div_csp:Add(card)
-          i = i + 1
-        end
-
-        section_csp:Add(card_div_csp)
-        bodyDiv:Add(section_csp)
+    on create
+        SetLocation("lessons/code.html")
     end
 
-    action GetMetaDescription returns text
-        return "Sample the libraries and features available out of the box in the Quorum programming language."
+    action SetTrackSeries(Array<PageSeries> trackUnits)
+        units = trackUnits
+    end
+
+    action Setup
+        SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
+        Banner("Computer Science Principles", "The AP CSP Quorum course is adaptation of code.org's online curriculum for the College Board's Computer Science Principles Course.", "media/userInterface/quorumAssets/csp-logos.png", "Reference Page")
+        Section("About the Course")
+        Paragraph("This AP Course is designed to expose students to the multidisciplinary concepts of computer science with a goal to attract future leaders in the field and engage students who are underrepresented in computer science. This course has been been adapted and made accessible based off of Code.org’s AP Computer Science curriculum.")
+        integer i = 0
+        repeat while i < units:GetSize()
+            PageSeries unit = units:Get(i)
+            UnitCard("Unit " + (i + 1) + ": " + unit:GetName(), unit, unit:GetImage())
+            i = i + 1
+        end
     end
 end

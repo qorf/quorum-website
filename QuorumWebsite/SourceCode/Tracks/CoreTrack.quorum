@@ -1,91 +1,32 @@
+use Libraries.Web.Page.QuorumPage
 use Libraries.Web.Series.PageSeries
-use Libraries.Web.Page.all
 use Libraries.Containers.Array
-use Libraries.System.File
 
-class CoreTrack is Lesson
-    action SetupTrack(Array<PageSeries> units)
-        //html header stuff
-        SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
-        AddDefaultHeaders()
+/*
+    The Core Track page: its title, then a card for each unit (design B,
+    plan 13 phase 5): its name, linked to its first lesson, its description,
+    and what its lessons teach.
+*/
+class CoreTrack is QuorumPage
+    // The track's units, in order, from the builder.
+    Array<PageSeries> units = undefined
 
-        ImageHeader header
-        text headerHeading = "Core Track"
-        text headerText = ""
-        text headerImage = "/media/userInterface/quorumAssets/csp-logos.png"
-        text headerImageAlt = "Core Track"
-        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
-        header:AddClassAttribute("!bg-neutral-white h-80")
-        //Add(header)
-
-        //page header
-        Array<Division> divs = InitializeTutorialPage()
-        Division leftDiv = divs:Get(0)
-        Division bodyDiv = divs:Get(1)
-        Division rightDiv = divs:Get(2)
-
-        leftDiv:SetClassAttribute("hidden")
-        rightDiv:SetClassAttribute("hidden")
-        //center everything
-        bodyDiv:SetClassAttribute("flex flex-col gap-y-6 items-center w-full px-0 lg:px-10")
-
-
-        Section section_csp
-        section_csp:SetClassAttribute("flex flex-col gap-y-3")
-        Heading h_csp = section_csp:AddHeading("Core Track", 1)
-        h_csp:SetClassAttribute("text-2xl font-bold")
-
-        Paragraph p_csp
-        p_csp:AddText("This AP Course is designed to expose students to the multidisciplinary concepts of computer science with a goal to attract future leaders in the field and engage students who are underrepresented in computer science. This course has been been adapted and made accessible based off of Code.org’s AP Computer Science curriculum.")
-        //section_csp:Add(p_csp)
-        
-
-
-        Division card_div_csp
-        card_div_csp:AddClassAttribute("flex flex-col gap-y-3")
-
-        integer i = 0
-        repeat while i < units:GetSize()
-          PageSeries unit = units:Get(i)
-          LongCourseCard card
-            text image_src = unit:GetImage()
-            text image_alt = ""
-            text description = unit:GetDescription()
-            text title = unit:GetName()
-            text url = "/"+unit:GetEntry(0):GetLocation()
-          card:Create("", image_alt, description, title, url, true)
-
-          Division imageDiv = card:GetImageDiv()
-
-        Span quorumIcon
-        HtmlFileLoader quorumIconFile
-        File file
-        file:SetPath("html/media/userInterface/SVG/WhiteQuorumLogo.svg")
-        quorumIconFile:SetLoaded(file:Read())
-        quorumIcon:AddText(quorumIconFile:ToText())
-
-        Paragraph p_imageTitle
-        p_imageTitle:AddText(title)
-        imageDiv:Add(quorumIcon)
-        imageDiv:Add(p_imageTitle)
-
-        imageDiv:AddClassAttribute("bg-quorum-blue-100 flex flex-col items-center justify-center gap-x-2 gap-y-3 px-5")
-        quorumIcon:AddClassAttribute("inline-block w-auto mr-2 h-20")
-        p_imageTitle:AddClassAttribute("font-bold text-neutral-white select-none text-center text-xl")
-
-          TutorialPreview preview
-          preview:Create(unit:GetName(), unit)
-          card_div_csp:Add(preview)
-
-          card_div_csp:Add(card)
-          i = i + 1
-        end
-
-        section_csp:Add(card_div_csp)
-        bodyDiv:Add(section_csp)
+    on create
+        SetLocation("lessons/core.html")
     end
 
-    action GetMetaDescription returns text
-        return "Sample the libraries and features available out of the box in the Quorum programming language."
+    action SetTrackSeries(Array<PageSeries> trackUnits)
+        units = trackUnits
+    end
+
+    action Setup
+        SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
+        Title("Core Track")
+        integer i = 0
+        repeat while i < units:GetSize()
+            PageSeries unit = units:Get(i)
+            UnitCard(unit:GetName(), unit)
+            i = i + 1
+        end
     end
 end

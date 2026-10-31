@@ -5,17 +5,28 @@ use Libraries.System.File
 use Libraries.Web.Page.Division
 use Libraries.Web.Page.Span
 use Libraries.Web.Page.OrderedList
+use Libraries.Web.Page.Details
+use Libraries.Web.Page.Summary
+use Libraries.Web.Series.PageSeriesEntry
+use Libraries.Web.Series.PageSeries
 use Libraries.Web.Page.ListItem
 use Libraries.Web.Page.Link
+use Libraries.Web.Page.Heading
 use Libraries.Web.Page.Image
 use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.Button
+use Libraries.Containers.Array
+use Libraries.Web.Page.NavigationDivision
+use Libraries.Web.Page.Label
+use Libraries.Web.Page.Input
 use Libraries.Web.Page.MathML
 use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
 use Libraries.Web.Styles.QuorumSiteOptions
+use Libraries.Web.Styles.StyleSheetConstants
+use Libraries.Web.Styles.WebBoxStyle
 use Libraries.Web.WebLocations
 use Libraries.Web.WebTextEscaper
 use Libraries.Web.Page.IDE
@@ -80,6 +91,7 @@ class QuorumPage is WebPage
     constant text PROBLEM_SET_START = "Start "
     constant text PROBLEM_SET_ARROW = "→"
     VersionHelper versions
+    StyleSheetConstants constants
     WebLocations locations
     WebTextEscaper escaper
 
@@ -88,6 +100,37 @@ class QuorumPage is WebPage
     boolean mathScriptAdded = false
     boolean chartsScriptAdded = false
     boolean slidesScriptAdded = false
+
+    // The words column PictureBeside made last, which PictureBesideLink
+    // adds to, and how many it made (so the picture's side alternates).
+    Division pictureWordsColumn = undefined
+    integer pictureRowCount = 0
+
+    // The grid PictureGrid started, which GridPicture adds to.
+    Division pictureGrid = undefined
+
+    // The grid TopicCards started, which TopicCard adds to.
+    Division topicGrid = undefined
+    boolean topicScriptAdded = false
+
+    // The banner's words column, its picture, and the row under its words
+    // for tiles and links (made by the first).
+    Division bannerColumn = undefined
+    Image bannerPicture = undefined
+    Division bannerActions = undefined
+
+    // The grid Choices started, which Choice adds to.
+    Division choiceGrid = undefined
+
+    // The grid CourseCards started, the card CourseCard added last, and its
+    // "Details", which CourseDetail adds to (made by the first detail).
+    Division courseGrid = undefined
+    Division courseBody = undefined
+    Division courseDetails = undefined
+
+    // The heading level of a track page's unit cards: 0 before the first,
+    // then 2 (sections) or 3 (subsections), chosen by the first.
+    integer unitCardLevel = 0
     integer editorCount = 0
 
     // The editor CodeEditorFromProject(title) started, and its files, which
@@ -106,6 +149,18 @@ class QuorumPage is WebPage
     constant text CHARTS_SCRIPT = "script/quorumCharts.js"
     constant text SLIDES_SCRIPT = "script/slides.js"
     constant text PREVIOUS_SLIDE = "Previous Slide"
+    constant text UNIT_LESSONS = "Lessons"
+    constant text COURSE_DETAILS = "Details"
+    constant text TOPIC_SCRIPT = "script/topicSearch.js"
+    constant text TOPIC_SEARCH_IDENTIFIER = "topic-search"
+    constant text TOPIC_CLEAR = "Clear"
+    constant text TOPICS_LABEL = "Topics"
+    constant text LESSON_SEPARATOR = " · "
+    constant text TOPIC_CHIPS_SCROLL = "overflow-x: auto; padding-bottom: 4px;"
+    constant text TOPIC_CHIP_SIZE = "white-space: nowrap; flex: none;"
+    // The letters a heading's address keeps, as WebPage names headings
+    // (a child class can't see its parent's constants).
+    constant text ADDRESS_CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789"
     constant text NEXT_SLIDE = "Next Slide"
     constant text EDITOR_CODE_ATTRIBUTE = "data-code-for-ide"
     constant text CHART_LAYOUT = "min-width: 100px; max-width: 100%;"
@@ -327,12 +382,23 @@ class QuorumPage is WebPage
         Header header = GetTitleHeader()
         SetStyle(header, quorumOptions:GetBanner())
 
+        // Stacked on phones and tablets; from a large screen up, the picture
+        // beside the words. (The page's middle column is narrow on a tablet,
+        // beside "On this page". A row that may wrap can't be told not to
+        // from a width, so the narrow layout is a stack, not a wrapping row.)
         Division row
-        SetLayout(row, quorumOptions:GetBannerLayout())
+        SetLayout(row, quorumOptions:GetPictureStack())
+        SetLayoutFromWidth(row, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetBannerLayoutWide())
+        // The words in a column of their own, so BannerChoice and BannerLink
+        // can add under them.
+        Division column
+        SetStyle(column, quorumOptions:GetPictureWords())
+        SetLayout(column, quorumOptions:GetPictureStack())
         Paragraph paragraph
         SetStyle(paragraph, quorumOptions:GetBannerWords())
         paragraph:AddText(escaper:Escape(words))
-        row:AddNestedTag(paragraph)
+        column:AddNestedTag(paragraph)
+        row:AddNestedTag(column)
 
         Image image
         image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
@@ -340,6 +406,62 @@ class QuorumPage is WebPage
         SetStyle(image, quorumOptions:GetBannerPicture())
         row:AddNestedTag(image)
         header:AddNestedTag(row)
+        bannerColumn = column
+        bannerPicture = image
+        bannerActions = undefined
+    end
+
+    /*
+        Makes the banner's picture wide (nearly half the banner) from a
+        large screen up, for a screenshot that needs the room, as the
+        Download page's has. Phones and tablets keep the usual size.
+    */
+    action WideBannerPicture
+        if bannerPicture = undefined
+            alert("A wide banner picture needs a banner. Add one first with Banner.")
+        end
+        SetStyleFromWidth(bannerPicture, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetBannerPictureWide())
+    end
+
+    /*
+        Adds a tile under the banner's words, such as "Download Quorum
+        Studio", in the look Choice gives tiles.
+
+        Attribute: Parameter words The tile's words.
+        Attribute: Parameter address Where it goes.
+        Attribute: Parameter icon An SVG icon's location inside the relative folder, or "" for none.
+    */
+    action BannerChoice(text words, text address, text icon)
+        BannerActions():AddNestedTag(NewChoiceTile(words, address, icon))
+    end
+
+    /*
+        Adds a link under the banner's words, beside any tiles, such as
+        "Release Notes".
+
+        Attribute: Parameter words The link's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action BannerLink(text words, text address)
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, GetStyleOptions():GetLink())
+        BannerActions():AddNestedTag(link)
+    end
+
+    // The row under the banner's words that holds its tiles and links.
+    private action BannerActions returns Division
+        if bannerColumn = undefined
+            alert("Banner tiles and links need a banner. Add one first with Banner.")
+        end
+        if bannerActions = undefined
+            Division actions
+            SetLayout(actions, quorumOptions:GetBannerActions())
+            bannerColumn:AddNestedTag(actions)
+            bannerActions = actions
+        end
+        return bannerActions
     end
 
     /*
@@ -685,6 +807,656 @@ class QuorumPage is WebPage
     end
 
     /*
+        Adds a picture beside some words, in the current part: stacked on
+        phones and tablets, side by side from a large screen up, the
+        picture on the left, then on the right, then the left again, down
+        the page. Add links under the words with PictureBesideLink.
+
+        Attribute: Parameter picture The picture's location inside the relative folder.
+        Attribute: Parameter pictureDescription What the picture shows, or "" if it is decoration.
+        Attribute: Parameter words The words beside it, or "" for none.
+    */
+    action PictureBeside(text picture, text pictureDescription, text words)
+        pictureRowCount = pictureRowCount + 1
+        PictureRow(picture, pictureDescription, words, pictureRowCount mod 2 = 1, quorumOptions:GetPictureBesideWide())
+    end
+
+    /*
+        Adds a feature: its words on the left and a large picture on the
+        right (over half the row) from a large screen up, stacked on phones
+        and tablets, as a page shows off a product's new feature. Add links under
+        the words with PictureBesideLink.
+
+        Attribute: Parameter picture The picture's location inside the relative folder.
+        Attribute: Parameter pictureDescription What the picture shows, or "" if it is decoration.
+        Attribute: Parameter words The words beside it, or "" for none.
+    */
+    action FeaturePicture(text picture, text pictureDescription, text words)
+        PictureRow(picture, pictureDescription, words, false, quorumOptions:GetPictureFeatureWide())
+    end
+
+    // A picture beside words: the picture first (on the left) or last, at
+    // a share of the row from a large screen up, stacked below that.
+    private action PictureRow(text picture, text pictureDescription, text words, boolean pictureFirst, WebBoxStyle wide)
+        Division row
+        SetLayout(row, quorumOptions:GetPictureStack())
+        SetLayoutFromWidth(row, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetPictureRow())
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyleFromWidth(image, constants:LARGE_SCREEN_WIDTH, wide)
+
+        Division column
+        SetStyle(column, quorumOptions:GetPictureWords())
+        SetLayout(column, quorumOptions:GetPictureStack())
+        if not words:IsEmpty()
+            Paragraph paragraph
+            paragraph:AddText(escaper:Escape(words))
+            column:AddNestedTag(paragraph)
+        end
+        if pictureFirst
+            row:AddNestedTag(image)
+            row:AddNestedTag(column)
+        else
+            row:AddNestedTag(column)
+            row:AddNestedTag(image)
+        end
+        Include(row)
+        pictureWordsColumn = column
+    end
+
+    /*
+        Adds a link under the words PictureBeside added last.
+
+        Attribute: Parameter words The link's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action PictureBesideLink(text words, text address)
+        if pictureWordsColumn = undefined
+            alert("A link beside a picture needs one. Add it first with PictureBeside.")
+        end
+        Paragraph paragraph
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, GetStyleOptions():GetLink())
+        paragraph:AddNestedTag(link)
+        pictureWordsColumn:AddNestedTag(paragraph)
+    end
+
+    /*
+        Starts a grid of pictures, such as photos from an event: as many
+        across as fit, one on a phone. Add each with GridPicture.
+    */
+    action PictureGrid
+        Division grid
+        SetLayout(grid, quorumOptions:GetCourseCards())
+        Include(grid)
+        pictureGrid = grid
+    end
+
+    /*
+        Adds a picture to the grid PictureGrid started.
+
+        Attribute: Parameter picture The picture's location inside the relative folder.
+        Attribute: Parameter pictureDescription What the picture shows.
+    */
+    action GridPicture(text picture, text pictureDescription)
+        if pictureGrid = undefined
+            alert("A grid picture needs a grid. Start one with PictureGrid.")
+        end
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetCourseCardPicture())
+        pictureGrid:AddNestedTag(image)
+    end
+
+    /*
+        Adds a question that opens to its answer, as a list of frequently
+        asked questions has: built in, so keyboards and screen readers open
+        it with no script.
+
+        Attribute: Parameter questionWords The question.
+        Attribute: Parameter answer The answer.
+    */
+    action Question(text questionWords, text answer)
+        Details details
+        SetStyle(details, quorumOptions:GetQuestion())
+        Summary label
+        label:AddText(escaper:Escape(questionWords))
+        SetStyle(label, quorumOptions:GetUnitLessonsLabel())
+        details:AddNestedTag(label)
+        Paragraph paragraph
+        paragraph:AddText(escaper:Escape(answer))
+        details:AddNestedTag(paragraph)
+        Include(details)
+    end
+
+    /*
+        Adds a search box for the topic map that follows it (TopicCards and
+        TopicCard): as the reader types, only the tutorials whose name,
+        description or lessons match stay shown, the matching words are
+        marked, and a line says how many match. Without its script, the box
+        does nothing and every tutorial stays shown, so the page's own find
+        still reaches every lesson.
+
+        Attribute: Parameter label What the box searches, such as "Search tutorials and lessons".
+    */
+    action TopicSearch(text label)
+        if not topicScriptAdded
+            AddScript(locations:FromSiteTop(TOPIC_SCRIPT))
+            topicScriptAdded = true
+        end
+        Division search
+        search:AddAttribute("role", "search")
+        search:AddAttribute("data-topic-search", "")
+
+        Label name
+        name:SetElementId(TOPIC_SEARCH_IDENTIFIER)
+        name:AddText(escaper:Escape(label))
+        SetStyle(name, quorumOptions:GetTopicSearchLabel())
+        search:AddNestedTag(name)
+
+        Division row
+        SetLayout(row, quorumOptions:GetTopicSearchRow())
+        Input box
+        box:SetType("search")
+        box:SetIdentifier(TOPIC_SEARCH_IDENTIFIER)
+        box:SetPlaceHolder(escaper:EscapeAttribute(label))
+        box:SetAutocomplete(false)
+        SetStyle(box, quorumOptions:GetTopicSearchBox())
+        row:AddNestedTag(box)
+        Button clear
+        clear:SetType("button")
+        clear:AddAttribute("data-topic-clear", "")
+        clear:AddAttribute("hidden", "")
+        clear:AddText(escaper:Escape(TOPIC_CLEAR))
+        SetStyle(clear, quorumOptions:GetTopicChip())
+        SetStyleOnHover(clear, quorumOptions:GetTopicChipActive())
+        row:AddNestedTag(clear)
+        search:AddNestedTag(row)
+
+        Paragraph status
+        status:AddAttribute("data-topic-status", "")
+        status:AddAttribute("aria-live", "polite")
+        SetStyle(status, quorumOptions:GetTopicStatus())
+        search:AddNestedTag(status)
+        Include(search)
+    end
+
+    /*
+        Adds links to the topic map's groups, as a row of chips, each to the
+        group's heading (written with Subsection, so its address is made
+        from its words).
+
+        Attribute: Parameter names The groups' names, in order.
+    */
+    action TopicJumps(Array<text> names)
+        NavigationDivision jumps
+        jumps:AddAttribute("aria-label", TOPICS_LABEL)
+        // A navigation can't take a layout, so the chips go in a row inside
+        // it: one line that scrolls sideways on a phone, wrapping from a
+        // small screen up (the library has no sideways scrolling, so it is
+        // set here, as Chart sets its size).
+        Division row
+        row:AddAttribute("style", TOPIC_CHIPS_SCROLL)
+        SetLayout(row, quorumOptions:GetTopicChips())
+        SetLayoutFromWidth(row, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetTopicChipsWrapping())
+        jumps:AddNestedTag(row)
+        integer i = 0
+        repeat while i < names:GetSize()
+            text name = names:Get(i)
+            Link chip
+            chip:AddAttribute("style", TOPIC_CHIP_SIZE)
+            chip:SetAddress("#" + HeadingAddress(name))
+            chip:AddText(escaper:Escape(name))
+            SetStyle(chip, quorumOptions:GetTopicChip())
+            SetStyleOnHover(chip, quorumOptions:GetTopicChipActive())
+            SetStyleOnFocus(chip, quorumOptions:GetTopicChipActive())
+            row:AddNestedTag(chip)
+            i = i + 1
+        end
+        Include(jumps)
+    end
+
+    /*
+        Starts a grid of tutorial cards in the topic map, two across on a
+        wide screen, one on a phone. Add each with TopicCard.
+    */
+    action TopicCards
+        Division grid
+        grid:AddAttribute("data-topic-cards", "")
+        SetLayout(grid, quorumOptions:GetTopicCards())
+        Include(grid)
+        topicGrid = grid
+    end
+
+    /*
+        Adds a tutorial to the cards TopicCards started: its name (linked to
+        its first lesson, with an address of its own, such as
+        reference.html#charts), its description, and every lesson, each
+        linked, so the page's find and the topic search reach them all.
+
+        Attribute: Parameter unit The tutorial's series.
+    */
+    action TopicCard(PageSeries unit)
+        if topicGrid = undefined
+            alert("A tutorial card needs a grid to go in. Start one with TopicCards.")
+        end
+        Division card
+        card:AddAttribute("data-topic-card", "")
+        SetStyle(card, quorumOptions:GetTopicCard())
+        SetLayout(card, quorumOptions:GetTopicCardLayout())
+
+        text title = unit:GetName()
+        Heading name
+        name:SetScale(4)
+        name:SetIdentifier(HeadingAddress(title))
+        SetStyle(name, GetStyleOptions():GetHeading(4))
+        Link link
+        if unit:GetSize() > 0
+            link:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(unit:GetEntry(0):GetLocation())))
+        end
+        link:AddText(escaper:Escape(title))
+        SetStyle(link, GetStyleOptions():GetLink())
+        name:AddNestedTag(link)
+        card:AddNestedTag(name)
+
+        text unitDescription = unit:GetDescription()
+        if not unitDescription:IsEmpty()
+            Paragraph words
+            words:AddText(escaper:Escape(unitDescription))
+            SetStyle(words, quorumOptions:GetTopicCardWords())
+            card:AddNestedTag(words)
+        end
+
+        Paragraph lessons
+        SetStyle(lessons, quorumOptions:GetTopicCardLessons())
+        integer i = 0
+        repeat while i < unit:GetSize()
+            PageSeriesEntry entry = unit:GetEntry(i)
+            if i > 0
+                // The dot between lessons, which screen readers skip.
+                Span separator
+                separator:AddAttribute("aria-hidden", "true")
+                separator:AddText(escaper:Escape(LESSON_SEPARATOR))
+                lessons:AddNestedTag(separator)
+            end
+            Link lesson
+            lesson:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(entry:GetLocation())))
+            lesson:AddText(escaper:Escape(entry:GetTitle()))
+            SetStyle(lesson, GetStyleOptions():GetLink())
+            lessons:AddNestedTag(lesson)
+            i = i + 1
+        end
+        card:AddNestedTag(lessons)
+        topicGrid:AddNestedTag(card)
+    end
+
+    // A heading's address from its words, by WebPage's rule: lower case,
+    // letters and digits kept, anything else one hyphen ("Graphics and
+    // games" becomes "graphics-and-games").
+    private action HeadingAddress(text words) returns text
+        text address = ""
+        text lowered = words:ToLowerCase()
+        boolean lastWasHyphen = true
+        integer i = 0
+        repeat while i < lowered:GetSize()
+            text character = lowered:GetCharacter(i)
+            if ADDRESS_CHARACTERS:Contains(character)
+                address = address + character
+                lastWasHyphen = false
+            elseif not lastWasHyphen
+                address = address + "-"
+                lastWasHyphen = true
+            end
+            i = i + 1
+        end
+        if address:EndsWith("-")
+            address = address:GetSubtext(0, address:GetSize() - 1)
+        end
+        return address
+    end
+
+    /*
+        Starts a grid of course cards, as the Learn page lists its courses:
+        three across on a wide screen, one on a phone. Add each with
+        CourseCard, and its details with CourseDetail.
+
+        Attribute: Example
+        class MyPage is QuorumPage
+            action Setup
+                Section("Quorum Courses")
+                CourseCards()
+                CourseCard("Core Track", "/lessons/core.html", "media/core.png", "The Core Track's page.", "Learn the basics.")
+                CourseDetail("Grades: 6-12")
+            end
+        end
+    */
+    action CourseCards
+        Division grid
+        SetLayout(grid, quorumOptions:GetCourseCards())
+        Include(grid)
+        courseGrid = grid
+        courseBody = undefined
+        courseDetails = undefined
+    end
+
+    /*
+        Adds a course to the cards CourseCards started: its picture across
+        the top, its name (a heading, linked to the course) and its
+        description.
+
+        Attribute: Parameter title The course's name.
+        Attribute: Parameter address The course's page, such as "/lessons/core.html", or "" for a card with no link.
+        Attribute: Parameter picture The picture's location inside the relative folder ("/media/..." works too), or "" for none.
+        Attribute: Parameter pictureDescription What the picture shows.
+        Attribute: Parameter cardDescription The course in a sentence or two, or "" for none.
+    */
+    action CourseCard(text title, text address, text picture, text pictureDescription, text cardDescription)
+        if courseGrid = undefined
+            alert("A course card needs a grid to go in. Start one with CourseCards.")
+        end
+        Division card
+        SetStyle(card, quorumOptions:GetCourseCard())
+
+        if not picture:IsEmpty()
+            text location = picture
+            if location:StartsWith("/")
+                location = location:GetSubtext(1)
+            end
+            Image image
+            image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), location))))
+            image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+            SetStyle(image, quorumOptions:GetCourseCardPicture())
+            card:AddNestedTag(image)
+        end
+
+        Division body
+        SetStyle(body, quorumOptions:GetCourseCardBody())
+        SetLayout(body, quorumOptions:GetCourseCardLayout())
+        // A card's heading is one level under the part it is in (h2 on a
+        // page with no sections), so no heading level is skipped.
+        integer level = 3
+        if GetCurrentPart() = undefined
+            level = 2
+        end
+        Heading name
+        name:SetScale(level)
+        SetStyle(name, GetStyleOptions():GetHeading(level))
+        if address:IsEmpty()
+            // A card about something with no page, such as a person.
+            name:AddText(escaper:Escape(title))
+        else
+            Link link
+            link:SetAddress(escaper:EscapeAttribute(address))
+            link:AddText(escaper:Escape(title))
+            SetStyle(link, GetStyleOptions():GetLink())
+            name:AddNestedTag(link)
+        end
+        body:AddNestedTag(name)
+        if not cardDescription:IsEmpty()
+            Paragraph words
+            words:AddText(escaper:Escape(cardDescription))
+            body:AddNestedTag(words)
+        end
+        card:AddNestedTag(body)
+        courseGrid:AddNestedTag(card)
+        courseBody = body
+        courseDetails = undefined
+    end
+
+    /*
+        Adds a link at the bottom of the card CourseCard added last, such as
+        "Send Report" when the card's words point to it.
+
+        Attribute: Parameter words The link's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action CourseCardLink(text words, text address)
+        if courseBody = undefined
+            alert("A card link needs a card. Add one first with CourseCard.")
+        end
+        Paragraph paragraph
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, GetStyleOptions():GetLink())
+        paragraph:AddNestedTag(link)
+        courseBody:AddNestedTag(paragraph)
+    end
+
+    /*
+        Adds a line to the "Details" of the course CourseCard added last,
+        such as "Grades: 6-12". The first line makes the "Details"
+        disclosure, which opens to them all.
+
+        Attribute: Parameter words The line.
+    */
+    action CourseDetail(text words)
+        if courseBody = undefined
+            alert("A course detail needs a course. Add one first with CourseCard.")
+        end
+        if courseDetails = undefined
+            Details details
+            Summary label
+            label:AddText(escaper:Escape(COURSE_DETAILS))
+            SetStyle(label, quorumOptions:GetUnitLessonsLabel())
+            details:AddNestedTag(label)
+            Division lines
+            SetLayout(lines, quorumOptions:GetCourseCardLayout())
+            details:AddNestedTag(lines)
+            courseBody:AddNestedTag(details)
+            courseDetails = lines
+        end
+        Paragraph line
+        line:AddText(escaper:Escape(words))
+        courseDetails:AddNestedTag(line)
+    end
+
+    /*
+        Starts a row of choices: tiles, each a link with an icon and a few
+        words, such as "Try Online" and "Try Offline". Add each with Choice.
+
+        Attribute: Example
+        class MyPage is QuorumPage
+            action Setup
+                Subsection("New to Quorum?")
+                Paragraph("Try it online or offline.")
+                Choices()
+                Choice("Try Online", "/tutorials/online/starting.html", "media/userInterface/SVG/choice-online.svg")
+                Choice("Practice Problems", "/problems.html", "media/userInterface/SVG/choice-practice.svg")
+            end
+        end
+    */
+    action Choices
+        Division grid
+        SetLayout(grid, quorumOptions:GetChoices())
+        Include(grid)
+        choiceGrid = grid
+    end
+
+    /*
+        Adds a choice to the tiles Choices started: one link, its icon
+        beside its words. The icon is decoration, so readers hear only the
+        words.
+
+        Attribute: Parameter words The choice's words, such as "Try Online".
+        Attribute: Parameter address Where it goes, such as "/tutorials/online/starting.html".
+        Attribute: Parameter icon An SVG icon's location inside the relative folder, or "" for none.
+    */
+    action Choice(text words, text address, text icon)
+        if choiceGrid = undefined
+            alert("A choice needs tiles to go in. Start them with Choices.")
+        end
+        choiceGrid:AddNestedTag(NewChoiceTile(words, address, icon))
+    end
+
+    // A choice tile: one link, its icon (decoration) beside its words.
+    private action NewChoiceTile(text words, text address, text icon) returns Link
+        Link tile
+        tile:SetAddress(escaper:EscapeAttribute(address))
+        SetLayout(tile, quorumOptions:GetChoiceTileLayout())
+        SetStyle(tile, quorumOptions:GetChoiceTile())
+        SetStyleOnHover(tile, quorumOptions:GetChoiceTileActive())
+        SetStyleOnFocus(tile, quorumOptions:GetChoiceTileActive())
+        if not icon:IsEmpty()
+            File file = GetWebSite():GetRelativeFile(icon)
+            if not file:Exists()
+                alert("There's no icon at " + icon + ".")
+            end
+            Span picture
+            picture:AddAttribute("aria-hidden", "true")
+            picture:AddText(file:Read())
+            tile:AddNestedTag(picture)
+        end
+        Span name
+        name:AddText(escaper:Escape(words))
+        tile:AddNestedTag(name)
+        return tile
+    end
+
+    /*
+        Adds a card for one unit of a track: its name, linked to the
+        unit's first lesson, its description, and a "Lessons" disclosure
+        that opens to its lessons, numbered and linked. Each card is its own
+        part: a section, or a subsection when the page has already started
+        a section (such as "About the Course"), so its heading is in the
+        page's contents.
+
+        Attribute: Parameter title The unit's name on the card.
+        Attribute: Parameter unit The unit.
+
+        Attribute: Example
+        class MyTrack is QuorumPage
+            Array<PageSeries> units = undefined
+
+            action Setup
+                Title("Core Track")
+                integer i = 0
+                repeat while i < units:GetSize()
+                    PageSeries unit = units:Get(i)
+                    UnitCard(unit:GetName(), unit)
+                    i = i + 1
+                end
+            end
+        end
+    */
+    action UnitCard(text title, PageSeries unit)
+        UnitCard(title, unit, "")
+    end
+
+    /*
+        Adds a card for one unit of a track, as UnitCard does, with a
+        small picture beside its words. The picture is decoration: the
+        card's name says what the unit is.
+
+        Attribute: Parameter title The unit's name on the card.
+        Attribute: Parameter unit The unit.
+        Attribute: Parameter picture The picture's location inside the relative folder, or "" for none.
+    */
+    action UnitCard(text title, PageSeries unit, text picture)
+        if unitCardLevel = 0
+            if GetCurrentPart() = undefined
+                unitCardLevel = 2
+            else
+                unitCardLevel = 3
+            end
+        end
+        text address = ""
+        if unit:GetSize() > 0
+            address = locations:FromSiteTop(unit:GetEntry(0):GetLocation())
+        end
+        // The heading is written with plain words, so it is named and goes
+        // in the page's contents, then its words become a link.
+        if unitCardLevel = 2
+            Section(title)
+        else
+            Subsection(title)
+        end
+        Heading heading = GetLastHeading()
+        heading:Remove(heading:GetTag(0))
+        Link headingLink
+        headingLink:SetAddress(escaper:EscapeAttribute(address))
+        headingLink:AddText(escaper:Escape(title))
+        SetStyle(headingLink, GetStyleOptions():GetLink())
+        heading:AddNestedTag(headingLink)
+        Card()
+
+        // The unit's words: its description, then its lessons, numbered
+        // and linked, in a "Lessons" disclosure.
+        Division words
+        text unitDescription = unit:GetDescription()
+        if not unitDescription:IsEmpty()
+            Paragraph description
+            description:AddText(escaper:Escape(unitDescription))
+            words:AddNestedTag(description)
+        end
+        Details lessons
+        Summary label
+        label:AddText(escaper:Escape(UNIT_LESSONS + " (" + unit:GetSize() + ")"))
+        SetStyle(label, quorumOptions:GetUnitLessonsLabel())
+        lessons:AddNestedTag(label)
+        OrderedList list
+        SetStyle(list, GetStyleOptions():GetNumberedList())
+        integer i = 0
+        repeat while i < unit:GetSize()
+            PageSeriesEntry entry = unit:GetEntry(i)
+            ListItem item
+            Link link
+            link:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(entry:GetLocation())))
+            link:AddText(escaper:Escape(entry:GetTitle()))
+            SetStyle(link, GetStyleOptions():GetLink())
+            item:AddNestedTag(link)
+            list:AddNestedTag(item)
+            i = i + 1
+        end
+        lessons:AddNestedTag(list)
+        words:AddNestedTag(lessons)
+
+        if picture:IsEmpty()
+            Include(words)
+        else
+            // The picture beside the words, as the old cards had it; the
+            // words narrow beside it on a small screen.
+            text location = picture
+            // A series' picture may be written from the site's top ("/media/...").
+            if location:StartsWith("/")
+                location = location:GetSubtext(1)
+            end
+            Image image
+            image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), location))))
+            image:SetAlternate("")
+            SetStyle(image, quorumOptions:GetUnitPicture())
+            SetStyle(words, quorumOptions:GetUnitWords())
+            Division row
+            SetLayout(row, quorumOptions:GetUnitLayout())
+            row:AddNestedTag(image)
+            row:AddNestedTag(words)
+            Include(row)
+        end
+    end
+
+    /*
+        Adds a picture from another website, at its full address, such as a
+        sponsor's logo. (Image takes a location inside this site.)
+
+        Attribute: Parameter address The picture's full address, such as "https://www.yourkit.com/images/yklogo.png".
+        Attribute: Parameter imageDescription What the picture shows.
+    */
+    action OutsideImage(text address, text imageDescription)
+        if imageDescription:IsEmpty()
+            alert("The picture at " + address + " needs a description.")
+        end
+        Image picture
+        picture:SetAddress(escaper:EscapeAttribute(address))
+        picture:SetAlternate(escaper:EscapeAttribute(imageDescription))
+        Include(picture)
+    end
+
+    /*
         Adds a tracking picture from another site, such as Code.org's
         Hour of Code counter: hidden, with nothing for readers, but still
         loaded, so the other site counts the visit.
@@ -707,6 +1479,31 @@ class QuorumPage is WebPage
         button:AddText(escaper:Escape(words))
         SetStyle(button, quorumOptions:GetSlideButton())
         return button
+    end
+
+    /*
+        Adds working HTML from a file in the site's relative folder, such as
+        buttons a lesson asks readers to try with a screen reader. The file's
+        HTML goes into the page as it is, with its own scripts and styles.
+
+        Attribute: Parameter location The file's location inside the relative folder.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Engage")
+                Demonstration("media/Accessibility/IntroductionToARIA/ButtonDemo.html")
+            end
+        end
+    */
+    action Demonstration(text location)
+        File file = GetWebSite():GetRelativeFile(location)
+        if not file:Exists()
+            alert("There's no demonstration at " + location + ".")
+        end
+        Division demonstration
+        demonstration:AddText(file:Read())
+        Include(demonstration)
     end
 
     // An editor with its files, its script added to the page once.

@@ -1,280 +1,139 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.StrongText
-use Libraries.Web.Page.HeaderLink
-use Libraries.Web.Page.WebPageHeader
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Image
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.Heading
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.Section
-use Libraries.Web.Page.Button
+use Libraries.Web.Page.QuorumPage
 use Libraries.System.File
 use Libraries.Data.Formats.JavaScriptObjectNotation
-use Libraries.Containers.Array
-use Libraries.Web.Page.IDE
-use Libraries.Web.Page.CodeForIDE
 
-class Learn is Lesson
+/*
+    The Learn page: a banner, "Using Quorum" with its "New to Quorum?"
+    choices (design C, plan 13 phase 5), the courses as a grid of cards
+    (design A), each with its details, and an editor to try Quorum. The
+    courses come from html/json/courses.json.
+*/
+class Learn is QuorumPage
+    // A double quote, for code that holds one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
-    Lesson nextLesson = undefined
 
+    constant text COURSES_FILE = "json/courses.json"
+
+    on create
+        SetLocation("learn.html")
+        SetDescription("Learn the Quorum programming language in tracks dedicated to audio or visual games, robotics, or through core computer science principles.")
+    end
 
     action Setup
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Learn Quorum - Quorum Programming Language")
-        AddDefaultHeaders()
-
-        //Main Region
-        ImageHeader blueSection = makeBlueHeader()
-        Add(blueSection)
-
-        Array<Division> divs = InitializeTutorialPage()
-        Division leftDiv = divs:Get(0)
-        Division bodyDiv = divs:Get(1)
-        Division rightDiv = divs:Get(2)
-
-        leftDiv:SetClassAttribute("hidden")
-        rightDiv:SetClassAttribute("hidden")
-        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10%")
-
-
-        Section usingQuorumSection = usingQuorumSection()
-        Section coursesSection = makeCoursesSection()
-        Section idePlaygroundSection = makeIdePlaygroundSection()
-        bodyDiv:Add(usingQuorumSection)
-        bodyDiv:Add(coursesSection)
-        bodyDiv:Add(idePlaygroundSection)
+        Banner("Learn Something New in Quorum", "Create advanced programs, understand data like a pro, and help make programming easy for everyone, regardless of your age.", "media/userInterface/quorumAssets/learnHeader.png", "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it.")
+        UsingQuorum()
+        Courses()
+        NotSureWhereToStart()
     end
 
-    action makeBlueHeader returns ImageHeader
-        ImageHeader header
-        text headerHeading = "Learn Something New in Quorum"
-        text headerText = "Create advanced programs, understand data like a pro, and help make programming easy for everyone, regardless of your age."
-        text headerImage = "/media/userInterface/quorumAssets/learnHeader.png"
-        text headerImageAlt = "Two cartoon rabbits wearing glasses. The rabbit on the left is holding a game controller, while the rabbit on the right is holding up a paper with a pie chart on it."
-        header:Create(headerHeading, headerText, headerImage, headerImageAlt)
-        return header
+    private action UsingQuorum
+        Section("Using Quorum")
+        Paragraph("If you want to use Quorum offline, "):Link("install it first.", "/download.html")
+        Subsection("New to Quorum?")
+        Card()
+        Paragraph("Quorum is awesome for beginners and pros. Try it online for learning or solving practice problems and offline for larger projects")
+        Choices()
+        Choice("Try Online", "/tutorials/online/starting.html", "media/userInterface/SVG/choice-online.svg")
+        Choice("Practice Problems", "/problems.html", "media/userInterface/SVG/choice-practice.svg")
+        Choice("Try Offline", "/tutorials/blocks/gettingStartedBlocks.html", "media/userInterface/SVG/choice-offline.svg")
     end
 
-    action usingQuorumSection returns Section
-      Section section
-
-      //Division groupingText
-      section:AddClassAttribute("my-9 space-y-4")
-      Heading h2
-      h2:SetScale(2)
-      h2:AddText("Using Quorum")
-      h2:AddAttribute("tabindex","0")
-      h2:AddClassAttribute("text-3xl font-bold font-sans")
-       section:Add(h2)
-
-      Paragraph p
-      p:AddText("If you want to use Quorum offline, ")
-      Link link
-      link:SetAddress("/download.html")
-      link:AddText("install it first.")
-      link:AddAttribute("aria-label", "Download Quorum")
-      link:AddClassAttribute("underline text-quorum-blue-150 font-bold")
-      link:AddAttribute("tabindex","0")
-
-      p:Add(link)
-      p:AddAttribute("tabindex","0")
-      section:Add(p)
-
-      Division newToQuorum
-      newToQuorum:AddClassAttribute("flex flex-col justify-between rounded-xl bg-neutral-grey-15 p-4")
-      newToQuorum:AddAttribute("tabindex","0")
-      Heading h3
-      h3:SetScale(3)
-      h3:AddText("New to Quorum?")
-      h3:AddClassAttribute("text-xl font-bold mb-2")
-      Paragraph p2
-      p2:AddClassAttribute("text-base mb-4 w-4/5")
-      p2:AddText("Quorum is awesome for beginners and pros. Try it online for learning or solving practice problems and offline for larger projects")
-      Link link_getStarted
-      link_getStarted:AddText("Try Offline")
-      // move text to the bottom right of the div
-      link_getStarted:AddClassAttribute("self-end font-bold mt-3 py-2.5 px-4 text-center rounded-3xl w-56 duration-150 block p text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900 md:inline")
-      link_getStarted:AddAttribute("tabindex","0")
-      link_getStarted:SetAddress("/tutorials/blocks/gettingStartedBlocks.html")
-        
-        
-Link linkGetStartedOnline
-      linkGetStartedOnline:AddText("Try Online")
-      // move text to the bottom right of the div
-      linkGetStartedOnline:AddClassAttribute("self-end font-bold mt-3 py-2.5 px-4 text-center rounded-3xl w-56 duration-150 block p text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900 md:inline")
-      linkGetStartedOnline:AddAttribute("tabindex","0")
-      linkGetStartedOnline:SetAddress("/tutorials/online/starting.html")
-        
-Link linkPracticeProblems
-      linkPracticeProblems:AddText("Practice Problems")
-      // move text to the bottom right of the div
-      linkPracticeProblems:AddClassAttribute("self-end font-bold mt-3 py-2.5 px-4 text-center rounded-3xl w-56 duration-150 block p text-sm text-white bg-quorum-blue-100 hover:bg-gray-600 active:bg-gray-900 md:inline")
-      linkPracticeProblems:AddAttribute("tabindex","0")
-      linkPracticeProblems:SetAddress("/problems.html")
-        
-        
-      newToQuorum:Add(h3)
-      newToQuorum:Add(p2)
-newToQuorum:Add(linkGetStartedOnline)
-      newToQuorum:Add(linkPracticeProblems)
-newToQuorum:Add(link_getStarted)
-
-      section:Add(newToQuorum)
-
-      return section
-    end
-
-   action makeCoursesSection returns Section
-        Section section
-        Array<text> courses
-        courses:Add("Quorum Courses")
-        courses:Add("Hour of Code")
-        courses:Add("Legacy Courses")
-
-        Array<text> coursesDescription
-        coursesDescription:Add("Each track provides curriculum that can be freely used in the classroom.")
-        coursesDescription:Add("Hour of code is to provide supplemental courses for learners in a short amount of time.")
-        coursesDescription:Add("These are legacy courses that are no longer maintained and may not be up-to date with the the latest versions of  Quorum. Feel free to use these courses but you may run into possible bugs using these references. ")
+    // Each group of courses ("Quorum Courses", "Hour of Code", "Legacy
+    // Courses"): its heading, its line, and a card for each course.
+    private action Courses
+        File file = GetWebSite():GetRelativeFile(COURSES_FILE)
+        JavaScriptObjectNotation notation
+        notation:Read(file:Read())
+        // As the old page read it: an array's key, then the array itself.
+        JavaScriptObjectNotation sections = notation:GetObject("sections")
+        JavaScriptObjectNotation groups = sections:Get(0)
         integer i = 0
-        repeat while i < courses:GetSize()
-            Division courseDiv
-            courseDiv:AddClassAttribute("my-9 space-y-4")
-            Heading courseHeader
-            courseHeader:AddClassAttribute("text-3xl font-semibold tracking-wider text-gray-400")
-            courseHeader:SetScale(2)
-            courseHeader:AddText(courses:Get(i))
-            JavaScriptObjectNotation quorumCourse = GetCourseJson(courses:Get(i))
-            JavaScriptObjectNotation items = quorumCourse:GetObject("courses")
-            JavaScriptObjectNotation itemsArray = items:Get(0)
-   
+        repeat while i < groups:GetSize()
+            JavaScriptObjectNotation group = groups:Get(i)
+            text name = group:GetValue("name")
+            Section(name)
+            Paragraph(GroupDescription(name))
+            CourseCards()
+            JavaScriptObjectNotation coursesKey = group:GetObject("courses")
+            JavaScriptObjectNotation courses = coursesKey:Get(0)
             integer j = 0
-            Division courseCards
-            courseCards:AddClassAttribute("grid gap-4 grid-cols-1 auto-rows-auto md:grid-cols-2 lg:grid-cols-3")
-
-            repeat while j < itemsArray:GetSize()
-                //json received from /html/json/courses.json
-                JavaScriptObjectNotation item = itemsArray:Get(j)
-                text title = item:GetValue("title")
-                text courseUrl = item:GetValue("courseUrl")
-
-                JavaScriptObjectNotation cardJson = item:GetObject("courseCard")
-                CourseCard courseCard
-                text imageSrc = cardJson:GetValue("image")
-                text imageAltText = cardJson:GetValue("imageAltText")
-                text description = cardJson:GetValue("description")
-                courseCard:Create(imageSrc, imageAltText, description, title, courseUrl, true)
-                courseCards:Add(courseCard)
-
-                JavaScriptObjectNotation previewJson = item:GetObject("preview")
-                CardPreview cardPreview
-                cardPreview:Create(title, previewJson)
-                courseCards:Add(cardPreview)
-
+            repeat while j < courses:GetSize()
+                Course(courses:Get(j))
                 j = j + 1
             end
-            
-            courseDiv:Add(courseHeader)
-            courseDiv:AddText(coursesDescription:Get(i))
-            courseDiv:Add(courseCards)
-            
             i = i + 1
-            section:Add(courseDiv)
         end
-        return section
     end
-    
-    action GetCourseJson(text courseToGet) returns JavaScriptObjectNotation
-        File file
-        file:SetPath("/html/json/courses.json")
-        text value = file:Read()
-        JavaScriptObjectNotation notate
-        notate:Read(value)
 
-        JavaScriptObjectNotation courses = notate:GetObject("sections")
-        JavaScriptObjectNotation topLevel = courses:Get(0)
+    // The line under each group's heading, as the old page had it.
+    private action GroupDescription(text name) returns text
+        if name = "Quorum Courses"
+            return "Each track provides curriculum that can be freely used in the classroom."
+        elseif name = "Hour of Code"
+            return "Hour of code is to provide supplemental courses for learners in a short amount of time."
+        end
+        return "These are legacy courses that are no longer maintained and may not be up-to date with the the latest versions of  Quorum. Feel free to use these courses but you may run into possible bugs using these references. "
+    end
 
-        JavaScriptObjectNotation returnCourse = undefined
+    // A course's card, then its details: what the old "Preview" showed.
+    private action Course(JavaScriptObjectNotation course)
+        JavaScriptObjectNotation card = course:GetObject("courseCard")
+        CourseCard(course:GetValue("title"), course:GetValue("courseUrl"), card:GetValue("image"), card:GetValue("imageAltText"), card:GetValue("description"))
+
+        JavaScriptObjectNotation preview = course:GetObject("preview")
+        CourseDetail(preview:GetValue("description"))
+        CourseDetail("Grades: " + preview:GetValue("grades"))
+        CourseDetail("Completion Time: " + preview:GetValue("timeToComplete"))
+
+        JavaScriptObjectNotation topicsKey = preview:GetObject("Topics")
+        JavaScriptObjectNotation topics = topicsKey:GetArray()
+        text topicWords = ""
         integer i = 0
-        boolean break = false
-        
-        repeat while i < topLevel:GetSize() or not break
-            JavaScriptObjectNotation course = topLevel:Get(i)
-            text courseArray = course:GetValue("name")
+        repeat while i < topics:GetSize()
+            JavaScriptObjectNotation topic = topics:Get(i)
+            if i > 0
+                topicWords = topicWords + ", "
+            end
+            topicWords = topicWords + topic:GetText()
+            i = i + 1
+        end
+        CourseDetail("Topics: " + topicWords)
 
-            if courseArray = courseToGet
-                 returnCourse = course
-                 break = true
+        // The old page marked each device with a check or a cross, with no
+        // words for readers who can't see them; here the words say it.
+        JavaScriptObjectNotation devices = preview:GetObject("compatibility")
+        text worksOn = ""
+        text notOn = ""
+        i = 0
+        repeat while i < devices:GetSize()
+            JavaScriptObjectNotation device = devices:Get(i)
+            if device:GetBoolean()
+                worksOn = AddToList(worksOn, device:GetKey())
+            else
+                notOn = AddToList(notOn, device:GetKey())
             end
             i = i + 1
         end
-        return returnCourse
+        if not worksOn:IsEmpty()
+            CourseDetail("Works on: " + worksOn)
+        end
+        if not notOn:IsEmpty()
+            CourseDetail("Doesn't work on: " + notOn)
+        end
     end
 
-    action makeIdePlaygroundSection returns Section
-        Section section
-        
-        Heading h2
-        h2:SetScale(2)
-        h2:AddText("Not Sure Where to Start?")
-        h2:AddClassAttribute("text-3xl font-bold font-sans")
-        section:Add(h2)
-        
-        Paragraph p
-        p:AddText("Play around with the Quorum IDE and get a feel for the language. Start by typing output " + dq + "Hello World!" + dq + " into the text editor and see what you can do. There is so much that you can learn when using Quorum.")
-        section:Add(p)
-        
-        CodeForIDE code1
-        code1:AddFileText("Main.quorum", "output " + dq + "Hello World" + dq)
-        IDE ide = AddIDE()
-        ide:SetLightTheme()
-        ide:SetCodeForIDE(code1:GetJsonArray())
-        ide:SetIdeTitle("Try Quorum")
-        section:Add(ide)
-        
-        return section
+    private action AddToList(text list, text item) returns text
+        if list:IsEmpty()
+            return item
+        end
+        return list + ", " + item
     end
 
-    action GetMetaDescription returns text
-        return "Learn the Quorum programming language in tracks dedicated to audio or visual games, robotics, or through core computer science principles."
+    private action NotSureWhereToStart
+        Section("Not Sure Where to Start?")
+        Paragraph("Play around with the Quorum IDE and get a feel for the language. Start by typing output " + dq + "Hello World!" + dq + " into the text editor and see what you can do. There is so much that you can learn when using Quorum.")
+        CodeEditorWithCode("Try Quorum", "output " + dq + "Hello World" + dq)
     end
-
-    action GetNextLesson returns Lesson
-        return nextLesson
-    end
-
-    action SetNextLesson(Lesson next)
-        nextLesson = next
-    end
-
-    action GetName returns text
-        return "Learn Page"
-    end
-
-    action GetShortDescription returns text
-        return "This page describes the tracks for various lessons."
-    end
-
-    action GetSummaryName returns text
-        return ""
-    end
-
-    action GetImageLocation returns text
-        return ""
-    end
-
-    action GetLocation returns text
-        return ""
-    end
-
 end
