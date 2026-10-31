@@ -1,499 +1,216 @@
+package Lessons
+
 use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
-class SceneCreation is Lesson
-    text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
+class SceneCreation is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
-    action Setup
-        //html header stuff
-        SetWebPageTitle("Create a Scene Project - Quorum Programming Language")
-        AddDefaultHeaders()
-        AddJsonPrism()
-
-        //page header
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Create a Scene Project", 1)
-        bodyDiv:Add(headDiv)
-
-        bodyDiv:Add(AddOverview())
-        bodyDiv:Add(AddWarmup())
-        bodyDiv:Add(AddExplore())
-        bodyDiv:Add(AddEngage())
-        bodyDiv:Add(AddWrapup())
-
-        Section nextLesson
-        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(nextLesson)
-        WriteNextTutorial(nextLesson)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+    on create
+        SetLocation("tutorials/Scenes/create.html")
     end
 
-    action AddOverview returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Overview", 2)
-        section:AddParagraph("This tutorial shows how to make a project with a scene in it. You will use the
+    action Setup
+        // For search engines and link previews.
+        SetDescription("Learn to create a new scene project in Quorum Studio, and what its scene, terrain and material files hold.")
+
+        Title("Create a Scene Project")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("This tutorial shows how to make a project with a scene in it. You will use the
 New Project dialog, see what files Quorum Studio puts in a scene project, and look inside them. A scene is
 not one file but a small family of files: the scene file itself, plus files for any terrain and materials
 it uses. Knowing what each file holds makes it easier to understand, share and fix your scenes.")
 
-        AddHeading(section, "Goals", 3)
-        section:AddParagraph("You have the following goals for this lesson:")
-        UnorderedList goals
-        goals:AddClassAttribute("list-disc list-outside pl-8")
-        goals:AddListItem("Create a 2D or 3D scene project from a template.")
-        goals:AddListItem("Describe the folders and files in a scene project, including terrain and material files.")
-        goals:AddListItem("Explain what a material is and what it is made of.")
-        section:Add(goals)
-        return section
+        Subsection("Goals")
+        Goals()
+        ListItem("Create a 2D or 3D scene project from a template.")
+        ListItem("Describe the folders and files in a scene project, including terrain and material files.")
+        ListItem("Explain what a material is and what it is made of.")
     end
 
-    action AddWarmup returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Warm up", 2)
-        section:AddParagraph("When you start a new document in a word processor, it already has a page size,
+    action WarmUp
+        Section("Warm up")
+        Paragraph("When you start a new document in a word processor, it already has a page size,
 fonts and margins. Why do programs give you a starting point like this, instead of a completely empty file?
 What would a game need in its starting point?")
 
-        AddHeading(section, "Vocabulary", 3)
-        section:AddParagraph("You will be learning about the following vocabulary words:")
-        WebTable vocabularyTable = LoadWebTable("Vocabulary", "/html/media/scenes/CreateScene/Vocabulary.csv")
-        section:Add(vocabularyTable)
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/CreateScene/Vocabulary.csv")
 
-        AddHeading(section, "CSTA Standards", 3)
-        Paragraph standardsParagraph
-        standardsParagraph:AddText("This lesson covers the following standards, from the ")
-        AddLink(standardsParagraph, "2026 CSTA K–12 Computer Science Standards", "https://csteachers.org/pk12standards/view/")
-        standardsParagraph:AddText(":")
-        section:Add(standardsParagraph)
-
-        UnorderedList standards
-        standards:AddClassAttribute("list-disc list-outside pl-8")
-        AddStandard(standards, "S1-SWD-DD-03", "Use integrated development environment (IDE) features to streamline software development, including code editing, debugging, version control, and project management.")
-        AddStandard(standards, "HS-DAT-DC-22", "Create a data dictionary that describes the name, type, and allowable values for each attribute and the logical relationships between variables in a dataset.")
-        section:Add(standards)
-        return section
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_DESIGN_AND_DEVELOPMENT_3)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_22)
+        CoversStandard(computerScience, computerScience:SPECIALTY_2_SOFTWARE_DEVELOPMENT_DESIGN_AND_DEVELOPMENT_1)
+        StandardsList(computerScience)
     end
 
-    action AddExplore returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Explore", 2)
-        AddNewProject(section)
-        AddProjectContents(section)
-        AddSceneFile(section)
-        AddTerrainFiles(section)
-        AddMaterials(section)
-        AddMaterialFiles(section)
-        AddOpeningTheScene(section)
-        return section
+    action Explore
+        Section("Explore")
+        NewProject()
+        ProjectContents()
+        SceneFile()
+        TerrainFiles()
+        Materials()
+        MaterialFiles()
+        OpeningTheScene()
     end
 
-    action AddNewProject(Section section)
-        AddHeading(section, "Creating a new project", 3)
-        section:AddParagraph("To create a new scene project, either choose File, then New Project, or use
+    private action NewProject
+        Subsection("Creating a new project")
+        Paragraph("To create a new scene project, either choose File, then New Project, or use
 the keyboard.")
-        WebTable keysTable = LoadWebTable("Keys for creating and opening a project", "/html/media/scenes/CreateScene/Keys.csv")
-        section:Add(keysTable)
-        section:AddParagraph("The New Project dialog appears. Its first page is a tree of templates, sorted
+        Table("Keys for creating and opening a project", "media/scenes/CreateScene/Keys.csv")
+        Paragraph("The New Project dialog appears. Its first page is a tree of templates, sorted
 into groups: General, Games, Data Science, Sound and Other.")
-        AddZoomImage(section, "/media/scenes/CreateScene/SceneCreate1.png", "The New Project dialog, with 3D Scene chosen under Games and its description below.")
+        Image("media/scenes/CreateScene/SceneCreate1.png", "The New Project dialog, with 3D Scene chosen under Games and its description below.")
 
-        Paragraph choose
-        choose:AddText("Open Games, then choose either ")
-        AddBold(choose, "2D Scene")
-        choose:AddText(" or ")
-        AddBold(choose, "3D Scene")
-        choose:AddText(". This choice matters because Quorum loads the default assets for that kind of game
-into your project. As you move through the tree, the dialog describes each template; for 3D Scene it says "
-+ dq + "A project to get started with using Scenes in 3D." + dq)
-        section:Add(choose)
+        Paragraph("Open Games, then choose either "):Strong("2D Scene"):Text(" or "):Strong("3D Scene"):Text(". This choice matters because Quorum loads the default assets for that kind of game
+into your project. As you move through the tree, the dialog describes each template; for 3D Scene it says "):DoubleQuote():Output("A project to get started with using Scenes in 3D."):DoubleQuote()
 
-        Paragraph second
-        second:AddText("Choose ")
-        AddBold(second, "Next")
-        second:AddText(". The second page says which template you chose, for example " + dq
-+ "Selected Template: 3D Scene" + dq + ". Type a name in ")
-        AddBold(second, "Project Name")
-        second:AddText(". You can change where the project is saved in ")
-        AddBold(second, "Project Location")
-        second:AddText(", or with ")
-        AddBold(second, "Browse...")
-        second:AddText(". Then choose ")
-        AddBold(second, "Ok")
-        second:AddText(". ")
-        AddBold(second, "Back")
-        second:AddText(" returns to the list of templates.")
-        section:Add(second)
-        AddZoomImage(section, "/media/scenes/CreateScene/SceneCreate2.png", "The second page of the New Project dialog, with the project name and location fields.")
+        Paragraph("Choose "):Strong("Next"):Text(". The second page says which template you chose, for example "):DoubleQuote():Output("Selected Template: 3D Scene"):DoubleQuote():Text(". Type a name in "):Strong("Project Name"):Text(". You can change where the project is saved in "):Strong("Project Location"):Text(", or with "):Strong("Browse..."):Text(". Then choose "):Strong("Ok"):Text(". "):Strong("Back"):Text(" returns to the list of templates.")
+        Image("media/scenes/CreateScene/SceneCreate2.png", "The second page of the New Project dialog, with the project name and location fields.")
     end
 
-    action AddProjectContents(Section section)
-        AddHeading(section, "What is in a scene project", 3)
-        section:AddParagraph("After the project is created, the Projects tab shows it, with several items
+    private action ProjectContents
+        Subsection("What is in a scene project")
+        Paragraph("After the project is created, the Projects tab shows it, with several items
 made for you:")
-        UnorderedList contents
-        contents:AddClassAttribute("list-disc list-outside pl-8")
-
-        ListItem scenes
-        AddBold(scenes, "Scenes")
-        scenes:AddText(" holds the file ")
-        AddCode(scenes, "Scene.qs")
-        scenes:AddText(", the Quorum scene file. It starts with two layers and no items.")
-        contents:Add(scenes)
-
-        ListItem resources
-        AddBold(resources, "Resources")
-        resources:AddText(" holds the art for the palette:")
-        UnorderedList kinds
-        kinds:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem twoD
-        twoD:AddText("a 2D project has a ")
-        AddBold(twoD, "Tilesets")
-        twoD:AddText(" folder with 6 files: three PNG picture files and three JSON files that describe them;")
-        kinds:Add(twoD)
-        ListItem threeD
-        threeD:AddText("a 3D project has a ")
-        AddBold(threeD, "Tilesets3D")
-        threeD:AddText(" folder with eight kits of 3D models. Each kit is a JSON file and a folder of models,
+        BulletList()
+        ListItem():Strong("Scenes"):Text(" holds the file "):Code("Scene.qs"):Text(", the Quorum scene file. It starts with two layers and no items.")
+        ListItem():Strong("Resources"):Text(" holds the art for the palette:")
+        NestedBulletList()
+        ListItem("a 2D project has a "):Strong("Tilesets"):Text(" folder with 6 files: three PNG picture files and three JSON files that describe them;")
+        ListItem("a 3D project has a "):Strong("Tilesets3D"):Text(" folder with eight kits of 3D models. Each kit is a JSON file and a folder of models,
 with its license.")
-        kinds:Add(threeD)
-        resources:Add(kinds)
-        contents:Add(resources)
-
-        ListItem sourceCode
-        AddBold(sourceCode, "SourceCode")
-        sourceCode:AddText(" holds ")
-        AddCode(sourceCode, "Main.quorum")
-        sourceCode:AddText(". This file has the code that loads and runs the scene. In a 3D project it also
+        EndNestedList()
+        ListItem():Strong("SourceCode"):Text(" holds "):Code("Main.quorum"):Text(". This file has the code that loads and runs the scene. In a 3D project it also
 turns on 3D physics.")
-        contents:Add(sourceCode)
-        section:Add(contents)
     end
 
-    action AddSceneFile(Section section)
-        AddHeading(section, "Inside a scene file", 3)
-        Paragraph intro
-        intro:AddText("A scene file is plain text in JSON, so you can open it in any text editor and read it.
-Here is the start of a new 3D project's ")
-        AddCode(intro, "Scene.qs")
-        intro:AddText(". It lists the scene's layers. Each layer has a name, a camera, its items and its lights:")
-        section:Add(intro)
-        AddJson(section, "/html/sources/tutorials/scenes/SceneFile.json")
+    private action SceneFile
+        Subsection("Inside a scene file")
+        Paragraph("A scene file is plain text in JSON, so you can open it in any text editor and read it.
+Here is the start of a new 3D project's "):Code("Scene.qs"):Text(". It lists the scene's layers. Each layer has a name, a camera, its items and its lights:")
+        JsonExampleFromFile("sources/tutorials/scenes/SceneFile.json")
 
-        Paragraph position
-        position:AddText("(Some details are left out here to keep it short.) Notice the camera's ")
-        AddBold(position, "Position")
-        position:AddText(", ")
-        AddCode(position, "[0.0, 3.0, -5.0]")
-        position:AddText(": that's x, y and z. The camera starts 3 meters up and 5 meters back from the origin,
+        Paragraph("(Some details are left out here to keep it short.) Notice the camera's "):Strong("Position"):Text(", "):Code("[0.0, 3.0, -5.0]"):Text(": that's x, y and z. The camera starts 3 meters up and 5 meters back from the origin,
 looking toward it.")
-        section:Add(position)
 
-        Paragraph items
-        items:AddText("As you add items in the scene editor and save, each one is added under ")
-        AddBold(items, "Items")
-        items:AddText(", with its kind, its name and its position.")
-        section:Add(items)
+        Paragraph("As you add items in the scene editor and save, each one is added under "):Strong("Items"):Text(", with its kind, its name and its position.")
     end
 
-    action AddTerrainFiles(Section section)
-        AddHeading(section, "Terrain files", 3)
-        Paragraph intro
-        intro:AddText("When you add a terrain to a 3D scene, Quorum Studio saves it in a folder of its own,
-under ")
-        AddBold(intro, "Scenes/Terrains")
-        intro:AddText(". The first terrain goes in ")
-        AddCode(intro, "Scenes/Terrains/Terrain1")
-        intro:AddText(", the next in ")
-        AddCode(intro, "Terrain2")
-        intro:AddText(", and so on. A new project doesn't have this folder until you add a terrain.")
-        section:Add(intro)
+    private action TerrainFiles
+        Subsection("Terrain files")
+        Paragraph("When you add a terrain to a 3D scene, Quorum Studio saves it in a folder of its own,
+under "):Strong("Scenes/Terrains"):Text(". The first terrain goes in "):Code("Scenes/Terrains/Terrain1"):Text(", the next in "):Code("Terrain2"):Text(", and so on. A new project doesn't have this folder until you add a terrain.")
 
-        section:AddParagraph("A terrain's folder holds:")
-        UnorderedList files
-        files:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem json
-        AddCode(json, "terrain.json")
-        json:AddText(": a short file describing the terrain, such as how many points each region has and how
+        Paragraph("A terrain's folder holds:")
+        BulletList()
+        ListItem():Code("terrain.json"):Text(": a short file describing the terrain, such as how many points each region has and how
 far apart they are;")
-        files:Add(json)
-        ListItem regions
-        AddBold(regions, "one picture for each region")
-        regions:AddText(", such as ")
-        AddCode(regions, "region_0_0.png")
-        regions:AddText(". A terrain is split into square pieces called regions, and each picture stores the
+        ListItem():Strong("one picture for each region"):Text(", such as "):Code("region_0_0.png"):Text(". A terrain is split into square pieces called regions, and each picture stores the
 heights of one piece, with each pixel holding the height of one point of ground;")
-        files:Add(regions)
-        ListItem splat
-        AddBold(splat, "a second picture for each painted region")
-        splat:AddText(", such as ")
-        AddCode(splat, "region_0_0_splat.png")
-        splat:AddText(", called a ")
-        AddBold(splat, "splat map")
-        splat:AddText(". It records which material shows where. It only appears once you paint that region.")
-        files:Add(splat)
-        section:Add(files)
+        ListItem():Strong("a second picture for each painted region"):Text(", such as "):Code("region_0_0_splat.png"):Text(", called a "):Term("splat map"):Text(". It records which material shows where. It only appears once you paint that region.")
 
-        section:AddParagraph("The scene file doesn't copy any of this. It just names the terrain's folder.
+        Paragraph("The scene file doesn't copy any of this. It just names the terrain's folder.
 Here is a real terrain entry from a scene file:")
-        AddJson(section, "/html/sources/tutorials/scenes/TerrainEntry.json")
+        JsonExampleFromFile("sources/tutorials/scenes/TerrainEntry.json")
 
-        Paragraph fields
-        AddBold(fields, "File")
-        fields:AddText(" says where the terrain is. ")
-        AddBold(fields, "Collision")
-        fields:AddText(" and ")
-        AddBold(fields, "Friction")
-        fields:AddText(" say how it behaves in a running game. ")
-        AddLink(fields, "Terrain in a Scene", "/tutorials/Scenes/terrain.html")
-        fields:AddText(" covers terrain in detail.")
-        section:Add(fields)
+        Paragraph():Strong("File"):Text(" says where the terrain is. "):Strong("Collision"):Text(" and "):Strong("Friction"):Text(" say how it behaves in a running game. "):Link("Terrain in a Scene", "/tutorials/Scenes/terrain.html"):Text(" covers terrain in detail.")
     end
 
-    action AddMaterials(Section section)
-        AddHeading(section, "What is a material?", 3)
-        Paragraph intro
-        intro:AddText("When you look at a real surface, such as a stone wall or a lawn, you see more than a
-color. You see bumps and cracks, shiny spots and dull ones, and dark shadows in the gaps. A ")
-        AddBold(intro, "material")
-        intro:AddText(" describes all of this to the computer, so it can draw a surface that looks real from
+    private action Materials
+        Subsection("What is a material?")
+        Paragraph("When you look at a real surface, such as a stone wall or a lawn, you see more than a
+color. You see bumps and cracks, shiny spots and dull ones, and dark shadows in the gaps. A "):Term("material"):Text(" describes all of this to the computer, so it can draw a surface that looks real from
 any angle and in any light.")
-        section:Add(intro)
 
-        Paragraph maps
-        maps:AddText("A material is made of pictures, called ")
-        AddBold(maps, "maps")
-        maps:AddText(", and a few settings. A full set of maps for one surface is called a ")
-        AddBold(maps, "texture set")
-        maps:AddText(":")
-        section:Add(maps)
+        Paragraph("A material is made of pictures, called "):Term("maps"):Text(", and a few settings. A full set of maps for one surface is called a "):Term("texture set"):Text(":")
 
-        UnorderedList mapList
-        mapList:AddClassAttribute("list-disc list-outside pl-8")
-        AddBoldItem(mapList, "the ", "color map", " is the surface's colors, like a photo of it taken in flat,
+        BulletList()
+        ListItem("the "):Term("color map"):Text(" is the surface's colors, like a photo of it taken in flat,
 even light;")
-        AddBoldItem(mapList, "the ", "normal map", " stores which way each tiny bit of the surface faces, so
+        ListItem("the "):Term("normal map"):Text(" stores which way each tiny bit of the surface faces, so
 bumps and cracks catch the light even though the surface is really flat;")
-        AddBoldItem(mapList, "the ", "roughness map", " says which parts are rough and dull and which are
+        ListItem("the "):Term("roughness map"):Text(" says which parts are rough and dull and which are
 smooth and shiny;")
-        AddBoldItem(mapList, "the ", "ambient occlusion map", " darkens the gaps and corners that light has
+        ListItem("the "):Term("ambient occlusion map"):Text(" darkens the gaps and corners that light has
 trouble reaching;")
-        AddBoldItem(mapList, "the ", "height map", " says which parts stick up and which sink down. On
+        ListItem("the "):Term("height map"):Text(" says which parts stick up and which sink down. On
 terrain, it helps two materials blend naturally where they meet: the higher one shows, so stones poke up
 through grass instead of the two just fading into each other.")
-        section:Add(mapList)
 
-        Paragraph settings
-        settings:AddText("Along with the maps, a material has settings, such as its ")
-        AddBold(settings, "tile size")
-        settings:AddText(": how big one copy of the pictures is on the ground before it repeats. A simple
-material can skip the maps and use just one picture, a plain ")
-        AddBold(settings, "texture")
-        settings:AddText(".")
-        section:Add(settings)
+        Paragraph("Along with the maps, a material has settings, such as its "):Strong("tile size"):Text(": how big one copy of the pictures is on the ground before it repeats. A simple
+material can skip the maps and use just one picture, a plain "):Term("texture"):Text(".")
 
-        section:AddParagraph("Many free texture sets are available online, from sites such as Poly Haven and
+        Paragraph("Many free texture sets are available online, from sites such as Poly Haven and
 ambientCG. Each comes as a folder of pictures, one for each map. Check each set's license before you use it.")
     end
 
-    action AddMaterialFiles(Section section)
-        AddHeading(section, "Material files", 3)
-        section:AddParagraph("Quorum keeps each material in a small JSON file that names its pictures and
+    private action MaterialFiles
+        Subsection("Material files")
+        Paragraph("Quorum keeps each material in a small JSON file that names its pictures and
 lists its settings. A material file sits in the same folder as the pictures it names. Here is one:")
-        AddJson(section, "/html/sources/tutorials/scenes/Material.json")
+        JsonExampleFromFile("sources/tutorials/scenes/Material.json")
 
-        Paragraph layers
-        layers:AddText("A terrain can have up to four materials, called ")
-        AddBold(layers, "layers")
-        layers:AddText(", such as grass, rock, sand and dirt, and you paint where each one shows. Quorum
-Studio keeps a terrain's list of layers in another JSON file, in ")
-        AddBold(layers, "Scenes/Materials")
-        layers:AddText(", named after the terrain's folder, such as ")
-        AddCode(layers, "Scenes/Materials/Terrain1.json")
-        layers:AddText(". Like the Terrains folder, Materials doesn't exist until you give a terrain its first
-material. ")
-        AddLink(layers, "Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html")
-        layers:AddText(" shows how.")
-        section:Add(layers)
+        Paragraph("A terrain can have up to four materials, called "):Term("layers"):Text(", such as grass, rock, sand and dirt, and you paint where each one shows. Quorum
+Studio keeps a terrain's list of layers in another JSON file, in "):Strong("Scenes/Materials"):Text(", named after the terrain's folder, such as "):Code("Scenes/Materials/Terrain1.json"):Text(". Like the Terrains folder, Materials doesn't exist until you give a terrain its first
+material. "):Link("Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html"):Text(" shows how.")
 
-        section:AddParagraph("Putting it together, a 3D scene project with a painted terrain looks like this:")
-        Preformatter folders
-        folders:SetIsQuorumCode(false)
-        folders:SetShowLineNumbers(false)
-        section:Add(AllowWrapping(folders:GeneratePreformattedCode(GetTextFromSource("/html/sources/tutorials/scenes/ProjectFolders.txt"))))
-        section:AddParagraph("The material files for each layer sit wherever their texture pictures are.")
+        Paragraph("Putting it together, a 3D scene project with a painted terrain looks like this:")
+        CodeExampleFromFile("sources/tutorials/scenes/ProjectFolders.txt", "")
+        Paragraph("The material files for each layer sit wherever their texture pictures are.")
     end
 
-    action AddOpeningTheScene(Section section)
-        AddHeading(section, "Opening the scene", 3)
-        Paragraph open
-        open:AddText("To open the scene, go to the Projects tab (Ctrl+1, or Cmd+1 on a Mac), open the Scenes
-folder, and choose ")
-        AddCode(open, "Scene.qs")
-        open:AddText(". The scene opens in the editor. Two more tabs, ")
-        AddBold(open, "Scene")
-        open:AddText(" and ")
-        AddBold(open, "Palette")
-        open:AddText(", sit beside the Projects tab. The next tutorial explains them. You can move between
+    private action OpeningTheScene
+        Subsection("Opening the scene")
+        Paragraph("To open the scene, go to the Projects tab (Ctrl+1, or Cmd+1 on a Mac), open the Scenes
+folder, and choose "):Code("Scene.qs"):Text(". The scene opens in the editor. Two more tabs, "):Strong("Scene"):Text(" and "):Strong("Palette"):Text(", sit beside the Projects tab. The next tutorial explains them. You can move between
 these tabs with the keys in the table above, or click them with the mouse.")
-        section:Add(open)
 
-        Paragraph layers
-        layers:AddText("A scene is made of layers. A new scene has two: ")
-        AddBold(layers, "Default Layer3D")
-        layers:AddText(" and ")
-        AddBold(layers, "Default Layer2D")
-        layers:AddText(". Quorum uses layers so different parts of a game can be drawn on top of each other.
+        Paragraph("A scene is made of layers. A new scene has two: "):Strong("Default Layer3D"):Text(" and "):Strong("Default Layer2D"):Text(". Quorum uses layers so different parts of a game can be drawn on top of each other.
 For example, a game could have a 3D world with a 2D layer on top showing health or magic. You know, use the
 force, Harry.")
-        section:Add(layers)
 
-        section:AddParagraph("To choose which layer you are working in, go to the Scene tab. Each layer is at
+        Paragraph("To choose which layer you are working in, go to the Scene tab. Each layer is at
 the top of its own branch of the tree. Choose the layer's name, such as Default Layer3D, and press Enter, or
 double-click it. The editor switches to that layer.")
     end
 
-    action AddEngage returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Engage", 2)
-
-        Paragraph first
-        first:AddText("The goal of this activity is to explore how a scene is stored on the computer: to find
+    action Engage
+        Section("Engage")
+        Paragraph("The goal of this activity is to explore how a scene is stored on the computer: to find
 every file a scene uses, open each one, and explain what it holds. Work with a partner. Together, create a
-new ")
-        AddBold(first, "3D Scene")
-        first:AddText(" project and open its scene. Before changing anything, open ")
-        AddCode(first, "Scene.qs")
-        first:AddText(" in a plain text editor, such as Notepad on Windows or TextEdit on a Mac, and save a copy
+new "):Strong("3D Scene"):Text(" project and open its scene. Before changing anything, open "):Code("Scene.qs"):Text(" in a plain text editor, such as Notepad on Windows or TextEdit on a Mac, and save a copy
 of it somewhere else. Then, back in Quorum Studio, add one item from the palette, such as a cube, and add a
 terrain from the Basic 3D group. Save the scene.")
-        section:Add(first)
 
-        Paragraph second
-        second:AddText("Now go looking. Open ")
-        AddCode(second, "Scene.qs")
-        second:AddText(" again and compare it with your saved copy: find the new entries for your cube and your
+        Paragraph("Now go looking. Open "):Code("Scene.qs"):Text(" again and compare it with your saved copy: find the new entries for your cube and your
 terrain, and the coordinates that say where the cube is. Then use your computer's file browser to open the
-project folder, find ")
-        AddCode(second, "Scenes/Terrains/Terrain1")
-        second:AddText(", and open ")
-        AddCode(second, "terrain.json")
-        second:AddText(". Count the region pictures and check that the count matches what ")
-        AddCode(second, "terrain.json")
-        second:AddText(" lists. Finally, write a short data dictionary for the terrain's entry in ")
-        AddCode(second, "Scene.qs")
-        second:AddText(": for each field (Class, Name, Description, File, Physics Enabled, Collision and
+project folder, find "):Code("Scenes/Terrains/Terrain1"):Text(", and open "):Code("terrain.json"):Text(". Count the region pictures and check that the count matches what "):Code("terrain.json"):Text(" lists. Finally, write a short data dictionary for the terrain's entry in "):Code("Scene.qs"):Text(": for each field (Class, Name, Description, File, Physics Enabled, Collision and
 Friction), write its name, its type (text, number or true/false), and what values you think it allows.
 Compare your dictionary with another pair's. Where you disagree, look for evidence in the files or in Quorum
 Studio's Properties panel to settle it.")
-        section:Add(second)
-        return section
     end
 
-    action AddWrapup returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Wrap up", 2)
-        section:AddParagraph("Templates give every scene project the same starting point: a scene file, the
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Templates give every scene project the same starting point: a scene file, the
 art for the palette, and code that loads the scene. As you build, the project grows: terrains add a folder of
 heights each, and materials add small files that point at pictures. Why do you think Quorum stores a scene as
 many small files, instead of one big file?")
-        return section
-    end
-
-    private action AddStandard(UnorderedList list, text identifier, text standard)
-        ListItem item
-        AddBold(item, identifier)
-        item:AddText(": " + standard)
-        list:Add(item)
-    end
-
-    private action AddBoldItem(UnorderedList list, text before, text bold, text after)
-        ListItem item
-        item:AddText(before)
-        AddBold(item, bold)
-        item:AddText(after)
-        list:Add(item)
-    end
-
-    private action AddBold(WebTag tag, text value)
-        StrongText strong
-        strong:AddText(value)
-        tag:AddNestedTag(strong)
-    end
-
-    private action AddCode(WebTag tag, text value)
-        CodeBlock code
-        code:AddClassAttribute("break-words")
-        code:AddText(value)
-        tag:AddNestedTag(code)
-    end
-
-    private action AddLink(WebTag tag, text name, text address)
-        Link link
-        link:AddText(name)
-        link:SetAddress(address)
-        link:SetClassAttribute("underline text-quorum-blue-150")
-        tag:AddNestedTag(link)
-    end
-
-    private action AddJson(Section section, text path)
-        PreformattedText preformatted
-        preformatted:AddClassAttribute("whitespace-pre-wrap break-words")
-        preformatted:AddClassAttribute("language-json")
-        CodeBlock code
-        code:AddText(GetTextFromSource(path))
-        preformatted:Add(code)
-        section:Add(preformatted)
-    end
-
-    private action AddZoomImage(Section section, text path, text alt)
-        Image image = section:AddImage(path, alt)
-        image:AddAttribute("data-zoom", "")
-    end
-
-    //wraps long lines, so code never scrolls sideways on a narrow screen (WCAG 1.4.10, reflow)
-    private action AllowWrapping(PreformattedText code) returns PreformattedText
-        code:AddClassAttribute("whitespace-pre-wrap break-words")
-        return code
-    end
-
-    action GetMetaDescription returns text
-        return "Learn to create a new scene project in Quorum Studio, and what its scene, terrain and material files hold."
-    end
-
-    action GetSummaryName returns text
-        return "Creating a scene project"
-    end
-
-    action GetName returns text
-        return "Creating a scene project"
-    end
-
-    action GetShortDescription returns text
-        return "creating a scene project in Quorum Studio"
-    end
-
-    action GetLocation returns text
-        return "tutorials/Scenes/create.html"
-    end
-
-    action GetLinkName returns text
-        return "Create a Scene Project"
-    end
-
-    action GetSectionName returns text
-        return "Scene Editing"
     end
 end

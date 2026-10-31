@@ -21,28 +21,56 @@ use Libraries.Database.Server.RequestPasswordReset
 use Libraries.Database.Server.ConfirmResetPassword
 use Libraries.Database.Server.Fastrun
 use Libraries.Database.Server.Delete
+use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.Standards.QuorumStandards
+use Libraries.Web.Styles.QuorumSiteOptions
+use Lessons.SceneIntroduction
+use Lessons.SceneCreation
+use Lessons.SceneComponents
+use Lessons.SceneItems
+use Lessons.SceneNavigation
+use Lessons.SceneProperties
+use Lessons.SceneRunning
+use Lessons.SceneManipulation
+use Lessons.SceneTerrain
+use Lessons.TerrainMaterials
+use Lessons.SceneTerrainShape
+use Lessons.SceneTerrainGenerate
+use Lessons.TerrainGames
+use Lessons.ScenePalette
 
 /*
-    The whole Quorum website: every page, in one place. WebsiteMain writes
-    it into html/; ServerMain writes it and then serves the pages that
+    The whole Quorum website: every page, in one place. Main writes it into
+    html/; ServerMain writes it and then serves the pages that
     answer requests (signing in, saving projects, and so on).
 
-    The pages are still the old site's. Each page is added once, and the
-    site sets it up and writes it; the old pages are written exactly as
-    they make themselves. Lessons that follow one another are listed in a
-    series, such as a unit of a track, and the track pages list their
-    series.
+    Each page is added once, and the site sets it up and writes it. Most
+    pages are still the old site's, written exactly as they make
+    themselves; pages in the new look (the scene lessons, so far) get the
+    site's frame, stylesheet, search tags and course navigation. Lessons
+    that follow one another are listed in a series, such as a unit of a
+    track, and the track pages list their series.
 */
 class QuorumWebsite
     constant text WRITE_PATH = "html/"
     constant text SITE_FOLDER = "html"
     constant text SITE_NAME = "https://quorumlanguage.com"
 
+    // Search and sharing, for pages in the new look: the site's name, the
+    // ending of every tab title, and the picture shown when a page
+    // without its own is shared (Quincy, 1200 by 630).
+    constant text SITE_TITLE = "Quorum Programming Language"
+    constant text TITLE_ENDING = " - Quorum Programming Language"
+    constant text DEFAULT_SHARE_IMAGE = "media/userInterface/quorumAssets/bunnyShare.jpg"
+    constant text DEFAULT_SHARE_IMAGE_DESCRIPTION = "Tech-savvy bunny named Quincy with glasses working on a laptop"
+
     QuorumSite site
 
+    // The look of every page in the new look.
+    QuorumSiteOptions options
+
     // The old site's pages by location. A lesson in more than one track is
-    // made once for each, and the last one added is the one written, as in
-    // main.quorum.
+    // made once for each, and the last one added is the one written.
     HashTable<text, WebPage> oldPages
 
     // Each series' lessons by the series' key, and the key of each lesson's
@@ -59,6 +87,7 @@ class QuorumWebsite
         VersionHelper helper
         output "Loading Quorum Website. Version " + helper:GetLanguageVersion()
         output "Writing index pages"
+        SiteSettings()
         HomePages()
         output "Writing Tutorials"
         TutorialPages()
@@ -94,6 +123,37 @@ class QuorumWebsite
 
     action GetSite returns QuorumSite
         return site
+    end
+
+    // What the pages in the new look need from the site: the scripts'
+    // versions, search and sharing, their look, and the report of the
+    // 2026 CSTA standards their lessons cover (standards/CSTA2026.html).
+    private action SiteSettings
+        // Pages name their files from the top of the site, such as
+        // "media/scenes/...".
+        site:SetRelativeFolder("")
+
+        VersionHelper versions
+        site:SetScriptVersions(versions:GetLanguageVersionQuery(), versions:GetScriptVersionQuery(), versions:GetPrismVersionQuery(), versions:GetLoadVersionQuery())
+
+        site:SetAddress(SITE_NAME)
+        site:SetSiteName(SITE_TITLE)
+        site:SetTitleEnding(TITLE_ENDING)
+        site:SetDefaultShareImage(DEFAULT_SHARE_IMAGE, DEFAULT_SHARE_IMAGE_DESCRIPTION)
+        site:SetStyleOptions(options)
+
+        // Set to true to check every page in the new look for
+        // accessibility problems; the build stops and lists any it finds.
+        site:SetAccessibilityChecks(false)
+
+        QuorumStandards standards
+        site:AddStandardsReport(standards:GetComputerScience2026())
+    end
+
+    // Adds a page in the new look, with the site's look.
+    private action AddStyled(QuorumPage page)
+        page:SetStyleOptions(options)
+        site:AddPage(page)
     end
 
     // What answers requests while people use the site: signing in, saving
@@ -2806,6 +2866,7 @@ end
         NetworkAuthentication   networkAuthentication
         NetworkSkynet networkSkynet
 
+        // The scene lessons, in the new look.
         SceneIntroduction sceneIntroduction
         SceneComponents sceneComponents
         SceneCreation sceneCreation
@@ -3044,21 +3105,26 @@ end
         Add(network, networkAuthentication)
         Add(network, networkSkynet)
 
+        // The first course in the new look: its pages get the site's frame,
+        // course navigation and an overview page.
         PageSeries sceneEditing = Series("tutorials-scene-editing")
-        Add(sceneEditing, sceneIntroduction)
-        Add(sceneEditing, sceneCreation)
-        Add(sceneEditing, sceneComponents)
-        Add(sceneEditing, sceneItems)
-        Add(sceneEditing, sceneNavigation)
-        Add(sceneEditing, sceneProperties)
-        Add(sceneEditing, sceneRunning)
-        Add(sceneEditing, sceneManipulation)
-        Add(sceneEditing, sceneTerrain)
-        Add(sceneEditing, terrainMaterials)
-        Add(sceneEditing, sceneTerrainShape)
-        Add(sceneEditing, sceneTerrainGenerate)
-        Add(sceneEditing, terrainGames)
-        Add(sceneEditing, scenePalette)
+        sceneEditing:SetName("Scene Editing")
+        sceneEditing:SetDescription("An introduction to scene editing: what a scene editor is, where it came from, 2D and 3D scenes, and x, y and z coordinates.")
+        sceneEditing:SetOverviewLocation("tutorials/Scenes/index.html")
+        sceneEditing:Add(sceneIntroduction)
+        sceneEditing:Add(sceneCreation)
+        sceneEditing:Add(sceneComponents)
+        sceneEditing:Add(sceneItems)
+        sceneEditing:Add(sceneNavigation)
+        sceneEditing:Add(sceneProperties)
+        sceneEditing:Add(sceneRunning)
+        sceneEditing:Add(sceneManipulation)
+        sceneEditing:Add(sceneTerrain)
+        sceneEditing:Add(terrainMaterials)
+        sceneEditing:Add(sceneTerrainShape)
+        sceneEditing:Add(sceneTerrainGenerate)
+        sceneEditing:Add(terrainGames)
+        sceneEditing:Add(scenePalette)
 
         PageSeries filteringDataSeries = Series("tutorials-filtering-data")
         Add(filteringDataSeries, filteringData)
@@ -3130,20 +3196,20 @@ end
 
         //write all of the tutorials
 
-        Add(sceneIntroduction)
-        Add(sceneComponents)
-        Add(sceneCreation)
-        Add(sceneManipulation)
-        Add(sceneProperties)
-        Add(sceneNavigation)
-        Add(sceneRunning)
-        Add(sceneItems)
-        Add(scenePalette)
-        Add(sceneTerrain)
-        Add(terrainMaterials)
-        Add(sceneTerrainShape)
-        Add(sceneTerrainGenerate)
-        Add(terrainGames)
+        AddStyled(sceneIntroduction)
+        AddStyled(sceneComponents)
+        AddStyled(sceneCreation)
+        AddStyled(sceneManipulation)
+        AddStyled(sceneProperties)
+        AddStyled(sceneNavigation)
+        AddStyled(sceneRunning)
+        AddStyled(sceneItems)
+        AddStyled(scenePalette)
+        AddStyled(sceneTerrain)
+        AddStyled(terrainMaterials)
+        AddStyled(sceneTerrainShape)
+        AddStyled(sceneTerrainGenerate)
+        AddStyled(terrainGames)
 
         Add(gettingStarted)
         Add(types)

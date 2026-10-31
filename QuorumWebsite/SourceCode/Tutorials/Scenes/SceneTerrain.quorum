@@ -1,527 +1,272 @@
+package Lessons
+
 use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
-class SceneTerrain is Lesson
-    text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
+class SceneTerrain is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
-    action Setup
-        //html header stuff
-        SetWebPageTitle("Terrain in a Scene - Quorum Programming Language")
-        AddDefaultHeaders()
-        AddJsonPrism()
-
-        //page header
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Terrain in a Scene", 1)
-        bodyDiv:Add(headDiv)
-
-        bodyDiv:Add(AddOverview())
-        bodyDiv:Add(AddWarmup())
-        bodyDiv:Add(AddExplore())
-        bodyDiv:Add(AddEngage())
-        bodyDiv:Add(AddWrapup())
-
-        Section nextLesson
-        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(nextLesson)
-        WriteNextTutorial(nextLesson)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+    on create
+        SetLocation("tutorials/Scenes/terrain.html")
     end
 
-    action AddOverview returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Overview", 2)
-        Paragraph paragraph1
-        paragraph1:AddText("Most 3D games and simulations happen on the ground: hills to climb, valleys
+    action Setup
+        // For search engines and link previews.
+        SetDescription("Learn to add a terrain to a 3D scene in Quorum Studio, select it, read its properties, and find the files it is saved in.")
+
+        Title("Terrain in a Scene")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Most 3D games and simulations happen on the ground: hills to climb, valleys
 to drive through, and flat land to build on. In 3D graphics this ground is
-called ")
-        AddBold(paragraph1, "terrain")
-        paragraph1:AddText(". In this tutorial, you will add a terrain to a 3D scene in
+called "):Term("terrain"):Text(". In this tutorial, you will add a terrain to a 3D scene in
 Quorum Studio, select it, read its properties, and look at the files Quorum Studio
 saves for it. Along the way you will see that a terrain is really a large
 set of numbers, one height for each point on the ground, split into square
 pieces called regions so that big worlds stay manageable.")
-        section:Add(paragraph1)
 
-        AddHeading(section, "Goals", 3)
-        section:AddParagraph("You have the following goals for this lesson:")
-        UnorderedList list1
-        list1:AddClassAttribute("list-disc list-outside pl-8")
-        list1:AddListItem("Add a terrain to a 3D scene, and select and delete it")
-        list1:AddListItem("Understand that a terrain is height data split into regions")
-        list1:AddListItem("Find a terrain's files in a project, and describe what each one holds")
-        section:Add(list1)
-        return section
+        Subsection("Goals")
+        Goals()
+        ListItem("Add a terrain to a 3D scene, and select and delete it")
+        ListItem("Understand that a terrain is height data split into regions")
+        ListItem("Find a terrain's files in a project, and describe what each one holds")
     end
 
-    action AddWarmup returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Warm up", 2)
-        section:AddParagraph("Think of an outdoor place you know well, such as a park, a school field or
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of an outdoor place you know well, such as a park, a school field or
 a hill near your home. How would you describe its shape to someone who has
 never seen it, using only numbers? What would you measure, and how far
 apart would your measurements need to be?")
 
-        AddHeading(section, "Vocabulary", 3)
-        section:AddParagraph("You will be learning about the following vocabulary words:")
-        WebTable table1 = LoadWebTable("Vocabulary", "/html/media/scenes/Terrain/InAScene/Vocabulary.csv")
-        section:Add(table1)
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Terrain/InAScene/Vocabulary.csv")
 
-        AddHeading(section, "CSTA Standards", 3)
-        Paragraph standardsParagraph
-        standardsParagraph:AddText("This lesson covers the following standards, from the ")
-        AddLink(standardsParagraph, "2026 CSTA K–12 Computer Science Standards", "https://csteachers.org/pk12standards/view/")
-        standardsParagraph:AddText(":")
-        section:Add(standardsParagraph)
-
-        UnorderedList standards
-        standards:AddClassAttribute("list-disc list-outside pl-8")
-        AddStandard(standards, "HS-DAT-DC-22", "Create a data dictionary that describes the name, type, and allowable values for each attribute and the logical relationships between variables in a dataset.")
-        AddStandard(standards, "MS-DAT-DC-21", "Evaluate how different levels of precision and granularity in data collection affect accuracy, storage, and analysis.")
-        AddStandard(standards, "S1-GMD-DD-01", "Analyze the fundamental components of a game, including players, rules, game mechanics, and outcomes.")
-        section:Add(standards)
-        return section
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_22)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_X_PLUS_COMPUTER_SCIENCE_X_PLUS_COMPUTER_SCIENCE_4)
+        StandardsList(computerScience)
     end
 
-    action AddExplore returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Explore", 2)
-        Paragraph paragraph1
-        paragraph1:AddText("A terrain is the ground under a 3D scene. Instead of being one big model
-made by hand, it is stored as ")
-        AddBold(paragraph1, "data")
-        paragraph1:AddText(": a grid of heights. Quorum measures
-the height of the ground at evenly spaced points, called ")
-        AddBold(paragraph1, "samples")
-        paragraph1:AddText(", and
+    action Explore
+        Section("Explore")
+        Paragraph("A terrain is the ground under a 3D scene. Instead of being one big model
+made by hand, it is stored as "):Strong("data"):Text(": a grid of heights. Quorum measures
+the height of the ground at evenly spaced points, called "):Term("samples"):Text(", and
 draws a smooth surface through them. The closer together the samples are,
 the more detail the ground can have, and the more numbers there are to
 store.")
-        section:Add(paragraph1)
-        AddBeforeYouStart(section)
-        AddAddingTerrain(section)
-        AddTerrainStaysAtOrigin(section)
-        AddMovingAroundTerrainKeyboard(section)
-        AddMovingCameraKeyboard(section)
-        AddSelectingTerrain(section)
-        AddTerrainSectionPropertiesPanel(section)
-        AddRegions(section)
-        AddFilesOnDisk(section)
-        AddDeletingUndoingRedoing(section)
-        return section
+        BeforeYouStart()
+        AddingTerrain()
+        TerrainStaysAtOrigin()
+        MovingAroundTerrainKeyboard()
+        MovingCameraKeyboard()
+        SelectingTerrain()
+        TerrainSectionPropertiesPanel()
+        Regions()
+        FilesOnDisk()
+        DeletingUndoingRedoing()
     end
 
-    action AddBeforeYouStart(Section section)
-        AddHeading(section, "Before you start", 3)
-        section:AddParagraph("A terrain needs three things. If one is missing, Quorum Studio says why
+    private action BeforeYouStart
+        Subsection("Before you start")
+        Paragraph("A terrain needs three things. If one is missing, Quorum Studio says why
 instead of adding it:")
-        UnorderedList list1
-        list1:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem item1
-        AddBold(item1, "Vulkan")
-        item1:AddText(", the graphics system terrains are drawn with. Quorum Studio
-must be running with Vulkan. Otherwise you hear " + dq + "A terrain needs Vulkan, so it can't be
-added here." + dq)
-        list1:Add(item1)
-        ListItem item2
-        AddBold(item2, "A project.")
-        item2:AddText(" A terrain's files are saved in the scene's project. A scene
-opened on its own gives " + dq + "A terrain is saved in the scene's project, but
-this scene isn't in a project." + dq)
-        list1:Add(item2)
-        ListItem item3
-        AddBold(item3, "A 3D layer")
-        item3:AddText(" in the scene. Otherwise you hear " + dq + "A terrain needs a 3D
-layer, and this scene has none." + dq)
-        list1:Add(item3)
-        section:Add(list1)
-        Paragraph paragraph2
-        paragraph2:AddText("If you have not made a scene yet, see
-")
-        AddLink(paragraph2, "Creating a Scene", "/tutorials/Scenes/create.html")
-        paragraph2:AddText(".")
-        section:Add(paragraph2)
+        BulletList()
+        ListItem():Strong("Vulkan"):Text(", the graphics system terrains are drawn with. Quorum Studio
+must be running with Vulkan. Otherwise you hear "):Quoted("A terrain needs Vulkan, so it can't be
+added here.")
+        ListItem():Strong("A project."):Text(" A terrain's files are saved in the scene's project. A scene
+opened on its own gives "):Quoted("A terrain is saved in the scene's project, but
+this scene isn't in a project.")
+        ListItem():Strong("A 3D layer"):Text(" in the scene. Otherwise you hear "):Quoted("A terrain needs a 3D
+layer, and this scene has none.")
+        Paragraph("If you have not made a scene yet, see
+"):Link("Creating a Scene", "/tutorials/Scenes/create.html"):Text(".")
     end
 
-    action AddAddingTerrain(Section section)
-        AddHeading(section, "Adding a terrain", 3)
-        Paragraph paragraph3
-        paragraph3:AddText("Terrain is in the palette, in the ")
-        AddBold(paragraph3, "Basic 3D")
-        paragraph3:AddText(" group, next to the cube,
+    private action AddingTerrain
+        Subsection("Adding a terrain")
+        Paragraph("Terrain is in the palette, in the "):Strong("Basic 3D"):Text(" group, next to the cube,
 sphere and other shapes. Its description, read by a screen reader, is
-" + dq + "Ground for the scene, made of heightmap regions. It starts flat, 128 by
-128 units." + dq)
-        section:Add(paragraph3)
-        section:AddParagraph("There are two ways to add it:")
-        UnorderedList list2
-        list2:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem item4
-        AddBold(item4, "With the keyboard:")
-        item4:AddText(" move to Terrain in the palette and press
-")
-        AddKey(item4, "Enter")
-        item4:AddText(".")
-        list2:Add(item4)
-        ListItem item5
-        AddBold(item5, "With the mouse:")
-        item5:AddText(" drag Terrain into the scene and let go. The terrain
+"):Quoted("Ground for the scene, made of heightmap regions. It starts flat, 128 by
+128 units.")
+        Paragraph("There are two ways to add it:")
+        BulletList()
+        ListItem():Strong("With the keyboard:"):Text(" move to Terrain in the palette and press
+"):Key("Enter"):Text(".")
+        ListItem():Strong("With the mouse:"):Text(" drag Terrain into the scene and let go. The terrain
 is added only when you drop it; dragging over the scene and back off adds
 nothing.")
-        list2:Add(item5)
-        section:Add(list2)
-        section:AddParagraph("Unlike other items, a terrain does not show a preview to place first. It is
+        Paragraph("Unlike other items, a terrain does not show a preview to place first. It is
 added at once, flat, at the origin. Quorum Studio saves its files straight away,
 selects it and says, for example:")
-        section:AddParagraph(dq + "Placed Terrain, flat, 128.0 by 128.0 units, saved in
-Scenes/Terrains/Terrain1." + dq)
-        section:AddParagraph("A new terrain is flat and plain. Later tutorials shape it, generate hills
+        Paragraph():Quoted("Placed Terrain, flat, 128.0 by 128.0 units, saved in
+Scenes/Terrains/Terrain1.")
+        Paragraph("A new terrain is flat and plain. Later tutorials shape it, generate hills
 and mountains on it, and paint it with materials such as grass and rock.")
     end
 
-    action AddTerrainStaysAtOrigin(Section section)
-        AddHeading(section, "A terrain stays at the origin", 3)
-        section:AddParagraph("Other items can be moved, turned and scaled. A terrain can't. Its heights
+    private action TerrainStaysAtOrigin
+        Subsection("A terrain stays at the origin")
+        Paragraph("Other items can be moved, turned and scaled. A terrain can't. Its heights
 are positions in the world, and games use them to work out where the ground
 is, so it always stays at the origin. If you press a move, turn or scale
 key with a terrain selected, it stays where it is, and the first time you
 hear:")
-        section:AddParagraph(dq + "A terrain stays at the origin. It can't be moved, turned or scaled." + dq)
-        Paragraph paragraph4
-        paragraph4:AddText("Instead of moving a terrain, you move the other items onto it. A later
-tutorial, ")
-        AddLink(paragraph4, "Shaping Terrain", "/tutorials/Scenes/terrainShape.html")
-        paragraph4:AddText(", shows
+        Paragraph():DoubleQuote():Output("A terrain stays at the origin. It can't be moved, turned or scaled."):DoubleQuote()
+        Paragraph("Instead of moving a terrain, you move the other items onto it. A later
+tutorial, "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(", shows
 how the move keys take on a new job once you choose a terrain tool.")
-        section:Add(paragraph4)
     end
 
-    action AddMovingAroundTerrainKeyboard(Section section)
-        AddHeading(section, "Moving around a terrain with the keyboard", 3)
-        Paragraph paragraph5
-        paragraph5:AddText("Everything you can do on a terrain with the mouse, you can also do with the
+    private action MovingAroundTerrainKeyboard
+        Subsection("Moving around a terrain with the keyboard")
+        Paragraph("Everything you can do on a terrain with the mouse, you can also do with the
 keyboard. With nothing selected, the arrow keys move the scene editor's
-")
-        AddBold(paragraph5, "cursor")
-        paragraph5:AddText(", a small marker, around the 3D grid:")
-        section:Add(paragraph5)
-        WebTable table1 = LoadWebTable("Keys for moving around the scene", "/html/media/scenes/Terrain/InAScene/MoveKeys.csv")
-        section:Add(table1)
-        Paragraph paragraph6
-        paragraph6:AddText("When you let go of an arrow key, a screen reader says what is at the
+"):Term("cursor"):Text(", a small marker, around the 3D grid:")
+        Table("Keys for moving around the scene", "media/scenes/Terrain/InAScene/MoveKeys.csv")
+        Paragraph("When you let go of an arrow key, a screen reader says what is at the
 cursor's spot and where it is. To select the terrain, move the cursor down
-to ground level and press ")
-        AddKey(paragraph6, "Enter")
-        paragraph6:AddText(". If something stands on the ground there,
-")
-        AddKey(paragraph6, "Tab")
-        paragraph6:AddText(" moves between the items in that spot. With a terrain selected, the
+to ground level and press "):Key("Enter"):Text(". If something stands on the ground there,
+"):Key("Tab"):Text(" moves between the items in that spot. With a terrain selected, the
 arrow keys don't move it, because a terrain stays at the origin. Once you
 choose a terrain tool, they move the tool's brush over the ground instead,
-as ")
-        AddLink(paragraph6, "Shaping Terrain", "/tutorials/Scenes/terrainShape.html")
-        paragraph6:AddText(" shows.")
-        section:Add(paragraph6)
+as "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(" shows.")
     end
 
-    action AddMovingCameraKeyboard(Section section)
-        AddHeading(section, "Moving the camera with the keyboard", 3)
-        Paragraph paragraph7
-        paragraph7:AddText("The view of the scene comes from the scene editor's ")
-        AddBold(paragraph7, "camera")
-        paragraph7:AddText(". With the
+    private action MovingCameraKeyboard
+        Subsection("Moving the camera with the keyboard")
+        Paragraph("The view of the scene comes from the scene editor's "):Strong("camera"):Text(". With the
 mouse, hold the right button and drag to look around, hold the middle
-button and drag to orbit around a point, hold ")
-        AddKey(paragraph7, "Shift")
-        paragraph7:AddText(" and the middle button
+button and drag to orbit around a point, hold "):Key("Shift"):Text(" and the middle button
 to pan, and use the scroll wheel to zoom.")
-        section:Add(paragraph7)
-        section:AddParagraph("With the keyboard, you move the camera by changing its properties:")
-        OrderedList list3
-        list3:AddClassAttribute("list-decimal list-outside pl-8")
-        ListItem item6
-        item6:AddText("Press ")
-        AddKey(item6, "Alt+F")
-        item6:AddText(" (")
-        AddKey(item6, "Option+F")
-        item6:AddText(" on Mac) to select the scene editor's camera.")
-        list3:Add(item6)
-        ListItem item7
-        item7:AddText("Press ")
-        AddKey(item7, "Ctrl+P")
-        item7:AddText(" (")
-        AddKey(item7, "Cmd+P")
-        item7:AddText(" on Mac) to move into the Properties panel.")
-        list3:Add(item7)
-        ListItem item8
-        item8:AddText("The camera's section has its ")
-        AddBold(item8, "distance")
-        item8:AddText(" from the point it looks at,
-its ")
-        AddBold(item8, "direction")
-        item8:AddText(" as a yaw (turning left and right) and a pitch (looking
-up and down), its ")
-        AddBold(item8, "zoom")
-        item8:AddText(", and its ")
-        AddBold(item8, "field of view")
-        item8:AddText(". ")
-        AddKey(item8, "Tab")
-        item8:AddText(" to a field,
-type a new value, and press ")
-        AddKey(item8, "Enter")
-        item8:AddText(".")
-        list3:Add(item8)
-        ListItem item9
-        item9:AddText("Press ")
-        AddKey(item9, "Escape")
-        item9:AddText(" to go back to the scene.")
-        list3:Add(item9)
-        section:Add(list3)
-        Paragraph paragraph8
-        paragraph8:AddText("For example, changing the pitch tilts the camera to look further down at
+        Paragraph("With the keyboard, you move the camera by changing its properties:")
+        NumberedList()
+        ListItem("Press "):Keys("Alt", "F"):Text(" ("):Keys("Option", "F"):Text(" on Mac) to select the scene editor's camera.")
+        ListItem("Press "):Keys("Ctrl", "P"):Text(" ("):Keys("Cmd", "P"):Text(" on Mac) to move into the Properties panel.")
+        ListItem("The camera's section has its "):Strong("distance"):Text(" from the point it looks at,
+its "):Strong("direction"):Text(" as a yaw (turning left and right) and a pitch (looking
+up and down), its "):Strong("zoom"):Text(", and its "):Strong("field of view"):Text(". "):Key("Tab"):Text(" to a field,
+type a new value, and press "):Key("Enter"):Text(".")
+        ListItem("Press "):Key("Escape"):Text(" to go back to the scene.")
+        Paragraph("For example, changing the pitch tilts the camera to look further down at
 the terrain or further across it, and a larger distance shows more of it at
-once. With nothing selected, ")
-        AddKey(paragraph8, "Ctrl+Shift+2")
-        paragraph8:AddText(" says which way the camera
+once. With nothing selected, "):Keys("Ctrl", "Shift", "2"):Text(" says which way the camera
 faces, so you can check it after each change. These keys work the
 same in every scene, terrain or not; the full list is on
-")
-        AddLink(paragraph8, "Navigation and Keys", "/tutorials/Scenes/navigate.html")
-        paragraph8:AddText(".")
-        section:Add(paragraph8)
+"):Link("Navigation and Keys", "/tutorials/Scenes/navigate.html"):Text(".")
     end
 
-    action AddSelectingTerrain(Section section)
-        AddHeading(section, "Selecting a terrain", 3)
-        section:AddParagraph("You can select a terrain in three ways:")
-        UnorderedList list4
-        list4:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem item10
-        item10:AddText("from the ")
-        AddBold(item10, "scene tree")
-        item10:AddText(", where it is listed once, by its name;")
-        list4:Add(item10)
-        ListItem item11
-        item11:AddText("by ")
-        AddBold(item11, "clicking the ground")
-        item11:AddText(" in the 3D view. If an item stands on the
+    private action SelectingTerrain
+        Subsection("Selecting a terrain")
+        Paragraph("You can select a terrain in three ways:")
+        BulletList()
+        ListItem("from the "):Strong("scene tree"):Text(", where it is listed once, by its name;")
+        ListItem("by "):Strong("clicking the ground"):Text(" in the 3D view. If an item stands on the
 ground, such as a cube, clicking the item selects the item, not the
 ground;")
-        list4:Add(item11)
-        ListItem item12
-        item12:AddText("with the ")
-        AddBold(item12, "scene cursor:")
-        item12:AddText(" move the cursor to ground level and press
-")
-        AddKey(item12, "Enter")
-        item12:AddText(".")
-        list4:Add(item12)
-        section:Add(list4)
-        section:AddParagraph("A selected terrain gets a thin border around its edges.")
+        ListItem("with the "):Strong("scene cursor:"):Text(" move the cursor to ground level and press
+"):Key("Enter"):Text(".")
+        Paragraph("A selected terrain gets a thin border around its edges.")
     end
 
-    action AddTerrainSectionPropertiesPanel(Section section)
-        AddHeading(section, "The Terrain section of the Properties panel", 3)
-        Paragraph paragraph9
-        paragraph9:AddText("When a terrain is selected, the Properties panel on the right of the scene
-tab shows its sections. Press ")
-        AddKey(paragraph9, "Cmd+P")
-        paragraph9:AddText(" on Mac or ")
-        AddKey(paragraph9, "Ctrl+P")
-        paragraph9:AddText(" on Windows to
-move into the panel, ")
-        AddKey(paragraph9, "Tab")
-        paragraph9:AddText(" to move through it, and ")
-        AddKey(paragraph9, "Escape")
-        paragraph9:AddText(" to go
+    private action TerrainSectionPropertiesPanel
+        Subsection("The Terrain section of the Properties panel")
+        Paragraph("When a terrain is selected, the Properties panel on the right of the scene
+tab shows its sections. Press "):Keys("Cmd", "P"):Text(" on Mac or "):Keys("Ctrl", "P"):Text(" on Windows to
+move into the panel, "):Key("Tab"):Text(" to move through it, and "):Key("Escape"):Text(" to go
 back to the scene. (The panel is introduced in
-")
-        AddLink(paragraph9, "Properties", "/tutorials/Scenes/properties.html")
-        paragraph9:AddText(".)")
-        section:Add(paragraph9)
-        Paragraph paragraph10
-        paragraph10:AddText("The first section is ")
-        AddBold(paragraph10, "Terrain")
-        paragraph10:AddText(". It starts with the terrain's ")
-        AddBold(paragraph10, "Name")
-        paragraph10:AddText(",
+"):Link("Properties", "/tutorials/Scenes/properties.html"):Text(".)")
+        Paragraph("The first section is "):Strong("Terrain"):Text(". It starts with the terrain's "):Strong("Name"):Text(",
 which you can change. Below it is a line for each fact about the terrain.
-")
-        AddKey(paragraph10, "Tab")
-        paragraph10:AddText(" stops on each line, so a screen reader reads it. For a new terrain
+"):Key("Tab"):Text(" stops on each line, so a screen reader reads it. For a new terrain
 they read:")
-        section:Add(paragraph10)
-        UnorderedList list5
-        list5:AddClassAttribute("list-disc list-outside pl-8")
-        list5:AddListItem(dq + "Size: 128.0 by 128.0 units" + dq)
-        list5:AddListItem(dq + "Regions: 4, each 64 by 64 samples" + dq)
-        list5:AddListItem(dq + "Sample spacing: 1.0 units" + dq)
-        list5:AddListItem(dq + "Ground height: 0.0 to 0.0" + dq)
-        list5:AddListItem(dq + "Folder: Scenes/Terrains/Terrain1" + dq)
-        section:Add(list5)
-        Paragraph paragraph11
-        paragraph11:AddText("The ground height is the lowest and highest point on the terrain. It is 0
+        BulletList()
+        ListItem():DoubleQuote():Output("Size: 128.0 by 128.0 units"):DoubleQuote()
+        ListItem():DoubleQuote():Output("Regions: 4, each 64 by 64 samples"):DoubleQuote()
+        ListItem():DoubleQuote():Output("Sample spacing: 1.0 units"):DoubleQuote()
+        ListItem():DoubleQuote():Output("Ground height: 0.0 to 0.0"):DoubleQuote()
+        ListItem():DoubleQuote():Output("Folder: Scenes/Terrains/Terrain1"):DoubleQuote()
+        Paragraph("The ground height is the lowest and highest point on the terrain. It is 0
 to 0 now because the terrain is flat. Watch it change when you shape the
-ground in ")
-        AddLink(paragraph11, "Shaping Terrain", "/tutorials/Scenes/terrainShape.html")
-        paragraph11:AddText(".")
-        section:Add(paragraph11)
-        Paragraph paragraph12
-        paragraph12:AddText("The section ends with a button, ")
-        AddBold(paragraph12, "Grow by one region on every side")
-        paragraph12:AddText(", which
+ground in "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(".")
+        Paragraph("The section ends with a button, "):Strong("Grow by one region on every side"):Text(", which
 adds a ring of flat regions around the terrain. Regions are explained
 below.")
-        section:Add(paragraph12)
-        section:AddParagraph("After the Terrain section come four more:")
-        UnorderedList list6
-        list6:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem item13
-        AddBold(item13, "Materials")
-        item13:AddText(", for the ground's look
-(")
-        AddLink(item13, "Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html")
-        item13:AddText(");")
-        list6:Add(item13)
-        ListItem item14
-        AddBold(item14, "Brush")
-        item14:AddText(", for shaping it
-(")
-        AddLink(item14, "Shaping Terrain", "/tutorials/Scenes/terrainShape.html")
-        item14:AddText(");")
-        list6:Add(item14)
-        ListItem item15
-        AddBold(item15, "Generate")
-        item15:AddText(", for making ground from rules
-(")
-        AddLink(item15, "Generating Terrain", "/tutorials/Scenes/terrainGenerate.html")
-        item15:AddText(");")
-        list6:Add(item15)
-        ListItem item16
-        AddBold(item16, "Physics")
-        item16:AddText(", for how the terrain acts in a running game, such as whether
+        Paragraph("After the Terrain section come four more:")
+        BulletList()
+        ListItem():Strong("Materials"):Text(", for the ground's look
+("):Link("Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html"):Text(");")
+        ListItem():Strong("Brush"):Text(", for shaping it
+("):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(");")
+        ListItem():Strong("Generate"):Text(", for making ground from rules
+("):Link("Generating Terrain", "/tutorials/Scenes/terrainGenerate.html"):Text(");")
+        ListItem():Strong("Physics"):Text(", for how the terrain acts in a running game, such as whether
 things collide with it and how slippery it is
-(")
-        AddLink(item16, "Terrain in a Game", "/tutorials/Scenes/terrainGames.html")
-        item16:AddText(").")
-        list6:Add(item16)
-        section:Add(list6)
+("):Link("Terrain in a Game", "/tutorials/Scenes/terrainGames.html"):Text(").")
     end
 
-    action AddRegions(Section section)
-        AddHeading(section, "Regions", 3)
-        Paragraph paragraph13
-        paragraph13:AddText("A large world could have millions of samples, so a terrain is split into
-square ")
-        AddBold(paragraph13, "regions")
-        paragraph13:AddText(". Each region is a small grid of samples with its own
+    private action Regions
+        Subsection("Regions")
+        Paragraph("A large world could have millions of samples, so a terrain is split into
+square "):Term("regions"):Text(". Each region is a small grid of samples with its own
 heightmap file. A game can then load only the regions near the player, which
 keeps very big worlds manageable. A new terrain in Quorum Studio has four
 regions, two by two, each 64 by 64 samples, with the samples 1 unit apart.
 That makes it 128 by 128 units, with the origin in the middle.")
-        section:Add(paragraph13)
-        Paragraph paragraph14
-        paragraph14:AddText("Regions are numbered by where they sit. Region 0, 0 starts at the origin
+        Paragraph("Regions are numbered by where they sit. Region 0, 0 starts at the origin
 and covers the next 64 units along x and z; region -1, 0 is the one just
 before it along x, and so on. You can add regions to make the world bigger,
 or remove ones you don't need, with tools covered in
-")
-        AddLink(paragraph14, "Generating Terrain", "/tutorials/Scenes/terrainGenerate.html")
-        paragraph14:AddText(".")
-        section:Add(paragraph14)
+"):Link("Generating Terrain", "/tutorials/Scenes/terrainGenerate.html"):Text(".")
     end
 
-    action AddFilesOnDisk(Section section)
-        AddHeading(section, "The files on disk", 3)
-        Paragraph paragraph15
-        paragraph15:AddText("Quorum Studio keeps a scene's own files in the project's ")
-        AddBold(paragraph15, "Scenes")
-        paragraph15:AddText(" folder. Each
-terrain gets a folder under ")
-        AddCode(paragraph15, "Scenes/Terrains")
-        paragraph15:AddText(": the first is ")
-        AddCode(paragraph15, "Terrain1")
-        paragraph15:AddText(", the
-next ")
-        AddCode(paragraph15, "Terrain2")
-        paragraph15:AddText(", and so on. A new terrain's folder holds:")
-        section:Add(paragraph15)
-        UnorderedList list7
-        list7:AddClassAttribute("list-disc list-outside pl-8")
-        ListItem item17
-        AddCode(item17, "terrain.json")
-        item17:AddText(", a small text file describing the terrain;")
-        list7:Add(item17)
-        ListItem item18
-        item18:AddText("one image for each region, named for the region's place in the grid of
-regions: ")
-        AddCode(item18, "region_-1_-1.png")
-        item18:AddText(", ")
-        AddCode(item18, "region_-1_0.png")
-        item18:AddText(", ")
-        AddCode(item18, "region_0_-1.png")
-        item18:AddText(" and
-")
-        AddCode(item18, "region_0_0.png")
-        item18:AddText(".")
-        list7:Add(item18)
-        section:Add(list7)
-        Paragraph paragraph16
-        paragraph16:AddText("Open ")
-        AddCode(paragraph16, "terrain.json")
-        paragraph16:AddText(" in Quorum Studio. It is plain data, much like this:")
-        section:Add(paragraph16)
-        AddJson(section, "/html/sources/tutorials/scenes/SceneTerrain/terrain.json")
-        Paragraph paragraph17
-        paragraph17:AddText("Each region's image holds its heights. Every pixel is one sample. Its color
+    private action FilesOnDisk
+        Subsection("The files on disk")
+        Paragraph("Quorum Studio keeps a scene's own files in the project's "):Strong("Scenes"):Text(" folder. Each
+terrain gets a folder under "):Code("Scenes/Terrains"):Text(": the first is "):Code("Terrain1"):Text(", the
+next "):Code("Terrain2"):Text(", and so on. A new terrain's folder holds:")
+        BulletList()
+        ListItem():Code("terrain.json"):Text(", a small text file describing the terrain;")
+        ListItem("one image for each region, named for the region's place in the grid of
+regions: "):Code("region_-1_-1.png"):Text(", "):Code("region_-1_0.png"):Text(", "):Code("region_0_-1.png"):Text(" and
+"):Code("region_0_0.png"):Text(".")
+        Paragraph("Open "):Code("terrain.json"):Text(" in Quorum Studio. It is plain data, much like this:")
+        JsonExampleFromFile("sources/tutorials/scenes/SceneTerrain/terrain.json")
+        Paragraph("Each region's image holds its heights. Every pixel is one sample. Its color
 is not a picture of the ground: the red, green and blue values together
 store a number that says how far the sample's height is between the
-region's lowest and highest heights, which ")
-        AddCode(paragraph17, "terrain.json")
-        paragraph17:AddText(" lists. That is
+region's lowest and highest heights, which "):Code("terrain.json"):Text(" lists. That is
 why an image of hilly ground can look like odd stripes of color.")
-        section:Add(paragraph17)
-        Paragraph paragraph18
-        paragraph18:AddText("The scene file itself, the ")
-        AddCode(paragraph18, ".qs")
-        paragraph18:AddText(" file, only refers to the terrain's
-")
-        AddCode(paragraph18, "terrain.json")
-        paragraph18:AddText(", along with its name and its physics settings. Saving the
+        Paragraph("The scene file itself, the "):Code(".qs"):Text(" file, only refers to the terrain's
+"):Code("terrain.json"):Text(", along with its name and its physics settings. Saving the
 scene saves the terrain's files too.")
-        section:Add(paragraph18)
     end
 
-    action AddDeletingUndoingRedoing(Section section)
-        AddHeading(section, "Deleting, undoing and redoing", 3)
-        Paragraph paragraph19
-        paragraph19:AddText("A terrain is deleted like any item: select it and press ")
-        AddKey(paragraph19, "Delete")
-        paragraph19:AddText(" or
-")
-        AddKey(paragraph19, "Backspace")
-        paragraph19:AddText(". Quorum Studio's Undo and Redo bring it back or remove it again.
+    private action DeletingUndoingRedoing
+        Subsection("Deleting, undoing and redoing")
+        Paragraph("A terrain is deleted like any item: select it and press "):Key("Delete"):Text(" or
+"):Key("Backspace"):Text(". Quorum Studio's Undo and Redo bring it back or remove it again.
 Deleting a terrain doesn't delete its folder. Quorum Studio never deletes files
 from a project when it saves, so the folder stays until you remove it.")
-        section:Add(paragraph19)
     end
 
-    action AddEngage returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Engage", 2)
-        section:AddParagraph("In this activity, you and a partner make a terrain out of numbers and read
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner make a terrain out of numbers and read
 each other's worlds from the numbers alone. The goal is to understand that a
 terrain is a grid of heights, which is exactly what Quorum stores. Each of
 you takes a piece of squared paper and marks out an area about 6 by 6
@@ -530,111 +275,23 @@ peak). Don't draw anything else: just numbers. Then swap papers. Using only
 the numbers, describe your partner's world out loud: where are the hills,
 the valleys and the flat places? Your partner then says what they imagined,
 and you compare.")
-        section:AddParagraph("Your paper is a heightmap, and each square is one sample, just like one
+        Paragraph("Your paper is a heightmap, and each square is one sample, just like one
 point in a Quorum terrain. Together, discuss:")
-        UnorderedList list1
-        list1:AddClassAttribute("list-disc list-outside pl-8")
-        list1:AddListItem("What would change if the squares were twice as far apart? Half as far?")
-        list1:AddListItem("If your world were 1,000 squares wide, how could you split it into pieces
+        BulletList()
+        ListItem("What would change if the squares were twice as far apart? Half as far?")
+        ListItem("If your world were 1,000 squares wide, how could you split it into pieces
 so a game only needs part of it at once?")
-        ListItem item1
-        item1:AddText("Write a short data dictionary for ")
-        AddCode(item1, "terrain.json")
-        item1:AddText(": for each field, its
+        ListItem("Write a short data dictionary for "):Code("terrain.json"):Text(": for each field, its
 name, its type, and what values make sense.")
-        list1:Add(item1)
-        section:Add(list1)
-        return section
     end
 
-    action AddWrapup returns Section
-        Section section
-        section:AddClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section, "Wrap up", 2)
-        Paragraph paragraph1
-        paragraph1:AddText("A terrain is a set of heights, measured at evenly spaced samples and split
-into square regions, each saved as its own image, with ")
-        AddCode(paragraph1, "terrain.json")
-        paragraph1:AddText(" to
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A terrain is a set of heights, measured at evenly spaced samples and split
+into square regions, each saved as its own image, with "):Code("terrain.json"):Text(" to
 describe them. What did you notice about the trade-off between detail and
 the amount of data to store? In the next tutorial,
-")
-        AddLink(paragraph1, "Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html")
-        paragraph1:AddText(",
+"):Link("Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html"):Text(",
 you will give the ground its look: grass, rock, dirt and sand.")
-        section:Add(paragraph1)
-        return section
-    end
-
-    private action AddStandard(UnorderedList list, text identifier, text standard)
-        ListItem item
-        AddBold(item, identifier)
-        item:AddText(": " + standard)
-        list:Add(item)
-    end
-
-    private action AddBold(WebTag tag, text value)
-        StrongText strong
-        strong:AddText(value)
-        tag:AddNestedTag(strong)
-    end
-
-    private action AddCode(WebTag tag, text value)
-        CodeBlock code
-        code:AddClassAttribute("break-words")
-        code:AddText(value)
-        tag:AddNestedTag(code)
-    end
-
-    private action AddKey(WebTag tag, text value)
-        KeyboardInput key
-        key:AddText(value)
-        tag:AddNestedTag(key)
-    end
-
-    private action AddLink(WebTag tag, text name, text address)
-        Link link
-        link:AddText(name)
-        link:SetAddress(address)
-        link:SetClassAttribute("underline text-quorum-blue-150")
-        tag:AddNestedTag(link)
-    end
-
-    private action AddJson(Section section, text path)
-        PreformattedText preformatted
-        preformatted:AddClassAttribute("whitespace-pre-wrap break-words")
-        preformatted:AddClassAttribute("language-json")
-        CodeBlock code
-        code:AddText(GetTextFromSource(path))
-        preformatted:Add(code)
-        section:Add(preformatted)
-    end
-
-    action GetMetaDescription returns text
-        return "Learn to add a terrain to a 3D scene in Quorum Studio, select it, read its properties, and find the files it is saved in."
-    end
-
-    action GetSummaryName returns text
-        return "Terrain in a Scene"
-    end
-
-    action GetName returns text
-        return "Terrain in a Scene"
-    end
-
-    action GetShortDescription returns text
-        return "adding a terrain to a 3D scene"
-    end
-
-    action GetLocation returns text
-        return "tutorials/Scenes/terrain.html"
-    end
-
-    action GetLinkName returns text
-        return "Terrain in a Scene"
-    end
-
-    action GetSectionName returns text
-        return "Scene Editing"
     end
 end

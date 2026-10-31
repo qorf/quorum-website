@@ -840,6 +840,9 @@ HasFontOutlineThickness() {
 GetFocusFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusFontColor();
 }
+SnapClipEdge$quorum_number(value) {
+     return this.Libraries_Interface_Item2D__.SnapClipEdge$quorum_number(value);
+}
 SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
@@ -1010,6 +1013,9 @@ GetBoundingRectangle() {
 }
 GetMouseMovementListeners() {
      return this.Libraries_Interface_Item__.GetMouseMovementListeners();
+}
+SetFocusBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFocusBorderThickness$quorum_number(value);
 }
 SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
@@ -1245,6 +1251,9 @@ RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivat
 Focus() {
      return this.Libraries_Interface_Item__.Focus();
 }
+GetFocusBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetFocusBorderThickness();
+}
 SetScale$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
 }
@@ -1418,6 +1427,9 @@ GetGestureListeners() {
 }
 SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+HasFocusBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasFocusBorderThickness();
 }
 GetFocusBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusBorderColor();
@@ -3219,6 +3231,9 @@ HasFontOutlineThickness() {
 GetFocusFontColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusFontColor();
 }
+SnapClipEdge$quorum_number(value) {
+     return this.Libraries_Interface_Item2D__.SnapClipEdge$quorum_number(value);
+}
 SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetGlowColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
 }
@@ -3389,6 +3404,9 @@ GetBoundingRectangle() {
 }
 GetMouseMovementListeners() {
      return this.Libraries_Interface_Item__.GetMouseMovementListeners();
+}
+SetFocusBorderThickness$quorum_number(value) {
+     return this.Libraries_Interface_Controls_Control__.SetFocusBorderThickness$quorum_number(value);
 }
 SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetFocusColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
@@ -3630,6 +3648,9 @@ RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivat
 Focus() {
      return this.Libraries_Interface_Item__.Focus();
 }
+GetFocusBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.GetFocusBorderThickness();
+}
 SetScale$quorum_number$quorum_number(newX, newY) {
      return this.Libraries_Interface_Item2D__.SetScale$quorum_number$quorum_number(newX, newY);
 }
@@ -3803,6 +3824,9 @@ GetGestureListeners() {
 }
 SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value) {
      return this.Libraries_Interface_Controls_Control__.SetIconColor$quorum_Libraries_Game_Graphics_ColorGroup(value);
+}
+HasFocusBorderThickness() {
+     return this.Libraries_Interface_Controls_Control__.HasFocusBorderThickness();
 }
 GetFocusBorderColor() {
      return this.Libraries_Interface_Controls_Control__.GetFocusBorderColor();
@@ -6681,23 +6705,11 @@ ProcessScreenshots() {
 IsWindowMinimized() {
      return this.Libraries_Game_Game__.IsWindowMinimized();
 }
-SetVSync$quorum_boolean(vSync) {
-     return this.Libraries_Game_Game__.SetVSync$quorum_boolean(vSync);
-}
 ResetDepthBuffer() {
      return this.Libraries_Game_Game__.ResetDepthBuffer();
 }
-FindItem2DByName$quorum_text(name) {
-     return this.Libraries_Game_Game__.FindItem2DByName$quorum_text(name);
-}
-RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener) {
-     return this.Libraries_Game_Game__.RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener);
-}
 GetInterfaceOptions() {
      return this.Libraries_Game_Game__.GetInterfaceOptions();
-}
-AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
-     return this.Libraries_Game_Game__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
 }
 RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Game_Game__.RemoveMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
@@ -6711,17 +6723,11 @@ RemoveControlActivationListener$quorum_Libraries_Interface_Events_ControlActivat
 GetPointLights() {
      return this.Libraries_Game_Game__.GetPointLights();
 }
-RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener) {
-     return this.Libraries_Game_Game__.RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener);
-}
 IsWindowMaximized() {
      return this.Libraries_Game_Game__.IsWindowMaximized();
 }
 AddLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer) {
      return this.Libraries_Game_Game__.AddLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer);
-}
-AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
-     return this.Libraries_Game_Game__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
 AddTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener) {
      return this.Libraries_Game_Game__.AddTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener);
@@ -6735,29 +6741,17 @@ RemoveLayer$quorum_integer(index) {
 SetInterfaceScale$quorum_number(scale) {
      return this.Libraries_Game_Game__.SetInterfaceScale$quorum_number(scale);
 }
-SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer) {
-     return this.Libraries_Game_Game__.SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer);
-}
 IsFinished() {
      return this.Libraries_Interface_Behaviors_Behavior__.IsFinished();
-}
-RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
-     return this.Libraries_Game_Game__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
 }
 GetSceneManager() {
      return this.Libraries_Game_Game__.GetSceneManager();
 }
-Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback) {
-     return this.Libraries_Game_Game__.Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback);
-}
 AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener) {
      return this.Libraries_Game_Game__.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener);
 }
-Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback) {
-     return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback);
-}
-AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
-     return this.Libraries_Game_Game__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
+ShowFocusOutline() {
+     return this.Libraries_Game_Game__.ShowFocusOutline();
 }
 TestForCollisions$quorum_number(seconds) {
      return this.Libraries_Game_Game__.TestForCollisions$quorum_number(seconds);
@@ -6767,9 +6761,6 @@ GetFocus() {
 }
 GetWebConfiguration() {
      return this.Libraries_Game_Game__.GetWebConfiguration();
-}
-Remove$quorum_Libraries_Game_Graphics_PointLight(light) {
-     return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_PointLight(light);
 }
 Dispose() {
      return this.Libraries_Interface_Behaviors_Behavior__.Dispose();
@@ -6786,35 +6777,14 @@ RemoveMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListe
 UseVulkan$quorum_boolean(enabled) {
      return this.Libraries_Game_Game__.UseVulkan$quorum_boolean(enabled);
 }
-GetHashCode() {
-return global_Object_GetHashCode(this.prototype, );
-}
-GetEditManager() {
-     return this.Libraries_Game_Game__.GetEditManager();
-}
 GetFirstLetterNavigationTime() {
      return this.Libraries_Game_Game__.GetFirstLetterNavigationTime();
-}
-StartAndroidGame() {
-     return this.Libraries_Game_Game__.StartAndroidGame();
-}
-SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras) {
-     return this.Libraries_Game_Game__.SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras);
 }
 CompleteInitialSetup$quorum_Libraries_Game_Application(application) {
      return this.Libraries_Game_Game__.CompleteInitialSetup$quorum_Libraries_Game_Application(application);
 }
 GetFontManager() {
      return this.Libraries_Game_Game__.GetFontManager();
-}
-Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light) {
-     return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light);
-}
-AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
-     return this.Libraries_Game_Game__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
-}
-DrawAll() {
-     return this.Libraries_Game_Game__.DrawAll();
 }
 GetCamera2D() {
      return this.Libraries_Game_Game__.GetCamera2D();
@@ -6825,38 +6795,17 @@ GetInterfaceScale() {
 SetSimulationThreshold2D$quorum_number(threshold) {
      return this.Libraries_Game_Game__.SetSimulationThreshold2D$quorum_number(threshold);
 }
-SaveScene() {
-     return this.Libraries_Game_Game__.SaveScene();
-}
-GetDirectionalLight$quorum_integer(index) {
-     return this.Libraries_Game_Game__.GetDirectionalLight$quorum_integer(index);
-}
 Compare$quorum_Libraries_Language_Object(object) {
 return global_Object_Compare(this.prototype, object);
 }
-EnablePhysics2D$quorum_boolean(flag) {
-     return this.Libraries_Game_Game__.EnablePhysics2D$quorum_boolean(flag);
-}
 SetAmbientLight$quorum_Libraries_Game_Graphics_AmbientLight(light) {
      return this.Libraries_Game_Game__.SetAmbientLight$quorum_Libraries_Game_Graphics_AmbientLight(light);
-}
-RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener) {
-     return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener);
-}
-SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer) {
-     return this.Libraries_Game_Game__.SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer);
 }
 SetGameName$quorum_text(name) {
      return this.Libraries_Game_Game__.SetGameName$quorum_text(name);
 }
 GetAvailableResolutions() {
      return this.Libraries_Game_Game__.GetAvailableResolutions();
-}
-RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
-     return this.Libraries_Game_Game__.RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
-}
-SetGravity2D$quorum_Libraries_Compute_Vector2(gravity) {
-     return this.Libraries_Game_Game__.SetGravity2D$quorum_Libraries_Compute_Vector2(gravity);
 }
 RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
      return this.Libraries_Game_Game__.RemoveGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
@@ -6879,35 +6828,17 @@ RemoveWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(
 Add$quorum_Libraries_Game_Graphics_DirectionalLight(light) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Game_Graphics_DirectionalLight(light);
 }
-Screenshot() {
-     return this.Libraries_Game_Game__.Screenshot();
+HideFocusOutlineUntilTouch() {
+     return this.Libraries_Game_Game__.HideFocusOutlineUntilTouch();
 }
 GetPointLight$quorum_integer(index) {
      return this.Libraries_Game_Game__.GetPointLight$quorum_integer(index);
 }
-AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
-     return this.Libraries_Game_Game__.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
-}
-GetScreenWidth() {
-     return this.Libraries_Game_Game__.GetScreenWidth();
-}
 GetCamera3D() {
      return this.Libraries_Game_Game__.GetCamera3D();
 }
-RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
-     return this.Libraries_Game_Game__.RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
-}
-CreateGraphicsManager() {
-     return this.Libraries_Game_Game__.CreateGraphicsManager();
-}
 RemoveAmbientLight() {
      return this.Libraries_Game_Game__.RemoveAmbientLight();
-}
-SetWindowMinimized$quorum_boolean(minimized) {
-     return this.Libraries_Game_Game__.SetWindowMinimized$quorum_boolean(minimized);
-}
-FindItem3DByName$quorum_text(name) {
-     return this.Libraries_Game_Game__.FindItem3DByName$quorum_text(name);
 }
 RemoveTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener) {
      return this.Libraries_Game_Game__.RemoveTreeChangeListener$quorum_Libraries_Interface_Events_TreeChangeListener(listener);
@@ -6927,23 +6858,272 @@ SetScreenSize$quorum_integer$quorum_integer(width, height) {
 SetCamera3D$quorum_Libraries_Game_Graphics_Camera(cam) {
      return this.Libraries_Game_Game__.SetCamera3D$quorum_Libraries_Game_Graphics_Camera(cam);
 }
-RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
-     return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
-}
 SetConfiguration$quorum_Libraries_Game_DesktopConfiguration(config) {
      return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_DesktopConfiguration(config);
-}
-AddLayer$quorum_Libraries_Game_Layer(layer) {
-     return this.Libraries_Game_Game__.AddLayer$quorum_Libraries_Game_Layer(layer);
 }
 AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
      return this.Libraries_Game_Game__.AddTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
 }
+SetDefaultInputTable$quorum_Libraries_Game_InputTable(table) {
+     return this.Libraries_Game_Game__.SetDefaultInputTable$quorum_Libraries_Game_InputTable(table);
+}
+GetSecondsBetweenFrames() {
+     return this.Libraries_Game_Game__.GetSecondsBetweenFrames();
+}
+RemoveLayer$quorum_Libraries_Game_Layer(layer) {
+     return this.Libraries_Game_Game__.RemoveLayer$quorum_Libraries_Game_Layer(layer);
+}
+AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
+     return this.Libraries_Game_Game__.AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
+}
+Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height) {
+     return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height);
+}
+SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution) {
+     return this.Libraries_Game_Game__.SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution);
+}
+GetAmbientLight() {
+     return this.Libraries_Game_Game__.GetAmbientLight();
+}
+SelectApplicationTypeNative() {
+     return this.Libraries_Game_Game__.SelectApplicationTypeNative();
+}
+AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
+     return this.Libraries_Game_Game__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
+}
+RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
+     return this.Libraries_Game_Game__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
+}
+RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
+     return this.Libraries_Game_Game__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
+}
+RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
+     return this.Libraries_Game_Game__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
+}
+GetSafeRegion() {
+     return this.Libraries_Game_Game__.GetSafeRegion();
+}
+GetFocusManager() {
+     return this.Libraries_Game_Game__.GetFocusManager();
+}
+EnableResizing$quorum_boolean(resize) {
+     return this.Libraries_Game_Game__.EnableResizing$quorum_boolean(resize);
+}
+RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener) {
+     return this.Libraries_Game_Game__.RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener);
+}
+GetDirectionalLights() {
+     return this.Libraries_Game_Game__.GetDirectionalLights();
+}
+SetWebContainerID$quorum_text(id) {
+     return this.Libraries_Game_Game__.SetWebContainerID$quorum_text(id);
+}
+RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
+     return this.Libraries_Game_Game__.RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
+}
+EnableTextureAutoResizing$quorum_boolean(resize) {
+     return this.Libraries_Game_Game__.EnableTextureAutoResizing$quorum_boolean(resize);
+}
+GetSimulationThreshold2D() {
+     return this.Libraries_Game_Game__.GetSimulationThreshold2D();
+}
+GetDesktopResolution() {
+     return this.Libraries_Game_Game__.GetDesktopResolution();
+}
+SetColliding$quorum_boolean(collide) {
+     return this.Libraries_Game_Game__.SetColliding$quorum_boolean(collide);
+}
+IsRunningOnUpdate() {
+     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
+}
+SetConfiguration$quorum_Libraries_Game_WebConfiguration(config) {
+     return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_WebConfiguration(config);
+}
+GetGameName() {
+     return this.Libraries_Game_Game__.GetGameName();
+}
+GetIOSConfiguration() {
+     return this.Libraries_Game_Game__.GetIOSConfiguration();
+}
+StartGame() {
+     return this.Libraries_Game_Game__.StartGame();
+}
+TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event) {
+     return this.Libraries_Interface_Events_TextChangeListener__.TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event);
+}
+AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
+     return this.Libraries_Game_Game__.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
+}
+SetConfiguration$quorum_Libraries_Game_IOSConfiguration(config) {
+     return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_IOSConfiguration(config);
+}
+Add$quorum_Libraries_Game_Graphics_PointLight(light) {
+     return this.Libraries_Game_Game__.Add$quorum_Libraries_Game_Graphics_PointLight(light);
+}
+GetSkybox() {
+     return this.Libraries_Game_Game__.GetSkybox();
+}
+GetInputTable$quorum_text(key) {
+     return this.Libraries_Game_Game__.GetInputTable$quorum_text(key);
+}
+SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha) {
+     return this.Libraries_Game_Game__.SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha);
+}
+GetDialogLayerPool() {
+     return this.Libraries_Game_Game__.GetDialogLayerPool();
+}
+GetAndroidConfiguration() {
+     return this.Libraries_Game_Game__.GetAndroidConfiguration();
+}
+RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener) {
+     return this.Libraries_Game_Game__.RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener);
+}
+GetAccessibility() {
+     return this.Libraries_Game_Game__.GetAccessibility();
+}
+AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
+     return this.Libraries_Game_Game__.AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
+}
+IsColliding() {
+     return this.Libraries_Game_Game__.IsColliding();
+}
+ContinueGame() {
+     return this.Libraries_Game_Game__.ContinueGame();
+}
+GetScreenResolution() {
+     return this.Libraries_Game_Game__.GetScreenResolution();
+}
+UpdateAfterPhysics$quorum_number(seconds) {
+     return this.Libraries_Game_Game__.UpdateAfterPhysics$quorum_number(seconds);
+}
+SetVSync$quorum_boolean(vSync) {
+     return this.Libraries_Game_Game__.SetVSync$quorum_boolean(vSync);
+}
+FindItem2DByName$quorum_text(name) {
+     return this.Libraries_Game_Game__.FindItem2DByName$quorum_text(name);
+}
+RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener) {
+     return this.Libraries_Game_Game__.RemoveResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener);
+}
+AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener) {
+     return this.Libraries_Game_Game__.AddGestureListener$quorum_Libraries_Interface_Events_GestureListener(listener);
+}
+RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener) {
+     return this.Libraries_Game_Game__.RemoveKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener);
+}
+AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
+     return this.Libraries_Game_Game__.AddMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
+}
+ReplaceSceneEditorInput$quorum_Libraries_Interface_SceneEditorKeys(keys) {
+     return this.Libraries_Game_Game__.ReplaceSceneEditorInput$quorum_Libraries_Interface_SceneEditorKeys(keys);
+}
+SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer) {
+     return this.Libraries_Game_Game__.SetLayer$quorum_integer$quorum_Libraries_Game_Layer(index, layer);
+}
+RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener) {
+     return this.Libraries_Game_Game__.RemoveMouseListener$quorum_Libraries_Interface_Events_MouseListener(listener);
+}
+Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback) {
+     return this.Libraries_Game_Game__.Screenshot$quorum_Libraries_Interface_Events_ScreenshotListener(callback);
+}
+Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback) {
+     return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer$quorum_Libraries_Interface_Events_ScreenshotListener(x, y, width, height, callback);
+}
+AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener) {
+     return this.Libraries_Game_Game__.AddMouseMovementListener$quorum_Libraries_Interface_Events_MouseMovementListener(listener);
+}
+Remove$quorum_Libraries_Game_Graphics_PointLight(light) {
+     return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_PointLight(light);
+}
+StartMobileVulkan$quorum_Libraries_Game_Graphics_Vulkan_VulkanGraphics(vulkan) {
+     return this.Libraries_Game_Game__.StartMobileVulkan$quorum_Libraries_Game_Graphics_Vulkan_VulkanGraphics(vulkan);
+}
+GetHashCode() {
+return global_Object_GetHashCode(this.prototype, );
+}
+GetEditManager() {
+     return this.Libraries_Game_Game__.GetEditManager();
+}
+UpdateFollowingCameras$quorum_number(seconds) {
+     return this.Libraries_Game_Game__.UpdateFollowingCameras$quorum_number(seconds);
+}
+StartAndroidGame() {
+     return this.Libraries_Game_Game__.StartAndroidGame();
+}
+SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras) {
+     return this.Libraries_Game_Game__.SetScreenSize$quorum_integer$quorum_integer$quorum_boolean(width, height, adjustCameras);
+}
+Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light) {
+     return this.Libraries_Game_Game__.Remove$quorum_Libraries_Game_Graphics_DirectionalLight(light);
+}
+AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
+     return this.Libraries_Game_Game__.AddFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
+}
+DrawAll() {
+     return this.Libraries_Game_Game__.DrawAll();
+}
+SaveScene() {
+     return this.Libraries_Game_Game__.SaveScene();
+}
+GetDirectionalLight$quorum_integer(index) {
+     return this.Libraries_Game_Game__.GetDirectionalLight$quorum_integer(index);
+}
+EnablePhysics2D$quorum_boolean(flag) {
+     return this.Libraries_Game_Game__.EnablePhysics2D$quorum_boolean(flag);
+}
+RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener) {
+     return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener2D(listener);
+}
+SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer) {
+     return this.Libraries_Game_Game__.SetCurrentLayer2D$quorum_Libraries_Game_Layer2D(layer);
+}
+RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
+     return this.Libraries_Game_Game__.RemoveScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
+}
+SetGravity2D$quorum_Libraries_Compute_Vector2(gravity) {
+     return this.Libraries_Game_Game__.SetGravity2D$quorum_Libraries_Compute_Vector2(gravity);
+}
+GetMultisampling2D() {
+     return this.Libraries_Game_Game__.GetMultisampling2D();
+}
+IsFocusOutlineHidden() {
+     return this.Libraries_Game_Game__.IsFocusOutlineHidden();
+}
+Screenshot() {
+     return this.Libraries_Game_Game__.Screenshot();
+}
+AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
+     return this.Libraries_Game_Game__.AddTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
+}
+GetScreenWidth() {
+     return this.Libraries_Game_Game__.GetScreenWidth();
+}
+RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener) {
+     return this.Libraries_Game_Game__.RemoveTextChangeListener$quorum_Libraries_Interface_Events_TextChangeListener(listener);
+}
+CreateGraphicsManager() {
+     return this.Libraries_Game_Game__.CreateGraphicsManager();
+}
+SetWindowMinimized$quorum_boolean(minimized) {
+     return this.Libraries_Game_Game__.SetWindowMinimized$quorum_boolean(minimized);
+}
+FindItem3DByName$quorum_text(name) {
+     return this.Libraries_Game_Game__.FindItem3DByName$quorum_text(name);
+}
+RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
+     return this.Libraries_Game_Game__.RemoveCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
+}
+AddLayer$quorum_Libraries_Game_Layer(layer) {
+     return this.Libraries_Game_Game__.AddLayer$quorum_Libraries_Game_Layer(layer);
+}
+GetMultisampling3D() {
+     return this.Libraries_Game_Game__.GetMultisampling3D();
+}
 HasBeenRun() {
      return this.Libraries_Interface_Behaviors_Behavior__.HasBeenRun();
 }
-SetDefaultInputTable$quorum_Libraries_Game_InputTable(table) {
-     return this.Libraries_Game_Game__.SetDefaultInputTable$quorum_Libraries_Game_InputTable(table);
+SetMultisampling2D$quorum_integer(samples) {
+     return this.Libraries_Game_Game__.SetMultisampling2D$quorum_integer(samples);
 }
 SetScreenResolution$quorum_Libraries_Game_ScreenResolution$quorum_boolean(resolution, adjustCameras) {
      return this.Libraries_Game_Game__.SetScreenResolution$quorum_Libraries_Game_ScreenResolution$quorum_boolean(resolution, adjustCameras);
@@ -6960,15 +7140,6 @@ LoadScene$quorum_Libraries_Game_Scenes_Scene(scene) {
 SetGravity3D$quorum_Libraries_Compute_Vector3(gravity) {
      return this.Libraries_Game_Game__.SetGravity3D$quorum_Libraries_Compute_Vector3(gravity);
 }
-GetSecondsBetweenFrames() {
-     return this.Libraries_Game_Game__.GetSecondsBetweenFrames();
-}
-RemoveLayer$quorum_Libraries_Game_Layer(layer) {
-     return this.Libraries_Game_Game__.RemoveLayer$quorum_Libraries_Game_Layer(layer);
-}
-AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
-     return this.Libraries_Game_Game__.AddMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
-}
 ProcessInputEvents() {
      return this.Libraries_Game_Game__.ProcessInputEvents();
 }
@@ -6981,47 +7152,17 @@ SetFontManager$quorum_Libraries_Game_Graphics_Fonts_FontManager(fontManager) {
 SetWindowMaximized$quorum_boolean(maximized) {
      return this.Libraries_Game_Game__.SetWindowMaximized$quorum_boolean(maximized);
 }
-Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height) {
-     return this.Libraries_Game_Game__.Screenshot$quorum_integer$quorum_integer$quorum_integer$quorum_integer(x, y, width, height);
-}
 SetColorFilter$quorum_Libraries_Game_Graphics_Color(color) {
      return this.Libraries_Game_Game__.SetColorFilter$quorum_Libraries_Game_Graphics_Color(color);
-}
-SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution) {
-     return this.Libraries_Game_Game__.SetScreenResolution$quorum_Libraries_Game_ScreenResolution(resolution);
-}
-GetAmbientLight() {
-     return this.Libraries_Game_Game__.GetAmbientLight();
-}
-SelectApplicationTypeNative() {
-     return this.Libraries_Game_Game__.SelectApplicationTypeNative();
-}
-AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
-     return this.Libraries_Game_Game__.AddSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
 }
 AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener) {
      return this.Libraries_Game_Game__.AddMouseWheelListener$quorum_Libraries_Interface_Events_MouseWheelListener(listener);
 }
-RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener) {
-     return this.Libraries_Game_Game__.RemoveSelectionListener$quorum_Libraries_Interface_Events_SelectionListener(listener);
-}
 SetGravity2D$quorum_number$quorum_number(gravityX, gravityY) {
      return this.Libraries_Game_Game__.SetGravity2D$quorum_number$quorum_number(gravityX, gravityY);
 }
-RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener) {
-     return this.Libraries_Game_Game__.RemoveFocusListener$quorum_Libraries_Interface_Events_FocusListener(listener);
-}
-RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener) {
-     return this.Libraries_Game_Game__.RemoveTouchListener$quorum_Libraries_Interface_Events_TouchListener(listener);
-}
 SetSkybox$quorum_Libraries_Game_Graphics_Skybox(skybox) {
      return this.Libraries_Game_Game__.SetSkybox$quorum_Libraries_Game_Graphics_Skybox(skybox);
-}
-GetFocusManager() {
-     return this.Libraries_Game_Game__.GetFocusManager();
-}
-EnableResizing$quorum_boolean(resize) {
-     return this.Libraries_Game_Game__.EnableResizing$quorum_boolean(resize);
 }
 Add$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Game_Game__.Add$quorum_Libraries_Interface_Item2D(item);
@@ -7041,23 +7182,11 @@ SetInterfaceOptions$quorum_Libraries_Interface_Options_InterfaceOptions(options)
 AddWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener) {
      return this.Libraries_Game_Game__.AddWindowFocusListener$quorum_Libraries_Interface_Events_WindowFocusListener(listener);
 }
-RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener) {
-     return this.Libraries_Game_Game__.RemoveTextInputListener$quorum_Libraries_Interface_Events_TextInputListener(listener);
-}
 ClearScreen() {
      return this.Libraries_Game_Game__.ClearScreen();
 }
-GetDirectionalLights() {
-     return this.Libraries_Game_Game__.GetDirectionalLights();
-}
 SetCamera2D$quorum_Libraries_Game_Graphics_Camera(cam) {
      return this.Libraries_Game_Game__.SetCamera2D$quorum_Libraries_Game_Graphics_Camera(cam);
-}
-SetWebContainerID$quorum_text(id) {
-     return this.Libraries_Game_Game__.SetWebContainerID$quorum_text(id);
-}
-RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener) {
-     return this.Libraries_Game_Game__.RemoveMenuChangeListener$quorum_Libraries_Interface_Events_MenuChangeListener(listener);
 }
 AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener) {
      return this.Libraries_Game_Game__.AddResizeListener$quorum_Libraries_Interface_Events_ResizeListener(listener);
@@ -7071,53 +7200,23 @@ SetFullScreen$quorum_boolean(fullScreen) {
 SelectApplicationType() {
      return this.Libraries_Game_Game__.SelectApplicationType();
 }
-EnableTextureAutoResizing$quorum_boolean(resize) {
-     return this.Libraries_Game_Game__.EnableTextureAutoResizing$quorum_boolean(resize);
-}
-GetSimulationThreshold2D() {
-     return this.Libraries_Game_Game__.GetSimulationThreshold2D();
-}
 Run$quorum_Libraries_Interface_Events_BehaviorEvent(event) {
      return this.Libraries_Interface_Behaviors_Behavior__.Run$quorum_Libraries_Interface_Events_BehaviorEvent(event);
-}
-GetDesktopResolution() {
-     return this.Libraries_Game_Game__.GetDesktopResolution();
 }
 SetFirstLetterNavigationTime$quorum_number(firstLetterNavigationTime) {
      return this.Libraries_Game_Game__.SetFirstLetterNavigationTime$quorum_number(firstLetterNavigationTime);
 }
-SetColliding$quorum_boolean(collide) {
-     return this.Libraries_Game_Game__.SetColliding$quorum_boolean(collide);
-}
-IsRunningOnUpdate() {
-     return this.Libraries_Interface_Behaviors_Behavior__.IsRunningOnUpdate();
-}
-SetConfiguration$quorum_Libraries_Game_WebConfiguration(config) {
-     return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_WebConfiguration(config);
-}
 LoadScene$quorum_text(path) {
      return this.Libraries_Game_Game__.LoadScene$quorum_text(path);
-}
-GetGameName() {
-     return this.Libraries_Game_Game__.GetGameName();
 }
 SetFocusManager$quorum_Libraries_Game_FocusManager(focus) {
      return this.Libraries_Game_Game__.SetFocusManager$quorum_Libraries_Game_FocusManager(focus);
 }
-StartGame() {
-     return this.Libraries_Game_Game__.StartGame();
-}
 FocusWindow() {
      return this.Libraries_Game_Game__.FocusWindow();
 }
-TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event) {
-     return this.Libraries_Interface_Events_TextChangeListener__.TextChanged$quorum_Libraries_Interface_Events_TextChangeEvent(event);
-}
 SetFocus$quorum_Libraries_Interface_Item(item) {
      return this.Libraries_Game_Game__.SetFocus$quorum_Libraries_Interface_Item(item);
-}
-AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener) {
-     return this.Libraries_Game_Game__.AddCollisionListener$quorum_Libraries_Interface_Events_CollisionListener3D(listener);
 }
 LoadScene$quorum_Libraries_System_File(file) {
      return this.Libraries_Game_Game__.LoadScene$quorum_Libraries_System_File(file);
@@ -7125,17 +7224,8 @@ LoadScene$quorum_Libraries_System_File(file) {
 AddKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener) {
      return this.Libraries_Game_Game__.AddKeyboardListener$quorum_Libraries_Interface_Events_KeyboardListener(listener);
 }
-Add$quorum_Libraries_Game_Graphics_PointLight(light) {
-     return this.Libraries_Game_Game__.Add$quorum_Libraries_Game_Graphics_PointLight(light);
-}
 SetAccessibility$quorum_Libraries_Interface_Accessibility(accessibilityManager) {
      return this.Libraries_Game_Game__.SetAccessibility$quorum_Libraries_Interface_Accessibility(accessibilityManager);
-}
-GetSkybox() {
-     return this.Libraries_Game_Game__.GetSkybox();
-}
-GetInputTable$quorum_text(key) {
-     return this.Libraries_Game_Game__.GetInputTable$quorum_text(key);
 }
 GetLayout() {
      return this.Libraries_Game_Game__.GetLayout();
@@ -7155,32 +7245,14 @@ SetHasRunFlag$quorum_boolean(hasRun) {
 SetConfiguration$quorum_Libraries_Game_AndroidConfiguration(config) {
      return this.Libraries_Game_Game__.SetConfiguration$quorum_Libraries_Game_AndroidConfiguration(config);
 }
-SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha) {
-     return this.Libraries_Game_Game__.SetColorFilter$quorum_number$quorum_number$quorum_number$quorum_number(red, green, blue, alpha);
-}
-GetDialogLayerPool() {
-     return this.Libraries_Game_Game__.GetDialogLayerPool();
-}
-GetAndroidConfiguration() {
-     return this.Libraries_Game_Game__.GetAndroidConfiguration();
-}
 GetScreenHeight() {
      return this.Libraries_Game_Game__.GetScreenHeight();
-}
-RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener) {
-     return this.Libraries_Game_Game__.RemoveTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener);
-}
-GetAccessibility() {
-     return this.Libraries_Game_Game__.GetAccessibility();
 }
 GetSharedTextureManager() {
      return this.Libraries_Game_Game__.GetSharedTextureManager();
 }
 Remove$quorum_Libraries_Interface_Item2D(item) {
      return this.Libraries_Game_Game__.Remove$quorum_Libraries_Interface_Item2D(item);
-}
-AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener) {
-     return this.Libraries_Game_Game__.AddScreenshotListener$quorum_Libraries_Interface_Events_ScreenshotListener(listener);
 }
 AddTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener) {
      return this.Libraries_Game_Game__.AddTabChangeListener$quorum_Libraries_Interface_Events_TabChangeListener(listener);
@@ -7197,26 +7269,20 @@ Add$quorum_Libraries_Interface_Item3D(item) {
 RemoveInputTable$quorum_text(key) {
      return this.Libraries_Game_Game__.RemoveInputTable$quorum_text(key);
 }
-IsColliding() {
-     return this.Libraries_Game_Game__.IsColliding();
-}
 GetClipboard() {
      return this.Libraries_Game_Game__.GetClipboard();
 }
 CreateDefaultInputTables() {
      return this.Libraries_Game_Game__.CreateDefaultInputTables();
 }
-ContinueGame() {
-     return this.Libraries_Game_Game__.ContinueGame();
-}
-GetScreenResolution() {
-     return this.Libraries_Game_Game__.GetScreenResolution();
-}
 UseDesktopResolution() {
      return this.Libraries_Game_Game__.UseDesktopResolution();
 }
 SetCurrentLayer3D$quorum_Libraries_Game_Layer3D(layer) {
      return this.Libraries_Game_Game__.SetCurrentLayer3D$quorum_Libraries_Game_Layer3D(layer);
+}
+SetMultisampling3D$quorum_integer(samples) {
+     return this.Libraries_Game_Game__.SetMultisampling3D$quorum_integer(samples);
 }
 GetTextForIDE$quorum_text(containerID) {
 return this.plugin_.GetTextForIDE$quorum_text(containerID);
@@ -8301,6 +8367,12 @@ Get_Libraries_Game_Game__collide_() {
 Set_Libraries_Game_Game__collide_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__collide_(value);
 };
+Get_Libraries_Game_Game__followedCameras_() {
+   return this.Libraries_Game_Game__.Get_Libraries_Game_Game__followedCameras_();
+};
+Set_Libraries_Game_Game__followedCameras_(value) {
+   this.Libraries_Game_Game__.Set_Libraries_Game_Game__followedCameras_(value);
+};
 Get_Libraries_Game_Game__webConfig_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__webConfig_();
 };
@@ -8343,6 +8415,12 @@ Get_Libraries_Game_Game__desktopConfig_() {
 Set_Libraries_Game_Game__desktopConfig_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__desktopConfig_(value);
 };
+Get_Libraries_Game_Game__multisampleCount2D_() {
+   return this.Libraries_Game_Game__.Get_Libraries_Game_Game__multisampleCount2D_();
+};
+Set_Libraries_Game_Game__multisampleCount2D_(value) {
+   this.Libraries_Game_Game__.Set_Libraries_Game_Game__multisampleCount2D_(value);
+};
 Get_Libraries_Game_Game__currentLayer2D_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__currentLayer2D_();
 };
@@ -8361,11 +8439,23 @@ Get_Libraries_Game_Game__dialogLayerPool_() {
 Set_Libraries_Game_Game__dialogLayerPool_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__dialogLayerPool_(value);
 };
+Get_Libraries_Game_Game__multisampleCount_() {
+   return this.Libraries_Game_Game__.Get_Libraries_Game_Game__multisampleCount_();
+};
+Set_Libraries_Game_Game__multisampleCount_(value) {
+   this.Libraries_Game_Game__.Set_Libraries_Game_Game__multisampleCount_(value);
+};
 Get_Libraries_Game_Game__IOS_APPLICATION_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__IOS_APPLICATION_();
 };
 Set_Libraries_Game_Game__IOS_APPLICATION_(value) {
    this.Libraries_Game_Game__.Set_Libraries_Game_Game__IOS_APPLICATION_(value);
+};
+Get_Libraries_Game_Game__focusOutlineHidden_() {
+   return this.Libraries_Game_Game__.Get_Libraries_Game_Game__focusOutlineHidden_();
+};
+Set_Libraries_Game_Game__focusOutlineHidden_(value) {
+   this.Libraries_Game_Game__.Set_Libraries_Game_Game__focusOutlineHidden_(value);
 };
 Get_Libraries_Game_Game__sceneManager_() {
    return this.Libraries_Game_Game__.Get_Libraries_Game_Game__sceneManager_();

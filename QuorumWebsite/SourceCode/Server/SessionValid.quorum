@@ -3,11 +3,21 @@ package Libraries.Database.Server
 use Libraries.Network.NetworkExchangeListener
 use Libraries.Network.NetworkExchange
 use Libraries.Data.Database.Connection
+use Libraries.Containers.HashTable
+use Libraries.Containers.List
 
 class SessionValid is ResponsePage
     action ResponseReceived(NetworkExchange exchange)
         SharedConnection con
         text user = con:GetUserFromCookie(exchange)
+
+        // The answer is plain text. Without saying so, browsers such as
+        // Firefox try to read it as XML and log a parsing error.
+        HashTable<text, List<text>> headers
+        List<text> contentType
+        contentType:Add("text/plain; charset=UTF-8")
+        headers:Add("Content-Type", contentType)
+        exchange:SetResponseHeaders(headers)
 
         if user = undefined //not logged in
             Failure(exchange)
