@@ -11,6 +11,7 @@ use Libraries.Web.Page.Image
 use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.Script
+use Libraries.Web.Page.Button
 use Libraries.Web.Page.MathML
 use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
@@ -86,6 +87,7 @@ class QuorumPage is WebPage
     boolean editorScriptAdded = false
     boolean mathScriptAdded = false
     boolean chartsScriptAdded = false
+    boolean slidesScriptAdded = false
     integer editorCount = 0
 
     // The editor CodeEditorFromProject(title) started, and its files, which
@@ -102,6 +104,9 @@ class QuorumPage is WebPage
     constant text SCRIPT_ENDING = ".js"
     constant text MATH_SCRIPT = "script/load-mathjax.js"
     constant text CHARTS_SCRIPT = "script/quorumCharts.js"
+    constant text SLIDES_SCRIPT = "script/slides.js"
+    constant text PREVIOUS_SLIDE = "Previous Slide"
+    constant text NEXT_SLIDE = "Next Slide"
     constant text EDITOR_CODE_ATTRIBUTE = "data-code-for-ide"
     constant text CHART_LAYOUT = "min-width: 100px; max-width: 100%;"
 
@@ -629,6 +634,79 @@ class QuorumPage is WebPage
         chart:AddAttribute("style", CHART_LAYOUT)
         chart:AddText(file:Read())
         Include(chart)
+    end
+
+    /*
+        Starts slides in the current section: the subsections that follow,
+        each started with Slide, are shown one at a time, with Previous
+        Slide, a button for each slide and Next Slide under them. Without
+        the slides script, every slide shows, one after another, as
+        ordinary subsections. The slides end where the section ends.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Learn About Variables")
+                Slides()
+                Slide("Variables")
+                Paragraph("A variable is a container for information.")
+                Slide("Creating Variables")
+                Paragraph("Start with the variable's type.")
+            end
+        end
+    */
+    action Slides
+        if not slidesScriptAdded
+            AddScript(locations:FromSiteTop(SLIDES_SCRIPT))
+            slidesScriptAdded = true
+        end
+        Division navigation
+        navigation:AddAttribute("data-slides", "")
+        navigation:AddAttribute("role", "group")
+        navigation:AddAttribute("aria-label", "Slides")
+        SetLayout(navigation, quorumOptions:GetSlidesNavigation())
+        navigation:AddNestedTag(SlideButton(PREVIOUS_SLIDE, "data-slides-previous"))
+        Division numbers
+        numbers:AddAttribute("data-slides-numbers", "")
+        SetLayout(numbers, quorumOptions:GetSlidesNavigation())
+        navigation:AddNestedTag(numbers)
+        navigation:AddNestedTag(SlideButton(NEXT_SLIDE, "data-slides-next"))
+        Include(navigation)
+    end
+
+    /*
+        Starts a slide, after Slides: a subsection with its heading.
+
+        Attribute: Parameter heading The slide's heading.
+        Attribute: Returns A writer for the slide's heading.
+    */
+    action Slide(text heading) returns RichText
+        return Subsection(heading)
+    end
+
+    /*
+        Adds a tracking picture from another site, such as Code.org's
+        Hour of Code counter: hidden, with nothing for readers, but still
+        loaded, so the other site counts the visit.
+
+        Attribute: Parameter address The picture's full address.
+    */
+    action TrackingImage(text address)
+        Image picture
+        picture:SetAddress(escaper:EscapeAttribute(address))
+        picture:SetAlternate("")
+        picture:AddAttribute("hidden", "")
+        Include(picture)
+    end
+
+    // A slide navigation button, in the site's slide button look.
+    private action SlideButton(text words, text marker) returns Button
+        Button button
+        button:SetType("button")
+        button:AddAttribute(marker, "")
+        button:AddText(escaper:Escape(words))
+        SetStyle(button, quorumOptions:GetSlideButton())
+        return button
     end
 
     // An editor with its files, its script added to the page once.
