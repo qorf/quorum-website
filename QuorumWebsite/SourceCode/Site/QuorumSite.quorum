@@ -471,7 +471,14 @@ class QuorumSite is WebSite
 
         list:AddNestedTag(GetBreadcrumb(page, HOME_NAME, HOME_ADDRESS))
         list:AddNestedTag(GetSeparator(page))
-        list:AddNestedTag(GetBreadcrumb(page, course:GetName(), GetCourseAddress(course:GetOverviewLocation(), course)))
+        if course:GetOverviewLocation():IsEmpty()
+            // A course with no overview page is named, not linked.
+            ListItem courseName
+            courseName:AddText(escaper:Escape(course:GetName()))
+            list:AddNestedTag(courseName)
+        else
+            list:AddNestedTag(GetBreadcrumb(page, course:GetName(), GetCourseAddress(course:GetOverviewLocation(), course)))
+        end
         list:AddNestedTag(GetSeparator(page))
 
         ListItem current
@@ -557,25 +564,35 @@ class QuorumSite is WebSite
             end
         else
             label:AddText(escaper:Escape(END_OF + course:GetName()))
-            Link overview = GetLink(page, COURSE_OVERVIEW, overviewAddress, quorumOptions:GetUpNextLink())
-            overview:AddNestedTag(GetMark(FORWARD_MARK))
-            nextLine:AddNestedTag(overview)
+            // A course with no overview page has nowhere to go from its end.
+            if not course:GetOverviewLocation():IsEmpty()
+                Link overview = GetLink(page, COURSE_OVERVIEW, overviewAddress, quorumOptions:GetUpNextLink())
+                overview:AddNestedTag(GetMark(FORWARD_MARK))
+                nextLine:AddNestedTag(overview)
+            end
         end
 
         Paragraph line
         page:SetStyle(line, quorumOptions:GetCourseLine())
         column:AddNestedTag(line)
-        line:AddNestedTag(GetMark(BACKWARD_MARK))
+        // Back goes to the page before, or at the start to the course's
+        // overview, if it has one.
+        boolean hasBack = position > 0 or not course:GetOverviewLocation():IsEmpty()
+        if hasBack
+            line:AddNestedTag(GetMark(BACKWARD_MARK))
+        end
         RichText writer = WriterFor(line, page)
         if position > 0
             PageSeriesEntry previous = course:GetEntry(position - 1)
             writer:Text(BACK):Link(previous:GetTitle(), GetCourseAddress(previous:GetLocation(), course))
-        else
+        elseif hasBack
             writer:Link(BACK_TO + course:GetName(), overviewAddress)
         end
 
         if courses:GetSize() > 1
-            line:AddNestedTag(GetMark(LINE_SEPARATOR))
+            if hasBack
+                line:AddNestedTag(GetMark(LINE_SEPARATOR))
+            end
             writer:Text(ALSO_PART_OF)
             boolean first = true
             integer i = 0
@@ -585,7 +602,11 @@ class QuorumSite is WebSite
                     if not first
                         writer:Text(", ")
                     end
-                    writer:Link(other:GetName(), GetCourseAddress(other:GetOverviewLocation(), other))
+                    if other:GetOverviewLocation():IsEmpty()
+                        writer:Text(other:GetName())
+                    else
+                        writer:Link(other:GetName(), GetCourseAddress(other:GetOverviewLocation(), other))
+                    end
                     first = false
                 end
                 i = i + 1

@@ -1,349 +1,169 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class NetworkSkynet is Lesson
+/*
+    Connecting to Skynet.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class NetworkSkynet is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
 
-    Preformatter preformatter //helper
-
+    on create
+        SetLocation("tutorials/network/skynet.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Connecting to Skynet")
+        SetSectionName("Network")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Connecting to Skynet using HTTP with the Quorum programming language.")
+        SetSummary("an introduction to connecting to Skynet's telescopes to take a picture using the Hypertext Transfer Protocol (HTTP)")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Connecting to Skynet")
-        AddDefaultHeaders()
+        Title("Connecting to Skynet")
+        Paragraph("Connecting to Skynet using Hypertext Transfer Protocol (HTTP)")
+        SettingUpASkynetAccount()
+        TakingAPicture()
+        SubmittingAnObservationRequestByName()
+        SubmittingAnObservationRequestByCoordinates()
+        HandlingSkynetSResponseMessage()
+    end
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+    private action SettingUpASkynetAccount
+        Section("Setting Up a Skynet Account")
+        Paragraph("In order to use Skynet’s telescopes to take a picture you must first set up an account which will contain your Time Account ID number and then acquire a token to use for submitting observation requests. You can click on the links for more information regarding "):Link("Skynet", "https://skynet.unc.edu"):Text(" and "):Link("Skynet Junior Scholars", "https://skynetjuniorscholars.org"):Text(".")
+    end
 
-        //page header
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+    private action TakingAPicture
+        Section("Taking a Picture")
+        Paragraph("After you have setup an account through Skynet and obtained your "):DoubleQuote():Text("token"):DoubleQuote():Text(" and "):DoubleQuote():Text("Time Account ID"):DoubleQuote():Text(" you are all set to start taking pictures using Skynet’s telescopes. There are two ways you can request an observation (picture) including:")
+        BulletList()
+        ListItem():Strong("Astronomical Target Name"):Text(" : such as ("):DoubleQuote():Text("Pinwheel Galaxy"):DoubleQuote():Text(", "):DoubleQuote():Text("Saturn"):DoubleQuote():Text(")")
+        ListItem():Strong("Astronomical Target Coordinates"):Text(" : such as (RA: 14h 3m 13s | Dec: 54°20'57"):DoubleQuote():Text(")")
+        Paragraph("To start in the process of taking a picture and obtaining data from Skynet’s Response Message we will need to add the following libraries:")
+        CodeExample("use Libraries.Network.NetworkResponseEvent
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Science.Astronomy.Skynet
+use Libraries.Science.Astronomy.SkynetListener
+use Libraries.System.File
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator")
+        Paragraph("Next, we will create a text type variable called "):DoubleQuote():Text("token"):DoubleQuote():Text(" which will contain our token key obtained from Skynet for ease of use. Then we will create a Skynet object called "):DoubleQuote():Text("skynet"):DoubleQuote():Text(" which we will add all of our specifications to in the next step.")
+        CodeExample("class DriverCode is SkynetListener
+   text token = " + dq + "your token will go here" + dq + "
+   Skynet skynet")
+        Paragraph("In this next step we will add all of the necessary specifications in obtaining a picture to our Skynet object "):DoubleQuote():Text("skynet"):DoubleQuote():Text(" as shown below:")
+        Paragraph("For further information on the meaning of these specifications look to SkynetJuniorScholars.org Explorations IDATA section which includes a module dedicated to "):Link("Using Telescopes to take Images of Asteroids", "https://skynetjuniorscholars.org/explorations/idata/activities/module1-section3/steps/introduction-section3"):Text(".")
+        CodeExample("   action Main
+       skynet:AddListener(me)
+        //sets your previously defined " + dq + "token" + dq + " as the Skynet Account key to be used in
+        //requesting the observation.
+       skynet:SetAccountKey(token)
+        //sets the maximum sun elevation integer (we used the default of -12 in this case) 
+       skynet:SetMaxSun(-12)
+        //sets the minimum object elevation integer (we used the default of 30.0
+        //in this case)
+       skynet:SetMinElevation(30.0)
+        //sets your 5 digit time account ID integer for a specific telescope which must 
+        //have an adequate time allowance to be used in requesting an observation.
+        //(We used a sample account ID in this example to show that the time account 
+        //ID should be entered as an integer)
+       skynet:SetTimeAccount(12345)
+        //sets the name of the telescope you will be using to make your observations,
+        //(for more information on available telescopes and their associated Time 
+        //Account ID’s look at your Account on Skynet.)
+       skynet:AddTelescope(" + dq + "Prompt6" + dq + ")
+        //sets the filter for your observation
+       skynet:AddFilter(" + dq + "Clear" + dq + ")
+        //sets the number of exposures for your observation
+       skynet:SetNumberOfExposures(2)
+        //sets the exposure length for your observation
+       skynet:SetExposureLength(30.0)")
+    end
 
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Connecting to Skynet", 1)
+    private action SubmittingAnObservationRequestByName
+        Section("Submitting an Observation Request by Name")
+        Paragraph("If you wish to submit an observation request by coordinates, then you can skip this step and move to the section labeled "):DoubleQuote():Text("Submitting an Observation Request by Coordinates"):DoubleQuote():Text(" below.")
+        Paragraph("To submit a request for an observation by name you will have to provide the following information:")
+        BulletList()
+        ListItem():Strong("Name"):Text(" : used to identify the Astronomical target. (We will use "):DoubleQuote():Text("M104"):DoubleQuote():Text(" in this example)")
+        ListItem():Strong("Type"):Text(" : used to specify the type of Astronomical target you are observing. (We will use "):DoubleQuote():Text("sidereal"):DoubleQuote():Text(" in this example)")
+        Paragraph("The information will be added to the existing code in the following format:")
+        CodeExample("        //sets the Astronomical Type to " + dq + "sidereal" + dq + "
+       skynet:SetAstronomicalType(" + dq + "sidereal" + dq + ")
+        //sets the name of the Astronomical Target to " + dq + "M104" + dq + "
+       skynet:SetName(" + dq + "M104" + dq + ")
+        //lets Skynet know that we are submitting the observation request by name
+       skynet:SubmitObservationByName()")
+    end
 
-        headDiv:AddText("Connecting to Skynet using Hypertext Transfer Protocol (HTTP)")
-        bodyDiv:Add(headDiv)
+    private action SubmittingAnObservationRequestByCoordinates
+        Section("Submitting an Observation Request by Coordinates")
+        Paragraph("If you are already submitting an observation request by name then you can skip this step and move to the section labeled "):DoubleQuote():Text("Handling Skynet’s Response Message"):DoubleQuote():Text(" below.")
+        Paragraph("To submit a request for an observation by coordinates you will have to provide the following information:")
+        BulletList()
+        ListItem():Strong("Name"):Text(" : used to identify the Astronomical target. (We will use "):DoubleQuote():Text("M104"):DoubleQuote():Text(" in this example)")
+        ListItem():Strong("Right Ascension & Declination"):Text(" : specify the direction of the Astronomical target in the sky. If you are unsure of the coordinates you can find them by searching the Astronomical target on the internet.")
+        Paragraph("In a search for our example Astronomical Target "):Link("The Right Ascension and Declination for our Astronomical target " + dq + "M104" + dq, "https://en.wikipedia.org/wiki/Sombrero_Galaxy"):Text(" you will find the following results (12h 39m 59.4s) and (-11° 37’ 23"):DoubleQuote():Text(") which need to be formatted as follows to "):DoubleQuote():Text("12:39:59.4"):DoubleQuote():Text(" and "):DoubleQuote():Text("-11:37:23"):DoubleQuote():Text(" so that the coordinates will be interpreted correctly by Skynet.)")
+        Paragraph("The information will be added to the existing code in the following format:")
+        CodeExample("       //sets the name of the Astronomical Target to " + dq + "M104" + dq + "
+       skynet:SetName(" + dq + "M104" + dq + ")
+       //sets the Right Ascension for the specified Astronomical Target " + dq + "M104" + dq + "
+       skynet:SetRightAscension(" + dq + "12:39:59.4" + dq + ")
+       //sets the Declination for the specified Astronomical Target " + dq + "M104" + dq + "
+       skynet:SetDeclination(" + dq + "-11:37:23" + dq + ")
+       //lets Skynet know that we are submitting the Observation Request by Coordinates
+       skynet:SubmitObservationByCoordinates()")
+    end
 
-        Section section_setup
-        section_setup:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_setup, "Setting Up a Skynet Account", 2)
-        Paragraph p_setup
-        p_setup:AddText("In order to use Skynet’s telescopes to take a picture you 
-        must first set up an account which will contain your Time Account ID number and then 
-        acquire a token to use for submitting observation requests. You can click on the links for more information regarding ")
-        Link link1 = p_setup:AddLink("Skynet", "https://skynet.unc.edu")
-        link1:SetClassAttribute("underline text-quorum-blue-150")
-        p_setup:AddText(" and ")
-        Link link2 = p_setup:AddLink("Skynet Junior Scholars", "https://skynetjuniorscholars.org")
-        link2:SetClassAttribute("underline text-quorum-blue-150")
-        p_setup:AddText(".")
-        section_setup:Add(p_setup)
-
-        Section section_picture
-        section_picture:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_picture, "Taking a Picture", 2)
-
-        Paragraph p_picture
-          p_picture:AddText("After you have setup an account through Skynet and obtained 
-          your " + dq + "token" + dq + " and " + dq + "Time Account ID" + dq + " you are all set to start taking pictures 
-          using Skynet’s telescopes. There are two ways you can request an observation (picture) including: ")
-        section_picture:Add(p_picture)
-
-        UnorderedList list
-                AddListItemWithBoldAtFront(list, "Astronomical Target Name", " : such as (" + dq + "Pinwheel Galaxy" + dq + ", " + dq + "Saturn" + dq + ")")
-                AddListItemWithBoldAtFront(list, "Astronomical Target Coordinates", " : such as (RA: 14h 3m 13s | Dec: 54°20'57" + dq + ")")       
-        section_picture:Add(list)
-        section_picture:AddParagraph("To start in the process of taking a picture and obtaining 
-        data from Skynet’s Response Message we will need to add the following libraries:")
-
-        CodeBlock cb1
-            cb1:AddText("use Libraries.Network.NetworkResponseEvent" + cr)
-            cb1:AddText("use Libraries.Data.Formats.JavaScriptObjectNotation" + cr)
-            cb1:AddText("use Libraries.Science.Astronomy.Skynet" + cr)
-            cb1:AddText("use Libraries.Science.Astronomy.SkynetListener" + cr)
-            cb1:AddText("use Libraries.System.File" + cr)
-            cb1:AddText("use Libraries.Containers.HashTable" + cr)
-            cb1:AddText("use Libraries.Containers.Iterator" + cr)
-        section_picture:Add(preformatter:GeneratePreformattedCode(cb1))
-
-        section_picture:AddParagraph("Next, we will create a text type variable called " + dq + "token" + dq + " 
-        which will contain our token key obtained from Skynet for ease of use. Then we 
-        will create a Skynet object called " + dq + "skynet" + dq + " which we will add all of our 
-        specifications to in the next step.")
-
-        CodeBlock cb2
-            cb2:AddText("class DriverCode is SkynetListener" + cr)
-            cb2:AddText("   text token = " + dq + "your token will go here" + dq + cr)
-            cb2:AddText("   Skynet skynet" + cr)
-        section_picture:Add(preformatter:GeneratePreformattedCode(cb2))
-
-        section_picture:AddParagraph("In this next step we will add all of the necessary 
-        specifications in obtaining a picture to our Skynet object " + dq + "skynet" + dq + " as shown 
-        below: ")
-
-        Paragraph p_picture2
-          p_picture2:AddText("For further information on the meaning of these specifications 
-          look to SkynetJuniorScholars.org Explorations IDATA section which includes a module 
-          dedicated to ")
-          Link link3 = p_picture2:AddLink("Using Telescopes to take Images of Asteroids", "https://skynetjuniorscholars.org/explorations/idata/activities/module1-section3/steps/introduction-section3")
-          link3:SetClassAttribute("underline text-quorum-blue-150")
-          p_picture2:AddText(".")
-        section_picture:Add(p_picture2)
-
-        CodeBlock cb3
-            Span s1
-            Span s2
-            Span s3
-            Span s4
-            Span s5
-            Span s6
-            Span s7
-            Span s8
-            s1:AddText("        //sets your previously defined " + dq + "token" + dq + " as the Skynet Account key to be used in" + cr)
-            s1:AddText("        //requesting the observation." + cr)
-            s2:AddText("        //sets the maximum sun elevation integer (we used the default of -12 in this case) " + cr)
-            s3:AddText("        //sets the minimum object elevation integer (we used the default of 30.0" + cr)
-            s3:AddText("        //in this case)" + cr)
-            s4:AddText("        //sets your 5 digit time account ID integer for a specific telescope which must " + cr)
-            s4:AddText("        //have an adequate time allowance to be used in requesting an observation." + cr)
-            s4:AddText("        //(We used a sample account ID in this example to show that the time account " + cr)
-            s4:AddText("        //ID should be entered as an integer)" + cr)
-            s5:AddText("        //sets the name of the telescope you will be using to make your observations," + cr)
-            s5:AddText("        //(for more information on available telescopes and their associated Time " + cr)
-            s5:AddText("        //Account ID’s look at your Account on Skynet.)" + cr)
-            s6:AddText("        //sets the filter for your observation" + cr)
-            s7:AddText("        //sets the number of exposures for your observation" + cr)
-            s8:AddText("        //sets the exposure length for your observation" + cr)
-            s1:SetClassAttribute("comment")
-            s2:SetClassAttribute("comment")
-            s3:SetClassAttribute("comment")
-            s4:SetClassAttribute("comment")
-            s5:SetClassAttribute("comment")
-            s6:SetClassAttribute("comment")
-            s7:SetClassAttribute("comment")
-            s8:SetClassAttribute("comment")
-            cb3:AddText("   action Main" + cr)
-            cb3:AddText("       skynet:AddListener(me)" + cr)
-            cb3:Add(s1)
-            cb3:AddText("       skynet:SetAccountKey(token)" + cr)
-            cb3:Add(s2)
-            cb3:AddText("       skynet:SetMaxSun(-12)" + cr)
-            cb3:Add(s3)
-            cb3:AddText("       skynet:SetMinElevation(30.0)" + cr)
-            cb3:Add(s4)
-            cb3:AddText("       skynet:SetTimeAccount(12345)" + cr)
-            cb3:Add(s5)
-            cb3:AddText("       skynet:AddTelescope(" + dq + "Prompt6" + dq + ")" + cr)
-            cb3:Add(s6)
-            cb3:AddText("       skynet:AddFilter(" + dq + "Clear" + dq + ")" + cr)
-            cb3:Add(s7)
-            cb3:AddText("       skynet:SetNumberOfExposures(2)" + cr) 
-            cb3:Add(s8)
-            cb3:AddText("       skynet:SetExposureLength(30.0)" + cr) 
-        section_picture:Add(preformatter:GeneratePreformattedCode(cb3))
-
-        Section section_submit_name
-        section_submit_name:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_submit_name, "Submitting an Observation Request by Name", 2)
-        section_submit_name:AddParagraph("If you wish to submit an observation request by coordinates, 
-        then you can skip this step and move to the section labeled " + dq + "Submitting an 
-        Observation Request by Coordinates" + dq + " below.")
-        section_submit_name:AddParagraph("To submit a request for an observation by name you will 
-        have to provide the following information:")
-
-        UnorderedList list1
-                list1:AddClassAttribute("list-disc list-outside pl-8")
-                AddListItemWithBoldAtFront(list1, "Name", " : used to identify the 
-                Astronomical target. (We will use " + dq + "M104" + dq + " in this example)")
-                AddListItemWithBoldAtFront(list1, "Type", " : used to specify the type of 
-                Astronomical target you are observing. (We will use " + dq + "sidereal" + dq + " in this example)")
-        section_submit_name:Add(list1)
-
-        section_submit_name:AddParagraph("The information will be added to the existing code in the 
-        following format:")
-
-        CodeBlock cb4
-            Span s9
-            Span s10
-            Span s11
-            s9:AddText("        //sets the Astronomical Type to " + dq + "sidereal" + dq + "" + cr)
-            s10:AddText("        //sets the name of the Astronomical Target to " + dq + "M104" + dq + "" + cr)
-            s11:AddText("        //lets Skynet know that we are submitting the observation request by name" + cr)
-            s9:SetClassAttribute("comment")
-            s10:SetClassAttribute("comment")
-            s11:SetClassAttribute("comment")
-            cb4:Add(s9)
-            cb4:AddText("       skynet:SetAstronomicalType(" + dq + "sidereal" + dq + ")" + cr)
-            cb4:Add(s10)
-            cb4:AddText("       skynet:SetName(" + dq + "M104" + dq + ")" + cr)    
-            cb4:Add(s11)
-            cb4:AddText("       skynet:SubmitObservationByName()" + cr)
-        section_submit_name:Add(preformatter:GeneratePreformattedCode(cb4))
-
-        Section section_submit_coordinates
-        AddHeading(section_submit_coordinates, "Submitting an Observation Request by Coordinates", 2)
-        section_submit_coordinates:AddParagraph("If you are already submitting an observation request by 
-        name then you can skip this step and move to the section labeled " + dq + "Handling 
-        Skynet’s Response Message" + dq + " below.")
-        section_submit_coordinates:AddParagraph("To submit a request for an observation by coordinates you 
-        will have to provide the following information:")
-
-        UnorderedList list2
-                list2:AddClassAttribute("list-disc list-outside pl-8")
-                AddListItemWithBoldAtFront(list2, "Name", " : used to identify the 
-                Astronomical target. (We will use " + dq + "M104" + dq + " in this example)")
-                AddListItemWithBoldAtFront(list2, "Right Ascension & Declination", " : specify 
-                the direction of the Astronomical target in the sky. If you are unsure of the 
-                coordinates you can find them by searching the Astronomical target on the internet.")
-        section_submit_coordinates:Add(list2) 
-        Paragraph p_coordinates
-        p_coordinates:AddText("In a search for our example Astronomical Target ")
-        Link link4 = p_coordinates:AddLink("The Right Ascension and Declination for our Astronomical target " + dq + "M104" + dq + "", "https://en.wikipedia.org/wiki/Sombrero_Galaxy")
-        link4:SetClassAttribute("underline text-quorum-blue-150")
-        p_coordinates:AddText(" you will find the following results (12h 39m 59.4s) and (-11° 37’ 23" + dq + ") which 
-                need to be formatted as follows to " + dq + "12:39:59.4" + dq + " and " + dq + "-11:37:23" + dq + " so that the 
-                coordinates will be interpreted correctly by Skynet.)")
-        section_submit_coordinates:Add(p_coordinates)
-
-        section_submit_coordinates:AddParagraph("The information will be added to the existing code in the 
-        following format:")
-
-        CodeBlock cb5
-            Span s12
-            Span s13
-            Span s14
-            Span s15
-            s12:AddText("       //sets the name of the Astronomical Target to " + dq + "M104" + dq + cr)
-            s13:AddText("       //sets the Right Ascension for the specified Astronomical Target " + dq + "M104" + dq + "" + cr)
-            s14:AddText("       //sets the Declination for the specified Astronomical Target " + dq + "M104" + dq + "" + cr)
-            s15:AddText("       //lets Skynet know that we are submitting the Observation Request by Coordinates" + cr)
-            s12:SetClassAttribute("comment")
-            s13:SetClassAttribute("comment")
-            s14:SetClassAttribute("comment")
-            s15:SetClassAttribute("comment")
-            cb5:Add(s12)
-            cb5:AddText("       skynet:SetName(" + dq + "M104" + dq + ")" + cr)
-            cb5:Add(s13)
-            cb5:AddText("       skynet:SetRightAscension(" + dq + "12:39:59.4" + dq + ")" + cr)
-            cb5:Add(s14)
-            cb5:AddText("       skynet:SetDeclination(" + dq + "-11:37:23" + dq + ")" + cr)
-            cb5:Add(s15)
-            cb5:AddText("       skynet:SubmitObservationByCoordinates()" + cr)
-        section_submit_coordinates:Add(preformatter:GeneratePreformattedCode(cb5))
-
-        Section section_response
-        section_response:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_response, "Handling Skynet’s Response Message", 2)
-        section_response:AddParagraph("We have all of the code necessary to complete an 
-        observation request through Skynet, however, we will want to view the components 
-        of the  Response Message that they send back to us. There are several ways in 
-        which we can view and format this data. In this tutorial we will go over how to 
-        output specific Response Data such as the Web Address accessed, the Status Code 
-        and Status Text, the Content Type and the Response Headers. We will also go over 
-        how to output the Response Text in formatted JavaScript Object Notation.")
-        section_response:AddParagraph("We will begin by creating a NetworkResponseEvent " + dq + "response" + dq + " 
-        and outputting " + dq + "response’s" + dq + " web address, status code, status text, and content 
-        type with labels for readability.")
-
-        CodeBlock cb6
-            Span s16
-            Span s17
-            s16:AddText("   //creates a NetworkResponseEvent object " + dq + "response" + dq + " which will hold the contents of" + cr)
-            s16:AddText("   //the Response Message from Skynet" + cr)
-            s17:AddText("       //outputs the Response Message’s web address, Status Code, Status Text, and" + cr)
-            s17:AddText("       //Content Type with their labels" + cr)
-            s16:SetClassAttribute("comment")
-            s17:SetClassAttribute("comment")
-            cb6:Add(s16)
-            cb6:AddText("   action ResponseReceived(NetworkResponseEvent response)" + cr)
-            cb6:Add(s17)
-            cb6:AddText("       output " + dq + " URL : " + dq + " + response:GetWebAddress()" + cr)
-            cb6:AddText("       output " + dq + " Status Code : " + dq + " + response:GetStatusCode()" + cr) 
-            cb6:AddText("       output " + dq + " Status Text : " + dq + " + response:GetStatusText()" + cr) 
-            cb6:AddText("       output " + dq + " Content Type : " + dq + " + response:GetContentType()" + cr)     
-        section_response:Add(preformatter:GeneratePreformattedCode(cb6))
-
-        section_response:AddParagraph("Next, we will output the Response Headers with a label, by 
-        iterating (or going through) the HashTable object " + dq + "headers" + dq + " that 
-        contains the response headers as shown below.")
-
-        CodeBlock cb7
-            Span s18
-            Span s19
-            s18:AddText("       //creates a HashTable object " + dq + "headers" + dq + " which holds all of the" + cr)
-            s18:AddText("       //NetworkResponseEvent object " + dq + "response’s" + dq + " Response Headers." + cr)
-            s19:AddText("       //iterates (goes through) the entire HashTable object " + dq + "headers" + dq + " and outputs the" + cr)
-            s19:AddText("       //key name and its associated value(s) separated by a colon " + dq + ":" + dq + " for readability." + cr)
-            s18:SetClassAttribute("comment")
-            s19:SetClassAttribute("comment")
-            cb6:Add(s18)
-            cb7:AddText("       output " + dq + "Response Headers : " + dq + cr)
-            cb7:AddText("       HashTable&lt;text, text&gt; headers = response:GetHeaders()" + cr)
-            cb7:Add(s19)
-            cb7:AddText("       Iterator&lt;text&gt; keys = headers:GetKeyIterator()" + cr)
-            cb7:AddText("       repeat while keys:HasNext()" + cr) 
-            cb7:AddText("           key = keys:Next()" + cr) 
-            cb7:AddText("           output key + " + dq + ":" + dq + " + headers:GetValue(key)" + cr)   
-            cb7:AddText("       end" + cr)  
-        section_response:Add(preformatter:GeneratePreformattedCode(cb7))
-
-        section_response:AddParagraph("Finally, we will output the specific " + dq + "obsId" + dq + " and 
-        " + dq + "telescope" + dq + " key names and their associated value(s) that are included in the returned 
-        Response Text using JavaScript Object Notation formatting. ")
-
-        CodeBlock cb8
-            Span s20
-            s20:AddText("       //creates a JavaScriptObjectNotation object " + dq + "json" + dq + " which is used to read in the" + cr)
-            s20:AddText("       //Response Text from the NetworkResponseEvent object " + dq + "response" + dq + " and output " + cr)
-            s20:AddText("       //the requested key name’s associated values in JavaScript Object Notation" + cr)
-            s20:AddText("       //format" + cr)
-            s20:SetClassAttribute("comment")
-            cb8:Add(s20)
-            cb8:AddText("       JavaScriptObjectNotation json" + cr)
-            cb8:AddText("       json:Read(response:GetResponseText())" + cr)
-            cb8:AddText("       output " + dq + " ObservationID : " + dq + " + json:GetValue(" + dq + "obsId" + dq + ")" + cr)
-            cb8:AddText("       output " + dq + "Telescope Info : " + dq + " + json:GetVaue(" + dq + "telescope" + dq + ")" + cr)
-        section_response:Add(preformatter:GeneratePreformattedCode(cb8))
-
-        section_response:AddParagraph("If you would like to view ALL of the key names and values 
-        included in the Response Text in JavaScript Object Notation format then you can 
-        use the following code instead:")
-
-        CodeBlock cb9
-            Span s21
-            s21:AddText("       //creates a JavaScriptObjectNotation object " + dq + "json" + dq + " which is used to read in the" + cr)
-            s21:AddText("       //Response Text from the NetworkResponseEvent object " + dq + "response" + dq + " and output " + cr)
-            s21:AddText("       //in JavaScript Object Notation format" + cr)
-            s21:SetClassAttribute("comment")
-            cb9:Add(s21)
-            cb9:AddText("       JavaScriptObjectNotation json" + cr)
-            cb9:AddText("       json:Read(response:GetResponseText())" + cr)
-            cb9:AddText("       output " + "Response Text in JavaScript Object Notation Format : " + dq + " + json:ToText()" + cr)
-        section_response:Add(preformatter:GeneratePreformattedCode(cb9))
-
-        section_response:AddParagraph("Alternately, if you would like to condense the JavaScript 
-        Object Notation Response Text you can use the following code instead without the 
-        need to create the JavaScriptObjectNotation object " + dq + "json" + dq + ":")
-
-        section_response:Add(preformatter:GeneratePreformattedCode("output "+ dq + "Response Text : " + dq + " + response:GetResponseText()" + cr))
-
-        section_response:AddParagraph("In which case the condensed Response Text will  look 
-        something like this:")
-
-        section_response:Add(preformatter:GeneratePreformattedCode("Response Text : 
+    private action HandlingSkynetSResponseMessage
+        Section("Handling Skynet’s Response Message")
+        Paragraph("We have all of the code necessary to complete an observation request through Skynet, however, we will want to view the components of the Response Message that they send back to us. There are several ways in which we can view and format this data. In this tutorial we will go over how to output specific Response Data such as the Web Address accessed, the Status Code and Status Text, the Content Type and the Response Headers. We will also go over how to output the Response Text in formatted JavaScript Object Notation.")
+        Paragraph("We will begin by creating a NetworkResponseEvent "):DoubleQuote():Text("response"):DoubleQuote():Text(" and outputting "):DoubleQuote():Text("response’s"):DoubleQuote():Text(" web address, status code, status text, and content type with labels for readability.")
+        CodeExample("   //creates a NetworkResponseEvent object " + dq + "response" + dq + " which will hold the contents of
+   //the Response Message from Skynet
+   action ResponseReceived(NetworkResponseEvent response)
+       //outputs the Response Message’s web address, Status Code, Status Text, and
+       //Content Type with their labels
+       output " + dq + " URL : " + dq + " + response:GetWebAddress()
+       output " + dq + " Status Code : " + dq + " + response:GetStatusCode()
+       output " + dq + " Status Text : " + dq + " + response:GetStatusText()
+       output " + dq + " Content Type : " + dq + " + response:GetContentType()
+       //creates a HashTable object " + dq + "headers" + dq + " which holds all of the
+       //NetworkResponseEvent object " + dq + "response’s" + dq + " Response Headers.")
+        Paragraph("Next, we will output the Response Headers with a label, by iterating (or going through) the HashTable object "):DoubleQuote():Text("headers"):DoubleQuote():Text(" that contains the response headers as shown below.")
+        CodeExample("       output " + dq + "Response Headers : " + dq + "
+       HashTable<text, text> headers = response:GetHeaders()
+       //iterates (goes through) the entire HashTable object " + dq + "headers" + dq + " and outputs the
+       //key name and its associated value(s) separated by a colon " + dq + ":" + dq + " for readability.
+       Iterator<text> keys = headers:GetKeyIterator()
+       repeat while keys:HasNext()
+           key = keys:Next()
+           output key + " + dq + ":" + dq + " + headers:GetValue(key)
+       end")
+        Paragraph("Finally, we will output the specific "):DoubleQuote():Text("obsId"):DoubleQuote():Text(" and "):DoubleQuote():Text("telescope"):DoubleQuote():Text(" key names and their associated value(s) that are included in the returned Response Text using JavaScript Object Notation formatting.")
+        CodeExample("       //creates a JavaScriptObjectNotation object " + dq + "json" + dq + " which is used to read in the
+       //Response Text from the NetworkResponseEvent object " + dq + "response" + dq + " and output 
+       //the requested key name’s associated values in JavaScript Object Notation
+       //format
+       JavaScriptObjectNotation json
+       json:Read(response:GetResponseText())
+       output " + dq + " ObservationID : " + dq + " + json:GetValue(" + dq + "obsId" + dq + ")
+       output " + dq + "Telescope Info : " + dq + " + json:GetVaue(" + dq + "telescope" + dq + ")")
+        Paragraph("If you would like to view ALL of the key names and values included in the Response Text in JavaScript Object Notation format then you can use the following code instead:")
+        CodeExample("       //creates a JavaScriptObjectNotation object " + dq + "json" + dq + " which is used to read in the
+       //Response Text from the NetworkResponseEvent object " + dq + "response" + dq + " and output 
+       //in JavaScript Object Notation format
+       JavaScriptObjectNotation json
+       json:Read(response:GetResponseText())
+       output Response Text in JavaScript Object Notation Format : " + dq + " + json:ToText()")
+        Paragraph("Alternately, if you would like to condense the JavaScript Object Notation Response Text you can use the following code instead without the need to create the JavaScriptObjectNotation object "):DoubleQuote():Text("json"):DoubleQuote():Text(":")
+        CodeExample("output " + dq + "Response Text : " + dq + " + response:GetResponseText()")
+        Paragraph("In which case the condensed Response Text will look something like this:")
+        CodeExample("Response Text : 
         {" + dq + "endBefore" + dq + ": null, " + dq + "commandedDec" + dq + ": null, " + dq + "telescope" + dq + ": {" + dq + "site" + dq + ": {" + dq + "lngDegs" + dq + ": -70.8053888736413, 
         " + dq + "id" + dq + ": 2, " + dq + "name" + dq + ": " + dq + "CTIO" + dq + ", " + dq + "latDegs" + dq + ": -30.167638879504135}, " + dq + "name" + dq + ": " + dq + "Prompt6" + dq + ", " + dq + "id" + dq + ": 31}, 
         " + dq + "startAfter" + dq + ": null, " + dq + "timeArchived" + dq + ": null, " + dq + "linkedExps" + dq + ": [], " + dq + "wcsState" + dq + ": " + dq + "not_attempted" + dq + ", 
@@ -357,144 +177,84 @@ class NetworkSkynet is Lesson
         " + dq + "filterIdRequested" + dq + ": 19, " + dq + "filterUsed" + dq + ": null, " + dq + "wcsId" + dq + ": null, " + dq + "targetExpId" + dq + ": null, 
         " + dq + "teleOwnerIdUsed" + dq + ": null, " + dq + "binningRequested" + dq + ": 2, " + dq + "isCompressed" + dq + ": false, 
         " + dq + "binningUsed" + dq + ": 1, " + dq + "numFileErrors" + dq + ": 0, " + dq + "parentGroupTimeAccountId" + dq + ": null, " + dq + "obs" + dq + ": 
-        {" + dq + "id" + dq + ": 2933191, " + dq + "name" + dq + ": " + dq + "M104" + dq + "}}" + cr))
+        {" + dq + "id" + dq + ": 2933191, " + dq + "name" + dq + ": " + dq + "M104" + dq + "}}")
+        Paragraph("The complete code section for submitting an observation request by coordinates and handling the response message from Skynet is shown below:")
+        CodeExample("use Libraries.Network.NetworkResponseEvent
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Science.Astronomy.Skynet
+use Libraries.Science.Astronomy.SkynetListener
+use Libraries.System.File
+use Libraries.Containers.HashTable
+use Libraries.Containers.Iterator
+use Libraries.Containers.Array
 
-        section_response:AddParagraph("The complete code section for submitting an observation 
-        request by coordinates and handling the response message from Skynet is shown below:")
+class DriverCode is SkynetListener
+  text token = " + dq + "Your token goes here" + dq + "
+  Skynet skynet
 
-        CodeBlock cb10
-            Span s22
-            Span s23
-            Span s24
-            s22:AddText("       //If you would like to submit an observation request by name simply omit the next two" + cr)
-            s22:AddText("       //lines and replace them with  " + dq + "skynet:SetAstronomicalType(" + dq + "sidereal" + dq + ")" + dq + "" + cr)
-            s23:AddText("       //you will need to use your 5 digit Time Account integer here" + cr)
-            s24:AddText("       //if you would like to submit an observation request by name simply omit the following" + cr)
-            s24:AddText("       //line and replace it with " + dq + "skynet:SubmitObservationByName()" + dq + "" + cr)
-            s22:SetClassAttribute("comment")
-            s23:SetClassAttribute("comment")
-            s24:SetClassAttribute("comment")
-            cb10:AddText("use Libraries.Network.NetworkResponseEvent" + cr)
-            cb10:AddText("use Libraries.Data.Formats.JavaScriptObjectNotation" + cr)
-            cb10:AddText("use Libraries.Science.Astronomy.Skynet" + cr)
-            cb10:AddText("use Libraries.Science.Astronomy.SkynetListener" + cr)
-            cb10:AddText("use Libraries.System.File" + cr)
-            cb10:AddText("use Libraries.Containers.HashTable" + cr)
-            cb10:AddText("use Libraries.Containers.Iterator" + cr)
-            cb10:AddText("use Libraries.Containers.Array" + cr + cr)
+  action Main
+      skynet:AddListener(me)
+       //If you would like to submit an observation request by name simply omit the next two
+       //lines and replace them with  " + dq + "skynet:SetAstronomicalType(" + dq + "sidereal" + dq + ")" + dq + "
+      skynet:SetRightAscension(" + dq + "12:39:59.4" + dq + ")
+      skynet:SetDeclination(" + dq + "-11:37:23" + dq + ")
+      skynet:SetName(" + dq + "M104" + dq + ")
 
-            cb10:AddText("class DriverCode is SkynetListener" + cr)
-            cb10:AddText("  text token = " + dq + "Your token goes here" + dq + cr)
-            cb10:AddText("  Skynet skynet" + cr + cr)
-            cb10:AddText("  action Main" + cr)
-            cb10:AddText("      skynet:AddListener(me)" + cr)
-            cb10:Add(s22)   
-            cb10:AddText("      skynet:SetRightAscension(" + dq + "12:39:59.4" + dq + ")" + cr)
-            cb10:AddText("      skynet:SetDeclination(" + dq + "-11:37:23" + dq + ")" + cr)
-            cb10:AddText("      skynet:SetName(" + dq + "M104" + dq + ")" + cr + cr)
-            cb10:AddText("      skynet:SetAccountKey(token)" + cr)
-            cb10:AddText("      skynet:SetMaxSun(-12)" + cr)
-            cb10:AddText("      skynet:SetMinElevation(30.0)" + cr)
-            cb10:Add(s23)
-            cb10:AddText("      skynet:SetTimeAccount(12345)" + cr)
-            cb10:AddText("      skynet:AddTelescope(" + dq + "Prompt6" + dq + ")" + cr)
-            cb10:AddText("      skynet:AddFilter(" + dq + "Clear" + dq + ")" + cr)
-            cb10:AddText("      skynet:SetNumberOfExposures(2)" + cr)
-            cb10:AddText("      skynet:SetExposureLength(30.0)" + cr)
-            cb10:Add(s24)
-            cb10:AddText("      skynet:SubmitObservationByCoordinates()" + cr)
-            cb10:AddText("  end" + cr + cr)
-            cb10:AddText("  action ResponseReceived(NetworkResponseEvent response)" + cr)
-            cb10:AddText("      output " + dq + "URL : " + dq + " + response:GetWebAddress()" + cr)
-            cb10:AddText("      output " + dq + "Status Code : " + dq + " + response:GetStatusCode()" + cr)
-            cb10:AddText("      output " + dq + "Status Text : " + dq + " + response:GetStatusText()" + cr)
-            cb10:AddText("      output " + dq + "Content Type : " + dq + " + response:GetContentType()" + cr)
-            cb10:AddText("      output " + dq + "Response Headers : " + dq + cr)
-            cb10:AddText("      HashTable&lt;text, text&gt; headers = response:GetHeaders()" + cr)
-            cb10:AddText("      Iterator&lt;text&gt; keys = headers:GetKeyIterator()" + cr)
-            cb10:AddText("      repeat while keys:HasNext()" + cr)
-            cb10:AddText("          key = keys:Next()" + cr)
-            cb10:AddText("          output key + " + dq + " : " + dq + " + headers:GetValue(key)" + cr)
-            cb10:AddText("      end" + cr)
-            cb10:AddText("      JavaScriptObjectNotation json" + cr)
-            cb10:AddText("      json:Read(response:GetResponseText())" + cr)
-            cb10:AddText("      output " + dq + "ObservationID : " + dq + " + json:GetValue(" + dq + "obsId" + dq + ")" + cr)
-            cb10:AddText("      output " + dq + "Telescope Info : " + dq + " + json:GetValue(" + dq + "telescope" + dq + ")" + cr)
-            cb10:AddText("  end" + cr)
-            cb10:AddText("end" + cr)
-            section_response:Add(preformatter:GeneratePreformattedCode(cb10))
+      skynet:SetAccountKey(token)
+      skynet:SetMaxSun(-12)
+      skynet:SetMinElevation(30.0)
+       //you will need to use your 5 digit Time Account integer here
+      skynet:SetTimeAccount(12345)
+      skynet:AddTelescope(" + dq + "Prompt6" + dq + ")
+      skynet:AddFilter(" + dq + "Clear" + dq + ")
+      skynet:SetNumberOfExposures(2)
+      skynet:SetExposureLength(30.0)
+       //if you would like to submit an observation request by name simply omit the following
+       //line and replace it with " + dq + "skynet:SubmitObservationByName()" + dq + "
+      skynet:SubmitObservationByCoordinates()
+  end
 
-        CodeForIDE code_response
-        code_response:AddFileText("Main.quorum", "//This code will output the Response Status Code, Text, Headers, and specific fields of the Response Message Body")
-        IDE ide_response = AddIDE()
-        ide_response:HideDisplay()
-        ide_response:SetCodeForIDE(code_response:GetJsonArray())
-        ide_response:SetIdeTitle("Activity: Submitting an Observation Request")
-        section_response:Add(ide_response)
-
-
-
-        section_response:AddParagraph("The output should look something like this:")//TODO: its not outputting that plugins_quorum_Libraries_Network_NetworkExchange_ is not defined
-
-        CodeBlock cb11
-            cb11:AddText("URL  : https://api.skynet.unc.edu/2.0/exps" + cr)
-            cb11:AddText("Status Code  : 200" + cr)
-            cb11:AddText("Status Text  : OK" + cr)
-            cb11:AddText("Content Type  : text/html; charset=utf-8" + cr)
-            cb11:AddText("Response Headers : " + cr)
-            cb11:AddText("content-type : text/html; charset=utf-8" + cr)
-            cb11:AddText("expires : Thu, 21 Jun 2018 18:45:09 GMT" + cr)
-            cb11:AddText("cache-control : no-store, no-cache, must-revalidate, post-check=0, pre-check=0" + cr)
-            cb11:AddText("pragma : no-cache" + cr)
-            cb11:AddText("ObservationID : 2933108" + cr)
-            cb11:AddText("Telescope Info : {" + cr)
-            cb11:AddText("   " + dq + "site" + dq + ":     {" + cr)
-            cb11:AddText("{" + cr)
-            cb11:AddText("      " + dq + "lngDegs" + dq + ": -70.8053888736413," + cr)
-            cb11:AddText("      " + dq + "id" + dq + ": 2," + cr)
-            cb11:AddText("      " + dq + "name" + dq + ": " + dq + "CTIO" + dq + "," + cr)
-            cb11:AddText("      " + dq + "latDegs" + dq + ": -30.167638879504135" + cr)
-            cb11:AddText("}" + cr)
-            cb11:AddText("  }," + cr)
-            cb11:AddText("  " + dq + "name" + dq + ": " + dq + "Prompt6" + dq + "," + cr)
-            cb11:AddText("  " + dq + "id" + dq + ": 31" + cr)
-            cb11:AddText("}" + cr)
-            section_response:Add(preformatter:GeneratePreformattedCode(cb11))
-
-            bodyDiv:Add(section_setup)
-            bodyDiv:Add(section_picture)
-            bodyDiv:Add(section_submit_name)
-            bodyDiv:Add(section_submit_coordinates)
-            bodyDiv:Add(section_response)
-
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
-    end
-
-    action GetMetaDescription returns text
-        return "Connecting to Skynet using HTTP with the Quorum programming language."
-    end
-
-    action GetSummaryName returns text
-        return "Connecting to Skynet using the Hypertext Transfer Protocol (HTTP)"
-    end
-    action GetName returns text
-        return "Connecting to Skynet"
-    end
-    action GetShortDescription returns text
-        return "an introduction to connecting to Skynet's telescopes to take a picture using the Hypertext Transfer Protocol (HTTP)"
-    end
-    action GetLocation returns text
-        return "tutorials/network/skynet.html"
-    end
-
-    action GetLinkName returns text
-        return "Connecting to Skynet"
-    end
-
-    action GetSectionName returns text
-        return "Network"
+  action ResponseReceived(NetworkResponseEvent response)
+      output " + dq + "URL : " + dq + " + response:GetWebAddress()
+      output " + dq + "Status Code : " + dq + " + response:GetStatusCode()
+      output " + dq + "Status Text : " + dq + " + response:GetStatusText()
+      output " + dq + "Content Type : " + dq + " + response:GetContentType()
+      output " + dq + "Response Headers : " + dq + "
+      HashTable<text, text> headers = response:GetHeaders()
+      Iterator<text> keys = headers:GetKeyIterator()
+      repeat while keys:HasNext()
+          key = keys:Next()
+          output key + " + dq + " : " + dq + " + headers:GetValue(key)
+      end
+      JavaScriptObjectNotation json
+      json:Read(response:GetResponseText())
+      output " + dq + "ObservationID : " + dq + " + json:GetValue(" + dq + "obsId" + dq + ")
+      output " + dq + "Telescope Info : " + dq + " + json:GetValue(" + dq + "telescope" + dq + ")
+  end
+end")
+        CodeEditorWithCode("Activity: Submitting an Observation Request", "//This code will output the Response Status Code, Text, Headers, and specific fields of the Response Message Body"):HideDisplay()
+        Paragraph("The output should look something like this:")
+        CodeExample("URL  : https://api.skynet.unc.edu/2.0/exps
+Status Code  : 200
+Status Text  : OK
+Content Type  : text/html; charset=utf-8
+Response Headers : 
+content-type : text/html; charset=utf-8
+expires : Thu, 21 Jun 2018 18:45:09 GMT
+cache-control : no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+pragma : no-cache
+ObservationID : 2933108
+Telescope Info : {
+   " + dq + "site" + dq + ":     {
+{
+      " + dq + "lngDegs" + dq + ": -70.8053888736413,
+      " + dq + "id" + dq + ": 2,
+      " + dq + "name" + dq + ": " + dq + "CTIO" + dq + ",
+      " + dq + "latDegs" + dq + ": -30.167638879504135
+}
+  },
+  " + dq + "name" + dq + ": " + dq + "Prompt6" + dq + ",
+  " + dq + "id" + dq + ": 31
+}")
     end
 end

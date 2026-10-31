@@ -1,294 +1,246 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class Physics3DGravityTutorial is Lesson
+/*
+    Physics Gravity In 3D.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class Physics3DGravityTutorial is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+
+    on create
+        SetLocation("tutorials/physics/gravity3D.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Gravity in 3D")
+        SetSectionName("Game Physics")
+        SetCardImage("media/physics/Dominos.png")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn how to add physics effects like 3D gravity to games written in the Quorum programming language.")
+        SetSummary("how to add gravity to a 3D game")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Physics Gravity In 3D - Quorum Programming Language")
-        AddDefaultHeaders()
-
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)        
-
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("Physics Gravity In 3D", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Physics Gravity In 3D")
-        AddToHeadingArray(h_heading)
-
-        headDiv:AddText("Understanding and making your first 3D physics enabled Quorum game")
-        bodyDiv:Add(headDiv)
-
-
-
-        //the section on general information
-        Section section_overview
-        section_overview:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_overview)
-        AddHeading(section_overview, "Overview", 2)
-
-        Paragraph para
-
-        para:AddText(    "The Quorum 3D Physics Engine is meant to make basic forces and the interaction of objects in our games simpler to implement. "
-                            +   "In this tutorial, we will learn how to turn on physics and apply gravity. "
-                            +   "Note that this tutorial is quite similar to the ")
-        Link link1 = para:AddLink(    "Gravity In 2D", "/tutorials/physics/gravity2D.html")                    
-        link1:AddClassAttribute("underline text-quorum-blue-150")
-        para:AddText(" tutorial. "    
-                            +   "If you need a refresher on making 3D games, be sure to review the other Games and Media tutorials on the ") 
-        para:AddLink("Reference page", "/reference.html")
-        para:AddText(" before beginning this tutorial. "
-                            +   "The code provided at the end of this tutorial will load a blue box onto the game screen which will be in the air above a green box representing the ground. "
-                            +   "Then the blue box will fall, increasing in speed as it approaches the ground. "
-                            +   "A lot of this code will be familiar to the ")
-        para:AddLink(    "3D Drawing", "/tutorials/games/drawing3D.html")
-        para:AddText(    " tutorial, because we still need to create shapes and add them to the screen. ")
-        section_overview:Add(para)
-
-        //the section on setting the necessary flags
-            Section section_flags
-        section_flags:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_flags)
-        AddHeading(section_flags, "Physics Flags", 2)
-
-
-        section_flags:AddParagraph(   "Our first step in using physics is to turn it on. "
-                            +   "We do this by setting the global physics flag in the CreateGame action. ")
-        section_flags:Add(preformatter:GeneratePreformattedCode(  "EnablePhysics3D(true)"))
-        section_flags:AddParagraph(   "With the physics engine, there are additional properties that can be set for each item we add to the screen. "
-                            +   "Most importantly, when we want to use the Physics engine for an object, there is a flag that needs to be set to true: EnablePhysics. "
-                            +   "This is set in the same way that position or color is set, for example: ")
-        section_flags:Add(preformatter:GeneratePreformattedCode(  "itemName:EnablePhysics(true)"))
-        section_flags:AddParagraph(   "After we turn physics on, we need to tell the engine more information about the item. "
-                            +   "There are two ways to do this part, but we will focus on only one for this tutorial. "
-                            +   "All Item3D objects now have physics properties stored in a PhysicsProperties3D object. "
-                            +   "We can access most of these properties through new actions in the Item3D class. "
-                            +   "The properties include friction, linear velocity, and others. "
-                            +   "We will cover more of these properties in further tutorials, but for this gravity game, we need responsiveness. ")
-        //the section on responsiveness
-             Section section_responsiveness
-        section_responsiveness:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_responsiveness)
-        AddHeading(section_responsiveness, "Responsiveness", 2)
-
-        section_responsiveness:AddParagraph(   "Responsiveness describes how this item interacts with other items on the screen. "
-                            +   "There are three levels of responsiveness: Responsive, NonResponsive, and Unmovable. ")
-        AddHeading(section_responsiveness, "Responsive", 3)
-        section_responsiveness:AddParagraph("An object set to be responsive can be affected by forces like gravity or forces resulting from a collision. "
-                            +   "A player controlled character, for example, might be responsive. "
-                            +   "We can set an item to be responsive like this:")
-        section_responsiveness:Add(preformatter:GeneratePreformattedCode( "itemName:SetResponsive()"))
-        AddHeading(section_responsiveness, "NonResponsive", 3)
-        section_responsiveness:AddParagraph("A nonresponsive object will not respond to forces, but can be moved programmatically. "
-                            +   "A moving platform might be nonresponsive so that it can be moved in the program without responding to gravity or collisions. "
-                            +   "We can move the platform using "+ dq +"itemName:Move()"+ dq 
-                            +   ", for example. "
-                            +   "Note that using Move() with responsive items will bypass collisions and gravity for them as well. "
-                            +   "We can set an item to be nonresponsive like this:")
-        section_responsiveness:Add(preformatter:GeneratePreformattedCode(  "itemName:SetNonResponsive()"))
-          AddHeading(section_responsiveness, "Unmovable", 3)
-        section_responsiveness:AddParagraph("An unmovable object will not respond to forces and cannot be moved. "
-                            +   "This is the perfect option for the ground, as it should not fall from gravity, be pushed by collisions, or be moved in the program after being set in place. "
-                            +   "Note that if the position of an Unmovable object is changed in Update() or anytime after being set initially, the object will move on screen, but the physics will act as if the object remains in its original position. "
-                            +   "Unmovable is a physics property, so it only affects the physics of the object and not how it appears on screen. "
-                            +   "We can set an item to be unmovable like this:")
-        section_responsiveness:Add(preformatter:GeneratePreformattedCode("itemName:SetUnmovable()"))
-        section_responsiveness:AddParagraph("In this tutorial, we will use two of these levels of responsiveness: Unmovable and Responsive. "
-                            +   "The ground will be Unmovable. "
-                            +   "The box on the other hand, should be Responsive because we want gravity and collision forces to act on it: "
-                            +   "stopping it when it hits the ground. "
-                            +   "Finally, we need to tell the computer the impact of gravity. ")
-        
-        Section section_gravity
-        section_gravity:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_gravity)
-        AddHeading(section_gravity, "Gravity", 2)
-
-        section_gravity:AddParagraph("Like the global physics flag, we need to set gravity in the CreateGame() action. There are two ways to set gravity, both with the same handy action. "
-                            +   "Here, we will focus one of these ways. The next tutorial about forces will cover the other. The action to set gravity is: ")
-        section_gravity:Add(preformatter:GeneratePreformattedCode(  "number X = 0" + cr
-                            +   "number Y = -10" + cr
-                            +   "number Z = 0" + cr
-                            +   "SetGravity3D( X , Y , Z )"))
-        section_gravity:AddParagraph("When we set gravity, the X, Y, and Z coordinates will correspond to the direction and amount of change per second. "
-                            +   "For gravity, we want a force pulling down vertically (set Y to a negative number), no pull horizontally (set X to 0) and no pull closer or farther from us (set Z to 0.) "
-                            +   "Because the engine has to convert pixels to metric measurements, sometimes we may need to try a few different force values for gravity to make sure it looks right. ")
-
-       Section section_code
-        section_code:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_code)
-        AddHeading(section_code, "Code", 2)
-
-        Paragraph para2    
-
-        para2:AddText(    "Here is a ")
-        Link linkA = para2:AddLink(    "zip file" , "/files/games/Gravity3D.zip" )
-        linkA:SetClassAttribute("underline text-quorum-blue-150")
-        para2:AddText(    " containing a Quorum project using the code below. "
-                            +   "Read through, then use the following code to discover gravity. ")
-        section_code:Add(para2)
-
-        CodeBlock cb1
-        Span s1
-        Span s2
-        Span s3 //unused
-        Span s4
-        Span s5
-        Span s6
-        Span s7
-        cb1:AddText("use Libraries.Game.Game" + cr 
-                    +   "use Libraries.Game.Graphics.Model"+ cr 
-                    +   "use Libraries.Game.Graphics.Color" + cr 
-                    +   "use Libraries.Interface.Events.CollisionListener3D"+ cr 
-                    +   "use Libraries.Interface.Events.CollisionEvent3D" + cr 
-                    +   "use Libraries.Sound.Audio" +cr
-                    +   "use Libraries.Game.Graphics.DirectionalLight" + cr
-                    +   "use Libraries.Game.Graphics.AmbientLight" + cr + cr)
-        cb1:AddText("class Main is Game, CollisionListener3D" + cr
-                    +   "   Model ground" + cr
-                    +   "   Model box" + cr
-                    +   "   Audio fallSound" + cr
-                    +   "   Audio boomSound" + cr)
-        cb1:AddText("   Color color" + cr + cr 
-                    +   "   action Main" + cr 
-                    +   "       StartGame()" + cr 
-                    +   "   end" + cr + cr
-                    +   "   action CreateGame" + cr + cr
-                    +   "        DirectionalLight light" + cr
-                    +   "        light:SetColor(0.8, 0.8, 0.8, 1)" + cr
-                    +   "        light:SetDirection(GetCamera3D():GetDirection())" + cr
-                    +   "        Add(light)" + cr + cr
-                    +   "        AmbientLight ambient" + cr
-                    +   "        ambient:SetColor(0.4, 0.4, 0.4, 1)" + cr
-                    +   "        SetAmbientLight(ambient)" + cr)
-        s2:AddText( "   /*" + cr
-                    +   "       This flag enables 3 dimensional physics for the game. Make sure to set " + cr
-                    +   "       this when you want to add physics." + cr
-                    +   "   */" + cr)
-        s2:SetClassAttribute("comment")
-        cb1:Add(s2)
-        cb1:AddText("       EnablePhysics3D(true)" + cr + cr)
-        cb1:AddText("       ground:SetName(" + dq + "Ground" + dq + ")" + cr
-                    +   "       ground:LoadBox(15, 1, 20, color:Green())" + cr
-                    +   "       ground:SetPosition(0,-2,0)" + cr
-                    +   "       Add(ground)" + cr)
-        s4:AddText( "   /*" + cr
-                    +   "       We must enable physics for each Item3D object that will interact " + cr
-                    +   "       with other Item3D objects." + cr
-                    +   "   */" + cr)
-        s4:SetClassAttribute("comment")
-        cb1:Add(s4)
-        cb1:AddText("       ground:EnablePhysics(true)" + cr)
-        s5:AddText( "   /*" + cr
-                    +   "       Neither gravity, collision, nor any programmatic method should be able " + cr
-                    +   "       to move the ground; its responsiveness needs to be set to unmovable." + cr
-                    +   "   */" + cr)
-        s5:SetClassAttribute("comment")
-        cb1:Add(s5)
-        cb1:AddText("       ground:SetUnmovable()" + cr + cr 
-                    +   "       box:SetName(" + dq + "Box" + dq + ")" + cr
-                    +   "       box:LoadBox(1,1,1, color:Blue())" + cr
-                    +   "       box:SetPosition(0,1,0)" + cr
-                    +   "       Add(box)" + cr 
-                    +   "       box:EnablePhysics(true)" + cr)
-        s6:AddText( "   /*" + cr
-                    +   "       The box is responds to gravity and impact with the ground, so we will " + cr
-                    +   "       set to be responsive. " + cr
-                    +   "   */" + cr)
-        s6:SetClassAttribute("comment")
-        cb1:Add(s6)
-        cb1:AddText("       box:SetResponsive()" + cr)
-        s7:AddText("   /*" + cr
-                    +   "       Finally, we set gravity " + cr
-                    +   "       (This is an approximation of actual gravity)" + cr
-                    +   "   */" + cr)
-        s7:SetClassAttribute("comment")
-        cb1:Add(s7)
-        cb1:AddText("       SetGravity3D(0, -10, 0)" + cr + cr 
-                    +   "       fallSound:Load(" + dq + "media/Fall.ogg" + dq + ")" + cr
-                    +   "       boomSound:Load(" + dq + "media/Boom.ogg" + dq + ")" + cr
-                    +   "       fallSound:Play()" + cr + cr
-                    +   "       AddCollisionListener(me)" + cr
-                    +   "   end" + cr + cr
-                    +   "   action BeginCollision(CollisionEvent3D event)" + cr
-                    +   "       fallSound:Pause()" + cr
-                    +   "       boomSound:SetVolume(0.1)" + cr
-                    +   "       boomSound:Play()" + cr
-                    +   "   end" + cr
-                    +   "end" + cr + cr)
-        section_code:Add(preformatter:GeneratePreformattedCode(cb1))
-
- //the section on running the program
-        Section section_try_yourself
-    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
-    bodyDiv:Add(section_try_yourself)
-    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
-    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
-    AddToHeadingArray(h2_try_yourself)
-    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
-    
-      section_try_yourself:AddParagraph(   "If we run this gravity game, we should have a box load on the screen which falls to the ground like so:")
-
-    CodeForIDE code4
-    code4:AddFileUrl("Main.quorum", "examples/Physics/Gravity/Gravity3D.quorum")
-    IDE ide3 = AddIDE()
-    ide3:SetLightTheme()
-    ide3:SetCodeForIDE(code4:GetJsonArray())
-    ide3:SetIdeTitle("Gravity in 3D")
-    section_try_yourself:Add(ide3)
-
-
-     Section nextLesson
-        nextLesson:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(nextLesson)
-        WriteNextTutorial(nextLesson)    
-        onPageDiv:Add(CreateHeadingTableOfContents())
-
-  
+        Title("Physics Gravity In 3D")
+        Paragraph("Understanding and making your first 3D physics enabled Quorum game")
+        Overview()
+        PhysicsFlags()
+        Responsiveness()
+        Gravity()
+        Code()
+        TryItYourself()
     end
 
-    action GetMetaDescription returns text
-        return "Learn how to add physics effects like 3D gravity to games written in the Quorum programming language."
+    private action Overview
+        Section("Overview")
+        Paragraph("The Quorum 3D Physics Engine is meant to make basic forces and the interaction of objects in our games simpler to implement. In this tutorial, we will learn how to turn on physics and apply gravity. Note that this tutorial is quite similar to the "):Link("Gravity In 2D", "/tutorials/physics/gravity2D.html"):Text(" tutorial. If you need a refresher on making 3D games, be sure to review the other Games and Media tutorials on the "):Link("Reference page", "/reference.html"):Text(" before beginning this tutorial. The code provided at the end of this tutorial will load a blue box onto the game screen which will be in the air above a green box representing the ground. Then the blue box will fall, increasing in speed as it approaches the ground. A lot of this code will be familiar to the "):Link("3D Drawing", "/tutorials/games/drawing3D.html"):Text(" tutorial, because we still need to create shapes and add them to the screen.")
     end
 
-    action GetSummaryName returns text
-        return "Gravity In 3D"
+    private action PhysicsFlags
+        Section("Physics Flags")
+        Paragraph("Our first step in using physics is to turn it on. We do this by setting the global physics flag in the CreateGame action.")
+        CodeExample("EnablePhysics3D(true)")
+        Paragraph("With the physics engine, there are additional properties that can be set for each item we add to the screen. Most importantly, when we want to use the Physics engine for an object, there is a flag that needs to be set to true: EnablePhysics. This is set in the same way that position or color is set, for example:")
+        CodeExample("itemName:EnablePhysics(true)")
+        Paragraph("After we turn physics on, we need to tell the engine more information about the item. There are two ways to do this part, but we will focus on only one for this tutorial. All Item3D objects now have physics properties stored in a PhysicsProperties3D object. We can access most of these properties through new actions in the Item3D class. The properties include friction, linear velocity, and others. We will cover more of these properties in further tutorials, but for this gravity game, we need responsiveness.")
     end
 
-    action GetImageLocation returns text
-        return "media/physics/Dominos.png"
+    private action Responsiveness
+        Section("Responsiveness")
+        Paragraph("Responsiveness describes how this item interacts with other items on the screen. There are three levels of responsiveness: Responsive, NonResponsive, and Unmovable.")
+        Subsection("Responsive")
+        Paragraph("An object set to be responsive can be affected by forces like gravity or forces resulting from a collision. A player controlled character, for example, might be responsive. We can set an item to be responsive like this:")
+        CodeExample("itemName:SetResponsive()")
+        Subsection("NonResponsive")
+        Paragraph("A nonresponsive object will not respond to forces, but can be moved programmatically. A moving platform might be nonresponsive so that it can be moved in the program without responding to gravity or collisions. We can move the platform using "):DoubleQuote():Text("itemName:Move()"):DoubleQuote():Text(", for example. Note that using Move() with responsive items will bypass collisions and gravity for them as well. We can set an item to be nonresponsive like this:")
+        CodeExample("itemName:SetNonResponsive()")
+        Subsection("Unmovable")
+        Paragraph("An unmovable object will not respond to forces and cannot be moved. This is the perfect option for the ground, as it should not fall from gravity, be pushed by collisions, or be moved in the program after being set in place. Note that if the position of an Unmovable object is changed in Update() or anytime after being set initially, the object will move on screen, but the physics will act as if the object remains in its original position. Unmovable is a physics property, so it only affects the physics of the object and not how it appears on screen. We can set an item to be unmovable like this:")
+        CodeExample("itemName:SetUnmovable()")
+        Paragraph("In this tutorial, we will use two of these levels of responsiveness: Unmovable and Responsive. The ground will be Unmovable. The box on the other hand, should be Responsive because we want gravity and collision forces to act on it: stopping it when it hits the ground. Finally, we need to tell the computer the impact of gravity.")
     end
 
-    action GetName returns text
-        return "Gravity In 3D"
+    private action Gravity
+        Section("Gravity")
+        Paragraph("Like the global physics flag, we need to set gravity in the CreateGame() action. There are two ways to set gravity, both with the same handy action. Here, we will focus one of these ways. The next tutorial about forces will cover the other. The action to set gravity is:")
+        CodeExample("number X = 0
+number Y = -10
+number Z = 0
+SetGravity3D( X , Y , Z )")
+        Paragraph("When we set gravity, the X, Y, and Z coordinates will correspond to the direction and amount of change per second. For gravity, we want a force pulling down vertically (set Y to a negative number), no pull horizontally (set X to 0) and no pull closer or farther from us (set Z to 0.) Because the engine has to convert pixels to metric measurements, sometimes we may need to try a few different force values for gravity to make sure it looks right.")
     end
 
-    action GetShortDescription returns text
-        return "how to add gravity to a 3D game"
+    private action Code
+        Section("Code")
+        Paragraph("Here is a "):Link("zip file", "/files/games/Gravity3D.zip"):Text(" containing a Quorum project using the code below. Read through, then use the following code to discover gravity.")
+        CodeExample("use Libraries.Game.Game
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Interface.Events.CollisionEvent3D
+use Libraries.Sound.Audio
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Game.Graphics.AmbientLight
+
+class Main is Game, CollisionListener3D
+   Model ground
+   Model box
+   Audio fallSound
+   Audio boomSound
+   Color color
+
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+
+        DirectionalLight light
+        light:SetColor(0.8, 0.8, 0.8, 1)
+        light:SetDirection(GetCamera3D():GetDirection())
+        Add(light)
+
+        AmbientLight ambient
+        ambient:SetColor(0.4, 0.4, 0.4, 1)
+        SetAmbientLight(ambient)
+   /*
+       This flag enables 3 dimensional physics for the game. Make sure to set 
+       this when you want to add physics.
+   */
+       EnablePhysics3D(true)
+
+       ground:SetName(" + dq + "Ground" + dq + ")
+       ground:LoadBox(15, 1, 20, color:Green())
+       ground:SetPosition(0,-2,0)
+       Add(ground)
+   /*
+       We must enable physics for each Item3D object that will interact 
+       with other Item3D objects.
+   */
+       ground:EnablePhysics(true)
+   /*
+       Neither gravity, collision, nor any programmatic method should be able 
+       to move the ground; its responsiveness needs to be set to unmovable.
+   */
+       ground:SetUnmovable()
+
+       box:SetName(" + dq + "Box" + dq + ")
+       box:LoadBox(1,1,1, color:Blue())
+       box:SetPosition(0,1,0)
+       Add(box)
+       box:EnablePhysics(true)
+   /*
+       The box is responds to gravity and impact with the ground, so we will 
+       set to be responsive. 
+   */
+       box:SetResponsive()
+   /*
+       Finally, we set gravity 
+       (This is an approximation of actual gravity)
+   */
+       SetGravity3D(0, -10, 0)
+
+       fallSound:Load(" + dq + "media/Fall.ogg" + dq + ")
+       boomSound:Load(" + dq + "media/Boom.ogg" + dq + ")
+       fallSound:Play()
+
+       AddCollisionListener(me)
+   end
+
+   action BeginCollision(CollisionEvent3D event)
+       fallSound:Pause()
+       boomSound:SetVolume(0.1)
+       boomSound:Play()
+   end
+end")
     end
 
-    action GetLocation returns text
-        return "tutorials/physics/gravity3D.html"
-    end
+    private action TryItYourself
+        Section("Try it Yourself!")
+        Paragraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "):DoubleQuote():Text("Build Successful!"):DoubleQuote()
+        Paragraph("If we run this gravity game, we should have a box load on the screen which falls to the ground like so:")
+        CodeEditorWithCode("Gravity in 3D", "use Libraries.Game.Game
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Interface.Events.CollisionEvent3D
+use Libraries.Sound.Audio
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Game.Graphics.AmbientLight
 
-     action GetLinkName returns text
-        return "Gravity in 3D"
-    end
+class Main is Game, CollisionListener3D
+   Model ground
+   Model box
+   Audio fallSound
+   Audio boomSound
+   Color color
 
-    action GetSectionName returns text
-        return "Game Physics"
+   action Main
+       StartGame()
+   end
+
+   action CreateGame
+
+        DirectionalLight light
+        light:SetColor(0.8, 0.8, 0.8, 1)
+        light:SetDirection(GetCamera3D():GetDirection())
+        Add(light)
+
+        AmbientLight ambient
+        ambient:SetColor(0.4, 0.4, 0.4, 1)
+        SetAmbientLight(ambient)
+   /*
+       This flag enables 3 dimensional physics for the game. Make sure to set 
+       this when you want to add physics.
+   */
+       EnablePhysics3D(true)
+
+       ground:SetName(" + dq + "Ground" + dq + ")
+       ground:LoadBox(15, 1, 20, color:Green())
+       ground:SetPosition(0,-2,0)
+       Add(ground)
+   /*
+       We must enable physics for each Item3D object that will interact 
+       with other Item3D objects.
+   */
+       ground:EnablePhysics(true)
+   /*
+       Neither gravity, collision, nor any programmatic method should be able 
+       to move the ground; its responsiveness needs to be set to unmovable.
+   */
+       ground:SetUnmovable()
+
+       box:SetName(" + dq + "Box" + dq + ")
+       box:LoadBox(1,1,1, color:Blue())
+       box:SetPosition(0,1,0)
+       Add(box)
+       box:EnablePhysics(true)
+   /*
+       The box is responds to gravity and impact with the ground, so we will 
+       set to be responsive. 
+   */
+       box:SetResponsive()
+   /*
+       Finally, we set gravity 
+       (This is an approximation of actual gravity)
+   */
+       SetGravity3D(0, -10, 0)
+
+       fallSound:Load(" + dq + "/media/Fall.ogg" + dq + ")
+       boomSound:Load(" + dq + "/media/Boom.ogg" + dq + ")
+       fallSound:Play()
+
+       AddCollisionListener(me)
+   end
+
+   action BeginCollision(CollisionEvent3D event)
+       fallSound:Pause()
+       boomSound:SetVolume(0.1)
+       boomSound:Play()
+   end
+end")
     end
 end

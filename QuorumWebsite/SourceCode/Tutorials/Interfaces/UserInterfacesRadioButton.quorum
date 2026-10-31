@@ -1,185 +1,144 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class UserInterfacesRadioButton is Lesson
+/*
+    Tutorial: Radio Button.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class UserInterfacesRadioButton is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+
+    on create
+        SetLocation("tutorials/ui/radioButton.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Radio Button")
+        SetSectionName("User Interfaces")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn about Radio Buttons in the Quorum programming language.")
+        SetSummary("how to use Radio Buttons")
+    end
 
     action Setup
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Radio Button Tutorial - Quorum Programming Language")
-        AddDefaultHeaders()
+        Title("Tutorial: Radio Button")
+        Paragraph("This tutorial tells you how to use Radio Buttons in Quorum")
+        Paragraph("Now, we will add a simple "):Strong("focus cycle"):Text(" to make our Interface "):Strong("accessible"):Text(". We will be able to go through the options with the Tab key and activate a Radio Button with the Spacebar. We will do this with the following lines of code:")
+        CodeExample("option1:SetNextFocus(option2)
+option2:SetNextFocus(option3)
+option3:SetNextFocus(option1)
+SetFocus(option1)")
+        Paragraph("With this, we can now run the game and select one of the three options. If one is already selected and we select a different Radio Button, then the previous one will be deselected. But, other than selecting and deselecting, the Radio Buttons do nothing else. In the next section, we'll change this by adding Behaviors to our Radio Buttons.")
+        IntroductionToRadioButtonsInQuorum()
+        MakingASetOfRadioButtons()
+        SettingABehavior()
+        RunTheProgram()
+    end
 
-        //Figure out getting main regions properly.
-        MainContent mainRegion
-        AdjustMain(mainRegion)
+    private action IntroductionToRadioButtonsInQuorum
+        Section("Introduction to Radio Buttons in Quorum")
+        Subsection("What are Radio Buttons?")
+        Paragraph("In the "):Link("Checkbox", "/tutorials/ui/checkbox.html"):Text(" tutorial we were introduced to toggle buttons. A Toggle Button is simply a Button that switches between two toggle states when activated. Radio Buttons are another type of Toggle Button, but they handle switching states differently than a Checkbox. A Radio Button can be toggled on by activating it, but a different Radio Button in the same group must be toggled on for the currently activated Radio Button to be deactivated. In Quorum, we accomplish this be adding related Radio Buttons to a ButtonGroup.")
+        Paragraph("Although similar to Checkboxes, the method that Radio Buttons use to handle toggle states reflects their main design purpose: a Radio Button is useful when you want the user to select one and only one of a given set of options. To demonstrate this, we will make a set of three Radio Buttons where only one can be selected at a time. To start, create a new Game Application project.")
+    end
 
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+    private action MakingASetOfRadioButtons
+        Section("Making a Set of Radio Buttons")
+        Paragraph("In order to use Radio Buttons, we must add the Radio Button library with the following use statement:")
+        CodeExample("use Libraries.Interface.Controls.RadioButton")
+        Paragraph("Now, just like with Buttons or Checkboxes, we need to declare our three Radio Buttons, then give them a name, position them, and add them to the Game. Thus, the CreateGame action so far will be as follows:")
+        CodeExample("action CreateGame
+    RadioButton option1
+    RadioButton option2
+    RadioButton option3
 
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
+    option1:SetName(" + dq + "Option 1" + dq + ")
+    option2:SetName(" + dq + "Option 2" + dq + ")
+    option3:SetName(" + dq + "Option 3" + dq + ")
 
-        AddHeading(headDiv, "Tutorial: Radio Button", 1)
+    option1:SetPosition(300, 400)
+    option2:SetPosition(300, 350)
+    option3:SetPosition(300, 300)
 
-        headDiv:AddText("This tutorial tells you how to use Radio Buttons in Quorum")
-        bodyDiv:Add(headDiv)
+    Add(option1)
+    Add(option2)
+    Add(option3)
+end")
+        Subsection("Adding Buttons to a ButtonGroup")
+        Paragraph("If you run the program as it is now, you would notice that all three Radio Buttons appear correctly and you can activate them, but you will not be able to deactivate any of them. This is because a Radio Button needs to be in a ButtonGroup to deselect one. A ButtonGroup is a Control that you can add toggle buttons to, particularly Checkboxes and Radio Buttons, and when one button is toggled on, all the other Buttons in the ButtonGroup are deselected.")
+        Paragraph("To add our Radio Buttons to a group, we first need to include the ButtonGroup library with the following use statement:")
+        CodeExample("use Libraries.Interface.Controls.ButtonGroup")
+        Paragraph("Next, we'll declare a ButtonGroup object and call its AddButton action to add all three Radio Buttons to it. This is done with the following lines of code, which we will append to our CreateGame action:")
+        CodeExample("ButtonGroup radios
+radios:AddButton(option1)
+radios:AddButton(option2)
+radios:AddButton(option3)")
+    end
+
+    private action SettingABehavior
+        Section("Setting a Behavior")
+        Paragraph("Giving a Behavior to a Radio Button is similar to a Checkbox, in that when the Radio Button is activated it will call the Behavior's Run action, and when deactivated it will call the Behavior's the Dispose action will be called. For our Radio Buttons, we will make a simple Behavior to say and output their name and status when Toggled On or Off.")
+        Paragraph("To show this, we will create a new Quorum class for our Behavior and we name it "):DoubleQuote():Text("RadioBehavior.quorum."):DoubleQuote():Text(" Our class will inherit from the Behavior class and we will override the Run and Dispose actions.")
+        Paragraph("This Behavior will need the Speech and Item libraries, since we need to get the name of the Item that called the Behavior and will have the program say it. The full Behavior is shown in the following code block:")
+        CodeExample("use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Sound.Speech
+use Libraries.Interface.Item
+
+class RadioBehavior is Behavior
+    Item item = undefined
+
+    action Run(BehaviorEvent event)
+        item = event:GetItem()
+        output item:GetName() + " + dq + " is now selected" + dq + "
+        Speech speech
+        speech:Say(item:GetName() + " + dq + " is now selected" + dq + ")
+    end
+
+    action Dispose()
+        output item:GetName() + " + dq + " was deselected" + dq + "
+    end
+end")
+        Paragraph("Now we simply need to go back to the main class and add our Behaviors, adding the following lines of code:")
+        CodeExample("RadioBehavior behavior
+option1:SetBehavior(behavior)
+option2:SetBehavior(behavior)
+option3:SetBehavior(behavior)")
+        Paragraph("Now when you run the program, you can activate a Radio Button and the program will output and say which Radio Button was selected. Activating a different Radio Button will cause the program to say and output the new selection, as well as output what was deselected, giving us a fully functional set of Radio Buttons.")
+        Image("media/userInterface/RadioButtons.png", "This image shows the final game window with three Radio Buttons with option 2 toggled on")
+    end
+
+    private action RunTheProgram
+        Section("Run the Program")
+        CodeEditorWithCode("Activity: Radio Button", "Radio.quorum", "use Libraries.Game.Game
+use Libraries.Interface.Controls.ButtonGroup
+use Libraries.Interface.Controls.RadioButton
+
+class Main is Game
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        ButtonGroup group
+
+        group:SetName(" + dq + "My Grouping" + dq + ")
+
+        RadioButton button1
+        RadioButton button2
+        RadioButton button3
         
-        Section section_intro_to_radio_buttons
-        section_intro_to_radio_buttons:SetClassAttribute("flex flex-col gap-y-2")
+        group:SetPosition(100, 100)
 
-        AddHeading(section_intro_to_radio_buttons, "Introduction to Radio Buttons in Quorum", 2)
-          
-        AddHeading(section_intro_to_radio_buttons, "What are Radio Buttons?", 3)
+        group:Add(button1)
+        group:Add(button2)
+        group:Add(button3)
+        Add(group)
 
-        Paragraph firstParagraph
-        firstParagraph:AddText("In the ")
-        firstParagraph:AddLink("Checkbox", "/tutorials/ui/checkbox.html")
-        firstParagraph:AddText(" tutorial we were introduced to toggle buttons. A Toggle Button is simply a Button that switches
-                                 between two toggle states when activated. Radio Buttons are another type of Toggle Button, but they handle switching states differently than a Checkbox. 
-                                A Radio Button can be toggled on by activating it, but a different Radio Button in the same 
-                                group must be toggled on for the currently activated Radio Button to be deactivated. In Quorum, we accomplish 
-                                this be adding related Radio Buttons to a ButtonGroup.")
-        section_intro_to_radio_buttons:Add(firstParagraph)
-
-        section_intro_to_radio_buttons:AddParagraph("Although similar to Checkboxes, the method that Radio Buttons use to handle toggle states reflects their main design purpose: a Radio Button is useful when you want the user to select one and only one of a given set of options. To demonstrate this, we will make a set of three Radio Buttons where only one can be selected at a time. To start, create a new Game Application project.")
-        
-        Section section_making_a_set
-        section_making_a_set:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_making_a_set, "Making a Set of Radio Buttons", 2)
-        
-        section_making_a_set:AddParagraph("In order to use Radio Buttons, we must add the Radio Button library with the following use statement:")
-        section_making_a_set:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.RadioButton"))
-        section_making_a_set:AddParagraph("Now, just like with Buttons or Checkboxes, we need to declare our three Radio Buttons, then give them a name, position them, and add them to the Game. Thus, the CreateGame action so far will be as follows:")
-        section_making_a_set:Add(preformatter:GeneratePreformattedCode(
-                                            "action CreateGame" + cr
-                                            +"    RadioButton option1" + cr
-                                            +"    RadioButton option2" + cr
-                                            +"    RadioButton option3" + cr + cr
-
-                                            +"    option1:SetName("+dq+"Option 1"+dq+")" + cr
-                                            +"    option2:SetName("+dq+"Option 2"+dq+")" + cr
-                                            +"    option3:SetName("+dq+"Option 3"+dq+")" + cr + cr
-
-                                            +"    option1:SetPosition(300, 400)" + cr
-                                            +"    option2:SetPosition(300, 350)" + cr
-                                            +"    option3:SetPosition(300, 300)" + cr + cr
-
-                                            +"    Add(option1)" + cr
-                                            +"    Add(option2)" + cr
-                                            +"    Add(option3)" + cr
-                                            +"end"))
-
-        AddHeading(section_making_a_set, "Adding Buttons to a ButtonGroup", 3)
-
-        section_making_a_set:AddParagraph("If you run the program as it is now, you would notice that all three Radio Buttons appear correctly and you can activate them, but you will not be able to deactivate any of them. This is because a Radio Button needs to be in a ButtonGroup to deselect one. A ButtonGroup is a Control that you can add toggle buttons to, particularly Checkboxes and Radio Buttons, and when one button is toggled on, all the other Buttons in the ButtonGroup are deselected. ")
-        section_making_a_set:AddParagraph("To add our Radio Buttons to a group, we first need to include the ButtonGroup library with the following use statement:")
-        section_making_a_set:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Controls.ButtonGroup"))
-        section_making_a_set:AddParagraph("Next, we'll declare a ButtonGroup object and call its AddButton action to add all three Radio Buttons to it. This is done with the following lines of code, which we will append to our CreateGame action:")
-        section_making_a_set:Add(preformatter:GeneratePreformattedCode(
-                                            "ButtonGroup radios" + cr
-                                            +"radios:AddButton(option1)" + cr
-                                            +"radios:AddButton(option2)" + cr
-                                            +"radios:AddButton(option3)"))
-
-        bodyDiv:AddParagraph("Now, we will add a simple <b>focus cycle</b> to make our Interface <b>accessible</b>. We will be able to go through the options with the Tab key and activate a Radio Button with the Spacebar. We will do this with the following lines of code:")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(
-                                            "option1:SetNextFocus(option2)" + cr
-                                            +"option2:SetNextFocus(option3)" + cr
-                                            +"option3:SetNextFocus(option1)" + cr
-                                            +"SetFocus(option1)"))
-        bodyDiv:AddParagraph("With this, we can now run the game and select one of the three options. If one is already selected and we select a different Radio Button, then the previous one will be deselected. But, other than selecting and deselecting, the Radio Buttons do nothing else. In the next section, we'll change this by adding Behaviors to our Radio Buttons.")
-
-        Section section_setting_a_behavior
-        section_setting_a_behavior:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_setting_a_behavior, "Setting a Behavior", 2)
-        section_setting_a_behavior:AddParagraph("Giving a Behavior to a Radio Button is similar to a Checkbox, in that when the Radio Button is activated it will call the Behavior's Run action, and when deactivated it will call the Behavior's the Dispose action will be called. For our Radio Buttons, we will make a simple Behavior to say and output their name and status when Toggled On or Off.")
-        section_setting_a_behavior:AddParagraph("To show this, we will create a new Quorum class for our Behavior and we name it "+dq+"RadioBehavior.quorum."+dq+" Our class will inherit from the Behavior class and we will override the Run and Dispose actions.")
-        section_setting_a_behavior:AddParagraph("This Behavior will need the Speech and Item libraries, since we need to get the name of the Item that called the Behavior and will have the program say it.  The full Behavior is shown in the following code block:")
-        section_setting_a_behavior:Add(preformatter:GeneratePreformattedCode(
-                                            "use Libraries.Interface.Behaviors.Behavior" + cr
-                                            +"use Libraries.Interface.Events.BehaviorEvent" + cr
-                                            +"use Libraries.Sound.Speech" + cr
-                                            +"use Libraries.Interface.Item" + cr + cr
-
-                                            +"class RadioBehavior is Behavior" + cr
-                                            +"    Item item = undefined" + cr + cr
-
-                                            +"    action Run(BehaviorEvent event)" + cr
-                                            +"        item = event:GetItem()" + cr
-                                            +"        output item:GetName() + "+dq+" is now selected" + dq + cr
-                                            +"        Speech speech" + cr
-                                            +"        speech:Say(item:GetName() + "+dq+" is now selected"+dq+")" + cr
-                                            +"    end" + cr + cr
-
-                                            +"    action Dispose()" + cr
-                                            +"        output item:GetName() + "+dq+" was deselected" + dq + cr
-                                            +"    end" + cr
-                                            +"end"))
-        section_setting_a_behavior:AddParagraph("Now we simply need to go back to the main class and add our Behaviors, adding the following lines of code:")
-        section_setting_a_behavior:Add(preformatter:GeneratePreformattedCode(
-                                            "RadioBehavior behavior" + cr
-                                            +"option1:SetBehavior(behavior)" + cr
-                                            +"option2:SetBehavior(behavior)" + cr
-                                            +"option3:SetBehavior(behavior)"))
-        section_setting_a_behavior:AddParagraph("Now when you run the program, you can activate a Radio Button and the program will output and say which Radio Button was selected. Activating a different Radio Button will cause the program to say and output the new selection, as well as output what was deselected, giving us a fully functional set of Radio Buttons.")
-        Image image = section_setting_a_behavior:AddImage("/media/userInterface/RadioButtons.png","This image shows the final game window with three Radio Buttons with option 2 toggled on")
-        image:AddAttribute("data-zoom", "")
-
-        Section section_run_the_program
-        section_run_the_program:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_run_the_program, "Run the Program", 2)
-
-        CodeForIDE code1
-        code1:AddFileUrl("Radio.quorum", "/examples/UserInterface/RadioButton/Main.quorum")
-        IDE ide = AddIDE()
-        ide:SetLightTheme()
-        ide:SetCodeForIDE(code1:GetJsonArray())
-        ide:SetIdeTitle("Activity: Radio Button")
-        section_run_the_program:Add(ide)
-
-        bodyDiv:Add(section_intro_to_radio_buttons)
-        bodyDiv:Add(section_making_a_set)
-        bodyDiv:Add(section_setting_a_behavior)
-        bodyDiv:Add(section_run_the_program)
-
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        group:Focus()
     end
-
-    action GetMetaDescription returns text
-        return "Learn about Radio Buttons in the Quorum programming language."
-    end
-
-    action GetSummaryName returns text
-        return "Radio Buttons"
-    end
-
-    action GetName returns text
-        return "Radio Buttons"
-    end
-
-    action GetShortDescription returns text
-        return "how to use Radio Buttons"
-    end
-
-    action GetLocation returns text
-        return "tutorials/ui/radioButton.html"
-    end
-    action GetLinkName returns text
-        return "Radio Button"
-    end
-
-    action GetSectionName returns text
-        return "User Interfaces"
+end")
     end
 end

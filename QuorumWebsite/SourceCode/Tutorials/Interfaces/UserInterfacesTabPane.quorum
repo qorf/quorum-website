@@ -1,608 +1,393 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class UserInterfacesTabPane is Lesson
+/*
+    Tutorial: TabPane.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class UserInterfacesTabPane is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+
+    on create
+        SetLocation("tutorials/ui/tabPane.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("TabPane")
+        SetSectionName("User Interfaces")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn about TabPanes in the Quorum programming language.")
+        SetSummary("how to use TabPanes")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("TabPane Tutorial - Quorum Programming Language")
-        AddDefaultHeaders()
+        Title("Tutorial: TabPane")
+        Paragraph("This tutorial tells you how to use TabPanes in Quorum")
+        AnIntroductionToTabPanesInQuorum()
+        CreatingATabPane()
+        TabPaneSelection()
+        TabPaneListener()
+        AddingTabs()
+        TryMakingAUserInterface()
+    end
 
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+    private action AnIntroductionToTabPanesInQuorum
+        Section("An Introduction to TabPanes in Quorum")
+        Subsection("What is a Tab Pane?")
+        Paragraph("In this tutorial, we will learn how to use TabPanes in the Quorum Game Engine. Tab panes are interface tools that allows for different content to share the same space or panel. The user can select which content to view by changing the selected tab. For example, most Internet browsers allow you to open multiple webpages as Tabs in a single window. The TabPane would then be the window where the tabs exist. All the tabs share the pane, but only the selected tab gets drawn while the other tabs are inactive.")
+        Subsection("What is a Tab?")
+        Paragraph("Tabs are the different panels that exist in the Tab Pane. In our Internet browser example, the Tabs would then be the different webpages. Each Tab in the browser has content that is related to it that is displayed depending on whether it is selected or not. In Quorum, each Tab has a "):DoubleQuote():Text("Related Item"):DoubleQuote():Text(" that we can set, and that item is displayed when that Tab is being selected. One important thing to note is that while only one Tab is active at a time, the data stored on inactive Tabs is not lost, and can be displayed simply by switching the active Tab.")
+        Paragraph("For this tutorial, we will create a TabPane with three different Tabs, where their Related Items are different shapes, and we will allow the user to add or remove Tabs using Buttons. To start, create a new Game Application project.")
+    end
 
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Tutorial: TabPane", 1)
+    private action CreatingATabPane
+        Section("Creating a TabPane")
+        Subsection("Making our Pane")
+        Paragraph("The main class will need the libraries for TabPane, Tab, Icon, Drawable, Color, and Array, requiring the following use statements:")
+        CodeExample("use Libraries.Game.Game
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+use Libraries.Containers.Array")
+        Paragraph("Since we want the TabPane to be usable as soon as the program begins, we will be writing code in the CreateGame action. To start, create a TabPane, three Tabs, and a Color. We will be using the Color for our Drawables later. Our declarations are as follows:")
+        CodeExample("TabPane pane
+Tab tab1
+Tab tab2
+Tab tab3
+Color color")
+        Paragraph("Then we will make the TabPane, set its position, and add the TabPane to the game. This is done with the following lines of code:")
+        CodeExample("pane:SetSize(450, 450)
+pane:SetPosition(50, 100)
+Add(pane)")
+        Paragraph("Additionally, we will add an outline for the display area of our Tabs. This is only forappearances, but is easily done by creating a simple Drawable. This adds the following lines:")
+        CodeExample("Drawable outline
+outline:LoadRectangle(450, 425, color:Black())
+outline:SetPosition(50, 100)
+Add(outline)")
+        Subsection("Making the Tabs")
+        Paragraph("If we were to run the program now, all that would be on the screen is our outline showing where the pane's display area is. This is because we have not added anything to the tabs or added them to the pane yet. Each Tab will show a different shape: a rectangle, a circle, or a triangle. The shapes are created as follows:")
+        CodeExample("Drawable box
+Drawable circle
+Drawable triangle
 
-        headDiv:AddText("This tutorial tells you how to use TabPanes in Quorum")
-        bodyDiv:Add(headDiv)
+box:LoadFilledRectangle(300, 300, color:Red())
+circle:LoadFilledCircle(150, color:Blue())
+triangle:LoadFilledTriangle(0, 0, 300, 0, 150, 300, color:Green())")
+        Paragraph("The next thing we will do before we can add our Tabs are the icons and they will appear next to the Tab's name. Our icons are created as follows:")
+        CodeExample("Icon icon1
+Icon icon2
+Icon icon3
 
-        Section section_intro_tabpane
-        section_intro_tabpane:SetClassAttribute("flex flex-col gap-y-2")
+icon1:LoadFilledRectangle(50, 50)
+icon2:LoadFilledCircle(25)
+icon3:LoadFilledTriangle(0, 0, 50, 0, 25, 50)")
+        Paragraph("Now that our shapes and icons are created, we take our Tabs we created earlier and set their Name, Related Item, and Icon. The name will be the text that is displayed on the tab at the top of our pane along with its icon. The Related Item will be the drawable that is displayed when that tab is selected. This is done as follows:")
+        CodeExample("tab1:SetName(" + dq + "Square" + dq + ")
+tab1:SetRelatedItem(box)
+tab1:SetIcon(icon1)
 
-        AddHeading(section_intro_tabpane, "An Introduction to TabPanes in Quorum", 2)
-        AddHeading(section_intro_tabpane, "What is a Tab Pane?", 3)
-        section_intro_tabpane:AddParagraph("In this tutorial, we will learn how to use TabPanes in the Quorum Game Engine. Tab panes "
-                            +"are interface tools that allows for different content to share the same space or panel. "
-                            +"The user can select which content to view by changing the selected tab. For example, most "
-                            +"Internet browsers allow you to open multiple webpages as Tabs in a single window. The Tab"
-                            +"Pane would then be the window where the tabs exist. All the tabs share the pane, but only "
-                            +"the selected tab gets drawn while the other tabs are inactive.")
+tab2:SetName(" + dq + "Circle" + dq + ")
+tab2:SetRelatedItem(circle)
+tab2:SetIcon(icon2)
 
-        AddHeading(section_intro_tabpane, "What is a Tab?", 3)
-        section_intro_tabpane:AddParagraph("Tabs are the different panels that exist in the Tab Pane. In our Internet browser example, "
-                            +"the Tabs would then be the different webpages. Each Tab in the browser has content that is "
-                            +"related to it that is displayed depending on whether it is selected or not. In Quorum, each "
-                            +"Tab has a " + dq + "Related Item" + dq + " that we can set, and that item is displayed when that Tab "
-                            +"is being selected. One important thing to note is that while only one Tab is active at a "
-                            +"time, the data stored on inactive Tabs is not lost, and can be displayed simply by switching the active Tab.")
+tab3:SetName(" + dq + "Triangle" + dq + ")
+tab3:SetRelatedItem(triangle)
+tab3:SetIcon(icon3)")
+        Paragraph("Next, we need to create an Array with our Tabs and add it to our pane. This is done through the following lines of code:")
+        CodeExample("Array<Tab> tabs
+tabs:Add(tab1)
+tabs:Add(tab2)
+tabs:Add(tab3)
+pane:Add(tabs)")
+        Paragraph("Note that these tabs do not need to be in an Array to be added to the pane. Using pane:Add(tab1) for each tab will also work, but we do it this way to show that this method also works.")
+        Paragraph("For "):Strong("accessibility"):Text(" we will be setting the Focus to the TabPane with the following line of code:")
+        CodeExample("SetFocus(pane)")
+        Paragraph("When a Tab Pane receives Focus the user can navigate through the Tabs using Ctrl + Tab and Ctrl + Shift + Tab on Windows or Ctrl + [ and Ctrl + ] on Mac.")
+        Paragraph("Now, when we run the program, we can switch Tabs to see our different shapes, and we can close out of them. But, we can still add more to the pane by adding Behaviors for when you change your current selection or close a Tab.")
+        Image("media/userInterface/TabPanesBegin.png", "This image shows the Tab Pane with the Circle Tab open.")
+        Paragraph("Note that we did not set the position of the shapes but they are drawn inside of our outline. This is because the shapes, now Related Items to the Tabs, are drawn relative to the TabPane.")
+    end
 
-        section_intro_tabpane:AddParagraph("For this tutorial, we will create a TabPane with three different Tabs, where their Related "
-                            +"Items are different shapes, and we will allow the user to add or remove Tabs using Buttons. To "
-                            +"start, create a new Game Application project.")
+    private action TabPaneSelection
+        Section("TabPaneSelection")
+        Paragraph("Like Trees and TextBoxes, TabPanes have their own specific type of Selection, which keeps track of the index of the current Tab. For this tutorial, we will create a SelectionListener to output and say aloud a newly selected Tab.")
+        Paragraph("First, let's create our SelectionListener. To start, create a new Quorum class, named "):DoubleQuote():Text("TabSelectionListener.quorum."):DoubleQuote():Text(" This class will need the libraries for SelectionListener, SelectionEvent, and Speech.")
+        Paragraph("The TabSelectionListener class itself will inherit SelectionListener and override the SelectionChanged action. To read the current Tab's name aloud, we simply need to obtain the name with the SelectionEvent's GetDisplayName action, and then use the Speech class's Say action. This gives us the following complete TabSelectionListener class:")
+        CodeExample("use Libraries.Interface.Events.SelectionListener
+use Libraries.Interface.Events.SelectionEvent
+use Libraries.Sound.Speech
 
+class TabSelectionListener is SelectionListener
+    action SelectionChanged(SelectionEvent selection)
+        text currentTab = selection:GetDisplayName()
+        Speech speech
+        speech:Say(currentTab)
+        output currentTab
+    end
+end")
+        Paragraph("Returning to the main, we need to create a TabSelectionListener variable and add it as a SelectionListener to the game. This is done by adding the following two lines to the CreateGame action:")
+        CodeExample("TabSelectionListener selectionListener
+AddSelectionListener(selectionListener)")
+    end
 
-        Section section_creating_tabpane
-        section_creating_tabpane:SetClassAttribute("flex flex-col gap-y-2")
+    private action TabPaneListener
+        Section("TabPaneListener")
+        Paragraph("Every time we open or close tabs, a TabChangeEvent occurs. If we want an action to happen when this event occurs, then we need a listener. To do this, create a new Quorum class, "):DoubleQuote():Text("TabPaneListener.quorum,"):DoubleQuote():Text(" to listen for when a Tab is added or removed from the TabPane. When this listener detects an addition or removal, the program will say and output that a Tab was opened or closed.")
+        Paragraph("This class will use the libraries for TabChangeListener, TabChangeEvent, and Speech. The class itself will inherit the TabChangeListener class, and will override the OpenedTab and ClosedTab actions. In each of those actions, we will create a Speech object, and call its Say action with "):DoubleQuote():Text("Tab opened"):DoubleQuote():Text(" or "):DoubleQuote():Text("Tab closed."):DoubleQuote():Text(" The resulting class is as follows:")
+        CodeExample("use Libraries.Interface.Events.TabChangeListener
+use Libraries.Interface.Events.TabChangeEvent
+use Libraries.Sound.Speech
 
-        AddHeading(section_creating_tabpane, "Creating a TabPane", 2)
-        AddHeading(section_creating_tabpane, "Making our Pane", 3)
-        section_creating_tabpane:AddParagraph("The main class will need the libraries for TabPane, Tab, Icon, "
-                            + "Drawable, Color, and Array, requiring the following use statements:")
+class TabPaneListener is TabChangeListener
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("use Libraries.Game.Game" + cr
-                                                        + "use Libraries.Interface.Controls.TabPane" + cr
-                                                        + "use Libraries.Interface.Controls.Tab" + cr
-                                                        + "use Libraries.Interface.Controls.Icon" + cr
-                                                        + "use Libraries.Game.Graphics.Drawable" + cr
-                                                        + "use Libraries.Game.Graphics.Color" + cr
-                                                        + "use Libraries.Containers.Array" + cr))
+    action OpenedTab(TabChangeEvent event)
+        Speech speech
+        speech:Say(" + dq + "Tab opened" + dq + ", false)
+        output " + dq + "Tab opened" + dq + "
+    end
 
-        section_creating_tabpane:AddParagraph("Since we want the TabPane to be usable as soon as the program begins, we will be writing "
-                            + "code in the CreateGame action. To start, create a TabPane, three "
-                            + "Tabs, and a Color. We will be using the Color for our Drawables later. Our declarations are as follows:")
+    action ClosedTab(TabChangeEvent event)
+        Speech speech
+        speech:Say(" + dq + "Tab closed" + dq + ", false)
+        output " + dq + "Tab closed" + dq + "
+    end
+end")
+        Paragraph("Returning to the main, we need to create a TabPaneListener variable and add it to our pane. This is done by adding the following two lines to the CreateGame action:")
+        CodeExample("TabPaneListener listener
+pane:AddTabChangeListener(listener)")
+        Paragraph("If both listeners are added to your game, then the program will output and say the Tab's name when selecting Tabs, and it will output and say when a Tab is opened or closed.")
+        Paragraph("For additional information on how these listeners and events work, check out the tutorial on "):Link("Events", "/tutorials/games/events.html"):Text(".")
+    end
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("TabPane pane" + cr
-                                                        + "Tab tab1" + cr
-                                                        + "Tab tab2" + cr
-                                                        + "Tab tab3" + cr
-                                                        + "Color color"))
-        section_creating_tabpane:AddParagraph("Then we will make the TabPane, set its position, and add the TabPane to the game. This is done with the following lines of code:")
+    private action AddingTabs
+        Section("Adding Tabs")
+        Subsection("Adding Generic Tab")
+        Paragraph("As the program is now, we can close Tabs, but they will stay closed and we can't open more Tabs. Now, let's give our program the ability to add new Tabs, which we will do with Buttons. To start, we will need to create a Behavior. We will name this new class "):DoubleQuote():Text("AddTabBehavior,"):DoubleQuote():Text(" and it will use the libraries for Behavior, BehaviorEvent, Tab, TabPane, Icon, and Drawable.")
+        Paragraph("The AddTabBehavior class will inherit the Behavior class, and override the Run action. For simplicity, we will design this Behavior to make the same shape for the new Tab every time. To add our new Tab, we will also need an action to get the TabPane from our main class. This gives us the following template for our class:")
+        CodeExample("use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.Graphics.Drawable
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("pane:SetSize(450, 450)" + cr
-                                                        + "pane:SetPosition(50, 100)" + cr
-                                                        + "Add(pane)" + cr))
+class AddTabBehavior is Behavior
 
-        section_creating_tabpane:AddParagraph("Additionally, we will add an outline for the display area of our Tabs. This is only for"
-                            + "appearances, but is easily done by creating a simple Drawable. This adds the following"
-                            + " lines:")
+    TabPane pane = undefined
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("Drawable outline" + cr
-                                                        + "outline:LoadRectangle(450, 425, color:Black())" + cr
-                                                        + "outline:SetPosition(50, 100)" + cr
-                                                        + "Add(outline)"))
-        AddHeading(section_creating_tabpane, "Making the Tabs", 3)
-        section_creating_tabpane:AddParagraph("If we were to run the program now, all that would be on the screen is our outline showing "
-                            +"where the pane's display area is. This is because we have not added anything to the tabs or added "
-                            +"them to the pane yet. Each Tab will show a different shape: a rectangle, "
-                            +"a circle, or a triangle. The shapes are created as follows:")
+    action Run(BehaviorEvent event)
+    end
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("Drawable box" + cr
-                                                        + "Drawable circle" + cr
-                                                        + "Drawable triangle" + cr + cr
-                                                        + "box:LoadFilledRectangle(300, 300, color:Red())" + cr
-                                                        + "circle:LoadFilledCircle(150, color:Blue())" + cr
-                                                        + "triangle:LoadFilledTriangle(0, 0, 300, 0, 150, 300, color:Green())"))
+    action SetTabPane(TabPane newPane)
+        pane = newPane
+    end
+end")
+        Paragraph("For the Run action, we need to create a new Tab, making a simple blue rectangle for the icon and Related Item, and add it to the TabPane. We will also protect against program crashes by checking if the TabPane is still undefined. Adding this to our template, the complete AddTabBehavior class is as follows:")
+        CodeExample("use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.Graphics.Drawable
 
-        section_creating_tabpane:AddParagraph("The next thing we will do before we can add our Tabs are the icons and they will appear next "
-                            + "to the Tab's name. Our icons are created as follows:")
+class AddTabBehavior is Behavior
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("Icon icon1" + cr
-                                                        + "Icon icon2" + cr
-                                                        + "Icon icon3" + cr + cr
-                                                        + "icon1:LoadFilledRectangle(50, 50)" + cr
-                                                        + "icon2:LoadFilledCircle(25)" + cr
-                                                        + "icon3:LoadFilledTriangle(0, 0, 50, 0, 25, 50)"))
+    TabPane pane = undefined
 
-        section_creating_tabpane:AddParagraph("Now that our shapes and icons are created, we take our Tabs we created earlier and set their Name, "
-                            +"Related Item, and Icon. The name will be the text that is displayed on the tab at the top of our"
-                            +" pane along with its icon. The Related Item will be the drawable that is displayed when that tab "
-                            +"is selected. This is done as follows:")
+    action Run(BehaviorEvent event)
+        if pane not= undefined
+            Tab newTab
+            Drawable newSquare
+            Icon newIcon
+            Color color
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode(
-                                     "tab1:SetName("+dq+"Square"+dq+")" + cr
-                                    +"tab1:SetRelatedItem(box)" + cr
-                                    +"tab1:SetIcon(icon1)" + cr + cr
-                                    +"tab2:SetName("+dq+"Circle"+dq+")" + cr
-                                    +"tab2:SetRelatedItem(circle)" + cr
-                                    +"tab2:SetIcon(icon2)" + cr + cr
-                                    +"tab3:SetName("+dq+"Triangle"+dq+")" + cr
-                                    +"tab3:SetRelatedItem(triangle)" + cr
-                                    +"tab3:SetIcon(icon3)"
-                                    ))
+            newSquare:LoadFilledRectangle(300, 300, color:Blue())
+            newIcon:LoadFilledRectangle(50, 50, color:Blue())
+            newTab:SetName(" + dq + "New Square" + dq + ")
+            newTab:SetRelatedItem(newSquare)
+            newTab:SetIcon(newIcon)
+            pane:Add(newTab)
+            pane:Resize()
+        end
+    end
 
-        section_creating_tabpane:AddParagraph("Next, we need to create an Array with our Tabs and add it to our pane"
-                            + ". This is done through the following lines of code:")
+    action SetTabPane(TabPane newPane)
+        pane = newPane
+    end
+end")
+        Paragraph("Returning the main class, we can now make a AddTabBehavior object, set the TabPane, and create a Button to add new Tabs, which adds the following lines to the CreateGame action:")
+        CodeExample("AddTabBehavior tabBehavior
+tabBehavior:SetTabPane(pane)
 
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("Array&lt;Tab&gt; tabs" + cr
-                                                        + "tabs:Add(tab1)" + cr
-                                                        + "tabs:Add(tab2)" + cr
-                                                        + "tabs:Add(tab3)" + cr
-                                                        + "pane:Add(tabs)"))
+Button addTab
+addTab:SetName(" + dq + "Add New Tab" + dq + ")
+addTab:SetPosition(600, 400)
+addTab:SetBehavior(tabBehavior)
+Add(addTab)")
+        Subsection("Adding Tabs Based on Selection")
+        Paragraph("Now, we will create another new Quorum class for the new Button's Behavior. We will call this class "):DoubleQuote():Text("AddCurrentBehavior.quorum."):DoubleQuote():Text(" The template for this class is almost identical to the AddTabBehavior class, but it will also include the TabPaneSelection library.")
+        Paragraph("The Run action will first check if the pane variable was defined by the SetTabPane action. If so, it will create a TabPaneSelection variable and set it using the TabPane's GetSelection action. Once this selection has been obtained, we can create a Tab object and set it to the current Tab using the TabPaneSelection's GetTab action.")
+        Paragraph("Still within this conditional if-statement, we now need to check if the Tab variable "):DoubleQuote():Text("current"):DoubleQuote():Text(" is undefined before calling any actions from it. If it is defined, we can obtain the Tab's name and the contents of the Tab using the Tab class's GetName and GetRelatedItem actions, respectively. Note that the GetRelatedItem action returns an Item2D, not a Drawable, so we will have to cast it before assigning it to a Drawable variable. This gives us the following code so far:")
+        CodeExample("if pane not= undefined
+    TabPaneSelection selection = pane:GetSelection()
+    Tab current = selection:GetTab()
 
-        section_creating_tabpane:AddParagraph("Note that these tabs do not need to be in an Array to be added to the pane. "
-                            +"Using pane:Add(tab1) for each tab will also work, but we do it this way to "
-                            +"show that this method also works.")
-        section_creating_tabpane:AddParagraph("For <b>accessibility</b> we will be setting the Focus to the TabPane with the following line of code:")
-        section_creating_tabpane:Add(preformatter:GeneratePreformattedCode("SetFocus(pane)"))
-        section_creating_tabpane:AddParagraph("When a Tab Pane receives Focus the user can navigate through the Tabs using Ctrl + Tab and Ctrl + Shift + Tab on Windows or Ctrl + [ and Ctrl + ] on Mac. ")
-        section_creating_tabpane:AddParagraph("Now, when we run the program, we can switch Tabs to see our different shapes, and we can "
-                            + "close out of them. But, we can still add more to the pane by adding Behaviors for when you "
-                            +"change your current selection or close a Tab.")
+    if current not= undefined
+        text name = current:GetName()
+        Drawable shape = cast(Drawable, current:GetRelatedItem())
+    end
+end")
+        Paragraph("We now have the Tab's name and shape, but are still missing the icon. While there is not an action to get the Tab's icon, we can simply use the obtained name to determine which shape to make. Using conditionals, we can accomplish this with the following lines of code, which are still within the previous conditionals:")
+        CodeExample("Icon icon
 
-        Image image1 = section_creating_tabpane:AddImage("/media/userInterface/TabPanesBegin.png", "This image shows the Tab Pane with the Circle Tab open.")
-        image1:AddAttribute("data-zoom", "")
+if name = " + dq + "Square" + dq + "
+    icon:LoadFilledRectangle(50, 50)
+elseif name = " + dq + "Circle" + dq + "
+    icon:LoadFilledCircle(25)
+elseif name = " + dq + "Triangle" + dq + "
+    icon:LoadFilledTriangle(0, 0, 50, 0, 25, 50)
+end")
+        Paragraph("With our name, shape, and icon variables obtained from the current Tab, we can now create a new Tab and Add it to the pane.")
+        CodeExample("Tab newTab
+newTab:SetName(name)
+newTab:SetRelatedItem(shape)
+newTab:SetIcon(icon)
+pane:Add(newTab)")
+        Paragraph("This gives the completed AddCurrentBehavior class as follows:")
+        CodeExample("use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Selections.TabPaneSelection
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.Graphics.Drawable
 
-        section_creating_tabpane:AddParagraph("Note that we did not set the position of the shapes but they are drawn inside of our outline. "
-                            +"This is because the shapes, now Related Items to the Tabs, are drawn relative to the TabPane. ")
+class AddCurrentBehavior is Behavior
 
-        Section section_tabpane_selection
-        section_tabpane_selection:SetClassAttribute("flex flex-col gap-y-2")
+    TabPane pane = undefined
 
-        AddHeading(section_tabpane_selection, "TabPaneSelection", 2)
+    action Run(BehaviorEvent behavior)
+        if pane not= undefined
+            TabPaneSelection selection = pane:GetSelection()
+            Tab current = selection:GetTab()
+            Icon icon
 
-        section_tabpane_selection:AddParagraph("Like Trees and TextBoxes, TabPanes have their own specific type of Selection, which keeps "
-                            + "track of the index of the current Tab. For this tutorial, we will create a "
-                            + "SelectionListener to output and say aloud a newly selected Tab.")
+            if current not= undefined
+                Tab newTab
+                text name = current:GetName()
+                Drawable shape = cast(Drawable, current:GetRelatedItem())
 
-        section_tabpane_selection:AddParagraph("First, let's create our SelectionListener. To start, create a new Quorum class, named "
-                            + dq + "TabSelectionListener.quorum." + dq + " This class will need the libraries "
-                            + "for SelectionListener, SelectionEvent, and Speech.")
+                if name = " + dq + "Circle" + dq + "
+                    icon:LoadFilledCircle(25)
+                elseif name = " + dq + "Triangle" + dq + "
+                    icon:LoadFilledTriangle(0, 0, 50, 0, 25, 50)
+                else
+                    icon:LoadFilledRectangle(50, 50)
+                end
 
-        section_tabpane_selection:AddParagraph("The TabSelectionListener class itself will inherit SelectionListener and "
-                            + "override the SelectionChanged action. To read the current Tab's name aloud, we simply "
-                            + "need to obtain the name with the SelectionEvent's GetDisplayName action, and then use "
-                            + "the Speech class's Say action. This gives us the following complete TabSelectionListener "
-                            + "class:")
+                newTab:SetName(name)
+                newTab:SetRelatedItem(shape)
+                newTab:SetIcon(icon)
+                pane:Add(newTab)
+            end
+        end
+    end
 
-        section_tabpane_selection:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Events.SelectionListener" + cr
-                                                        + "use Libraries.Interface.Events.SelectionEvent" + cr
-                                                        + "use Libraries.Sound.Speech" + cr + cr
-                                                        + "class TabSelectionListener is SelectionListener" + cr
-                                                        + "    action SelectionChanged(SelectionEvent selection)" + cr
-                                                        + "        text currentTab = selection:GetDisplayName()" + cr
-                                                        + "        Speech speech" + cr
-                                                        + "        speech:Say(currentTab)" + cr
-                                                        + "        output currentTab" + cr
-                                                        + "    end" + cr
-                                                        + "end"))
+    action SetTabPane(TabPane newPane)
+        pane = newPane
+    end
+end")
+        Paragraph("Returning to the main class, we need to make another Button for the new Behavior. This gives us the following code added to the end of the CreateGame action:")
+        CodeExample("AddCurrentBehavior currentBehavior
+currentBehavior:SetTabPane(pane)
 
-        section_tabpane_selection:AddParagraph("Returning to the main, we need to create a TabSelectionListener variable and add it as "
-                            + "a SelectionListener to the game. This is done by adding the following two lines to the "
-                            + "CreateGame action:")
+Button addCurrent
+addCurrent:SetName(" + dq + "Add Current" + dq + ")
+addCurrent:SetPosition(600, 350)
+addCurrent:SetBehavior(currentBehavior)
+Add(addCurrent)")
+        Paragraph("Now that we have all of the Buttons added we will add our "):Strong("focus cycle"):Text(" so that our application is "):Strong("accessible"):Text(".")
+        CodeExample("pane:SetNextFocus(addTab)
+pane:SetPreviousFocus(addCurrent)
+addTab:SetNextFocus(addCurrent)
+addTab:SetPreviousFocus(pane)
+addCurrent:SetNextFocus(pane)
+addCurrent:SetPreviousFocus(addTab)")
+        Paragraph("Now when we run the program, we can add new Tabs or duplicate the current Tab by clicking the appropriate Button. Then we can select between which Tab to display, reading aloud the Tab title, and can actively open or close more Tabs, the program saying aloud either "):DoubleQuote():Text("Tab opened"):DoubleQuote():Text(" or "):DoubleQuote():Text("Tab closed"):DoubleQuote():Text(" when we do so.")
+        Image("media/userInterface/TabPanesFinal.png", "This image shows the final expected game window with the Square Tab open.")
+    end
 
-        section_tabpane_selection:Add(preformatter:GeneratePreformattedCode("TabSelectionListener selectionListener" + cr
-                                                        + "AddSelectionListener(selectionListener)"))
+    private action TryMakingAUserInterface
+        Section("Try making a User Interface")
+        CodeEditorWithCode("Activity: TabPane", "TabPane.quorum", "use Libraries.Game.Game
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+use Libraries.Containers.Array
 
-        //the section on TabPaneListeners
-        Section section_tabpane_listener
-        section_tabpane_listener:SetClassAttribute("flex flex-col gap-y-2")
+class Main is Game
+    action Main
+        StartGame()
+    end
 
-        AddHeading(section_tabpane_listener, "TabPaneListener", 2)
-
-        section_tabpane_listener:AddParagraph("Every time we open or close tabs, a TabChangeEvent occurs. If we want an action to happen when "
-                            +"this event occurs, then we need a listener. To do this, create a new Quorum class, "+ dq 
-                            +"TabPaneListener.quorum," + dq + " to listen for when a Tab is added or removed from the TabPane."
-                            +" When this listener detects an addition or removal, the program will say and output that a Tab was opened or closed. ")
-
-        section_tabpane_listener:AddParagraph("This class will use the libraries for TabChangeListener, TabChangeEvent, and Speech. "
-                            + "The class itself will inherit the TabChangeListener class, and will override the OpenedTab "
-                            + "and ClosedTab actions. In each of those actions, we will create a Speech object, and call "
-                            + "its Say action with " + dq + "Tab opened" + dq + " or " + dq + "Tab closed." + dq + " The "
-                            + "resulting class is as follows:")
-
-        section_tabpane_listener:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Events.TabChangeListener" + cr
-                                                        + "use Libraries.Interface.Events.TabChangeEvent" + cr
-                                                        + "use Libraries.Sound.Speech" + cr + cr
-                                                        + "class TabPaneListener is TabChangeListener" + cr + cr
-                                                        + "    action OpenedTab(TabChangeEvent event)" + cr
-                                                        + "        Speech speech" + cr
-                                                        + "        speech:Say(" + dq + "Tab opened" + dq + ", false)" + cr
-                                                        + "        output " + dq + "Tab opened" + dq + cr
-                                                        + "    end" + cr + cr
-                                                        + "    action ClosedTab(TabChangeEvent event)" + cr
-                                                        + "        Speech speech" + cr
-                                                        + "        speech:Say(" + dq + "Tab closed" + dq + ", false)" + cr
-                                                        + "        output " + dq + "Tab closed" + dq + cr
-                                                        + "    end" + cr
-                                                        + "end"))
-
-        section_tabpane_listener:AddParagraph("Returning to the main, we need to create a TabPaneListener variable and add it to our pane. This "
-                            +"is done by adding the following two lines to the CreateGame action:")
+    action CreateGame
+        TabPane pane
+        Tab tab1
+        Tab tab2
+        Tab tab3
+        Color color
         
-        section_tabpane_listener:Add(preformatter:GeneratePreformattedCode("TabPaneListener listener" + cr
-                                                         +"pane:AddTabChangeListener(listener)"))
+        pane:SetSize(450, 450)
+        pane:SetPosition(50, 100)
+        Add(pane)
         
-        section_tabpane_listener:AddParagraph("If both listeners are added to your game, then the program will output and say the Tab's name when selecting Tabs, "
-                            +"and it will output and say when a Tab is opened or closed.")
-        Paragraph p_tabpane_listener
-        p_tabpane_listener:AddText("For additional information on how these listeners and events work, check out the tutorial on ")
-        Link link1 = p_tabpane_listener:AddLink("Events", "/tutorials/games/events.html")
-        link1:AddClassAttribute("underline text-quorum-blue-150")
-        p_tabpane_listener:AddText(".")
-        section_tabpane_listener:Add(p_tabpane_listener)
+        Drawable outline
+        outline:LoadRectangle(450, 425, color:Black())
+        outline:SetPosition(50, 100)
+        Add(outline)
         
-        Section section_adding_tabs
-        section_adding_tabs:SetClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(section_adding_tabs, "Adding Tabs", 2)
-        AddHeading(section_adding_tabs, "Adding Generic Tab", 3)
-        section_adding_tabs:AddParagraph("As the program is now, we can close Tabs, but they will stay closed and we can't open more Tabs. "
-                            + "Now, let's give our program the ability to add new Tabs, which we will do with Buttons. "
-                            + "To start, we will need to create a Behavior. We will name this new class " + dq
-                            + "AddTabBehavior," + dq + " and it will use the libraries for Behavior, BehaviorEvent, Tab, "
-                            + "TabPane, Icon, and Drawable.")
-
-        section_adding_tabs:AddParagraph("The AddTabBehavior class will inherit the Behavior class, and override the "
-                            + "Run action. For simplicity, we will design this Behavior to make the same shape "
-                            + "for the new Tab every time. To add our new Tab, we will also need an action to get the TabPane from "
-                            + "our main class. This gives us the following template for our class:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
-                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
-                                                        + "use Libraries.Interface.Controls.Tab" + cr
-                                                        + "use Libraries.Interface.Controls.TabPane" + cr
-                                                        + "use Libraries.Interface.Controls.Icon" + cr
-                                                        + "use Libraries.Game.Graphics.Drawable" + cr + cr
-                                                        + "class AddTabBehavior is Behavior" + cr + cr
-                                                        + "    TabPane pane = undefined" + cr+ cr
-                                                        + "    action Run(BehaviorEvent event)" + cr
-                                                        + "    end" + cr + cr
-                                                        + "    action SetTabPane(TabPane newPane)" + cr
-                                                        + "        pane = newPane" + cr
-                                                        + "    end" + cr
-                                                        + "end"))
-
-        section_adding_tabs:AddParagraph("For the Run action, we need to create a new Tab, making a simple blue rectangle for the "
-                            +"icon and Related Item, and add it to the TabPane. We will also protect against program "
-                            +"crashes by checking if the TabPane is still undefined. Adding this to our template, the complete "
-                            +"AddTabBehavior class is as follows:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
-                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
-                                                        + "use Libraries.Interface.Controls.Tab" + cr
-                                                        + "use Libraries.Interface.Controls.TabPane" + cr
-                                                        + "use Libraries.Interface.Controls.Icon" + cr
-                                                        + "use Libraries.Game.Graphics.Drawable" + cr + cr
-                                                        + "class AddTabBehavior is Behavior" + cr + cr
-                                                        + "    TabPane pane = undefined" + cr + cr
-                                                        + "    action Run(BehaviorEvent event)" + cr
-                                                        + "        if pane not= undefined" + cr
-                                                        + "            Tab newTab" + cr
-                                                        + "            Drawable newSquare" + cr
-                                                        + "            Icon newIcon" + cr
-                                                        + "            Color color" + cr + cr
-                                                        + "            newSquare:LoadFilledRectangle(300, 300, color:Blue())" + cr
-                                                        + "            newIcon:LoadFilledRectangle(50, 50, color:Blue())" + cr
-                                                        + "            newTab:SetName("+dq+"New Square"+dq+")" + cr
-                                                        + "            newTab:SetRelatedItem(newSquare)" + cr
-                                                        + "            newTab:SetIcon(newIcon)" + cr
-                                                        + "            pane:Add(newTab)" + cr
-                                                        + "            pane:Resize()" + cr
-                                                        + "        end" + cr
-                                                        + "    end" + cr + cr
-                                                        + "    action SetTabPane(TabPane newPane)" + cr
-                                                        + "        pane = newPane" + cr
-                                                        + "    end" + cr
-                                                        + "end"))
-
-        section_adding_tabs:AddParagraph("Returning the main class, we can now make a AddTabBehavior object, set the TabPane, and create a Button "
-                            +"to add new Tabs, which adds the following lines to the CreateGame action:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("AddTabBehavior tabBehavior" + cr
-                                                        + "tabBehavior:SetTabPane(pane)" + cr + cr
-                                                        + "Button addTab" + cr
-                                                        + "addTab:SetName("+dq+"Add New Tab"+dq+")" + cr
-                                                        + "addTab:SetPosition(600, 400)" + cr
-                                                        + "addTab:SetBehavior(tabBehavior)" + cr
-                                                        + "Add(addTab)"))
-
-        AddHeading(section_adding_tabs, "Adding Tabs Based on Selection", 3)
-        section_adding_tabs:AddParagraph("Now, we will create another new Quorum class for the new Button's Behavior. We will call "
-                            + "this class " + dq + "AddCurrentBehavior.quorum." + dq + " The template for this class is "
-                            + "almost identical to the AddTabBehavior class, but it will also include the TabPaneSelection library.")
-
-        section_adding_tabs:AddParagraph("The Run action will first check if the pane variable was defined by the SetTabPane action. "
-                            + "If so, it will create a TabPaneSelection variable and set it using the TabPane's "
-                            + "GetSelection action. Once this selection has been obtained, we can create a Tab object "
-                            + "and set it to the current Tab using the TabPaneSelection's GetTab action.")
-
-        section_adding_tabs:AddParagraph("Still within this conditional if-statement, we now need to check if the Tab variable "
-                            + dq + "current" + dq + " is undefined before calling any actions from it. If it is defined, "
-                            + "we can obtain the Tab's name and the contents of the Tab using the Tab class's GetName "
-                            + "and GetRelatedItem actions, respectively. Note that the GetRelatedItem action returns an "
-                            + "Item2D, not a Drawable, so we will have to cast it before assigning it to a Drawable "
-                            + "variable. This gives us the following code so far:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("if pane not= undefined" + cr
-                                                        + "    TabPaneSelection selection = pane:GetSelection()" + cr
-                                                        + "    Tab current = selection:GetTab()" + cr + cr
-                                                        + "    if current not= undefined" + cr
-                                                        + "        text name = current:GetName()" + cr
-                                                        + "        Drawable shape = cast(Drawable, current:GetRelatedItem())" + cr
-                                                        + "    end" + cr
-                                                        + "end"))
-
-        section_adding_tabs:AddParagraph("We now have the Tab's name and shape, but are still missing the icon. While there is not "
-                            + "an action to get the Tab's icon, we can simply use the obtained name to determine which "
-                            + "shape to make. Using conditionals, we can accomplish this with the following lines of "
-                            + "code, which are still within the previous conditionals:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("Icon icon" + cr + cr
-                                                        +"if name = " + dq + "Square" + dq + cr
-                                                        + "    icon:LoadFilledRectangle(50, 50)" + cr
-                                                        + "elseif name = " + dq + "Circle" + dq + cr
-                                                        + "    icon:LoadFilledCircle(25)" + cr
-                                                        + "elseif name = " + dq + "Triangle" + dq + cr
-                                                        + "    icon:LoadFilledTriangle(0, 0, 50, 0, 25, 50)" + cr
-                                                        + "end"))
-
-        section_adding_tabs:AddParagraph("With our name, shape, and icon variables obtained from the current Tab, we can now "
-                            + "create a new Tab and Add it to the pane.")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("Tab newTab" + cr
-                                                        + "newTab:SetName(name)" + cr
-                                                        + "newTab:SetRelatedItem(shape)" + cr
-                                                        + "newTab:SetIcon(icon)" + cr
-                                                        + "pane:Add(newTab)"))
-
-        section_adding_tabs:AddParagraph("This gives the completed AddCurrentBehavior class as  follows:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("use Libraries.Interface.Behaviors.Behavior" + cr
-                                                        + "use Libraries.Interface.Events.BehaviorEvent" + cr
-                                                        + "use Libraries.Interface.Controls.TabPane" + cr
-                                                        + "use Libraries.Interface.Selections.TabPaneSelection" + cr
-                                                        + "use Libraries.Interface.Controls.Tab" + cr
-                                                        + "use Libraries.Interface.Controls.Icon" + cr
-                                                        + "use Libraries.Game.Graphics.Drawable" + cr + cr
-                                                        + "class AddCurrentBehavior is Behavior" + cr + cr
-                                                        + "    TabPane pane = undefined" + cr + cr
-                                                        + "    action Run(BehaviorEvent behavior)" + cr
-                                                        + "        if pane not= undefined" + cr
-                                                        + "            TabPaneSelection selection = pane:GetSelection()" + cr
-                                                        + "            Tab current = selection:GetTab()" + cr
-                                                        + "            Icon icon" + cr + cr
-                                                        + "            if current not= undefined" + cr
-                                                        + "                Tab newTab" + cr
-                                                        + "                text name = current:GetName()" + cr
-                                                        + "                Drawable shape = cast(Drawable, current:GetRelatedItem())" + cr + cr
-                                                        + "                if name = " + dq + "Circle" + dq + cr
-                                                        + "                    icon:LoadFilledCircle(25)" + cr
-                                                        + "                elseif name = " + dq + "Triangle" + dq + cr
-                                                        + "                    icon:LoadFilledTriangle(0, 0, 50, 0, 25, 50)" + cr
-                                                        + "                else" + cr
-                                                        + "                    icon:LoadFilledRectangle(50, 50)" + cr
-                                                        + "                end" + cr + cr
-                                                        + "                newTab:SetName(name)" + cr
-                                                        + "                newTab:SetRelatedItem(shape)" + cr
-                                                        + "                newTab:SetIcon(icon)" + cr
-                                                        + "                pane:Add(newTab)" + cr
-                                                        + "            end" + cr
-                                                        + "        end" + cr
-                                                        + "    end" + cr + cr
-                                                        + "    action SetTabPane(TabPane newPane)" + cr
-                                                        + "        pane = newPane" + cr
-                                                        + "    end" + cr
-                                                        + "end"))
-
-        section_adding_tabs:AddParagraph("Returning to the main class, we need to make another Button for the new Behavior. "
-                            + "This gives us the following code added to the end of the CreateGame action:")
-
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("AddCurrentBehavior currentBehavior" + cr
-                                                        + "currentBehavior:SetTabPane(pane)" + cr + cr
-                                                        + "Button addCurrent" + cr
-                                                        + "addCurrent:SetName(" + dq + "Add Current" + dq + ")" + cr
-                                                        + "addCurrent:SetPosition(600, 350)" + cr
-                                                        + "addCurrent:SetBehavior(currentBehavior)" + cr
-                                                        + "Add(addCurrent)"))
-
-//        bodyDiv:AddParagraph("With that, our completed main class is as follows:")
-
-        /*CodeBlock cb2
-        Span s3
-        Span s4
-        Span s5
-        Span s6
-        Span s7
-        Span s8
-        Span s9
-        Span s10
-        Span s11
-        Span s12
-        cb2:AddText("use Libraries.Game.Game" + cr
-                    + "use Libraries.Interface.Controls.TabPane" + cr
-                    + "use Libraries.Interface.Controls.Tab" + cr
-                    + "use Libraries.Game.Graphics.Drawable" + cr
-                    + "use Libraries.Game.Graphics.Color" + cr
-                    + "use Libraries.Containers.Array" + cr
-                    + "use Libraries.Interface.Controls.Button" + cr + cr
-                    + "class Main is Game" + cr + cr
-                    + "    action Main" + cr
-                    + "        StartGame()" + cr
-                    + "    end" + cr + cr
-                    + "    action CreateGame" + cr)
-        s3:AddText("        //We declare our TabPane and our Tabs" + cr)
-        s3:SetClassAttribute("comment")
-        cb2:Add(s3)
-        cb2:AddText("        TabPane pane" + cr
-                    + "        TabPaneListener listener" + cr
-                    + "        Tab tab1" + cr
-                    + "        Tab tab2" + cr
-                    + "        Tab tab3" + cr + cr)
-        s4:AddText( "        //We create the Drawables to be contained in each Tab" + cr)
-        s4:SetClassAttribute("comment")
-        cb2:Add(s4)
-        cb2:AddText("        Color color" + cr + cr
-                    + "        Drawable box" + cr
-                    + "        Drawable circle" + cr
-                    + "        Drawable triangle" + cr + cr
-                    + "        box:LoadFilledRectangle(100, 100, color:Red())" + cr
-                    + "        circle:LoadFilledCircle(50, color:Blue())" + cr
-                    + "        triangle:LoadFilledTriangle(0, 0, 100, 0, 50, 100, color:Green())" + cr + cr)
-        s5:AddText("        //We create the Drawables to be each Tab's icon" + cr)
-        s5:SetClassAttribute("comment")
-        cb2:Add(s5)
-        cb2:AddText("        Drawable icon1" + cr
-                    + "        Drawable icon2" + cr
-                    + "        Drawable icon3" + cr + cr
-                    + "        icon1:LoadFilledRectangle(50, 50)" + cr
-                    + "        icon2:LoadFilledCircle(25)" + cr
-                    + "        icon3:LoadFilledTriangle(0, 0, 50, 0, 25, 50)" + cr + cr)
-        s6:AddText("        //We Initialize each of our Tabs" + cr)
-        s6:SetClassAttribute("comment")
-        cb2:Add(s6)
-        cb2:AddText("        tab1:Initialize(" + dq + "Square" + dq + ", box, icon1, true)" + cr
-                    + "        tab2:Initialize(" + dq + "Circle" + dq + ", circle, icon2, true)" + cr
-                    + "        tab3:Initialize(" + dq + "Triangle" + dq + ", triangle, icon3, true)" + cr + cr)
-        s7:AddText("        //We add each Tab to an Array" + cr)
-        s7:SetClassAttribute("comment")
-        cb2:Add(s7)
-        cb2:AddText("        Array<Tab> tabs" + cr
-                    + "        tabs:Add(tab1)" + cr
-                    + "        tabs:Add(tab2)" + cr
-                    + "        tabs:Add(tab3)" + cr + cr)
-        s8:AddText("        //We initialize the TabPane with our Array of Tabs" + cr)
-        s8:SetClassAttribute("comment")
-        cb2:Add(s8)
-        cb2:AddText("        pane:Initialize(450, 450, tabs)" + cr
-                    + "        pane:SetPosition(50, 100)" + cr
-                    + "        pane:AddTabChangeListener(listener)" + cr
-                    + "        Add(pane)" + cr + cr
-                    + "        Drawable outline" + cr
-                    + "        outline:LoadRectangle(450, 425, color:Black())" + cr
-                    + "        outline:SetPosition(50, 100)" + cr
-                    + "        Add(outline)" + cr + cr)
-        s9:AddText("        //We create our Buttons for creating new Tabs" + cr)
-        s9:SetClassAttribute("comment")
-        cb2:Add(s9)
-        cb2:AddText("        Button addSquare" + cr
-                    + "        Button addCircle" + cr
-                    + "        Button addTriangle" + cr + cr
-                    + "        addSquare:Initialize(150, 75, " + dq + "Add Square" + dq + ")" + cr
-                    + "        addSquare:SetPosition(600, 400)" + cr
-                    + "        addCircle:Initialize(150, 75, " + dq + "Add Circle" + dq + ")" + cr
-                    + "        addCircle:SetPosition(600, 300)" + cr
-                    + "        addTriangle:Initialize(150, 75, " + dq + "Add Triangle" + dq + ")" + cr
-                    + "        addTriangle:SetPosition(600, 200)" + cr + cr
-                    + "        Add(addSquare)" + cr
-                    + "        Add(addCircle)" + cr
-                    + "        Add(addTriangle)" + cr + cr)
-        s10:AddText("        //We create Behaviors for each Button to add new Tabs" + cr)
-        s10:SetClassAttribute("comment")
-        cb2:Add(s10)
-        cb2:AddText("        AddTabBehavior squareBehavior" + cr
-                    + "        AddTabBehavior circleBehavior" + cr
-                    + "        AddTabBehavior triangleBehavior" + cr + cr
-                    + "        squareBehavior:SetTabPane(pane)" + cr
-                    + "        squareBehavior:SetTabType(" + dq + "Square" + dq + ", box, icon1)" + cr + cr
-                    + "        circleBehavior:SetTabPane(pane)" + cr
-                    + "        circleBehavior:SetTabType(" + dq + "Circle" + dq + ", circle, icon2)" + cr + cr
-                    + "        triangleBehavior:SetTabPane(pane)" + cr
-                    + "        triangleBehavior:SetTabType(" + dq + "Triangle" + dq + ", triangle, icon3)" + cr + cr
-                    + "        addSquare:SetBehavior(squareBehavior)" + cr
-                    + "        addCircle:SetBehavior(circleBehavior)" + cr
-                    + "        addTriangle:SetBehavior(triangleBehavior)" + cr + cr)
-        s11:AddText("        //We add our SelectionListener to the game to detect when Tabs are opened or close" + cr)
-        s11:SetClassAttribute("comment")
-        cb2:Add(s11)
-        cb2:AddText("        TabSelectionListener selectionListener" + cr
-                    + "        AddSelectionListener(selectionListener)" + cr + cr)
-        s12:AddText("        //We create and add the Button to duplicate the currently selected Tab" + cr)
-        s12:SetClassAttribute("comment")
-        cb2:Add(s12)
-        cb2:AddText("        AddCurrentBehavior currentBehavior" + cr
-                    + "        currentBehavior:SetTabPane(pane)" + cr + cr
-                    + "        Button addCurrent" + cr
-                    + "        addCurrent:Initialize(150, 75, " + dq + "Add Current" + dq + ")" + cr
-                    + "        addCurrent:SetPosition(600, 100)" + cr
-                    + "        addCurrent:SetBehavior(currentBehavior)" + cr
-                    + "        Add(addCurrent)")
-        bodyDiv:Add(preformatter:GeneratePreformattedCode(cb2))
-*/
-        section_adding_tabs:AddParagraph("Now that we have all of the Buttons added we will add our <b>focus cycle</b> so that our application is <b>accessible</b>.")
-        section_adding_tabs:Add(preformatter:GeneratePreformattedCode("pane:SetNextFocus(addTab)" + cr
-                                        +"pane:SetPreviousFocus(addCurrent)" + cr
-                                        +"addTab:SetNextFocus(addCurrent)" + cr
-                                        +"addTab:SetPreviousFocus(pane)" + cr
-                                        +"addCurrent:SetNextFocus(pane)" + cr
-                                        +"addCurrent:SetPreviousFocus(addTab)"))
-        section_adding_tabs:AddParagraph("Now when we run the program, we can add new Tabs or duplicate the current Tab "
-                            + "by clicking the appropriate Button. Then we can select between which Tab to display, "
-                            + "reading aloud the Tab title, and can actively open or close more Tabs, the program saying "
-                            + "aloud either " + dq + "Tab opened" + dq + " or " + dq + "Tab closed" + dq + " when we do so.")
-
-        Image image2 = section_adding_tabs:AddImage("/media/userInterface/TabPanesFinal.png", "This image shows the final expected game window with the Square Tab open.")
-        image2:AddAttribute("data-zoom", "")
+        Drawable box
+        Drawable circle
+        Drawable triangle
         
-
-        Section section_make_ui
-        section_make_ui:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(section_make_ui, "Try making a User Interface", 2)
-
-        CodeForIDE code1
-        code1:AddFileUrl("TabPane.quorum", "/examples/UserInterface/TabPane/Main.quorum")
-        IDE ide = AddIDE()
-        ide:SetLightTheme()
-        ide:SetCodeForIDE(code1:GetJsonArray())
-        ide:SetIdeTitle("Activity: TabPane")
-        section_make_ui:Add(ide)
-
-        bodyDiv:Add(section_intro_tabpane)
-        bodyDiv:Add(section_creating_tabpane)
-        bodyDiv:Add(section_tabpane_selection)
-        bodyDiv:Add(section_tabpane_listener)
-        bodyDiv:Add(section_adding_tabs)
-        bodyDiv:Add(section_make_ui)
-
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        box:LoadFilledRectangle(300, 300, color:Red())
+        circle:LoadFilledCircle(150, color:Blue())
+        triangle:LoadFilledTriangle(0, 0, 300, 0, 150, 300, color:Green())
+        
+        Icon icon1
+        Icon icon2
+        Icon icon3
+        
+        icon1:LoadFilledRectangle(50, 50)
+        icon2:LoadFilledCircle(25)
+        icon3:LoadFilledTriangle(0, 0, 50, 0, 25, 50)
+        
+        tab1:SetName(" + dq + "Square" + dq + ")
+        tab1:SetRelatedItem(box)
+        tab1:SetIcon(icon1)
+        
+        tab2:SetName(" + dq + "Circle" + dq + ")
+        tab2:SetRelatedItem(circle)
+        tab2:SetIcon(icon2)
+        
+        tab3:SetName(" + dq + "Triangle" + dq + ")
+        tab3:SetRelatedItem(triangle)
+        tab3:SetIcon(icon3)
+        
+        Array<Tab> tabs
+        tabs:Add(tab1)
+        tabs:Add(tab2)
+        tabs:Add(tab3)
+        pane:Add(tabs)
+        
+        SetFocus(pane)
     end
-
-    action GetMetaDescription returns text
-        return "Learn about TabPanes in the Quorum programming language."
-    end
-
-    action GetSummaryName returns text
-        return "TabPanes"
-    end
-
-    action GetName returns text
-        return "TabPanes"
-    end
-
-    action GetShortDescription returns text
-        return "how to use TabPanes"
-    end
-
-    action GetLocation returns text
-        return "tutorials/ui/tabPane.html"
-    end
-    action GetLinkName returns text
-        return "TabPane"
-    end
-
-    action GetSectionName returns text
-        return "User Interfaces"
+end")
     end
 end

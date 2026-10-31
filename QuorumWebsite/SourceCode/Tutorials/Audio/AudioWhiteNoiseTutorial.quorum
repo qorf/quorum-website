@@ -1,209 +1,85 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class AudioWhiteNoiseTutorial is Lesson
-    text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+/*
+    Tutorial: Generate White Noise.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class AudioWhiteNoiseTutorial is QuorumPage
+
+    on create
+        SetLocation("tutorials/dsp/audiowhitenoise.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Generate White Noise")
+        SetSectionName("Audio")
+        SetCardImage("/media/Sound.gif")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn how to create white noise in Quoroum.")
+        SetSummary("how to generate white noise.")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
         SetWebPageTitle("White Noise Generator - Quorum Programming Language")
-        AddDefaultHeaders()
-
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-
-        //page header
-
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("Tutorial: Generate White Noise", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Tutorial: Generate White Noise")
-        AddToHeadingArray(h_heading)
-        
-        headDiv:AddText("Creating White Noise")
-        bodyDiv:Add(headDiv)
-
-        Section section_white_noise
-        section_white_noise:AddClassAttribute("flex flex-col gap-y-2")
-        Heading h_white_noise = section_white_noise:AddHeading("White Noise", 2)
-        h_white_noise:AddClassAttribute("text-2xl font-bold")
-        h_white_noise:AddAttribute("data-text", "White Noise")
-        AddToHeadingArray(h_white_noise)
-
-        section_white_noise:AddText("White noise is a combination of all the different sound frequencies audible to the human ear. 
-            This is similar to the static noise you hear from your television when it loses reception. 
-            To create white noise in Quorum, we begin by creating an Audio object as well as an AudioSamples object. 
-            Next we must set the channels within our noise and specify how long we want our noise to play for (in seconds). 
-            Then we assign values within our AudioSamples object to create the sounds. 
-            Finally we load our Audio object and play it until it finishes. ")
-        
-        section_white_noise:AddParagraph("Below is an example of a simple white noise generator producing mono sound:")
-
-        CodeBlock cb1
-        Span s1
-        Span s2
-        Span s3
-        Span s4
-        Span s5
-        Span s6
-        cb1:AddText("use Libraries.Compute.Random" + cr + 
-            "use Libraries.Sound.AudioSamples" + cr + 
-            "use Libraries.Sound.Audio" + cr + cr + 
-            "Random random" + cr + 
-            "AudioSamples samples" + cr + 
-            "Audio noise" + cr + cr)
-        s1:AddText("// We set the number of channels and how long we want our noise to play for. " + cr )
-        s1:SetClassAttribute("comment")
-        s2:AddText("// This will produce mono sound" + cr)
-        cb1:Add(s1)
-        cb1:AddText("samples:SetChannels(1) ")
-        s2:SetClassAttribute("comment")
-        cb1:Add(s2)
-        cb1:AddText("samples:SetSizeInSeconds(4) ") 
-        s3:AddText("// This will play the sound for 4 seconds" + cr + cr)
-        s3:SetClassAttribute("comment")
-        cb1:Add(s3)
-        
-        s4:AddText("// To simulate white noise, we must first generate a series of random numbers within the range of -1 and 1." + cr)
-        s4:SetClassAttribute("comment")
-        cb1:Add(s4)
-        cb1:AddText("integer counter = 0" + cr + 
-            "repeat while counter < samples:GetSize()" + cr)
-        s5:AddText("    // We set the randomly generated number at index (counter) within the channel." + cr)
-        s5:SetClassAttribute("comment")
-        cb1:Add(s5)
-        cb1:AddText("    samples:Set(counter, random:RandomNumber() * 2 - 1, 0)" + cr + 
-            "    counter = counter + 1" + cr + 
-            "end" + cr + cr) 
-           
-        s6:AddText("// Finally, we load and play the noise we created until it finishes." + cr)
-        s6:SetClassAttribute("comment")
-        cb1:Add(s6)
-        cb1:AddText("noise:Load(samples)" + cr + 
-            "noise:PlayUntilDone()")
-
-        section_white_noise:Add(preformatter:GeneratePreformattedCode(cb1))
-
-        Section section_audio_samples
-        section_audio_samples:AddClassAttribute("flex flex-col gap-y-2")
-
-        Heading h_audio_samples = section_audio_samples:AddHeading("Audio Samples", 2)
-        h_audio_samples:AddClassAttribute("text-2xl font-bold")
-        h_audio_samples:AddAttribute("data-text", "Audio Samples")
-        AddToHeadingArray(h_audio_samples)
-
-        section_audio_samples:AddParagraph("The AudioSamples object holds the discrete values of a signal. 
-            It can be used to create audio rather than just loading one. 
-            The object contains information for the number of channels it holds, the sample’s length in terms of seconds, and the number of samples per channel. 
-            A sample with a single channel will produce a mono sound while a dual channel sample produces stereo sound. 
-            Mono sound plays the same signal to all speakers. 
-            Stereo sounds assign each channel with a corresponding speaker so the signals in each speaker differ. 
-            You must first specify how many channels you want the object to hold by calling the SetChannels action. 
-            You can change the default sampling rate (44.1 kHz) by calling the SetSamplesPerSecond action. 
-            For most cases, leaving the sampling rate of 44.1 kHz will suffice. 
-            To change the amount in seconds of audio the AudioSamples object can hold, call the SetSizeInSeconds action.")
-        
-        section_audio_samples:AddParagraph("In the example above, we go through the AudioSamples object by using a counter that increments until it reaches the amount of samples stored in each channel which is set by using the GetSize action. 
-            As we go through the object, we set the sample value to the randomly generated number through Random’s RandomNumber action. 
-            Each value in the AudioSamples must be between -1 and 1, so when using the RandomNumber action (which returns between 0 and 1), we multiply the random value by 2 then subtract 1 to fit it into the range -1 and 1.")
-        
-        section_audio_samples:AddParagraph("Each channel requires its own values. 
-            If we had multiple channels, we would have to provide the samples for each one. 
-            In that case the code would look like this:")
-
-        CodeBlock cb2
-        cb2:AddText("integer counter = 0" + cr + 
-            "repeat while counter < samples:GetSize()" + cr + 
-            "   i = 0" + cr + 
-            "   repeat while i < samples:GetChannels()" + cr + 
-            "       samples:Set(counter, random:RandomNumber() * 2 - 1, i)" + cr + 
-            "       i = i + 1" + cr + 
-            "   end" + cr + 
-            "   counter = counter + 1" + cr + 
-            "end")   
-
-        section_audio_samples:Add(preformatter:GeneratePreformattedCode(cb2))
-        
-        Section section_playing_sound
-        section_playing_sound:AddClassAttribute("flex flex-col gap-y-2")
-
-        Heading h_playing_sound =  section_playing_sound:AddHeading("Playing the Sound", 2)
-        h_playing_sound:AddClassAttribute("text-2xl font-bold")
-        h_playing_sound:AddAttribute("data-text", "Playing the Sound")
-        AddToHeadingArray(h_playing_sound)
-
-        section_playing_sound:AddParagraph("To play the white noise we just created, we use Audio object. 
-            The Audio object is used to load our AudioSamples object using the Load action followed by playback of the sound using the PlayUntilDone action. 
-            We call these actions as follows:")
-            
-        CodeBlock cb3  
-        cb3:AddText("noise:Load(samples)" + cr + 
-            "noise:PlayUntilDone()")
-        section_playing_sound:Add(preformatter:GeneratePreformattedCode(cb3))
-        
-        section_playing_sound:AddParagraph("For the duration of the playback, you should be hearing something similar to the sound of a radio on an unknown station. ")
-
-        CodeForIDE code1
-        code1:AddFileText("Main.quorum", "//Generate some white noise")
-        IDE ide = AddIDE()
-        ide:SetLightTheme()
-        ide:SetCodeForIDE(code1:GetJsonArray())
-        ide:SetIdeTitle("Generate White Noise")
-        section_playing_sound:Add(ide)
-
-        section_playing_sound:AddParagraph(cr + "Congratulations! 
-            You were able to create a white noise generator and successfully played it back. 
-            There are also other noises you can create like pink and brown noise. 
-            Check them out and see if you can generate them yourself! 
-            You can run this program offline or online in a web browser.")
-
-        bodyDiv:Add(section_white_noise)
-        bodyDiv:Add(section_audio_samples)
-        bodyDiv:Add(section_playing_sound)
-
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        Title("Tutorial: Generate White Noise")
+        Paragraph("Creating White Noise")
+        WhiteNoise()
+        AudioSamples()
+        PlayingTheSound()
     end
 
-    action GetMetaDescription returns text
-        return "Learn how to create white noise in Quoroum."
+    private action WhiteNoise
+        Section("White Noise")
+        Paragraph("White noise is a combination of all the different sound frequencies audible to the human ear. This is similar to the static noise you hear from your television when it loses reception. To create white noise in Quorum, we begin by creating an Audio object as well as an AudioSamples object. Next we must set the channels within our noise and specify how long we want our noise to play for (in seconds). Then we assign values within our AudioSamples object to create the sounds. Finally we load our Audio object and play it until it finishes.")
+        Paragraph("Below is an example of a simple white noise generator producing mono sound:")
+        CodeExample("use Libraries.Compute.Random
+use Libraries.Sound.AudioSamples
+use Libraries.Sound.Audio
+
+Random random
+AudioSamples samples
+Audio noise
+
+// We set the number of channels and how long we want our noise to play for. 
+samples:SetChannels(1) // This will produce mono sound
+samples:SetSizeInSeconds(4) // This will play the sound for 4 seconds
+
+// To simulate white noise, we must first generate a series of random numbers within the range of -1 and 1.
+integer counter = 0
+repeat while counter < samples:GetSize()
+    // We set the randomly generated number at index (counter) within the channel.
+    samples:Set(counter, random:RandomNumber() * 2 - 1, 0)
+    counter = counter + 1
+end
+
+// Finally, we load and play the noise we created until it finishes.
+noise:Load(samples)
+noise:PlayUntilDone()")
     end
 
-    action GetSummaryName returns text
-        return "White Noise Generator"
+    private action AudioSamples
+        Section("Audio Samples")
+        Paragraph("The AudioSamples object holds the discrete values of a signal. It can be used to create audio rather than just loading one. The object contains information for the number of channels it holds, the sample’s length in terms of seconds, and the number of samples per channel. A sample with a single channel will produce a mono sound while a dual channel sample produces stereo sound. Mono sound plays the same signal to all speakers. Stereo sounds assign each channel with a corresponding speaker so the signals in each speaker differ. You must first specify how many channels you want the object to hold by calling the SetChannels action. You can change the default sampling rate (44.1 kHz) by calling the SetSamplesPerSecond action. For most cases, leaving the sampling rate of 44.1 kHz will suffice. To change the amount in seconds of audio the AudioSamples object can hold, call the SetSizeInSeconds action.")
+        Paragraph("In the example above, we go through the AudioSamples object by using a counter that increments until it reaches the amount of samples stored in each channel which is set by using the GetSize action. As we go through the object, we set the sample value to the randomly generated number through Random’s RandomNumber action. Each value in the AudioSamples must be between -1 and 1, so when using the RandomNumber action (which returns between 0 and 1), we multiply the random value by 2 then subtract 1 to fit it into the range -1 and 1.")
+        Paragraph("Each channel requires its own values. If we had multiple channels, we would have to provide the samples for each one. In that case the code would look like this:")
+        CodeExample("integer counter = 0
+repeat while counter < samples:GetSize()
+   i = 0
+   repeat while i < samples:GetChannels()
+       samples:Set(counter, random:RandomNumber() * 2 - 1, i)
+       i = i + 1
+   end
+   counter = counter + 1
+end")
     end
 
-    action GetImageLocation returns text
-        return "/media/Sound.gif"
-    end
-
-    action GetName returns text
-        return "Creating White Noise sounds"
-    end
-
-    action GetShortDescription returns text
-        return "how to generate white noise."
-    end
-
-    action GetLocation returns text
-        return "tutorials/dsp/audiowhitenoise.html"
-    end
-
-    action GetLinkName returns text
-        return "Generate White Noise"
-    end
-
-    action GetSectionName returns text
-        return "Audio"
+    private action PlayingTheSound
+        Section("Playing the Sound")
+        Paragraph("To play the white noise we just created, we use Audio object. The Audio object is used to load our AudioSamples object using the Load action followed by playback of the sound using the PlayUntilDone action. We call these actions as follows:")
+        CodeExample("noise:Load(samples)
+noise:PlayUntilDone()")
+        Paragraph("For the duration of the playback, you should be hearing something similar to the sound of a radio on an unknown station.")
+        CodeEditorWithCode("Generate White Noise", "//Generate some white noise")
+        Paragraph("Congratulations! You were able to create a white noise generator and successfully played it back. There are also other noises you can create like pink and brown noise. Check them out and see if you can generate them yourself! You can run this program offline or online in a web browser.")
     end
 end

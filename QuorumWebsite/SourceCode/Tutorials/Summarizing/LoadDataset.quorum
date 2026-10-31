@@ -1,156 +1,54 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class SummaryLoading is Lesson
+/*
+    Loading and Formatting our Dataset.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class SummaryLoading is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+
+    on create
+        SetLocation("tutorials/Summarizing/summmaryLoad.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Loading and Formatting the Dataset")
+        SetSectionName("Descriptive Statistics")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Loading our data files for descriptive statistics in the Quorum programming language.")
+        SetSummary("loading the dataset using dataframes")
+    end
 
     action Setup
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Descriptive Statistics - Quorum Programming Language")
-        AddDefaultHeaders()
+        Title("Loading and Formatting our Dataset")
+        Paragraph("This tutorial shows us how to properly load our dataset using DataFrames")
+        FormattingAndLoadingTheDryBeanData()
+        TryItYourself()
+    end
 
-        //Figure out getting main regions properly.
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("Loading and Formatting our Dataset", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Loading and Formatting our Dataset")
-        AddToHeadingArray(h_heading)
-
-        headDiv:AddText("This tutorial shows us how to properly load our dataset using DataFrames")
-        bodyDiv:Add(headDiv)
-
-        
-        Section section_intro
-        section_intro:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_intro)
-        AddHeading(section_intro, "Formatting and Loading the Dry Bean Data", 2)
-
-        
-        section_intro:AddParagraph("Before we run analysis on this data, let us examine it. This dry bean dataset comes from seven different classes of beans: Seker, Barbunya, Bombay, Cali, Horoz, Sira, and Dermason. From these beans, researchers collected data on 12 dimensions and 4 shape forms in order for systems to distinguish between seven different registered beans. The attributes recorded from the beans are: Area, Perimeter, Major axis length, Minor axis length, Aspect ratio, Eccentricity, Convex area, Equivalent diameter, Extent, Solidity, Roundness, Compactness, ShapeFactor1, ShapeFactor2, ShapeFactor3, ShapeFactor4, and Class. In terms of classification, these attributes are important because they help scientists understand the natural world. Here is a sample of our dataset:")
-      
-         WebTable table = AddWebTable("Snippet of DryBeans.csv")
-        TableBody tableBody = AddTableBody()
-        
-        Array<text> tableHeaderArray
-        tableHeaderArray:Add("Area")
-        tableHeaderArray:Add("Perimeter") 
-        tableHeaderArray:Add("MajorAxisLength") 
-        tableHeaderArray:Add("MinorAxisLength") 
-        tableHeaderArray:Add("AspectRation") 
-      
-        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
-        table:Add(thead)        
-
-        Array<text> rubricText1
-        rubricText1:Add("28395")
-        rubricText1:Add("610.291") 
-        rubricText1:Add("208.1781")
-        rubricText1:Add("173.8887")
-        rubricText1:Add("1.197191")
-        tableBody:Add(AddTableBodyRow(rubricText1))
-
-        Array<text> rubricText2
-        rubricText2:Add("28734")
-        rubricText2:Add("638.018") 
-        rubricText2:Add("200.5248")
-        rubricText2:Add("182.7344")
-        rubricText2:Add("1.097356")
-        tableBody:Add(AddTableBodyRow(rubricText2))
-
-         Array<text> rubricText3
-        rubricText3:Add("29380")
-        rubricText3:Add("624.11") 
-        rubricText3:Add("212.8261")
-        rubricText3:Add("175.9311")
-        rubricText3:Add("1.209713")
-        tableBody:Add(AddTableBodyRow(rubricText3))
-
-         Array<text> rubricText4
-        rubricText4:Add("30008")
-        rubricText4:Add("645.884") 
-        rubricText4:Add("210.558")
-        rubricText4:Add("182.5165")
-        rubricText4:Add("1.153638")
-        tableBody:Add(AddTableBodyRow(rubricText4))
-
-        Array<text> rubricHeader1
-        rubricHeader1:Add(AddTextBoldFront("Area", " "))
-        rubricHeader1:Add(AddTextBoldFront("Perimeter", " "))
-        rubricHeader1:Add(AddTextBoldFront("MajorAxisLength", " "))
-        rubricHeader1:Add(AddTextBoldFront("MinorAxisLength", " "))
-        rubricHeader1:Add(AddTextBoldFront("AspectRation", " "))
-
-        table:Add(tableBody)
-        section_intro:Add(table)
-
-        section_intro:AddParagraph("Oftentimes, we need to transform our data before we can use it and here is no exception. From the UCI repository, the dry bean dataset can be downloaded as a zip file, and within the zip file, the dataset itself, it is saved as an XLSX, however Quorum only accepts datasets that are of CSV type. Recall that a CSV is a plain text file that contains data separated by commas. To fix this issue, we need to save the file in any spreadsheet program (e.g., Excel, Google Sheets). From there, we simply would want to keep the file name relating to the dry beans and be sure to save as 'CSV (comma delimited) *.csv.' Now that we have the correct file format, we can use this dataset to analyze. ")
-
-
-        Paragraph para
-        para:AddText("For easier access, we have the converted dataset readily available ")
-        
-        Link link
-        link:AddText("here")
-        link:SetAddress("https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/DryBeans.csv")
-        link:SetTarget(link:newTab)
-        link:SetClassAttribute("underline text-quorum-blue-150")
-        
-        para:Add(link)
-        section_intro:Add(para) 
-
-        section_intro:AddParagraph("Now that our dataset is prepared, we are going to load it into a DataFrame. A DataFrame is the object that will hold in our data. To do this, we create the DataFrame and call it 'frame.' From there we use 'frame' like a regular variable and now have access to many functions on loading, formatting, etc. and for this purpose, we will be using the Load(text filepath) function and AddSelectedColumns(text heading). Here is a brief explanation of what our Load(text filepath) and our AddSelectedColumns(text heading) functions do.")  
-
-         WebTable tableAction = AddWebTable("Helper Actions to Load Our Files")
-        TableBody tableBodyAction = AddTableBody()
-        
-        Array<text> tableHeaderArrayAction
-        tableHeaderArrayAction:Add("Class / Action")
-        tableHeaderArrayAction:Add("Description") 
-        tableHeaderArrayAction:Add("Usage")
-      
-        TableHeader theadAction = AddTableHeaderRow(tableHeaderArrayAction)
-        tableAction:Add(theadAction)   
-
-        Array<text> rubricText5
-        rubricText5:Add("frame:Load(text filepath)")
-        rubricText5:Add("This action takes in a string which is the location of the file path (inside the file explorer) of the dataset we want to read in.")
-        rubricText5:Add("frame:Load("+dq+"../Data/Food/FastFoodRestaurants.CSV"+dq+")")
-          tableBodyAction:Add(AddTableBodyRow(rubricText5))
-        
-        Array<text> rubricText6
-        rubricText6:Add("frame:AddSelectedColumns(text heading)")
-        rubricText6:Add("This action takes in a string which is an exact text header within the dataset. ")
-        rubricText6:Add("frame:AddSelectedColumns("+dq+"Heading 1"+dq+")")
-  tableBodyAction:Add(AddTableBodyRow(rubricText6))
-         
-        Array<text> rubricText7
-        rubricText7:Add("frame:AddSelectedColumn(integer colNum)")
-        rubricText7:Add("Alternatively, we can add the corresponding integer column in the dataset. This function takes in an integer which is the column number starting from 0.")
-        rubricText7:Add("frame:AddSelectedColumn(0)
-frame:AddSelectedColumn(1)
-")
-  tableBodyAction:Add(AddTableBodyRow(rubricText7))
-        
-        
-        tableAction:Add(tableBodyAction)
-        section_intro:Add(tableAction)
-
-        section_intro:AddParagraph("Now that we have this 'frame' object, we can call the Load function which will locate the file and read all data entries in. To confirm that our data has been read, we can output our CSV file using the function call, ToText(). If we wanted to only output a specified column (because datasets can become quite large), we can also call the function ToText(integer) that allows us to print out the row based on the integer inside the parameter. This will only print one row at a time rather than the entire dataset.")
-
-        section_intro:AddParagraph("Luckily, for this dataset, there is no missing data, however as we have seen in the data science world, some datasets are messy and would require preprocessing. Typically after loading in a dataset, we would want to clean it, meaning, getting rid of empty rows or columns. In Quorum, this is how we would properly read in our data:
-")
-
-        section_intro:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+    private action FormattingAndLoadingTheDryBeanData
+        Section("Formatting and Loading the Dry Bean Data")
+        Paragraph("Before we run analysis on this data, let us examine it. This dry bean dataset comes from seven different classes of beans: Seker, Barbunya, Bombay, Cali, Horoz, Sira, and Dermason. From these beans, researchers collected data on 12 dimensions and 4 shape forms in order for systems to distinguish between seven different registered beans. The attributes recorded from the beans are: Area, Perimeter, Major axis length, Minor axis length, Aspect ratio, Eccentricity, Convex area, Equivalent diameter, Extent, Solidity, Roundness, Compactness, ShapeFactor1, ShapeFactor2, ShapeFactor3, ShapeFactor4, and Class. In terms of classification, these attributes are important because they help scientists understand the natural world. Here is a sample of our dataset:")
+        Table("Snippet of DryBeans.csv")
+        TableHeader():Cell("Area"):Cell("Perimeter"):Cell("MajorAxisLength"):Cell("MinorAxisLength"):Cell("AspectRation")
+        TableRow():Cell("28395"):Cell("610.291"):Cell("208.1781"):Cell("173.8887"):Cell("1.197191")
+        TableRow():Cell("28734"):Cell("638.018"):Cell("200.5248"):Cell("182.7344"):Cell("1.097356")
+        TableRow():Cell("29380"):Cell("624.11"):Cell("212.8261"):Cell("175.9311"):Cell("1.209713")
+        TableRow():Cell("30008"):Cell("645.884"):Cell("210.558"):Cell("182.5165"):Cell("1.153638")
+        Paragraph("Oftentimes, we need to transform our data before we can use it and here is no exception. From the UCI repository, the dry bean dataset can be downloaded as a zip file, and within the zip file, the dataset itself, it is saved as an XLSX, however Quorum only accepts datasets that are of CSV type. Recall that a CSV is a plain text file that contains data separated by commas. To fix this issue, we need to save the file in any spreadsheet program (e.g., Excel, Google Sheets). From there, we simply would want to keep the file name relating to the dry beans and be sure to save as 'CSV (comma delimited) *.csv.' Now that we have the correct file format, we can use this dataset to analyze.")
+        Paragraph("For easier access, we have the converted dataset readily available "):Link("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/DryBeans.csv")
+        Paragraph("Now that our dataset is prepared, we are going to load it into a DataFrame. A DataFrame is the object that will hold in our data. To do this, we create the DataFrame and call it 'frame.' From there we use 'frame' like a regular variable and now have access to many functions on loading, formatting, etc. and for this purpose, we will be using the Load(text filepath) function and AddSelectedColumns(text heading). Here is a brief explanation of what our Load(text filepath) and our AddSelectedColumns(text heading) functions do.")
+        Table("Helper Actions to Load Our Files")
+        TableHeader():Cell("Class / Action"):Cell("Description"):Cell("Usage")
+        TableRow():Cell("frame:Load(text filepath)"):Cell("This action takes in a string which is the location of the file path (inside the file explorer) of the dataset we want to read in."):Cell("frame:Load(" + dq + "../Data/Food/FastFoodRestaurants.CSV" + dq + ")")
+        TableRow():Cell("frame:AddSelectedColumns(text heading)"):Cell("This action takes in a string which is an exact text header within the dataset."):Cell("frame:AddSelectedColumns(" + dq + "Heading 1" + dq + ")")
+        TableRow():Cell("frame:AddSelectedColumn(integer colNum)"):Cell("Alternatively, we can add the corresponding integer column in the dataset. This function takes in an integer which is the column number starting from 0."):Cell("frame:AddSelectedColumn(0) frame:AddSelectedColumn(1)")
+        Paragraph("Now that we have this 'frame' object, we can call the Load function which will locate the file and read all data entries in. To confirm that our data has been read, we can output our CSV file using the function call, ToText(). If we wanted to only output a specified column (because datasets can become quite large), we can also call the function ToText(integer) that allows us to print out the row based on the integer inside the parameter. This will only print one row at a time rather than the entire dataset.")
+        Paragraph("Luckily, for this dataset, there is no missing data, however as we have seen in the data science world, some datasets are messy and would require preprocessing. Typically after loading in a dataset, we would want to clean it, meaning, getting rid of empty rows or columns. In Quorum, this is how we would properly read in our data:")
+        CodeExample("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
 
@@ -159,70 +57,28 @@ use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
 DataFrame frame
 
 //This loads data relative to the project, so put the dryBeans file in the Data/Miscellaneous folder
-frame:Load("+dq+"../Data/Miscellaneous/DryBeans.csv"+dq+")
+frame:Load(" + dq + "../Data/Miscellaneous/DryBeans.csv" + dq + ")
+
+//We can save the frame or output it to the console, like we are doing here.
+output frame:ToText()")
+    end
+
+    private action TryItYourself
+        Section("Try it Yourself!")
+        Paragraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "):DoubleQuote():Text("Build Successful!"):DoubleQuote()
+        CodeEditorWithCode("Loading the Dry Bean file", "//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Transforms.RemoveUndefinedRowsTransform
+
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
+
+//This loads data relative to the project, so put the dryBeans file in the Data/Miscellaneous folder
+frame:Load(" + dq + "data/DryBeans.csv" + dq + ")
 
 //We can save the frame or output it to the console, like we are doing here.
 output frame:ToText()
-"))
-
-        
-        Section section_try_yourself
-    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
-    bodyDiv:Add(section_try_yourself)
-    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
-    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
-    AddToHeadingArray(h2_try_yourself)
-    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
-    
-    CodeForIDE code4
-    code4:AddFileUrl("Main.quorum", "examples/DataFrames/LoadBeanFile.quorum")
-    IDE ide3 = AddIDE()
-    ide3:SetLightTheme()
-    ide3:SetCodeForIDE(code4:GetJsonArray())
-    ide3:SetIdeTitle("Loading the Dry Bean file")
-    section_try_yourself:Add(ide3)
-        
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
-    end
-
-    action AddKeywords
-        MetaData keywords
-        keywords:AddAttribute("name", "keywords")
-        keywords:AddAttribute("content", GetDataScienceDefaultKeywords() + 
-        ", Loading data, summarizing data, summary statistics, descriptive statistics")
-        AddMetaData(keywords)
-    end
-
-    action GetMetaDescription returns text
-        return "Loading our data files for descriptive statistics in the Quorum programming language."
-    end
-
-    action GetSummaryName returns text
-        return "loading file"
-    end
-
-    action GetName returns text
-        return "loading file"
-    end
-
-    action GetShortDescription returns text
-        return "loading the dataset using dataframes"
-    end
-
-    action GetLocation returns text
-        return "tutorials/Summarizing/summmaryLoad.html"
-    end
-
-           action GetLinkName returns text
-        return "Loading and Formatting the Dataset"
-    end
-
-    action GetSectionName returns text
-        return "Descriptive Statistics"
+")
     end
 end

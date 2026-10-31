@@ -1,176 +1,56 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Web.Page.OrderedList
-use Libraries.Containers.Array
-use Libraries.Web.Page.Section
-use Libraries.Web.Page.Heading
-use Libraries.Web.Page.WebTable
-use Libraries.Web.Page.TableBody
-use Libraries.Web.Page.TableHeader
-use Libraries.Web.Page.IDE
-use Libraries.Web.Page.CodeForIDE
+use Libraries.Web.Page.QuorumPage
 
-class LoadFileByHand is Lesson
+/*
+    Loading a dataset "by Hand".
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class LoadFileByHand is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-    Preformatter preformatter //helper
+
+    on create
+        dq = dq:GetDoubleQuote()
+        SetLocation("tutorials/SavingAndLoading/LoadingByHand.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Loading a File (By Hand)")
+        SetSectionName("Data Science")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn about loading data ")
+        SetSummary("how to load data " + dq + "by Hand" + dq + " in a file using DataFrames")
+    end
 
     action Setup
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Data Science - Quorum Programming Language")
-        AddDefaultHeaders()
+        Title("Loading a dataset " + dq + "by Hand" + dq)
+        Paragraph("This tutorial tells use the DataFrame to load data "):DoubleQuote():Text("by Hand"):DoubleQuote()
+        LoadingDataByHand()
+        CodeExamplePart()
+        TryItYourself()
+    end
 
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-        
-        //page header
-        Section headerSection
-        Heading head = headerSection:AddHeading("Loading a dataset "+dq+"by Hand"+dq+"", 1)
-        head:AddAttribute("data-text", "Loading a dataset "+dq+"by Hand"+dq+"")
-        head:AddClassAttribute("text-3xl font-bold") 
-        AddToHeadingArray(head)       
-        headerSection:AddText("This tutorial tells use the DataFrame to load data "+dq+"by Hand"+dq+"")
-        bodyDiv:Add(headerSection)
+    private action LoadingDataByHand
+        Section("Loading data " + dq + "by Hand" + dq)
+        Paragraph("While normally we load data from a file or another source, we can also create it by hand. We recommend making our data in excel or other sources, but document this possibility here for completeness. By default, there are six column types we can add, NumberColumn, BooleanColumn, IntegerColumn, TextColumn, AudioColumn, and DateColumn. Here are brief explanations on each valid column data entry we can use.")
+        Table("Column Types")
+        TableHeader():Cell("Object"):Cell("Description"):Cell("Usage")
+        TableRow():Cell("NumberColumn"):Cell("NumberColumns allow us to insert both integers and decimal values into our data sets."):Cell("NumberColumn numCol numCol:Add(" + dq + "1" + dq + ") numCol:Add(" + dq + "1.5" + dq + ")")
+        TableRow():Cell("BooleanColumn"):Cell("BooleanColumns allow us to insert true and false values into our data sets."):Cell("BooleanColumn boolCol boolCol:Add(true) boolCol:Add(false)")
+        TableRow():Cell("IntegerColumn"):Cell("IntegerColumns allow us to insert whole numbers into our data sets."):Cell("IntegerColumn intCol integerCol:Add(5) integerCol:Add(8)")
+        TableRow():Cell("TextColumn"):Cell("TextColumns allow us to insert strings/text into our data sets."):Cell("TextColumn txtCol txtCol:(" + dq + "Mickey" + dq + ") txtCol:(" + dq + "Mouse" + dq + ")")
+        TableRow():Cell("AudioColumn"):Cell("AudioColumns allow us to insert audio files into our data sets. It takes in a string which is the file path of the audio file. AudioColumn* will accept both .ogg files and .wav files."):Cell("AudioColumn aCol aCol:Add(" + dq + "..\Audio\squeak.mp4" + dq + ") aCol:Add(" + dq + "..\Audio\beep.mp4" + dq + ")")
+        TableRow():Cell("DateColumn**"):Cell("DateColumns allow us to insert dates into our data sets."):Cell("DateColumn dCol dCol:Add(" + dq + "11/2/2022" + dq + ") dCol:Add(" + dq + "11/3/2022" + dq + ")")
+        Paragraph("**DateColumn was added in Quorum 10.0.")
+        Paragraph("For this example, we will be creating a dataset that incorporates a selection of the data types we can insert. What we want to start off is creating a DataFrame object to load our dataset. We will go ahead and name it 'frame.' Now, let us create the columns of the data types: number, boolean, integer, and text.")
+        Paragraph("We should have the following code:")
+        Paragraph():Strong("*Note that AudioColumns cannot be used with the ToText() function with DataFrames.")
+    end
 
-        Section section_load_file
-        section_load_file:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_load_file)
-        
-        Heading h2_load_file = section_load_file:AddHeading("Loading data "+dq+"by Hand"+dq+"", 2)
-        h2_load_file:AddAttribute("data-text", "Loading data "+dq+"by Hand"+dq+"")
-        
-        h2_load_file:AddClassAttribute("text-2xl font-bold")
-        AddToHeadingArray(h2_load_file)
-
-        section_load_file:AddParagraph("While normally we load data from a file or another source, we can also create it by hand. We recommend making our data in excel or other sources, but document this possibility here for completeness. By default, there are six column types we can add, NumberColumn, BooleanColumn, IntegerColumn, TextColumn, AudioColumn, and DateColumn. Here are brief explanations on each valid column data entry we can use.")
-        
-
-        WebTable table = AddWebTable("Column Types")
-        TableBody tableBody = AddTableBody()
-        
-        Array<text> tableHeaderArray
-        tableHeaderArray:Add("Object")
-        tableHeaderArray:Add("Description") 
-        tableHeaderArray:Add("Usage")
-
-        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
-        table:Add(thead)
-        
-         Array<text> rubricText1
-        rubricText1:Add("NumberColumn")
-        rubricText1:Add("NumberColumns allow us to insert both integers and decimal values into our data sets.") 
-        rubricText1:Add("
-NumberColumn numCol
-
-numCol:Add("+dq+"1"+dq+")
-numCol:Add("+dq+"1.5"+dq+")
-")
-        tableBody:Add(AddTableBodyRow(rubricText1))
-   
-        Array<text> rubricText2
-        rubricText2:Add("BooleanColumn")
-        rubricText2:Add("BooleanColumns allow us to insert true and false values into our data sets.")
-        rubricText2:Add("
-BooleanColumn boolCol
-
-boolCol:Add(true)
-boolCol:Add(false)
-")
-        tableBody:Add(AddTableBodyRow(rubricText2))
-
-        Array<text> rubricText3
-        rubricText3:Add("IntegerColumn")
-        rubricText3:Add("IntegerColumns allow us to insert whole numbers into our data sets.")
-        rubricText3:Add("
-IntegerColumn intCol
-
-integerCol:Add(5)
-integerCol:Add(8)
-
-")        
-        tableBody:Add(AddTableBodyRow(rubricText3))
-
-
-        Array<text> rubricText4
-        rubricText4:Add("TextColumn")
-        rubricText4:Add("TextColumns allow us to insert strings/text into our data sets.")
-        rubricText4:Add("
-TextColumn txtCol
-
-txtCol:("+dq+"Mickey"+dq+")
-txtCol:("+dq+"Mouse"+dq+")
-
-")
-        tableBody:Add(AddTableBodyRow(rubricText4))
-
-
-        Array<text> rubricText5
-        rubricText5:Add("AudioColumn")
-        rubricText5:Add("AudioColumns allow us to insert audio files into our data sets. It takes in a string which is the file path of the audio file. AudioColumn* will accept both .ogg files and .wav files.")
-        rubricText5:Add("
-AudioColumn aCol
-
-aCol:Add("+dq+"..\Audio\squeak.mp4"+dq+")
-aCol:Add("+dq+"..\Audio\beep.mp4"+dq+")
-
-")
-        tableBody:Add(AddTableBodyRow(rubricText5))
-
-
-        Array<text> rubricText6
-        rubricText6:Add("DateColumn**")
-        rubricText6:Add("DateColumns allow us to insert dates into our data sets.")
-        rubricText6:Add("
-DateColumn dCol
-
-dCol:Add("+dq+"11/2/2022"+dq+")
-dCol:Add("+dq+"11/3/2022"+dq+")
-
-")
-
-    tableBody:Add(AddTableBodyRow(rubricText6))
-
-
-
-        table:Add(tableBody)
-        section_load_file:Add(table)
-
-        Bold b1
-        b1:AddText("*Note that AudioColumns cannot be used with the ToText() function with DataFrames.")
-        bodyDiv:Add(b1)
-        section_load_file:AddParagraph("**DateColumn was added in Quorum 10.0.")
-
-
-        section_load_file:AddParagraph("For this example, we will be creating a dataset that incorporates a selection of the data types we can insert. What we want to start off is creating a DataFrame object to load our dataset. We will go ahead and name it 'frame.' Now, let us create the columns of the data types: number, boolean, integer, and text.")
-    
-        section_load_file:AddParagraph("We should have the following code:")
-        
-        Section section_code_example       
-        section_code_example:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_code_example)        
-        
-        Heading h2_code_example = section_code_example:AddHeading("Code Example", 2)
-        h2_code_example:AddAttribute("data-text", "Code Example")
-        
-        h2_code_example:AddClassAttribute("text-2xl font-bold")
-        AddToHeadingArray(h2_code_example)
-
-        section_code_example:Add(preformatter:GeneratePreformattedCode("//We need the DataFrame class to load in files for Data Science operations.
+    private action CodeExamplePart
+        Section("Code Example")
+        CodeExample("//We need the DataFrame class to load in files for Data Science operations.
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Compute.Statistics.Columns.NumberColumn
 use Libraries.Containers.Array
@@ -186,130 +66,70 @@ DataFrame frame
 NumberColumn numCol
 TextColumn textCol
 BooleanColumn boolCol
-IntegerColumn intCol"))
-
-    section_code_example:AddParagraph("Now that we have our data columns, we can simply use the Add(type element) with the respective column object we have created. Our Add(type element) can be used with all the different columns and will add our element of the respective data type within the data set. Here, we will add two elements to each column.")    
-
-    section_code_example:Add(preformatter:GeneratePreformattedCode("numCol:Add(1.4)
-textCol:Add("+dq+"Fruit"+dq+")
+IntegerColumn intCol")
+        Paragraph("Now that we have our data columns, we can simply use the Add(type element) with the respective column object we have created. Our Add(type element) can be used with all the different columns and will add our element of the respective data type within the data set. Here, we will add two elements to each column.")
+        CodeExample("numCol:Add(1.4)
+textCol:Add(" + dq + "Fruit" + dq + ")
 boolCol:Add(true)
 intCol:Add(6)
 
 numCol:Add(3.5)
-textCol:Add("+dq+"Vegetable"+dq+")
+textCol:Add(" + dq + "Vegetable" + dq + ")
 boolCol:Add(false)
-intCol:Add(10)"))
-    
-    section_code_example:AddParagraph("Now that we have populated our dataset, we would like to insert them into the DataFrame. Doing this step actually helps construct the elements and form it into a CSV-style type of dataset. We can achieve this by calling the AddColumn(dataColumn type) function with our DataFrame 'frame' object. Here is a brief description of how AddColumn(dataColumn type) works.")
-        
-
-    WebTable tableAddCol = AddWebTable("AddColumn Function")
-    TableBody tableBodyAddCol = AddTableBody()
-    
-    Array<text> tableHeaderArrayAddCol
-    tableHeaderArrayAddCol:Add("Function")
-    tableHeaderArrayAddCol:Add("Description") 
-    tableHeaderArrayAddCol:Add("Usage")
-
-    TableHeader theadAddCol = AddTableHeaderRow(tableHeaderArrayAddCol)
-    tableAddCol:Add(theadAddCol)
-
-    Array<text> rubricText7
-    rubricText7:Add("frame:AddColumn(dataColumn type)")
-    rubricText7:Add("This function takes in a data column of either: text, boolean, number, audio, integer, or date and constructs the column. It forms one column each instance it is called.") 
-    rubricText7:Add("
-booleanColumn boolCol
-
-boolCol:Add(true)
-boolCol:Add(true)
-boolCol:Add(false)
-
-frame:AddColumn(boolCol)
-")
-    tableBodyAddCol:Add(AddTableBodyRow(rubricText7))
-
-
-     tableAddCol:Add(tableBodyAddCol)
-     section_code_example:Add(tableAddCol)
-
-    section_code_example:AddParagraph("For our case, calling AddColumn() will add the two elements of each type into a DataFrame. Afterwards, we can view our data set onto the console by calling the ToText() function with our 'frame' object as well. We will now be inserting the elements we have added onto our data frame as follows and displaying them onto the console:")
-
-    section_code_example:Add(preformatter:GeneratePreformattedCode("frame:AddColumn(numCol)
+intCol:Add(10)")
+        Paragraph("Now that we have populated our dataset, we would like to insert them into the DataFrame. Doing this step actually helps construct the elements and form it into a CSV-style type of dataset. We can achieve this by calling the AddColumn(dataColumn type) function with our DataFrame 'frame' object. Here is a brief description of how AddColumn(dataColumn type) works.")
+        Table("AddColumn Function")
+        TableHeader():Cell("Function"):Cell("Description"):Cell("Usage")
+        TableRow():Cell("frame:AddColumn(dataColumn type)"):Cell("This function takes in a data column of either: text, boolean, number, audio, integer, or date and constructs the column. It forms one column each instance it is called."):Cell("booleanColumn boolCol boolCol:Add(true) boolCol:Add(true) boolCol:Add(false) frame:AddColumn(boolCol)")
+        Paragraph("For our case, calling AddColumn() will add the two elements of each type into a DataFrame. Afterwards, we can view our data set onto the console by calling the ToText() function with our 'frame' object as well. We will now be inserting the elements we have added onto our data frame as follows and displaying them onto the console:")
+        CodeExample("frame:AddColumn(numCol)
 frame:AddColumn(textCol)
 frame:AddColumn(boolCol)
 frame:AddColumn(intCol)
 
-output frame:ToText()"))
-
-
-    Section section_try_yourself
-    section_try_yourself:AddClassAttribute("flex flex-col gap-y-2")
-    bodyDiv:Add(section_try_yourself)
-    Heading h2_try_yourself = section_try_yourself:AddHeading("Try it Yourself!", 2)
-    h2_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    h2_try_yourself:AddClassAttribute("text-2xl font-bold")
-    AddToHeadingArray(h2_try_yourself)
-    section_try_yourself:AddAttribute("data-text", "Try it Yourself!")
-    section_try_yourself:AddParagraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "+dq+"Build Successful!"+dq+"")
-
-    CodeForIDE code1
-    code1:AddFileUrl("LoadFileHand.quorum", "examples/DataFrames/LoadFileHand.quorum")
-    IDE ide = AddIDE()
-    ide:SetLightTheme()
-    ide:SetCodeForIDE(code1:GetJsonArray())
-    ide:SetIdeTitle("Loading a File by Hand")
-    section_try_yourself:Add(ide)
-
-    Paragraph paragraph
-    paragraph:AddText("Congratulations! We have successfully created our first dataset. To view another example of loading data by hand we can reference it ")
-    paragraph:AddLink(" here","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileLoadByHand.quorum")
-    paragraph:AddText(". ")
-    paragraph:AddText("To add on, here is another example of using the AudioColumn")
-    paragraph:AddLink(" here","https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileLoadByHandAudio.quorum")
-    paragraph:AddText(".")
-    section_try_yourself:Add(paragraph)
-
-    Section nextLesson
-    nextLesson:AddClassAttribute("flex flex-col gap-y-2")
-    bodyDiv:Add(nextLesson)
-    WriteNextTutorial(nextLesson)    
-    onPageDiv:Add(CreateHeadingTableOfContents())
-        
+output frame:ToText()")
     end
 
-    action AddKeywords
-        MetaData keywords
-        keywords:AddAttribute("name", "keywords")
-        keywords:AddAttribute("content", GetDataScienceDefaultKeywords() + 
-        ", hand coding a data frame, loading a data frame by hand, creating a data frame")
-        AddMetaData(keywords)
-    end
+    private action TryItYourself
+        Section("Try it Yourself!")
+        Paragraph("Press the blue run button to execute the code in the code editor. Press the red stop button to end the program. Your program will work when the console outputs "):DoubleQuote():Text("Build Successful!"):DoubleQuote()
+        CodeEditorWithCode("Loading a File by Hand", "LoadFileHand.quorum", "//We need the DataFrame class to load in files for Data Science operations.
+use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Columns.NumberColumn
+use Libraries.Containers.Array
+use Libraries.Compute.Statistics.DataFrameColumn
+use Libraries.Compute.Statistics.Columns.TextColumn
+use Libraries.Compute.Statistics.Columns.BooleanColumn
+use Libraries.Compute.Statistics.Columns.IntegerColumn
 
-    action GetMetaDescription returns text
-        return "Learn about loading data "+dq+"by Hand"+dq+" in the Quorum programming language."
-    end
+//Create a DataFrame, which is essentially a table that understands 
+//more information about the data that is being loaded.
+DataFrame frame
 
-    action GetSummaryName returns text
-        return "data loading "+dq+"by Hand"+dq+" with DataFrames"
-    end
+NumberColumn numCol
+TextColumn textCol
+BooleanColumn boolCol
+IntegerColumn intCol
 
-    action GetName returns text
-        return "data loading"
-    end
+numCol:Add(1.4)
+textCol:Add(" + dq + "Fruit" + dq + ")
+boolCol:Add(true)
+intCol:Add(6)
 
-    action GetShortDescription returns text
-        return "how to load data "+dq+"by Hand"+dq+" in a file using DataFrames"
-    end
+numCol:Add(3.5)
+textCol:Add(" + dq + "Vegetable" + dq + ")
+boolCol:Add(false)
+intCol:Add(10)
 
-    action GetLocation returns text
-        return "tutorials/SavingAndLoading/LoadingByHand.html"
-    end
+//This will add the data we added into a formal column
+//Adding more columns will create the comma separation similar to a CSV
+frame:AddColumn(numCol)
+frame:AddColumn(textCol)
+frame:AddColumn(boolCol)
+frame:AddColumn(intCol)
 
-    action GetLinkName returns text
-        return "Loading a File (By Hand)"
-    end
-
-    action GetSectionName returns text
-        return "Data Science"
+//The system loaded the file, but can also output it a text value, or the console, if we want that.
+output frame:ToText()")
+        Paragraph("Congratulations! We have successfully created our first dataset. To view another example of loading data by hand we can reference it "):Link("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileLoadByHand.quorum"):Text(". To add on, here is another example of using the AudioColumn"):Text(" "):Link("here", "https://github.com/qorf/curriculum/blob/main/Reference/DataScience/Data%20Frames/FileLoadByHandAudio.quorum"):Text(".")
     end
 end

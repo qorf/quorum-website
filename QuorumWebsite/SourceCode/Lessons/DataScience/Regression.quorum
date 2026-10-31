@@ -1,194 +1,99 @@
-use Libraries.Web.Page.WebPage
-use Libraries.Web.Page.LineBreak
-use Libraries.Web.Page.MetaData
-use Libraries.Web.Page.Division
-use Libraries.Web.Page.UnorderedList
-use Libraries.Web.Page.Bold
-use Libraries.Web.Page.CodeBlock
-use Libraries.Web.Page.ListItem
-use Libraries.Web.Page.Paragraph
-use Libraries.Web.Page.PreformattedText
-use Libraries.Web.Page.Comment
-use Libraries.Web.Page.Span
-use Libraries.Web.Page.Italic
-use Libraries.Web.Page.OrderedList
-use Libraries.Web.Page.MainContent
-use Libraries.Web.Page.Header
-use Libraries.Containers.Array
-use Libraries.Web.Page.Link
-use Libraries.Web.Page.Section
+use Libraries.Web.Page.QuorumPage
 
-class Regression is Lesson
-    // text version needs cleaning, then do code version
+/*
+    Regression.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class Regression is QuorumPage
+    // A double quote, for code and words that hold one.
     text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
 
-    Preformatter preformatter //helper
-
+    on create
+        SetLocation("lessons/DataScience/regression.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Regression")
+        SetSectionName("Data Science")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Regression")
+        SetSummary("Understanding the Regression model using Quorum.")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
+        dq = dq:GetDoubleQuote()
         SetWebPageTitle("Regression")
-        AddDefaultHeaders()
+        Title("Regression")
+        Paragraph("Understanding regression to determine fitted data in Quorum")
+        LearningObjectives()
+        LoadADataFrame10Minutes()
+        SetupColumnsForTheRegression5Minutes()
+        CalculateTheRegression15Minutes()
+        InterpretingTheOutput20Minutes()
+        AnotherExample10Minutes()
+        RelevantCommonCoreStandards()
+    end
 
-        //Figure out getting main regions properly.
-        Array<Division> divs = InitializeTutorialPage()
-        Division leftDiv = divs:Get(0)
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
+    private action LearningObjectives
+        Section("Learning Objectives")
+        Paragraph("Regression is basically creating a well-fitting line for data. Usually when people talk about regression, they're talking about linear regression. Linear regression is finding the best fitting straight line, so a line in the format y = mx + c. In 2D cases, we could use this line to predict y using x. However, regression can be used for as many dimensions as we want, drawing that line to allow us to predict a single factor based on multiple others.")
+        Paragraph("The student will learn:")
+        BulletList()
+        ListItem("Students will be able to understand the concept of regression and what it is used for.")
+        ListItem("Students can load data and calculate a regression with variables of their choosing.")
+        ListItem("Students can interpret the output of a regression.")
+        Paragraph("While no documentation is yet available online, Quorum 10 has a new experimental system for calculating regression, which we will outline in this session. All of us should note that this system is quite new and is still in testing, meaning that the way we use this library will likely change in the future. We highlight it here because regression is a common topic in high-school and this shows how to write code to accomplish it.")
+    end
 
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        AddHeading(headDiv, "Regression", 1)
-        headDiv:AddParagraph("Understanding regression to determine fitted data in Quorum")
-        bodyDiv:Add(headDiv)
-
-        Section introSection
-        introSection:AddClassAttribute("flex flex-col gap-y-2")
-
-        AddHeading(introSection, "Learning Objectives", 1)
-        introSection:AddParagraph("Regression is basically creating a well-fitting line for data. Usually when people talk about regression, they're talking about linear regression. Linear regression is finding the best fitting straight line, so a line in the format y = mx + c. In 2D cases, we could use this line to predict y using x. However, regression can be used for as many dimensions as we want, drawing that line to allow us to predict a single factor based on multiple others.")
-        
-        introSection:AddParagraph("The student will learn:")
-        Array<text> objectives
-        objectives:Add("Students will be able to understand the concept of regression and what it is used for.")
-        objectives:Add("Students can load data and calculate a regression with variables of their choosing.")
-        objectives:Add("Students can interpret the output of a regression.")
-        OrderedList ol = GenerateList(objectives)
-        introSection:Add(ol)
-
-        introSection:AddParagraph("While no documentation is yet available online, Quorum 10 has a new experimental system for calculating regression, which we will outline in this session. All of us should note that this system is quite new and is still in testing, meaning that the way we use this library will likely change in the future. We highlight it here because regression is a common topic in high-school and this shows how to write code to accomplish it.")
-        
-        AddHeading(introSection, "Load a DataFrame (10 minutes)",2)
-        
-        Link link1 = GenerateDefaultLink()
-        link1:AddText("ice cream sharks dataset")
-        link1:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Other/GoogleTrendsIceCreamSharks.csv")
-        link1:SetTarget(link1:newTab)
-
-        Link link2 = GenerateDefaultLink()
-        link2:AddText("downloading CSVs for our charts")
-        link2:SetAddress("https://quorumlanguage.com/tutorials/charts/downloading.html")
-        link2:SetTarget(link2:newTab)
-
-        introSection:AddParagraph("First, we want to make sure we load in all the libraries we're going to need for this session. We're going to be using both Dataframe and Regression, so we should load both of those in.")
-
-        introSection:Add(preformatter:GeneratePreformattedCode("use Libraries.Compute.Statistics.DataFrame
-use Libraries.Compute.Statistics.Tests.Regression
-"))
-
-        Paragraph p1 = introSection:AddParagraph(" ")
-        p1:AddText("To start us off we will download the dataset, so that we can have the means to create a bar chart. You can follow the link to download ")
-        p1:Add(link1)
-        p1:AddText(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, ")
-        p1:Add(link2)
-        p1:AddText(".")
-        
-        introSection:AddParagraph("Now, we can load it in as our DataFrame:
-")    
-        introSection:Add(preformatter:GeneratePreformattedCode("DataFrame frame
+    private action LoadADataFrame10Minutes
+        Section("Load a DataFrame (10 minutes)")
+        Paragraph("First, we want to make sure we load in all the libraries we're going to need for this session. We're going to be using both Dataframe and Regression, so we should load both of those in.")
+        CodeExample("use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression")
+        Paragraph("To start us off we will download the dataset, so that we can have the means to create a bar chart. You can follow the link to download "):Link("ice cream sharks dataset", "https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Other/GoogleTrendsIceCreamSharks.csv"):Text(". If you are lost on how to download the dataset from GitHub, here is a link to our tutorial, "):Link("downloading CSVs for our charts", "https://quorumlanguage.com/tutorials/charts/downloading.html"):Text(".")
+        Paragraph("Now, we can load it in as our DataFrame:")
+        CodeExample("DataFrame frame
 frame:Load('../Data/Science/GoogleTrendsIceCreamSharks.csv')
 
+output frame:ToText()")
+        CodeEditorWithCode("Reading our shark ice cream datset", "use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
+
+DataFrame frame
+frame:Load(" + dq + "data/GoogleTrendsIceCreamSharks.csv" + dq + ")
+
 output frame:ToText()
-"))
-
-        AddIDE(introSection,"Load the Dataset","Reading our shark ice cream datset","/examples/Epiq/LoadDataFrameRegression.quorum")
-
-
-        AddHeading(introSection, "Setup Columns for the Regression (5 minutes)",2)
-
-        introSection:AddParagraph("Just like with charts, we use a regression by telling it which columns are the variables we are interested in. For example, if we want the dependent variable to be the variable named 'y' and the others to be independent variables, the code would look as so:")
-        
-        introSection:Add(preformatter:GeneratePreformattedCode("frame:AddSelectedColumns('shark attacks')
-frame:AddSelectedFactors('ice cream')
-frame:AddSelectedFactors('pools')
-"))
-
-        introSection:AddParagraph("In this case, we're seeing how much pools and ice cream relate to shark attacks.")
-
-        AddIDE(introSection,"Adding the Columns","Selecting columns we want to use to calculate regression","/examples/Epiq/ColumnsRegression.quorum")
-
-        AddHeading(introSection, "Calculate the Regression (15 minutes)",2)
-
-        Link link4 = GenerateDefaultLink()
-        link4:AddText("reference the median tutorial")
-        link4:SetAddress("https://quorumlanguage.com/tutorials/Summarizing/median.html")
-        link4:SetTarget(link4:newTab)
-
-        introSection:AddParagraph("Once we have set up the columns, we now calculate the regression information. Regression is itself a bit esoteric and is not particularly easy to understand. We start by feeding in the data to calculate a regression line (a straight line that minimizes the distance to each point):")        
-
-        introSection:Add(preformatter:GeneratePreformattedCode("//now calculate a Regression
-Regression result = frame:RegressionOnSelected()
-"))
-
-        introSection:AddParagraph("There's also lots of relevant data that we can get from a regression line, which you can load in like this:")
-        introSection:Add(preformatter:GeneratePreformattedCode("//provide information in a format often used in academia
-output result:GetFormalSummary()
-
-output 'Beta: ' + result:GetCoefficients():ToText()
-output 'Residuals: ' + result:GetResiduals():ToText()
-output 'Residual Sum of Squared: ' + result:GetResidualSumOfSquares()
-output 'Total Sum of Squared: ' + result:GetTotalSumOfSquares()
-output 'F ' + result:GetCriticalValue()
-output 'p = ' + result:GetProbabilityValue()
-output 'R^2: ' + result:GetEffectSize()
-"))
-
-        AddIDE(introSection,"Calculating Regression","Using our regression model to output our calculated data","/examples/Epiq/CalculateRegression.quorum")
-
-
-        introSection:AddParagraph("There's obviously a lot going on here, so we're going to go through this code in the context of what it means for this data.")
-
-        AddHeading(introSection, "Interpreting the Output (20 minutes)",2)
-
-        introSection:Add(preformatter:GeneratePreformattedCode("Beta: |0.0000158, 0.0948, -0.0457|"))
-        introSection:AddParagraph("The first is 'Beta.' Each factor is going to have a different amount of impact on the dependent variable. For this case, we can see that the amount of searches for ice cream (second value) has a larger impact on shark searches than the amount of searches for pools (third value). The first value is an added constant to try to take into account any factors we missed, and since it's fairly low we can tell that when people aren't searching for ice cream or pools, it's unlikely they'll search for sharks.")
-
-        introSection:Add(preformatter:GeneratePreformattedCode("Residuals: |2.43, 2.11, ... "))
-        introSection:AddParagraph("Points do not usually fall exactly on our regression line. The residual is the difference between the predicted value and the actual value measured. So in this case, if we predicted that 5 ice cream searches and 10 pool searches meant there would be 15 shark searches, but there were only 7, the residual would be 8. We want residuals to be as low as possible, since lower residuals mean we predicted more accurately. ")
-
-        introSection:Add(preformatter:GeneratePreformattedCode("Residual Sum of Squared: 1128
-Total Sum of Squared: 1546
-"))
-        introSection:AddParagraph("The two lines about squaring refer to the squared distance between the points and the regression line, and the points and a straight line drawn at their average. These mainly show us how much the total residual amount (squared) has decreased when we added an actual regression line, and later we'll use this information to calculate a correlation.")
-        
-        introSection:Add(preformatter:GeneratePreformattedCode("F 47.7"))
-        introSection:AddParagraph("It's important for us to know if any of the factors in our model are even related to the variable we want to predict. For this dataset, ice cream and sharks seem like they would be unrelated, so we should check the general relationship between everything, and that's where F comes in. If F is below our chosen significance level, then the factors are related.")
-
-        introSection:Add(preformatter:GeneratePreformattedCode("p = .001"))
-        introSection:AddParagraph("The overall p value tells us the probability that our factors are related beyond chance. It is a statistical measurement that is used to validate or reject a hypothesis according to the collected data. In simpler terms, p-value measures the probability of obtaining the numbers that we have collected by research. Since p-value is a probability we need to understand that it can only be in the range from 0 up to 1, or in other words from 0% to 100%. In our case, a low p-value (less than or equal 0.05) indicates that the data is statistically significant. And the greater p-value (greater 0.05) means that the data is not statistically significant. Statistical significance means that we can connect the data to a specific cause that we are testing.")
-
-        introSection:Add(preformatter:GeneratePreformattedCode("R^2: 0.270"))
-        introSection:AddParagraph("R-Squared is often termed a 'variance accounted for' measure. In a sense, it provides us some evidence of how much variance, the wobble in our data, is contributing to the predictiveness of our model. So for the shark vs ice cream dataset, it would be how much the changes in searches for ice cream and pools can explain changes in shark searches. While these are correlated, shark searches are also impacted by other factors, like the time of year.
 ")
+    end
 
-        introSection:AddParagraph("This data also shows how correlation is not the same as causation. Although the various measurements show that Google searches for pools and ice cream are correlated to searches for sharks, why is not explained by these numbers. So ice cream and pool searches are correlated to shark searches, but we can imagine more likely explanations, like the time of year the search was made (e.g., in the summer).")
-       
-        AddHeading(introSection, "Another Example (10 minutes)",2)
-        
-        Link link20 = GenerateDefaultLink()
-        link20:AddText("Christmas Spending CSV")
-        link20:SetAddress("https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/Christmas%20spending.csv")
-        link20:SetTarget(link20:newTab)
+    private action SetupColumnsForTheRegression5Minutes
+        Section("Setup Columns for the Regression (5 minutes)")
+        Paragraph("Just like with charts, we use a regression by telling it which columns are the variables we are interested in. For example, if we want the dependent variable to be the variable named 'y' and the others to be independent variables, the code would look as so:")
+        CodeExample("frame:AddSelectedColumns('shark attacks')
+frame:AddSelectedFactors('ice cream')
+frame:AddSelectedFactors('pools')")
+        Paragraph("In this case, we're seeing how much pools and ice cream relate to shark attacks.")
+        CodeEditorWithCode("Selecting columns we want to use to calculate regression", "use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
 
-        Paragraph p2 = introSection:AddParagraph(" ")
-        p2:AddText("Next we're going to take some time to try doing this with another dataset. First, download the ")
-        p2:Add(link20)
-        p2:AddText(". Next, we're going to do regression using year and Christmas spending in the US to predict Christmas spending in the UK.")
+DataFrame frame
+frame:Load(" + dq + "data/GoogleTrendsIceCreamSharks.csv" + dq + ")
 
-        introSection:AddParagraph("If we run the same regression calculations on this dataset, we should notice some changes. Here are some questions to keep in mind as we go through this example:")
-        Array<text> questions
-        questions:Add("Are the variables actually related? How can we tell?")
-        questions:Add("How does this model do compared to the previous example?")
-        OrderedList qs = GenerateList(questions)
-        introSection:Add(qs)
+frame:AddSelectedColumns(" + dq + "shark attacks" + dq + ")
+frame:AddSelectedFactors(" + dq + "ice cream" + dq + ")
+frame:AddSelectedFactors(" + dq + "pools" + dq + ")
 
-        introSection:Add(preformatter:GeneratePreformattedCode("//provide information in a format often used in academia
+output frame:ToText()
+")
+    end
+
+    private action CalculateTheRegression15Minutes
+        Section("Calculate the Regression (15 minutes)")
+        Paragraph("Once we have set up the columns, we now calculate the regression information. Regression is itself a bit esoteric and is not particularly easy to understand. We start by feeding in the data to calculate a regression line (a straight line that minimizes the distance to each point):")
+        CodeExample("//now calculate a Regression
+Regression result = frame:RegressionOnSelected()")
+        Paragraph("There's also lots of relevant data that we can get from a regression line, which you can load in like this:")
+        CodeExample("//provide information in a format often used in academia
 output result:GetFormalSummary()
 
 output 'Beta: ' + result:GetCoefficients():ToText()
@@ -197,90 +102,97 @@ output 'Residual Sum of Squared: ' + result:GetResidualSumOfSquares()
 output 'Total Sum of Squared: ' + result:GetTotalSumOfSquares()
 output 'F ' + result:GetCriticalValue()
 output 'p = ' + result:GetProbabilityValue()
-output 'R^2: ' + result:GetEffectSize()
-"))
+output 'R^2: ' + result:GetEffectSize()")
+        CodeEditorWithCode("Using our regression model to output our calculated data", "use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
 
-        AddIDE(introSection,"Regression Example","Using our regression model to output our calculated data","/examples/Epiq/AnotherRegressionExample.quorum")
-        text standardsPath = "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"
-        Paragraph pStandard = introSection:AddParagraph(" ")
+DataFrame frame
+frame:Load(" + dq + "data/GoogleTrendsIceCreamSharks.csv" + dq + ")
 
-        Link link14 = GenerateDefaultLink()
-        link14:AddText("website")
-        link14:SetAddress(standardsPath)
-        link14:SetTarget(link14:newTab)
-        
-        Link link15 = GenerateDefaultLink()
-        link15:AddText("CCSS.MATH.CONTENT.8.SP.A.1")
-        link15:SetAddress(standardsPath)
-        link15:SetTarget(link15:newTab)
-        
-        Link link16 = GenerateDefaultLink()
-        link16:AddText("CCSS.MATH.CONTENT.8.SP.A.2")
-        link16:SetAddress(standardsPath)
-        link16:SetTarget(link16:newTab)
-        
-        Link link17 = GenerateDefaultLink()
-        link17:AddText("CCSS.MATH.CONTENT.8.SP.A.3")
-        link17:SetAddress(standardsPath)
-        link17:SetTarget(link17:newTab)
+frame:AddSelectedColumns(" + dq + "shark attacks" + dq + ")
+frame:AddSelectedFactors(" + dq + "ice cream" + dq + ")
+frame:AddSelectedFactors(" + dq + "pools" + dq + ")
 
+//now calculate a Regression
+Regression result = frame:RegressionOnSelected()
 
-        AddHeading(introSection, "Relevant Common Core Standards",2)
-        
-        pStandard:AddText("We use the following ")
-        pStandard:Add(link14)
-        pStandard:AddText(" for common core standards in relation to histograms and measurements of distribution.")
+//provide information in a format often used in academia
+output result:GetFormalSummary()
 
-        pStandard:Add(link15)
-        pStandard:AddText(": Construct and interpret scatter plots for bivariate measurement data to investigate patterns of association between two quantities. Describe patterns such as clustering, outliers, positive or negative association, linear association, and nonlinear association.")       
-
-        pStandard:Add(link16)
-        pStandard:AddText(": Know that straight lines are widely used to model relationships between two quantitative variables. For scatter plots that suggest a linear association, informally fit a straight line, and informally assess the model fit by judging the closeness of the data points to the line.")    
-
-        pStandard:Add(link17)
-        pStandard:AddText(": Use the equation of a linear model to solve problems in the context of bivariate measurement data, interpreting the slope and intercept. For example, in a linear model for a biology experiment, interpret a slope of 1.5 cm/hr as meaning that an additional hour of sunlight each day is associated with an additional 1.5 cm in mature plant height.")     
-
-        bodyDiv:Add(introSection)
-
-        Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+output " + dq + "Beta: " + dq + " + result:GetCoefficients():ToText()
+output " + dq + "Residuals: " + dq + " + result:GetResiduals():ToText()
+output " + dq + "Residual Sum of Squared: " + dq + " + result:GetResidualSumOfSquares()
+output " + dq + "Total Sum of Squared: " + dq + " + result:GetTotalSumOfSquares()
+output " + dq + "F " + dq + " + result:GetCriticalValue()
+output " + dq + "p = " + dq + " + result:GetProbabilityValue()
+output " + dq + "R^2: " + dq + " + result:GetEffectSize()
+")
+        Paragraph("There's obviously a lot going on here, so we're going to go through this code in the context of what it means for this data.")
     end
 
-    action GetMetaDescription returns text
-        return "Regression"
+    private action InterpretingTheOutput20Minutes
+        Section("Interpreting the Output (20 minutes)")
+        CodeExample("Beta: |0.0000158, 0.0948, -0.0457|")
+        Paragraph("The first is 'Beta.' Each factor is going to have a different amount of impact on the dependent variable. For this case, we can see that the amount of searches for ice cream (second value) has a larger impact on shark searches than the amount of searches for pools (third value). The first value is an added constant to try to take into account any factors we missed, and since it's fairly low we can tell that when people aren't searching for ice cream or pools, it's unlikely they'll search for sharks.")
+        CodeExample("Residuals: |2.43, 2.11, ... ")
+        Paragraph("Points do not usually fall exactly on our regression line. The residual is the difference between the predicted value and the actual value measured. So in this case, if we predicted that 5 ice cream searches and 10 pool searches meant there would be 15 shark searches, but there were only 7, the residual would be 8. We want residuals to be as low as possible, since lower residuals mean we predicted more accurately.")
+        CodeExample("Residual Sum of Squared: 1128
+Total Sum of Squared: 1546")
+        Paragraph("The two lines about squaring refer to the squared distance between the points and the regression line, and the points and a straight line drawn at their average. These mainly show us how much the total residual amount (squared) has decreased when we added an actual regression line, and later we'll use this information to calculate a correlation.")
+        CodeExample("F 47.7")
+        Paragraph("It's important for us to know if any of the factors in our model are even related to the variable we want to predict. For this dataset, ice cream and sharks seem like they would be unrelated, so we should check the general relationship between everything, and that's where F comes in. If F is below our chosen significance level, then the factors are related.")
+        CodeExample("p = .001")
+        Paragraph("The overall p value tells us the probability that our factors are related beyond chance. It is a statistical measurement that is used to validate or reject a hypothesis according to the collected data. In simpler terms, p-value measures the probability of obtaining the numbers that we have collected by research. Since p-value is a probability we need to understand that it can only be in the range from 0 up to 1, or in other words from 0% to 100%. In our case, a low p-value (less than or equal 0.05) indicates that the data is statistically significant. And the greater p-value (greater 0.05) means that the data is not statistically significant. Statistical significance means that we can connect the data to a specific cause that we are testing.")
+        CodeExample("R^2: 0.270")
+        Paragraph("R-Squared is often termed a 'variance accounted for' measure. In a sense, it provides us some evidence of how much variance, the wobble in our data, is contributing to the predictiveness of our model. So for the shark vs ice cream dataset, it would be how much the changes in searches for ice cream and pools can explain changes in shark searches. While these are correlated, shark searches are also impacted by other factors, like the time of year.")
+        Paragraph("This data also shows how correlation is not the same as causation. Although the various measurements show that Google searches for pools and ice cream are correlated to searches for sharks, why is not explained by these numbers. So ice cream and pool searches are correlated to shark searches, but we can imagine more likely explanations, like the time of year the search was made (e.g., in the summer).")
     end
 
-    action GetSummaryName returns text
-        return "Regression"
+    private action AnotherExample10Minutes
+        Section("Another Example (10 minutes)")
+        Paragraph("Next we're going to take some time to try doing this with another dataset. First, download the "):Link("Christmas Spending CSV", "https://raw.githubusercontent.com/qorf/curriculum/main/Reference/DataScience/Charts%20(New)/Data/Miscellaneous/Christmas%20spending.csv"):Text(". Next, we're going to do regression using year and Christmas spending in the US to predict Christmas spending in the UK.")
+        Paragraph("If we run the same regression calculations on this dataset, we should notice some changes. Here are some questions to keep in mind as we go through this example:")
+        BulletList()
+        ListItem("Are the variables actually related? How can we tell?")
+        ListItem("How does this model do compared to the previous example?")
+        CodeExample("//provide information in a format often used in academia
+output result:GetFormalSummary()
+
+output 'Beta: ' + result:GetCoefficients():ToText()
+output 'Residuals: ' + result:GetResiduals():ToText()
+output 'Residual Sum of Squared: ' + result:GetResidualSumOfSquares()
+output 'Total Sum of Squared: ' + result:GetTotalSumOfSquares()
+output 'F ' + result:GetCriticalValue()
+output 'p = ' + result:GetProbabilityValue()
+output 'R^2: ' + result:GetEffectSize()")
+        CodeEditorWithCode("Using our regression model to output our calculated data", "use Libraries.Compute.Statistics.DataFrame
+use Libraries.Compute.Statistics.Tests.Regression
+
+DataFrame frame
+frame:Load(" + dq + "data/Christmas spending.csv" + dq + ")
+
+frame:AddSelectedColumns(" + dq + "Christmas spend in UK" + dq + ")
+frame:AddSelectedFactors(" + dq + "Christmas spend in US" + dq + ")
+frame:AddSelectedFactors(" + dq + "Year" + dq + ")
+
+//now calculate a Regression
+Regression result = frame:RegressionOnSelected()
+
+//provide information in a format often used in academia
+output result:GetFormalSummary()
+
+output " + dq + "Beta: " + dq + " + result:GetCoefficients():ToText()
+output " + dq + "Residuals: " + dq + " + result:GetResiduals():ToText()
+output " + dq + "Residual Sum of Squared: " + dq + " + result:GetResidualSumOfSquares()
+output " + dq + "Total Sum of Squared: " + dq + " + result:GetTotalSumOfSquares()
+output " + dq + "F " + dq + " + result:GetCriticalValue()
+output " + dq + "p = " + dq + " + result:GetProbabilityValue()
+output " + dq + "R^2: " + dq + " + result:GetEffectSize()
+")
+        Paragraph("We use the following "):Link("website", "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"):Text(" for common core standards in relation to histograms and measurements of distribution."):Link("CCSS.MATH.CONTENT.8.SP.A.1", "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"):Text(": Construct and interpret scatter plots for bivariate measurement data to investigate patterns of association between two quantities. Describe patterns such as clustering, outliers, positive or negative association, linear association, and nonlinear association."):Link("CCSS.MATH.CONTENT.8.SP.A.2", "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"):Text(": Know that straight lines are widely used to model relationships between two quantitative variables. For scatter plots that suggest a linear association, informally fit a straight line, and informally assess the model fit by judging the closeness of the data points to the line."):Link("CCSS.MATH.CONTENT.8.SP.A.3", "https://corestandards.org/wp-content/uploads/2023/09/ADA-Compliant-Math-Standards.pdf"):Text(": Use the equation of a linear model to solve problems in the context of bivariate measurement data, interpreting the slope and intercept. For example, in a linear model for a biology experiment, interpret a slope of 1.5 cm/hr as meaning that an additional hour of sunlight each day is associated with an additional 1.5 cm in mature plant height.")
     end
 
-    action AddKeywords
-        MetaData keywords
-        keywords:AddAttribute("name", "keywords")
-        keywords:AddAttribute("content", "programming for beginners, data science, 
-        programming, chart, graph, accessibility, scatter plot,
-        regression, correlation, r, r squared, beta coefficient, residual,
-        computer science, computer languages, Quorum programming language")
-        AddMetaData(keywords)
-    end
-
-    action GetName returns text
-        return "Regression"
-    end
-
-    action GetShortDescription returns text
-        return "Understanding the Regression model using Quorum."
-    end
-
-    action GetLocation returns text
-        return "lessons/DataScience/regression.html"
-    end
-    action GetSectionName returns text
-        if GetNewSectionName() not= ""
-          return GetNewSectionName()
-        end
-        return "Data Science"
+    private action RelevantCommonCoreStandards
+        Section("Relevant Common Core Standards")
     end
 end

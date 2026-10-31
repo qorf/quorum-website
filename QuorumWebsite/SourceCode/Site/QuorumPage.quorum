@@ -1,6 +1,7 @@
 package Libraries.Web.Page
 
 use Libraries.Web.Page.WebPage
+use Libraries.System.File
 use Libraries.Web.Page.Division
 use Libraries.Web.Page.Span
 use Libraries.Web.Page.OrderedList
@@ -513,12 +514,42 @@ class QuorumPage is WebPage
         Attribute: Parameter location The file's location inside the relative folder.
     */
     action Math(text location)
+        AddMath(GetWebSite():GetRelativeFile(location):GetPath())
+    end
+
+    /*
+        Adds math from a MathML file outside the site's folder, by its path
+        from the project folder, such as "examples/MathXML/Mean.xml". Locations
+        stay inside the site everywhere else; this is for the few files kept
+        elsewhere. Use Math for a file inside the site.
+
+        Attribute: Parameter path The file's path from the project folder.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("The mean")
+                MathFromProject("examples/MathXML/Mean.xml")
+            end
+        end
+    */
+    action MathFromProject(text path)
+        File file
+        file:SetPath(path)
+        if not file:Exists()
+            alert("There's no math at " + path + ".")
+        end
+        AddMath(path)
+    end
+
+    // Math from a file's path, its script added to the page once.
+    private action AddMath(text path)
         if not mathScriptAdded
             AddScript(locations:FromSiteTop(MATH_SCRIPT))
             mathScriptAdded = true
         end
         MathML math
-        math:AddSource(GetWebSite():GetRelativeFile(location):GetPath())
+        math:AddSource(path)
         Include(math)
     end
 
