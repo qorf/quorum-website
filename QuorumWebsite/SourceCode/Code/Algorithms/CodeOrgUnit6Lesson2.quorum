@@ -1,379 +1,186 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
+use Libraries.Web.Page.QuorumPage
 
-class CodeOrgUnit6Lesson2 is Lesson
-    text dq = ""
-    dq = dq:GetDoubleQuote()
-    text cr = ""
-    cr = cr:GetCarriageReturn()
-   
-    Preformatter preformatter //helper
+/*
+    Algorithms - Lesson 2: Algorithm Efficiency.
+    Converted from the old Lesson page by plan 13's generator: the same
+    words, now without Tailwind.
+*/
+class CodeOrgUnit6Lesson2 is QuorumPage
+
+    on create
+        SetLocation("lessons/code/Algorithms/Lesson2.html")
+        // The name lists and links use, and the series and track it belongs
+        // to: its section and picture.
+        SetShortTitle("Algorithm Efficiency")
+        SetSectionName("Algorithms")
+        // For search engines and link previews, and what lists of pages say.
+        SetDescription("Learn how different algorithms can solve problems at different speeds")
+        SetSummary("Learn about efficiency in algorithms")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-        
-        //html header stuff
         SetWebPageTitle("Unit 6 Lesson 2: Algorithm Efficiency")
-        AddDefaultHeaders()
-
-        //Figure out getting main regions properly.
-        Array<Division> divs = InitializeTutorialPage()
-        Division bodyDiv = divs:Get(1)
-        Division onPageDiv = divs:Get(2)
-
-        //page header
-        Header headDiv
-        headDiv:SetClassAttribute("flex flex-col gap-y-2")
-        Heading h_heading = headDiv:AddHeading("Algorithms - Lesson 2: Algorithm Efficiency", 1)
-        h_heading:AddClassAttribute("text-3xl font-bold")
-        h_heading:AddAttribute("data-text", "Algorithms - Lesson 2: Algorithm Efficiency")
-        AddToHeadingArray(h_heading)
-
-        bodyDiv:Add(headDiv)
-
-        
-        Section section_intro
-        section_intro:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_intro)
-        AddHeading(section_intro, "Overview", 2)
-
-
-        section_intro:AddParagraph("In this lesson students follow a demonstration of Linear Search before writing their own search algorithms. Following this, students are introduced to Binary Search after which they compare graphs of the search algorithms to determine which is most efficient. ")
-            
-        AddHeading(section_intro, "Goals", 3)
-        section_intro:AddParagraph("Students will be able to:")
-        UnorderedList goalList
-        goalList:AddClassAttribute("list-disc list-outside pl-8")
-        goalList:AddListItem("Use Linear Search to determine if a number is in a list")
-        goalList:AddListItem("Use Binary Search to determine if a number is in a list")
-        goalList:AddListItem("Compare the efficiency of Linear Search and Binary Search")
-        section_intro:Add(goalList)
-
-        AddHeading(section_intro, "Purpose", 3)
-        section_intro:AddParagraph("In the previous lesson students learned that there are many different ways to write an algorithm to solve a problem. However, not all solutions are good options, and some algorithms require many fewer steps to run than others. This lesson focuses on comparing Linear Search to Binary Search. The the length of the list being searched, the more efficient Binary Search is compared to Linear Search. That said, Binary Search has a constraint: the list must first be sorted. This lesson more broadly introduces students to thinking about the efficiency of an algorithm, an idea that will be explored more in future lessons.")        
-
-
-        Section section_gettingStarted
-        section_gettingStarted:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_gettingStarted)
-        AddHeading(section_gettingStarted, "Getting Started (5 minutes)", 2)
-
-        section_gettingStarted:AddParagraph(AddStrongTag("Prompt: ") + " Have you ever lost a pencil in a backpack? What are the steps you take to find the pencil?")
-       section_gettingStarted:AddParagraph(AddStrongTag("Discuss: ") + " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
-
-        Division startGoal = AddDisscussionGoal(section_gettingStarted)
-        startGoal:AddParagraph("Use this discussion to highlight the following points")
-        UnorderedList startList
-        startList:AddClassAttribute("list-disc list-outside pl-8")
-        startList:AddListItem("Students may have as systematic approach (search through every pocket in order) or a random approach.")
-        startList:AddListItem("Some students may have a system where they place their books and materials in their backpack to be retrieved in the order of their class schedule. If they look in their bag at a certain spot and don't see the pencil, they have a pretty good idea where to search next. ")
-        startList:AddListItem("There are no right answers here - the idea is to start thinking about the efficiency of different search methods. ")
-        startGoal:Add(startList)
-
-         AddHeading(section_gettingStarted, "Remarks", 3)
-        UnorderedList startRemarks
-        startRemarks:AddClassAttribute("list-disc list-outside pl-8")
-        startRemarks:AddListItem("There are many different ways to achieve the same goal for this problem: finding your pencil. Today we are going to explore different search methods that computers use. ")        
-        section_gettingStarted:Add(startRemarks)
-
-
-        Section section_activity
-        section_activity:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_activity)
-        AddHeading(section_activity, "Activity (30 minutes)", 2)
-        
-        section_activity:AddParagraph(AddStrongTag("Distribute: ") + " Students should have their journals. They will also need somewhere to record numbers, such as on sticky notes.")
-        section_activity:AddParagraph(AddStrongTag("Open a Project: ") + " Have students open the <b>Lesson2_TicketGenerator</b> project in the Unit 6 folder of the CSP-Widgets repository. Students will use this to randomly generate ticket numbers for today's activity.")
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " Call for three volunteers. These students use the Ticket Generator program to produce raffle ticket numbers (one per volunteer). Students record their number and come to the front of the room.")
-
-        AddHeading(section_activity, "Remarks", 3)
-        UnorderedList activityRemarks
-        activityRemarks:AddClassAttribute("list-disc list-outside pl-8")
-        activityRemarks:AddListItem("Thank you, volunteers! Let's figure out if any of you have the winning number for this instance of the problem. I'm going to ask you one by one to show your number and we will compare it with the winning number.")
-        section_activity:Add(activityRemarks)
-
-        Division winningTip = AddTeachingTip(section_activity)
-        winningTip:AddParagraph("Before class, choose your own winning number (a number between 0-999), or alternatively use the Ticket Generator yourself!")
-        
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " Each volunteer reveals their number and compares it to the winning number.")
-        section_activity:AddParagraph(AddStrongTag("Prompt 1: ") + " How many steps did it take to find out if anyone had the winning ticket? What is the greatest possible number of steps it could take for this instance?")
-        section_activity:AddParagraph(AddStrongTag("Prompt 2: ") + " What if we had six volunteers? The whole class? The whole school? What is the pattern here?")
-
-        //BoxTip stepGoal
-        //stepGoal:AddHeading("Discussion Goal", 3)
-        //stepGoal:AddHeading("Answer:", 4)
-        //UnorderedList stepAnswers
-        //stepAnswers:AddListItem("The greatest possible of steps for //this instance is 3.")
-        //stepAnswers:AddListItem("With six volunteers, the greatest number of steps is 6.")
-        //stepAnswers:AddListItem("The patterns is a 1:1 relationship. The number of tickets in the raffle exactly equals the number of steps it would take to check for a number in the worst case. ")
-        //stepGoal:Add(stepAnswers)
-        //section_activity:Add(stepGoal)
-
-        section_activity:AddParagraph(AddStrongTag("Display: ") + " Look at the chart as a class and examine the graph. The graph visualizes the pattern the class discussed. ")
-        
-        WebTable table = AddWebTable("Raffle Tickets")
-        TableBody tableBody = AddTableBody()
-        
-        Array<text> tableHeaderArray
-        tableHeaderArray:Add("Inputs")
-        tableHeaderArray:Add("Steps") 
-
-        TableHeader thead = AddTableHeaderRow(tableHeaderArray)
-        table:Add(thead)    
-
-        Array<text> rubricText1
-        rubricText1:Add("3")
-        rubricText1:Add("3") 
-        tableBody:Add(AddTableBodyRow(rubricText1))
-
-        Array<text> rubricText2
-        rubricText2:Add("6")
-        rubricText2:Add("6") 
-        tableBody:Add(AddTableBodyRow(rubricText2))
-
-        Array<text> rubricText3
-        rubricText3:Add("10")
-        rubricText3:Add("10") 
-        tableBody:Add(AddTableBodyRow(rubricText3))
-
-         Array<text> rubricText4
-        rubricText4:Add("100")
-        rubricText4:Add("100") 
-        tableBody:Add(AddTableBodyRow(rubricText4))
-
-        table:Add(tableBody)
-        section_activity:Add(table)
-
-        // need this image in csp folder
-        Image image = section_activity:AddImage("/media/lessons/csp/unit6/LinearGraph.png", "A graph mapping the number of inputs to the max number of steps to solve the problem. The result is a straight line where the x and y axes are always equal.")
-        image:AddAttribute("data-zoom","")
-
-        AddHeading(section_activity, "Remarks", 3)
-        UnorderedList transitionRemark
-        transitionRemark:AddClassAttribute("list-disc list-outside pl-8")
-        transitionRemark:AddListItem("Now let's try a different way to search.")
-        section_activity:Add(transitionRemark)
-
-        section_activity:AddParagraph(AddStrongTag("Group: ") + " Place students in groups of two.")
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " With a partner, students use the Ticket Generator to create seven random numbers that are recorded, such as on sticky notes. Students organize the results in numerical order. Students choose one extra number as the " + dq + "winning number" + dq + " and write that number down on a separate sticky note.")
-        section_activity:AddParagraph(AddStrongTag("Challenge: ") + " Students work with their partner to write an algorithm to search for their winning number. Make sure the rules are displayed.")
-        UnorderedList ruleList
-        ruleList:AddClassAttribute("list-disc list-outside pl-8")
-        ruleList:AddListItem("The search can start at any of the numbers.")
-        ruleList:AddListItem("You can " + dq + "jump" + dq + " over numbers. In other words, you don't need to search the stickies in order.")
-        ruleList:AddListItem("You can determine which numbers to search next based on the current number you are checking.")
-        ruleList:AddListItem("The goal is to make the determination in the least steps possible, but don't forget your number could be anywhere in the list - what is the worst possible case? What is the greatest number of comparison steps it would take to find any number in your list using your current algorithm?")
-        section_activity:Add(ruleList)
-
-        section_activity:AddParagraph(AddStrongTag("Discuss: ") +  " Students share their algorithms with another group and determine which one runs faster, depending on the number of steps it takes to find a number in the list. ")
-
-        Division algorithmTip = AddTeachingTip(section_activity)
-        algorithmTip:AddParagraph("It's important for students to think about this problem as looking for the number in the worst possible situation. In other words, what is the least amount of steps it would take to definitively cross off every option?")
-
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " Students return to their partner and now run this given algorithm, shown below, step by step. As they are doing this, they should think about whether or not this algorithm runs faster (has less steps) than their own algorithms. ")
-        OrderedList algorithmList
-        algorithmList:AddClassAttribute("list-disc list-outside pl-8")
-        algorithmList:AddListItem("Find the middle number in the list. Compare that number to the given number. If the number is less than the given number, remove all of the cards to the right (including the middle number). If the number is more than the given number, remove all of the cards to the left (including the middle number).")
-        algorithmList:AddListItem("Find the middle number in this shorter list. Follow the instructions in Step #1 for comparing.")
-        algorithmList:AddListItem("Find the middle number in this new shorter list. Follow the instructions in Step #1 for comparing.")
-        section_activity:Add(algorithmList)
-
-        UnorderedList binaryRemarks
-        binaryRemarks:AddClassAttribute("list-disc list-outside pl-8")
-        binaryRemarks:AddListItem("This search algorithm is known as Binary Search. Let's see it in action.")
-        section_activity:Add(binaryRemarks)
-
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " As a class, find the number <code>705</code> in this list: <code>117, 232, 245, 410, 705, 716, 833</code>. Follow the steps below, and discuss each step as it is happening.")
-        UnorderedList binaryList
-        binaryList:AddClassAttribute("list-disc list-outside pl-8")
-        binaryList:AddListItem("Find the number in the middle (410) and compare it with the given number (705). The given number is greater than the middle number, so remove the middle number and all to the left. ")
-        binaryList:AddListItem("Find the number in the middle of the numbers left (716), and compare it with the given number (705). The given number is less than the middle number, so remove the middle number and all to the right.")
-        binaryList:AddListItem("Find the number in the middle of the numbers left (there is only one!), and compare it with the given number. The given number is equal to the middle number. We have found our number!")
-        section_activity:Add(binaryList)
-
-        UnorderedList midActivityRemark
-        midActivityRemark:AddClassAttribute("list-disc list-outside pl-8")
-        midActivityRemark:AddListItem("Binary search only works with a sorted list of numbers. This allows us to remove options from the search after we've made a decision. In other words, if we know the number is greater than 410, we can remove all numbers less than or equal to 410 and we don't have to manually check those numbers one by one.")
-        section_activity:Add(midActivityRemark)
-
-        section_activity:AddParagraph(AddStrongTag("Do This: ") + " Display the table and graph below. Have students work out a few of the instances in the table to see how they arrive at the listed number of steps. Students copy the table and chart into their journals.")
-
-        
-        WebTable tableBinary = AddWebTable("Binary")
-        TableBody tableBodyBinary = AddTableBody()
-        
-        Array<text> tableHeaderArrayBinary
-        tableHeaderArrayBinary:Add("Inputs")
-        tableHeaderArrayBinary:Add("Steps") 
-
-        TableHeader theadBinary = AddTableHeaderRow(tableHeaderArrayBinary)
-        tableBinary:Add(theadBinary)  
-        
-        Array<text> rubricText5
-        rubricText5:Add("1")
-        rubricText5:Add("1") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText5))
-
-        Array<text> rubricText6
-        rubricText6:Add("3")
-        rubricText6:Add("2") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText6))
-
-         Array<text> rubricText7
-        rubricText7:Add("5")
-        rubricText7:Add("3") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText7))
-
-         Array<text> rubricText8
-        rubricText8:Add("7")
-        rubricText8:Add("3") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText8))
-
-         Array<text> rubricText9
-        rubricText9:Add("9")
-        rubricText9:Add("4") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText9))
-
-                 Array<text> rubricText10
-        rubricText10:Add("15")
-        rubricText10:Add("4") 
-        tableBodyBinary:Add(AddTableBodyRow(rubricText10))
-
-     
-
-        tableBinary:Add(tableBodyBinary)
-        section_activity:Add(tableBinary)
-
-
-        Image image2 = section_activity:AddImage("/media/lessons/csp/unit6/BinarySearchGraph.png", "A graph mapping the number of inputs to the max number of steps to find an item with Binary Search. The result is a curved line, where the number of steps (the y-axis) grows more slowly than the inputs (the x-axis). The line begins at 0, 0 and ends at 15, 4.")
-        image2:AddAttribute("data-zoom","")
-
-        section_activity:AddParagraph(AddStrongTag("Question: ") + " Look at the table for Binary Search again. If we wanted to store the number of inputs in each row as a binary number, how many bits would each of the numbers need?")
-        section_activity:AddParagraph("For Binary Search, for each instance the number of steps it takes to run is equal to the number of bits required to represent the input. ")
-
-        Division middleTip = AddTeachingTip(section_activity)
-        middleTip:AddParagraphBoldFront("Binary Search with Even Numbers:", " What if there is no middle number while performing a step in Binary Search? Students can come up with a protocol for this like: if there is no middle number, compare the number on the right. ")
-        middleTip:AddParagraphBoldFront("Hard Concepts:", " The relationship between binary numbers and binary search is a tricky concept! It's ok if students don't fully understand. What's most important is what is revealed next: Binary Search is more efficient than Linear Search. ")
-
-        section_activity:AddParagraph(AddStrongTag("Display: ") + " Show students the graph below, which displays the two search algorithms we've explored.")
-        section_activity:AddParagraph("The first is <b>linear</b>. As we add more inputs, the number of steps grows at the same rate.")
-        section_activity:AddParagraph("The second represents what happens with Binary Search. It grows at a much slower rate! Binary Search is faster than Linear Search, BUT the data must be sorted.")
-        Image image3 = section_activity:AddImage("/media/lessons/csp/unit6/LinearVsBinarySearch.png", "This graph compares the previous lines for linear search and binary search from the previous two graphs. While the linear search line remains 1-to-1 on the x and y axis, the line for binary search has a much lower value on the y-axis.")
-        image3:AddAttribute("data-zoom","")
-
-         AddHeading(section_activity, "Remarks", 3)
-        UnorderedList closingActivityRemark
-        closingActivityRemark:AddClassAttribute("list-disc list-outside pl-8")
-        closingActivityRemark:AddListItem("Both Binary Search and Linear Search find the answer to our search problem. However, one option is much faster than the other: Binary Search, although it requires that the numbers are sorted first. ")
-        section_activity:Add(closingActivityRemark)
-
-               Section section_wrap
-        section_wrap:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_wrap)
-        AddHeading(section_wrap, "Wrap up (10 Minutes)", 2)
-
-        section_wrap:AddParagraph(AddStrongTag("Prompt: ") + " If I had one input, which algorithm would I use to get my answer with the fewest amount of steps? What if I had five? What about one hundred? ")
-        section_wrap:AddParagraph(AddStrongTag("Discuss: ") + " Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
-
-        Division closingGoal = AddDisscussionGoal(section_wrap)
-        UnorderedList closingAnswers
-        closingAnswers:AddClassAttribute("list-disc list-outside pl-8")
-        closingAnswers:AddListItem("For one input, either Binary Search or Linear Search would be appropriate. Students may argue for Linear as it does not need to first be sorted.")
-        closingAnswers:AddListItem("For five inputs, it's clear that Binary Search is fastest, although it only saves two steps over Linear Search. This is all the more true with one hundred inputs, which only takes seven steps (Binary number for 100 inputs: 1100100, 7 bits in total) compared to Linear Search's one hundred steps. ")
-        closingGoal:Add(closingAnswers)
-
-        AddHeading(section_wrap, "Remarks", 3)
-        UnorderedList closingRemarks
-        closingRemarks:AddClassAttribute("list-disc list-outside pl-8")
-        closingRemarks:AddListItem("Computer scientists don't just think about " + dq + "code" + dq + ", they think about problems and the algorithms that solve them. In this unit we're going to explore what makes two problems, or two algorithms, similar or different from one another, and the way computer scientists talk about them. Not only will you be a better programmer, but you'll get to work on some really interesting problems along the way.")
-        section_wrap:Add(closingRemarks)
-
-        section_wrap:AddParagraph(AddStrongTag("Journal: ") + " Students add the following vocabulary words and definitions to their journals:")
-        UnorderedList vocabulary
-        vocabulary:AddClassAttribute("list-disc list-outside pl-8")
-        vocabulary:AddListItem("<i>Efficiency:</i> a measure of how many steps are needed to complete an algorithm")
-        vocabulary:AddListItem("<i>Linear Search:</i> a search algorithm which checks each element of a list, in order, until the desired value is found or all elements in the list have been checked.")
-        vocabulary:AddListItem("<i>Binary Search:</i> a search algorithm that starts at the middle of a sorted set of numbers and removes half of the data; this process repeats until the desired value is found or all elements have been eliminated.")
-        section_wrap:Add(vocabulary)
-
-        UnorderedList wrapUpRemarks
-        wrapUpRemarks:AddClassAttribute("list-disc list-outside pl-8")
-        wrapUpRemarks:AddListItem("Well done! It's clear that there are many algorithms we can use to search for an item in a list. Some are faster, or more efficient, than others. In the case of Binary Search, the larger the list we are searching through, the greater the efficiency in using this algorithm instead of Linear Search. ")
-        section_wrap:Add(wrapUpRemarks)
-
-             Section section_assessment
-        section_assessment:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_assessment)
-        AddHeading(section_assessment, "Assessment: Check for Understanding", 2)
-
-
-           AddHeading(section_assessment, "For Students", 3)
-        section_assessment:AddParagraph("Open a word doc or google doc and copy/paste the 2 following question.")
-
-        AddHeading(section_assessment, "Question 1", 3)
-        section_assessment:AddParagraph(" What is the third step using Binary Search to look for the number 32 in this list: <code>1, 2, 3, 4, 10, 11, 16, 25, 32, 33, 45, 47, 51, 69, 75</code> ?")
-        section_assessment:AddParagraph("<ol type="+ dq +"a" + dq + ">
-                            <li>Compare the number 4 to the given number.</li>
-                            <li>Compare the number 25 to the given number.</li>
-                            <li>Compare the number 33 to the given number.</li>
-                            <li>Compare the number 47 to the given number.</li>
-                            </ol>")
-
-        AddHeading(section_assessment, "Question 2", 3)
-        section_assessment:AddParagraph(" Which of the following is true of two algorithms designed to solve the same problem?")
-        section_assessment:AddParagraph("<ol type="+ dq +"a" + dq + ">
-                            <li>If two algorithms solve the same problem they must have the same efficiency.</li>
-                            <li>If two algorithms solve the same problem they must have different efficiency.</li>
-                            <li>For any given problem there is a single algorithm that can solve it with a single efficiency.</li>
-                            <li>It is possible for two algorithms with different efficiencies to solve the same problem.</li>
-                            </ol>")
-
-               Section section_standards
-        section_standards:AddClassAttribute("flex flex-col gap-y-2")
-        bodyDiv:Add(section_standards)
-        AddHeading(section_standards, "Standards Alignment", 2)
-
-        UnorderedList list
-        list:AddClassAttribute("list-disc list-outside pl-8")
-        AddListItemWithBoldAtFront(list, "CSTA K-12 Computer Science Standards (2017): ","3B-AP-10, 3B-AP-11")
-        AddListItemWithBoldAtFront(list, "CSP2021: ","AAP-2.O.5")
-        AddListItemWithBoldAtFront(list, "CSP2021: ","AAP-2.P.1, AAP-2.P.2, AAP-2.P.3")
-        AddListItemWithBoldAtFront(list, "CSP2021: ","AAP-4.A.1, AAP-4.A.2, AAP-4.A.3, AAP-4.A.4, AAP-4.A.5, AAP-4.A.6")
-        section_standards:Add(list)
-
-
-       Section nextSection
-        WriteNextTutorial(nextSection)
-        bodyDiv:Add(nextSection)
-        onPageDiv:Add(CreateHeadingTableOfContents())
+        Title("Algorithms - Lesson 2: Algorithm Efficiency")
+        Overview()
+        GettingStarted5Minutes()
+        Activity30Minutes()
+        WrapUp10Minutes()
+        AssessmentCheckForUnderstanding()
+        StandardsAlignment()
     end
 
-    action GetMetaDescription returns text
-        return "Learn how different algorithms can solve problems at different speeds"
+    private action Overview
+        Section("Overview")
+        Paragraph("In this lesson students follow a demonstration of Linear Search before writing their own search algorithms. Following this, students are introduced to Binary Search after which they compare graphs of the search algorithms to determine which is most efficient.")
+        Subsection("Goals")
+        Paragraph("Students will be able to:")
+        BulletList()
+        ListItem("Use Linear Search to determine if a number is in a list")
+        ListItem("Use Binary Search to determine if a number is in a list")
+        ListItem("Compare the efficiency of Linear Search and Binary Search")
+        Subsection("Purpose")
+        Paragraph("In the previous lesson students learned that there are many different ways to write an algorithm to solve a problem. However, not all solutions are good options, and some algorithms require many fewer steps to run than others. This lesson focuses on comparing Linear Search to Binary Search. The the length of the list being searched, the more efficient Binary Search is compared to Linear Search. That said, Binary Search has a constraint: the list must first be sorted. This lesson more broadly introduces students to thinking about the efficiency of an algorithm, an idea that will be explored more in future lessons.")
     end
 
-    action GetSummaryName returns text
-        return "Code.Org Unit 6 Lesson 2: Algorithms Solve Problems"
+    private action GettingStarted5Minutes
+        Section("Getting Started (5 minutes)")
+        Paragraph():Strong("Prompt: "):Text("Have you ever lost a pencil in a backpack? What are the steps you take to find the pencil?")
+        Paragraph():Strong("Discuss: "):Text("Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
+        DiscussionGoal()
+        Paragraph("Use this discussion to highlight the following points")
+        BulletList()
+        ListItem("Students may have as systematic approach (search through every pocket in order) or a random approach.")
+        ListItem("Some students may have a system where they place their books and materials in their backpack to be retrieved in the order of their class schedule. If they look in their bag at a certain spot and don't see the pencil, they have a pretty good idea where to search next.")
+        ListItem("There are no right answers here - the idea is to start thinking about the efficiency of different search methods.")
+        EndCallout()
+        Subsection("Remarks")
+        BulletList()
+        ListItem("There are many different ways to achieve the same goal for this problem: finding your pencil. Today we are going to explore different search methods that computers use.")
     end
 
-    action GetName returns text
-        return "Code.Org Unit 6 Lesson 2"
+    private action Activity30Minutes
+        Section("Activity (30 minutes)")
+        Paragraph():Strong("Distribute: "):Text("Students should have their journals. They will also need somewhere to record numbers, such as on sticky notes.")
+        Paragraph():Strong("Open a Project: "):Text("Have students open the "):Strong("Lesson2_TicketGenerator"):Text(" project in the Unit 6 folder of the CSP-Widgets repository. Students will use this to randomly generate ticket numbers for today's activity.")
+        Paragraph():Strong("Do This: "):Text("Call for three volunteers. These students use the Ticket Generator program to produce raffle ticket numbers (one per volunteer). Students record their number and come to the front of the room.")
+        Subsection("Remarks")
+        BulletList()
+        ListItem("Thank you, volunteers! Let's figure out if any of you have the winning number for this instance of the problem. I'm going to ask you one by one to show your number and we will compare it with the winning number.")
+        TeachingTip()
+        Paragraph("Before class, choose your own winning number (a number between 0-999), or alternatively use the Ticket Generator yourself!")
+        EndCallout()
+        Paragraph():Strong("Do This: "):Text("Each volunteer reveals their number and compares it to the winning number.")
+        Paragraph():Strong("Prompt 1: "):Text("How many steps did it take to find out if anyone had the winning ticket? What is the greatest possible number of steps it could take for this instance?")
+        Paragraph():Strong("Prompt 2: "):Text("What if we had six volunteers? The whole class? The whole school? What is the pattern here?")
+        Paragraph():Strong("Display: "):Text("Look at the chart as a class and examine the graph. The graph visualizes the pattern the class discussed.")
+        Table("Raffle Tickets")
+        TableHeader():Cell("Inputs"):Cell("Steps")
+        TableRow():Cell("3"):Cell("3")
+        TableRow():Cell("6"):Cell("6")
+        TableRow():Cell("10"):Cell("10")
+        TableRow():Cell("100"):Cell("100")
+        Image("media/lessons/csp/unit6/LinearGraph.png", "A graph mapping the number of inputs to the max number of steps to solve the problem. The result is a straight line where the x and y axes are always equal.")
+        Subsection("Remarks")
+        BulletList()
+        ListItem("Now let's try a different way to search.")
+        Paragraph():Strong("Group: "):Text("Place students in groups of two.")
+        Paragraph():Strong("Do This: "):Text("With a partner, students use the Ticket Generator to create seven random numbers that are recorded, such as on sticky notes. Students organize the results in numerical order. Students choose one extra number as the "):DoubleQuote():Text("winning number"):DoubleQuote():Text(" and write that number down on a separate sticky note.")
+        Paragraph():Strong("Challenge: "):Text("Students work with their partner to write an algorithm to search for their winning number. Make sure the rules are displayed.")
+        BulletList()
+        ListItem("The search can start at any of the numbers.")
+        ListItem("You can "):DoubleQuote():Text("jump"):DoubleQuote():Text(" over numbers. In other words, you don't need to search the stickies in order.")
+        ListItem("You can determine which numbers to search next based on the current number you are checking.")
+        ListItem("The goal is to make the determination in the least steps possible, but don't forget your number could be anywhere in the list - what is the worst possible case? What is the greatest number of comparison steps it would take to find any number in your list using your current algorithm?")
+        Paragraph():Strong("Discuss: "):Text("Students share their algorithms with another group and determine which one runs faster, depending on the number of steps it takes to find a number in the list.")
+        TeachingTip()
+        Paragraph("It's important for students to think about this problem as looking for the number in the worst possible situation. In other words, what is the least amount of steps it would take to definitively cross off every option?")
+        EndCallout()
+        Paragraph():Strong("Do This: "):Text("Students return to their partner and now run this given algorithm, shown below, step by step. As they are doing this, they should think about whether or not this algorithm runs faster (has less steps) than their own algorithms.")
+        BulletList()
+        ListItem("Find the middle number in the list. Compare that number to the given number. If the number is less than the given number, remove all of the cards to the right (including the middle number). If the number is more than the given number, remove all of the cards to the left (including the middle number).")
+        ListItem("Find the middle number in this shorter list. Follow the instructions in Step #1 for comparing.")
+        ListItem("Find the middle number in this new shorter list. Follow the instructions in Step #1 for comparing.")
+        BulletList()
+        ListItem("This search algorithm is known as Binary Search. Let's see it in action.")
+        Paragraph():Strong("Do This: "):Text("As a class, find the number "):Code("705"):Text(" in this list: "):Code("117, 232, 245, 410, 705, 716, 833"):Text(". Follow the steps below, and discuss each step as it is happening.")
+        BulletList()
+        ListItem("Find the number in the middle (410) and compare it with the given number (705). The given number is greater than the middle number, so remove the middle number and all to the left.")
+        ListItem("Find the number in the middle of the numbers left (716), and compare it with the given number (705). The given number is less than the middle number, so remove the middle number and all to the right.")
+        ListItem("Find the number in the middle of the numbers left (there is only one!), and compare it with the given number. The given number is equal to the middle number. We have found our number!")
+        BulletList()
+        ListItem("Binary search only works with a sorted list of numbers. This allows us to remove options from the search after we've made a decision. In other words, if we know the number is greater than 410, we can remove all numbers less than or equal to 410 and we don't have to manually check those numbers one by one.")
+        Paragraph():Strong("Do This: "):Text("Display the table and graph below. Have students work out a few of the instances in the table to see how they arrive at the listed number of steps. Students copy the table and chart into their journals.")
+        Table("Binary")
+        TableHeader():Cell("Inputs"):Cell("Steps")
+        TableRow():Cell("1"):Cell("1")
+        TableRow():Cell("3"):Cell("2")
+        TableRow():Cell("5"):Cell("3")
+        TableRow():Cell("7"):Cell("3")
+        TableRow():Cell("9"):Cell("4")
+        TableRow():Cell("15"):Cell("4")
+        Image("media/lessons/csp/unit6/BinarySearchGraph.png", "A graph mapping the number of inputs to the max number of steps to find an item with Binary Search. The result is a curved line, where the number of steps (the y-axis) grows more slowly than the inputs (the x-axis). The line begins at 0, 0 and ends at 15, 4.")
+        Paragraph():Strong("Question: "):Text("Look at the table for Binary Search again. If we wanted to store the number of inputs in each row as a binary number, how many bits would each of the numbers need?")
+        Paragraph("For Binary Search, for each instance the number of steps it takes to run is equal to the number of bits required to represent the input.")
+        TeachingTip()
+        Paragraph():Strong("Binary Search with Even Numbers:"):Text(" What if there is no middle number while performing a step in Binary Search? Students can come up with a protocol for this like: if there is no middle number, compare the number on the right.")
+        Paragraph():Strong("Hard Concepts:"):Text(" The relationship between binary numbers and binary search is a tricky concept! It's ok if students don't fully understand. What's most important is what is revealed next: Binary Search is more efficient than Linear Search.")
+        EndCallout()
+        Paragraph():Strong("Display: "):Text("Show students the graph below, which displays the two search algorithms we've explored.")
+        Paragraph("The first is "):Strong("linear"):Text(". As we add more inputs, the number of steps grows at the same rate.")
+        Paragraph("The second represents what happens with Binary Search. It grows at a much slower rate! Binary Search is faster than Linear Search, BUT the data must be sorted.")
+        Image("media/lessons/csp/unit6/LinearVsBinarySearch.png", "This graph compares the previous lines for linear search and binary search from the previous two graphs. While the linear search line remains 1-to-1 on the x and y axis, the line for binary search has a much lower value on the y-axis.")
+        Subsection("Remarks")
+        BulletList()
+        ListItem("Both Binary Search and Linear Search find the answer to our search problem. However, one option is much faster than the other: Binary Search, although it requires that the numbers are sorted first.")
     end
 
-    action GetShortDescription returns text
-        return "Learn about efficiency in algorithms"
+    private action WrapUp10Minutes
+        Section("Wrap up (10 Minutes)")
+        Paragraph():Strong("Prompt: "):Text("If I had one input, which algorithm would I use to get my answer with the fewest amount of steps? What if I had five? What about one hundred?")
+        Paragraph():Strong("Discuss: "):Text("Have students think about their answers on their own, then share with a partner, and then finally discuss responses with the entire room.")
+        DiscussionGoal()
+        BulletList()
+        ListItem("For one input, either Binary Search or Linear Search would be appropriate. Students may argue for Linear as it does not need to first be sorted.")
+        ListItem("For five inputs, it's clear that Binary Search is fastest, although it only saves two steps over Linear Search. This is all the more true with one hundred inputs, which only takes seven steps (Binary number for 100 inputs: 1100100, 7 bits in total) compared to Linear Search's one hundred steps.")
+        EndCallout()
+        Subsection("Remarks")
+        BulletList()
+        ListItem("Computer scientists don't just think about "):DoubleQuote():Text("code"):DoubleQuote():Text(", they think about problems and the algorithms that solve them. In this unit we're going to explore what makes two problems, or two algorithms, similar or different from one another, and the way computer scientists talk about them. Not only will you be a better programmer, but you'll get to work on some really interesting problems along the way.")
+        Paragraph():Strong("Journal: "):Text("Students add the following vocabulary words and definitions to their journals:")
+        BulletList()
+        ListItem():Emphasis("Efficiency:"):Text(" a measure of how many steps are needed to complete an algorithm")
+        ListItem():Emphasis("Linear Search:"):Text(" a search algorithm which checks each element of a list, in order, until the desired value is found or all elements in the list have been checked.")
+        ListItem():Emphasis("Binary Search:"):Text(" a search algorithm that starts at the middle of a sorted set of numbers and removes half of the data; this process repeats until the desired value is found or all elements have been eliminated.")
+        BulletList()
+        ListItem("Well done! It's clear that there are many algorithms we can use to search for an item in a list. Some are faster, or more efficient, than others. In the case of Binary Search, the larger the list we are searching through, the greater the efficiency in using this algorithm instead of Linear Search.")
     end
 
-    action GetLocation returns text
-        return "lessons/code/Algorithms/Lesson2.html"
+    private action AssessmentCheckForUnderstanding
+        Section("Assessment: Check for Understanding")
+        Subsection("For Students")
+        Paragraph("Open a word doc or google doc and copy/paste the 2 following question.")
+        Subsection("Question 1")
+        Paragraph("What is the third step using Binary Search to look for the number 32 in this list: "):Code("1, 2, 3, 4, 10, 11, 16, 25, 32, 33, 45, 47, 51, 69, 75"):Text(" ?")
+        NumberedList()
+        ListItem("Compare the number 4 to the given number.")
+        ListItem("Compare the number 25 to the given number.")
+        ListItem("Compare the number 33 to the given number.")
+        ListItem("Compare the number 47 to the given number.")
+        Subsection("Question 2")
+        Paragraph("Which of the following is true of two algorithms designed to solve the same problem?")
+        NumberedList()
+        ListItem("If two algorithms solve the same problem they must have the same efficiency.")
+        ListItem("If two algorithms solve the same problem they must have different efficiency.")
+        ListItem("For any given problem there is a single algorithm that can solve it with a single efficiency.")
+        ListItem("It is possible for two algorithms with different efficiencies to solve the same problem.")
     end
 
-       action GetLinkName returns text
-        return "Algorithm Efficiency"
+    private action StandardsAlignment
+        Section("Standards Alignment")
+        BulletList()
+        ListItem():Strong("CSTA K-12 Computer Science Standards (2017): "):Text("3B-AP-10, 3B-AP-11")
+        ListItem():Strong("CSP2021: "):Text("AAP-2.O.5")
+        ListItem():Strong("CSP2021: "):Text("AAP-2.P.1, AAP-2.P.2, AAP-2.P.3")
+        ListItem():Strong("CSP2021: "):Text("AAP-4.A.1, AAP-4.A.2, AAP-4.A.3, AAP-4.A.4, AAP-4.A.5, AAP-4.A.6")
     end
-
-    action GetSectionName returns text
-        return "Algorithms"
-    end
-
 end

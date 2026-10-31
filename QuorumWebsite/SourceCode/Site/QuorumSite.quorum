@@ -72,6 +72,11 @@ class QuorumSite is WebSite
     // Pages with no "On this page" at all (see HideOnThisPage).
     HashTable<WebPage, boolean> onThisPageHidden
 
+    // The larger course a series is part of, by the series' key: its name
+    // and location (a track page listing its units), for the breadcrumbs.
+    HashTable<text, text> partOfNames
+    HashTable<text, text> partOfLocations
+
     // Structured data, in the shared schema.org vocabulary.
     constant text SCHEMA_CONTEXT = "https://schema.org"
     constant text STRUCTURED_DATA_TYPE = "application/ld+json"
@@ -460,6 +465,20 @@ class QuorumSite is WebSite
     end
 
     // Home › Course › Lesson, for one course, in one row (design B).
+    /*
+        Records that a series is one part of a larger course, such as a unit
+        of a track, so the breadcrumbs read Home › the course › the series ›
+        the lesson.
+
+        Attribute: Parameter unit The series.
+        Attribute: Parameter courseName The larger course's name, such as "Computer Science Principles".
+        Attribute: Parameter courseLocation The larger course's page, such as "lessons/code.html".
+    */
+    action PartOf(PageSeries unit, text courseName, text courseLocation)
+        partOfNames:Set(unit:GetKey(), courseName)
+        partOfLocations:Set(unit:GetKey(), courseLocation)
+    end
+
     private action GetBreadcrumbs(WebPage page, PageSeries course, boolean shown) returns NavigationDivision
         NavigationDivision navigation
         navigation:AddAttribute(LABEL_ATTRIBUTE, BREADCRUMB_LABEL)
@@ -471,8 +490,15 @@ class QuorumSite is WebSite
 
         list:AddNestedTag(GetBreadcrumb(page, HOME_NAME, HOME_ADDRESS))
         list:AddNestedTag(GetSeparator(page))
-        if course:GetOverviewLocation():IsEmpty()
-            // A course with no overview page is named, not linked.
+        text partOfLocation = ""
+        if partOfNames:HasKey(course:GetKey())
+            // The larger course first, then this series within it.
+            partOfLocation = partOfLocations:GetValue(course:GetKey())
+            list:AddNestedTag(GetBreadcrumb(page, partOfNames:GetValue(course:GetKey()), locations:FromSiteTop(partOfLocation)))
+            list:AddNestedTag(GetSeparator(page))
+        end
+        if course:GetOverviewLocation():IsEmpty() or course:GetOverviewLocation() = partOfLocation
+            // A course with no overview page of its own is named, not linked.
             ListItem courseName
             courseName:AddText(escaper:Escape(course:GetName()))
             list:AddNestedTag(courseName)
@@ -721,8 +747,13 @@ class QuorumSite is WebSite
             JavaScriptObjectNotation items
             items:SetArray()
             items:Add(GetTrailItem(1, HOME_NAME, GetPublicAddress("")))
-            items:Add(GetTrailItem(2, course:GetName(), GetPublicAddress(course:GetOverviewLocation())))
-            items:Add(GetTrailItem(3, page:GetTitleText(), GetPublicAddress(page:GetLocation())))
+            integer position = 2
+            if partOfNames:HasKey(course:GetKey())
+                items:Add(GetTrailItem(position, partOfNames:GetValue(course:GetKey()), GetPublicAddress(partOfLocations:GetValue(course:GetKey()))))
+                position = position + 1
+            end
+            items:Add(GetTrailItem(position, course:GetName(), GetPublicAddress(course:GetOverviewLocation())))
+            items:Add(GetTrailItem(position + 1, page:GetTitleText(), GetPublicAddress(page:GetLocation())))
             trail:Add("itemListElement", items)
             AddStructuredDataScript(page, trail)
             i = i + 1
