@@ -84,7 +84,13 @@ class QuorumPage is WebPage
     // Scripts a page loads once, only if it uses them.
     boolean editorScriptAdded = false
     boolean mathScriptAdded = false
+    boolean chartsScriptAdded = false
     integer editorCount = 0
+
+    // The editor CodeEditorFromProject(title) started, and its files, which
+    // EditorFileFromProject adds to.
+    IDE currentEditor = undefined
+    CodeForIDE currentEditorFiles = undefined
 
     constant text TEACHING_TIP = "Teaching Tip"
     constant text GOALS_LABEL = "By the end of this lesson, you can"
@@ -94,6 +100,9 @@ class QuorumPage is WebPage
     constant text EDITOR_SCRIPT_START = "script/widgets/widget-js/IDE-"
     constant text SCRIPT_ENDING = ".js"
     constant text MATH_SCRIPT = "script/load-mathjax.js"
+    constant text CHARTS_SCRIPT = "script/quorumCharts.js"
+    constant text EDITOR_CODE_ATTRIBUTE = "data-code-for-ide"
+    constant text CHART_LAYOUT = "min-width: 100px; max-width: 100%;"
 
     // The code highlighter's JSON grammar, from the same release Lesson
     // uses, added to a page once if it shows JSON.
@@ -490,6 +499,118 @@ class QuorumPage is WebPage
         return AddEditor(editorTitle, files)
     end
 
+    /*
+        Adds a live code editor whose code is in a file outside the site's
+        folder, by its path from the project folder, such as
+        "examples/Charts/BC1.quorum", in a file with the name given. Locations
+        stay inside the site everywhere else; this is for the few files kept
+        elsewhere. Returns the editor, as CodeEditor does.
+
+        Attribute: Parameter editorTitle The editor's title.
+        Attribute: Parameter fileName The file's name in the editor, such as "BarChart.quorum".
+        Attribute: Parameter path The code's path from the project folder.
+        Attribute: Returns The editor.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Bar charts")
+                CodeEditorFromProject("Making a Bar Chart", "BarChart.quorum", "examples/Charts/BC1.quorum")
+            end
+        end
+    */
+    action CodeEditorFromProject(text editorTitle, text fileName, text path) returns IDE
+        IDE editor = CodeEditorFromProject(editorTitle)
+        EditorFileFromProject(fileName, path)
+        return editor
+    end
+
+    /*
+        Starts a live code editor with several files, each outside the site's
+        folder; add them with EditorFileFromProject, as rows follow Table.
+        Returns the editor, as CodeEditor does.
+
+        Attribute: Parameter editorTitle The editor's title.
+        Attribute: Returns The editor.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Bogmort's Spellbook")
+                CodeEditorFromProject("Bogmort's Spellbook")
+                EditorFileFromProject("Main.quorum", "examples/Blocks/H13.quorum")
+                EditorFileFromProject("Spellbook.quorum", "examples/Blocks/Spellbook.quorum")
+            end
+        end
+    */
+    action CodeEditorFromProject(text editorTitle) returns IDE
+        CodeForIDE files
+        IDE editor = AddEditor(editorTitle, files)
+        currentEditor = editor
+        currentEditorFiles = files
+        return editor
+    end
+
+    /*
+        Adds a file to the editor CodeEditorFromProject(title) started, from
+        its path in the project folder, with the name it has in the editor.
+
+        Attribute: Parameter fileName The file's name in the editor, such as "Spellbook.quorum".
+        Attribute: Parameter path The code's path from the project folder.
+    */
+    action EditorFileFromProject(text fileName, text path)
+        if currentEditor = undefined
+            alert("An editor file needs an editor to go in. Start one with CodeEditorFromProject.")
+        end
+        File file
+        file:SetPath(path)
+        if not file:Exists()
+            alert("There's no code for the editor at " + path + ".")
+        end
+        currentEditorFiles:AddFileUrl(fileName, path)
+        currentEditor:RemoveAttribute(EDITOR_CODE_ATTRIBUTE)
+        currentEditor:SetCodeForIDE(currentEditorFiles:GetJsonArray())
+    end
+
+    /*
+        Loads the script that makes charts navigable, once. Chart calls it;
+        a page whose editors draw charts calls it too.
+    */
+    action UseCharts
+        if not chartsScriptAdded
+            AddScript(locations:FromSiteTop(CHARTS_SCRIPT) + versions:GetChartsScriptVersionQuery())
+            chartsScriptAdded = true
+        end
+    end
+
+    /*
+        Adds a chart Quorum exported as an SVG file, from a location in the
+        site's relative folder, such as "media/tutorials/charts/gallery/barchart1.svg".
+        The chart goes into the page itself, so readers can explore it with
+        the keyboard and a screen reader; the charts script is added once.
+
+        Attribute: Parameter location The chart's location inside the relative folder.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Bar charts")
+                Chart("media/tutorials/charts/gallery/barchart1.svg")
+            end
+        end
+    */
+    action Chart(text location)
+        File file = GetWebSite():GetRelativeFile(location)
+        if not file:Exists()
+            alert("There's no chart at " + location + ".")
+        end
+        UseCharts()
+        Division chart
+        chart:AddAttribute("style", CHART_LAYOUT)
+        chart:AddText(file:Read())
+        Include(chart)
+    end
+
     // An editor with its files, its script added to the page once.
     private action AddEditor(text editorTitle, CodeForIDE code) returns IDE
         if not editorScriptAdded
@@ -504,6 +625,7 @@ class QuorumPage is WebPage
         editor:SetCodeForIDE(code:GetJsonArray())
         editor:SetIdeTitle(escaper:Escape(editorTitle))
         Include(editor)
+        currentEditor = undefined
         return editor
     end
 
