@@ -3,6 +3,7 @@ use Libraries.System.File
 use Libraries.Containers.Array
 use Libraries.Compute.Statistics.DataFrame
 use Libraries.Web.VersionHelper
+use Libraries.Web.Series.PageSeries
 
 
 class Lesson is WebPage
@@ -21,19 +22,32 @@ class Lesson is WebPage
     text newLocation = ""
     text newSectionName = ""
 
-    // The lessons a track page lists. The site sets every page up with
-    // Setup, so a track page keeps its lessons until then.
+    // What a track page lists: its units, each a series of lessons, or (for
+    // the tracks not yet moved to series) its lessons. The site sets every
+    // page up with Setup, so a track page keeps them until then.
+    Array<PageSeries> trackSeries = undefined
     Array<Lesson> trackLessons = undefined
+
+    action SetTrackSeries(Array<PageSeries> units)
+        trackSeries = units
+    end
 
     action SetTrackLessons(Array<Lesson> lessons)
         trackLessons = lessons
     end
 
-    // Track pages override this to list their lessons.
+    // Track pages override one of these to list their units or lessons.
+    action SetupTrack(Array<PageSeries> units)
+    end
+
     action Setup(Array<Lesson> lessons)
     end
 
     action Setup
+        if trackSeries not= undefined
+            SetupTrack(trackSeries)
+            return now
+        end
         if trackLessons not= undefined
             Setup(trackLessons)
             return now
@@ -92,6 +106,22 @@ class Lesson is WebPage
 
     action SetPreviousLesson(Lesson prev)
         prevLesson = prev
+    end
+
+    // Sets the next lesson without making this one its previous lesson,
+    // for a series ending in a lesson whose home is another series.
+    action SetNextInSeries(Lesson next)
+        nextLesson = next
+    end
+
+    // A lesson's title and description as a series lists it: its link name
+    // and its short description.
+    action GetTitleText returns text
+        return GetLinkName()
+    end
+
+    action GetDescription returns text
+        return GetShortDescription()
     end
 
     action CreateLinkedArrays() returns Array<Lesson>

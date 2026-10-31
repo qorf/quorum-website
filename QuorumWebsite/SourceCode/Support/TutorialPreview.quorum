@@ -1,12 +1,44 @@
 use Libraries.Web.Page.all
 use Libraries.Containers.Array
+use Libraries.Web.Series.PageSeries
+use Libraries.Web.Series.PageSeriesEntry
 
 class TutorialPreview is Division
+    // A preview of a unit: each of its lessons, in order.
+    action Create(text title, PageSeries unit) returns TutorialPreview
+        Array<text> names
+        Array<text> descriptions
+        Array<text> locations
+        integer i = 0
+        repeat while i < unit:GetSize()
+            PageSeriesEntry entry = unit:GetEntry(i)
+            names:Add(entry:GetTitle())
+            descriptions:Add(entry:GetDescription())
+            locations:Add(entry:GetLocation())
+            i = i + 1
+        end
+        return Create(title, names, descriptions, locations)
+    end
+
+    // A preview of a lesson and every lesson after it, for the track pages
+    // that still list lessons.
     action Create(text title, Lesson lesson) returns TutorialPreview
+        Array<text> names
+        Array<text> descriptions
+        Array<text> locations
+        repeat while lesson not= undefined
+            names:Add(lesson:GetLinkName())
+            descriptions:Add(lesson:GetShortDescription())
+            locations:Add(lesson:GetLocation())
+            lesson = lesson:GetNextLesson()
+        end
+        return Create(title, names, descriptions, locations)
+    end
+
+    private action Create(text title, Array<text> names, Array<text> descriptions, Array<text> locations) returns TutorialPreview
         // Setting card attributes
         SetIdentifier("previewBar" + title)
         AddAttribute("data-test", "previewBar" + title)
-        Lesson startLesson = lesson
         //make the max width the col 3 span, needs both flex and hidden to work
         AddClassAttribute("bg-neutral-grey-25 font-sans rounded-2xl box-border relative p-6 w-full gap-y-2 flex flex-col hidden col-span-full max-w-[384px] md:max-w-full")
 
@@ -27,15 +59,13 @@ class TutorialPreview is Division
         h_guiding_question:AddClassAttribute("text-lg font-bold")
 
         div_guiding_question:AddClassAttribute("flex flex-col gap-y-2")
-        lesson = startLesson
         UnorderedList ul
         ul:AddClassAttribute("list-disc list-outside pl-8")
-        repeat while lesson not= undefined
+        repeat while i < descriptions:GetSize()
           ListItem li
-          li:AddText(lesson:GetShortDescription())
+          li:AddText(descriptions:Get(i))
           li:AddClassAttribute("text-sm capitalize")
           ul:Add(li)
-          lesson = lesson:GetNextLesson()
           i = i + 1
         end
         div_guiding_question:Add(ul)
@@ -46,8 +76,7 @@ class TutorialPreview is Division
         Division lessonDiv
         lessonDiv:AddAttribute("tabindex","0")
         lessonDiv:AddClassAttribute("flex flex-col gap-y-2")
-        lesson = startLesson
-        repeat while lesson not= undefined
+        repeat while i < names:GetSize()
           Division div_link
           div_link:AddClassAttribute("flex flex-row gap-x-2 items-center")
           //creating a div that is a circle with a number in it
@@ -62,12 +91,11 @@ class TutorialPreview is Division
 
           Link link
           link:AddAttribute("tabindex","0")
-          link:AddText(lesson:GetLinkName())
-          link:SetAddress("/" + lesson:GetLocation())
+          link:AddText(names:Get(i))
+          link:SetAddress("/" + locations:Get(i))
           link:AddClassAttribute("font-bold hover:underline")
           div_link:Add(link)
           lessonDiv:Add(div_link)
-          lesson = lesson:GetNextLesson()
           i = i + 1
         end
 
