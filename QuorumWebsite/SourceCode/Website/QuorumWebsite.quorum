@@ -87,11 +87,11 @@ class QuorumWebsite
     // made once for each, and the last one added is the one written.
     HashTable<text, WebPage> oldPages
 
-    // Each series' lessons by the series' key, and the key of each lesson's
+    // Each series' pages by the series' key, and the key of each page's
     // home series: the first one it's added to, which gives it its Back
-    // and Next.
-    HashTable<text, Array<Lesson>> seriesLessons
-    HashTable<Lesson, text> homeSeries
+    // and Next. A series may mix old lessons and converted pages (plan 13).
+    HashTable<text, Array<WebPage>> seriesLessons
+    HashTable<WebPage, text> homeSeries
 
     /*
         Builds every page, writes the site into html/, then writes the
@@ -417,45 +417,88 @@ class QuorumWebsite
     private action Series(text key) returns PageSeries
         PageSeries series
         series:SetKey(key)
-        Array<Lesson> lessons
-        seriesLessons:Set(key, lessons)
+        Array<WebPage> pages
+        seriesLessons:Set(key, pages)
         site:AddSeries(series)
         return series
     end
 
     /*
-        Adds a lesson to the end of a series. The series takes its name,
-        description and picture from its first lesson, as the track pages
-        show it. A lesson takes its Back and Next from its home series only,
-        so a lesson that also ends another series (as each chapter ends the
-        previous chapter's labs) keeps its own.
+        Adds a page, an old lesson or a converted one, to the end of a
+        series. The series takes its name, description and picture from its
+        first page, as the track pages show it. A page takes its Back and
+        Next from its home series only, so a page that also ends another
+        series (as each chapter ends the previous chapter's labs) keeps its
+        own.
     */
-    private action Add(PageSeries series, Lesson lesson)
+    private action Add(PageSeries series, WebPage page)
         text key = series:GetKey()
-        Array<Lesson> lessons = seriesLessons:GetValue(key)
-        Lesson previous = undefined
-        if lessons:IsEmpty()
-            series:SetName(lesson:GetSectionName())
-            series:SetDescription(lesson:GetMetaDescription())
-            series:SetImage(lesson:GetImageLocation())
+        Array<WebPage> pages = seriesLessons:GetValue(key)
+        WebPage previous = undefined
+        if pages:IsEmpty()
+            if page is Lesson
+                Lesson lesson = cast(Lesson, page)
+                series:SetName(lesson:GetSectionName())
+                series:SetDescription(lesson:GetMetaDescription())
+                series:SetImage(lesson:GetImageLocation())
+            elseif page is QuorumPage
+                QuorumPage converted = cast(QuorumPage, page)
+                series:SetName(converted:GetSectionName())
+                series:SetDescription(converted:GetDescription())
+                series:SetImage(converted:GetCardImage())
+            end
         else
-            previous = lessons:Get(lessons:GetSize() - 1)
+            previous = pages:Get(pages:GetSize() - 1)
         end
-        series:Add(lesson)
-        lessons:Add(lesson)
+        series:Add(page)
+        pages:Add(page)
 
-        if not homeSeries:HasKey(lesson)
-            homeSeries:Set(lesson, key)
-            lesson:SetPreviousLesson(previous)
+        if not homeSeries:HasKey(page)
+            homeSeries:Set(page, key)
+            page:SetHomeSeries(series)
+            LinkPrevious(page, previous)
         end
         if previous not= undefined and homeSeries:GetValue(previous) = key
-            previous:SetNextInSeries(lesson)
+            LinkNext(previous, page)
         end
     end
 
-    // The lessons of a series, for the track pages that still list lessons.
+    // Links a page to the one before it in its home series, and a page to
+    // the one after it, for the old pages' index and "Next Tutorial".
+    private action LinkPrevious(WebPage page, WebPage previous)
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            lesson:SetPreviousPage(previous)
+        elseif page is QuorumPage
+            QuorumPage converted = cast(QuorumPage, page)
+            converted:SetPreviousOldPage(previous)
+        end
+    end
+
+    private action LinkNext(WebPage page, WebPage next)
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            lesson:SetNextPage(next)
+        elseif page is QuorumPage
+            QuorumPage converted = cast(QuorumPage, page)
+            converted:SetNextOldPage(next)
+        end
+    end
+
+    // The old lessons of a series, for the track pages that still list
+    // lessons.
     private action GetLessons(PageSeries series) returns Array<Lesson>
-        return seriesLessons:GetValue(series:GetKey())
+        Array<Lesson> lessons
+        Array<WebPage> pages = seriesLessons:GetValue(series:GetKey())
+        integer i = 0
+        repeat while i < pages:GetSize()
+            WebPage page = pages:Get(i)
+            if page is Lesson
+                lessons:Add(cast(Lesson, page))
+            end
+            i = i + 1
+        end
+        return lessons
     end
 
     private action WriteProblemsPages
@@ -1586,28 +1629,28 @@ end
         text track = "audio"
         text section = "Types and Variables"
         TypesTutorial u1l1
-        u1l1:SetNewLocation(track + "/types.html")
-        u1l1:SetNewSectionName(section)
+        u1l1:SetLocation(track + "/types.html")
+        u1l1:SetSectionName(section)
         OperatorsTutorial u1l2
-        u1l2:SetNewLocation(track + "/operators.html")
-        u1l2:SetNewSectionName(section)
+        u1l2:SetLocation(track + "/operators.html")
+        u1l2:SetSectionName(section)
         Lab2_4 u1l3
         u1l3:SetNewLocation(track + "/lab2_4.html")
         u1l3:SetNewSectionName(section)
 
         //Deleted one
         GettingStartedTutorial u1l4
-        u1l4:SetNewLocation(track + "/gettingStarted.html")
-        u1l4:SetNewSectionName(section)
+        u1l4:SetLocation(track + "/gettingStarted.html")
+        u1l4:SetSectionName(section)
         TypeCastingTutorial u1l5
-        u1l5:SetNewLocation(track + "/typeCasting.html")
-        u1l5:SetNewSectionName(section)
+        u1l5:SetLocation(track + "/typeCasting.html")
+        u1l5:SetSectionName(section)
         Assignment2_1 u1l6
         u1l6:SetNewLocation(track + "/assignment2_1.html")
         u1l6:SetNewSectionName(section)
         CommentsTutorial u1l7
-        u1l7:SetNewLocation(track + "/comments.html")
-        u1l7:SetNewSectionName(section)
+        u1l7:SetLocation(track + "/comments.html")
+        u1l7:SetSectionName(section)
         Assignment2_3 u1l8
         u1l8:SetNewLocation(track + "/assignment2_3.html")
         u1l8:SetNewSectionName(section)
@@ -1621,8 +1664,8 @@ end
         //B. Control Structures
         section = "Control Structures"
         IfTutorial u2l1
-        u2l1:SetNewLocation(track + "/if.html")
-        u2l1:SetNewSectionName(section)
+        u2l1:SetLocation(track + "/if.html")
+        u2l1:SetSectionName(section)
         Lab3_1 u2l2
         u2l2:SetNewLocation(track + "/lab3_1.html")
         u2l2:SetNewSectionName(section)
@@ -1630,8 +1673,8 @@ end
         u2l3:SetNewLocation(track + "/lab3_4.html")
         u2l3:SetNewSectionName(section)
         RepeatTutorial u2l4
-        u2l4:SetNewLocation(track + "/repeat.html")
-        u2l4:SetNewSectionName(section)
+        u2l4:SetLocation(track + "/repeat.html")
+        u2l4:SetSectionName(section)
         Lab3_2 u2l5
         u2l5:SetNewLocation(track + "/lab3_2.html")
         u2l5:SetNewSectionName(section)
@@ -1639,8 +1682,8 @@ end
         u2l6:SetNewLocation(track + "/assignment3_3.html")
         u2l6:SetNewSectionName(section)
         LibrariesTutorial u2l7
-        u2l7:SetNewLocation(track + "/libraries.html")
-        u2l7:SetNewSectionName(section)
+        u2l7:SetLocation(track + "/libraries.html")
+        u2l7:SetSectionName(section)
         Chapter3ControlStructures u2l8
         u2l8:SetNewLocation(track + "/chapter3.html")
         u2l8:SetNewSectionName(section)
@@ -1648,8 +1691,8 @@ end
         //C. Actions
         section = "Actions"
         ActionsTutorial u3l1
-        u3l1:SetNewLocation(track + "/actions.html")
-        u3l1:SetNewSectionName(section)
+        u3l1:SetLocation(track + "/actions.html")
+        u3l1:SetSectionName(section)
         Lab4_1 u3l2
         u3l2:SetNewLocation(track + "/lab4_1.html")
         u3l2:SetNewSectionName(section)
@@ -1681,8 +1724,8 @@ end
         //D. Classes
         section = "Classes"
         ClassesTutorial u4l1
-        u4l1:SetNewLocation(track + "/classes.html")
-        u4l1:SetNewSectionName(section)
+        u4l1:SetLocation(track + "/classes.html")
+        u4l1:SetSectionName(section)
         Lab5_1 u4l2
         u4l2:SetNewLocation(track + "/lab5_1.html")
         u4l2:SetNewSectionName(section)
@@ -1690,18 +1733,18 @@ end
         u4l3:SetNewLocation(track + "/lab5_2.html")
         u4l3:SetNewSectionName(section)
         GenericsTutorial u4l4
-        u4l4:SetNewLocation(track + "/generics.html")
-        u4l4:SetNewSectionName(section)
+        u4l4:SetLocation(track + "/generics.html")
+        u4l4:SetSectionName(section)
         ArraysTutorial u4l5
-        u4l5:SetNewLocation(track + "/arrays.html")
-        u4l5:SetNewSectionName(section)
+        u4l5:SetLocation(track + "/arrays.html")
+        u4l5:SetSectionName(section)
         Lab5_3 u4l6
         u4l6:SetNewLocation(track + "/lab5_3.html")
         u4l6:SetNewSectionName(section)
 
         AutoboxingTutorial u4l7
-        u4l7:SetNewLocation(track + "/autoboxing.html")
-        u4l7:SetNewSectionName(section)
+        u4l7:SetLocation(track + "/autoboxing.html")
+        u4l7:SetSectionName(section)
         Assignment5_1 u4l8
         u4l8:SetNewLocation(track + "/assignment5_1.html")
         u4l8:SetNewSectionName(section)
@@ -1769,27 +1812,27 @@ end
         coreTrackArray:Add(actions)
         coreTrackArray:Add(classes)
 
-        Add(u1l1)
-        Add(u1l2)
+        AddStyled(u1l1)
+        AddStyled(u1l2)
         Add(u1l3)
-        Add(u1l4)
-        Add(u1l5)
+        AddStyled(u1l4)
+        AddStyled(u1l5)
         Add(u1l6)
-        Add(u1l7)
+        AddStyled(u1l7)
         Add(u1l8)
         Add(u1l9)
         Add(u1l10)
 
-        Add(u2l1)
+        AddStyled(u2l1)
         Add(u2l2)
         Add(u2l3)
-        Add(u2l4)
+        AddStyled(u2l4)
         Add(u2l5)
         Add(u2l6)
-        Add(u2l7)
+        AddStyled(u2l7)
         Add(u2l8)
 
-        Add(u3l1)
+        AddStyled(u3l1)
         Add(u3l2)
         Add(u3l3)
         Add(u3l4)
@@ -1800,13 +1843,13 @@ end
         Add(u3l9)
         Add(u3l10)
 
-        Add(u4l1)
+        AddStyled(u4l1)
         Add(u4l2)
         Add(u4l3)
-        Add(u4l4)
-        Add(u4l5)
+        AddStyled(u4l4)
+        AddStyled(u4l5)
         Add(u4l6)
-        Add(u4l7)
+        AddStyled(u4l7)
         Add(u4l8)
         Add(u4l9)
         Add(u4l10)
@@ -1820,11 +1863,11 @@ end
     text track = "core"
     text section = "Types and Variables"
      TypesTutorial u1l1
-     u1l1:SetNewLocation(track + "/types.html")
-     u1l1:SetNewSectionName(section)
+     u1l1:SetLocation(track + "/types.html")
+     u1l1:SetSectionName(section)
      OperatorsTutorial u1l2
-     u1l2:SetNewLocation(track + "/operators.html")
-     u1l2:SetNewSectionName(section)
+     u1l2:SetLocation(track + "/operators.html")
+     u1l2:SetSectionName(section)
      Lab2_2 u1l3
      u1l3:SetNewLocation(track + "/lab2_2.html")
      u1l3:SetNewSectionName(section)
@@ -1832,17 +1875,17 @@ end
      u1l4:SetNewLocation(track + "/assignment2_2.html")
      u1l4:SetNewSectionName(section)
      GettingStartedTutorial u1l5
-     u1l5:SetNewLocation(track + "/gettingStarted.html")
-     u1l5:SetNewSectionName(section)
+     u1l5:SetLocation(track + "/gettingStarted.html")
+     u1l5:SetSectionName(section)
      TypeCastingTutorial u1l6
-     u1l6:SetNewLocation(track + "/typeCasting.html")
-     u1l6:SetNewSectionName(section)
+     u1l6:SetLocation(track + "/typeCasting.html")
+     u1l6:SetSectionName(section)
      Assignment2_1 u1l7
      u1l7:SetNewLocation(track + "/assignment2_1.html")
      u1l7:SetNewSectionName(section)
      CommentsTutorial u1l8
-     u1l8:SetNewLocation(track + "/comments.html")
-     u1l8:SetNewSectionName(section)
+     u1l8:SetLocation(track + "/comments.html")
+     u1l8:SetSectionName(section)
      Assignment2_6 u1l9
      u1l9:SetNewLocation(track + "/assignment2_6.html")
      u1l9:SetNewSectionName(section)
@@ -1853,8 +1896,8 @@ end
      //B. Control Structures
      section = "Control Structures"
      IfTutorial u2l1
-     u2l1:SetNewLocation(track + "/if.html")
-     u2l1:SetNewSectionName(section)
+     u2l1:SetLocation(track + "/if.html")
+     u2l1:SetSectionName(section)
      Lab3_1 u2l2
      u2l2:SetNewLocation(track + "/lab3_1.html")
      u2l2:SetNewSectionName(section)
@@ -1862,8 +1905,8 @@ end
      u2l3:SetNewLocation(track + "/assignment3_1.html")
      u2l3:SetNewSectionName(section)
      RepeatTutorial u2l4
-     u2l4:SetNewLocation(track + "/repeat.html")
-     u2l4:SetNewSectionName(section)
+     u2l4:SetLocation(track + "/repeat.html")
+     u2l4:SetSectionName(section)
      Lab3_2 u2l5
      u2l5:SetNewLocation(track + "/lab3_2.html")
      u2l5:SetNewSectionName(section)
@@ -1871,8 +1914,8 @@ end
      u2l6:SetNewLocation(track + "/assignment3_2.html")
      u2l6:SetNewSectionName(section)
      LibrariesTutorial u2l7
-     u2l7:SetNewLocation(track + "/libraries.html")
-     u2l7:SetNewSectionName(section)
+     u2l7:SetLocation(track + "/libraries.html")
+     u2l7:SetSectionName(section)
      Chapter3ControlStructures u2l8
      u2l8:SetNewLocation(track + "/chapter3.html")
      u2l8:SetNewSectionName(section)
@@ -1880,8 +1923,8 @@ end
      //C. Actions
      section = "Actions"
      ActionsTutorial u3l1
-     u3l1:SetNewLocation(track + "/actions.html")
-     u3l1:SetNewSectionName(section)
+     u3l1:SetLocation(track + "/actions.html")
+     u3l1:SetSectionName(section)
      Lab4_1 u3l2
      u3l2:SetNewLocation(track + "/lab4_1.html")
      u3l2:SetNewSectionName(section)
@@ -1901,8 +1944,8 @@ end
      //D. Classes
      section = "Classes"
      ClassesTutorial u4l1
-     u4l1:SetNewLocation(track + "/classes.html")
-     u4l1:SetNewSectionName(section)
+     u4l1:SetLocation(track + "/classes.html")
+     u4l1:SetSectionName(section)
      Lab5_1 u4l2
      u4l2:SetNewLocation(track + "/lab5_1.html")
      u4l2:SetNewSectionName(section)
@@ -1910,14 +1953,14 @@ end
      u4l3:SetNewLocation(track + "/lab5_2.html")
      u4l3:SetNewSectionName(section)
      GenericsTutorial u4l4
-     u4l4:SetNewLocation(track + "/generics.html")
-     u4l4:SetNewSectionName(section)
+     u4l4:SetLocation(track + "/generics.html")
+     u4l4:SetSectionName(section)
      ArraysTutorial u4l5
-     u4l5:SetNewLocation(track + "/arrays.html")
-     u4l5:SetNewSectionName(section)
+     u4l5:SetLocation(track + "/arrays.html")
+     u4l5:SetSectionName(section)
      AutoboxingTutorial u4l6
-     u4l6:SetNewLocation(track + "/autoboxing.html")
-     u4l6:SetNewSectionName(section)
+     u4l6:SetLocation(track + "/autoboxing.html")
+     u4l6:SetSectionName(section)
      Assignment5_1 u4l7
      u4l7:SetNewLocation(track + "/assignment5_1.html")
      u4l7:SetNewSectionName(section)
@@ -1980,39 +2023,39 @@ end
         coreTrackArray:Add(actions)
         coreTrackArray:Add(classes)
 
-     Add(u1l1)
-     Add(u1l2)
+     AddStyled(u1l1)
+     AddStyled(u1l2)
      Add(u1l3)
      Add(u1l4)
-     Add(u1l5)
-     Add(u1l6)
+     AddStyled(u1l5)
+     AddStyled(u1l6)
      Add(u1l7)
-     Add(u1l8)
+     AddStyled(u1l8)
      Add(u1l9)
      Add(u1l10)
 
-     Add(u2l1)
+     AddStyled(u2l1)
      Add(u2l2)
      Add(u2l3)
-     Add(u2l4)
+     AddStyled(u2l4)
      Add(u2l5)
      Add(u2l6)
-     Add(u2l7)
+     AddStyled(u2l7)
      Add(u2l8)
 
-     Add(u3l1)
+     AddStyled(u3l1)
      Add(u3l2)
      Add(u3l3)
      Add(u3l4)
      Add(u3l5)
      Add(u3l6)
 
-     Add(u4l1)
+     AddStyled(u4l1)
      Add(u4l2)
      Add(u4l3)
-     Add(u4l4)
-     Add(u4l5)
-     Add(u4l6)
+     AddStyled(u4l4)
+     AddStyled(u4l5)
+     AddStyled(u4l6)
      Add(u4l7)
      Add(u4l8)
      Add(u4l9)
@@ -2027,23 +2070,23 @@ end
     text track = "robotics"
     text section = "Types and Variables"
      TypesTutorial u1l1
-     u1l1:SetNewLocation(track + "/types.html")
-     u1l1:SetNewSectionName(section)
+     u1l1:SetLocation(track + "/types.html")
+     u1l1:SetSectionName(section)
      OperatorsTutorial u1l2
-     u1l2:SetNewLocation(track + "/operators.html")
-     u1l2:SetNewSectionName(section)
+     u1l2:SetLocation(track + "/operators.html")
+     u1l2:SetSectionName(section)
      Lab2_2 u1l3
      u1l3:SetNewLocation(track + "/lab2_2.html")
      u1l3:SetNewSectionName(section)
      GettingStartedTutorial u1l4
-     u1l4:SetNewLocation(track + "/gettingStarted.html")
-     u1l4:SetNewSectionName(section)
+     u1l4:SetLocation(track + "/gettingStarted.html")
+     u1l4:SetSectionName(section)
      Assignment2_1 u1l5
      u1l5:SetNewLocation(track + "/assignment2_1.html")
      u1l5:SetNewSectionName(section)
      CommentsTutorial u1l6
-     u1l6:SetNewLocation(track + "/comments.html")
-     u1l6:SetNewSectionName(section)
+     u1l6:SetLocation(track + "/comments.html")
+     u1l6:SetSectionName(section)
      LegoGettingStartedTutorial u1l7
      u1l7:SetNewLocation(track + "/legoGettingStarted.html")
      u1l7:SetNewSectionName(section)
@@ -2081,14 +2124,14 @@ end
      //B. Control Structures
      section = "Control Structures"
      IfTutorial u2l1
-     u2l1:SetNewLocation(track + "/if.html")
-     u2l1:SetNewSectionName(section)
+     u2l1:SetLocation(track + "/if.html")
+     u2l1:SetSectionName(section)
      Lab3_1 u2l2
      u2l2:SetNewLocation(track + "/lab3_1.html")
      u2l2:SetNewSectionName(section)
      RepeatTutorial u2l3
-     u2l3:SetNewLocation(track + "/repeat.html")
-     u2l3:SetNewSectionName(section)
+     u2l3:SetLocation(track + "/repeat.html")
+     u2l3:SetSectionName(section)
 
     Lab3_2 u2l4
      u2l4:SetNewLocation(track + "/lab3_2.html")
@@ -2103,8 +2146,8 @@ end
      u2l6:SetNewSectionName(section)
 
      LibrariesTutorial u2l7
-     u2l7:SetNewLocation(track + "/libraries.html")
-     u2l7:SetNewSectionName(section)
+     u2l7:SetLocation(track + "/libraries.html")
+     u2l7:SetSectionName(section)
 
      Chapter3ControlStructures u2l8
      u2l8:SetNewLocation(track + "/chapter3.html")
@@ -2113,8 +2156,8 @@ end
      //C. Actions
      section = "Actions"
      ActionsTutorial u3l1
-     u3l1:SetNewLocation(track + "/actions.html")
-     u3l1:SetNewSectionName(section)
+     u3l1:SetLocation(track + "/actions.html")
+     u3l1:SetSectionName(section)
      Lab4_1 u3l2
      u3l2:SetNewLocation(track + "/lab4_1.html")
      u3l2:SetNewSectionName(section)
@@ -2144,8 +2187,8 @@ end
      //D. Classes
      section = "Classes"
      ClassesTutorial u4l1
-     u4l1:SetNewLocation(track + "/classes.html")
-     u4l1:SetNewSectionName(section)
+     u4l1:SetLocation(track + "/classes.html")
+     u4l1:SetSectionName(section)
      Lab5_1 u4l2
      u4l2:SetNewLocation(track + "/lab5_1.html")
      u4l2:SetNewSectionName(section)
@@ -2153,14 +2196,14 @@ end
      u4l3:SetNewLocation(track + "/lab5_2.html")
      u4l3:SetNewSectionName(section)
      GenericsTutorial u4l4
-     u4l4:SetNewLocation(track + "/generics.html")
-     u4l4:SetNewSectionName(section)
+     u4l4:SetLocation(track + "/generics.html")
+     u4l4:SetSectionName(section)
      ArraysTutorial u4l5
-     u4l5:SetNewLocation(track + "/arrays.html")
-     u4l5:SetNewSectionName(section)
+     u4l5:SetLocation(track + "/arrays.html")
+     u4l5:SetSectionName(section)
      AutoboxingTutorial u4l6
-     u4l6:SetNewLocation(track + "/autoboxing.html")
-     u4l6:SetNewSectionName(section)
+     u4l6:SetLocation(track + "/autoboxing.html")
+     u4l6:SetSectionName(section)
      Assignment5_1 u4l7
      u4l7:SetNewLocation(track + "/assignment5_1.html")
      u4l7:SetNewSectionName(section)
@@ -2177,8 +2220,8 @@ end
      // E. Optional
      section = "Optional Lessons"
      DevelopmentTutorial u5l1
-     u5l1:SetNewLocation(track + "/codingGuidelines.html")
-     u5l1:SetNewSectionName(section)
+     u5l1:SetLocation(track + "/codingGuidelines.html")
+     u5l1:SetSectionName(section)
 
      LegoSoundTutorial u5l2
      u5l2:SetNewLocation(track + "/legoSound.html")
@@ -2255,12 +2298,12 @@ end
         robotTrackArray:Add(classes)
         robotTrackArray:Add(optionalLessons)
 
-     Add(u1l1)
-     Add(u1l2)
+     AddStyled(u1l1)
+     AddStyled(u1l2)
      Add(u1l3)
-     Add(u1l4)
+     AddStyled(u1l4)
      Add(u1l5)
-     Add(u1l6)
+     AddStyled(u1l6)
      Add(u1l7)
      Add(u1l8)
      Add(u1l9)
@@ -2271,16 +2314,16 @@ end
      Add(u1l14)
      Add(u1l15)
 
-     Add(u2l1)
+     AddStyled(u2l1)
      Add(u2l2)
-     Add(u2l3)
+     AddStyled(u2l3)
      Add(u2l4)
      Add(u2l5)
      Add(u2l6)
-     Add(u2l7)
+     AddStyled(u2l7)
      Add(u2l8)
 
-     Add(u3l1)
+     AddStyled(u3l1)
      Add(u3l2)
      Add(u3l3)
      Add(u3l4)
@@ -2289,18 +2332,18 @@ end
      Add(u3l7)
      Add(u3l8)
 
-     Add(u4l1)
+     AddStyled(u4l1)
      Add(u4l2)
      Add(u4l3)
-     Add(u4l4)
-     Add(u4l5)
-     Add(u4l6)
+     AddStyled(u4l4)
+     AddStyled(u4l5)
+     AddStyled(u4l6)
      Add(u4l7)
      Add(u4l8)
      Add(u4l9)
      Add(u4l10)
 
-     Add(u5l1)
+     AddStyled(u5l1)
      Add(u5l2)
      Add(u5l3)
      Add(u5l4)
@@ -2314,11 +2357,11 @@ end
         text track = "visual"
         text section = "Types and Variables"
         TypesTutorial u1l1
-        u1l1:SetNewLocation(track + "/types.html")
-        u1l1:SetNewSectionName(section)
+        u1l1:SetLocation(track + "/types.html")
+        u1l1:SetSectionName(section)
         OperatorsTutorial u1l2
-        u1l2:SetNewLocation(track + "/operators.html")
-        u1l2:SetNewSectionName(section)
+        u1l2:SetLocation(track + "/operators.html")
+        u1l2:SetSectionName(section)
         Lab2_2 u1l3
         u1l3:SetNewLocation(track + "/lab2_2.html")
         u1l3:SetNewSectionName(section)
@@ -2329,17 +2372,17 @@ end
         u1l5:SetNewLocation(track + "/lab2_5.html")
         u1l5:SetNewSectionName(section)
         GettingStartedTutorial u1l6
-        u1l6:SetNewLocation(track + "/gettingStarted.html")
-        u1l6:SetNewSectionName(section)
+        u1l6:SetLocation(track + "/gettingStarted.html")
+        u1l6:SetSectionName(section)
         TypeCastingTutorial u1l7
-        u1l7:SetNewLocation(track + "/typeCasting.html")
-        u1l7:SetNewSectionName(section)
+        u1l7:SetLocation(track + "/typeCasting.html")
+        u1l7:SetSectionName(section)
         Assignment2_1 u1l8
         u1l8:SetNewLocation(track + "/assignment2_1.html")
         u1l8:SetNewSectionName(section)
         CommentsTutorial u1l9
-        u1l9:SetNewLocation(track + "/comments.html")
-        u1l9:SetNewSectionName(section)
+        u1l9:SetLocation(track + "/comments.html")
+        u1l9:SetSectionName(section)
         Assignment2_4 u1l10
         u1l10:SetNewLocation(track + "/assignment2_4.html")
         u1l10:SetNewSectionName(section)
@@ -2354,14 +2397,14 @@ end
 
         section = "Control Structures"
         IfTutorial u2l1
-        u2l1:SetNewLocation(track + "/if.html")
-        u2l1:SetNewSectionName(section)
+        u2l1:SetLocation(track + "/if.html")
+        u2l1:SetSectionName(section)
         Lab3_1 u2l2
         u2l2:SetNewLocation(track + "/lab3_1.html")
         u2l2:SetNewSectionName(section)
         RepeatTutorial u2l3
-        u2l3:SetNewLocation(track + "/repeat.html")
-        u2l3:SetNewSectionName(section)
+        u2l3:SetLocation(track + "/repeat.html")
+        u2l3:SetSectionName(section)
         Lab3_2 u2l4
         u2l4:SetNewLocation(track + "/lab3_2.html")
         u2l4:SetNewSectionName(section)
@@ -2382,8 +2425,8 @@ end
 
         section = "Actions"
         ActionsTutorial u3l1
-        u3l1:SetNewLocation(track + "/actions.html")
-        u3l1:SetNewSectionName(section)
+        u3l1:SetLocation(track + "/actions.html")
+        u3l1:SetSectionName(section)
         Lab4_1 u3l2
         u3l2:SetNewLocation(track + "/lab4_1.html")
         u3l2:SetNewSectionName(section)
@@ -2413,8 +2456,8 @@ end
 
         section = "Classes"
         ClassesTutorial u4l1
-        u4l1:SetNewLocation(track + "/classes.html")
-        u4l1:SetNewSectionName(section)
+        u4l1:SetLocation(track + "/classes.html")
+        u4l1:SetSectionName(section)
         Lab5_1 u4l2
         u4l2:SetNewLocation(track + "/lab5_1.html")
         u4l2:SetNewSectionName(section)
@@ -2428,17 +2471,17 @@ end
         u4l5:SetNewLocation(track + "/lighting.html")
         u4l5:SetNewSectionName(section)
         GenericsTutorial u4l6
-        u4l6:SetNewLocation(track + "/generics.html")
-        u4l6:SetNewSectionName(section)
+        u4l6:SetLocation(track + "/generics.html")
+        u4l6:SetSectionName(section)
         ArraysTutorial u4l7
-        u4l7:SetNewLocation(track + "/arrays.html")
-        u4l7:SetNewSectionName(section)
+        u4l7:SetLocation(track + "/arrays.html")
+        u4l7:SetSectionName(section)
         Lab5_3 u4l8
         u4l8:SetNewLocation(track + "/lab5_3.html")
         u4l8:SetNewSectionName(section)
         AutoboxingTutorial u4l9
-        u4l9:SetNewLocation(track + "/autoboxing.html")
-        u4l9:SetNewSectionName(section)
+        u4l9:SetLocation(track + "/autoboxing.html")
+        u4l9:SetSectionName(section)
         Assignment5_1 u4l10
         u4l10:SetNewLocation(track + "/assignment5_1.html")
         u4l10:SetNewSectionName(section)
@@ -2514,29 +2557,29 @@ end
         // Setup each lesson
 
         // Write each lesson
-        Add(u1l1)
-        Add(u1l2)
+        AddStyled(u1l1)
+        AddStyled(u1l2)
         Add(u1l3)
         Add(u1l4)
         Add(u1l5)
-        Add(u1l6)
-        Add(u1l7)
+        AddStyled(u1l6)
+        AddStyled(u1l7)
         Add(u1l8)
-        Add(u1l9)
+        AddStyled(u1l9)
         Add(u1l10)
         Add(u1l11)
         Add(u1l12)
 
-        Add(u2l1)
+        AddStyled(u2l1)
         Add(u2l2)
-        Add(u2l3)
+        AddStyled(u2l3)
         Add(u2l4)
         Add(u2l5)
         Add(u2l6)
         Add(u2l7)
         Add(u2l8)
 
-        Add(u3l1)
+        AddStyled(u3l1)
         Add(u3l2)
         Add(u3l3)
         Add(u3l4)
@@ -2546,15 +2589,15 @@ end
         Add(u3l8)
         Add(u3l9)
 
-        Add(u4l1)
+        AddStyled(u4l1)
         Add(u4l2)
         Add(u4l3)
         Add(u4l4)
         Add(u4l5)
-        Add(u4l6)
-        Add(u4l7)
+        AddStyled(u4l6)
+        AddStyled(u4l7)
         Add(u4l8)
-        Add(u4l9)
+        AddStyled(u4l9)
         Add(u4l10)
         Add(u4l11)
         Add(u4l12)
@@ -2984,11 +3027,6 @@ end
         PageSeries developmentSeries = Series("tutorials-development")
         Add(developmentSeries, development)
 
-        // A bug, kept for now so the site comes out the same: Back on
-        // development goes to teams, though teams has no Next, so its
-        // sidebar starts with the teams lessons. To fix, remove this line.
-        development:SetPreviousLesson(teams)
-
         PageSeries userInterfaces = Series("tutorials-user-interfaces")
         Add(userInterfaces, userInterfacesOverview)
         Add(userInterfaces, userInterfacesBehavior)
@@ -3222,25 +3260,23 @@ end
         AddStyled(sceneTerrainGenerate)
         AddStyled(terrainGames)
 
-        Add(gettingStarted)
-        Add(types)
-        Add(hotkeys)
-        Add(ops)
-        Add(casting)
-        Add(comments)
-        Add(repetition)
-        Add(conditionals)
-        Add(actions)
-        Add(classes)
-        Add(inheritance)
-        Add(generics)
-        Add(autobox)
-        Add(errors)
-
-        Add(libraries)
-        Add(arrays)
-        Add(containers)
-
+        AddStyled(gettingStarted)
+        AddStyled(types)
+        AddStyled(hotkeys)
+        AddStyled(ops)
+        AddStyled(casting)
+        AddStyled(comments)
+        AddStyled(repetition)
+        AddStyled(conditionals)
+        AddStyled(actions)
+        AddStyled(classes)
+        AddStyled(inheritance)
+        AddStyled(generics)
+        AddStyled(autobox)
+        AddStyled(errors)
+        AddStyled(libraries)
+        AddStyled(arrays)
+        AddStyled(containers)
         Add(gamesStarted)
         Add(gamesDrawing2D)
         Add(gamesDrawing2DImages)
@@ -3289,13 +3325,12 @@ end
         Add(mobileAndroidVibrationTutorial)
 
         Add(sound)
-        Add(plugins)
-        Add(codingGuidelines)
+        AddStyled(plugins)
+        AddStyled(codingGuidelines)
         Add(teams)
-        Add(development)
+        AddStyled(development)
         Add(mobileAppleTutorial)
-        Add(embed)
-
+        AddStyled(embed)
         Add(userInterfacesOverview)
         Add(userInterfacesBehavior)
         Add(userInterfacesButton)

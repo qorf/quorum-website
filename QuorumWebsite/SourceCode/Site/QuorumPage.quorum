@@ -58,6 +58,17 @@ class QuorumPage is WebPage
     // The name links and lists use for this page, if not its title.
     text shortTitle = ""
 
+    // For the series and track pages: the name of the part of the site the
+    // page belongs to, and its picture there.
+    text sectionName = ""
+    text cardImage = ""
+
+    // Until every old Lesson is converted (plan 13, phase 7): this page's
+    // neighbors in its home series, so an old page beside it can walk
+    // through it for its lesson index and its "Next Tutorial".
+    WebPage previousOldPage = undefined
+    WebPage nextOldPage = undefined
+
     // The grid ProblemSets started, for ProblemSet, and how many sets it
     // has so far (each card is labelled "Set 1", "Set 2", ...).
     Division problemSetGrid = undefined
@@ -199,6 +210,64 @@ class QuorumPage is WebPage
             return shortTitle
         end
         return parent:WebPage:GetTitleText()
+    end
+
+    /*
+        Sets the name of the part of the site this page belongs to, such as
+        "Quorum Basics" or "Types and Variables". A series that starts with
+        this page takes it as its name.
+
+        Attribute: Parameter value The name.
+    */
+    action SetSectionName(text value)
+        sectionName = value
+    end
+
+    /*
+        Returns the name set with SetSectionName, or nothing.
+
+        Attribute: Returns The name.
+    */
+    action GetSectionName returns text
+        return sectionName
+    end
+
+    /*
+        Sets the picture that stands for this page where pages are shown as
+        cards, from the site's top, such as "/media/basics/actions.png". A
+        series that starts with this page takes it as its picture.
+
+        Attribute: Parameter location The picture's location.
+    */
+    action SetCardImage(text location)
+        cardImage = location
+    end
+
+    /*
+        Returns the picture set with SetCardImage, or nothing.
+
+        Attribute: Returns The picture's location.
+    */
+    action GetCardImage returns text
+        return cardImage
+    end
+
+    // Until every old Lesson is converted (plan 13, phase 7): the page
+    // before and after this one in its home series, for the old pages.
+    action SetPreviousOldPage(WebPage page)
+        previousOldPage = page
+    end
+
+    action GetPreviousOldPage returns WebPage
+        return previousOldPage
+    end
+
+    action SetNextOldPage(WebPage page)
+        nextOldPage = page
+    end
+
+    action GetNextOldPage returns WebPage
+        return nextOldPage
     end
 
     /*
@@ -360,10 +429,12 @@ class QuorumPage is WebPage
     /*
         Adds a live code editor, where readers can change code and run it,
         with code from a file in the site's relative folder. The editor's
-        script is added to the page once.
+        script is added to the page once. It returns the editor, so a page
+        can hide its display and keep only its output, with HideDisplay.
 
         Attribute: Parameter editorTitle The editor's title.
         Attribute: Parameter location The code's location inside the relative folder.
+        Attribute: Returns The editor.
 
         Attribute: Example
         class MyLesson is QuorumPage
@@ -373,18 +444,58 @@ class QuorumPage is WebPage
             end
         end
     */
-    action CodeEditor(text editorTitle, text location)
+    action CodeEditor(text editorTitle, text location) returns IDE
         if not GetWebSite():GetRelativeFile(location):Exists()
             alert("There's no code for the editor at " + location + ".")
         end
+        CodeForIDE code
+        // The code is read from the file and put in the page.
+        code:AddFileUrl(EDITOR_FILE_NAME, GetWebSite():GetRelativeFile(location):GetPath())
+        return AddEditor(editorTitle, code)
+    end
+
+    /*
+        Adds a live code editor that starts with the code given, in a file
+        named Main.quorum. Returns the editor, as CodeEditor does.
+
+        Attribute: Parameter editorTitle The editor's title.
+        Attribute: Parameter code The code the editor starts with.
+        Attribute: Returns The editor.
+
+        Attribute: Example
+        class MyLesson is QuorumPage
+            action Setup
+                Section("Try it")
+                CodeEditorWithCode("Activity: Try actions", "//Try creating a Main action"):HideDisplay()
+            end
+        end
+    */
+    action CodeEditorWithCode(text editorTitle, text code) returns IDE
+        return CodeEditorWithCode(editorTitle, EDITOR_FILE_NAME, code)
+    end
+
+    /*
+        Adds a live code editor that starts with the code given, in a file
+        with the name given. Returns the editor, as CodeEditor does.
+
+        Attribute: Parameter editorTitle The editor's title.
+        Attribute: Parameter fileName The file's name, such as "Histogram.quorum".
+        Attribute: Parameter code The code the editor starts with.
+        Attribute: Returns The editor.
+    */
+    action CodeEditorWithCode(text editorTitle, text fileName, text code) returns IDE
+        CodeForIDE files
+        files:AddFileText(fileName, code)
+        return AddEditor(editorTitle, files)
+    end
+
+    // An editor with its files, its script added to the page once.
+    private action AddEditor(text editorTitle, CodeForIDE code) returns IDE
         if not editorScriptAdded
             AddScript(locations:FromSiteTop(EDITOR_SCRIPT_START + versions:GetWidgetVersion() + SCRIPT_ENDING))
             editorScriptAdded = true
         end
         editorCount = editorCount + 1
-        CodeForIDE code
-        // The code is read from the file and put in the page.
-        code:AddFileUrl(EDITOR_FILE_NAME, GetWebSite():GetRelativeFile(location):GetPath())
         IDE editor
         editor:Init()
         editor:SetIdentifier(EDITOR_IDENTIFIER_START + editorCount)
@@ -392,6 +503,7 @@ class QuorumPage is WebPage
         editor:SetCodeForIDE(code:GetJsonArray())
         editor:SetIdeTitle(escaper:Escape(editorTitle))
         Include(editor)
+        return editor
     end
 
     /*

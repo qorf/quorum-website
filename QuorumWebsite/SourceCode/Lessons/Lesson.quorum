@@ -12,8 +12,10 @@ class Lesson is WebPage
     text cr = ""
     cr = cr:GetCarriageReturn()
     Preformatter preformatter //helper
-    Lesson nextLesson = undefined
-    Lesson prevLesson = undefined
+    // The pages before and after this one in its series: old lessons, or
+    // pages already converted to QuorumPage (plan 13).
+    WebPage nextPage = undefined
+    WebPage previousPage = undefined
     VersionHelper versions
     text scriptsLocation = "/script/"
     boolean IdeScriptSet = false
@@ -89,29 +91,98 @@ class Lesson is WebPage
         return value
     end
 
+    // The next page if it is an old lesson, or undefined.
     action GetNextLesson returns Lesson
-        return nextLesson
+        if nextPage not= undefined and nextPage is Lesson
+            return cast(Lesson, nextPage)
+        end
+        return undefined
     end
 
     action SetNextLesson(Lesson next)
-        nextLesson = next
-        if nextLesson not= undefined
-            nextLesson:SetPreviousLesson(me)
+        nextPage = next
+        if next not= undefined
+            next:SetPreviousLesson(me)
         end
     end
 
+    // The previous page if it is an old lesson, or undefined.
     action GetPreviousLesson returns Lesson
-        return prevLesson
+        if previousPage not= undefined and previousPage is Lesson
+            return cast(Lesson, previousPage)
+        end
+        return undefined
     end
 
     action SetPreviousLesson(Lesson prev)
-        prevLesson = prev
+        previousPage = prev
     end
 
     // Sets the next lesson without making this one its previous lesson,
     // for a series ending in a lesson whose home is another series.
     action SetNextInSeries(Lesson next)
-        nextLesson = next
+        nextPage = next
+    end
+
+    // The next and previous pages, old or converted (plan 13). A converted
+    // page is set with these; the builder links the series either way.
+    action GetNextPage returns WebPage
+        return nextPage
+    end
+
+    action SetNextPage(WebPage next)
+        nextPage = next
+    end
+
+    action GetPreviousPage returns WebPage
+        return previousPage
+    end
+
+    action SetPreviousPage(WebPage previous)
+        previousPage = previous
+    end
+
+    // The page before or after another in its series, whether it is an old
+    // lesson or a converted page, so the index walks through both.
+    private action PageBefore(WebPage page) returns WebPage
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            return lesson:GetPreviousPage()
+        elseif page is QuorumPage
+            QuorumPage converted = cast(QuorumPage, page)
+            return converted:GetPreviousOldPage()
+        end
+        return undefined
+    end
+
+    private action PageAfter(WebPage page) returns WebPage
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            return lesson:GetNextPage()
+        elseif page is QuorumPage
+            QuorumPage converted = cast(QuorumPage, page)
+            return converted:GetNextOldPage()
+        end
+        return undefined
+    end
+
+    // How "Next Tutorial" names the next page and says what it describes:
+    // an old lesson's own name and short description, or a converted
+    // page's title and summary (plan 13, decision D8).
+    private action NextPageName(WebPage page) returns text
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            return lesson:GetName()
+        end
+        return page:GetTitleText()
+    end
+
+    private action NextPageDescription(WebPage page) returns text
+        if page is Lesson
+            Lesson lesson = cast(Lesson, page)
+            return lesson:GetShortDescription()
+        end
+        return page:GetSummary()
     end
 
     // A lesson's title and description as a series lists it: its link name
@@ -124,16 +195,16 @@ class Lesson is WebPage
         return GetShortDescription()
     end
 
-    action CreateLinkedArrays() returns Array<Lesson>
+    action CreateLinkedArrays() returns Array<WebPage>
         // Initialize the arrays if not already done
-        Array<Lesson> chronologicalLinks
+        Array<WebPage> chronologicalLinks
     
         // Collect links of all previous lessons
-        Lesson prevLesson = GetPreviousLesson()
-        Array<Lesson> pastLessons
+        WebPage prevLesson = GetPreviousPage()
+        Array<WebPage> pastLessons
         repeat while prevLesson not= undefined
             pastLessons:Add(prevLesson)
-            prevLesson = prevLesson:GetPreviousLesson()
+            prevLesson = PageBefore(prevLesson)
         end
         
         // Since we collected the previous lessons in reverse order, we need to reverse the array
@@ -149,10 +220,10 @@ class Lesson is WebPage
         chronologicalLinks:Add(me)
         
         // Add all next lessons in order
-        Lesson nextLesson = GetNextLesson()
+        WebPage nextLesson = GetNextPage()
         repeat while nextLesson not= undefined
             chronologicalLinks:Add(nextLesson)
-            nextLesson = nextLesson:GetNextLesson()
+            nextLesson = PageAfter(nextLesson)
         end
     
         // Return the single array with all lessons in chronological order
@@ -326,7 +397,7 @@ class Lesson is WebPage
 end
 
     action CreateHeadingTableOfContents returns Division
-        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Array<WebPage> lessonArray = CreateLinkedArrays()
         Division div
         div:SetIdentifier("onPageTableOfContentsScrolling")
         div:AddClassAttribute("h-toc overflow-auto")
@@ -491,7 +562,7 @@ end
     end
 
     action CreateTableOfContents returns Division
-        Array<Lesson> lessonArray = CreateLinkedArrays()
+        Array<WebPage> lessonArray = CreateLinkedArrays()
         Division div
         div:AddClassAttribute("h-toc overflow-auto")
         Division innerDiv
@@ -502,7 +573,7 @@ end
         ul:AddClassAttribute("space-y-2")
         integer i = 0
         repeat while i < lessonArray:GetSize()
-            Lesson LessonIndex = lessonArray:Get(i)
+            WebPage LessonIndex = lessonArray:Get(i)
             
             ListItem li
             li:AddClassAttribute("w-full rounded-xl hover:bg-quorum-blue-25")
@@ -510,7 +581,7 @@ end
             Link lessonLink
             lessonLink:AddClassAttribute("block w-full py-1 px-2 capitalize")
             lessonLink:SetAddress("/" + LessonIndex:GetLocation())
-            lessonLink:AddText(LessonIndex:GetLinkName())
+            lessonLink:AddText(LessonIndex:GetTitleText())
             
             if IsLocation(LessonIndex:GetLocation())
                 lessonLink:AddClassAttribute("bg-quorum-blue-50 font-bold rounded-xl")
@@ -1205,22 +1276,22 @@ cell:AddClassAttribute("text-left py-3 px-4 break-words")
 
     action WriteNextTutorial(Division div)
         // Link to the next tutorial
-        Lesson lesson = GetNextLesson()
+        WebPage lesson = GetNextPage()
         if lesson not= undefined
             div:AddHeading("Next Tutorial", 2)
             Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-            Link nextLink = next:AddLink(lesson:GetName(), "/" + lesson:GetLocation())
+            Link nextLink = next:AddLink(NextPageName(lesson), "/" + lesson:GetLocation())
             
-            next:AddText(", which describes " + lesson:GetShortDescription() + ".")
+            next:AddText(", which describes " + NextPageDescription(lesson) + ".")
         end
     end
 
       action WriteNextTutorial(Section div)
         // Link to the next tutorial
         div:SetClassAttribute("flex flex-col gap-y-2")
-        if GetPreviousLesson() not= undefined or GetNextLesson() not= undefined 
+        if GetPreviousPage() not= undefined or GetNextPage() not= undefined 
             text HeaderText = ""
-            if GetNextLesson() not= undefined
+            if GetNextPage() not= undefined
                 HeaderText = "Next Tutorial"
             else
                 HeaderText = "End of Lesson"
@@ -1229,27 +1300,27 @@ cell:AddClassAttribute("text-left py-3 px-4 break-words")
             nextTutorial:AddAttribute("data-text", HeaderText)
             AddToHeadingArray(nextTutorial)
             nextTutorial:AddClassAttribute("text-2xl font-bold")
-            if GetNextLesson() not= undefined
+            if GetNextPage() not= undefined
               Paragraph next = div:AddParagraph("In the next tutorial, we will discuss ")
-              next:AddLink(GetNextLesson():GetName(), "/" + GetNextLesson():GetLocation()):AddClassAttribute("underline text-quorum-blue-150")
-              next:AddText(", which describes " + GetNextLesson():GetShortDescription() + ".")
+              next:AddLink(NextPageName(GetNextPage()), "/" + GetNextPage():GetLocation()):AddClassAttribute("underline text-quorum-blue-150")
+              next:AddText(", which describes " + NextPageDescription(GetNextPage()) + ".")
             else
               Paragraph backToReference = div:AddParagraph("You have reached the end of the lesson for " + GetSectionName() + ". To view more tutorials, press the button below or you can go back to the previous lesson pages.")
             end
             Division button_div
             button_div:AddClassAttribute("flex flex-col md:flex-row justify-end")
-            if GetPreviousLesson() not= undefined
+            if GetPreviousPage() not= undefined
                 Link previousLesson
                 previousLesson:AddClassAttribute("py-2 px-5 bg-neutral-grey-25 font-bold captitalize rounded-2xl")
-                previousLesson:SetAddress("/" + GetPreviousLesson():GetLocation())
+                previousLesson:SetAddress("/" + GetPreviousPage():GetLocation())
                 previousLesson:AddText("Go Back")
                 button_div:Add(previousLesson)
             end
             
-            if GetNextLesson() not= undefined
+            if GetNextPage() not= undefined
                 Link nextLesson
                 nextLesson:AddClassAttribute("py-2 px-10 w-fit bg-quorum-blue-100 ml-4 font-bold captitalize rounded-2xl")
-                nextLesson:SetAddress("/" + GetNextLesson():GetLocation())
+                nextLesson:SetAddress("/" + GetNextPage():GetLocation())
                 nextLesson:AddText("Next Tutorial")
                 button_div:Add(nextLesson)
             else
