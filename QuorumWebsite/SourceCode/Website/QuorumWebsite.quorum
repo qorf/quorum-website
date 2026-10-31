@@ -8,6 +8,19 @@ use Libraries.Web.VersionHelper
 use Libraries.Web.QuorumSite
 use Libraries.Web.Page.WebPage
 use Libraries.Web.Series.PageSeries
+use Libraries.Database.Server.Login
+use Libraries.Database.Server.Logout
+use Libraries.Database.Server.SessionValid
+use Libraries.Database.Server.ChangePrivacy
+use Libraries.Database.Server.Search
+use Libraries.Database.Server.ProjectSave
+use Libraries.Database.Server.LoadProjectFile
+use Libraries.Database.Server.LoadProjectSelect
+use Libraries.Database.Server.Register
+use Libraries.Database.Server.RequestPasswordReset
+use Libraries.Database.Server.ConfirmResetPassword
+use Libraries.Database.Server.Fastrun
+use Libraries.Database.Server.Delete
 
 /*
     The whole Quorum website: every page, in one place. WebsiteMain writes
@@ -57,6 +70,7 @@ class QuorumWebsite
             text location = locations:Next()
             site:AddPlainPage(oldPages:GetValue(location), location)
         end
+        ServerResponders()
         site:SetFolder(SITE_FOLDER)
         site:Write()
         output "Website finished."
@@ -69,8 +83,61 @@ class QuorumWebsite
         output "Sitemap created"
     end
 
+    /*
+        Answers requests on a port until the server is stopped: the
+        responders below, and the site's pages. Write the site first.
+    */
+    action Serve(integer port)
+        output "Listening ..."
+        site:Serve(port)
+    end
+
     action GetSite returns QuorumSite
         return site
+    end
+
+    // What answers requests while people use the site: signing in, saving
+    // and running projects, resetting passwords. Served, never written.
+    private action ServerResponders
+        Login login
+        Logout logout
+        Analytics analytics
+        SessionValid session
+        ChangePrivacy changePrivacy
+        Search search
+        ProjectSave projectSave
+        ProjectRun projectRun
+        Delete delete
+        LoadProjectFile loadProjectFile
+        LoadProjectSelect loadProjectSelect
+        Profile profile
+        Project project
+        BlocksProject blocksProject
+        Register register
+        RequestPasswordReset requestReset
+        ResetPasswordResponsePage resetPassword
+        ConfirmResetPassword confirmPassword
+        Fastrun fastrun
+
+        site:AddResponder(login)
+        site:AddResponder(logout)
+        site:AddResponder(analytics)
+        site:AddResponder(session)
+        site:AddResponder(changePrivacy)
+        site:AddResponder(search)
+        site:AddResponder(projectSave)
+        site:AddResponder(projectRun)
+        site:AddResponder(delete)
+        site:AddResponder(loadProjectFile)
+        site:AddResponder(loadProjectSelect)
+        site:AddResponder(profile)
+        site:AddResponder(project)
+        site:AddResponder(blocksProject)
+        site:AddResponder(register)
+        site:AddResponder(requestReset)
+        site:AddResponder(resetPassword)
+        site:AddResponder(confirmPassword)
+        site:AddResponder(fastrun)
     end
 
     // The site's main pages, and the track pages listing the lessons

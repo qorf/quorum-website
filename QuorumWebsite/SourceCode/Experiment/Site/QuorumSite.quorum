@@ -4,6 +4,8 @@ use Libraries.Containers.Array
 use Libraries.Containers.HashTable
 use Libraries.Containers.Iterator
 use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Network.NetworkExchange
+use Libraries.System.DateTime
 use Libraries.Web.WebSite
 use Libraries.Web.Page.WebTag
 use Libraries.Web.Page.RichText
@@ -199,6 +201,41 @@ class QuorumSite is WebSite
     */
     action AddStandardsReport(StandardSet set)
         reportedSets:Add(set)
+    end
+
+    /*
+        Answers a request as WebSite does, and logs it to the console: its
+        path, who asked, when, and how long it took. If answering fails,
+        it logs the stack trace and answers with an error (500), so one
+        failed request doesn't stop the server.
+    */
+    action ResponseReceived(NetworkExchange exchange)
+        DateTime time
+        number start = time:GetEpochTime()
+        text path = exchange:GetPath()
+
+        check
+            parent:WebSite:ResponseReceived(exchange)
+
+            number stop = time:GetEpochTime()
+            output exchange:GetPath() + ": " + exchange:GetHost() + ": " + time:GetYear() + "-" + time:GetMonth() + "-" + time:GetDayOfMonth() + " " +
+                time:GetHour() + ":" + time:GetMinute() + ":" + time:GetSecond() + ", " + (stop - start)
+            output "END"
+            output ""
+        detect e
+            output "------------ ERROR ------------"
+            output "Path: " + path
+            output "Stack Trace"
+            output e:GetStackTraceMessage()
+            output ""
+            output "Status"
+            output exchange:GetPath() + ": " + exchange:GetHost() + ": " + time:GetYear() + "-" + time:GetMonth() + "-" + time:GetDayOfMonth() + " " +
+                time:GetHour() + ":" + time:GetMinute() + ":" + time:GetSecond()
+            output "------------ ERROR ------------"
+            text response = "The server encountered a fatal error and could not fulfill the request"
+            exchange:SendResponseHeaders(500, response)
+            exchange:SendResponse(response)
+        end
     end
 
     /*
