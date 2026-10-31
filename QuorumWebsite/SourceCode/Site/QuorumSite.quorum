@@ -65,6 +65,10 @@ class QuorumSite is WebSite
     Array<StandardSet> reportedSets
     WebTextEscaper escaper
 
+    // Pages whose "On this page" goes in the left column (see
+    // SetOnThisPageOnLeft).
+    HashTable<WebPage, boolean> onThisPageOnLeft
+
     // Structured data, in the shared schema.org vocabulary.
     constant text SCHEMA_CONTEXT = "https://schema.org"
     constant text STRUCTURED_DATA_TYPE = "application/ld+json"
@@ -201,6 +205,18 @@ class QuorumSite is WebSite
     */
     action AddStandardsReport(StandardSet set)
         reportedSets:Add(set)
+    end
+
+    /*
+        Puts a page's "On this page" in the left column, where a course's
+        lessons would go, instead of the right. For a page in no course
+        whose contents are its main way around, such as the release
+        notes, listed by year.
+
+        Attribute: Parameter page A page on the site, in no course.
+    */
+    action SetOnThisPageOnLeft(WebPage page)
+        onThisPageOnLeft:Set(page, true)
     end
 
     /*
@@ -756,7 +772,12 @@ class QuorumSite is WebSite
         page:SetLayout(content, frame:GetContent())
         page:SetStyle(content, frame:GetContentBox())
         page:SetStyleFromWidth(content, constants:SMALL_SCREEN_WIDTH, frame:GetContentSmall())
-        page:SetStyleFromWidth(content, constants:MEDIUM_SCREEN_WIDTH, frame:GetContentMedium())
+        // A page whose "On this page" is on the left has no right column,
+        // so its text keeps the wider width on wide screens too.
+        boolean onLeft = onThisPageOnLeft:HasKey(page)
+        if not onLeft
+            page:SetStyleFromWidth(content, constants:MEDIUM_SCREEN_WIDTH, frame:GetContentMedium())
+        end
         page:MoveContentInto(content)
 
         Division courseContents
@@ -773,14 +794,20 @@ class QuorumSite is WebSite
         Division onThisPage
         page:SetStyle(onThisPage, frame:GetSideColumn())
         page:SetStyleFromWidth(onThisPage, constants:MEDIUM_SCREEN_WIDTH, frame:GetOnThisPageColumnMedium())
-        onThisPage:AddNestedTag(GetOnThisPage(page))
+        if onLeft
+            courseContents:AddNestedTag(GetOnThisPage(page))
+        else
+            onThisPage:AddNestedTag(GetOnThisPage(page))
+        end
 
         Division columns
         columns:SetIdentifier(COLUMNS_IDENTIFIER)
         page:SetLayout(columns, frame:GetColumns())
         columns:AddNestedTag(courseContents)
         columns:AddNestedTag(content)
-        columns:AddNestedTag(onThisPage)
+        if not onLeft
+            columns:AddNestedTag(onThisPage)
+        end
 
         MainContent main
         main:AddAttribute(ROLE_ATTRIBUTE, MAIN_ROLE)
