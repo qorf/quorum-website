@@ -1,0 +1,286 @@
+package Libraries.Web
+
+use Libraries.Containers.Array
+use Libraries.Containers.HashTable
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Web.WebLocations
+use Libraries.Web.WebTextEscaper
+use Libraries.Web.Page.WebPage
+use Libraries.Web.Page.WebTag
+use Libraries.Web.Page.Division
+use Libraries.Web.Page.Paragraph
+use Libraries.Web.Page.Link
+use Libraries.Web.Page.Standards.Standard
+use Libraries.Web.Page.Standards.StandardSet
+use Libraries.Web.Page.Standards.StandardsTracker
+use Libraries.Web.Page.Standards.StandardsReport
+use Libraries.Web.Page.Standards.StandardsListEntry
+use Libraries.Web.Series.CourseOverview
+use Libraries.Web.Series.PageSeries
+use Libraries.Web.Quorum.QuorumSite
+use Libraries.Web.Quorum.QuorumSiteOptions
+
+/*
+    QuorumWebsiteSite is the Quorum website: QuorumSite's frame and course
+    navigation (in the standard library), with what only the website
+    needs. Once every page is set up, it fills in the pages' standards
+    lists and builds a report page for each set of standards it is asked
+    to report on, so each report has a permanent address to share. Each
+    course gets an overview page, unless the site has a page there. It
+    describes each lesson (every page that covers a standard) to search
+    engines (structured data).
+
+    Attribute: Example
+    QuorumSiteOptions options
+    QuorumStandards standards
+    QuorumWebsiteSite site
+    site:SetFolder("html")
+    site:SetStyleOptions(options)
+    site:AddStandardsReport(standards:GetComputerScience2026())
+*/
+class QuorumWebsiteSite is QuorumSite
+    // A parent's fields and constants aren't visible here, so what these
+    // actions share is named again. Shared classes: still one copy.
+    QuorumSiteOptions quorumOptions
+    WebTextEscaper escaper
+    WebLocations locations
+
+    // The one tracker for every page on the site (a shared class).
+    StandardsTracker tracker
+
+    // The sets of standards to write report pages for.
+    Array<StandardSet> reportedSets
+
+    // Structured data, in the shared schema.org vocabulary.
+    constant text SCHEMA_CONTEXT = "https://schema.org"
+    constant text LEARNING_RESOURCE = "LearningResource"
+    constant text LESSON = "Lesson"
+    constant text ALIGNMENT = "AlignmentObject"
+    constant text TEACHES = "teaches"
+    constant text LANGUAGE = "en"
+    constant text FORWARD_MARK = " ›"
+    constant text FOR_TEACHERS = "For teachers · "
+    constant text SPECIALTIES = "Specialties"
+    constant text EVERY_STANDARD = "Every standard, and the lessons that cover it"
+    constant text DETAILS_SEPARATOR = " · "
+    constant text ONLY_THIS_LESSON = "Only this lesson so far"
+    constant text ALSO_IN = "Also in "
+    constant text OTHER_LESSON = " other lesson"
+    constant text OTHER_LESSONS = " other lessons"
+
+    /*
+        Fills in the pages' standards lists, builds a report page for each
+        set of standards asked for, and an overview page for every course
+        whose overview location has no page yet (QuorumSite calls this
+        before adding the course navigation and the frame).
+    */
+    action FinishSitePages
+        FillStandardsLists()
+        integer i = 0
+        repeat while i < reportedSets:GetSize()
+            StandardSet set = reportedSets:Get(i)
+            StandardsReport report
+            report:SetLocation(set:GetReportLocation())
+            report:SetStyleOptions(GetStyleOptions())
+            report:SetLooks(quorumOptions:GetStandardsReport())
+            report:SetOtherGroupsLabel(SPECIALTIES)
+            AddPage(report)
+            report:Build(set, tracker)
+            i = i + 1
+        end
+
+        // An overview page for every course, unless the site already has a
+        // page there (a track page written for the course).
+        Array<PageSeries> courses = GetSeriesList()
+        i = 0
+        repeat while i < courses:GetSize()
+            PageSeries course = courses:Get(i)
+            text overviewLocation = course:GetOverviewLocation()
+            if not overviewLocation:IsEmpty() and GetPage(overviewLocation) = undefined
+                CourseOverview overview
+                overview:SetLocation(course:GetOverviewLocation())
+                overview:SetStyleOptions(GetStyleOptions())
+                AddPage(overview)
+                overview:Build(course, tracker, me)
+                if not GetAddress():IsEmpty()
+                    AddCourseData(overview, course)
+                end
+            end
+            i = i + 1
+        end
+    end
+
+    /*
+        Describes a lesson (a page that covers a standard) to search
+        engines (QuorumSite calls this for each page).
+    */
+    action FinishSitePage(WebPage page, Array<PageSeries> pageCourses)
+        if tracker:GetRecorded(page):GetSize() > 0
+            AddStructuredData(page, pageCourses)
+        end
+    end
+
+    /*
+        Fills in every page's standards list (design 2): a label naming
+        the set, a grid of cards, one for each standard the page covers,
+        and a link to the set's report. Each card links its standard to
+        its place on the report.
+    */
+    private action FillStandardsLists
+        Array<StandardsListEntry> lists = tracker:GetLists()
+        integer i = 0
+        repeat while i < lists:GetSize()
+            StandardsListEntry entry = lists:Get(i)
+            WebPage page = entry:GetPage()
+            StandardSet set = entry:GetSet()
+            WebTag container = entry:GetList()
+            text reportAddress = locations:FromSiteTop(set:GetReportLocation())
+
+            Paragraph label
+            page:SetStyle(label, quorumOptions:GetStandardsLabel())
+            label:AddText(escaper:Escape(FOR_TEACHERS + set:GetName()))
+            container:AddNestedTag(label)
+
+            Division cards
+            page:SetLayout(cards, quorumOptions:GetStandardsGrid())
+            container:AddNestedTag(cards)
+            Array<Standard> covered = tracker:GetStandardsOn(page, set)
+            integer j = 0
+            repeat while j < covered:GetSize()
+                cards:AddNestedTag(GetStandardCard(page, covered:Get(j), reportAddress))
+                j = j + 1
+            end
+
+            Paragraph every
+            Link everyLink = GetLink(page, EVERY_STANDARD, reportAddress, quorumOptions:GetStandardsLink())
+            everyLink:AddNestedTag(GetMark(FORWARD_MARK))
+            every:AddNestedTag(everyLink)
+            container:AddNestedTag(every)
+            i = i + 1
+        end
+    end
+
+
+    // One standard's card: its identifier, linked to its place on the
+    // report; its level and concept; its words; and how many other
+    // lessons cover it.
+    private action GetStandardCard(WebPage page, Standard standard, text reportAddress) returns Division
+        Division card
+        page:SetStyle(card, quorumOptions:GetStandardCard())
+
+        Paragraph code
+        code:AddNestedTag(GetLink(page, standard:GetIdentifier(), reportAddress + "#" + standard:GetIdentifier(), quorumOptions:GetStandardCode()))
+        card:AddNestedTag(code)
+
+        Paragraph details
+        page:SetStyle(details, quorumOptions:GetStandardDetails())
+        details:AddText(escaper:Escape(standard:GetLevel() + DETAILS_SEPARATOR + standard:GetConcept()))
+        card:AddNestedTag(details)
+
+        Paragraph words
+        page:SetStyle(words, quorumOptions:GetStandardWords())
+        words:AddText(escaper:Escape(standard:GetText()))
+        card:AddNestedTag(words)
+
+        integer others = tracker:GetPagesFor(standard):GetSize() - 1
+        Paragraph coverage
+        page:SetStyle(coverage, quorumOptions:GetStandardDetails())
+        if others <= 0
+            coverage:AddText(ONLY_THIS_LESSON)
+        elseif others = 1
+            coverage:AddText(ALSO_IN + others + OTHER_LESSON)
+        else
+            coverage:AddText(ALSO_IN + others + OTHER_LESSONS)
+        end
+        card:AddNestedTag(coverage)
+        return card
+    end
+
+    /*
+        Adds structured data to a lesson's head: a schema.org
+        LearningResource with its title, summary, address, language and
+        level, and an alignment for each standard it covers, linked to the
+        standard's report. Search engines and other tools read it; people
+        don't see it.
+    */
+    private action AddStructuredData(WebPage page, Array<PageSeries> pageCourses)
+        Array<Standard> recorded = tracker:GetRecorded(page)
+
+        JavaScriptObjectNotation lesson
+        lesson:SetObject()
+        lesson:Add("@context", SCHEMA_CONTEXT)
+        lesson:Add("@type", LEARNING_RESOURCE)
+        lesson:Add("learningResourceType", LESSON)
+        lesson:Add("name", escaper:EscapeForScript(page:GetTitleText()))
+        text pageDescription = page:GetDescription()
+        if not pageDescription:IsEmpty()
+            lesson:Add("description", escaper:EscapeForScript(pageDescription))
+        end
+        if not GetAddress():IsEmpty()
+            lesson:Add("url", escaper:EscapeForScript(GetPublicAddress(page:GetLocation())))
+        end
+        lesson:Add("inLanguage", LANGUAGE)
+        lesson:Add("isAccessibleForFree", true)
+
+        // The level comes from the first standard the lesson covers.
+        lesson:Add("educationalLevel", escaper:EscapeForScript(recorded:Get(0):GetLevel()))
+
+        JavaScriptObjectNotation alignments
+        alignments:SetArray()
+        HashTable<text, boolean> seen
+        integer i = 0
+        repeat while i < recorded:GetSize()
+            Standard standard = recorded:Get(i)
+            StandardSet set = standard:GetSet()
+            text key = set:GetName() + " " + standard:GetIdentifier()
+            if not seen:HasKey(key)
+                seen:Set(key, true)
+                JavaScriptObjectNotation alignment
+                alignment:SetObject()
+                alignment:Add("@type", ALIGNMENT)
+                alignment:Add("alignmentType", TEACHES)
+                alignment:Add("educationalFramework", escaper:EscapeForScript(set:GetName()))
+                alignment:Add("targetName", escaper:EscapeForScript(standard:GetIdentifier()))
+                alignment:Add("targetDescription", escaper:EscapeForScript(standard:GetText()))
+                if not GetAddress():IsEmpty() and not set:GetReportLocation():IsEmpty()
+                    alignment:Add("targetUrl", escaper:EscapeForScript(GetPublicAddress(set:GetReportLocation())))
+                end
+                alignments:Add(alignment)
+            end
+            i = i + 1
+        end
+        lesson:Add("educationalAlignment", alignments)
+
+        // The courses this lesson is part of.
+        if pageCourses:GetSize() > 0 and not GetAddress():IsEmpty()
+            JavaScriptObjectNotation partOf
+            partOf:SetArray()
+            integer c = 0
+            repeat while c < pageCourses:GetSize()
+                PageSeries course = pageCourses:Get(c)
+                JavaScriptObjectNotation courseData
+                courseData:SetObject()
+                courseData:Add("@type", "Course")
+                courseData:Add("name", escaper:EscapeForScript(course:GetName()))
+                courseData:Add("url", escaper:EscapeForScript(GetPublicAddress(course:GetOverviewLocation())))
+                partOf:Add(courseData)
+                c = c + 1
+            end
+            lesson:Add("isPartOf", partOf)
+        end
+
+        AddStructuredDataScript(page, lesson)
+    end
+
+    /*
+        Asks the site to build a report page for a set of standards: every
+        standard in the set, with the pages that cover it. It goes at the
+        set's report location, such as "standards/CSTA2026.html", and uses
+        the site's style options.
+
+        Attribute: Parameter set The set to report.
+    */
+    action AddStandardsReport(StandardSet set)
+        reportedSets:Add(set)
+    end
+end
