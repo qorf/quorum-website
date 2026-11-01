@@ -439,8 +439,7 @@ class QuorumWebsite
     end
 
     /*
-        Adds a page, an old lesson or a converted one, to the end of a
-        series. The series takes its name, description and picture from its
+        Adds a page to the end of a series. The series takes its name, description and picture from its
         first page, as the track pages show it. A page takes its Back and
         Next from its home series only, so a page that also ends another
         series (as each chapter ends the previous chapter's labs) keeps its
@@ -451,12 +450,7 @@ class QuorumWebsite
         Array<WebPage> pages = seriesLessons:GetValue(key)
         WebPage previous = undefined
         if pages:IsEmpty()
-            if page is Lesson
-                Lesson lesson = cast(Lesson, page)
-                series:SetName(lesson:GetSectionName())
-                series:SetDescription(lesson:GetMetaDescription())
-                series:SetImage(lesson:GetImageLocation())
-            elseif page is QuorumPage
+            if page is QuorumPage
                 QuorumPage converted = cast(QuorumPage, page)
                 series:SetName(converted:GetSectionName())
                 series:SetDescription(converted:GetDescription())
@@ -481,20 +475,14 @@ class QuorumWebsite
     // Links a page to the one before it in its home series, and a page to
     // the one after it, for the old pages' index and "Next Tutorial".
     private action LinkPrevious(WebPage page, WebPage previous)
-        if page is Lesson
-            Lesson lesson = cast(Lesson, page)
-            lesson:SetPreviousPage(previous)
-        elseif page is QuorumPage
+        if page is QuorumPage
             QuorumPage converted = cast(QuorumPage, page)
             converted:SetPreviousOldPage(previous)
         end
     end
 
     private action LinkNext(WebPage page, WebPage next)
-        if page is Lesson
-            Lesson lesson = cast(Lesson, page)
-            lesson:SetNextPage(next)
-        elseif page is QuorumPage
+        if page is QuorumPage
             QuorumPage converted = cast(QuorumPage, page)
             converted:SetNextOldPage(next)
         end
@@ -517,22 +505,6 @@ class QuorumWebsite
             site:PartOf(unit, name, location)
             i = i + 1
         end
-    end
-
-    // The old lessons of a series, for the track pages that still list
-    // lessons.
-    private action GetLessons(PageSeries series) returns Array<Lesson>
-        Array<Lesson> lessons
-        Array<WebPage> pages = seriesLessons:GetValue(series:GetKey())
-        integer i = 0
-        repeat while i < pages:GetSize()
-            WebPage page = pages:Get(i)
-            if page is Lesson
-                lessons:Add(cast(Lesson, page))
-            end
-            i = i + 1
-        end
-        return lessons
     end
 
     // The practice problems, read from their files: the problems page, a

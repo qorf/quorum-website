@@ -39,42 +39,42 @@ $(document).ready(function() {
 
   // sign in modal keyboard navigation
   // document.getElementById('usernameInput')?.addEventListener("keydown", function(event) {
-  //   if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+  //   if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('loginModal'))) {
   //     document.getElementById('closeSignInModal').focus();
   //     event.preventDefault();
   //   }
   // });
 
   document.getElementById('submitSignInForm')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('loginModal'))) {
       document.getElementById('closeSignInModal').focus();
       event.preventDefault();
     }
   });
 
   document.getElementById('closeSignInModal')?.addEventListener("keydown", function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('loginModal').style.display !== 'none') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('loginModal'))) {
       document.getElementById('submitSignInForm').focus();
       event.preventDefault();
     }
   });
   //forgot password modal keyboard navigation
   document.getElementById('emailForgotInput')?.addEventListener("keydown", function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('forgotPasswordModal'))) {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
 
   document.getElementById('submitForgotPasswordForm')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('forgotPasswordModal'))) {
       document.getElementById('closeForgotPasswordModal').focus();
       event.preventDefault();
     }
   });
 
   document.getElementById('closeForgotPasswordModal')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('forgotPasswordModal').style.display !== 'none') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('forgotPasswordModal'))) {
       document.getElementById('emailForgotInput').focus();
       event.preventDefault();
     }
@@ -82,21 +82,21 @@ $(document).ready(function() {
 
   //Create An Account modal keyboard navigation
   document.getElementById('userNameInput')?.addEventListener("keydown", function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('signUpModal'))) {
       document.getElementById('registerAccountLink').focus();
       event.preventDefault();
     }
   });
 
   document.getElementById('submitRegistrationForm')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('signUpModal'))) {
       document.getElementById('closeSignUpModal').focus();
       event.preventDefault();
     }
   });
 
   document.getElementById('closeSignUpModal')?.addEventListener("keydown", function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById('signUpModal').style.display !== 'none') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById('signUpModal'))) {
       document.getElementById('userNameInput').focus();
       event.preventDefault();
     }
@@ -118,7 +118,7 @@ $(document).ready(function() {
 
     modal.addEventListener('keydown', function(event) {
       if (event.key !== "Tab" && event.keyCode !== 9) return;
-      if (modal.style.display === 'none') return;
+      if (!isShown(modal)) return;
 
       const focusableEls = Array.from(modal.querySelectorAll(focusableSelector))
         .filter(el => el.offsetParent !== null);
@@ -139,7 +139,7 @@ $(document).ready(function() {
   //end login modal keyboard navigations
 
   $(".loadcancelbtn").keydown(function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'LoadModal').style.display === 'block') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById(lastModalID + 'LoadModal'))) {
       var prefix = this.dataset.prefix;
       document.getElementById(prefix + 'LoadProjectSelect').focus();
       event.preventDefault();
@@ -147,7 +147,7 @@ $(document).ready(function() {
   });
 
   $(".loadProjectSelect").keydown(function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'LoadModal').style.display === 'block') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById(lastModalID + 'LoadModal'))) {
       var prefix = this.dataset.prefix;
       document.getElementById(prefix + 'LoadProjectCancel').focus();
       event.preventDefault();
@@ -155,7 +155,7 @@ $(document).ready(function() {
   });
 
   $(".savecancelbtn").keydown(function(event) {
-    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'SaveModal').style.display === 'block') {
+    if (!event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById(lastModalID + 'SaveModal'))) {
       var prefix = this.dataset.prefix;
       document.getElementById(prefix + 'projectNameInput').focus();
       event.preventDefault();
@@ -163,7 +163,7 @@ $(document).ready(function() {
   });
 
   $(".SaveField").keydown(function(event) {
-    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'SaveModal').style.display === 'block') {
+    if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById(lastModalID + 'SaveModal'))) {
       var prefix = this.dataset.prefix;
       document.getElementById(prefix + 'SaveProjectCancel').focus();
       event.preventDefault();
@@ -224,22 +224,29 @@ trapFocus('SaveModal');
 }
 );
 
+// Whether a dialog is showing. The site hides things with its generated
+// "hidden" class or the hidden attribute; scripts never write styles
+// (plan 13: Quorum generates all CSS).
+function isShown(element) {
+  return element != null && !element.hidden && !element.classList.contains('hidden');
+}
+
 // Stores the last ID used to open a load/save modal so it can be closed easily.
 var lastModalID = "";
 
 function hideModals() {
   let loginModal = document.getElementById('loginModal');
-  if (loginModal != null && loginModal.style.display === 'block') {
+  if (isShown(loginModal)) {
     hideLoginModal();
   }
 
   var saveModal = document.getElementById(lastModalID + 'SaveModal');
-  if (saveModal != null && saveModal.style.display === 'block') {
+  if (isShown(saveModal)) {
     hideSaveModal(lastModalID);
   }
 
   var loadModal = document.getElementById(lastModalID + 'LoadModal');
-  if (loadModal != null && loadModal.style.display === 'block') {
+  if (isShown(loadModal)) {
     hideLoadModal(lastModalID);
   }
   let saveProjectModal = document.getElementById('SaveModal');
@@ -314,13 +321,11 @@ function showLoginUI() {
   $("#loginButton").text("Login");
   let liItem = document.getElementById('profileButton').parentElement
   liItem.classList.add("hidden");
-  liItem.classList.remove("block");
 }
 
 function showLogoutUI() {
   $("#loginButton").text("Logout");
   let liItem = document.getElementById('profileButton').parentElement
-  liItem.classList.add("block");
   liItem.classList.remove("hidden");
 }
 
@@ -720,8 +725,10 @@ var blockEditorTogglePalette = function() {
 var blockEditorParentDiv = null;
 var blockEditorFullscreen = function() {
   const editorDiv = document.getElementById("BlockEditor");
-  if(editorDiv.hasAttribute('style')) {
-    editorDiv.removeAttribute('style');
+  // Fullscreen is the site's generated "editor-fullscreen" look on the
+  // editor, and "page-locked" on the page so it doesn't scroll behind it.
+  if(editorDiv.classList.contains('editor-fullscreen')) {
+    editorDiv.classList.remove('editor-fullscreen');
     blockEditorParentDiv.append(editorDiv);
     const mainDiv = document.getElementById("main");
     const footerDiv = document.getElementById("footer");
@@ -739,19 +746,13 @@ var blockEditorFullscreen = function() {
     navBar.inert = false;
     skipLink.ariaHidden = false;
     skipLink.inert = false;
-    fullscreenIcon.style.display = 'block';
-    minimizeIcon.style.display = 'none';
+    fullscreenIcon.removeAttribute('hidden');
+    minimizeIcon.setAttribute('hidden', '');
     fullscreenButton.ariaLabel = 'Fullscreen';
     fullscreenLabel.innerText = 'Fullscreen'; 
-    document.body.style.overflowY = 'auto';
+    document.body.classList.remove('page-locked');
   } else {
-    editorDiv.style.position = "fixed";
-    editorDiv.style.width = "100dvw";
-    editorDiv.style.height = "100dvh";
-    editorDiv.style.margin = "0";
-    editorDiv.style.left = "0";
-    editorDiv.style.top = "0";
-    editorDiv.style.zIndex = "10";
+    editorDiv.classList.add('editor-fullscreen');
     const mainDiv = document.getElementById("main");
     const footerDiv = document.getElementById("footer");
     const navBar = document.getElementById("navbar");
@@ -769,18 +770,18 @@ var blockEditorFullscreen = function() {
     navBar.inert = true;
     skipLink.ariaHidden = true;
     skipLink.inert = true;
-    fullscreenIcon.style.display = 'none';
-    minimizeIcon.style.display = 'block';
+    fullscreenIcon.setAttribute('hidden', '');
+    minimizeIcon.removeAttribute('hidden');
     fullscreenButton.ariaLabel = 'Minimize';
     fullscreenLabel.innerText = 'Minimize';
-    document.body.style.overflowY = 'hidden';
+    document.body.classList.add('page-locked');
     document.body.append(editorDiv);
   }
 }
 
 var showBlockHelpModal = function() {
   const modal = document.getElementById("blockHelpModal");
-  modal.style.display = "block";
+  modal.hidden = false;
   modal.ariaHidden = "false";
   modal.tabIndex = 0;
   modal.focus();
@@ -804,7 +805,7 @@ var showBlockHelpModal = function() {
       event.target !== helpButton &&
       !helpButton.contains(event.target)
     ) {
-      if (modal.style.display === 'block') {
+      if (!modal.hidden) {
         hideBlockHelpModal();
       }
     }
@@ -828,7 +829,7 @@ var hideBlockHelpModal = function() {
   const helpModal = document.getElementById("blockHelpModal");
   if (!helpModal)
     return;
-  helpModal.style.display = "none";
+  helpModal.hidden = true;
   helpModal.ariaHidden = "true";
   helpModal.tabIndex = -1;
   const helpButton = document.getElementById("blockHelpButton");
@@ -845,14 +846,14 @@ var blockEditorMoreToggle = function (open = null) {
   const moreIcon = document.getElementById("moreIcon");
   const moreIconClose = document.getElementById("upArrowIcon");
   if (moreButton.ariaExpanded === "true" || open == true) {
-    moreMenu.style.display = "none";
-    moreIcon.style.display = "block";
-    moreIconClose.style.display = "none";
+    moreMenu.hidden = true;
+    moreIcon.removeAttribute('hidden');
+    moreIconClose.setAttribute('hidden', '');
     moreButton.ariaExpanded = "false";
   } else if (moreButton.ariaExpanded === "false" || open == false) {
-    moreMenu.style.display = "block";
-    moreIcon.style.display = "none";
-    moreIconClose.style.display = "block";
+    moreMenu.hidden = false;
+    moreIcon.setAttribute('hidden', '');
+    moreIconClose.removeAttribute('hidden');
     moreButton.ariaExpanded = "true";
     const firstItem = moreMenu.querySelector('button');
     firstItem?.focus();
@@ -892,12 +893,12 @@ var loginButtonPressed = function() {
 };
 
 var showLoginModal = function() {
-  document.getElementById('loginModal').style.display = 'block';
+  document.getElementById('loginModal').classList.remove('hidden');
   document.getElementById('usernameInput').focus();
 };
 
 var hideLoginModal = function() {
-  document.getElementById('loginModal').style.display = 'none';
+  document.getElementById('loginModal').classList.add('hidden');
   //login modal
   document.getElementById('usernameInput').value = "";
   document.getElementById('passwordInput').value = "";
@@ -1009,10 +1010,10 @@ var showLoadModal = function(id) {
             hideModals();
             lastModalID = id;
             document.getElementById(id + 'LoadFieldContainer').innerHTML = result;
-            document.getElementById(id + 'LoadModal').style.display = 'block';
+            document.getElementById(id + 'LoadModal').hidden = false;
             document.getElementById(id + "LoadProjectSelect").focus();
             document.getElementById(id + "LoadProjectSelect").addEventListener("keydown", function(event) {
-              if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && document.getElementById(lastModalID + 'LoadModal').style.display === 'block') {
+              if (event.shiftKey && (event.key === "Tab" || event.keyCode === 9) && isShown(document.getElementById(lastModalID + 'LoadModal'))) {
                 var prefix = this.dataset.prefix;
                 document.getElementById(prefix + 'LoadProjectCancel').focus();
                 event.preventDefault();
@@ -1037,7 +1038,7 @@ var showLoadModal = function(id) {
 
 
 var hideLoadModal = function(id) {
-  document.getElementById(id + 'LoadModal').style.display = 'none';
+  document.getElementById(id + 'LoadModal').hidden = true;
 };
 
 $('.publicCheckbox').change(function() {
@@ -1759,8 +1760,8 @@ function trapTabKey(obj, evt) {
 
 function showModal(obj) {
   jQuery('#mainPage').attr('aria-hidden', 'true'); // mark the main page as hidden
-  jQuery('#modalOverlay, #noCodeModalContent').css('display', 'block'); // insert an overlay to prevent clicking and make a visual change to indicate the main page is not available
-  jQuery(obj).css('display', 'block'); // make the modal window visible
+  jQuery('#modalOverlay, #noCodeModalContent').prop('hidden', false); // insert an overlay to prevent clicking and make a visual change to indicate the main page is not available
+  jQuery(obj).prop('hidden', false); // make the modal window visible
   jQuery(obj).attr('aria-hidden', 'false'); // mark the modal window as visible
 
   // save current focus
@@ -1778,8 +1779,8 @@ function showModal(obj) {
 
 function hideModal() {
   console.log("Hiding modal");
-  jQuery('#modalOverlay, #noCodeModal, #noCodeModalContainer, #signInModalContainer, #signUpModalContainer').css('display', 'none'); // remove the overlay in order to make the main screen available again
-  jQuery('#modal, #noCodeModalContent').css('display', 'none'); // hide the modal window
+  jQuery('#modalOverlay, #noCodeModal, #noCodeModalContainer, #signInModalContainer, #signUpModalContainer').prop('hidden', true); // remove the overlay in order to make the main screen available again
+  jQuery('#modal, #noCodeModalContent').prop('hidden', true); // hide the modal window
   jQuery('#modal, #noCodeModalContent, #noCodeModal').attr('aria-hidden', 'true'); // mark the modal window as hidden
   jQuery('#mainPage').attr('aria-hidden', 'false'); // mark the main page as visible
 
@@ -1813,7 +1814,12 @@ function successMessageOff() {
   $('#successMessage').attr("aria-hidden", "true").prop('hidden', true);
 }
 
-function feedbackMessageOn(text) {
+// The message helpers below show and hide a message box and its header and
+// words (ids id, id + "Header", id + "Text"). With no id they use the
+// sign-in dialog's; a page with messages of its own (reset password)
+// passes its ids.
+function feedbackMessageOn(text, id) {
+  id = id || 'feedbackMessage';
   console.log("Brandon Feedback message on");
   console.log(new Error().stack);
   let header = 'Info';
@@ -1827,17 +1833,19 @@ function feedbackMessageOn(text) {
   }
 
   if (header)
-    $('#feedbackMessageHeader').text(header);
+    $('#' + id + 'Header').text(header);
   if (text)
-    $('#feedbackMessageText').text(text);
-  $('#feedbackMessage').attr("aria-hidden", "false").prop('hidden', false);
+    $('#' + id + 'Text').text(text);
+  $('#' + id).attr("aria-hidden", "false").prop('hidden', false);
 }
 
-function feedbackMessageOff() {
-  $('#feedbackMessage').attr("aria-hidden", "true").prop('hidden', true);
+function feedbackMessageOff(id) {
+  id = id || 'feedbackMessage';
+  $('#' + id).attr("aria-hidden", "true").prop('hidden', true);
 }
 
-function alertMessageOn(text) {
+function alertMessageOn(text, id) {
+  id = id || 'alertMessage';
   console.log("Brandon Alert message on");
   console.log(new Error().stack);
   let header = 'Error';
@@ -1891,20 +1899,21 @@ function alertMessageOn(text) {
   }
 
   if (header)
-    $('#alertMessageHeader').text(header);
+    $('#' + id + 'Header').text(header);
   if (text)
-    $('#alertMessageText').text(text);
-  $('#alertMessage').attr("aria-hidden", "false").prop('hidden', false);
+    $('#' + id + 'Text').text(text);
+  $('#' + id).attr("aria-hidden", "false").prop('hidden', false);
 }
 
-function alertMessageOff(aMsg) {
+function alertMessageOff(aMsg, id) {
+  id = id || 'alertMessage';
   if (aMsg && aMsg.length > 0) {
-    if ($('#alertMessage').text() === aMsg) {
-      $('#alertMessage').attr("aria-hidden", "true").prop('hidden', true);
+    if ($('#' + id).text() === aMsg) {
+      $('#' + id).attr("aria-hidden", "true").prop('hidden', true);
     }
   }
   else {
-    $('#alertMessage').attr("aria-hidden", "true").prop('hidden', true);
+    $('#' + id).attr("aria-hidden", "true").prop('hidden', true);
   }
 }
 
@@ -1986,10 +1995,8 @@ function ResetSignInModal() {
   let registerModal = document.getElementById('signUpModal');
 
   registerModal.classList.add('hidden');
-  registerModal.classList.remove('flex');
 
   signInModal.classList.add('hidden');
-  signInModal.classList.remove('flex');
   //focus on username input
   document.getElementById('alertMessage').ariaHidden = true;
   document.getElementById('alertMessage').hidden = true;
@@ -2050,23 +2057,25 @@ function forgotPasswordClick() {
   }
 }
 
+// The reset password page's form, with its own ids (the sign-in dialog on
+// the same page has its own password fields and messages).
 function resetPasswordClick() {
-  var password = $('#passwordEnterInput').val();
-  var passwordConfirm = $('#confirmPasswordInput').val();
+  var password = $('#newPasswordInput').val();
+  var passwordConfirm = $('#confirmNewPasswordInput').val();
   var hiddenKey = $('#hidden_reset_key').val();
 
   if (password === '') {
-    $('#passwordEnterInput').attr("aria-invalid", "true");
+    $('#newPasswordInput').attr("aria-invalid", "true");
   } else if (passwordConfirm === '') {
-    $('#passwordConfirmInput').attr("aria-invalid", "true");
+    $('#confirmNewPasswordInput').attr("aria-invalid", "true");
   } else if (passwordConfirm != password) {
-    $('#passwordConfirmInput').attr("aria-invalid", "true");
+    $('#confirmNewPasswordInput').attr("aria-invalid", "true");
   } else {
     // Cleanup
-    alertMessageOff();
-    feedbackMessageOff();
-    $('#passwordConfirmInput').attr("aria-invalid", "false");
-    $('#passwordEnterInput').attr("aria-invalid", "false");
+    alertMessageOff('', 'resetAlertMessage');
+    feedbackMessageOff('resetFeedbackMessage');
+    $('#confirmNewPasswordInput').attr("aria-invalid", "false");
+    $('#newPasswordInput').attr("aria-invalid", "false");
 
     $.ajax({
       type: "POST",
@@ -2077,7 +2086,7 @@ function resetPasswordClick() {
         if (result === "Password successfully reset. You may now close this page and log in to the website.") {
           document.location.href = "/";
         } else {
-          alertMessageOn(result);
+          alertMessageOn(result, 'resetAlertMessage');
         }
       },
       error: function(xhr, ajaxOptions, thrownError) {
@@ -2122,9 +2131,11 @@ function checkValidityDate() {
   checkRegistrationFieldsValidity();
 }
 
-function checkConfirmPassword() {
-  var elem = $('#confirmPasswordInput');
-  var password = $('#passwordEnterInput');
+// Marks the confirm field wrong unless it matches the password field; by
+// default the sign-in dialog's, or the fields whose ids are passed.
+function checkConfirmPassword(confirmId, passwordId) {
+  var elem = $('#' + (confirmId || 'confirmPasswordInput'));
+  var password = $('#' + (passwordId || 'passwordEnterInput'));
 
   var invalid = elem.val() != password.val();
   if (invalid) {
