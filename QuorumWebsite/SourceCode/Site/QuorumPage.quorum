@@ -27,6 +27,7 @@ use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
 use Libraries.Web.Styles.QuorumSiteOptions
 use Libraries.Web.Styles.BlockEditorLooks
+use Libraries.Web.Styles.FormLooks
 use Libraries.Web.Styles.StyleSheetConstants
 use Libraries.Web.Styles.WebBoxStyle
 use Libraries.Web.WebLocations
@@ -133,6 +134,25 @@ class QuorumPage is WebPage
     Division switcherPanels = undefined
     integer switcherCount = 0
     boolean switcherScriptAdded = false
+
+    // The form being written (Form or Quiz, until EndForm), the quiz
+    // script, and how many questions the quiz has so far.
+    Form currentForm = undefined
+    Division currentDialog = undefined
+    boolean quizScriptAdded = false
+    integer quizQuestions = 0
+    Select quizSelect = undefined
+
+    // The row of steps being written (Steps), and the block editor's
+    // files after its main one (BlockEditorFile).
+    OrderedList stepsList = undefined
+    // The numbered rows being written (NumberedRows), and how many so far.
+    OrderedList numberedRowsList = undefined
+    integer numberedRowsCount = 0
+    integer stepsCount = 0
+    Array<text> blockEditorFileNames
+    Array<text> blockEditorFileLocations
+    boolean blockProjectMode = false
     // The notice strip NoticeStrip made last, which NoticeButton adds to.
     Division noticeActions = undefined
     // Whether CourseCards was started as FeatureCards (grey lower halves).
@@ -168,6 +188,13 @@ class QuorumPage is WebPage
     constant text CHARTS_SCRIPT = "script/quorumCharts.js"
     constant text SLIDES_SCRIPT = "script/slides.js"
     constant text SWITCHER_SCRIPT = "script/switcher.js"
+    constant text QUIZ_SCRIPT = "script/quiz.js"
+    constant text QUIZ_PROMPT = "Choose an option"
+    // A dialog's close button: a cross, as the old dialogs had.
+    constant text CLOSE_ICON = "html/media/userInterface/SVG/exit-cross.svg"
+    // The arrow between steps (Step), from the project's icons, hidden
+    // from screen readers.
+    constant text STEP_ARROW_ICON = "stepArrow.svg"
     constant text BLOCK_EDITOR_SCRIPT = "script/blockEditor.js"
     constant text ACCESS_CHARTS_SCRIPT_START = "script/widgets/widget-js/AccessCharts-"
     constant text BLOCK_EDITOR_ICONS = "icons/"
@@ -424,6 +451,61 @@ class QuorumPage is WebPage
         image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
         image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
         SetStyle(image, quorumOptions:GetBannerPicture())
+        row:AddNestedTag(image)
+        header:AddNestedTag(row)
+        bannerColumn = column
+        bannerPicture = image
+        bannerActions = undefined
+        productBanner = false
+        heroBanner = false
+    end
+
+    /*
+        Starts the page with its title in a band of color across the
+        window: the title and a sentence or two beside a picture, the
+        picture on the left on a phone. Give the page UseEdgeToEdgeBanner (or
+        UseFullBleedBanner) on the site, so the band spans the window.
+        The title is the page's title (as Title).
+
+        Attribute: Parameter title The page's title.
+        Attribute: Parameter words A sentence or two beside the title.
+        Attribute: Parameter picture The picture's location, from the top of the site.
+        Attribute: Parameter pictureDescription What the picture shows, for readers who can't see it.
+    */
+    action ColorBanner(text title, text words, text picture, text pictureDescription)
+        Title(title)
+        Header header = GetTitleHeader()
+        SetStyle(header, quorumOptions:GetColorBanner())
+        SetStyleFromWidth(header, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetColorBannerWide())
+        Heading heading = GetLastHeading()
+        SetStyle(heading, quorumOptions:GetColorBannerTitle())
+        SetStyleFromWidth(heading, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetColorBannerTitleWide())
+        // The title goes in the words' column, beside the picture.
+        header:Remove(heading)
+
+        // On a phone the picture is on the left (the row shown reversed,
+        // since the words come first in the page); from a medium screen,
+        // on the right.
+        Division row
+        SetLayout(row, quorumOptions:GetColorBannerRowSmall())
+        SetLayoutFromWidth(row, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetColorBannerRow())
+        Division column
+        SetStyle(column, quorumOptions:GetColorBannerColumn())
+        SetStyleFromWidth(column, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetColorBannerColumnWide())
+        SetLayout(column, quorumOptions:GetColorBannerStack())
+        column:AddNestedTag(heading)
+        Paragraph paragraph
+        SetStyle(paragraph, quorumOptions:GetColorBannerWords())
+        SetStyleFromWidth(paragraph, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetColorBannerWordsWide())
+        paragraph:AddText(escaper:Escape(words))
+        column:AddNestedTag(paragraph)
+        row:AddNestedTag(column)
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetColorBannerPicture())
+        SetStyleFromWidth(image, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetColorBannerPictureWide())
         row:AddNestedTag(image)
         header:AddNestedTag(row)
         bannerColumn = column
@@ -1385,6 +1467,580 @@ class QuorumPage is WebPage
     end
 
     /*
+        Starts a form: the fields, words, buttons and messages added after
+        it (FormWords, FormEntry, HiddenField, SubmitButton,
+        ProblemMessage, FeedbackMessage) go in it, one under another,
+        until EndForm. Its look is the site's (FormLooks).
+
+        Attribute: Parameter identifier The form's id, which its scripts use, or "" for none.
+        Attribute: Parameter formAction Where the form goes when sent, such as "javascript:resetPasswordClick()", or "" for none.
+        Attribute: Returns The form, to add attributes to.
+
+        Attribute: Example
+        class MyPage is QuorumPage
+            action Setup
+                Title("Reset Password")
+                Form("resetPasswordForm", "javascript:resetPasswordClick()")
+                FormEntry("Password", "New Password", "passwordEnterInput", "password", "password")
+                SubmitButton("Reset my Password", "submitFormButton", "Save New Password")
+                EndForm()
+            end
+        end
+    */
+    action Form(text identifier, text formAction) returns Form
+        if currentForm not= undefined
+            alert("A form can't start inside another form. End the first with EndForm.")
+        end
+        Form form
+        if not identifier:IsEmpty()
+            form:SetIdentifier(identifier)
+        end
+        if not formAction:IsEmpty()
+            form:AddAttribute("method", "post")
+            form:AddAttribute("action", formAction)
+            form:SetPost(true)
+        end
+        SetLayout(form, quorumOptions:GetForms():GetForm())
+        Place(form)
+        currentForm = form
+        return form
+    end
+
+    /*
+        Ends the form Form or Quiz started; what follows goes in the page
+        again.
+    */
+    action EndForm
+        if currentForm = undefined
+            alert("EndForm needs a form. Start one with Form or Quiz.")
+        end
+        currentForm = undefined
+    end
+
+    /*
+        Adds words to the form or dialog being written, such as what it is
+        for.
+
+        Attribute: Parameter words The words.
+        Attribute: Returns The paragraph, to give an id or hide until a script shows it.
+    */
+    action FormWords(text words) returns Paragraph
+        Paragraph paragraph
+        paragraph:AddText(escaper:Escape(words))
+        Place(paragraph)
+        return paragraph
+    end
+
+    /*
+        Adds a box to type in, to the form. Its title is what screen
+        readers say it is; the placeholder shows in it until a reader
+        types. It is marked wrong (red edge) while a script sets
+        aria-invalid.
+
+        Attribute: Parameter title What the box is for, said by screen readers, such as "Password".
+        Attribute: Parameter placeholder The words in the empty box, such as "New Password".
+        Attribute: Parameter identifier The box's id, which scripts use.
+        Attribute: Parameter type The kind of box: "text", "password", "email" and the like.
+        Attribute: Parameter name The name the form sends its value as.
+        Attribute: Returns The box, to add attributes to, such as a check when it loses focus.
+    */
+    action FormEntry(text title, text placeholder, text identifier, text type, text name) returns Input
+        Input entry
+        entry:SetTitle(escaper:EscapeAttribute(title))
+        entry:SetIdentifier(identifier)
+        entry:SetPlaceHolder(escaper:EscapeAttribute(placeholder))
+        entry:SetType(type)
+        entry:SetName(name)
+        SetEntryLook(entry)
+        Division field
+        SetLayout(field, quorumOptions:GetForms():GetField())
+        field:AddNestedTag(entry)
+        Place(field)
+        return entry
+    end
+
+    /*
+        Adds a value the form sends that readers don't see.
+
+        Attribute: Parameter identifier Its id.
+        Attribute: Parameter name The name the form sends it as.
+        Attribute: Parameter value Its value.
+    */
+    action HiddenField(text identifier, text name, text value)
+        Input hidden
+        hidden:SetIdentifier(identifier)
+        hidden:SetName(name)
+        hidden:SetType("hidden")
+        hidden:AddAttribute("value", value)
+        Place(hidden)
+    end
+
+    /*
+        Adds the button that sends the form.
+
+        Attribute: Parameter words The button's words.
+        Attribute: Parameter identifier Its id, or "" for none.
+        Attribute: Parameter title What it does, said by screen readers.
+        Attribute: Returns The button.
+    */
+    action SubmitButton(text words, text identifier, text title) returns Input
+        Input button
+        if not identifier:IsEmpty()
+            button:SetIdentifier(identifier)
+        end
+        button:SetType("submit")
+        button:SetDefaultValue(escaper:EscapeAttribute(words))
+        button:SetTitle(escaper:EscapeAttribute(title))
+        SetButtonLook(button)
+        Division row
+        SetLayout(row, quorumOptions:GetForms():GetButtons())
+        row:AddNestedTag(button)
+        Place(row)
+        return button
+    end
+
+    /*
+        Adds a message box for problems, hidden until a script shows it
+        (script.js's alertMessageOn), with a heading and words the script
+        fills in.
+
+        Attribute: Parameter identifier Its id, such as "alertMessage"; its heading and words get this id with "Header" and "Text" after it.
+    */
+    action ProblemMessage(text identifier)
+        Place(NewMessage(identifier, quorumOptions:GetForms():GetProblem()))
+    end
+
+    /*
+        Adds a message box for information, hidden until a script shows it
+        (script.js's feedbackMessageOn), with a heading and words the
+        script fills in.
+
+        Attribute: Parameter identifier Its id, such as "feedbackMessage"; its heading and words get this id with "Header" and "Text" after it.
+    */
+    action FeedbackMessage(text identifier)
+        Place(NewMessage(identifier, quorumOptions:GetForms():GetFeedback()))
+    end
+
+    /*
+        Starts a dialog a script opens, such as one to share or save a
+        project: hidden until then, a shaded backdrop over the window with a
+        white box in its middle, its title, and a close button in its
+        corner. What is added after it (forms, words, buttons) goes in the
+        box until EndDialog. The page's scripts show and hide it by its id,
+        with the hidden attribute.
+
+        Attribute: Parameter identifier The dialog's id, which its scripts use, such as "shareModal".
+        Attribute: Parameter title The dialog's title.
+        Attribute: Parameter titleIdentifier The title's id, which names the dialog for screen readers.
+        Attribute: Parameter closeIdentifier The close button's id, or "" for none.
+        Attribute: Parameter closeScript What the close button does, such as "hideShareModal()".
+    */
+    action Dialog(text identifier, text title, text titleIdentifier, text closeIdentifier, text closeScript)
+        if currentDialog not= undefined
+            alert("A dialog can't start inside another dialog. End the first with EndDialog.")
+        end
+        FormLooks looks = quorumOptions:GetForms()
+        Division backdrop
+        backdrop:SetIdentifier(identifier)
+        backdrop:AddAttribute("hidden", "")
+        SetStyle(backdrop, looks:GetBackdrop())
+        SetLayout(backdrop, looks:GetBackdropLayout())
+        Division box
+        box:AddAttribute("role", "dialog")
+        box:AddAttribute("aria-modal", "true")
+        box:AddAttribute("aria-labelledby", titleIdentifier)
+        SetStyle(box, looks:GetDialog())
+        SetStyleFromWidth(box, constants:LARGE_SCREEN_WIDTH, looks:GetDialogWide())
+        SetLayout(box, looks:GetDialogLayout())
+        Paragraph heading
+        heading:SetIdentifier(titleIdentifier)
+        heading:AddText(escaper:Escape(title))
+        SetStyle(heading, looks:GetDialogTitle())
+        box:AddNestedTag(heading)
+        Button close
+        if not closeIdentifier:IsEmpty()
+            close:SetIdentifier(closeIdentifier)
+        end
+        close:SetType("button")
+        close:AddAttribute("aria-label", "Close")
+        File icon
+        icon:SetPath(CLOSE_ICON)
+        close:AddText(icon:Read())
+        close:SetOnClick(closeScript)
+        SetStyle(close, looks:GetClose())
+        SetStyleOnHover(close, looks:GetCloseHover())
+        SetStyleOnKeyboardFocus(close, looks:GetButtonFocus())
+        box:AddNestedTag(close)
+        backdrop:AddNestedTag(box)
+        Place(backdrop)
+        currentDialog = box
+    end
+
+    /*
+        Ends the dialog Dialog started; what follows goes in the page again.
+    */
+    action EndDialog
+        if currentDialog = undefined
+            alert("EndDialog needs a dialog. Start one with Dialog.")
+        end
+        currentDialog = undefined
+    end
+
+    /*
+        Adds a box to type in with its label above it, to the form or
+        dialog being written. It is marked wrong (red edge) while a script
+        sets aria-invalid.
+
+        Attribute: Parameter label The label's words, such as "Project Name: ".
+        Attribute: Parameter identifier The box's id, which scripts use.
+        Attribute: Parameter type The kind of box: "text", "password", "email" and the like.
+        Attribute: Parameter name The name the form sends its value as.
+        Attribute: Returns The box, to add attributes to.
+    */
+    action FormField(text label, text identifier, text type, text name) returns Input
+        FormLooks looks = quorumOptions:GetForms()
+        Division field
+        SetLayout(field, looks:GetField())
+        Label words
+        words:AddAttribute("for", identifier)
+        words:AddText(escaper:Escape(label))
+        SetStyle(words, looks:GetLabelBox())
+        field:AddNestedTag(words)
+        Input entry
+        entry:SetIdentifier(identifier)
+        entry:SetType(type)
+        entry:SetName(name)
+        SetEntryLook(entry)
+        field:AddNestedTag(entry)
+        Place(field)
+        return entry
+    end
+
+    /*
+        Adds a checkbox with its label beside it, to the form or dialog
+        being written.
+
+        Attribute: Parameter label The label's words.
+        Attribute: Parameter identifier The checkbox's id, which scripts use.
+        Attribute: Returns The checkbox.
+    */
+    action FormCheckbox(text label, text identifier) returns Input
+        Division row
+        SetLayout(row, quorumOptions:GetForms():GetCheckboxRow())
+        Input checkbox
+        checkbox:SetType("checkbox")
+        checkbox:SetIdentifier(identifier)
+        row:AddNestedTag(checkbox)
+        Label words
+        words:AddAttribute("for", identifier)
+        words:AddText(escaper:Escape(label))
+        row:AddNestedTag(words)
+        Place(row)
+        return checkbox
+    end
+
+    /*
+        Adds a button to the form or dialog being written, in the forms'
+        look; faded with a "not allowed" pointer while it is disabled.
+
+        Attribute: Parameter words The button's words.
+        Attribute: Parameter identifier Its id, or "" for none.
+        Attribute: Parameter type "button", or "submit" to send the form.
+        Attribute: Returns The button, to set what it does.
+    */
+    action FormButton(text words, text identifier, text type) returns Button
+        Button button
+        if not identifier:IsEmpty()
+            button:SetIdentifier(identifier)
+        end
+        button:SetType(type)
+        button:AddText(escaper:Escape(words))
+        SetButtonLook(button)
+        SetStyleWhenDisabled(button, quorumOptions:GetForms():GetButtonDisabled())
+        Place(button)
+        return button
+    end
+
+    /*
+        Starts a quiz: the questions added with QuizChoice, then the button
+        QuizCheck adds, which checks them and ends the quiz. The quiz's
+        script (script/quiz.js) marks each answer right or wrong, says the
+        score, and remembers the reader's choices on their own computer.
+
+        Attribute: Parameter key A short name, unique on the site, the choices are remembered under, such as "l4".
+    */
+    action Quiz(text key)
+        if not quizScriptAdded
+            AddScript(locations:FromSiteTop(QUIZ_SCRIPT))
+            quizScriptAdded = true
+        end
+        Form quiz = Form("quiz-form", "")
+        quiz:AddAttribute("data-quiz", escaper:EscapeAttribute(key))
+        quizQuestions = 0
+    end
+
+    /*
+        Adds a question with a list of choices to the quiz Quiz started;
+        add its choices with QuizOption. The list starts at "Choose an
+        option".
+
+        Attribute: Parameter question The question, such as "1. What's the largest bill length?"
+        Attribute: Parameter answer The right choice, exactly as QuizOption gives it.
+    */
+    action QuizChoice(text question, text answer)
+        if currentForm = undefined
+            alert("A quiz question needs a quiz. Start one with Quiz.")
+        end
+        FormLooks looks = quorumOptions:GetForms()
+        quizQuestions = quizQuestions + 1
+        text name = "q" + quizQuestions
+        Division field
+        SetLayout(field, looks:GetField())
+        Paragraph words
+        words:SetIdentifier(name + "-label")
+        words:AddText(escaper:Escape(question))
+        SetStyle(words, looks:GetQuestion())
+        field:AddNestedTag(words)
+        Paragraph line
+        line:SetIdentifier(name + "-validation")
+        line:AddAttribute("aria-live", "polite")
+        SetStyle(line, looks:GetAnswerLine())
+        field:AddNestedTag(line)
+        Select choice
+        choice:SetIdentifier(name)
+        choice:AddAttribute("aria-labelledby", name + "-label")
+        choice:AddAttribute("aria-describedby", name + "-validation")
+        choice:AddAttribute("data-answer", escaper:EscapeAttribute(answer))
+        SetEntryLook(choice)
+        SetStyleWhenAttribute(choice, "data-state", "correct", looks:GetEntryRight())
+        SetStyleWhenAttribute(choice, "data-state", "incorrect", looks:GetEntryWrong())
+        Option prompt
+        prompt:AddAttribute("value", "")
+        prompt:SetSelected(true)
+        prompt:SetDisabled(true)
+        prompt:AddText(QUIZ_PROMPT)
+        choice:Add(prompt)
+        field:AddNestedTag(choice)
+        currentForm:AddNestedTag(field)
+        quizSelect = choice
+    end
+
+    /*
+        Adds a choice to the quiz question QuizChoice added last.
+
+        Attribute: Parameter words The choice, as readers see it and as the answer names it.
+    */
+    action QuizOption(text words)
+        if quizSelect = undefined
+            alert("A quiz option needs a question. Add one with QuizChoice.")
+        end
+        Option option
+        option:AddAttribute("value", escaper:EscapeAttribute(words))
+        option:AddText(escaper:Escape(words))
+        quizSelect:Add(option)
+    end
+
+    /*
+        Adds the button that checks the quiz's answers, and the line under
+        it that says the score; it ends the quiz.
+
+        Attribute: Parameter words The button's words, such as "Check Answers".
+    */
+    action QuizCheck(text words)
+        if currentForm = undefined
+            alert("A quiz's check needs a quiz. Start one with Quiz.")
+        end
+        Button checkButton
+        checkButton:SetType("button")
+        checkButton:AddAttribute("data-quiz-check", "")
+        checkButton:AddText(escaper:Escape(words))
+        SetButtonLook(checkButton)
+        currentForm:AddNestedTag(checkButton)
+        Division result
+        result:SetIdentifier("result")
+        result:AddAttribute("role", "region")
+        result:AddAttribute("aria-live", "polite")
+        SetStyle(result, quorumOptions:GetForms():GetResult())
+        currentForm:AddNestedTag(result)
+        quizSelect = undefined
+        EndForm()
+    end
+
+    // Puts a part in the form being written, or the dialog, or else the
+    // page.
+    private action Place(WebTag tag)
+        if currentForm not= undefined
+            currentForm:AddNestedTag(tag)
+        elseif currentDialog not= undefined
+            currentDialog:AddNestedTag(tag)
+        else
+            Include(tag)
+        end
+    end
+
+    // A box to type in or choose from: its edge, its focus ring, and its
+    // red edge while marked wrong.
+    private action SetEntryLook(WebTag entry)
+        FormLooks looks = quorumOptions:GetForms()
+        SetStyle(entry, looks:GetEntry())
+        SetStyleOnKeyboardFocus(entry, looks:GetEntryFocus())
+        SetStyleWhenInvalid(entry, looks:GetEntryWrong())
+    end
+
+    // A form's button: its look, its shadow under the pointer, and its
+    // focus ring.
+    private action SetButtonLook(WebTag button)
+        FormLooks looks = quorumOptions:GetForms()
+        SetStyle(button, looks:GetButton())
+        SetStyleOnHover(button, looks:GetButtonHover())
+        SetStyleOnKeyboardFocus(button, looks:GetButtonFocus())
+    end
+
+    // A message box a script shows: hidden, with a heading and words the
+    // script fills in by their ids.
+    private action NewMessage(text identifier, WebBoxStyle look) returns Division
+        FormLooks looks = quorumOptions:GetForms()
+        Division message
+        message:SetIdentifier(identifier)
+        message:AddAttribute("hidden", "")
+        message:AddAttribute("aria-hidden", "true")
+        message:AddAttribute("role", "status")
+        SetStyle(message, look)
+        SetLayout(message, looks:GetMessage())
+        Paragraph heading
+        heading:SetIdentifier(identifier + "Header")
+        SetStyle(heading, looks:GetMessageHeading())
+        message:AddNestedTag(heading)
+        Paragraph words
+        words:SetIdentifier(identifier + "Text")
+        SetStyle(words, looks:GetMessageWords())
+        message:AddNestedTag(words)
+        return message
+    end
+
+    /*
+        Starts a numbered list of rows, such as the problems in a set: a
+        card with a row for each item (added with NumberedRow), its number,
+        its title and a link to it at the right.
+    */
+    action NumberedRows
+        OrderedList list
+        SetStyle(list, quorumOptions:GetNumberedRows())
+        Include(list)
+        numberedRowsList = list
+        numberedRowsCount = 0
+    end
+
+    /*
+        Adds a row to the list NumberedRows started: its number, its title
+        and a link at the right. Screen readers hear the link's words with
+        the title after them ("Practice Making a Counter"), so each link
+        says where it goes.
+
+        Attribute: Parameter title The item's title.
+        Attribute: Parameter address Where the link goes.
+        Attribute: Parameter linkWords The link's words, such as "Practice".
+    */
+    action NumberedRow(text title, text address, text linkWords)
+        if numberedRowsList = undefined
+            alert("A numbered row needs a list. Start one with NumberedRows.")
+        end
+        numberedRowsCount = numberedRowsCount + 1
+        ListItem item
+        SetStyle(item, quorumOptions:GetNumberedRow())
+        SetStyleWhenFirst(item, quorumOptions:GetNumberedRowFirst())
+        SetLayout(item, quorumOptions:GetNumberedRowLayout())
+        // The list is ordered for screen readers; the drawn number is for sight.
+        Span numberMark
+        numberMark:AddAttribute("aria-hidden", "true")
+        numberMark:AddText("" + numberedRowsCount)
+        SetStyle(numberMark, quorumOptions:GetStep())
+        SetLayout(numberMark, quorumOptions:GetStepLayout())
+        item:AddNestedTag(numberMark)
+        Span words
+        words:AddText(escaper:Escape(title))
+        SetStyle(words, quorumOptions:GetNumberedRowTitle())
+        item:AddNestedTag(words)
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddAttribute("aria-label", escaper:EscapeAttribute(linkWords + " " + title))
+        link:AddText(escaper:Escape(linkWords))
+        SetStyle(link, quorumOptions:GetNumberedRowLink())
+        SetStyleOnHover(link, quorumOptions:GetNumberedRowLinkHover())
+        SetStyleOnKeyboardFocus(link, quorumOptions:GetForms():GetButtonFocus())
+        item:AddNestedTag(link)
+        numberedRowsList:AddNestedTag(item)
+    end
+
+    /*
+        Starts a row of numbered steps, such as the problems in a set: a
+        list of links, one for each step (added with Step), the current one
+        filled in. On a narrow screen the row wraps.
+
+        Attribute: Parameter label What the steps are, said by screen readers, such as "Problems".
+    */
+    action Steps(text label)
+        NavigationDivision navigation
+        navigation:AddAttribute("aria-label", escaper:EscapeAttribute(label))
+        // A navigation can't take a style or layout, so the box is inside it.
+        Division box
+        SetStyle(box, quorumOptions:GetSteps())
+        SetStyleFromWidth(box, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetStepsWide())
+        OrderedList list
+        SetLayout(list, quorumOptions:GetStepsRow())
+        box:AddNestedTag(list)
+        navigation:AddNestedTag(box)
+        Include(navigation)
+        stepsList = list
+        stepsCount = 0
+    end
+
+    /*
+        Adds a step to the row Steps started: a link with the step's
+        number, an arrow before it after the first.
+
+        Attribute: Parameter stepNumber The step's number, as readers see it, such as "3".
+        Attribute: Parameter title The step's name, shown when the pointer is over it, such as "absolute-value".
+        Attribute: Parameter address Where the step's page is.
+        Attribute: Parameter current True for the step of the page this is on.
+    */
+    action Step(text stepNumber, text title, text address, boolean current)
+        if stepsList = undefined
+            alert("A step needs a row of steps. Start one with Steps.")
+        end
+        ListItem item
+        SetLayout(item, quorumOptions:GetStepItem())
+        if stepsCount > 0
+            item:AddText(ReadIcon(STEP_ARROW_ICON))
+        end
+        stepsCount = stepsCount + 1
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddAttribute("title", escaper:EscapeAttribute(title))
+        link:AddText(escaper:Escape(stepNumber))
+        SetStyle(link, quorumOptions:GetStep())
+        SetLayout(link, quorumOptions:GetStepLayout())
+        SetStyleWhenCurrent(link, quorumOptions:GetStepCurrent())
+        if current
+            link:AddAttribute("aria-current", "step")
+        end
+        item:AddNestedTag(link)
+        stepsList:AddNestedTag(item)
+    end
+
+    /*
+        Adds another file to the next block editor, after its main file;
+        call it before BlockEditor, once for each file.
+
+        Attribute: Parameter fileName The file's name in the editor, such as "Shape.quorum".
+        Attribute: Parameter location The file, from the project's folder.
+    */
+    action BlockEditorFile(text fileName, text location)
+        blockEditorFileNames:Add(fileName)
+        blockEditorFileLocations:Add(location)
+    end
+
+    /*
         Adds the block editor: a toolbar (Hide Tray, Zoom In, Zoom Out,
         Hotkeys, Fullscreen, More, Run, Stop), the blocks with the program's
         display beside them (when it has one), and the console under them,
@@ -1399,14 +2055,41 @@ class QuorumPage is WebPage
         Attribute: Parameter fill True to fill the width of the part it is in.
     */
     action BlockEditor(text fileName, text location, text palette, boolean showDisplay, boolean fill)
+        CodeForIDE code
+        code:AddFileUrl(fileName, location)
+        integer extra = 0
+        repeat while extra < blockEditorFileNames:GetSize()
+            code:AddFileUrl(blockEditorFileNames:Get(extra), blockEditorFileLocations:Get(extra))
+            extra = extra + 1
+        end
+        blockEditorFileNames:Empty()
+        blockEditorFileLocations:Empty()
+        BuildBlockEditor(code:GetJsonArray(), palette, showDisplay, fill)
+    end
+
+    /*
+        Adds the block editor for a reader's own project, which the server
+        fills in: the same editor, filling the width it is in, with "Add
+        File" and "Save Project" in its toolbar (Save Project opens the
+        page's save dialog, script.js's blockShowSaveModal), and the
+        editor started in project mode. Its tray is the editor's own.
+
+        Attribute: Parameter codeJson The project's files, as CodeForIDE:GetJsonArray gives them.
+        Attribute: Parameter showDisplay True to show the program's display beside the blocks when it runs.
+    */
+    action ProjectBlockEditor(text codeJson, boolean showDisplay)
+        blockProjectMode = true
+        BuildBlockEditor(codeJson, "", showDisplay, true)
+    end
+
+    // The block editor, from its files as JSON (BlockEditor and
+    // ProjectBlockEditor).
+    private action BuildBlockEditor(text codeJson, text palette, boolean showDisplay, boolean fill)
         if blockEditorAdded
             alert("A page can have one block editor: its parts have fixed ids the editor's scripts use.")
         end
         blockEditorAdded = true
         BlockEditorLooks looks = quorumOptions:GetBlockEditor()
-
-        CodeForIDE code
-        code:AddFileUrl(fileName, location)
 
         Division editor
         editor:SetIdentifier("BlockEditor")
@@ -1437,6 +2120,10 @@ class QuorumPage is WebPage
         buttons:Add(BlockTool("Zoom In", "zoomIn.svg", "blockEditorZoomIn()", ""))
         buttons:Add(BlockTool("Zoom Out", "zoomOut.svg", "blockEditorZoomOut()", ""))
         buttons:Add(BlockTool("Hotkeys", "helpIcon.svg", "showBlockHelpModal()", "blockHelpButton"))
+        if blockProjectMode
+            buttons:Add(BlockTool("Add File", "addFileIcon.svg", "window.BLOCK_EDITOR.AddNewFile('Class'+window.BLOCK_EDITOR.GetFileCount()+'.quorum')", ""))
+            buttons:Add(BlockTool("Save Project", "saveIcon.svg", "blockShowSaveModal()", "saveBlockProjectButton"))
+        end
         // Each with a second icon the script shows instead: Minimize in
         // fullscreen, an up arrow while the menu is open.
         Button fullscreen = BlockTool("Fullscreen", "fullscreenIcon.svg", "minimizeIcon.svg", "blockEditorFullscreen()", "blockEditorFullscreenButton")
@@ -1494,7 +2181,7 @@ class QuorumPage is WebPage
         if not palette:IsEmpty()
             blocks:AddAttribute("data-palette-for-ide", palette)
         end
-        blocks:AddAttribute("data-code-for-ide", code:GetJsonArray())
+        blocks:AddAttribute("data-code-for-ide", codeJson)
         area:Add(blocks)
         if showDisplay
             Division display
@@ -1673,6 +2360,11 @@ class QuorumPage is WebPage
     // editor, and the start, written so it works whether load.js has run
     // or not.
     private action AddBlockEditorScripts(Division editor)
+        // A reader's project starts the editor in project mode.
+        text projectStart = ""
+        if blockProjectMode
+            projectStart = " BlockEditor.SetToProjectMode();"
+        end
         Script module
         module:SetType("module")
         module:SetAddress(locations:FromSiteTop(BLOCK_EDITOR_SCRIPT) + versions:GetBlockEditorVersionQuery())
@@ -1777,10 +2469,11 @@ if (blockContainer) {
   function start() {
     import('/" + BLOCK_EDITOR_SCRIPT + versions:GetBlockEditorVersionQuery() + "').then((BlockEditor) => {
       window.BLOCK_EDITOR = BlockEditor;
+      function begin() {" + projectStart + " BlockEditor.Start(); }
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() { BlockEditor.Start(); });
+        document.addEventListener('DOMContentLoaded', begin);
       } else {
-        BlockEditor.Start();
+        begin();
       }
     });
   }

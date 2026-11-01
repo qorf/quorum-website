@@ -273,6 +273,36 @@ class QuorumSite is WebSite
     end
 
     /*
+        Lets a page's title banner span the window, edge to edge, while the
+        page keeps its columns (its course's contents on the left), as the
+        practice problems' header did. The rest of the page is set in from
+        the edges.
+
+        Attribute: Parameter page A page on the site, with a banner (such as ColorBanner).
+    */
+    action UseEdgeToEdgeBanner(WebPage page)
+        fullBleedBanner:Set(page, true)
+    end
+
+    /*
+        Puts a page the server built when asked (a reader's projects or
+        project, a password reset) in the site's frame, at the whole width
+        (as UseFullWidth), as WebSite:PrepareServedPage asks. Its settings
+        are kept only while the frame is built, so serving pages doesn't
+        fill the site's tables.
+
+        Attribute: Parameter page The page, set up.
+    */
+    action FinishServedPage(WebPage page)
+        Array<PageSeries> noCourses
+        fullWidth:Set(page, true)
+        onThisPageHidden:Set(page, true)
+        AddFrame(page, noCourses)
+        fullWidth:RemoveKey(page)
+        onThisPageHidden:RemoveKey(page)
+    end
+
+    /*
         Answers a request as WebSite does, and logs it to the console: its
         path, who asked, when, and how long it took. If answering fails,
         it logs the stack trace and answers with an error (500), so one
@@ -487,7 +517,11 @@ class QuorumSite is WebSite
             PageSeries course = courses:Get(i)
             boolean shown = (course = home)
             opening:AddNestedTag(GetBreadcrumbs(page, course, shown))
-            closing:AddNestedTag(GetCourseLinks(page, course, courses, shown))
+            // A page that is part of an entry (such as a problem in a set)
+            // has its own way through the entry, so no Up next or Back.
+            if not course:IsPart(page:GetLocation())
+                closing:AddNestedTag(GetCourseLinks(page, course, courses, shown))
+            end
             i = i + 1
         end
         page:PlaceAtStart(opening)
@@ -540,6 +574,16 @@ class QuorumSite is WebSite
             list:AddNestedTag(GetBreadcrumb(page, course:GetName(), GetCourseAddress(course:GetOverviewLocation(), course)))
         end
         list:AddNestedTag(GetSeparator(page))
+        // A page that is part of an entry (AddPart), such as a problem in a
+        // set: the entry it belongs to comes before it, unless the entry
+        // has the page's own title (as a set's own page has).
+        if course:IsPart(page:GetLocation())
+            PageSeriesEntry entry = course:GetEntry(course:GetPosition(page:GetLocation()))
+            if entry:GetTitle() not= page:GetTitleText()
+                list:AddNestedTag(GetBreadcrumb(page, entry:GetTitle(), GetCourseAddress(entry:GetLocation(), course)))
+                list:AddNestedTag(GetSeparator(page))
+            end
+        end
 
         ListItem current
         current:AddAttribute(CURRENT_ATTRIBUTE, CURRENT_PAGE)
@@ -787,6 +831,14 @@ class QuorumSite is WebSite
                 position = position + 1
             end
             items:Add(GetTrailItem(position, course:GetName(), GetPublicAddress(course:GetOverviewLocation())))
+            if course:IsPart(page:GetLocation())
+                // The entry the page is part of, as the breadcrumbs show it.
+                PageSeriesEntry entry = course:GetEntry(course:GetPosition(page:GetLocation()))
+                if entry:GetTitle() not= page:GetTitleText()
+                    position = position + 1
+                    items:Add(GetTrailItem(position, entry:GetTitle(), GetPublicAddress(entry:GetLocation())))
+                end
+            end
             items:Add(GetTrailItem(position + 1, page:GetTitleText(), GetPublicAddress(page:GetLocation())))
             trail:Add("itemListElement", items)
             AddStructuredDataScript(page, trail)
@@ -1038,7 +1090,8 @@ class QuorumSite is WebSite
             page:SetStyle(link, frame:GetContentsLink())
             link:SetAddress(escaper:EscapeAttribute(GetCourseAddress(entry:GetLocation(), course)))
             link:AddText(escaper:Escape(entry:GetTitle()))
-            if entry:GetLocation() = page:GetLocation()
+            // The page's own entry, or the entry it is part of (AddPart).
+            if course:GetPosition(page:GetLocation()) = i
                 page:SetStyle(link, frame:GetContentsCurrentLink())
                 link:AddAttribute(CURRENT_ATTRIBUTE, CURRENT_PAGE)
             end

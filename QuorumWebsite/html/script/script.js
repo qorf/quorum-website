@@ -243,11 +243,11 @@ function hideModals() {
     hideLoadModal(lastModalID);
   }
   let saveProjectModal = document.getElementById('SaveModal');
-  if (saveModal != null && saveModal.style.display === 'block') {
+  if (saveModal != null && !saveModal.hidden) {
     hideProjectSaveModal();
   }
   let shareProjectModal = document.getElementById('shareModal');
-  if (shareProjectModal != null && shareProjectModal.style.display === 'block') {
+  if (shareProjectModal != null && !shareProjectModal.hidden) {
     hideShareModal();
   }
 }
@@ -937,7 +937,7 @@ var showSaveModal = function(id) {
       if (result === "success") {
         hideModals();
         lastModalID = id;
-        document.getElementById('outerContentModal').style.display = 'block';
+        document.getElementById('outerContentModal').hidden = false;
         document.getElementById(id + "projectNameInput").focus();
       } else {
         hideModals();
@@ -956,7 +956,7 @@ var blockShowSaveModal = function(id) {
     url: "/SessionValid.quorum",
     success: function(result) {
       if (result === "success") {
-        document.getElementById('SaveModal').style.display = 'block';
+        document.getElementById('SaveModal').hidden = false;
         document.getElementById('projectNameInput').focus();
         document.getElementById('projectNameInput').value = document.getElementById('projectNameInput').dataset.projectname;
       } else {
@@ -979,13 +979,9 @@ var hideProjectSaveModal = function() {
   }
   if (submitButton != null) {
     submitButton.setAttribute('disabled', 'true');
-    if( !(submitButton.classList.contains('disabled:opacity-50')) ) {
-      submitButton.classList.add('disabled:opacity-50');
-      submitButton.classList.add('disabled:cursor-not-allowed');
-    }
   }
   if(saveModal != null) { 
-    saveModal.style.display = 'none';
+    saveModal.hidden = true;
   }
   if(saveButton != null) {
     saveButton.focus();
@@ -995,8 +991,7 @@ var hideProjectSaveModal = function() {
 var hideSaveModal = function(id) {
   let outerContentModal = document.getElementById('outerContentModal');
   if(outerContentModal != null) {
-    outerContentModal.classList.add("hidden");
-    outerContentModal.getElementById("outerContentModal").classList.remove("flex");
+    outerContentModal.hidden = true;
   }
 };
 
@@ -1063,26 +1058,23 @@ $('.publicCheckbox').change(function() {
 
 
 var showShareModal = function(value) {
-  document.getElementById('shareModal').style.display = 'block';
+  document.getElementById('shareModal').hidden = false;
   document.getElementById('shareText').value = value;
   document.getElementById('shareText').focus();
   document.getElementById('shareRunningCheckbox').checked = false;
   try {
     document.getElementById('shareText').select();
     var success = document.execCommand('copy');
-    if (success)
-      document.getElementById('clipboardCopyMessage').style.display = 'block';
-    else
-      document.getElementById('clipboardCopyMessage').style.display = 'none';
+    document.getElementById('clipboardCopyMessage').hidden = !success;
   }
   catch (error) {
-    document.getElementById('clipboardCopyMessage').style.display = 'none';
+    document.getElementById('clipboardCopyMessage').hidden = true;
     console.log("There was an error while copying the project sharing link to the clipboard.");
   }
 };
 
 var hideShareModal = function() {
-  document.getElementById('shareModal').style.display = 'none';
+  document.getElementById('shareModal').hidden = true;
 };
 
 var login = function() {
@@ -2152,7 +2144,7 @@ function deleteRow(button) {
       data: { project_name: button.value },
       success: function(result) {
         if (result === "success") {
-          var row = button.parentNode.parentNode;
+          var row = button.closest('tr');
           row.parentNode.removeChild(row);
         }
         else {

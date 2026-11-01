@@ -1,0 +1,39 @@
+use Libraries.Web.QuorumSite
+use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Styles.QuorumSiteOptions
+
+/*
+    ServedPages builds the pages the server makes when someone asks, such
+    as a reader's projects, in the site's look: each gets the site and its
+    look, is set up, and is then put in the site's frame and given its
+    class names from the site's stylesheet (WebSite:PrepareServedPage).
+    The site adds an example of each page with AddLookSample, so the
+    stylesheet has their looks. A shared class: the builder gives it the
+    site once, and every responder uses it.
+*/
+shared class ServedPages
+    QuorumSite site = undefined
+    QuorumSiteOptions options
+
+    action SetSite(QuorumSite site)
+        me:site = site
+    end
+
+    /*
+        Builds a served page, ready to Generate. A page whose looks the
+        stylesheet doesn't have (its example is missing or different)
+        still works, unstyled, and the server's log says so.
+    */
+    action Build(QuorumPage page)
+        if site = undefined
+            alert("The server's pages need the site. The builder gives it with SetSite.")
+        end
+        page:SetWebSite(site)
+        page:SetStyleOptions(options)
+        page:Setup()
+        integer missing = site:PrepareServedPage(page)
+        if missing > 0
+            output "A served page has " + missing + " looks the stylesheet doesn't have: add an example of it with AddLookSample."
+        end
+    end
+end

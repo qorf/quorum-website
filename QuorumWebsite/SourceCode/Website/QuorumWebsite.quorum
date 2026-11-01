@@ -93,6 +93,9 @@ class QuorumWebsite
     HashTable<text, Array<WebPage>> seriesLessons
     HashTable<WebPage, text> homeSeries
 
+    // The practice problems, read once and written with the site.
+    ProblemGenerator problemGenerator
+
     /*
         Builds every page, writes the site into html/, then writes the
         practice problems and the sitemap, which are read from files.
@@ -108,6 +111,10 @@ class QuorumWebsite
         output "Writing Lessons"
         AddLessons()
 
+        output "Adding Problems Pages"
+        AddProblemsPages()
+        ServedPageExamples()
+
         Iterator<text> locations = oldPages:GetKeyIterator()
         repeat while locations:HasNext()
             text location = locations:Next()
@@ -118,9 +125,9 @@ class QuorumWebsite
         site:Write()
         output "Website finished."
 
-        output "Writing Problems Pages"
-        WriteProblemsPages()
-        output "Finished Problems Pages"
+        output "Copying Problems Files"
+        CopyProblemsFiles()
+        output "Finished Problems Files"
 
         BuildSiteMap()
         output "Sitemap created"
@@ -173,6 +180,10 @@ class QuorumWebsite
     // What answers requests while people use the site: signing in, saving
     // and running projects, resetting passwords. Served, never written.
     private action ServerResponders
+        // The pages the responders build, in the site's look.
+        ServedPages served
+        served:SetSite(site)
+
         Login login
         Logout logout
         Analytics analytics
@@ -339,7 +350,8 @@ class QuorumWebsite
         AddStyled(selection)
 
         ResetPassword resetPassword
-        Add(resetPassword)
+        AddStyled(resetPassword)
+        site:HideOnThisPage(resetPassword)
 
         Sink sink
         AddStyled(sink)
@@ -350,14 +362,11 @@ class QuorumWebsite
         Charts charts
         AddStyled(charts)
         Presentation presentation
-        Add(presentation)
-
+        AddStyled(presentation)
         Activity activity
-        Add(activity)
-
+        AddStyled(activity)
         Feedback feedback
-        Add(feedback)
-
+        AddStyled(feedback)
         CodeorgCharts codeorg
         AddStyled(codeorg)
         CompilerErrorChallenge compilerErrorChallenge
@@ -523,37 +532,113 @@ class QuorumWebsite
         return lessons
     end
 
-    private action WriteProblemsPages
-        ProblemGenerator generator
-        generator:Generate()
+    // The practice problems, read from their files: the problems page, a
+    // page for each set, and a page for each problem, in the new look
+    // (plan 13, phase 6), so the site writes them with the rest.
+    private action AddProblemsPages
+        problemGenerator:Generate()
 
         AllProblemsPage allProblemsPage
-        allProblemsPage:SetGenerator(generator)
+        allProblemsPage:SetGenerator(problemGenerator)
+        AddStyled(allProblemsPage)
+        site:HideOnThisPage(allProblemsPage)
+        site:UseEdgeToEdgeBanner(allProblemsPage)
+        AddProblemsSeries()
 
-        allProblemsPage:Setup()
-        allProblemsPage:Write(WRITE_PATH)
-
-        Iterator<Problems> problemsIterator = generator:GetProblemsIterator()
+        Iterator<Problems> problemsIterator = problemGenerator:GetProblemsIterator()
         repeat while problemsIterator:HasNext()
             Problems problems = problemsIterator:Next()
-            //generate the problems page
             ProblemsPage problemsPage
             problemsPage:SetProblems(problems)
-            problemsPage:Setup()
-            problemsPage:Write(WRITE_PATH)
-            File writeFolder
-            writeFolder:SetAbsolutePath(WRITE_PATH)
+            AddStyled(problemsPage)
+            site:HideOnThisPage(problemsPage)
+            site:UseEdgeToEdgeBanner(problemsPage)
 
-            //now generate all the pages for the individual problems
             Iterator<Problem> problemIterator = problems:GetProblemIterator()
             repeat while problemIterator:HasNext()
                 Problem problem = problemIterator:Next()
                 ProblemPage page
                 page:SetProblem(problem)
-                page:Setup()
-                page:Write(WRITE_PATH)
+                AddStyled(page)
+                site:HideOnThisPage(page)
+                site:UseEdgeToEdgeBanner(page)
             end
-        problems:CopyTo(WRITE_PATH)
+        end
+    end
+
+    // The practice problems' list, as the old pages' left column had it:
+    // one entry for each set, in the problems page's order, named for the
+    // set and going to its first problem, and each of the set's problems
+    // (the first too) as a part of it. So each problem page shows the list
+    // with its set marked, and its breadcrumbs name the set before it
+    // (Home, Practice Problems, Output, the problem). The set's own page is
+    // a part too.
+    private action AddProblemsSeries
+        PageSeries practice
+        practice:SetName("Practice Problems")
+        practice:SetKey("problems")
+        practice:SetOverviewLocation("problems.html")
+        Array<Problems> sets = problemGenerator:GetAllProblemsArray()
+        integer i = 0
+        repeat while i < sets:GetSize()
+            Problems problems = sets:Get(i)
+            boolean first = true
+            Iterator<Problem> problemIterator = problems:GetProblemIterator()
+            repeat while problemIterator:HasNext()
+                Problem problem = problemIterator:Next()
+                text location = "problems/" + problems:GetId() + "/" + problem:GetId() + ".html"
+                if first
+                    practice:AddOutsidePage(problems:GetTitle(), location)
+                    first = false
+                end
+                practice:AddPart(location)
+            end
+            // The set's own page (its problems listed) is part of it too, so
+            // it keeps the list on the left with its set marked.
+            practice:AddPart("problems/" + problems:GetId() + ".html")
+            i = i + 1
+        end
+        site:AddSeries(practice)
+    end
+
+    // An example of each page the server builds when asked (plan 13, phase
+    // 6), with made-up content, so their looks are in the stylesheet; the
+    // server's responders build the real ones with ServedPages.
+    private action ServedPageExamples
+        ProfilePage profile
+        profile:SetUsername("example")
+        profile:AddProject("Example", "January 1, 2026", true)
+        AddExample(profile)
+        ProjectPage project
+        project:SetUsername("example")
+        project:SetProjectName("Example")
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        project:SetCode("output " + quote + "Hello" + quote)
+        AddExample(project)
+        BlockProjectPage blockProject
+        blockProject:SetUsername("example")
+        blockProject:SetProjectName("Example")
+        AddExample(blockProject)
+        ProjectRunPage projectRun
+        AddExample(projectRun)
+        AnalyticsPage analytics
+        AddExample(analytics)
+        ResetPasswordPage resetPassword
+        AddExample(resetPassword)
+    end
+
+    private action AddExample(QuorumPage page)
+        page:SetStyleOptions(options)
+        site:AddLookSample(page)
+    end
+
+    // Each set's own files (its pictures and code), after the site is written.
+    private action CopyProblemsFiles
+        Iterator<Problems> problemsIterator = problemGenerator:GetProblemsIterator()
+        repeat while problemsIterator:HasNext()
+            Problems problems = problemsIterator:Next()
+            problems:CopyTo(WRITE_PATH)
         end
     end
 
@@ -2653,13 +2738,13 @@ end
         Add(dataScienceHourOfCode, datascience6)
         Add(dataScienceHourOfCode, datascience7)
 
-        Add(datascience1)
-        Add(datascience2)
-        Add(datascience3)
-        Add(datascience4)
-        Add(datascience5)
-        Add(datascience6)
-        Add(datascience7)
+        AddStyled(datascience1)
+        AddStyled(datascience2)
+        AddStyled(datascience3)
+        AddStyled(datascience4)
+        AddStyled(datascience5)
+        AddStyled(datascience6)
+        AddStyled(datascience7)
     end
 
     private action AddCodeWithMary
@@ -3279,7 +3364,7 @@ end
         AddStyled(audioWaveGenerator)
         AddStyled(audioSynthesis)
         AddStyled(audioMixer)
-        Add(mobileAndroidTutorial)
+        AddStyled(mobileAndroidTutorial)
         AddStyled(mobileAndroidVibrationTutorial)
         AddStyled(sound)
         AddStyled(plugins)
