@@ -17,6 +17,7 @@ use Libraries.Web.Page.Paragraph
 use Libraries.Web.Page.Header
 use Libraries.Web.Page.Script
 use Libraries.Web.Page.Button
+use Libraries.Web.Page.UnorderedList
 use Libraries.Containers.Array
 use Libraries.Web.Page.NavigationDivision
 use Libraries.Web.Page.Label
@@ -25,6 +26,7 @@ use Libraries.Web.Page.MathML
 use Libraries.Web.Page.Standards.StandardSet
 use Libraries.Web.Page.Standards.StandardsTracker
 use Libraries.Web.Styles.QuorumSiteOptions
+use Libraries.Web.Styles.BlockEditorLooks
 use Libraries.Web.Styles.StyleSheetConstants
 use Libraries.Web.Styles.WebBoxStyle
 use Libraries.Web.WebLocations
@@ -100,6 +102,8 @@ class QuorumPage is WebPage
     boolean mathScriptAdded = false
     boolean chartsScriptAdded = false
     boolean slidesScriptAdded = false
+    boolean blockEditorAdded = false
+    boolean accessChartsAdded = false
 
     // The words column PictureBeside made last, which PictureBesideLink
     // adds to, and how many it made (so the picture's side alternates).
@@ -118,6 +122,21 @@ class QuorumPage is WebPage
     Division bannerColumn = undefined
     Image bannerPicture = undefined
     Division bannerActions = undefined
+    // Whether the banner is a product banner (ProductBanner), whose tile
+    // and link take the product look.
+    boolean productBanner = false
+    // Whether the banner is a hero banner (HeroBanner), whose tiles are
+    // white pills.
+    boolean heroBanner = false
+    // The switcher Switcher started: its button bar and its panels.
+    Division switcherButtons = undefined
+    Division switcherPanels = undefined
+    integer switcherCount = 0
+    boolean switcherScriptAdded = false
+    // The notice strip NoticeStrip made last, which NoticeButton adds to.
+    Division noticeActions = undefined
+    // Whether CourseCards was started as FeatureCards (grey lower halves).
+    boolean greyCardBodies = false
 
     // The grid Choices started, which Choice adds to.
     Division choiceGrid = undefined
@@ -148,6 +167,10 @@ class QuorumPage is WebPage
     constant text MATH_SCRIPT = "script/load-mathjax.js"
     constant text CHARTS_SCRIPT = "script/quorumCharts.js"
     constant text SLIDES_SCRIPT = "script/slides.js"
+    constant text SWITCHER_SCRIPT = "script/switcher.js"
+    constant text BLOCK_EDITOR_SCRIPT = "script/blockEditor.js"
+    constant text ACCESS_CHARTS_SCRIPT_START = "script/widgets/widget-js/AccessCharts-"
+    constant text BLOCK_EDITOR_ICONS = "icons/"
     constant text PREVIOUS_SLIDE = "Previous Slide"
     constant text UNIT_LESSONS = "Lessons"
     constant text COURSE_DETAILS = "Details"
@@ -156,14 +179,11 @@ class QuorumPage is WebPage
     constant text TOPIC_CLEAR = "Clear"
     constant text TOPICS_LABEL = "Topics"
     constant text LESSON_SEPARATOR = " · "
-    constant text TOPIC_CHIPS_SCROLL = "overflow-x: auto; padding-bottom: 4px;"
-    constant text TOPIC_CHIP_SIZE = "white-space: nowrap; flex: none;"
     // The letters a heading's address keeps, as WebPage names headings
     // (a child class can't see its parent's constants).
     constant text ADDRESS_CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789"
     constant text NEXT_SLIDE = "Next Slide"
     constant text EDITOR_CODE_ATTRIBUTE = "data-code-for-ide"
-    constant text CHART_LAYOUT = "min-width: 100px; max-width: 100%;"
 
     // The code highlighter's JSON grammar, from the same release Lesson
     // uses, added to a page once if it shows JSON.
@@ -409,6 +429,394 @@ class QuorumPage is WebPage
         bannerColumn = column
         bannerPicture = image
         bannerActions = undefined
+        productBanner = false
+        heroBanner = false
+    end
+
+    /*
+        Adds a product banner, as the Download page has: a grey band with
+        the title and words in a third of it and a large screenshot in the
+        other two thirds, from a large screen up (stacked below that). Add
+        a button and a link under the words with BannerChoice and
+        BannerLink, which take the product look: a full-width button in the
+        site's button blue and a bold underlined link.
+
+        Attribute: Parameter title The page's title.
+        Attribute: Parameter words The words under it.
+        Attribute: Parameter picture The screenshot's location inside the relative folder.
+        Attribute: Parameter pictureDescription What it shows.
+    */
+    action ProductBanner(text title, text words, text picture, text pictureDescription)
+        Title(title)
+        Header header = GetTitleHeader()
+        SetStyle(header, quorumOptions:GetProductBanner())
+        SetStyleFromWidth(header, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetProductBannerWide())
+        Heading heading = GetLastHeading()
+        SetStyle(heading, quorumOptions:GetProductTitle())
+        // The title goes in the words' column, as the old banner had it.
+        header:Remove(heading)
+
+        Division row
+        SetLayout(row, quorumOptions:GetProductStack())
+        SetLayoutFromWidth(row, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetProductRow())
+        Division column
+        SetStyle(column, quorumOptions:GetProductWords())
+        SetStyleFromWidth(column, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetProductWordsWide())
+        SetLayout(column, quorumOptions:GetProductStack())
+        column:AddNestedTag(heading)
+        Paragraph paragraph
+        SetStyle(paragraph, quorumOptions:GetProductTagline())
+        paragraph:AddText(escaper:Escape(words))
+        column:AddNestedTag(paragraph)
+        row:AddNestedTag(column)
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyleFromWidth(image, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetProductPictureWide())
+        row:AddNestedTag(image)
+        header:AddNestedTag(row)
+        bannerColumn = column
+        bannerPicture = image
+        bannerActions = undefined
+        productBanner = true
+        heroBanner = false
+    end
+
+    /*
+        Adds a hero banner, as the home page has: a light blue band with a
+        logo beside the title, a line of words (written with the writer this
+        returns, so it can hold a link), and a picture, side by side from a
+        large screen up (stacked below that). Add buttons under the words
+        with BannerChoice: white pills.
+
+        Attribute: Parameter title The page's title, beside the logo.
+        Attribute: Parameter logo The logo's location inside the relative folder.
+        Attribute: Parameter logoDescription What the logo is.
+        Attribute: Parameter picture The picture's location inside the relative folder.
+        Attribute: Parameter pictureDescription What it shows.
+        Attribute: Returns A writer for the words under the title.
+    */
+    action HeroBanner(text title, text logo, text logoDescription, text picture, text pictureDescription) returns RichText
+        Title(title)
+        Header header = GetTitleHeader()
+        SetStyle(header, quorumOptions:GetHeroBanner())
+        SetStyleFromWidth(header, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetHeroBannerWide())
+        Heading heading = GetLastHeading()
+        SetStyle(heading, quorumOptions:GetHeroTitle())
+        header:Remove(heading)
+
+        Division row
+        SetLayout(row, quorumOptions:GetProductStack())
+        SetLayoutFromWidth(row, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetProductRow())
+        Division column
+        SetLayout(column, quorumOptions:GetProductStack())
+        Division logoRow
+        SetLayout(logoRow, quorumOptions:GetHeroLogoRow())
+        Image logoImage
+        logoImage:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), logo))))
+        logoImage:SetAlternate(escaper:EscapeAttribute(logoDescription))
+        SetStyle(logoImage, quorumOptions:GetHeroLogo())
+        logoRow:AddNestedTag(logoImage)
+        logoRow:AddNestedTag(heading)
+        column:AddNestedTag(logoRow)
+        Paragraph paragraph
+        SetStyle(paragraph, quorumOptions:GetHeroWordsBox())
+        column:AddNestedTag(paragraph)
+        row:AddNestedTag(column)
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetHeroPicture())
+        row:AddNestedTag(image)
+        header:AddNestedTag(row)
+        bannerColumn = column
+        bannerPicture = image
+        bannerActions = undefined
+        productBanner = false
+        heroBanner = true
+        return NewWriter(paragraph)
+    end
+
+    /*
+        Starts a switcher, as the home page's "Accessible, Friendly,
+        Proven": a bar of buttons, each showing one panel (a heading, its
+        words and a picture). Its script makes the buttons tabs that the
+        keyboard can move between; without it, every panel shows. Add each
+        panel with SwitcherItem.
+    */
+    action Switcher
+        if not switcherScriptAdded
+            AddScript(locations:FromSiteTop(SWITCHER_SCRIPT))
+            switcherScriptAdded = true
+        end
+        Division switcher
+        switcher:AddAttribute("data-switcher", "")
+        SetLayout(switcher, quorumOptions:GetSwitcherLayout())
+        Division bar
+        bar:AddAttribute("data-switcher-tabs", "")
+        SetStyle(bar, quorumOptions:GetSwitcherBarBox())
+        SetLayout(bar, quorumOptions:GetSwitcherBar())
+        Division barRow
+        SetLayout(barRow, quorumOptions:GetCenteredRow())
+        barRow:AddNestedTag(bar)
+        switcher:AddNestedTag(barRow)
+        Division panels
+        SetLayout(panels, quorumOptions:GetSwitcherLayout())
+        switcher:AddNestedTag(panels)
+        Include(switcher)
+        switcherButtons = bar
+        switcherPanels = panels
+        switcherCount = 0
+    end
+
+    /*
+        Adds a panel to the switcher Switcher started, and its button.
+
+        Attribute: Parameter button The button's words, such as "Accessible".
+        Attribute: Parameter title The panel's heading.
+        Attribute: Parameter words The panel's words.
+        Attribute: Parameter picture The panel's picture, inside the relative folder.
+        Attribute: Parameter pictureDescription What the picture shows.
+    */
+    action SwitcherItem(text button, text title, text words, text picture, text pictureDescription)
+        if switcherPanels = undefined
+            alert("A switcher item needs a switcher. Start one with Switcher.")
+        end
+        switcherCount = switcherCount + 1
+        Button tab
+        tab:SetType("button")
+        tab:AddAttribute("data-switcher-tab", "")
+        tab:AddText(escaper:Escape(button))
+        SetStyle(tab, quorumOptions:GetSwitcherButton())
+        // The script marks the chosen tab with aria-selected.
+        SetStyleWhenSelected(tab, quorumOptions:GetSwitcherButtonChosen())
+        switcherButtons:AddNestedTag(tab)
+
+        Division panel
+        panel:AddAttribute("data-switcher-panel", "")
+        SetLayout(panel, quorumOptions:GetPictureStack())
+        SetLayoutFromWidth(panel, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetPictureRow())
+        Division info
+        SetStyle(info, quorumOptions:GetSwitcherInfo())
+        SetStyleFromWidth(info, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetSwitcherInfoWide())
+        SetLayout(info, quorumOptions:GetPictureStack())
+        Heading heading
+        heading:SetScale(2)
+        SetStyle(heading, quorumOptions:GetSwitcherHeading())
+        heading:AddText(escaper:Escape(title))
+        info:AddNestedTag(heading)
+        Paragraph paragraph
+        paragraph:AddText(escaper:Escape(words))
+        info:AddNestedTag(paragraph)
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetSwitcherPicture())
+        // The second panel has its picture on the left, as the old page.
+        Division centered
+        SetLayout(centered, quorumOptions:GetCenteredRow())
+        if switcherCount mod 2 = 0
+            panel:AddNestedTag(image)
+            panel:AddNestedTag(info)
+        else
+            panel:AddNestedTag(info)
+            panel:AddNestedTag(image)
+        end
+        centered:AddNestedTag(panel)
+        switcherPanels:AddNestedTag(centered)
+    end
+
+    /*
+        Starts a section whose words are centered under a large heading,
+        as the home page's sections: Section, in the home page's look.
+
+        Attribute: Parameter title The section's heading.
+    */
+    action CenteredSection(text title)
+        Section(title)
+        SetStyle(GetLastHeading(), quorumOptions:GetHomeHeading())
+        SetStyle(GetCurrentPart(), quorumOptions:GetHomeSection())
+    end
+
+    /*
+        Adds words centered in a narrower column (three fifths of the width
+        from a small screen up), as the home page's sections have. Returns a
+        writer for them.
+
+        Attribute: Parameter words The words.
+        Attribute: Returns A writer for the paragraph.
+    */
+    action NarrowParagraph(text words) returns RichText
+        Division row
+        SetLayout(row, quorumOptions:GetCenteredRow())
+        Paragraph paragraph
+        SetStyle(paragraph, quorumOptions:GetNarrowWords())
+        SetStyleFromWidth(paragraph, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetNarrowWordsWide())
+        row:AddNestedTag(paragraph)
+        Include(row)
+        return NewWriter(paragraph):Text(words)
+    end
+
+    /*
+        Adds a centered link as an outlined pill, such as "Go to Access
+        Charts".
+
+        Attribute: Parameter words The link's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action OutlineButton(text words, text address)
+        IncludeCenteredPill(words, address, quorumOptions:GetOutlinePill())
+    end
+
+    /*
+        Adds a centered link as a black pill with white words, such as
+        "Learn about EPIQ".
+
+        Attribute: Parameter words The link's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action DarkButton(text words, text address)
+        IncludeCenteredPill(words, address, quorumOptions:GetDarkPill())
+    end
+
+    // A writer for words in an element of a part this page builds itself.
+    private action NewWriter(WebTag target) returns RichText
+        RichText writer
+        writer:SetTarget(target, me)
+        return writer
+    end
+
+    private action IncludeCenteredPill(text words, text address, WebBoxStyle look)
+        Division row
+        SetLayout(row, quorumOptions:GetCenteredRow())
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, look)
+        row:AddNestedTag(link)
+        Include(row)
+    end
+
+    /*
+        Adds a notice strip, as the home page's Discord invitation: a
+        rounded light blue box with a picture (from a medium screen up), a
+        heading and words, and buttons on the right (NoticeButton).
+
+        Attribute: Parameter picture The picture's location inside the relative folder.
+        Attribute: Parameter pictureDescription What it shows.
+        Attribute: Parameter title The strip's heading.
+        Attribute: Parameter words Its words.
+    */
+    action NoticeStrip(text picture, text pictureDescription, text title, text words)
+        Division strip
+        SetStyle(strip, quorumOptions:GetNotice())
+        SetLayout(strip, quorumOptions:GetPictureStack())
+        SetLayoutFromWidth(strip, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetPictureRow())
+        Division left
+        SetStyle(left, quorumOptions:GetNoticeWords())
+        SetLayout(left, quorumOptions:GetHeroLogoRow())
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetNoticePicture())
+        SetStyleFromWidth(image, constants:MEDIUM_SCREEN_WIDTH, quorumOptions:GetNoticePictureWide())
+        left:AddNestedTag(image)
+        Division column
+        SetLayout(column, quorumOptions:GetPictureStack())
+        // One level under the part it is in.
+        integer level = 3
+        if GetCurrentPart() = undefined
+            level = 2
+        end
+        Heading heading
+        heading:SetScale(level)
+        SetStyle(heading, quorumOptions:GetNoticeHeading())
+        heading:AddText(escaper:Escape(title))
+        column:AddNestedTag(heading)
+        Paragraph paragraph
+        paragraph:AddText(escaper:Escape(words))
+        column:AddNestedTag(paragraph)
+        left:AddNestedTag(column)
+        strip:AddNestedTag(left)
+        Division actions
+        SetLayout(actions, quorumOptions:GetBannerActions())
+        strip:AddNestedTag(actions)
+        Include(strip)
+        noticeActions = actions
+    end
+
+    /*
+        Adds a button to the notice strip NoticeStrip made last: an
+        outlined pill, such as "Join Now".
+
+        Attribute: Parameter words The button's words.
+        Attribute: Parameter address Where it goes.
+    */
+    action NoticeButton(text words, text address)
+        if noticeActions = undefined
+            alert("A notice button needs a notice strip. Add one first with NoticeStrip.")
+        end
+        Link link
+        link:SetAddress(escaper:EscapeAttribute(address))
+        link:AddText(escaper:Escape(words))
+        SetStyle(link, quorumOptions:GetOutlinePill())
+        noticeActions:AddNestedTag(link)
+    end
+
+    /*
+        Adds a feature card, as the Download page shows off a new feature:
+        a black card with its name and words in white in a quarter of it
+        and a large screenshot in the rest, from a large screen up (stacked
+        below that).
+
+        Attribute: Parameter title The feature's name (a heading).
+        Attribute: Parameter words Its words.
+        Attribute: Parameter picture The screenshot's location inside the relative folder.
+        Attribute: Parameter pictureDescription What it shows.
+    */
+    action FeatureCard(text title, text words, text picture, text pictureDescription)
+        Division card
+        SetStyle(card, quorumOptions:GetFeatureCard())
+        SetLayout(card, quorumOptions:GetPictureStack())
+        SetLayoutFromWidth(card, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetPictureRow())
+
+        Division column
+        SetStyle(column, quorumOptions:GetFeatureCardText())
+        SetStyleFromWidth(column, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetFeatureCardTextWide())
+        SetLayout(column, quorumOptions:GetPictureStack())
+        // One level under the part it is in, as CourseCard's heading.
+        integer level = 3
+        if GetCurrentPart() = undefined
+            level = 2
+        end
+        Heading name
+        name:SetScale(level)
+        SetStyle(name, quorumOptions:GetFeatureCardHeading())
+        name:AddText(escaper:Escape(title))
+        column:AddNestedTag(name)
+        Paragraph paragraph
+        paragraph:AddText(escaper:Escape(words))
+        column:AddNestedTag(paragraph)
+        card:AddNestedTag(column)
+
+        Image image
+        image:SetAddress(escaper:EscapeAttribute(locations:FromSiteTop(locations:Join(GetWebSite():GetRelativeFolder(), picture))))
+        image:SetAlternate(escaper:EscapeAttribute(pictureDescription))
+        SetStyle(image, quorumOptions:GetFeatureCardPicture())
+        SetStyleFromWidth(image, constants:LARGE_SCREEN_WIDTH, quorumOptions:GetFeatureCardPictureWide())
+        card:AddNestedTag(image)
+        Include(card)
+    end
+
+    /*
+        Starts course cards with grey lower halves under their pictures, as
+        the Download page's feature cards have. Add each with CourseCard.
+    */
+    action FeatureCards
+        CourseCards()
+        greyCardBodies = true
     end
 
     /*
@@ -432,7 +840,13 @@ class QuorumPage is WebPage
         Attribute: Parameter icon An SVG icon's location inside the relative folder, or "" for none.
     */
     action BannerChoice(text words, text address, text icon)
-        BannerActions():AddNestedTag(NewChoiceTile(words, address, icon))
+        Link tile = NewChoiceTile(words, address, icon)
+        if productBanner
+            SetStyle(tile, quorumOptions:GetProductButton())
+        elseif heroBanner
+            SetStyle(tile, quorumOptions:GetHeroPill())
+        end
+        BannerActions():AddNestedTag(tile)
     end
 
     /*
@@ -446,8 +860,18 @@ class QuorumPage is WebPage
         Link link
         link:SetAddress(escaper:EscapeAttribute(address))
         link:AddText(escaper:Escape(words))
-        SetStyle(link, GetStyleOptions():GetLink())
-        BannerActions():AddNestedTag(link)
+        if productBanner
+            // Centered under the button, as the old banner had it (the text
+            // styles have no centering, so a centered row holds it).
+            SetStyle(link, quorumOptions:GetProductLink())
+            Division row
+            SetLayout(row, quorumOptions:GetProductLinkRow())
+            row:AddNestedTag(link)
+            BannerActions():AddNestedTag(row)
+        else
+            SetStyle(link, GetStyleOptions():GetLink())
+            BannerActions():AddNestedTag(link)
+        end
     end
 
     // The row under the banner's words that holds its tiles and links.
@@ -457,7 +881,11 @@ class QuorumPage is WebPage
         end
         if bannerActions = undefined
             Division actions
-            SetLayout(actions, quorumOptions:GetBannerActions())
+            if productBanner or heroBanner
+                SetLayout(actions, quorumOptions:GetProductStack())
+            else
+                SetLayout(actions, quorumOptions:GetBannerActions())
+            end
             bannerColumn:AddNestedTag(actions)
             bannerActions = actions
         end
@@ -753,7 +1181,7 @@ class QuorumPage is WebPage
         end
         UseCharts()
         Division chart
-        chart:AddAttribute("style", CHART_LAYOUT)
+        SetStyle(chart, quorumOptions:GetChartBox())
         chart:AddText(file:Read())
         Include(chart)
     end
@@ -935,6 +1363,447 @@ class QuorumPage is WebPage
     end
 
     /*
+        Adds the Access Charts widget, which makes accessible charts or
+        downloads them as pictures: a place for it, which its script (added
+        to the page once) fills.
+    */
+    action AccessChartsWidget
+        if accessChartsAdded
+            alert("A page can have one Access Charts widget: its place has a fixed id.")
+        end
+        accessChartsAdded = true
+        AddScript(locations:FromSiteTop(ACCESS_CHARTS_SCRIPT_START + versions:GetWidgetVersion() + SCRIPT_ENDING))
+        // The widget's script finds its place by its class, and draws inside
+        // a box that is positioned, as the old page had it.
+        Division box
+        SetStyle(box, quorumOptions:GetAnchoredBox())
+        Division widget
+        widget:SetIdentifier("ac1")
+        widget:SetClassAttribute("data11y-access-chart")
+        box:Add(widget)
+        Include(box)
+    end
+
+    /*
+        Adds the block editor: a toolbar (Hide Tray, Zoom In, Zoom Out,
+        Hotkeys, Fullscreen, More, Run, Stop), the blocks with the program's
+        display beside them (when it has one), and the console under them,
+        with a hotkeys dialog and a "More" menu. The editor's scripts are
+        added to the page once; its look is the site's (BlockEditorLooks).
+        Its code comes from a file in the project, such as an example.
+
+        Attribute: Parameter fileName The code's file name in the editor, such as "Histogram.quorum".
+        Attribute: Parameter location The code's file, from the project's folder, such as "examples/Charts/Histogram2.quorum".
+        Attribute: Parameter palette The tray's file, such as "/palette/frontPage.xml".
+        Attribute: Parameter showDisplay True to show the program's display beside the blocks when it runs.
+        Attribute: Parameter fill True to fill the width of the part it is in.
+    */
+    action BlockEditor(text fileName, text location, text palette, boolean showDisplay, boolean fill)
+        if blockEditorAdded
+            alert("A page can have one block editor: its parts have fixed ids the editor's scripts use.")
+        end
+        blockEditorAdded = true
+        BlockEditorLooks looks = quorumOptions:GetBlockEditor()
+
+        CodeForIDE code
+        code:AddFileUrl(fileName, location)
+
+        Division editor
+        editor:SetIdentifier("BlockEditor")
+        if fill
+            SetStyle(editor, looks:GetFilledEditor())
+        else
+            SetStyle(editor, looks:GetEditor())
+        end
+        SetLayout(editor, looks:GetEditorLayout())
+        editor:Add(BlockHelpDialog())
+
+        Division toolbar
+        SetStyle(toolbar, looks:GetToolbar())
+        SetLayout(toolbar, looks:GetToolbarLayout())
+        Division title
+        SetStyle(title, looks:GetTitle())
+        SetLayout(title, looks:GetTitleLayout())
+        title:AddText(ReadIcon("quorumIcon.svg"))
+        title:AddText("Blocks")
+        toolbar:Add(title)
+
+        Division buttons
+        SetStyle(buttons, looks:GetButtons())
+        SetLayout(buttons, looks:GetButtonsLayout())
+        Button hideTray = BlockTool("Hide Tray", "eyeIcon.svg", "blockEditorTogglePalette()", "")
+        hideTray:GetTag(1):SetIdentifier("HidePaletteContainer")
+        buttons:Add(hideTray)
+        buttons:Add(BlockTool("Zoom In", "zoomIn.svg", "blockEditorZoomIn()", ""))
+        buttons:Add(BlockTool("Zoom Out", "zoomOut.svg", "blockEditorZoomOut()", ""))
+        buttons:Add(BlockTool("Hotkeys", "helpIcon.svg", "showBlockHelpModal()", "blockHelpButton"))
+        // Each with a second icon the script shows instead: Minimize in
+        // fullscreen, an up arrow while the menu is open.
+        Button fullscreen = BlockTool("Fullscreen", "fullscreenIcon.svg", "minimizeIcon.svg", "blockEditorFullscreen()", "blockEditorFullscreenButton")
+        fullscreen:GetTag(2):SetIdentifier("blockFullscreenLabel")
+        buttons:Add(fullscreen)
+        Button more = BlockTool("More", "moreIcon.svg", "moreIconClose.svg", "blockEditorMoreToggle()", "blockEditorMoreButton")
+        more:GetTag(2):SetIdentifier("blockMoreLabel")
+        more:AddAttribute("aria-haspopup", "true")
+        more:AddAttribute("aria-controls", "moreActionsMenu")
+        more:AddAttribute("aria-expanded", "false")
+        buttons:Add(more)
+        buttons:Add(BlockMoreMenu())
+
+        // While Run waits (disabled), its icon hides and the spinner shows.
+        Button run
+        run:SetIdentifier("blockRunButton")
+        SetStyle(run, looks:GetRun())
+        SetLayout(run, looks:GetRunLayout())
+        SetStyleWhenDisabled(run, looks:GetUnavailable())
+        run:AddAttribute("aria-label", "Run Program")
+        Span runIcon
+        runIcon:AddText(ReadIcon("runIcon.svg"))
+        SetStyleInsideDisabled(runIcon, looks:GetHidden())
+        run:AddNestedTag(runIcon)
+        Span spinner
+        spinner:AddText(ReadIcon("spinner.svg"))
+        SetStyle(spinner, looks:GetSpinner())
+        SetStyleInsideDisabled(spinner, looks:GetShown())
+        run:AddNestedTag(spinner)
+        run:AddText(" &nbsp;Run")
+        run:SetOnClick("blockEditorRunCode('QuorumUIOutput','QuorumUIContainer')")
+        buttons:Add(run)
+        Button stop
+        stop:SetIdentifier("blockStopButton")
+        SetStyle(stop, looks:GetStop())
+        SetLayout(stop, looks:GetRunLayout())
+        SetStyleWhenDisabled(stop, looks:GetUnavailable())
+        stop:AddAttribute("aria-label", "Stop Program")
+        stop:AddText(ReadIcon("stopIcon.svg"))
+        stop:AddText(" &nbsp;Stop")
+        stop:SetOnClick("window.BLOCK_EDITOR.BlockEditorStop()")
+        stop:SetDisabled(true)
+        buttons:Add(stop)
+        toolbar:Add(buttons)
+        editor:Add(toolbar)
+
+        Division area
+        SetStyle(area, looks:GetArea())
+        SetLayout(area, looks:GetAreaLayout())
+        Division blocks
+        blocks:SetIdentifier("BlockUIContainer")
+        // The editor's scripts find the blocks by this class.
+        blocks:SetClassAttribute("focusButton")
+        SetStyle(blocks, looks:GetTray())
+        if not palette:IsEmpty()
+            blocks:AddAttribute("data-palette-for-ide", palette)
+        end
+        blocks:AddAttribute("data-code-for-ide", code:GetJsonArray())
+        area:Add(blocks)
+        if showDisplay
+            Division display
+            display:SetIdentifier("QuorumUIContainer")
+            SetStyle(display, looks:GetDisplay())
+            SetStyleWhenEmpty(display, looks:GetHidden())
+            area:Add(display)
+        end
+        editor:Add(area)
+
+        Division console
+        console:SetIdentifier("QuorumUIOutput")
+        SetStyle(console, looks:GetConsole())
+        console:AddAttribute("role", "log")
+        console:AddAttribute("aria-label", "Console Output")
+        console:SetTabIndex("0")
+        editor:Add(console)
+
+        AddBlockEditorScripts(editor)
+        Include(editor)
+    end
+
+    // A toolbar button: its icon above its label.
+    private action BlockTool(text label, text icon, text onClick, text identifier) returns Button
+        return BlockTool(label, icon, "", onClick, identifier)
+    end
+
+    // A toolbar button with a second icon the script swaps in (such as
+    // Minimize in fullscreen), both above its label.
+    private action BlockTool(text label, text icon, text otherIcon, text onClick, text identifier) returns Button
+        BlockEditorLooks looks = quorumOptions:GetBlockEditor()
+        Button tool
+        if not identifier:IsEmpty()
+            tool:SetIdentifier(identifier)
+        end
+        SetStyle(tool, looks:GetTool())
+        SetLayout(tool, looks:GetToolLayout())
+        SetBlockButtonStates(tool)
+        tool:AddAttribute("aria-label", label)
+        tool:AddText(ReadIcon(icon))
+        if not otherIcon:IsEmpty()
+            tool:AddText(ReadIcon(otherIcon))
+        end
+        Division name
+        SetStyle(name, looks:GetToolLabel())
+        name:AddText(label)
+        tool:AddNestedTag(name)
+        tool:SetOnClick(onClick)
+        return tool
+    end
+
+    // A toolbar button's or menu item's background under the pointer or
+    // focus, and pressed.
+    private action SetBlockButtonStates(Button button)
+        BlockEditorLooks looks = quorumOptions:GetBlockEditor()
+        SetStyleOnHover(button, looks:GetActive())
+        SetStyleOnFocus(button, looks:GetActive())
+        SetStyleWhenPressed(button, looks:GetPressed())
+    end
+
+    // An icon from the project's icons folder, as its SVG.
+    private action ReadIcon(text name) returns text
+        File file
+        file:SetPath(BLOCK_EDITOR_ICONS + name)
+        return file:Read()
+    end
+
+    // The hotkeys dialog, which script.js shows and hides.
+    private action BlockHelpDialog returns Division
+        BlockEditorLooks looks = quorumOptions:GetBlockEditor()
+        Division center
+        SetLayout(center, looks:GetDialogRow())
+        Division dialog
+        dialog:SetIdentifier("blockHelpModal")
+        SetStyle(dialog, looks:GetDialog())
+        dialog:AddAttribute("aria-modal", "true")
+        dialog:AddAttribute("aria-roledescription", "dialog")
+        dialog:AddAttribute("aria-labelledby", "blockHotkeyTitle")
+        dialog:AddAttribute("aria-hidden", "true")
+        Division content
+        content:SetIdentifier("blockHelpModalContent")
+        SetStyle(content, looks:GetDialogContent())
+        SetLayout(content, looks:GetDialogContentLayout())
+        content:SetTabIndex("0")
+        Button close
+        close:SetTabIndex("0")
+        SetStyle(close, looks:GetDialogClose())
+        close:AddText("X")
+        close:SetOnClick("hideBlockHelpModal()")
+        content:Add(close)
+        Division section
+        SetLayout(section, looks:GetHotkeys())
+        Paragraph title
+        title:SetIdentifier("blockHotkeyTitle")
+        SetStyle(title, looks:GetDialogTitle())
+        title:AddText("Hotkey Shortcuts")
+        section:Add(title)
+        UnorderedList list
+        SetLayout(list, looks:GetHotkeys())
+        AddHotkey(list, "Move Blocks", "UP DOWN TAB", " or ")
+        AddHotkey(list, "Run Program ", "ALT SHIFT R", " + ")
+        AddHotkey(list, "Stop Program ", "ALT SHIFT S", " + ")
+        AddHotkey(list, "Hide Tray ", "ALT SHIFT X", " + ")
+        AddHotkey(list, "Zoom In ", "ALT +", " + ")
+        AddHotkey(list, "Zoom Out ", "ALT -", " + ")
+        AddHotkey(list, "Open Help ", "ALT SHIFT H", " + ")
+        AddHotkey(list, "Navigate to Tray ", "ALT 1", " + ")
+        AddHotkey(list, "Navigate to Blocks ", "ALT 2", " + ")
+        AddHotkey(list, "Enter Navigation Mode ", "SHIFT ENTER", " + ")
+        AddHotkey(list, "Switch to Next Tab ", "CTRL ]", " + ")
+        AddHotkey(list, "Switch to Previous Tab", "CTRL [", " + ")
+        section:Add(list)
+        content:Add(section)
+        dialog:Add(content)
+        center:Add(dialog)
+        return center
+    end
+
+    // A hotkey: its words, then its keys (separated by spaces), each in a
+    // small box, with the separator between them. ALT is "OSSpecific": the
+    // hotkey script turns it into the right key for the reader's system.
+    private action AddHotkey(UnorderedList list, text words, text keys, text separator)
+        BlockEditorLooks looks = quorumOptions:GetBlockEditor()
+        ListItem item
+        item:AddText(words)
+        Array<text> keyNames = keys:Split(" ")
+        integer i = 0
+        repeat while i < keyNames:GetSize()
+            if i > 0
+                item:AddText(separator)
+            end
+            text keyName = keyNames:Get(i)
+            Span key
+            if keyName = "ALT"
+                key:SetClassAttribute("OSSpecific")
+            end
+            SetStyle(key, looks:GetKey())
+            key:AddText(keyName)
+            item:AddNestedTag(key)
+            i = i + 1
+        end
+        list:Add(item)
+    end
+
+    // The "More" menu, which script.js opens and closes.
+    private action BlockMoreMenu returns Division
+        Division menu
+        menu:SetIdentifier("moreActionsMenu")
+        SetStyle(menu, quorumOptions:GetBlockEditor():GetMenu())
+        menu:Add(BlockMenuItem("freeformButton", "Convert to Freeform", "freeform"))
+        menu:Add(BlockMenuItem("pickUpButton", "Pick Up Block", "pickUp"))
+        menu:Add(BlockMenuItem("dropButton", "Drop Block", "drop"))
+        menu:Add(BlockMenuItem("deleteButton", "Delete Block", "delete"))
+        menu:Add(BlockMenuItem("moveUpButton", "Move Placeholder Up", "moveUp"))
+        menu:Add(BlockMenuItem("moveDownButton", "Move Placeholder Down", "moveDown"))
+        menu:Add(BlockMenuItem("undoButton", "Undo", "undo"))
+        menu:Add(BlockMenuItem("redoButton", "Redo", "redo"))
+        menu:Add(BlockMenuItem("cutButton", "Cut", "cut"))
+        menu:Add(BlockMenuItem("copyButton", "Copy", "copy"))
+        menu:Add(BlockMenuItem("pasteButton", "Paste", "paste"))
+        return menu
+    end
+
+    private action BlockMenuItem(text identifier, text words, text command) returns Button
+        Button item
+        item:SetIdentifier(identifier)
+        SetStyle(item, quorumOptions:GetBlockEditor():GetMenuItem())
+        SetBlockButtonStates(item)
+        item:AddText(words)
+        item:SetOnClick("blockEditorMoreActions('" + command + "')")
+        return item
+    end
+
+    // The editor's scripts, as BlockIDE added them: blockEditor.js, the
+    // hotkey labels, the display's focus, the menu's focus, the jump to the
+    // editor, and the start, written so it works whether load.js has run
+    // or not.
+    private action AddBlockEditorScripts(Division editor)
+        Script module
+        module:SetType("module")
+        module:SetAddress(locations:FromSiteTop(BLOCK_EDITOR_SCRIPT) + versions:GetBlockEditorVersionQuery())
+        editor:Add(module)
+        editor:Add(InlineScript("
+const elements = document.querySelectorAll('.OSSpecific');
+let OSkey = 'UNKNOWN';
+let macTabNextKey = ']';
+let macTabPreviousKey = '[';
+let userAgent = window.navigator.userAgent;
+
+if (userAgent.indexOf('Win') != -1) {
+  OSkey = 'ALT';
+} else if (userAgent.indexOf('Mac') != -1) {
+  OSkey = 'CTRL';
+  let heading = document.getElementById('blockHotkeyTitle');
+  heading.innerText = 'Hotkey Shortcuts (Mac)';
+} else {
+  OSkey = 'ALT';
+}
+elements.forEach(keySpan => {
+  keySpan.innerHTML = OSkey;
+});
+"))
+        editor:Add(InlineScript("
+// observe the ui container for mutations
+const observerUIContainer = document.getElementById('QuorumUIContainer');
+const observerBlockContainer = document.getElementById('BlockUIContainer');
+var observerFocused = false;
+// check to see if canvas was added to the ui container
+const callback = (mutationList) => {
+  if(observerUIContainer.hasChildNodes()) {
+    let list = observerUIContainer.getElementsByTagName('canvas');
+    if (list.length != 0 && !observerFocused) {
+      observerBlockContainer.display = 'none';
+      observerBlockContainer.ariaHidden = 'true';
+      let buttons = observerBlockContainer.getElementsByTagName('button');
+      if(buttons.length > 0) buttons[0].tabIndex = 0;
+      if (observerBlockContainer.contains(document.activeElement)) {
+        observerUIContainer.getElementsByTagName('button')[0].focus();
+        observerFocused = true;
+      }
+    }
+  } else {
+    observerBlockContainer.display = 'block';
+    observerBlockContainer.ariaHidden = 'false';
+    let buttons = observerBlockContainer.getElementsByTagName('button');
+    if(buttons.length > 0) buttons[0].tabIndex = 0;
+    observerFocused = false;
+  }
+};
+
+const observer = new MutationObserver(callback);
+observer.observe(observerUIContainer, {childList: true});
+"))
+        editor:Add(InlineScript("
+  const container = document.getElementById('moreActionsMenu');
+  const triggerButton = document.getElementById('moreButton');
+
+  container.addEventListener('focusout', e => {
+    if (e.relatedTarget === triggerButton) return;
+    if (!container.contains(e.relatedTarget)) {
+      blockEditorMoreToggle(false);
+    }
+  });
+
+  container.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      blockEditorMoreToggle(false);
+      triggerButton.focus();
+    }
+  });"))
+        editor:Add(InlineScript("const blockContainer = document.getElementById('BlockUIContainer');
+
+if (blockContainer) {
+  let proxy = document.createElement('div');
+  proxy.id = 'editor-shortcut-proxy';
+  proxy.setAttribute('role', 'textbox');
+  proxy.setAttribute('aria-label', 'Jump to editor');
+  proxy.setAttribute('tabindex', '-1');
+  proxy.style.position = 'absolute';
+  proxy.style.width = '1px';
+  proxy.style.height = '1px';
+  proxy.style.overflow = 'hidden';
+  proxy.style.clip = 'rect(0, 0, 0, 0)';
+  proxy.style.whiteSpace = 'nowrap';
+
+  proxy.addEventListener('focus', () => {
+    const toggleBtn = blockContainer.querySelector('.focusButton');
+    if (toggleBtn) {
+      toggleBtn.click();
+    } else {
+      console.warn('.focusButton not found inside BlockUIContainer');
+    }
+  });
+
+  blockContainer.appendChild(proxy);
+} else {
+  console.warn('BlockUIContainer not found — proxy element not created.');
+}"))
+        editor:Add(InlineScript("(function(){
+  function start() {
+    import('/" + BLOCK_EDITOR_SCRIPT + versions:GetBlockEditorVersionQuery() + "').then((BlockEditor) => {
+      window.BLOCK_EDITOR = BlockEditor;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { BlockEditor.Start(); });
+      } else {
+        BlockEditor.Start();
+      }
+    });
+  }
+  if (window.Module && window.Module.calledRun) {
+    start();
+  } else {
+    window.Module = window.Module || {};
+    var earlier = window.Module['onRuntimeInitialized'];
+    window.Module['onRuntimeInitialized'] = function() {
+      if (earlier) { earlier(); }
+      start();
+    };
+  }
+})();"))
+    end
+
+    private action InlineScript(text code) returns Script
+        Script script
+        script:SetCode(code)
+        return script
+    end
+
+    /*
         Adds a search box for the topic map that follows it (TopicCards and
         TopicCard): as the reader types, only the tutorials whose name,
         description or lessons match stay shown, the matching words are
@@ -998,10 +1867,9 @@ class QuorumPage is WebPage
         jumps:AddAttribute("aria-label", TOPICS_LABEL)
         // A navigation can't take a layout, so the chips go in a row inside
         // it: one line that scrolls sideways on a phone, wrapping from a
-        // small screen up (the library has no sideways scrolling, so it is
-        // set here, as Chart sets its size).
+        // small screen up.
         Division row
-        row:AddAttribute("style", TOPIC_CHIPS_SCROLL)
+        SetStyle(row, quorumOptions:GetTopicChipsBox())
         SetLayout(row, quorumOptions:GetTopicChips())
         SetLayoutFromWidth(row, constants:SMALL_SCREEN_WIDTH, quorumOptions:GetTopicChipsWrapping())
         jumps:AddNestedTag(row)
@@ -1009,7 +1877,6 @@ class QuorumPage is WebPage
         repeat while i < names:GetSize()
             text name = names:Get(i)
             Link chip
-            chip:AddAttribute("style", TOPIC_CHIP_SIZE)
             chip:SetAddress("#" + HeadingAddress(name))
             chip:AddText(escaper:Escape(name))
             SetStyle(chip, quorumOptions:GetTopicChip())
@@ -1142,6 +2009,7 @@ class QuorumPage is WebPage
         courseGrid = grid
         courseBody = undefined
         courseDetails = undefined
+        greyCardBodies = false
     end
 
     /*
@@ -1175,7 +2043,11 @@ class QuorumPage is WebPage
         end
 
         Division body
-        SetStyle(body, quorumOptions:GetCourseCardBody())
+        if greyCardBodies
+            SetStyle(body, quorumOptions:GetGreyCardBody())
+        else
+            SetStyle(body, quorumOptions:GetCourseCardBody())
+        end
         SetLayout(body, quorumOptions:GetCourseCardLayout())
         // A card's heading is one level under the part it is in (h2 on a
         // page with no sections), so no heading level is skipped.
@@ -1478,6 +2350,10 @@ class QuorumPage is WebPage
         button:AddAttribute(marker, "")
         button:AddText(escaper:Escape(words))
         SetStyle(button, quorumOptions:GetSlideButton())
+        // The script copies these classes to each slide's button, and
+        // marks the current one with aria-current.
+        SetStyleWhenCurrent(button, quorumOptions:GetSlideButtonCurrent())
+        SetStyleWhenDisabled(button, quorumOptions:GetSlideButtonUnavailable())
         return button
     end
 

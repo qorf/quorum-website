@@ -1,407 +1,44 @@
-use Libraries.Web.Page.all
-use Libraries.Containers.Array
-use Libraries.Web.VersionHelper
+use Libraries.Web.Page.QuorumPage
 
-class Index is Lesson
-    text dq = ""
-    dq = dq:GetDoubleQuote()
-
+/*
+    The home page (plan 13 phase 5C), as close to its old look as possible
+    (the user, 2026-11-01): a light blue hero band across the window, the
+    "Accessible, Friendly, Proven" switcher, Data Science with the block
+    editor, the Discord strip, and professional development with photos.
+    Its old headings were h1 three times; they are h2 now, in the old size.
+*/
+class Index is QuorumPage
+    on create
+        SetLocation("index.html")
+    end
 
     action Setup
-        LineBreak break //will be used multiple times
-    
-        //html header stuff
         SetWebPageTitle("The Quorum Programming Language")
-        AddDefaultHeaders()
-    
-        //Main Region
-        Header blueHeader = makeBlueHeader()
-        Add(blueHeader)
+        HeroBanner("Quorum", "media/userInterface/SVG/blackQuorumLogo.svg", "Quorum Logo", "media/userInterface/quorumAssets/bunnyMain.png", "Tech-savvy bunny named Quincy with glasses working on a laptop"):Text("The World's "):Link("First Evidence Oriented", "/evidence.html"):Text(" Programming Language")
+        BannerChoice("Try it Online", "/problems/output/start.html", "")
+        BannerChoice("EPIQ 2026", "/epiq.html", "")
 
-        Array<Division> divs = InitializeTutorialPage()
-        Division leftDiv = divs:Get(0)
-        Division bodyDiv = divs:Get(1)
-        Division rightDiv = divs:Get(2)
+        Switcher()
+        SwitcherItem("Accessible", "Born Accessible", "Quorum is conscious about its user base and focuses on making the language intuitive for individuals with disabilities.", "media/userInterface/quorumAssets/accessibility.png", "Thoughtful bunny pondering symbols")
+        SwitcherItem("Friendly", "User Friendly", "Quorum is designed using simple words that are easy to interpret", "media/userInterface/quorumAssets/friendly.png", "Person admiring a radiant bespectacled bunny")
+        SwitcherItem("Proven", "Evidence Based", "Quorum's design uses studies that experts have checked about how people behave. It changes over time if there is new data.", "media/userInterface/quorumAssets/proven.png", "Surprised bunny with glasses reading a note")
 
-        leftDiv:SetClassAttribute("hidden")
-        rightDiv:SetClassAttribute("hidden")
-        bodyDiv:SetClassAttribute("flex flex-col w-full gap-y-6 px-5% lg:px-10% space-y-12")
+        CenteredSection("Data Science made simple")
+        NarrowParagraph("Quorum allows you to ease into the world of data science. You can create charts, clean up your data, and conduct descriptive statistical tests. Play around with the chart, you can even interact with it!")
+        BlockEditor("Histogram.quorum", "examples/Charts/Histogram2.quorum", "/palette/frontPage.xml", true, true)
+        NarrowParagraph("Quorum's chart creator has the ability to turn any chart accessible. Try it out today!")
+        OutlineButton("Go to Access Charts", "/widgets/accessCharts.html")
+        NoticeStrip("media/userInterface/quorumAssets/carrotMegaphone.png", "Megaphone made out of a carrot", "Join the Community Discord", "Get Quorum support and help advocate accessibility standards!")
+        NoticeButton("Join Now", "https://discord.gg/6yTVQq4")
 
-
-        Section infoCarousel = makeInfoCarousel()
-        Section discord = MakeDiscord()
-        Section joinCommunitySection = makeJoinTheCommunity()
-        Section ideSection = makeIdeSection()
-        Section tryQuorumToday = makeTryQuorumToday()
-        bodyDiv:Add(infoCarousel)
-bodyDiv:Add(ideSection)
-                        bodyDiv:Add(discord)
-bodyDiv:Add(joinCommunitySection)
-//bodyDiv:Add(tryQuorumToday)
-
-    end
-
-    action makeBlueHeader returns Header
-        Header blueHeader
-        blueHeader:AddClassAttribute("bg-quorum-blue-25 flex h-3/5 flex-row items-center justify-center py-10 w-full")
-    
-        // Quorum Icon and Text section
-        Division words
-        words:AddClassAttribute("flex flex-col items-start gap-4 mr-8") // Updated to flex-col and added gap and margin-right
-    
-        Division quorumIconAndTitle
-        quorumIconAndTitle:AddClassAttribute("flex flex-row items-center")
-        Image quorumIcon
-        quorumIcon:SetAlternate("Quorum Logo")
-        quorumIcon:SetAddress("media/userInterface/SVG/blackQuorumLogo.svg")
-        quorumIcon:AddClassAttribute("w-16 h-16") // Adjust the width and height as needed
-        Heading quorumHeader
-        quorumHeader:SetScale(1)
-        quorumHeader:AddText("Quorum")
-        quorumHeader:AddClassAttribute("text-4xl text-center font-semibold font-sans pl-4")
-        quorumIconAndTitle:Add(quorumIcon)
-        quorumIconAndTitle:Add(quorumHeader)
-        words:Add(quorumIconAndTitle)
-    
-        Paragraph sloganText
-        sloganText:AddText("The World's <a class="+ dq +"text-neutral-black underline" + dq + " href="+ dq +"/evidence.html" + dq +  " data-test="+dq+"first-evidence-oriented-link"+dq +   ">First Evidence Oriented</a> Programming Language")
-        sloganText:AddClassAttribute("text-quorum-blue-150 font-bold w-52")
-        words:Add(sloganText)
-    
-        Link getStartedLink
-        getStartedLink:SetTitle("Learn Quorum")
-        getStartedLink:AddText("Try it Online")
-        getStartedLink:SetAddress("/problems/output/start.html")
-        getStartedLink:AddAttribute("data-test", "get-started-button")
-        getStartedLink:AddClassAttribute("py-2 px-12 bg-neutral-white w-fit h-fit rounded-3xl font-bold")
-        words:Add(getStartedLink)
-        
-Link applyToEpiqLink
-        applyToEpiqLink:AddText("EPIQ 2026")
-        applyToEpiqLink:SetAddress("/epiq.html")
-        applyToEpiqLink:AddAttribute("data-test", "apply-epiq-button")
-        applyToEpiqLink:AddClassAttribute("py-2 px-12 bg-neutral-white w-fit h-fit rounded-3xl font-bold")
-        words:Add(applyToEpiqLink)
-              
-        blueHeader:Add(words)
-    
-        // Bunny Image
-        Division bunnyImageHolder
-        bunnyImageHolder:AddClassAttribute("w-1/4 max-w-[300px]")
-    
-        Image bunny
-        bunny:SetAddress("media/userInterface/quorumAssets/bunnyMain.png")
-        bunny:AddClassAttribute("w-full")
-        bunny:SetAlternate("Tech-savvy bunny named Quincy with glasses working on a laptop")
-
-        bunnyImageHolder:Add(bunny)
-        
-        blueHeader:Add(bunnyImageHolder)
-    
-        return blueHeader
-    end
-
-    action makeInfoCarousel returns Section
-        Section infoCarouselSection
-        infoCarouselSection:AddAttribute("aria-live", "polite")
-        infoCarouselSection:AddClassAttribute("mx-auto flex justify-center flex-col items-center gap-y-8 h-max")
-        Array<Division> sections
-        integer currentSectionIndex = 0
-        
-        Array<text> titles
-        Array<text> descriptions
-        Array<text> imageSources
-        Array<text> imageAltText
-        
-        titles:Add("Born Accessible")
-        descriptions:Add("Quorum is conscious about its user base and focuses on making the language intuitive for individuals with disabilities.")
-        imageSources:Add("media/userInterface/quorumAssets/accessibility.png")
-        imageAltText:Add("Thoughtful bunny pondering symbols")
-    
-        titles:Add("User Friendly")
-        descriptions:Add("Quorum is designed using simple words that are easy to interpret")
-        imageSources:Add("media/userInterface/quorumAssets/friendly.png")
-        imageAltText:Add("Person admiring a radiant bespectacled bunny")    
-
-        titles:Add("Evidence Based")
-        descriptions:Add("Quorum's design uses studies that experts have checked about how people behave. It changes over time if there is new data.")
-        imageSources:Add("media/userInterface/quorumAssets/proven.png")
-        imageAltText:Add("Surprised bunny with glasses reading a note")    
-
-        integer i = 0
-        NavigationDivision buttonNav
-        buttonNav:AddClassAttribute("flex space-x-2 bg-neutral-grey-25 rounded-3xl w-fit justify-between items-stretch")
-        Array<text> buttonTitles
-        buttonTitles:Add("Accessible")
-        buttonTitles:Add("Friendly")
-        buttonTitles:Add("Proven")
-        repeat until i > titles:GetSize() -1
-            Button navButton
-            navButton:AddText(buttonTitles:Get(i))
-            navButton:SetIdentifier("button" + i)
-            navButton:AddAttribute("data-test", buttonTitles:Get(i))
-            navButton:AddClassAttribute("flex justify-center items-center font-bold flex-1 py-2 px-6 rounded-3xl bg-neutral-grey-25 focus:text-quorum-blue-150 hover:text-quorum-blue-150")
-            navButton:AddAttribute("aria-label", "show description for " + buttonTitles:Get(i))
-            buttonNav:Add(navButton)
-            i = i + 1
-        end
-        infoCarouselSection:Add(buttonNav)
-        
-        i = 0
-        repeat until i > titles:GetSize() -1
-            Division sectionDiv
-            sectionDiv:SetIdentifier("section" + i)
-            sectionDiv:AddClassAttribute("flex w-full items-center justify-center sm: px-16")
-            if i = 1
-                sectionDiv:AddClassAttribute("flex-row-reverse")
-            end
-            Division infoDiv
-            infoDiv:AddClassAttribute("flex flex-col w-2/5")
-            Heading h2
-            h2:SetScale(2)
-            h2:AddClassAttribute("text-3xl font-sans font-semibold")
-            Paragraph p
-            h2:AddText(titles:Get(i))
-            infoDiv:Add(h2)
-            p:AddText(descriptions:Get(i))
-            infoDiv:Add(p)
-            sectionDiv:Add(infoDiv)
-            
-            Image image
-            image:AddClassAttribute("w-72")
-            image:SetAddress(imageSources:Get(i))
-            image:SetAlternate(imageAltText:Get(i))
-            sectionDiv:Add(image)
-            
-            infoCarouselSection:Add(sectionDiv)
-            i = i + 1
-        end
-        
-        Script script
-        script:SetCode("
-            document.addEventListener('DOMContentLoaded', function() {
-                let sections = document.querySelectorAll('[id^=\'section\']');
-                let buttons = document.querySelectorAll('[id^=\'button\']');
-                let inactiveButtonStyle = ['bg-neutral-grey-25', 'text-neutral-grey-50', 'focus:text-neutral-black', 'hover:text-quorum-blue-150'];
-                let activeButtonStyle = ['bg-quorum-blue-50', 'text-neutral-black'];
-                
-                // Initial setup
-                resetSectionsAndButtons()
-                sections[0].classList.remove('hidden');
-                buttons[0].classList.add(...activeButtonStyle);
-                buttons[0].classList.remove(...inactiveButtonStyle);
-
-                buttons.forEach((button, index) => {
-                    button.addEventListener('click', () => {
-                        resetSectionsAndButtons();
-                        button.classList.add(...activeButtonStyle);
-                        button.classList.remove(...inactiveButtonStyle);
-                        sections[index].classList.remove('hidden');
-                    });
-                });
-                
-                function resetSectionsAndButtons() {
-                    sections.forEach(section => section.classList.add('hidden'));
-                    buttons.forEach(button => button.classList.remove(...activeButtonStyle));
-                    buttons.forEach(button => button.classList.add(...inactiveButtonStyle));
-                }
-            });
-        ")
-        Add(script)
-        
-        return infoCarouselSection
-    end
-
-
-    action MakeDiscord returns Section
-        Section section
-
-        Division div2
-        div2:AddClassAttribute("flex bg-quorum-blue-25 rounded-3xl py-2 px-8 justify-between align-middle items-center w-full flex-col md:flex-row")
-        Division div3
-        div3:AddClassAttribute("flex flex-row items-center")
-        
-        Image image
-        image:AddClassAttribute("hidden w-[100px] h-[100px] md:block")
-        image:SetAlternate("Megaphone made out of a carrot")
-        image:SetAddress("media/userInterface/quorumAssets/carrotMegaphone.png")
-
-        VersionHelper versions
-        text quorumVersion = versions:GetConsoleVersion()
-        text quorumStudioVersion = versions:GetStudioVersion()
-
-        Division div4
-        div4:AddClassAttribute("flex flex-col gap-y-2")
-        Heading h2
-        h2:SetScale(2)
-        h2:AddClassAttribute("text-xl font-sans font-semibold")
-        h2:AddText("Join the Community Discord")
-
-        Paragraph p
-        p:AddText("Get Quorum support and help advocate accessibility standards!")
-        div3:Add(image)
-        div4:Add(h2)
-        div4:Add(p)
-        div3:Add(div4)
-        div2:Add(div3)
-        
-        Division div5
-        div5:AddClassAttribute("flex flex-row gap-x-4 items-center")
-        Link releaseNotes
-        releaseNotes:AddText("Release Notes")
-        releaseNotes:AddAttribute("data-test", "release-notes-button")
-        releaseNotes:SetAddress("/release.html")
-        releaseNotes:AddClassAttribute("text-quorum-blue-150 font-bold")
-
-        Link downloadLink
-        downloadLink:AddText("Join Now")
-        downloadLink:AddAttribute("data-test", "download-button")
-        downloadLink:SetAddress("https://discord.gg/6yTVQq4")
-        downloadLink:AddClassAttribute("bg-quorum-blue-10 px-6 border-quorum-blue-150 text-quorum-blue-150 rounded-3xl border-solid border-2 py-2 font-bold")
-        //div5:Add(releaseNotes)
-        div5:Add(downloadLink)
-        
-        div2:Add(div5)
-        section:Add(div2)
-        
-        return section
-    end
-
-    action makeIdeSection returns Section
-        Section section
-        section:AddClassAttribute("gap-y-6 h-fit flex flex-col items-center")
-
-        Heading h1
-        h1:AddClassAttribute("text-4xl font-sans font-semibold text-center")
-        h1:AddText("Data Science made simple")
-        section:Add(h1)
-
-        Paragraph p1
-        p1:AddClassAttribute("sm: w-5/5 w-3/5 text-center")
-        p1:AddText("Quorum allows you to ease into the world of data science. You can
-          create charts, clean up your data, and conduct descriptive statistical
-          tests. Play around with the chart, you can even interact with it!")
-        section:Add(p1)
-
-        CodeForIDE code
-        code:AddFileUrl("Histogram.quorum", "examples/Charts/Histogram2.quorum")
-
-BlockIDE ide
-        ide:SetFillDivision(true)
-        ide:SetNoCanvasMode(false)
-        text value = code:GetJsonArray()
-        ide:SetCodeForIDE(code:GetJsonArray())
-        text tray = "/palette/frontPage.xml"
-        ide:SetPaletteFile(tray)
-        
-ide:Setup(me)
-        //section_activity:Add(ide)
-        //IDE ide = AddIDE()
-        //ide:SetSimple()
-        //ide:SetLightTheme()
-        //ide:SetCodeForIDE(code1:GetJsonArray())
-        //ide:SetIdeTitle("Histogram")
-        //ide:SetHeight("400px")
-        section:Add(ide)
-
-        Paragraph p2
-        p2:AddText("Quorum's chart creator has the ability to turn any chart accessible. Try it out today!")
-        p2:AddClassAttribute("sm: w-5/5 w-3/5 text-center")
-        section:Add(p2)
-        
-        Link link
-        link:AddClassAttribute("border-quorum-blue-150 border-solid border-[2px] w-fit px-4 py-2 rounded-3xl text-quorum-blue-150 font-bold")
-        link:AddText("Go to Access Charts")
-        link:SetAddress("/widgets/accessCharts.html")
-        section:Add(link)
-        
-        return section
-    end
-
-    action makeJoinTheCommunity returns Section
-        Section section
-        section:AddClassAttribute("gap-y-6 h-fit flex flex-col items-center justify-center")
-
-        Heading h1
-        h1:SetScale(1)
-        h1:AddClassAttribute("text-4xl font-sans font-semibold text-center")
-        h1:AddText("Engage in Professional Development")
-        section:Add(h1)        
-
-        Paragraph p1
-        p1:AddClassAttribute("text-center")
-        p1:AddText("Every summer the Quorum team hosts a conference to teach professionals and educators about Quorum and the latest developments for accessible programming. This event is open to the public and is free. Learn how to program and become a catalyst in helping push for computer science access for all!")
-        section:Add(p1)
-
-        Division imageHolder
-        imageHolder:AddClassAttribute("grid w-full lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1")
-        Array<text> imageAddress
-        Array<text> imageAlt
-
-        imageAddress:Add("media/userInterface/quorumAssets/home-community1.png")
-        imageAlt:Add("Woman in wheelchair using a laptop")
-
-        imageAddress:Add("media/userInterface/quorumAssets/home-community2.png")
-        imageAlt:Add("Two young men working on laptops at a table")
-
-        imageAddress:Add("media/userInterface/quorumAssets/home-community3.png")
-        imageAlt:Add("Instructor guiding a group of adults around a table with laptops")
-
-        imageAddress:Add("media/userInterface/quorumAssets/home-community4.png")
-        imageAlt:Add("Instructor guiding students using laptops in a classroom")
-
-        integer i = 0
-        repeat until i > imageAddress:GetSize() - 1
-            Image image
-            image:SetAddress(imageAddress:Get(i))
-            image:SetAlternate(imageAlt:Get(i))
-            image:AddClassAttribute("max-w-[600px] w-full max-h-[600px]")
-            imageHolder:Add(image)
-            i = i + 1
-        end
-        section:Add(imageHolder)
-
-        Paragraph p2
-        p2:AddClassAttribute("text-center")
-        p2:AddText("Quorum Language is more than just a language. It’s an on-going project in an effort to give access to programming for all individuals. In this community, you will meet teachers, developers, researchers, designers, and scholars who working together to make a difference. In this diverse community, you are welcome to ask for help or participate in the many on-going projects!")
-        
-        section:Add(p2)
-
-        Link link
-        link:AddText("Learn about EPIQ")
-        link:SetAddress("/epiq.html")
-        link:AddAttribute("data-test", "get-started-button-2")
-        link:AddClassAttribute("bg-neutral-black w-fit px-4 py-2 rounded-3xl text-neutral-white font-bold")
-
-        section:Add(link)
-
-        return section
-    end
-
-    action makeTryQuorumToday returns Section
-        Section section
-        section:AddClassAttribute("gap-y-6 h-fit flex flex-col items-center justify-center w-full")
-
-        Image image
-        image:SetAlternate("Quorum Logo")
-        image:SetAddress("/media/userInterface/quorumAssets/transparentQuorumlogo.png")
-        image:AddClassAttribute("h-[75px] w-[75px]")
-
-        Paragraph p
-        p:AddText("Try Quorum Today")
-        p:AddClassAttribute("text-3xl font-sans font-bold")
-
-        Link link
-        link:AddText("Get Started")
-        link:SetAddress("/tutorials/blocks/gettingStartedBlocks.html")
-        link:AddAttribute("data-test", "get-started-button-2")
-        link:AddClassAttribute("bg-quorum-blue-100 w-fit px-4 py-2 rounded-3xl text-neutral-black font-bold")
-
-        section:Add(image)
-        section:Add(p)
-        section:Add(link)
-        
-        return section
+        CenteredSection("Engage in Professional Development")
+        Paragraph("Every summer the Quorum team hosts a conference to teach professionals and educators about Quorum and the latest developments for accessible programming. This event is open to the public and is free. Learn how to program and become a catalyst in helping push for computer science access for all!")
+        PictureGrid()
+        GridPicture("media/userInterface/quorumAssets/home-community1.png", "Woman in wheelchair using a laptop")
+        GridPicture("media/userInterface/quorumAssets/home-community2.png", "Two young men working on laptops at a table")
+        GridPicture("media/userInterface/quorumAssets/home-community3.png", "Instructor guiding a group of adults around a table with laptops")
+        GridPicture("media/userInterface/quorumAssets/home-community4.png", "Instructor guiding students using laptops in a classroom")
+        Paragraph("Quorum Language is more than just a language. It’s an on-going project in an effort to give access to programming for all individuals. In this community, you will meet teachers, developers, researchers, designers, and scholars who working together to make a difference. In this diverse community, you are welcome to ask for help or participate in the many on-going projects!")
+        DarkButton("Learn about EPIQ", "/epiq.html")
     end
 end
-

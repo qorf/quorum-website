@@ -1,7 +1,10 @@
 // Slides on a QuorumPage (QuorumPage:Slides). The page has each slide as an
 // ordinary subsection after a [data-slides] navigation row; this script
 // moves the row under the slides, adds a button for each slide, and shows
-// one slide at a time. Without it, every slide shows.
+// one slide at a time. It marks the current slide's button with
+// aria-current and disables Previous or Next at the ends; the site's
+// stylesheet gives those their look (QuorumPage:Slides), and each slide's
+// button copies Previous's classes. Without it, every slide shows.
 (function () {
   function setUp(navigation) {
     var slides = [];
@@ -19,9 +22,6 @@
     var previousButton = navigation.querySelector('[data-slides-previous]');
     var nextButton = navigation.querySelector('[data-slides-next]');
     var numbers = navigation.querySelector('[data-slides-numbers]');
-    var look = getComputedStyle(previousButton);
-    var normalBackground = look.backgroundColor;
-    var normalColor = look.color;
     var numberButtons = [];
     var current = 0;
 
@@ -38,8 +38,6 @@
 
     function setEnabled(button, enabled) {
       button.disabled = !enabled;
-      button.style.opacity = enabled ? '' : '0.5';
-      button.style.cursor = enabled ? '' : 'not-allowed';
     }
 
     function show(index) {
@@ -52,8 +50,6 @@
         } else {
           button.removeAttribute('aria-current');
         }
-        button.style.backgroundColor = selected ? normalColor : normalBackground;
-        button.style.color = selected ? normalBackground : normalColor;
       });
       setEnabled(previousButton, index > 0);
       setEnabled(nextButton, index < slides.length - 1);

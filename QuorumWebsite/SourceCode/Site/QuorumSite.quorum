@@ -18,6 +18,7 @@ use Libraries.Web.Page.UnorderedList
 use Libraries.Web.Page.Link
 use Libraries.Web.Page.Heading
 use Libraries.Web.Page.MainContent
+use Libraries.Web.Page.Header
 use Libraries.Web.Page.Span
 use Libraries.Web.Page.Image
 use Libraries.Web.Styles.WebTextStyle
@@ -71,6 +72,13 @@ class QuorumSite is WebSite
 
     // Pages with no "On this page" at all (see HideOnThisPage).
     HashTable<WebPage, boolean> onThisPageHidden
+
+    // Pages that use the whole width: no course contents, no "On this page"
+    // (UseFullWidth), such as the home page.
+    HashTable<WebPage, boolean> fullWidth
+
+    // Pages whose title banner spans the window (UseFullBleedBanner).
+    HashTable<WebPage, boolean> fullBleedBanner
 
     // The larger course a series is part of, by the series' key: its name
     // and location (a track page listing its units), for the breadcrumbs.
@@ -237,6 +245,31 @@ class QuorumSite is WebSite
     */
     action HideOnThisPage(WebPage page)
         onThisPageHidden:Set(page, true)
+    end
+
+    /*
+        Gives a page the whole width: no course contents on the left and no
+        "On this page", so wide parts such as the home page's block editor
+        have the room. For pages in no course.
+
+        Attribute: Parameter page A page on the site.
+    */
+    action UseFullWidth(WebPage page)
+        fullWidth:Set(page, true)
+        onThisPageHidden:Set(page, true)
+    end
+
+    /*
+        Gives a page the whole width (as UseFullWidth) and lets its title
+        banner span the window, edge to edge, as the Download page's old
+        header did. The banner stays the first thing in the main area; the
+        rest of the page is set in from the edges instead.
+
+        Attribute: Parameter page A page on the site, with a banner (such as ProductBanner).
+    */
+    action UseFullBleedBanner(WebPage page)
+        UseFullWidth(page)
+        fullBleedBanner:Set(page, true)
     end
 
     /*
@@ -840,7 +873,10 @@ class QuorumSite is WebSite
         content:SetIdentifier(CONTENT_IDENTIFIER)
         page:SetLayout(content, frame:GetContent())
         page:SetStyle(content, frame:GetContentBox())
-        page:SetStyleFromWidth(content, constants:SMALL_SCREEN_WIDTH, frame:GetContentSmall())
+        boolean full = fullWidth:HasKey(page)
+        if not full
+            page:SetStyleFromWidth(content, constants:SMALL_SCREEN_WIDTH, frame:GetContentSmall())
+        end
         // A page whose "On this page" is on the left, or left out, has no
         // right column, so its text keeps the wider width on wide screens
         // too.
@@ -875,7 +911,9 @@ class QuorumSite is WebSite
         Division columns
         columns:SetIdentifier(COLUMNS_IDENTIFIER)
         page:SetLayout(columns, frame:GetColumns())
-        columns:AddNestedTag(courseContents)
+        if not full
+            columns:AddNestedTag(courseContents)
+        end
         columns:AddNestedTag(content)
         if rightColumn
             columns:AddNestedTag(onThisPage)
@@ -885,9 +923,22 @@ class QuorumSite is WebSite
         main:AddAttribute(ROLE_ATTRIBUTE, MAIN_ROLE)
         main:SetIdentifier(MAIN_IDENTIFIER)
         main:SetTabIndex(MAIN_TAB_INDEX)
-        page:SetStyle(main, frame:GetMain())
-        page:SetStyleFromWidth(main, constants:MEDIUM_SCREEN_WIDTH, frame:GetMainMedium())
-        page:SetStyleFromWidth(main, constants:LARGE_SCREEN_WIDTH, frame:GetMainLarge())
+        if fullBleedBanner:HasKey(page)
+            // The banner first, edge to edge; the columns take the margins.
+            page:SetStyle(main, frame:GetMainFlush())
+            Header banner = page:GetTitleHeader()
+            if banner not= undefined
+                content:Remove(banner)
+                main:AddNestedTag(banner)
+            end
+            page:SetStyle(columns, frame:GetFlushColumns())
+            page:SetStyleFromWidth(columns, constants:MEDIUM_SCREEN_WIDTH, frame:GetFlushColumnsMedium())
+            page:SetStyleFromWidth(columns, constants:LARGE_SCREEN_WIDTH, frame:GetFlushColumnsLarge())
+        else
+            page:SetStyle(main, frame:GetMain())
+            page:SetStyleFromWidth(main, constants:MEDIUM_SCREEN_WIDTH, frame:GetMainMedium())
+            page:SetStyleFromWidth(main, constants:LARGE_SCREEN_WIDTH, frame:GetMainLarge())
+        end
         main:AddNestedTag(columns)
 
         Division outer
