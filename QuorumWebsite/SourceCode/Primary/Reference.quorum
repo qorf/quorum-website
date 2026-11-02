@@ -3,11 +3,12 @@ use Libraries.Web.Series.PageSeries
 use Libraries.Containers.Array
 
 /*
-    The Reference page (plan 13 phase 5, design C2 + C3, V1): a banner,
-    Getting Started, then every tutorial in a topic map: a search box, links
-    to the topic groups, and each group's tutorials as cards listing every
-    lesson, so the search and the page's own find reach them all. Then
-    Spotlight and For Developers.
+    The Reference page (redesigned 2026-11-02, design "A + tree 2";
+    Plans/Website/ReferenceRedesign.md): a short banner and a sentence,
+    then every tutorial in a topic browser: a search over every lesson; a
+    tree of the topic groups, Start here first; the chosen group's topics
+    as tiles; and the chosen topic's lessons. (Spotlight and For
+    Developers were removed, the user, 2026-11-02.)
 */
 class Reference is QuorumPage
     // The tutorials, from the builder, in its order.
@@ -22,10 +23,16 @@ class Reference is QuorumPage
     constant text SOUND = "Sound"
     constant text INTERFACES = "Interfaces and input"
     constant text DATA = "Working with data"
-    constant text STATISTICS = "Statistical testing and visualization"
+    constant text STATISTICS = "Statistics and charts"
     constant text STORAGE = "Storage and networks"
     constant text DEVICES = "Devices"
     constant text TOOLS = "Quorum Studio tools"
+
+    // Start here: the Quorum Blocks Online course, found by its series' key.
+    constant text START_HERE = "Start here"
+    constant text START_SERIES = "quorum-blocks-online"
+    constant text START_NAME = "Quorum Blocks Online"
+    constant text START_ICON = "puzzle"
 
     on create
         SetLocation("reference.html")
@@ -48,43 +55,55 @@ class Reference is QuorumPage
 
     action Setup
         SetWebPageTitle("Quorum Reference Pages - Quorum Programming Language")
-        Banner("Quorum Reference Page", "Discover and learn Quorum easily with our helpful guide. It's got all you need to know about coding, from the basics to the advanced tricks, all in one spot", "media/userInterface/referencePageBunny.png", "Quincy the Rabbit stacking bricks saying 'classes', 'forms', 'Data frame', 'Actions', 'syntax'")
-        GettingStarted()
+        ColorBanner("Quorum Reference Page", "Discover and learn Quorum easily with our helpful guide. It's got all you need to know about coding, from the basics to the advanced tricks, all in one spot", "media/userInterface/referencePageBunny.png", "Quincy the Rabbit stacking bricks saying 'classes', 'forms', 'Data frame', 'Actions', 'syntax'")
+        Paragraph("Each topic teaches one part of Quorum in short tutorials; search them all, or pick a topic. For full courses, see the "):Link("Learn page", "/learn.html"):Text(".")
+        TopicBrowser("Search tutorials and lessons")
+        StartHere()
         Tutorials()
-        Spotlight()
-        ForDevelopers()
+        EndTopicBrowser()
     end
 
-    private action GettingStarted
-        Section("Getting Started")
-        Paragraph("Learning Quorum is as easy as counting 1, 2, 3! This guide is for complete beginners learning to get into programming and have chosen Quorum as their first language to learn. You will learn how to download Quorum Studio and how to navigate through the code editor, learn the essential syntax of the language, and go through a walkthrough on how to make a simple quiz game!")
-        Subsection("Program using Blocks")
-        Card()
-        Paragraph("Learn how to program using Quorum. You will go through the basics of programming foundations and try the nifty features such as Data Science tools as you learn how to program.")
-        Choices()
-        Choice("Get Started", "/tutorials/blocks/gettingStartedBlocks.html", "")
+    // Start here: the Quorum Blocks Online course.
+    private action StartHere
+        TopicGroup(START_HERE, "New to programming? Start with Quorum Blocks Online, 14 short lessons you can do right in your browser.")
+        PageSeries start = FindSeries(START_SERIES)
+        if start = undefined
+            alert("The reference page's Start here needs the series " + START_SERIES + ".")
+        end
+        TopicSeries(start, START_NAME, START_ICON)
     end
 
+    // Each group, and its tutorials in the builder's order.
     private action Tutorials
-        Section("Tutorials")
-        Paragraph("These tutorials are provided for prospective learners looking to program in Quorum Language. These tutorials will teach you the basic concepts about a topic, but are not meant to be treated as a full learning course. To view the current courses, you can refer to the following Learn page.")
-        TopicSearch("Search tutorials and lessons")
-        TopicJumps(groupNames)
         integer g = 0
         repeat while g < groupNames:GetSize()
             text group = groupNames:Get(g)
-            Subsection(group)
-            TopicCards()
+            TopicGroup(group, "")
             integer i = 0
             repeat while i < units:GetSize()
                 PageSeries unit = units:Get(i)
-                if GroupFor(unit:GetName()) = group
-                    TopicCard(unit)
+                text unitName = unit:GetName()
+                if GroupFor(unitName) = group
+                    TopicSeries(unit, ShortName(unitName), IconFor(unitName))
                 end
                 i = i + 1
             end
             g = g + 1
         end
+    end
+
+    // A series on the site, by its key.
+    private action FindSeries(text key) returns PageSeries
+        Array<PageSeries> all = GetWebSite():GetSeriesList()
+        integer i = 0
+        repeat while i < all:GetSize()
+            PageSeries series = all:Get(i)
+            if series:GetKey() = key
+                return series
+            end
+            i = i + 1
+        end
+        return undefined
     end
 
     // The group a tutorial goes in, by its series' name: ten groups by
@@ -115,20 +134,65 @@ class Reference is QuorumPage
         return ""
     end
 
-    private action Spotlight
-        Section("Spotlight")
-        Paragraph("Check out these Quorum projects to see advanced work of programs written in Quorum. Want your work to get featured on the Quorum Spotlight? Submit your project by pressing the following link.")
-        CourseCards()
-        CourseCard("Quorum Platformer", "https://github.com/qorf/example-games", "media/userInterface/quorumAssets/quorumPlatformer.png", "Reference Page", "These tutorials introduce the Quorum programming language and basic programming concepts.")
-        CourseCard("Space Shooter", "https://github.com/qorf/example-games", "media/userInterface/quorumAssets/spaceShooter.png", "Reference Page", "These tutorials cover the more advanced features of the Quorum programming language.")
-        CourseCard("Ball Breaker", "https://github.com/qorf/example-games", "media/userInterface/quorumAssets/ballBreaker.png", "Reference Page", "These tutorials cover the more advanced features of the Quorum programming language.")
+    // A tutorial's name in the tree and on its tile: the long ones
+    // shortened (the user, 2026-11-02); its heading keeps the full name.
+    private action ShortName(text name) returns text
+        if name = "User Interaction and Events"
+            return "Events"
+        elseif name = "Reading and Writing JavaScript Object Notation (JSON) Data"
+            return "JSON Data"
+        end
+        return name
     end
 
-    private action ForDevelopers
-        Section("For Developers")
-        Paragraph("For advanced Quorum programmers, advance your skills and actively work to build out the language or test features prior to release. ")
-        CourseCards()
-        CourseCard("Become a Contributer", "https://github.com/qorf", "media/userInterface/contribute.png", "Reference Page", "Quorum is an open source language. If you would like to contribute to help build the language or develop something unique using Quorum")
-        CourseCard("Overriding the Standard Library", "https://github.com/qorf/quorum-language", "", "", "To access bleeding edge libraries not yet released publicly, you can override your version")
+    // A tutorial's icon, in icons/topics/ (approved 2026-11-02).
+    private action IconFor(text name) returns text
+        if name = "Quorum Basics"
+            return "code"
+        elseif name = "Libraries and Structures"
+            return "books"
+        elseif name = "2D Graphics"
+            return "brush"
+        elseif name = "3D Graphics"
+            return "cube"
+        elseif name = "Other Graphics"
+            return "stack-2"
+        elseif name = "Game Physics"
+            return "ball-bowling"
+        elseif name = "Audio"
+            return "volume"
+        elseif name = "User Interaction and Events"
+            return "click"
+        elseif name = "User Interfaces"
+            return "layout"
+        elseif name = "Data Science"
+            return "table"
+        elseif name = "Data Transformations"
+            return "transform"
+        elseif name = "Filtering Data"
+            return "filter"
+        elseif name = "Descriptive Statistics"
+            return "math-avg"
+        elseif name = "Charts"
+            return "chart-bar"
+        elseif name = "Statistical Tests"
+            return "scale"
+        elseif name = "Reading and Writing JavaScript Object Notation (JSON) Data"
+            return "braces"
+        elseif name = "Databases"
+            return "database"
+        elseif name = "Network"
+            return "world-www"
+        elseif name = "LEGO™ Robots"
+            return "robot"
+        elseif name = "Mobile"
+            return "device-mobile"
+        elseif name = "Scene Editing"
+            return "cube-3d-sphere"
+        elseif name = "Teams"
+            return "users"
+        end
+        alert("The tutorial " + name + " has no icon on the Reference page. Add it to IconFor.")
+        return ""
     end
 end

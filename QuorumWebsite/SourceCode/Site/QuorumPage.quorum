@@ -2,6 +2,7 @@ package Libraries.Web.Page
 
 use Libraries.Web.Quorum.BlockEditorLooks
 use Libraries.Web.Quorum.FormLooks
+use Libraries.Web.Quorum.TopicBrowserLooks
 use Libraries.Web.Quorum.QuorumSiteOptions
 use Libraries.Web.Page.WebPage
 use Libraries.System.File
@@ -118,6 +119,22 @@ class QuorumPage is WebPage
     Division topicGrid = undefined
     boolean topicScriptAdded = false
 
+    // The topic browser being built, from TopicBrowser to EndTopicBrowser:
+    // the whole, its tree, its content column and search results, and the
+    // group being filled (its content, tiles, tree list, button and count).
+    Division topicBrowserRoot = undefined
+    UnorderedList topicTree = undefined
+    Division topicContent = undefined
+    UnorderedList topicResults = undefined
+    Division topicGroupBox = undefined
+    Division topicGroupTiles = undefined
+    UnorderedList topicGroupTreeList = undefined
+    Button topicGroupButton = undefined
+    Span topicGroupCount = undefined
+    text topicGroupName = ""
+    integer topicGroupLessons = 0
+    boolean topicGroupHasTopic = false
+
     // The banner's words column, its picture, and the row under its words
     // for tiles and links (made by the first).
     Division bannerColumn = undefined
@@ -206,6 +223,15 @@ class QuorumPage is WebPage
     constant text TOPIC_CLEAR = "Clear"
     constant text TOPICS_LABEL = "Topics"
     constant text LESSON_SEPARATOR = " · "
+    // The topic browser's script, its search box, and its icon files
+    // (Tabler icons, icons/topics/README.md).
+    constant text TOPIC_BROWSER_SCRIPT = "script/topicBrowser.js"
+    constant text TOPIC_BROWSER_SEARCH_IDENTIFIER = "topic-browser-search"
+    constant text TOPIC_ICONS = "icons/topics/"
+    constant text TOPIC_ICON_ENDING = ".svg"
+    constant text TREE_LIST_ENDING = "-topics"
+    constant text MATCHING_LESSONS = "Matching lessons"
+    constant text LESSONS_IN = "Lessons in "
     // The letters a heading's address keeps, as WebPage names headings
     // (a child class can't see its parent's constants).
     constant text ADDRESS_CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -2652,6 +2678,346 @@ if (blockContainer) {
         end
         card:AddNestedTag(lessons)
         topicGrid:AddNestedTag(card)
+    end
+
+    /*
+        Starts a topic browser (the reference page's tutorials): a search
+        box over every lesson; a tree of topic groups on the left (on phones
+        and tablets, above), each opening to its topics; and the chosen
+        group's topics as tiles, with the chosen topic's lessons under them.
+        Add groups with TopicGroup and topics with TopicSeries, then end it
+        with EndTopicBrowser. Each topic has an address of its own (such as
+        reference.html#charts), and the first topic shows first. Without its
+        script (script/topicBrowser.js), every group and topic is shown in
+        order, so every lesson is still reachable.
+
+        Attribute: Parameter label What the box searches, such as "Search tutorials and lessons".
+    */
+    action TopicBrowser(text label)
+        if topicBrowserRoot not= undefined
+            alert("A topic browser is already open. End it with EndTopicBrowser.")
+        end
+        TopicBrowserLooks looks = quorumOptions:GetTopicBrowser()
+        AddScript(locations:FromSiteTop(TOPIC_BROWSER_SCRIPT))
+        Division root
+        root:AddAttribute("data-topic-browser", "")
+        SetLayout(root, GetStyleOptions():GetStack())
+        topicBrowserRoot = root
+
+        // The search: a box, a button that clears it, and a line saying how
+        // many lessons match.
+        Division search
+        search:AddAttribute("role", "search")
+        Label name
+        name:SetElementId(TOPIC_BROWSER_SEARCH_IDENTIFIER)
+        name:AddText(escaper:Escape(label))
+        SetStyle(name, quorumOptions:GetTopicSearchLabel())
+        search:AddNestedTag(name)
+        Division row
+        SetLayout(row, quorumOptions:GetTopicSearchRow())
+        Input box
+        box:SetType("search")
+        box:SetIdentifier(TOPIC_BROWSER_SEARCH_IDENTIFIER)
+        box:SetPlaceHolder(escaper:EscapeAttribute(label))
+        box:SetAutocomplete(false)
+        box:AddAttribute("data-topic-search-box", "")
+        SetStyle(box, quorumOptions:GetTopicSearchBox())
+        row:AddNestedTag(box)
+        Button clear
+        clear:SetType("button")
+        clear:AddAttribute("data-topic-clear", "")
+        clear:AddAttribute("hidden", "")
+        clear:AddText(escaper:Escape(TOPIC_CLEAR))
+        SetStyle(clear, quorumOptions:GetTopicChip())
+        SetStyleOnHover(clear, quorumOptions:GetTopicChipActive())
+        row:AddNestedTag(clear)
+        search:AddNestedTag(row)
+        Paragraph status
+        status:AddAttribute("data-topic-status", "")
+        status:AddAttribute("aria-live", "polite")
+        SetStyle(status, quorumOptions:GetTopicStatus())
+        search:AddNestedTag(status)
+        root:AddNestedTag(search)
+
+        // The tree beside the content (above it on smaller screens).
+        Division columns
+        SetLayout(columns, looks:GetColumns())
+        SetLayoutFromWidth(columns, constants:LARGE_SCREEN_WIDTH, looks:GetColumnsWide())
+        NavigationDivision tree
+        tree:AddAttribute("aria-label", TOPICS_LABEL)
+        SetStyle(tree, looks:GetTree())
+        SetStyleFromWidth(tree, constants:LARGE_SCREEN_WIDTH, looks:GetTreeWide())
+        UnorderedList treeList
+        SetStyle(treeList, looks:GetTreeList())
+        tree:AddNestedTag(treeList)
+        topicTree = treeList
+        columns:AddNestedTag(tree)
+
+        // The content: the search results (shown while searching), then
+        // each group.
+        Division content
+        SetStyle(content, looks:GetContent())
+        SetLayout(content, GetStyleOptions():GetStack())
+        Division resultsBox
+        resultsBox:AddAttribute("data-topic-results", "")
+        resultsBox:AddAttribute("hidden", "")
+        UnorderedList results
+        results:AddAttribute("aria-label", MATCHING_LESSONS)
+        SetStyle(results, quorumOptions:GetNumberedRows())
+        resultsBox:AddNestedTag(results)
+        content:AddNestedTag(resultsBox)
+        topicResults = results
+        columns:AddNestedTag(content)
+        topicContent = content
+        root:AddNestedTag(columns)
+    end
+
+    /*
+        Starts a group of topics in the topic browser: a button in the tree
+        (showing how many lessons it holds) that opens to its topics, and a
+        heading over its topics' tiles. Add its topics with TopicSeries.
+
+        Attribute: Parameter name The group's name, such as "Graphics".
+        Attribute: Parameter words A sentence about the group, or "" for none.
+    */
+    action TopicGroup(text name, text words)
+        if topicBrowserRoot = undefined
+            alert("A topic group needs a topic browser. Start one with TopicBrowser.")
+        end
+        FinishTopicGroup()
+        TopicBrowserLooks looks = quorumOptions:GetTopicBrowser()
+        text groupIdentifier = HeadingAddress(name)
+
+        // In the tree: the group's button, then its topics.
+        ListItem item
+        Button button
+        button:SetType("button")
+        button:AddAttribute("data-group-button", groupIdentifier)
+        button:AddAttribute("aria-expanded", "true")
+        button:AddAttribute("aria-controls", groupIdentifier + TREE_LIST_ENDING)
+        SetStyle(button, looks:GetGroupButton())
+        SetLayout(button, looks:GetGroupButtonLayout())
+        SetStyleOnHover(button, looks:GetGroupButtonHover())
+        SetStyleOnKeyboardFocus(button, quorumOptions:GetForms():GetButtonFocus())
+        Span buttonWords
+        buttonWords:AddText(escaper:Escape(name))
+        button:AddNestedTag(buttonWords)
+        Span groupCount
+        SetStyle(groupCount, looks:GetCount())
+        button:AddNestedTag(groupCount)
+        item:AddNestedTag(button)
+        Division topicsBox
+        topicsBox:SetIdentifier(groupIdentifier + TREE_LIST_ENDING)
+        topicsBox:AddAttribute("data-group-list", groupIdentifier)
+        SetStyle(topicsBox, looks:GetTreeTopics())
+        UnorderedList list
+        SetStyle(list, looks:GetTreeTopicList())
+        topicsBox:AddNestedTag(list)
+        item:AddNestedTag(topicsBox)
+        topicTree:AddNestedTag(item)
+
+        // In the content: the group's heading, words and tiles.
+        Division groupBox
+        groupBox:SetIdentifier(groupIdentifier)
+        groupBox:AddAttribute("data-group", groupIdentifier)
+        SetLayout(groupBox, looks:GetGroup())
+        Heading heading
+        heading:SetScale(2)
+        SetStyle(heading, GetStyleOptions():GetHeading(2))
+        heading:AddText(escaper:Escape(name))
+        groupBox:AddNestedTag(heading)
+        if not words:IsEmpty()
+            Paragraph groupWords
+            groupWords:AddText(escaper:Escape(words))
+            groupBox:AddNestedTag(groupWords)
+        end
+        Division tiles
+        SetLayout(tiles, looks:GetTiles())
+        groupBox:AddNestedTag(tiles)
+        topicContent:AddNestedTag(groupBox)
+
+        topicGroupBox = groupBox
+        topicGroupTiles = tiles
+        topicGroupTreeList = list
+        topicGroupButton = button
+        topicGroupCount = groupCount
+        topicGroupName = name
+        topicGroupLessons = 0
+        topicGroupHasTopic = false
+    end
+
+    /*
+        Adds a topic (a tutorial's series) to the current group: a link in
+        the tree, a tile (its icon, short name and lesson count), and its
+        section: its full name, its description and its lessons, numbered.
+        Its lessons also go in the search results.
+
+        Attribute: Parameter unit The tutorial's series.
+        Attribute: Parameter shortName Its name in the tree and on its tile, such as "JSON Data".
+        Attribute: Parameter icon Its icon's file name in icons/topics/, without ".svg", such as "chart-bar".
+    */
+    action TopicSeries(PageSeries unit, text shortName, text icon)
+        if topicGroupBox = undefined
+            alert("A topic needs a group. Start one with TopicGroup.")
+        end
+        TopicBrowserLooks looks = quorumOptions:GetTopicBrowser()
+        text topicIdentifier = HeadingAddress(unit:GetName())
+        integer size = unit:GetSize()
+        topicGroupLessons = topicGroupLessons + size
+        if not topicGroupHasTopic
+            topicGroupButton:AddAttribute("data-first-topic", topicIdentifier)
+            topicGroupHasTopic = true
+        end
+        text lessonCount = "" + size + " lessons"
+        if size = 1
+            lessonCount = "1 lesson"
+        end
+
+        // In the tree.
+        ListItem treeItem
+        Link treeLink
+        treeLink:SetAddress("#" + topicIdentifier)
+        treeLink:AddAttribute("data-topic-link", topicIdentifier)
+        SetStyle(treeLink, looks:GetTopicLink())
+        SetLayout(treeLink, looks:GetTopicLinkLayout())
+        SetStyleOnHover(treeLink, looks:GetTopicLinkHover())
+        SetStyleWhenCurrent(treeLink, looks:GetTopicLinkCurrent())
+        SetStyleOnKeyboardFocus(treeLink, quorumOptions:GetForms():GetButtonFocus())
+        Span treeName
+        treeName:AddText(escaper:Escape(shortName))
+        treeLink:AddNestedTag(treeName)
+        Span treeCount
+        treeCount:AddText("" + size)
+        treeCount:AddAttribute("aria-hidden", "true")
+        SetStyle(treeCount, looks:GetCount())
+        treeLink:AddNestedTag(treeCount)
+        treeItem:AddNestedTag(treeLink)
+        topicGroupTreeList:AddNestedTag(treeItem)
+
+        // Its tile.
+        Link tile
+        tile:SetAddress("#" + topicIdentifier)
+        tile:AddAttribute("data-topic-tile", topicIdentifier)
+        SetStyle(tile, looks:GetTile())
+        SetLayout(tile, looks:GetTileLayout())
+        SetStyleOnHover(tile, looks:GetTileHover())
+        SetStyleWhenCurrent(tile, looks:GetTileCurrent())
+        SetStyleOnKeyboardFocus(tile, quorumOptions:GetForms():GetButtonFocus())
+        Span iconBox
+        iconBox:AddAttribute("aria-hidden", "true")
+        SetStyle(iconBox, looks:GetTileIcon())
+        SetLayout(iconBox, looks:GetTileIconLayout())
+        iconBox:AddText(ReadTopicIcon(icon))
+        tile:AddNestedTag(iconBox)
+        Span tileWords
+        SetLayout(tileWords, looks:GetTileWords())
+        Span tileName
+        tileName:AddText(escaper:Escape(shortName))
+        SetStyle(tileName, looks:GetTileName())
+        tileWords:AddNestedTag(tileName)
+        Span tileCount
+        tileCount:AddText(lessonCount)
+        SetStyle(tileCount, looks:GetCount())
+        tileWords:AddNestedTag(tileCount)
+        tile:AddNestedTag(tileWords)
+        topicGroupTiles:AddNestedTag(tile)
+
+        // Its section: heading, words and lessons.
+        Division topicBox
+        topicBox:SetIdentifier(topicIdentifier)
+        topicBox:AddAttribute("data-topic", topicIdentifier)
+        SetLayout(topicBox, looks:GetTopic())
+        Heading heading
+        heading:SetScale(3)
+        heading:SetTabIndex("-1")
+        heading:AddAttribute("data-topic-heading", "")
+        SetStyle(heading, GetStyleOptions():GetHeading(3))
+        heading:AddText(escaper:Escape(unit:GetName()))
+        topicBox:AddNestedTag(heading)
+        text unitDescription = unit:GetDescription()
+        if not unitDescription:IsEmpty()
+            Paragraph words
+            words:AddText(escaper:Escape(unitDescription))
+            SetStyle(words, looks:GetTopicWords())
+            topicBox:AddNestedTag(words)
+        end
+        OrderedList lessons
+        lessons:AddAttribute("aria-label", escaper:EscapeAttribute(LESSONS_IN + unit:GetName()))
+        SetStyle(lessons, quorumOptions:GetNumberedRows())
+        integer i = 0
+        repeat while i < size
+            PageSeriesEntry entry = unit:GetEntry(i)
+            text address = escaper:EscapeAttribute(locations:FromSiteTop(entry:GetLocation()))
+            ListItem row
+            SetStyle(row, quorumOptions:GetNumberedRow())
+            SetStyleWhenFirst(row, quorumOptions:GetNumberedRowFirst())
+            SetLayout(row, quorumOptions:GetNumberedRowLayout())
+            Span numberMark
+            numberMark:AddAttribute("aria-hidden", "true")
+            numberMark:AddText("" + (i + 1))
+            SetStyle(numberMark, quorumOptions:GetStep())
+            SetLayout(numberMark, quorumOptions:GetStepLayout())
+            row:AddNestedTag(numberMark)
+            Link lesson
+            lesson:SetAddress(address)
+            lesson:AddText(escaper:Escape(entry:GetTitle()))
+            SetStyle(lesson, GetStyleOptions():GetLink())
+            row:AddNestedTag(lesson)
+            lessons:AddNestedTag(row)
+
+            // The same lesson in the search results, with its topic.
+            ListItem result
+            text searchWords = entry:GetTitle() + " " + shortName + " " + unit:GetName() + " " + topicGroupName
+            result:AddAttribute("data-topic-result", escaper:EscapeAttribute(searchWords:ToLowerCase()))
+            SetStyle(result, quorumOptions:GetNumberedRow())
+            SetStyleWhenFirst(result, quorumOptions:GetNumberedRowFirst())
+            SetLayout(result, looks:GetResultRow())
+            Link resultLink
+            resultLink:SetAddress(address)
+            resultLink:AddText(escaper:Escape(entry:GetTitle()))
+            SetStyle(resultLink, GetStyleOptions():GetLink())
+            result:AddNestedTag(resultLink)
+            Span resultTopic
+            resultTopic:AddText(escaper:Escape(shortName))
+            SetStyle(resultTopic, looks:GetCount())
+            result:AddNestedTag(resultTopic)
+            topicResults:AddNestedTag(result)
+            i = i + 1
+        end
+        topicBox:AddNestedTag(lessons)
+        topicGroupBox:AddNestedTag(topicBox)
+    end
+
+    /*
+        Ends the topic browser TopicBrowser started, and places it.
+    */
+    action EndTopicBrowser
+        if topicBrowserRoot = undefined
+            alert("There's no topic browser to end. Start one with TopicBrowser.")
+        end
+        FinishTopicGroup()
+        Include(topicBrowserRoot)
+        topicBrowserRoot = undefined
+        topicGroupBox = undefined
+        topicGroupCount = undefined
+    end
+
+    // The group being filled gets its count of lessons in the tree.
+    private action FinishTopicGroup
+        if topicGroupCount not= undefined
+            topicGroupCount:AddText("" + topicGroupLessons)
+            topicGroupCount = undefined
+        end
+    end
+
+    // A topic's icon, from icons/topics/.
+    private action ReadTopicIcon(text name) returns text
+        File file
+        file:SetPath(TOPIC_ICONS + name + TOPIC_ICON_ENDING)
+        if not file:Exists()
+            alert("There's no topic icon " + name + TOPIC_ICON_ENDING + " in " + TOPIC_ICONS + ".")
+        end
+        return file:Read()
     end
 
     // A heading's address from its words, by WebPage's rule: lower case,
