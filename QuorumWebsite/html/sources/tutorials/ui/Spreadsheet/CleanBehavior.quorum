@@ -1,0 +1,29 @@
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Spreadsheet
+
+class CleanBehavior is FormBehavior
+    action Run(BehaviorEvent event)
+        Page page = GetPage()
+        Spreadsheet sheet = page:GetSpreadsheet("Club survey")
+        if sheet = undefined
+            return now
+        end
+
+        integer row = 1
+        repeat while row < sheet:GetRowSize()
+            text grade = sheet:GetText(row, 1)
+            sheet:SetText(row, 1, grade:Trim())
+
+            text club = sheet:GetText(row, 2)
+            club = club:Trim()
+            sheet:SetText(row, 2, club:ToLowerCase())
+
+            row = row + 1
+        end
+
+        integer count = sheet:ReplaceAll("ninth", "9", false, true)
+        output "Replaced ninth in " + count + " cells."
+    end
+end

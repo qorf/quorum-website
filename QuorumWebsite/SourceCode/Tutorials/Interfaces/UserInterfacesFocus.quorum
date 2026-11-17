@@ -1,152 +1,351 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: Focus.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Focus, the item that receives the keyboard, in the user
+    interface series.
 */
 class UserInterfacesFocus is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/focus.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
         SetShortTitle("Focus")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about the Focus in the Quorum programming language.")
-        SetSummary("how to use the Focus")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("Focus Tutorial - Quorum Programming Language")
-        Title("Tutorial: Focus")
-        Paragraph("This tutorial tells you how to use Focus in Quorum")
-        AnIntroductionToFocusesInQuorum()
-        CreatingAFocusableDrawable()
-        CyclesUsingFocus()
-        GetNextFocusAndGetPreviousFocus()
+        // For search engines and link previews.
+        SetDescription("How the focus works in Quorum: the focus order a form sets for you, skipping labels, changing a form's order, setting a game's order with SetNextFocus and SetPreviousFocus, focus listeners, and making your own focusable items.")
+
+        Title("Focus")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToFocusesInQuorum
-        Section("An Introduction to Focuses in Quorum")
-        Paragraph("In this tutorial, we will learn how the Focus works in the Quorum Game Engine. The Focus is an element within the Item class that is used to indicate which Item is currently selected by the user. If an Item does not have the current Focus, it cannot be activated. Typically, the Focus cycles through several Focusable Items. In Quorum, this is done by manually setting the next and previous Focuses for each Item in the cycle. Having a cycle of focusable Items also allows the user to go through all these items with the keyboard.")
-        Paragraph("For this tutorial, we will create several Drawables and allow the user to cycle the Focus through them. When one of the Items receives the Focus, it will change color to green and say which shape it is, and when the Item loses the Focus, it will change color to red and output which shape lost the Focus and which shape gained the Focus. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("When you type, your keys go to exactly one place: the search box, the text
+field, or the button you just moved to. The item that receives the keyboard
+right now has the "):Strong("focus"):Text(". Focus is how keyboard users and screen reader
+users move around an interface, so every interface needs a sensible order
+for it. In this lesson, you will find out how a form sets the order that the
+"):Key("Tab"):Text(" key follows for you, how to change that order when it doesn't match
+the layout on the screen, how to set the order yourself in a game, and how to make
+your own items focusable.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this lesson:")
+        Goals()
+        ListItem("Explain what the focus is and why it matters for keyboard and screen
+reader users")
+        ListItem("Describe the focus order a form sets for you, and keep labels out of it
+with "):Code("SetSkipLabelsInFocus")
+        ListItem("Change a form's focus order, and set a game's focus order, with
+"):Code("SetNextFocus"):Text(" and "):Code("SetPreviousFocus")
+        ListItem("Respond when an item gains or loses the focus")
+        ListItem("Make a custom item focusable, named and described")
     end
 
-    private action CreatingAFocusableDrawable
-        Section("Creating a Focusable Drawable")
-        Paragraph("Before we can add much to the main, we need to create a new class. We will name this new class "):DoubleQuote():Text("FocusDrawable.quorum."):DoubleQuote():Text(" We will need the libraries for Drawable, FocusEvent, Color, and Speech.")
-        Paragraph("The FocusDrawable class will inherit the Drawable class, and we will override the GainedFocus and LostFocus actions to execute some instructions when the Drawable gains the Focus. We will also need a text class variable for the shape’s description and actions to set and get that description. This gives us the following template:")
-        CodeExample("use Libraries.Game.Graphics.Drawable
-use Libraries.Interface.Events.FocusEvent
-use Libraries.Game.Graphics.Color
-use Libraries.Sound.Speech
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Put your mouse or trackpad aside. Open a website or app you use often and
+try to do one task, such as searching for something, using only the
+keyboard. Press "):Key("Tab"):Text(" to move forward and "):Keys("Shift", "Tab"):Text(" to move back. How can
+you tell where you are? Did the focus ever jump somewhere you did not
+expect? Was there anything you could click with a mouse but never reach
+with "):Key("Tab"):Text("?")
 
-class FocusDrawable is Drawable
-    action GainedFocus(FocusEvent event)
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Focus/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Focus/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This lesson covers the following
+"):Link("standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_9)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_9)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_GAME_DEVELOPMENT_PLAYER_EXPERIENCE_5)
+        StandardsList(computerScience)
     end
 
-    action LostFocus(FocusEvent event)
-    end
-end")
-        Paragraph("For the GainedFocus action, recall that this class inherits the Drawable class. Thus, the FocusDrawable item itself will be the shape we want to change the color of. Thus, we need to use "):DoubleQuote():Text("me:SetColor(color:Green())."):DoubleQuote():Text(" Additionally, the Speech class will be used to have the program say the Description of the Drawable aloud. This gives us the following action:")
-        CodeExample("action GainedFocus(FocusEvent event)
-    Color color
-    me:SetColor(color:Green())
+    action Explore
+        Section("Explore")
 
-    Speech speech
-    speech:Say(GetDescription())
-end")
-        Paragraph("Now we can move on to LostFocus, the final action. This action will need to set itself to the color Red, and output the internal Description of the Item that just lost the Focus. This gives us the following code:")
-        CodeExample("action LostFocus(FocusEvent event)
-    Color color
-    me:SetColor(color:Red())
-
-    output " + dq + "The " + dq + " + GetDescription() + " + dq + " has lost the Focus." + dq + "
-end")
+        WhatIsTheFocus()
+        WhichItemsCanTakeTheFocus()
+        FormsSetTheFocusOrder()
+        ChangingAFormsFocusOrder()
+        FocusInsideAControl()
+        SettingTheFocusOrderInAGame()
+        MakingYourOwnFocusableItem()
+        LookingAhead()
+        AGoodFocusOrder()
     end
 
-    private action CyclesUsingFocus
-        Section("Cycles Using Focus")
-        Paragraph("We now have an Item that does something when it gains or loses the Focus, but that alone does not fully utilize the focus. To make use of having focus we can create a cycle that the focus goes through by setting each each Item’s NextFocus and PreviousFocus Item.")
-        Paragraph("Now that we’ve created the FocusDrawable class, we can return to the main class. This class will need the Color library, so we must add the appropriate use statement. Since we want the cycle of shapes to be usable as soon as the game begins, we will write our new code into the CreateGame class. To start, we will create a Color variable and six FocusDrawable objects. These objects will be two rectangles, two circles, and two triangles. The following are our declarations:")
-        CodeExample("Color color
-FocusDrawable rectangle1
-FocusDrawable circle1
-FocusDrawable triangle1
-FocusDrawable rectangle2
-FocusDrawable circle2
-FocusDrawable triangle2")
-        Paragraph("Now we will load each shape. Since the FocusDrawable class inherits the Drawable class, we can use the Drawable class’s LoadFilledRectangle, LoadFilledCircle, and LoadFilledTriangle actions. This adds the following lines of code:")
-        CodeExample("rectangle1:LoadFilledRectangle(50, 50, color:Red())
-circle1:LoadFilledCircle(25, color:Red())
-triangle1:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())
-rectangle2:LoadFilledRectangle(50, 50, color:Red())
-circle2:LoadFilledCircle(25, color:Red())
-triangle2:LoadFilledTriangle(0, 0, 25, 50, 50, 0, color:Red())")
-        Paragraph("To make the shapes match the cycle we will make later, we will arrange them in a circle on the game window. This gives the following lines:")
-        CodeExample("rectangle1:SetPosition(375, 500)
-circle1:SetPosition(600, 375)
-triangle1:SetPosition(600, 175)
-rectangle2:SetPosition(375, 50)
-circle2:SetPosition(150, 175)
-triangle2:SetPosition(150, 375)")
-        Paragraph("Next, we need to call SetDescription for each FocusDrawable to give it an appropriate description. Our calls are as follows:")
-        CodeExample("rectangle1:SetShapeDescription(" + dq + "First Rectangle" + dq + ")
-circle1:SetShapeDescription(" + dq + "First Circle" + dq + ")
-triangle1:SetShapeDescription(" + dq + "First Triangle" + dq + ")
-rectangle2:SetShapeDescription(" + dq + "Second Rectangle" + dq + ")
-circle2:SetShapeDescription(" + dq + "Second Circle" + dq + ")
-triangle2:SetShapeDescription(" + dq + "Second Triangle" + dq + ")")
-        Paragraph("Before we add each Item to the Focus cycle, we need to make them Focusable objects. Some Items are Focusable by default, such as TextBoxes and Trees, but Drawables are not, so we must set them manually. This is done by calling the SetFocusable action with a boolean parameter of true. This adds the following lines:")
-        CodeExample("rectangle1:SetFocusable(true)
-circle1:SetFocusable(true)
-triangle1:SetFocusable(true)
-rectangle2:SetFocusable(true)
-circle2:SetFocusable(true)
-triangle2:SetFocusable(true)")
-        Paragraph("Now that each Item is Focusable, we need to manually set the next and previous Focus for each Item. We will set the next Focus from rectangle1 to circle1, from circle1 to triangle1, then to rectangle2, circle2, triangle2, and finally have triangle2 go to rectangle1, forming a cycle, while the previous Focuses will go in reverse order. This gives us the following code:")
-        CodeExample("rectangle1:SetNextFocus(circle1)
-rectangle1:SetPreviousFocus(triangle2)
-circle1:SetNextFocus(triangle1)
-circle1:SetPreviousFocus(rectangle1)
-triangle1:SetNextFocus(rectangle2)
-triangle1:SetPreviousFocus(circle1)
-rectangle2:SetNextFocus(circle2)
-rectangle2:SetPreviousFocus(triangle1)
-circle2:SetNextFocus(triangle2)
-circle2:SetPreviousFocus(rectangle2)
-triangle2:SetNextFocus(rectangle1)
-triangle2:SetPreviousFocus(circle2)")
-        Paragraph("With the next and previous Focus set for each Item, now we need to add them to the game. This is done with the following lines:")
-        CodeExample("Add(rectangle1)
-Add(circle1)
-Add(triangle1)
-Add(rectangle2)
-Add(circle2)
-Add(triangle2)")
-        Paragraph("Finally, we must start the Focus on one of our Items, otherwise we cannot begin the cycle. We will begin with rectangle1. This is done simply by calling the Focus action, giving us the following line:")
-        CodeExample("rectangle1:Focus()")
-        Paragraph("Now when we run the program, the shapes are arranged in a circular pattern and can be cycled through, saying aloud the current Focus and turning it Green, and outputting when an Item loses the Focus and turning it back to Red. To move forwards to the next Focus, press Tab, and to move backwards to the previous Focus, press Shift + Tab. Alternatively, the shapes can be clicked on with the mouse to change the Focus.")
+    private action WhatIsTheFocus
+        Subsection("What is the focus?")
+        Paragraph("Only one item in a program has the focus at a time. When you press a key,
+the item with the focus gets it. For example, pressing "):Key("Space"):Text(" or "):Key("Enter"):Text("
+presses the button that has the focus.")
+
+        Paragraph("People who do not use a mouse move the focus with the keyboard. "):Key("Tab"):Text(" moves
+it forward and "):Keys("Shift", "Tab"):Text(" moves it back. A screen reader reads each item as
+it gets the focus, so for a screen reader user, the focus order "):Emphasis("is"):Text(" the
+order of the interface. Clicking an item with the mouse also gives it the
+focus.")
     end
 
-    private action GetNextFocusAndGetPreviousFocus
-        Section("GetNextFocus and GetPreviousFocus")
-        Paragraph("There are two additional actions relating to the Focus that are included in the Item class. These are GetNextFocus and GetPreviousFocus, both of which return an Item. To demonstrate these, we will modify the GainedFocus action in the FocusDrawable class from the program we created in the previous section.")
-        Paragraph("To start, delete the line of "):DoubleQuote():Text("speech:Say(GetDescription())."):DoubleQuote():Text(" Rather than have the program say which shape we are on, we will alter it to prompt the user to move to the next or previous shape.")
-        Paragraph("First, we need to create a new FocusDrawable object, nextDrawable, and assign it to the value returned from calling the current Item’s GetNextFocus action. However, this action returns an Item, which is fine since the actions we are using are part of the Item class. Then we can use the GetDescription action of the obtained Item to get its Description. This gives us the following lines of code:")
-        CodeExample("Item nextDrawable = me:GetNextFocus()
-text nextDescription = nextDrawable:GetDescription()")
-        Paragraph("Next, we will do the same to get the description of the previous FocusDrawable, only changing the variable names and calling GetPreviousFocus instead of GetNextFocus. This is done with the following lines:")
-        CodeExample("Item previousDrawable = me:GetPreviousFocus()
-text previousDescription = previousDrawable:GetDescription()")
-        Paragraph("Finally, we will use the Speech class to prompt the user aloud and we will also output the statement. We accomplish this by adding the following line:")
-        CodeExample("speech:Say(" + dq + "Tab to reach the " + dq + " + nextDescription + " + dq + ", Shift Tab to reach the " + dq + " + previousDescription)
-output " + dq + "Tab to reach the " + dq + " + nextDescription + " + dq + ", Shift Tab to reach the " + dq + " + previousDescription")
-        Paragraph("Now, when we run the program, it will verbally tell the user and output the description of both the next and previous Focuses when a new Focus is acquired.")
+    private action WhichItemsCanTakeTheFocus
+        Subsection("Which items can take the focus?")
+        Paragraph("An item can take the focus only if it is "):Strong("focusable"):Text(". Some items are
+focusable from the start, and some are not:")
+        BulletList()
+        ListItem():Strong("Focusable:"):Text(" buttons, check boxes, text fields, text boxes, lists,
+trees, combo boxes, sliders and most other controls that you interact
+with.")
+        ListItem():Strong("Not focusable at first:"):Text(" pictures, shapes, icons and plain
+containers. A program can make any of them focusable, as "):DoubleQuote():Text("Making your
+own focusable item"):DoubleQuote():Text(" shows below.")
+        ListItem():Strong("Labels on a form page:"):Text(" focusable, so a screen reader user can reach
+them with "):Key("Tab"):Text(". You can turn this off, as explained below.")
+        ListItem():Strong("Radio buttons:"):Text(" a group of radio buttons takes the focus as one item.
+"):Key("Tab"):Text(" moves into the group, and the arrow keys move between the buttons
+inside it. If nothing in the group is chosen yet, moving into the group
+chooses the first button.")
+
+        Paragraph("You can change this for any item with "):Code("SetFocusable(true)"):Text(" or
+"):Code("SetFocusable(false)"):Text(".")
+    end
+
+    private action FormsSetTheFocusOrder
+        Subsection("Forms set the focus order for you")
+        Paragraph("In the "):Link("Forms", "/tutorials/ui/forms.html"):Text(" tutorial, you pressed "):Key("Tab"):Text(" to move
+through a page without writing any focus code. That is because a form works
+out a "):Strong("default focus order"):Text(" when it is shown. It goes through the page
+from the first control you added to the last, including the controls inside
+each grouping, and links each one to the next. The last control links back
+to the first, so "):Key("Tab"):Text(" goes around in a loop and "):Keys("Shift", "Tab"):Text(" goes the other
+way. Then the form gives the focus to the first focusable item on the page.
+When a program switches to another page with "):Code("SetPage"):Text(", the focus goes to the
+first item on that page.")
+
+        Paragraph("The order you add controls is the order they appear on the screen, from top to
+bottom, so the default focus order usually matches the layout. The
+easiest way to change the focus order of a form is to change the order you
+add the controls in.")
+
+        Paragraph("The following program is a short sign-up page. Each text field has a label
+beside it, as you saw in the "):Link("Text Fields", "/tutorials/ui/textField.html"):Text("
+tutorial.")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/Main.quorum")
+
+        Paragraph("Run the program and press "):Key("Tab"):Text(" a few times. The focus goes from the First
+name field to the Last name field, the check box and the Join button, and
+then back to the First name field.")
+
+        Paragraph("Why skip the labels? Each text field already has a name, "):DoubleQuote():Text("First name"):DoubleQuote():Text(", and
+a screen reader reads that name when the field gets the focus. If the label
+beside it were in the "):Key("Tab"):Text(" order too, a screen reader user would hear
+"):DoubleQuote():Text("First name"):DoubleQuote():Text(" twice and press "):Key("Tab"):Text(" twice for every field. Delete the
+"):Code("SetSkipLabelsInFocus"):Text(" line and try it.")
+
+        Paragraph("Two things to know about "):Code("SetSkipLabelsInFocus"):Text(":")
+        BulletList()
+        ListItem():Strong("It only affects labels added after it,"):Text(" including the page title. Call
+it before "):Code("SetTitle"):Text(" and "):Code("AddLabel"):Text(".")
+        ListItem():Strong("Keep labels that say something new."):Text(" A label with instructions, or one
+that shows a result, should stay in the "):Key("Tab"):Text(" order, or a screen reader
+user may never hear it. Skip only labels that repeat a control's name.")
+    end
+
+    private action ChangingAFormsFocusOrder
+        Subsection("Changing a form's focus order")
+        Paragraph("Sometimes the order you add controls is not the order people read them. A
+"):Strong("grouping"):Text(" with columns is one example. In the
+"):Link("Pages", "/tutorials/ui/pages.html"):Text(" tutorial, you put controls in a grouping.
+"):Code("SetColumns"):Text(" arranges a grouping's controls in columns, and the controls
+fill the grid one row at a time, from left to right.")
+
+        Paragraph("Imagine a made-up table of contents with four chapters in two columns. Like
+a book's contents page, it reads down the first column, then down the
+second. To show Chapters 1 and 2 in the first column, the program has to
+add them in the order 1, 3, 2, 4, and so the default focus order is 1, 3,
+2, 4 too. To fix it, the program asks the page to work out its default
+order right away with "):Code("CalculateDefaultFocusOrdering"):Text(", then changes the
+links between the chapters:")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/Main2.quorum")
+
+        Paragraph():Code("CalculateDefaultFocusOrdering"):Text(" also marks the page's order as set, so the
+form does not work it out again, and replace your changes, when it is shown.
+The program changes only the links that were wrong. The links from the page
+title to Chapter 1 and from Close back to the title come from the default
+order.")
+
+        Paragraph("If you want to set every link yourself, call
+"):Code("page:SetHasDefaultFocusOrdering(true)"):Text(" instead. The form then sets no links
+at all, and "):Key("Tab"):Text(" reaches only the items you link.")
+
+        Paragraph("One more rule: "):Code("Focus()"):Text(" gives the focus to an item, but only once the
+program is running. In a form, call it from a behavior, never before
+"):Code("Display"):Text(".")
+    end
+
+    private action FocusInsideAControl
+        Subsection("Focus inside a control")
+        Paragraph("Some controls keep the focus on themselves while you move around inside
+them. When a "):Link("combo box", "/tutorials/ui/comboBox.html"):Text("'s list is open, for
+example, the arrow keys move through the choices, but the focus stays in
+the combo box's text field, so you can keep typing. The control tells
+screen readers which choice is highlighted, so they read the choice the
+arrow keys just moved to. That highlighted part is called the "):Strong("active
+descendant"):Text(", and "):Code("GetActiveDescendant"):Text(" returns it. You don't need to do
+anything to make this work in Quorum's controls.")
+    end
+
+    private action SettingTheFocusOrderInAGame
+        Subsection("Setting the focus order in a game")
+        Paragraph("A program that uses the "):Code("Game"):Text(" class doesn't work out a focus order. Until
+you set one, pressing "):Key("Tab"):Text(" does nothing, because no item knows which item
+comes next. And until some item has the focus, "):Key("Tab"):Text(" has nowhere to start
+from.")
+
+        Paragraph("Each item stores two links:")
+        BulletList()
+        ListItem():Code("SetNextFocus"):Text(" sets where "):Key("Tab"):Text(" goes from this item.")
+        ListItem():Code("SetPreviousFocus"):Text(" sets where "):Keys("Shift", "Tab"):Text(" goes from this item.")
+
+        Paragraph("The following program has three buttons. It links them in a loop, so that
+"):Key("Tab"):Text(" goes from New to Open to Save and back to New. It then gives the focus
+to New with "):Code("Focus()"):Text(", so the keyboard works as soon as the program starts.")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/Main3.quorum")
+
+        Paragraph("The "):Code("FocusReporter"):Text(" is a "):Strong("focus listener"):Text(": an object that is told whenever
+an item it listens to gains or loses the focus. Here it writes the name of
+the item that just got the focus to the output. Put it in
+its own file, "):Code("FocusReporter.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/FocusReporter.quorum")
+
+        Paragraph("Run the program and press "):Key("Tab"):Text(" a few times, then "):Keys("Shift", "Tab"):Text(". Each time,
+the output shows where the focus went, and the button with the focus is
+highlighted. A screen reader reads the button's name, its description and
+that it is a button.")
+    end
+
+    private action MakingYourOwnFocusableItem
+        Subsection("Making your own focusable item")
+        Paragraph("Shapes and pictures are not focusable, but you can make them focusable and
+decide what happens when they gain or lose the focus. Every item has two
+actions for this, "):Code("GainedFocus"):Text(" and "):Code("LostFocus"):Text(", which do nothing by
+default. If you make your own class that inherits from an item class, you
+can write your own versions of them.")
+
+        Paragraph("The following class is a "):Code("Drawable"):Text(", a shape you can draw, that turns green
+and grows a little while it has the focus, and turns red and goes back to
+its size when it loses the focus. Changing the size as well as the color
+helps people who cannot easily tell red from green. When it is made, it
+also makes itself focusable and gives itself an "):Strong("accessibility code"):Text(", so
+screen readers know it is there. Put it in a file named
+"):Code("FocusDrawable.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/FocusDrawable.quorum")
+
+        Paragraph("The main program makes three shapes, gives each one a name and a
+description, and links them in a loop from left to right:")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/Main4.quorum")
+
+        BlockEditorFile("FocusDrawable.quorum", "html/sources/tutorials/ui/Focus/FocusDrawable.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Focus/Main4.quorum", "", true, true)
+
+        Paragraph("Two lines in "):Code("FocusDrawable"):Text(" are easy to forget:")
+        BulletList()
+        ListItem():Code("SetFocusable(true)"):Strong("."):Text(" Without it, "):Code("Focus()"):Text(" and "):Key("Tab"):Text(" skip the shape.")
+        ListItem():Code("SetAccessibilityCode(parent:Item:ITEM)"):Strong("."):Text(" A shape is hidden from
+screen readers by default, because most shapes are decoration. Giving it
+the "):Code("ITEM"):Text(" code tells the screen reader that it is something the user can
+move to, so the screen reader can read its name and description. The
+"):Link("Accessibility", "/tutorials/ui/accessibility.html"):Text(" tutorial describes the
+other codes. "):Code("ITEM"):Text(" is a constant of the "):Code("Item"):Text(" class, so the class reaches
+it through "):Code("parent:Item:"):Text(".")
+    end
+
+    private action LookingAhead
+        Subsection("Looking ahead with GetNextFocus")
+        Paragraph("An item can also tell you where the focus will go next. "):Code("GetNextFocus"):Text("
+returns the item that "):Key("Tab"):Text(" moves to, and "):Code("GetPreviousFocus"):Text(" returns the item
+that "):Keys("Shift", "Tab"):Text(" moves to. Either one is "):Code("undefined"):Text(" if no link was set.")
+
+        Paragraph("For example, you can change "):Code("GainedFocus"):Text(" in "):Code("FocusDrawable"):Text(" to write where
+"):Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(" will go. Add "):Code("use Libraries.Interface.Item"):Text(" to the top
+of the file, and replace the "):Code("output"):Text(" line with:")
+        CodeExampleFromFile("sources/tutorials/ui/Focus/LookAhead.quorum")
+    end
+
+    private action AGoodFocusOrder
+        Subsection("A good focus order")
+        Paragraph("A focus order is a design choice, and a careless one makes a program hard to
+use. Whether a form sets it or you do, check that:")
+        BulletList()
+        ListItem():Strong("It follows the reading order."):Text(" Usually left to right, then top to
+bottom, in the same order the items appear on the screen. Groupings with
+columns may need help, as shown above.")
+        ListItem():Strong("It reaches everything."):Text(" Every item a person can click should also be
+reachable with "):Key("Tab"):Text(".")
+        ListItem():Strong("It does not trap the user."):Text(" "):Keys("Shift", "Tab"):Text(" should always lead back. A loop,
+like the ones in this lesson, is one simple way.")
+        ListItem():Strong("It starts somewhere useful."):Text(" A form starts at the first item on the
+page. In a game, call "):Code("Focus()"):Text(" on the first item, so the keyboard works
+right away.")
+        ListItem():Strong("It has no extra stops."):Text(" Labels that repeat a control's name can be
+skipped with "):Code("SetSkipLabelsInFocus"):Text(".")
+        ListItem():Strong("Every focusable item has a name."):Text(" Otherwise a screen reader can only say
+"):DoubleQuote():Text("button"):DoubleQuote():Text(" or nothing at all.")
+        ListItem():Strong("The focus is visible."):Text(" Controls draw a focus outline for you. If you
+make your own focusable item, make it change in a way that does not rely
+on color alone.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("The goal of this activity is to hold a "):Strong("crazy focus contest"):Text(". Build a form
+page with at least six controls, such as some text fields with labels, a
+check box and a grouping of buttons. Then use what you learned on this
+page, such as "):Code("SetNextFocus"):Text(" and "):Code("SetPreviousFocus"):Text(", to give it the
+craziest focus order you can. There is one rule: pressing "):Key("Tab"):Text(" over and
+over must still reach every control on the page, and "):Keys("Shift", "Tab"):Text(" must still
+go back the way it came. Before anyone tries it, plan your order on paper or
+with physical manipulatives.")
+
+        Paragraph("Then hold the contest, with a partner or as a class. Swap programs and try
+each one with the keyboard, and with a screen reader if one is available.
+Check that every entry follows the rule: if a control can't be reached, the
+entry is out. Then vote for the winner: the order that is the most
+surprising but still reaches everything.")
+
+        Paragraph("Last, fix the winner. Together, suggest changes that would make its order
+less crazy: which control should come first, which controls belong next to
+each other, and where "):Key("Tab"):Text(" should go after the last control. Make the
+changes, and explain how each one makes the page easier to use.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Before this lesson, had you ever noticed the focus in the programs you use?
+Think of a program where the "):Key("Tab"):Text(" key did something surprising. Now that
+you know how focus order is set, what do you think its programmers forgot?
+When would you trust a form's default order, and when would you check it
+by hand?")
     end
 end

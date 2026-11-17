@@ -1,0 +1,84 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.Grouping
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Layouts.FlowLayout
+use Libraries.Interface.Layouts.GridLayout
+use Libraries.Interface.Layouts.LayoutProperties
+use Libraries.Game.DesktopConfiguration
+
+class Main
+    action Main
+        Form form
+        DesktopConfiguration config = form:GetDesktopConfiguration()
+        config:resizable = true
+
+        Page page = form:GetMainPage()
+        page:SetTitle("Phone")
+
+        // A row of buttons that wraps onto a new line when it runs out of room.
+        Grouping toolbar = page:AddGrouping("Toolbar")
+        FlowLayout flow
+        toolbar:SetLayout(flow)
+        AddToolButton(toolbar, "Contacts")
+        AddToolButton(toolbar, "Recent")
+        AddToolButton(toolbar, "Favorites")
+        AddToolButton(toolbar, "Voicemail")
+        AddToolButton(toolbar, "Settings")
+        AddToolButton(toolbar, "Help")
+
+        // A number pad with 3 columns and 4 rows.
+        Grouping pad = page:AddGrouping("Number pad")
+        GridLayout grid
+        pad:SetLayout(grid)
+        pad:SetContainerGridWidth(3)
+        pad:SetContainerGridHeight(4)
+        LayoutProperties padProperties = pad:GetDefaultLayoutProperties()
+        padProperties:SetVerticalLayoutMode(padProperties:STANDARD)
+        pad:SetPixelHeight(240)
+
+        // Keys 1 to 9, in reading order: row 3 is the top row.
+        integer digit = 1
+        integer row = 3
+        repeat while row >= 1
+            integer column = 0
+            repeat while column < 3
+                AddKey(pad, "" + digit, column, row, 1)
+                digit = digit + 1
+                column = column + 1
+            end
+            row = row - 1
+        end
+        AddKey(pad, "0", 0, 0, 3)
+
+        page:AddButton("Call")
+        form:Display()
+    end
+
+    action AddToolButton(Grouping toolbar, text name)
+        Button button
+        button:SetName(name)
+        button:SetDescription("Opens the " + name + " screen.")
+        button:SetLeftMargin(5)
+        button:SetRightMargin(5)
+        button:SetTopMargin(5)
+        button:SetBottomMargin(5)
+        toolbar:Add(button)
+    end
+
+    action AddKey(Grouping pad, text name, integer column, integer row, integer columnsWide)
+        Button key
+        key:SetName(name)
+        key:SetDescription("Number key")
+        LayoutProperties properties = key:GetDefaultLayoutProperties()
+        properties:SetHorizontalLayoutMode(properties:FILL)
+        properties:SetVerticalLayoutMode(properties:FILL)
+        key:SetLeftMargin(4)
+        key:SetRightMargin(4)
+        key:SetTopMargin(4)
+        key:SetBottomMargin(4)
+        key:SetGridPosition(column, row)
+        key:SetGridWidth(columnsWide)
+        pad:Add(key)
+    end
+end

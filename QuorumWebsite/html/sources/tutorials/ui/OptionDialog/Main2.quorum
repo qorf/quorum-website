@@ -1,0 +1,44 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.OptionDialog
+use Libraries.Game.Graphics.Label
+
+class Main is FormBehavior
+    OptionDialog question = undefined
+    Label score = undefined
+
+    action Main
+        Form form
+        Page page = form:GetMainPage()
+
+        score = page:AddLabel("Score", "Score: 50")
+
+        Button newGame = page:AddButton("New Game")
+        newGame:SetDescription("Asks before starting over")
+        newGame:SetBehavior(me)
+
+        form:Display()
+    end
+
+    action Run(BehaviorEvent event)
+        if question = undefined
+            OptionDialog dialog
+            dialog:SetLabelTitle("Start a new game?")
+            dialog:SetDescription("Yes sets your score to 0. No keeps playing.")
+
+            YesBehavior yesBehavior
+            yesBehavior:SetDialog(dialog)
+            yesBehavior:SetScoreLabel(score)
+            dialog:SetBehavior(yesBehavior)
+            NoBehavior noBehavior
+            noBehavior:SetDialog(dialog)
+            dialog:SetCancelBehavior(noBehavior)
+
+            question = dialog
+        end
+        question:Show()
+    end
+end

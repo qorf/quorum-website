@@ -1,0 +1,287 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Pages, apps with more than one screen, in the user interface
+    series.
+*/
+class UserInterfacesPages is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/pages.html")
+        SetShortTitle("Pages")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("Add Pages to a Quorum Form, move between them with buttons, remember values of different types across Pages, and debate a real privacy law, COPPA.")
+
+        Title("Pages")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Most apps have more than one screen. A music app might have a home screen,
+a search screen and a settings screen. In a Form, each screen is a "):Strong("Page"):Text(". In this tutorial, you will add Pages to a Form, move between them
+with buttons, and carry what a person typed on one Page over to the next.
+You will also think about what information an app should ask for at all,
+and about a real law that answers part of that question for children.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this lesson:")
+        Goals()
+        ListItem("Add Pages to a Form and move between them with buttons")
+        ListItem("Remember values of different types, such as text, numbers and true or false, across Pages")
+        ListItem("Decide what personal information a sign-up form really needs")
+        ListItem("Debate whether a real law, COPPA, and its self-regulatory safe harbor do a good job of protecting children's data")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of a time you signed up for something online, such as a game, a
+club or a newsletter. What did it ask you for? Was there anything it asked
+for that it didn't seem to need? Did it show you what you had entered
+before you finished?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Pages/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Pages/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This lesson covers the following "):Link("CSTA K–12 standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_DATA_SCIENCE_28)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_ALGORITHMIC_PROBLEM_SOLVING_1)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_VARIABLES_AND_DATA_STORAGE_16)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_DATA_SCIENCE_28)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        Paragraph("In the "):Link("Forms", "/tutorials/ui/forms.html"):Text(" tutorial, you built an app with
+one Page, the main Page. In "):Link("Behaviors", "/tutorials/ui/behavior.html"):Text(" and "):Link("Buttons", "/tutorials/ui/button.html"):Text(", you made buttons that change a label
+on that Page, and you let one behavior serve many buttons. Now you will use
+buttons to move between Pages. A Form can hold many Pages, but it shows only
+one at a time. Each Page has a name. The main Page is always named "):DoubleQuote():Text("Main"):DoubleQuote():Text(".")
+
+        MoreThanOnePage()
+        RememberingValues()
+        AskOnlyForWhatYouNeed()
+        ARealRule()
+    end
+
+    private action MoreThanOnePage
+        Subsection("An app with more than one Page")
+        Paragraph():Code("form:AddPage(name)"):Text(" makes a new Page and gives it back to you, so you can
+add controls to it, just as you did with the main Page. "):Code("form:SetPage(name)"):Text(" shows the Page with that name, and hides the one that
+was showing. "):Code("form:GetPage(name)"):Text(" gives you a Page by its name, whether it
+is showing or not.")
+
+        Paragraph("This app is a made-up guide to a park, with three Pages. Buttons move
+between them.")
+        CodeExampleFromFile("sources/tutorials/ui/Pages/Main.quorum")
+
+        Paragraph("All four buttons use the same "):Code("Run"):Text(" action, as the color buttons did in the
+Buttons tutorial. To tell them apart, "):Code("Run"):Text(" asks the event which control was
+used: "):Code("event:GetItem()"):Text(" gives back the button that was pressed, and "):Code("GetName()"):Text(" gives its name. Every "):Code("Item"):Text(" has a name, so there is no need to
+cast it to a "):Code("Button"):Text(" here. The two "):DoubleQuote():Text("Back to Home"):DoubleQuote():Text("
+buttons share a name, and they do the same thing, so "):Code("Run"):Text(" doesn't need to
+tell them apart.")
+
+        Paragraph("When a new Page appears, the Form moves the focus to the first thing on it
+that can take the focus. A title can take the focus, so giving each Page a
+title with "):Code("SetTitle"):Text(" lets a screen reader user find out which Page they
+are on as soon as it appears. Each Page also gets its own "):Key("Tab"):Text(" order, from top to
+bottom, just like the main Page.")
+    end
+
+    private action RememberingValues
+        text dq = ""
+        dq = dq:GetDoubleQuote()
+
+        Subsection("Remembering values across Pages")
+        Paragraph("When a person types on one Page and then moves to another, the app often
+needs what they typed. A Form can remember values for you, each under a
+name you choose. There is an action for each "):Strong("data type"):Text(", the kind of
+value being stored:")
+
+        Table("Actions that remember a value, by type")
+        TableHeader():Cell("Type"):Cell("To remember"):Cell("To get it back")
+        TableRowWriter textRow = TableRow()
+        textRow:Cell("text")
+        textRow:Cell():Code("form:SetText(name, value)")
+        textRow:Cell():Code("form:GetText(name)")
+        TableRowWriter integerRow = TableRow()
+        integerRow:Cell("integer")
+        integerRow:Cell():Code("form:SetInteger(name, value)")
+        integerRow:Cell():Code("form:GetInteger(name)")
+        TableRowWriter numberRow = TableRow()
+        numberRow:Cell("number")
+        numberRow:Cell():Code("form:SetNumber(name, value)")
+        numberRow:Cell():Code("form:GetNumber(name)")
+        TableRowWriter booleanRow = TableRow()
+        booleanRow:Cell("boolean")
+        booleanRow:Cell():Code("form:SetBoolean(name, value)")
+        booleanRow:Cell():Code("form:GetBoolean(name)")
+
+        Paragraph("This made-up app orders movie tickets. The first Page asks for a name, in a
+text field, and has buttons to add and remove tickets. The second Page
+shows the order back so the person can check it. In this made-up app, an
+order of 4 or more tickets gets a group price. The app uses three data
+types: the name is text, the number of tickets is an integer, and whether
+the order gets the group price is a boolean.")
+        CodeExampleFromFile("sources/tutorials/ui/Pages/Main2.quorum")
+
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Pages/Main2.quorum", "", true, true)
+
+        Paragraph("Here is how the values are stored, changed and moved from one Page to the
+next:")
+        NumberedList()
+        ListItem("At the start, "):Code("Main"):Text(" remembers the integer 1 under the name "):DoubleQuote():Text("tickets"):DoubleQuote():Text(",
+before the Form is shown.")
+        ListItem("When "):DoubleQuote():Text("Add a ticket"):DoubleQuote():Text(" or "):DoubleQuote():Text("Remove a ticket"):DoubleQuote():Text(" is pressed, "):Code("Run"):Text(" gets the
+integer back, adds or takes away one, and remembers the new value. The "):Code("if"):Text(" statements keep it between 1 and 10. "):Code("ShowTickets"):Text(" then puts the new
+count in the label, so a person can "):Key("Tab"):Text(" to it and find the count.")
+        ListItem("When "):DoubleQuote():Text("Review my order"):DoubleQuote():Text(" is pressed, "):Code("Run"):Text(" finds the text field on the main
+Page by its name, gets the text typed in it, and remembers it as "):DoubleQuote():Text("name"):DoubleQuote():Text(".")
+        ListItem():Code("tickets >= 4"):Text(" is a comparison, so its value is a boolean: "):Code("true"):Text(" or "):Code("false"):Text(". "):Code("Run"):Text(" remembers it as "):DoubleQuote():Text("group price"):DoubleQuote():Text(". This boolean isn't typed
+by anyone; the app works it out from the integer.")
+        ListItem():Code("ShowReview"):Text(" gets each value back and puts it in a label on the review
+Page. A boolean needs a decision: "):Code("if"):Text(" turns true into "):DoubleQuote():Text("Yes"):DoubleQuote():Text(" and false
+into "):DoubleQuote():Text("No"):DoubleQuote():Text(", which is easier to read.")
+        ListItem("Then "):Code("SetPage"):Text(" shows the review Page.")
+
+        Paragraph("Press "):DoubleQuote():Text("Change my order"):DoubleQuote():Text(" and you're back on the main Page, with everything
+you typed still there. A Page keeps its controls, and what's in them, while
+it is hidden. That means you could also read a control on another Page
+directly, with "):Code("form:GetPage(" + dq + "Main" + dq + ")"):Text(" and then "):Code("GetTextField"):Text(". Remembering
+values on the Form keeps them all in one place, under clear names, so any
+Page can use them.")
+
+        Paragraph("Always remember a value before you try to get it. If you ask for a name
+that was never set, Quorum stops with a message that lists the names that
+do exist. That is why "):Code("Main"):Text(" sets "):DoubleQuote():Text("tickets"):DoubleQuote():Text(" before anything else.")
+    end
+
+    private action AskOnlyForWhatYouNeed
+        Subsection("Ask only for what you need")
+        Paragraph("Every text field on a sign-up form asks a person to hand over a piece of "):Strong("personal data"):Text(". Collecting it has benefits: a club needs your name to
+know who joined, and a reminder needs a way to reach you. It also has
+risks. Data that is stored can be shared, sold, or stolen, and the person
+may lose control over who gets it and how it is used.")
+
+        Paragraph("When you design a form, a few questions help:")
+        BulletList()
+        ListItem():Strong("Do we need it?"):Text(" Ask for each piece of data only if the app uses it.
+The movie ticket app asks for a name, but not a birthday or an address,
+because it doesn't use them.")
+        ListItem():Strong("Is it the person's choice?"):Text(" Something extra, like a phone number for
+reminders, can be optional. Say so in its label or description, and make
+sure the app still works when it is left empty. The "):Link("Checkboxes", "/tutorials/ui/checkbox.html"):Text(" tutorial shows another way to
+let a person opt in.")
+        ListItem():Strong("Can they check it?"):Text(" A summary Page, like "):DoubleQuote():Text("Check your order"):DoubleQuote():Text(", lets a
+person review everything they entered, and go back to change it, before
+anything is sent.")
+    end
+
+    private action ARealRule
+        Subsection("A real rule: COPPA")
+        Paragraph("Some of these questions are answered by law. In the United States, the
+Children's Online Privacy Protection Act (COPPA), passed by Congress in 1998,
+protects children under 13. The Federal Trade Commission (FTC) writes and
+enforces the rule. It covers websites and apps aimed at children under 13,
+and others that know they are collecting a child's personal information.
+They must post a privacy policy, get a parent's permission before collecting
+a child's personal information, let parents review or delete it, keep it
+secure, and not require a child to share more than is reasonably needed to
+take part. Congress chose not to cover teenagers
+("):Link("source", "https://www.ftc.gov/business-guidance/resources/complying-coppa-frequently-asked-questions"):Text(").
+The FTC updated the rule in 2025, and the update took effect on June 23,
+2025. You can read the whole update in the government's official journal,
+the Federal Register: Federal Trade Commission, "):DoubleQuote():Text("Children's Online Privacy
+Protection Rule,"):DoubleQuote():Text(" document 2025-05904, April 22, 2025
+("):Link("Federal Register", "https://www.federalregister.gov/documents/2025/04/22/2025-05904/childrens-online-privacy-protection-rule"):Text(").")
+
+        Paragraph("The rule also has a "):Strong("safe harbor"):Text(" provision, which lets an industry
+regulate itself. In the law's words, industry groups can ask the FTC to
+approve "):DoubleQuote():Text("self-regulatory program guidelines"):DoubleQuote():Text(": their own set of rules for
+the companies in the group. To be
+approved, the group's rules must give children "):DoubleQuote():Text("substantially the same or
+greater protections"):DoubleQuote():Text(" than the FTC's rule. The group must check each member
+company's privacy and security practices at least once a year, and must
+discipline companies that break its rules, for example by reporting them
+publicly or referring them to the FTC. A company that follows an approved
+group's rules is treated as following the FTC's rule
+(16 CFR 312.11, "):DoubleQuote():Text("Safe harbor programs"):DoubleQuote():Text(";
+"):Link("eCFR", "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312/section-312.11"):Text(").")
+
+        Paragraph("Notice that "):DoubleQuote():Text("ask only for what you need"):DoubleQuote():Text(" is part of the law for children.
+Whether a rule like this works well is a fair question to debate: it depends
+on what it protects, who it leaves out, and whether companies can and do
+follow it. You will debate it in the activity below.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you debate a real law, with a partner or as a class.
+There is no programming. Use only the facts in "):DoubleQuote():Text("A real rule: COPPA"):DoubleQuote():Text(" and
+the movie ticket app from this tutorial as evidence.")
+
+        Paragraph():Strong("Debate 1: does COPPA protect children's data well?"):Text(" One side argues that
+it does a good job; the other argues that it falls short. Questions to
+start with:")
+        BulletList()
+        ListItem("If the movie ticket app were made for children under 10, what would it
+have to do differently? What about a 14-year-old, whom COPPA doesn't
+cover?")
+        ListItem("Is asking a parent's permission enough?")
+        ListItem("Does asking only for what is reasonably needed protect children, or can
+companies get around it?")
+
+        Paragraph("After a few minutes, switch sides for one minute.")
+
+        Paragraph():Strong("Debate 2: the safe harbor provision."):Text(" Safe harbor is self-regulatory:
+industry groups write their own rules and check their own members. Debate
+questions like these:")
+        BulletList()
+        ListItem("If an industry group regulates itself, is that reasonable oversight?")
+        ListItem("Who should check that companies follow the rules: the government, the
+industry itself, or both?")
+        ListItem("What could a self-regulatory group gain by being strict with its own
+members? What could it gain by being easy on them?")
+        ListItem("Does the FTC's approval, the yearly checks and the discipline make
+self-regulation trustworthy enough to protect children?")
+
+        Paragraph("Switch sides again for one minute.")
+
+        Paragraph():Strong("To finish,"):Text(" write down the strongest point each side made in each
+debate, and one change to the rule you would suggest, with a reason.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Think about an app or website you use that asks for personal data. Which
+pieces does it really need to work, and which might it be collecting for
+another reason? What benefits do you get from sharing that data, and what
+risks come with it? How could its sign-up Pages make it clearer what is
+collected and why?")
+
+        Paragraph("As your Pages fill up with controls, it helps to sort them into sections.
+The "):Link("Groupings", "/tutorials/ui/groupings.html"):Text(" tutorial, next, shows how.")
+    end
+end

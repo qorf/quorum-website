@@ -1,292 +1,328 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: TextBox.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Text Boxes, part of the user interface series.
 */
 class UserInterfacesTextBox is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/textBox.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("TextBox")
+        SetShortTitle("Text Boxes")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about TextBoxes in the Quorum programming language.")
-        SetSummary("how to use TextBoxes")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("TextBox Tutorial - Quorum Programming Language")
-        Title("Tutorial: TextBox")
-        Paragraph("This tutorial tells you how to use TextBoxes in Quorum")
-        AnIntroductionToTextBoxesInQuorum()
-        CreatingTextBoxes()
-        AddingMoreFunctionality()
-        TheTextBoxSelectionClass()
-        AdditonalFeatures()
-        TextFields()
-        TryMakingAUserInterface()
+        // For search engines and link previews.
+        SetDescription("How to use text boxes in Quorum: put them on a page, work with the text and the selection, add line numbers and text styles, and think about autocorrect and automation.")
+
+        Title("Text Boxes")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToTextBoxesInQuorum
-        Section("An Introduction to TextBoxes in Quorum")
-        Paragraph("In this tutorial, we will learn how to use TextBoxes in the Quorum Game Engine. Textboxes are a simple interface tool that allows users to interact with it by typing text into it. TextBoxes also allow us to manipulate and use the text inside it.")
-        Paragraph("There is also another interface component that allows the user to input text and that is the "):Strong("TextField"):Text(". A TextField is similar to a TextBox, but it only allows for input in a single line. More information on the TextField is provided at the end of this tutorial.")
-        Paragraph("For this tutorial, we will create a project with two TextBoxes, and provide Buttons that allow the user to transfer text from one TextBox to the other, a Button to clear the receiving TextBox, and a Button to read aloud from the receiving TextBox. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("A text box is an area where a person can type many lines of text, like notes,
+a story or a program. Quorum Studio's code editor is built on the same idea.
+In this tutorial, you will put two text boxes on a page, add buttons that
+clear, show and copy text between them, and then add line numbers and
+colored, underlined text.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add text boxes to a page and give each one a clear label, name and
+description")
+        ListItem("Get, set, add to and empty the text in a text box from code")
+        ListItem("Use a "):Code("TextBoxSelection"):Text(" to work with the text a person has selected")
+        ListItem("Add a line number gutter and a text style, and explain why style alone
+shouldn't carry meaning")
+        ListItem("Examine how autocorrect, an algorithm in many text boxes, helps some
+people and harms others")
+        ListItem("Evaluate how automation such as self-driving vehicles can create and
+replace jobs")
     end
 
-    private action CreatingTextBoxes
-        Section("Creating TextBoxes")
-        Paragraph("For this main class, we will need the TextBox, Button, ManualLayout, and Color libraries. We need the ManualLayout library because the game needs a set layout for the textbox to render to the screen, giving us the following use statements:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Controls.Button
-use Libraries.Interface.Layouts.ManualLayout
-use Libraries.Game.Graphics.Color")
-        Paragraph("Since we want the TextBoxes and Buttons to be usable as soon as the game begins, all of our additional code in the main class will be in the CreateGame action.")
-        Paragraph("For this main class, we need to make a Manual Layout variable and set the game's layout to it. We then need a Color variable since we will be using color to differentiate between the two textboxes. This gives us the following lines of code:")
-        CodeExample("ManualLayout layout
-SetLayout(layout)
-Color color")
-        Paragraph("First, we will create a TextBox and add it to the game. We need to set the TextBox's size, background color, text, and position, this is done by using its respective Set functions. Then we add it to the game, giving us the following lines of code:")
-        CodeExample("TextBox box1
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of three programs where you type more than one line of text: maybe a
+word processor, a chat app and a code editor. What extra features does each
+one add beyond typing? Which of those features would you miss most if they
+were gone?")
 
-box1:SetSize(300, 300)
-box1:SetBackgroundColor(color:White())
-box1:SetText(" + dq + "Enter text in this TextBox" + dq + ")
-box1:SetPosition(100, 280)
-Add(box1)")
-        Paragraph("Now, let's create our second TextBox. To distinguish it from the first, we will make this TextBox gray, and will not preset text in it. We will also place it to the right of the first TextBox. This is done with the following lines of code:")
-        CodeExample("TextBox box2
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/TextBox/Vocabulary.csv")
 
-box2:SetSize(300, 300)
-box2:SetBackgroundColor(color:Gray())
-box2:SetPosition(400, 280)
-Add(box2)")
-        Subsection("Accessibility")
-        Paragraph("Normally when working with Focus you press Tab and Shift+Tab to move Focus around but a TextBox uses those keys for indenting text. As our example is now you will not be able to switch Focus from a TextBox. To change this you could either add another keybinding that will switch focus, or you set the TextBox to no longer use Tab for indenting. For our example we will do the latter and use Tab for Focus switching only. We will also change the TextBoxes’ names and make a small focus cycle so you can switch between both TextBoxes with only the keyboard. This can be done with the following lines of code:")
-        CodeExample("box1:SetName(" + dq + "Left Textbox" + dq + ")
-box2:SetName(" + dq + "Right Textbox" + dq + ")
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/TextBox/Code.csv")
 
-box1:SetMoveFocusOnTab(true)
-box2:SetMoveFocusOnTab(true)
-
-box1:SetNextFocus(box2)
-box1:SetPreviousFocus(box2)
-box2:SetNextFocus(box1)
-box2:SetPreviousFocus(box1)")
-        Paragraph("We will be adding Buttons to this project so they will be included in the focus cycle as they are added. The final focus cycle will be given later in this tutorial.")
-        Paragraph("If we build and run the project, we have the two TextBoxes and can type into either. By default, a TextBox can perform certain edit actions, such as copy and paste, with the default keys for your machine. You can copy, paste, select all, undo, and redo.")
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_10)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_CAREER_EXPLORATION_45)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_COMPUTING_SYSTEMS_37)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_HISTORY_OF_COMPUTING_39)
+        CoversStandard(computerScience, computerScience:GRADE_4_EMERGING_TECHNOLOGIES_17)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        StandardsList(computerScience)
     end
 
-    private action AddingMoreFunctionality
-        Section("Adding More Functionality")
-        Paragraph("Now that we have our TextBoxes, we can add more functionality to them by creating Buttons to clear and read the text in the second box. The TextBox has actions for adding, appending, and inserting text, to name a few, but for this tutorial we will focus on emptying, setting, and getting the text of a TextBox.")
-        Paragraph("First, we will create a Behavior for each Button, creating a new Quorum class for each. We will name these "):DoubleQuote():Text("ClearBehavior.quorum,"):DoubleQuote():Text(" and "):DoubleQuote():Text("SayBehavior.quorum."):DoubleQuote()
-        Paragraph("The ClearBehavior class is a Behavior that uses one TextBox, so we will need the libraries for TextBox, Behavior, and BehaviorEvent. We will create a TextBox class variable, which is undefined. Thus, we have an action to set the TextBox to the one in our main class. This class will use the Empty action, which clears the TextBox of any pre-existing text. The class is as follows:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-
-class ClearBehavior is Behavior
-
-    TextBox box = undefined
-
-    action SetTextBoxes(TextBox sourceBox)
-        box = sourceBox
+    action Explore
+        Section("Explore")
+        BoxesAndFields()
+        MakingTwoTextBoxes()
+        MovingTheFocus()
+        ButtonsThatWorkWithText()
+        WorkingWithTheSelection()
+        LineNumbers()
+        TextStyles()
+        TheFinishedProgram()
+        Autocorrect()
+        AutomationAndJobs()
     end
 
-    action Run(BehaviorEvent behavior)
-        if box not= undefined
-            box:Empty()
-        end
-    end
-end")
-        Paragraph("The SayBehavior class similarly needs the TextBox, Behavior, and BehaviorEvent libraries, as well as the Speech library. The SetTextBoxes action is identical to the same action in the ClearBehavior class. In its Run action, we will create a Speech object and call the Say action. For the text parameter, we will use the TextBox's GetText action. The complete SayBehavior class is as follows:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Behaviors.Behavior
-use Libraries.Sound.Speech
-use Libraries.Interface.Events.BehaviorEvent
+    private action BoxesAndFields
+        Subsection("Text boxes and text fields")
+        Paragraph("In the "):Link("Text Fields", "/tutorials/ui/textField.html"):Text(" tutorial, you used a text
+field for one line of text. A "):Strong("text box"):Text(" ("):Code("TextBox"):Text(") holds many lines. It
+scrolls when the text doesn't fit, and it can show extras like line numbers.
+Most of the actions are the same: "):Code("GetText"):Text(", "):Code("SetText"):Text(" and "):Code("Empty"):Text(" work just
+as they do on a text field.")
 
-class SayBehavior is Behavior
-
-    TextBox box = undefined
-
-    action SetTextBoxes(TextBox sourceBox)
-        box = sourceBox
+        Paragraph("A person can type in a text box with the usual editing keys: the arrow keys, "):Key("Home"):Text(" and "):Key("End"):Text(", "):Key("Shift"):Text(" to select, "):Key("Enter"):Text(" for a new line, and "):Keys("Ctrl", "A"):Text(", "):Keys("Ctrl", "C"):Text(", "):Keys("Ctrl", "X"):Text(", "):Keys("Ctrl", "V"):Text(", "):Keys("Ctrl", "Z"):Text(" and "):Keys("Ctrl", "Y"):Text(" (use "):Key("Cmd"):Text(" on a Mac).")
     end
 
-    action Run(BehaviorEvent behavior)
-        if box not= undefined
-            Speech speech
-            speech:Say(box:GetText(), false)
-            output box:GetText()
-        end
-    end
-end")
-        Paragraph("Now that our Behavior classes are completed, we can return to the main class and create the Behavior objects for each, as well as set our TextBoxes for each. Our Behavior declarations are as follows:")
-        CodeExample("ClearBehavior clearBehavior
-clearBehavior:SetTextBoxes(box2)
-SayBehavior sayBehavior
-sayBehavior:SetTextBoxes(box2)")
-        Paragraph("Next, we need to create our Buttons, set their respective Behaviors, and add them to the game. This is done through the following lines of code:")
-        CodeExample("Button clearButton
-clearButton:SetName(" + dq + "Clear Text" + dq + ")
-clearButton:SetPosition(475, 200)
-clearButton:SetBehavior(clearBehavior)
-Add(clearButton)
+    private action MakingTwoTextBoxes
+        Subsection("Making two text boxes")
+        Paragraph("In this tutorial, we build a small note copier: a "):DoubleQuote():Text("Source notes"):DoubleQuote():Text(" box and a "):DoubleQuote():Text("Copied notes"):DoubleQuote():Text(" box. A page's "):Code("AddTextBox"):Text(" action makes a text box and adds it
+to the page. The page makes it as wide as the row and four lines tall. "):Code("SetLayoutRows"):Text(" makes it taller.")
 
-Button readButton
-readButton:SetName(" + dq + "Read Text" + dq + ")
-readButton:SetPosition(475, 160)
-readButton:SetBehavior(sayBehavior)
-Add(readButton)")
-        Paragraph("Now, when the program is run, we can clear the right box, or read the right box's text aloud.")
+        Paragraph("Like a text field, a text box shows no words of its own, so each one gets a
+label. A label added right before a text box sits above it.")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/Main.quorum")
+
+        Paragraph("The two boxes have different names and descriptions, so a screen reader user
+can tell them apart. Don't rely on color or position alone to tell them
+apart: a person who can't see the screen, or who can't tell the colors
+apart, would miss it.")
     end
 
-    private action TheTextBoxSelectionClass
-        Section("The TextBoxSelection Class")
-        Paragraph("For the final additions to our program, we will use the TextBoxSelection class. The TextBoxSelection's main purpose is holding the start and end indices for the selection. For example, if the full TextBox holds "):DoubleQuote():Text("Hello world!"):DoubleQuote():Text(" and the selection is "):DoubleQuote():Text("world"):DoubleQuote():Text(" then the start index is 6 and the end index is 11.")
-        Paragraph("Before we create a Button for transferring the selected text, let's create the Behavior class for it. We will name it "):DoubleQuote():Text("TransferSelectionBehavior.quorum."):DoubleQuote()
-        Paragraph("The TransferSelectionBehavior class will need the libraries for TextBox, Behavior, BehaviorEvent, and TextBoxSelection, giving the following use statements:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Selections.TextBoxSelection")
-        Paragraph("The class itself will inherit the Behavior class. We will also need two TextBox class variables, an action to set those TextBoxes, and we will override the Run action.")
-        Paragraph("This Run action will check if box1 and box2 are defined, and then we need to create a TextBoxSelection variable and set it equal to box1's internal selection, using the TextBox's GetSelection action. Then we will get the selection's start and end indices to get the text from box1 in between those indices. To do this, we will use the TextBoxSelection's GetStartIndex and GetEndIndex actions.")
-        Paragraph("Here is the full TransferSelectionBehavior class:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Selections.TextBoxSelection
-
-class TransferSelectionBehavior is Behavior
-
-    TextBox box1 = undefined
-    TextBox box2 = undefined
-
-    action SetTextBoxes(TextBox sourceBox, TextBox receiveBox)
-        box1 = sourceBox
-        box2 = receiveBox
+    private action MovingTheFocus
+        Subsection("Moving the focus with Tab")
+        Paragraph("The page sets the "):Key("Tab"):Text(" order for you, top to bottom: the title, then each
+label and the text box under it. In a text box, "):Key("Tab"):Text(" moves the focus to the next control
+by default. That's what you want in most programs, because it means a
+keyboard user is never trapped in a text box. A code editor is different:
+there, "):Key("Tab"):Text(" should indent. You can switch with "):Code("SetMoveFocusOnTab(false)"):Text(",
+but then you must give keyboard users another way to leave the box.")
     end
 
-    action Run(BehaviorEvent behavior)
-        if box1 not= undefined and box2 not= undefined
-            TextBoxSelection selection = box1:GetSelection()
-            text subtext = box1:GetText(selection:GetStartIndex(), selection:GetEndIndex())
-            box2:SetText(subtext)
-        end
-    end
-end")
-        Paragraph("With our Behavior classes completed, we can now return to the main class. Adding to our CreateGame action, we merely need to create a new Button and give it our new Behavior. This adds the following code to the CreateGame action:")
-        CodeExample("TransferSelectionBehavior transferSelectionBehavior
-transferSelectionBehavior:SetTextBoxes(box1, box2)
+    private action ButtonsThatWorkWithText
+        Subsection("Buttons that work with the text")
+        Paragraph("Next, we add four buttons in a row under the text boxes. Each one gets its
+own behavior class. Each behavior is a "):Code("FormBehavior"):Text(", so it can find the
+text boxes on the page by their names with "):Code("GetTextBox"):Text(". This keeps every
+class small and easy to read.")
 
-Button transferSelection
-transferSelection:SetName(" + dq + "Transfer Selection" + dq + ")
-transferSelection:SetPosition(475, 110)
-transferSelection:SetBehavior(transferSelectionBehavior)
-Add(transferSelection)")
-        Paragraph("Now if you were to run the program, you can select text from the left TextBox, either with your mouse or by holding shift and using the arrow keys, and transfer that text to the right TextBox.")
+        Paragraph():Strong("Clear"):Text(" empties the copied notes. Make "):Code("ClearBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/ClearBehavior.quorum")
+
+        Paragraph():Strong("Show text"):Text(" outputs the copied notes and counts their lines. Make "):Code("ShowBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/ShowBehavior.quorum")
     end
 
-    private action AdditonalFeatures
-        Section("Additonal Features")
-        Subsection("Gutters")
-        Paragraph("TextBoxes in Quorum also support Gutters. A Gutter is an additional margin of space added to the layout of a TextBox that runs along the left side of the text. One of the most common Gutters you will see is a Line Number Gutter, which you find in almost every IDE. A Line Number Gutter runs along the left side of text and on every line, there is a number that represents the row the text is on. Quorum has a default Line Number Gutter class that we can easily add to our TextBox, so we'll start by adding the following library to our main class:")
-        CodeExample("use Libraries.Interface.Controls.LineNumberGutter")
-        Paragraph("Now all we have to do is go to our CreateGame action and make the Gutter object and add it our box. This is done with the following lines of code:")
-        CodeExample("LineNumberGutter gutter
-box1:Add(gutter)")
-        Paragraph("Now, when we run the program, you will notice that on the first box, next to every line of text there is a number that indicates what line the text is in.")
-        Paragraph("LineNumberGutters are not the only type of gutters that exist; you can also create custom gutters. Gutters also support having an action occur when you click on them. In an IDE, for example, you might click on the line number gutter to put a breakpoint on that line for debugging purposes. Making a custom Gutter with custom Behaviors is beyond the scope of this tutorial, but it is useful the know the customizability allowed by Quorum's TextBox Gutters.")
-        Subsection("TextStyles")
-        Paragraph("TextBoxes in Quorum also support TextStyles, which allow you stylize and add character to the text in a TextBox. To show how you can add a TextStyle to a TextBox, we will make a Behavior, which we will associate with a Button, that will take what is being selected in a text box and turn that text Red and Underline it. To start, we will make a new class called "):DoubleQuote():Text("StyleBehavior.quorum."):DoubleQuote()
-        Paragraph("This Behavior will use the same libraries as our TransferSelctionBehavior, but with the TextStyle, TextUnderline, and Color libraries added on. Like our previous Behaviors, we also need a SetTextBoxes action to get the TextBox from our main, giving us the following template:")
-        CodeExample("use Libraries.Interface.Controls.TextBox
-use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Selections.TextBoxSelection
-use Libraries.Interface.Controls.TextStyles.TextStyle
-use Libraries.Interface.Controls.TextStyles.TextUnderline
-use Libraries.Game.Graphics.Color
+    private action WorkingWithTheSelection
+        Subsection("Working with the selection")
+        Paragraph("When a person selects text, the text box keeps track of where the selection
+starts and ends. Each position is an "):Strong("index"):Text(": the number of characters
+before it, counting from 0. If the text is "):DoubleQuote():Text("Hello world!"):DoubleQuote():Text(" and "):DoubleQuote():Text("world"):DoubleQuote():Text(" is
+selected, the selection starts at index 6 and ends at index 11.")
 
-class StyleBehavior is Behavior
-    TextBox box = undefined
+        Paragraph():Code("GetSelection"):Text(" returns a "):Code("TextBoxSelection"):Text(" with these indexes. Its "):Code("IsEmpty"):Text("
+action is true if nothing is selected, and its "):Code("GetText"):Text(" action returns the
+selected text. "):Strong("Copy selection"):Text(" adds the selected text to the end of the
+copied notes. Make "):Code("CopySelectionBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/CopySelectionBehavior.quorum")
 
-    action SetTextBoxes(TextBox Box)
-        box = Box
+        Paragraph("A person can select text with the mouse, or by holding "):Key("Shift"):Text(" and pressing
+the arrow keys. The selection stays when the focus moves to the button.")
     end
 
-    action Run(BehaviorEvent behavior)
-        if box not= undefined
-        end
-    end
-end")
-        Paragraph("To start, the Run action will get the selection from the TextBox so we know what text to stylize. We also need to create our TextStyle, TextUnderline, and Color objects. After those objects are created, we can start customizing our TextStyle. TextStyles have actions for setting the color of text, two for text that is selected and while not selected, and for setting a highlight. The highlight we will use for our style is the TextUnderline Highlight. Highlights are objects that are drawn with the text. While Quorum also has the ColoredHighlight class and allows you to make your own, a custom highlight is beyond the scope of this tutorial.")
-        Paragraph("With the style made, now we need to set where the TextStyle will go into effect. To accomplish this, we will use the TextBoxSelection to get where the selection starts and set the style to start at that index. A TextStyle also has a size which signifies how many characters the style has effect over. To find the size, we will simply subtract the StartIndex of the selection from the EndIndex.")
-        Paragraph("Now that the style is done, we can now add it to the TextBox using the AddTextStyle action, which also needs a name for the style, which we will call "):DoubleQuote():Text("under."):DoubleQuote():Text(" We will also call the Resize action to update the TextBox so you can immediately see the style change when activating the Button. The code in the run class will look like this:")
-        CodeExample("TextBoxSelection selection = box:GetSelection()
-TextStyle style
-TextUnderline highlight
-Color color
+    private action LineNumbers
+        Subsection("Line numbers")
+        Paragraph("A "):Strong("gutter"):Text(" is a strip down the left side of a text box. The most common one
+shows line numbers, as in a code editor. Quorum has a "):Code("LineNumberGutter"):Text(" you
+can add with the text box's "):Code("Add"):Text(" action. A gutter is also a kind of control,
+so the code uses "):Code("cast"):Text(" to tell Quorum which "):Code("Add"):Text(" action you mean:")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/AddGutter.quorum")
 
-style:SetColor(color:Red())
-style:SetSelectionColor(color:Red())
-style:SetHighlight(highlight)
+        Paragraph("A gutter can also react when a person clicks it. A "):Strong("gutter listener"):Text(" is
+told which line was clicked. This one moves the caret, the blinking mark
+where typing goes, to the start of that line. Make "):Code("GoToLineListener.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/GoToLineListener.quorum")
 
-style:SetIndex(selection:GetStartIndex())
-style:SetSize(selection:GetEndIndex() - selection:GetStartIndex())
-box:AddTextStyle(" + dq + "under" + dq + ", style)
-box:Resize()")
-        Paragraph("Now, we will go back to the main class and create a Button with the Behavior we just made. The code for this is as follows:")
-        CodeExample("Button styleSelect
-styleSelect:SetName(" + dq + "Style Selection" + dq + ")
-styleSelect:SetPosition(475, 80)
-styleSelect:SetBehavior(styleBehavior)
-Add(styleSelect)")
-        Paragraph("Now that we have all of our Buttons we can add our finished Focus Cycle that includes all of the Buttons. The Focus cycle is giving in the following lines of code:")
-        CodeExample("box1:SetNextFocus(box2)
-box1:SetPreviousFocus(styleSelect)
-box2:SetNextFocus(clearButton)
-box2:SetPreviousFocus(box1)
-clearButton:SetNextFocus(readButton)
-clearButton:SetPreviousFocus(box2)
-readButton:SetNextFocus(transferSelection)
-readButton:SetPreviousFocus(clearButton)
-transferSelection:SetNextFocus(styleSelect)
-transferSelection:SetPreviousFocus(readButton)
-styleSelect:SetNextFocus(box1)
-styleSelect:SetPreviousFocus(transferSelection)")
-        Paragraph("Now, when we run the program, we can select text in the first TextBox and click our Style Button, and the text turns red and becomes underlined. Also note that if you type inside the styled text zone, the new text will retain that style.")
-        Image("media/userInterface/TextBoxFinal.png", "This image shows the final expected game window with the word Enter stylized in the left TextBox.")
+        Paragraph("Then add it to the gutter, in "):Code("Main.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/AddGutterListener.quorum")
+
+        Paragraph("A gutter only reacts to the mouse. A person using a keyboard can't click
+it, so every job a gutter does needs a keyboard way too. Here, a text
+field and a button go to a line from the keyboard. Make "):Code("GoToLineBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/GoToLineBehavior.quorum")
+
+        Paragraph("And add the field and button to "):Code("Main.quorum"):Text(", after the source notes:")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/AddGoToLine.quorum")
+
+        Paragraph("Now there are two ways to do the same thing:")
+
+        BulletList()
+        ListItem():Strong("With the mouse:"):Text(" click a line number in the gutter.")
+        ListItem():Strong("With the keyboard:"):Text(" press "):Key("Tab"):Text(" to reach the Line number field, type a
+number such as "):Code("2"):Text(", press "):Key("Tab"):Text(" to reach Go to line, and press "):Key("Space"):Text(".
+The caret moves to the start of line 2. Press "):Keys("Shift", "Tab"):Text(" until you are
+back in the source notes to keep typing there.")
+
+        Paragraph("People count lines from 1, but a text box counts them from 0, so the
+behavior subtracts 1. "):Code("ParseInteger"):Text(" expects a whole number: typing a word
+instead stops the program with an error.")
     end
 
-    private action TextFields
-        Section("TextFields")
-        Paragraph("Quorum has an interface element similar to a TextBox except it is made for single line input only known as a TextField. TextFields can be helpful if your GUI needs a short text input. All the additional features that TextBoxes provide, like multiple lines, gutters, and styles can become unnecessary if the user needs to input a simple line of text like a File name. The TextField will function just like the TextBox, but the additional features in TextBoxes are not present in the TextField class.")
-        Paragraph("To use a TextField you will need to include the following use statement:")
-        CodeExample("use Libraries.Interface.Controls.TextField")
-        Paragraph("To add one to your game you can do so with the following lines of code:")
-        CodeExample("ManualLayout layout
-SetLayout(layout)
+    private action TextStyles
+        Subsection("Text styles")
+        Paragraph("A "):Strong("text style"):Text(" changes how part of the text looks. You make a "):Code("TextStyle"):Text(",
+set its colors and an optional highlight such as "):Code("TextUnderline"):Text(", tell it
+where to start ("):Code("SetIndex"):Text(") and how many characters to cover ("):Code("SetSize"):Text("), then
+add it to the text box with "):Code("AddTextStyle"):Text(". Each style needs a name. This
+behavior colors and underlines the selected text. Make "):Code("StyleBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/StyleBehavior.quorum")
 
-TextField textField
-textField:SetSize(250, 20)
-textField:SetPosition(100, 200)
-Add(textField)")
-        Paragraph("Notice that a TextField can be sized and positioned like a TextBox, but remember that the input will only ever be one line in height so take that into account when adjusting the height of the TextField. Also note that there was ManualLayout set. Like a TextBox, a TextField needs its container to have ManualLayout set for it to work and render to the screen.")
-        Paragraph("The TextField also has its own selection class and actions for setting and getting text. Getting and setting text in a TextField is the same as in TextBox, to learn how to use those actions you can refer to where we do that in this tutorial with TextBoxes and Buttons, the only difference being that the object calling the action becomes a TextField instead of a TextBox.")
+        Paragraph("The "):Code("count"):Text(" gives each style its own name. If you type inside styled text,
+the new letters take the same style.")
+
+        Paragraph("A screen reader reads the words, not their color or underline. If a style
+means something, like "):DoubleQuote():Text("this part is important,"):DoubleQuote():Text(" also say it in words.")
     end
 
-    private action TryMakingAUserInterface
-        Section("Try making a User Interface")
-        CodeEditorFromProject("Activity: TextBox", "TextBox.quorum", "examples/UserInterface/TextBox/Main.quorum")
+    private action TheFinishedProgram
+        Subsection("The finished program")
+        Paragraph("Here is the whole program in "):Code("Main.quorum"):Text(", with the buttons and the gutter. The
+buttons go in a "):Strong("grouping"):Text(" with no title, which puts them side by side in
+one row, as in the "):Link("Groupings", "/tutorials/ui/groupings.html"):Text(" tutorial.")
+        CodeExampleFromFile("sources/tutorials/ui/TextBox/Main2.quorum")
+
+        Paragraph("Press "):Key("Tab"):Text(" from the top and notice where the focus goes. It moves through
+the title, each label and its control, the Go to line button, and then the
+four buttons in the row, in the
+order they are on the page. You didn't write any focus code.")
+
+        BlockEditorFile("CopySelectionBehavior.quorum", "html/sources/tutorials/ui/TextBox/CopySelectionBehavior.quorum")
+        BlockEditorFile("StyleBehavior.quorum", "html/sources/tutorials/ui/TextBox/StyleBehavior.quorum")
+        BlockEditorFile("ClearBehavior.quorum", "html/sources/tutorials/ui/TextBox/ClearBehavior.quorum")
+        BlockEditorFile("ShowBehavior.quorum", "html/sources/tutorials/ui/TextBox/ShowBehavior.quorum")
+        BlockEditorFile("GoToLineBehavior.quorum", "html/sources/tutorials/ui/TextBox/GoToLineBehavior.quorum")
+        BlockEditorFile("GoToLineListener.quorum", "html/sources/tutorials/ui/TextBox/GoToLineListener.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/TextBox/Main2.quorum", "", true, true)
+    end
+
+    private action Autocorrect
+        Subsection("When a text box guesses: autocorrect")
+        Paragraph("The text boxes in this tutorial show exactly what a person types. Many text
+boxes in phones and word processors do more: they run "):Strong("autocorrect"):Text(", an
+algorithm that compares each word with a dictionary and changes or marks
+words it doesn't find. That helps most people fix typing mistakes quickly.
+But a dictionary that leaves out some names treats those names as mistakes.
+In 2024, a campaign called I Am Not A Typo checked the names of babies born
+in Northern Ireland in 2022 against Microsoft's English (UK) dictionary.
+It found that 42% of the names, such as Fiadh, Meabh, Oisin and Daithi,
+were marked as wrong. Names of African and Asian origin were also marked
+more often than others
+("):Link("The Irish Times", "https://irishtimes.com/ireland/2024/03/11/popular-irish-names-deemed-typos-in-harmful-filters"):Text(").")
+
+        Paragraph("Who benefits from autocorrect, and who is harmed? Whose names were most
+likely left out of the dictionary, and why might that have happened?")
+
+        Paragraph("Try it yourself. In a word processor or on a phone, type five names: your
+own, and four from your school, your family or the news that come from
+different languages. Write down which ones autocorrect changes or marks as
+wrong, and one thing you would change about it.")
+    end
+
+    private action AutomationAndJobs
+        Subsection("Automation and jobs: self-driving cars")
+        Paragraph("User interfaces, including many of the components in these tutorials, provide a powerful way for humans to ask a machine to do something easily. A textbox can correct text or a button can be told to tell a car to "):DoubleQuote():Text("move."):DoubleQuote():Text(" There is nothing good or bad about user interfaces. However, "):Strong("Automation"):Text("
+can also do a whole job. Self-driving cars are a current example. Waymo, a
+US company, runs taxis with no human driver. In a February 2026 post on its
+own website, Waymo said it was giving more than 400,000 rides every week
+across six US metropolitan areas, gave 15 million rides in 2025, and was
+preparing to start in more than 20 more cities in 2026, including Tokyo and
+London
+("):Link("Waymo", "https://waymo.com/blog/2026/02/waymo-raises-usd16-billion-investment-round/"):Text(").
+These are the company's own numbers; this tutorial did not find an
+independent count of them. A regular taxi ride needs a paid driver; a Waymo
+ride does not.")
+
+        Paragraph("Driving is a large source of work in the United States. The US Bureau of
+Labor Statistics (BLS), a government agency that counts jobs, reports for
+2025:")
+
+        BulletList()
+        ListItem():Strong("Taxi drivers, shuttle drivers and chauffeurs:"):Text(" 455,700 jobs, with a
+median pay of $37,960 a year. No formal education credential is needed
+to start. BLS projects 9% more of these jobs by 2035
+("):Link("BLS", "https://www.bls.gov/ooh/transportation-and-material-moving/taxi-drivers-and-chauffeurs.htm"):Text(").")
+        ListItem():Strong("Heavy and tractor-trailer truck drivers:"):Text(" 2,221,200 jobs, with a
+median pay of $58,640 a year. Most drivers start with truck driving
+school. BLS projects 4% more of these jobs by 2035
+("):Link("BLS", "https://www.bls.gov/ooh/transportation-and-material-moving/heavy-and-tractor-trailer-truck-drivers.htm"):Text(").")
+
+        Paragraph("Together, that is more than 2.6 million people whose work is driving.
+Waymo's taxis do the work of the first group. The technology required to do the latter, however, is similar.")
+
+        Paragraph():Strong("What about jobs created?"):Text(" Here the evidence is much weaker. Waymo says
+its vehicle factory in Mesa, Arizona, "):DoubleQuote():Text("has created hundreds of jobs"):DoubleQuote():Text("
+("):Link("Waymo", "https://waymo.com/blog/2025/05/scaling-our-fleet-through-us-manufacturing/"):Text(").
+That is a claim from the company. It gives no exact number, doesn't say
+how the jobs were counted, and this tutorial found no independent source
+that checks it. Even if it is accurate, "):DoubleQuote():Text("hundreds"):DoubleQuote():Text(" means fewer than 1,000.
+Next to the 455,700 taxi and chauffeur jobs that driverless taxis are built
+to do, 999 jobs would be less than one quarter of one percent. This tutorial also found no reliable count of how many
+driving jobs self-driving cars have replaced so far, or of how many new jobs
+they have created overall.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you discuss how self-driving vehicles could create and
+replace jobs, in a small group or as a class. There is no programming for this one, although if you want to add such a component, students can create an app with a textbox in it and type their arguments in there. Use
+the facts in "):DoubleQuote():Text("Automation and jobs: self-driving cars"):DoubleQuote():Text(" as your evidence, and
+say which fact you are using when you make a point. Consider the following in the discussion.")
+
+        NumberedList()
+        ListItem("Are the facts actually facts? Consider the sources of each of the alleged numbers and look at BLS directly. Consider if there are any flaws in the claims.")
+        ListItem("What are the sources missing? Think like a scientist or a reporter and imagine the incentives of all of the people making and using the technology")
+        ListItem("What do you think the impact will be on society? Overall, what effect do you think the technology will have and what rules or laws might help shape that impact to be positive overall?")
+
+        Paragraph("To finish, write a paragraph or two with your position. Show it to a partner and consider the points and counterpoints. Then, see if you can find a middle ground between any positions you had, if they were different.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A text box holds many lines of text. You can read and change the text, work
+with what a person selected, and add extras like line numbers and styles.
+Every feature you add should work with the keyboard as well as the mouse,
+as the line number gutter's "):DoubleQuote():Text("Go to line"):DoubleQuote():Text(" does. Think about software you
+use: what work does it do that a person used to do, and who did that work?")
     end
 end

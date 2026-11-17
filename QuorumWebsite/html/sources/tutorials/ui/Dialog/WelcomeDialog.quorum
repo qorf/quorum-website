@@ -1,0 +1,47 @@
+use Libraries.Interface.Controls.Dialog
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Pages.StackedRowPage
+use Libraries.Interface.Behaviors.Controls.DialogHideBehavior
+
+class WelcomeDialog is Dialog
+    Page firstPage = undefined
+    StackedRowPage secondPage
+    DialogHideBehavior closeBehavior
+    NextPageBehavior nextBehavior
+
+    action Setup
+        SetName("Welcome")
+        SetDescription("Two steps that explain the app")
+        SetModal(true)
+        SetPixelWidth(400)
+        SetPixelHeight(180)
+
+        closeBehavior:SetDialog(me)
+        nextBehavior:SetDialog(me)
+
+        firstPage = InitializeDefaultPage()
+        firstPage:AddLabel("Step 1", "Step 1 of 2: Welcome to the app!")
+        Button nextButton = firstPage:AddButton("Next")
+        nextButton:SetDescription("Goes to step 2")
+        nextButton:SetBehavior(nextBehavior)
+
+        ApplyDefaultStyleToPage(secondPage)
+        secondPage:AddLabel("Step 2", "Step 2 of 2: Use the Help button whenever you get stuck.")
+        Button doneButton = secondPage:AddButton("Done")
+        doneButton:SetDescription("Closes the welcome dialog")
+        doneButton:SetBehavior(closeBehavior)
+    end
+
+    action ShowSecondPage
+        SetCurrentPage(secondPage)
+        SetBehavior(closeBehavior)
+        secondPage:GetFirstFocusableItem():Focus()
+    end
+
+    action OnShow
+        SetCurrentPage(firstPage)
+        SetBehavior(nextBehavior)
+        firstPage:GetFirstFocusableItem():Focus()
+    end
+end

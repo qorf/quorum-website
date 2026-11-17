@@ -1,235 +1,278 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: Behavior.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Behaviors, the third page of the user interface series.
 */
 class UserInterfacesBehavior is QuorumPage
-    // A double quote, for code and words that hold one.
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+    // A double quote, for code that holds one.
     text dq = ""
 
     on create
         SetLocation("tutorials/ui/behavior.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("Behavior")
+        SetShortTitle("Behaviors")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about Behaviors in the Quorum programming language.")
-        SetSummary("how to use Behaviors for GUIs")
     end
 
     action Setup
         dq = dq:GetDoubleQuote()
-        SetWebPageTitle("Behavior Tutorial - Quorum Programming Language")
-        Title("Tutorial: Behavior")
-        Paragraph("This tutorial tells you how to use Behaviors in Quorum")
-        WhatIsABehavior()
-        OutputtingWithABehavior()
-        RotationWithABehavior()
+
+        // For search engines and link previews.
+        SetDescription("Write behaviors in Quorum: code that runs once when a button is pressed, and code that runs a little at a time, such as a countdown.")
+
+        Title("Behaviors")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action WhatIsABehavior
-        Section("What is a Behavior?")
-        Paragraph("A Behavior is a critical GUI component that allows items in the user interface to conduct actions or even respond to user interaction. Most of the classes that use Behaviors are user interface controls, such as Buttons and TextBoxes, which will be covered in the following tutorials. Together, these classes provide a way to efficiently route user input throughout the system.")
-        Paragraph("This is what the Behavior class in Quorum looks like:")
-        CodeExample("package Libraries.Interface.Behaviors
-use Libraries.Interface.Events.BehaviorEvent
+    action Overview
+        Section("Overview")
+        Paragraph("A user interface has to "):Strong("do"):Text(" something when a person uses it. When a
+button is pressed, a message appears. When a timer starts, it counts down.
+In Quorum, the code that runs when something happens goes in a "):Strong("behavior"):Text(". A behavior is a class that inherits from "):Code("Behavior"):Text(". In this
+tutorial, you will write a behavior that runs once when a button on a page
+is pressed, and a behavior that runs a little at a time, over several
+seconds.")
 
-class Behavior
-    action Run(BehaviorEvent event)
+        Subsection("Goals")
+        Paragraph("You have the following goals for this lesson:")
+        Goals()
+        ListItem("Learn the four main actions of the "):Code("Behavior"):Text(" class and when each one runs")
+        ListItem("Write a behavior and attach it to a button on a page with "):Code("SetBehavior")
+        ListItem("Write a behavior that runs over time and attach it with "):Code("AddBehavior")
+        ListItem("Show changes in a way that every person can find, including screen reader
+users")
     end
 
-    action Update(number seconds)
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about a microwave. You press "):DoubleQuote():Text("Start"):DoubleQuote():Text(", and it runs for a set time,
+then beeps and stops. What happens once at the start? What happens over and
+over while it runs? What happens once at the end? Consider one other
+device that works the same way.")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Behavior/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Behavior/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This lesson covers the following "):Link("CSTA K–12 standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_READING_AND_DOCUMENTING_17)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_READING_AND_DOCUMENTING_17)
+        StandardsList(computerScience)
     end
 
-    action Dispose
+    action Explore
+        Section("Explore")
+        Paragraph("In "):Link("Forms", "/tutorials/ui/forms.html"):Text(", you used a "):Code("FormBehavior"):Text(" to respond
+to a button. "):Code("FormBehavior"):Text(" is one kind of behavior. In this tutorial, you
+will explore the "):Code("Behavior"):Text(" class itself and write your own. You should
+already know about "):Link("inheritance", "/tutorials/language/inheritance.html"):Text(",
+because every behavior inherits from "):Code("Behavior"):Text(" and replaces, or "):Strong("overrides"):Text(", some of its actions.")
+
+        TheBehaviorClass()
+        TwoWaysABehaviorRuns()
+        ABehaviorForAButton()
+        BehaviorsThatChangeThePage()
+        ABehaviorThatTakesTime()
+        AShortcutTimedBehavior()
+        MakingChangesEveryoneCanFind()
     end
 
-    action IsFinished returns boolean
-        return false
-    end
-end")
-        Paragraph("On the surface, you will see that the Behavior class does not do anything itself. This is because it is heavily subclassed for specific actions. For more information on inheritance and overriding actions, see the tutorial on "):Link("Inheritance", "/tutorials/language/inheritance.html"):Text(".")
-        Paragraph("Lets run through the four actions in a Behavior:")
-        NumberedList()
-        ListItem("Run - Run is called when an action is taken with the Behavior. For example, if a Button is clicked in the user interface, then Run would be called.")
-        ListItem("Update - A Behavior can also be set to Update on every frame of a running program. However, not all Behaviors do this. For example, when a Behavior is set to a Button via SetBehavior, Update is never called, while the Run action is called when the Button is pressed. In contrast, if the AddBehavior action is called on an item, Update will be called every frame. We will go over the specifics of each GUI element in their respective tutorials, so don't worry about this difference for now.")
-        ListItem("Dispose - This action does nothing by default, but it can be overridden for cleanup actions when the Behavior is finished. Note that, like the Update action, Dispose is only called if the Behavior is added through AddBehavior, not if it is set as a default Behavior using SetBehavior.")
-        ListItem("IsFinished - This action returns a boolean, which states if the Behavior has completed its work.")
-        Paragraph("For this tutorial, we will first create a simple Behavior that outputs and says text. To start, create a new Game Application project.")
-        Paragraph("Note: We will use the Drawable and Speech classes in this tutorial. For more information on using Drawables, check out the tutorial on "):Link("Drawing in 2D", "/tutorials/games/drawing2D.html"):Text(", and for more information on Speech, see the documentation on the "):Link("Speech", "https://quorumlanguage.com/Libraries/Sound/Speech.html"):Text(" class.")
-    end
+    private action TheBehaviorClass
+        Subsection("The Behavior class")
+        Paragraph("The "):Code("Behavior"):Text(" class lives in "):Code("Libraries.Interface.Behaviors"):Text(". On its own,
+it does nothing. You make a new class that inherits from it and override
+the actions you need. These are its four main actions:")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/BehaviorActions.quorum")
 
-    private action OutputtingWithABehavior
-        Section("Outputting with a Behavior")
-        Paragraph("To create our own Behavior, we will create a new Quorum Class, which we will name "):DoubleQuote():Text("OutputBehavior.quorum."):DoubleQuote():Text(" This class will use the libraries for Behavior, BehaviorEvent, and Speech. The class itself will override the Behavior's Run action to output and say the desired text. This gives the following OutputBehavior class:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Sound.Speech
+        Table("The four main actions of a Behavior")
+        TableHeader():Cell("Action"):Cell("When it runs"):Cell("What it is for")
+        TableRowWriter row = TableRow()
+        row:Cell():Code("Run")
+        row:Cell("Once, when the behavior starts")
+        row:Cell("The main work, or setting things up")
+        row = TableRow()
+        row:Cell():Code("Update")
+        row:Cell("Every frame, while the behavior is running")
+        row:Cell("Changes that happen bit by bit, like a countdown")
+        row = TableRow()
+        row:Cell():Code("IsFinished")
+        row:Cell():Text("Every frame, before "):Code("Update")
+        row:Cell():Text("Returns "):Code("true"):Text(" when the behavior is done")
+        row = TableRow()
+        row:Cell():Code("Dispose")
+        row:Cell():Text("Once, after "):Code("IsFinished"):Text(" returns "):Code("true")
+        row:Cell():Text("Cleaning up, or showing "):DoubleQuote():Text("done"):DoubleQuote()
 
-class OutputBehavior is Behavior
-    action Run(BehaviorEvent event)
-        Speech speech
-        speech:Say(" + dq + "Hello world!" + dq + ", false)
-        output " + dq + "Hello world!" + dq + "
-    end
-end")
-        Paragraph("We now have our completed OutputBehavior class, but nothing will happen yet because it has to be added to an object for the Behavior to run. To do so, we will make a Drawable and use it so our Behavior can run. Return to the main class and in the CreateGame action we will make a Drawable and add our Behavior to it.")
-        Paragraph("The complete main class will be as follows:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Game.Graphics.Drawable
-
-class Main is Game
-    action Main
-        StartGame()
+        Paragraph("The "):Code("event"):Text(" that "):Code("Run"):Text(" gets is a "):Code("BehaviorEvent"):Text(". Its "):Code("GetItem"):Text(" action
+tells you which item the behavior belongs to, such as the button that was
+pressed.")
     end
 
-    action CreateGame
-        Drawable box
-        OutputBehavior behavior
-        box:AddBehavior(behavior)
-    end
-end")
-        Paragraph("If we run the program now, nothing will be in the game window, but "):DoubleQuote():Text("Hello World!"):DoubleQuote():Text(" will output to the console and you will hear the program say "):DoubleQuote():Text("Hello World."):DoubleQuote()
-        Paragraph("This was a simple Behavior that only needed to override the Run action, but most Behaviors will perform more complex actions and may need to override all 4 of a Behavior's actions. For a deeper look into Behaviors, in the next section of this tutorial we will rotate a drawable for 5 seconds and change its color using Behaviors.")
-    end
+    private action TwoWaysABehaviorRuns
+        Subsection("Two ways a behavior runs")
+        Paragraph("There are two ways to give a behavior to an item. They run the actions
+differently:")
 
-    private action RotationWithABehavior
-        Section("Rotation with a Behavior")
-        Subsection("Creating a New Behavior")
-        Paragraph("To begin, we will create a new Quorum class, which we will name "):DoubleQuote():Text("RotationBehavior.quorum."):DoubleQuote():Text(" In addition to the Behavior and BehaviorEvent libraries needed to make a Behavior, we will be using the Color, Drawable, and Speech libraries.")
-        Paragraph("The RotationBehavior class will inherit the Behavior class, and we will override the actions for Run, Update, Dispose, and IsFinished. Additionally, we need to create a Drawable class variable to store our rectangle for use in all actions, and we must also create a timer so that we can make our Behavior last for five seconds, giving the following template:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Color
-use Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
+        Table("SetBehavior and AddBehavior")
+        TableRowWriter header = TableHeader()
+        header:Cell("")
+        header:Cell():Code("SetBehavior")
+        header:Cell():Code("AddBehavior")
+        TableRowWriter row = TableRow()
+        row:Cell("Used on")
+        row:Cell("Buttons and other controls")
+        row:Cell("Any item, such as a label or a button")
+        row = TableRow()
+        row:Cell():Text("When "):Code("Run"):Text(" happens")
+        row:Cell("Every time the control is pressed")
+        row:Cell("Once, right away")
+        row = TableRow()
+        row:Cell():Code("Update"):Text(", "):Code("IsFinished"):Text(", "):Code("Dispose")
+        row:Cell("Not called by a button")
+        row:Cell():Text("Called every frame until "):Code("IsFinished"):Text(" returns "):Code("true")
+        row = TableRow()
+        row:Cell("Good for")
+        row:Cell("Reacting to a press")
+        row:Cell("Something that takes time, like a countdown")
 
-class RotationBehavior is Behavior
-    Drawable rectangle = undefined
-    number timer = 0
-
-    action Run(BehaviorEvent event)
-    end
-
-    action Update(number seconds)
-    end
-
-    action Dispose
+        Paragraph("You will try both.")
     end
 
-    action IsFinished returns boolean
-    end
-end")
-        Paragraph("In the Run action, we must first obtain the Drawable we want to rotate. Since the RotationBehavior will later be added to the Drawable itself in the main class, we can use the BehaviorEvent's GetItem action to get the object associated with the Behavior. However, this action returns an Item, not a Drawable, so we must cast it. This gives us the following line:")
-        CodeExample("rectangle = cast(Drawable, event:GetItem())")
-        Paragraph("Next, for the program to say "):DoubleQuote():Text("Rotate,"):DoubleQuote():Text(" we will need to use the Speech class's Say action, giving us the following lines:")
-        CodeExample("Speech speech
-speech:Say(" + dq + "Rotate" + dq + ")")
-        Paragraph("This gives the following complete Run action:")
-        CodeExample("action Run(BehaviorEvent event)
-    rectangle = cast(Drawable, event:GetItem())
-    Speech speech
-    speech:Say(" + dq + "Rotate" + dq + ")
-end")
-        Paragraph("Moving on to the Update action, we want our rectangle to rotate, and we want to keep track of the time elapsed. Therefore, we need to increment the timer and call the Drawable's Rotate action. Since the Update action will be used for five seconds, a rotation of 72 degrees per second will result in a full 360 degrees rotation, giving us the following Update action:")
-        CodeExample("action Update(number seconds)
-    timer = timer + seconds
-    if rectangle not= undefined
-        rectangle:Rotate(72 * seconds)
-    end
-end")
-        Paragraph("Note that the conditional if-statement checks if the "):DoubleQuote():Text("rectangle"):DoubleQuote():Text(" variable is defined. If we did not include this, then the program could potentially crash by attempting to rotate an object that does not exist.")
-        Paragraph("In the Dispose action, we want our rectangle to change color to indicate that the Behavior is finished. As such, we need to create a Color variable and call the Drawable's SetColor action. Lastly, for the program to say "):DoubleQuote():Text("Rotation complete,"):DoubleQuote():Text(" we will once again need to use the Speech class's Say action. This gives the following Dispose action:")
-        CodeExample("action Dispose
-    if rectangle not= undefined
-        Color color
-        rectangle:SetColor(color:Green())
-        Speech speech
-        speech:Say(" + dq + "Rotation complete" + dq + ")
-    end
-end")
-        Paragraph("With this, once the Behavior is finished, the rectangle will change from Red to Green, and the program will say "):DoubleQuote():Text("Rotation complete."):DoubleQuote()
-        Paragraph("In the IsFinished action, we need to set the action to return true once five seconds have passed. Thus, we simply add the line "):DoubleQuote():Text("return timer >= 5"):DoubleQuote():Text(" to get the following action:")
-        CodeExample("action IsFinished returns boolean
-    return timer >= 5
-end")
-        Paragraph("Altogether, the resulting RotationBehavior class looks like this:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Color
-use Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
+    private action ABehaviorForAButton
+        Subsection("A behavior for a button")
+        Paragraph("To start, make a new project in Quorum Studio. Under "):Strong("General"):Text(", choose "):Strong("App"):Text(". Then add a new file to the project named "):Code("OutputBehavior.quorum"):Text("
+with this code:")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/OutputBehavior.quorum")
 
-class RotationBehavior is Behavior
+        Paragraph("This class overrides only "):Code("Run"):Text(". It gets the item that was pressed with "):Code("event:GetItem()"):Text(", then its name with "):Code("GetName()"):Text(", and writes a message in
+the output window.")
 
-    Drawable rectangle
-    number timer = 0
+        Paragraph("Now replace the code in "):Code("Main.quorum"):Text(" with this:")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/Main.quorum")
 
-    action Run(BehaviorEvent event)
-        rectangle = cast(Drawable, event:GetItem())
-        Speech speech
-        speech:Say(" + dq + "Rotate" + dq + ", false)
+        Paragraph("Run the program. Press "):Key("Tab"):Text(" until the Hello button has the focus, then
+press "):Key("Space"):Text(" or "):Key("Enter"):Text(", or click it. The output window shows "):DoubleQuote():Text("You pressed
+Hello"):DoubleQuote():Text(". Press "):Key("Tab"):Text(" to move to the other button and press it. Now the output window shows "):DoubleQuote():Text("You pressed Goodbye"):DoubleQuote():Text(". One behavior object serves both buttons, because "):Code("event:GetItem()"):Text(" tells it which one was pressed. With "):Code("SetBehavior"):Text(", a
+button calls "):Code("Run"):Text(" each time it is pressed. It doesn't call "):Code("Update"):Text(", "):Code("IsFinished"):Text(", or "):Code("Dispose"):Text(".")
     end
 
-    action Update(number seconds)
-        timer = timer + seconds
+    private action BehaviorsThatChangeThePage
+        Subsection("Behaviors that change the page")
+        Paragraph():Code("OutputBehavior"):Text(" writes to the output window, which is only for you, the
+programmer. Most apps change something on the page instead. A "):Strong("FormBehavior"):Text(" is a behavior that can find the page that is showing, with
+its "):Code("GetPage"):Text(" action. From the page, it can find any control by its name.")
 
-        if rectangle not= undefined
-            rectangle:Rotate(72 * seconds)
-        end
+        Paragraph("In this program, the "):Code("Main"):Text(" class is itself a "):Code("FormBehavior"):Text(", so it can be
+the button's behavior, as in the "):Link("Forms", "/tutorials/ui/forms.html"):Text("
+tutorial:")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/Main2.quorum")
+
+        Paragraph():Code("page:AddLabel(" + dq + "Count" + dq + ", ...)"):Text(" gives the label a name, "):DoubleQuote():Text("Count"):DoubleQuote():Text(", and the text
+it shows. In "):Code("Run"):Text(", "):Code("GetPage()"):Text(" gets the page, and "):Code("GetLabel(" + dq + "Count" + dq + ")"):Text(" finds
+the label by its name. "):Code("SetText"):Text(" changes what it says. The variable "):Code("presses"):Text(" belongs to the "):Code("Main"):Text(" object, so it keeps its value between
+presses.")
     end
 
-    action Dispose
-        if rectangle not= undefined
-            Color color
-            rectangle:SetColor(color:Green())
-            Speech speech
-            speech:Say(" + dq + "Rotation complete" + dq + ", false)
-        end
+    private action ABehaviorThatTakesTime
+        Subsection("A behavior that takes time")
+        Paragraph("Now you will make a countdown: a label that counts down from 5 seconds,
+then says "):DoubleQuote():Text("Time is up!"):DoubleQuote():Text(". This needs all four actions. Add a new file named "):Code("CountdownBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/CountdownBehavior.quorum")
+
+        Paragraph("Here is how each action works:")
+        BulletList()
+        ListItem():Strong("Variables:"):Text(" "):Code("label"):Text(" remembers the label between actions. It starts as "):Code("undefined"):Text(", which means "):DoubleQuote():Text("nothing yet"):DoubleQuote():Text(". "):Code("timer"):Text(" counts the seconds that
+have passed. "):Code("secondsShown"):Text(" counts the whole seconds the label has shown.")
+        ListItem():Code("Run"):Text(": "):Code("event:GetItem()"):Text(" gives back an "):Code("Item"):Text(", the most general kind
+of object on the screen. To change its text, you need it as a "):Code("Label"):Text(", so
+you "):Strong("cast"):Text(" it. Then the code shows the starting time.")
+        ListItem():Code("Update"):Text(": "):Code("seconds"):Text(" is the time since the last frame, usually a tiny
+fraction of a second. The code adds it to "):Code("timer"):Text(". Each time another whole
+second has passed, it changes the label.")
+        ListItem():Code("IsFinished"):Text(": returns "):Code("true"):Text(" once five seconds have passed.")
+        ListItem():Code("Dispose"):Text(": runs once, after "):Code("IsFinished"):Text(" returns "):Code("true"):Text(". It changes the
+label to "):DoubleQuote():Text("Time is up!"):DoubleQuote():Text(".")
+
+        Paragraph("Now replace "):Code("Main.quorum"):Text(" with this program. Its button starts a new
+countdown on the label each time it is pressed:")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/Main3.quorum")
+
+        Paragraph("Run it and press "):Strong("Start"):Text(". The label counts down, one second at a time,
+then says "):DoubleQuote():Text("Time is up!"):DoubleQuote():Text(". With "):Code("AddBehavior"):Text(", "):Code("Run"):Text(" happens right away. After
+that, on every frame, the Form asks "):Code("IsFinished"):Text(". While the answer is "):Code("false"):Text(", it calls "):Code("Update"):Text(". Once the answer is "):Code("true"):Text(", it calls "):Code("Dispose"):Text("
+and removes the behavior.")
+
+        Paragraph("The line "):Code("CountdownBehavior countdown"):Text(" is inside "):Code("Run"):Text(", so a brand new
+countdown, with its timer at zero, is made each time the button is pressed.
+Try pressing the button twice, about two seconds apart. What happens to the
+label, and why?")
+
+        BlockEditorFile("CountdownBehavior.quorum", "html/sources/tutorials/ui/Behavior/CountdownBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Behavior/Main3.quorum", "", true, true)
     end
 
-    action IsFinished returns boolean
-        return timer >= 5
-    end
-end")
-        Subsection("Setting up Main")
-        Paragraph("In the main, we will be using a Drawable and and will be altering its Color, so we must include the Drawable and Color libraries.")
-        Paragraph("First, we will create a Drawable object and a Color object. For the purposes of this tutorial, we want the Drawable to use its Behavior as soon as the game begins, so we'll add it to the game in the CreateGame action.")
-        Paragraph("Next, let's load a rectangle shape using the Drawable's LoadFilledRectangle action. We are going to make it red for this tutorial. Then, we'll give it a position with the SetPosition action. Finally, we'll add it to the game using "):DoubleQuote():Text("Add(box)."):DoubleQuote()
-        Paragraph("Lastly, we must return to the main class and give a RotationBehavior to our Drawable. At the end of the CreateGame action, this can be done creating a RotationBehavior variable and calling the Drawable's AddBehavior action, giving us the following lines:")
-        CodeExample("RotationBehavior rotate
-box:AddBehavior(rotate)")
-        Paragraph("The resulting final version of the Main class is as follows:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Game.Graphics.Drawable
-use Libraries.Game.Graphics.Color
+    private action AShortcutTimedBehavior
+        Subsection("A shortcut: TimedBehavior")
+        Paragraph("Counting time is so common that Quorum has a behavior that does it for you: "):Code("TimedBehavior"):Text(". You give it a number of seconds with "):Code("SetTimer"):Text(". Its "):Code("Update"):Text(" counts down, and its "):Code("IsFinished"):Text(" returns "):Code("true"):Text(" when the time is
+up. Add a file named "):Code("WaitBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Behavior/WaitBehavior.quorum")
 
-class Main is Game
-
-    action Main
-        StartGame()
+        Paragraph():Code("WaitBehavior"):Text(" doesn't write "):Code("Update"):Text(" or "):Code("IsFinished"):Text(" at all. It uses the
+ones it inherits from "):Code("TimedBehavior"):Text(". To try it, use "):Code("WaitBehavior"):Text("
+instead of "):Code("CountdownBehavior"):Text(" in "):Code("Main"):Text(". If you ever override "):Code("Update"):Text(" in a "):Code("TimedBehavior"):Text(", call the parent's first, with "):Code("parent:TimedBehavior:Update(seconds)"):Text(", so the timer keeps counting.")
     end
 
-    action CreateGame
-        Drawable box
-        Color color
-        box:LoadFilledRectangle(300, 200, color:Red())
-        box:SetPosition(250, 250)
-        Add(box)
+    private action MakingChangesEveryoneCanFind
+        Subsection("Making changes everyone can find")
+        Paragraph("When a behavior changes the page, every person using the app needs a way
+to find the change. In these programs, the change is in a label's text. On
+a Form, labels are in the "):Key("Tab"):Text(" order, so a screen reader user can press "):Key("Tab"):Text(" from the button to reach the label and hear what it says now. Keep the
+label close to the button that changes it, so it's easy to find.")
 
-        RotationBehavior rotate
-        box:AddBehavior(rotate)
+        Paragraph("A change that is only a color, a movement or a picture is easy to miss,
+even for people who can see the screen. When a behavior changes something,
+ask yourself how a person who can't see it would find out. Putting the news
+in a label's text, or in a control's name or description, is a good way.")
     end
 
-    action Update(number seconds)
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner change and write behaviors, predicting
+what each change will do before you run it. The goal is to understand that a
+behavior is code that runs when something happens, and to practice reading
+code carefully. One of you types while the other reads each line aloud and
+predicts what it will do; switch roles after each task. First, change "):Code("CountdownBehavior"):Text(" so it counts down from 10 seconds. Before you run it,
+agree on every number you need to change. Could you change the class so
+there is only one number to change?")
+
+        Paragraph("Next, write a new behavior, "):Code("CountUpBehavior"):Text(", that counts up from 0 to 5,
+one second at a time, and then shows "):DoubleQuote():Text("Done counting"):DoubleQuote():Text(". Then add a second
+button named "):DoubleQuote():Text("Count up"):DoubleQuote():Text(" that starts your "):Code("CountUpBehavior"):Text(" on a second label.
+To finish, test your program with only the keyboard: can you reach and press
+both buttons, and can you reach each label with "):Key("Tab"):Text(" to find out what it says?")
     end
-end")
-        Paragraph("Now, when the program is run, the rectangle will start as red, the program will say "):DoubleQuote():Text("Rotate,"):DoubleQuote():Text(" the rectangle will make one full rotation over five seconds, and then turn green while the program says "):DoubleQuote():Text("Rotation complete."):DoubleQuote():Text(" The following images show a sample of the beginning, middle, and end of the Behavior's execution.")
-        Image("media/userInterface/BehaviorBegin.png", "This is an image of initial position of the Drawable.")
-        Image("media/userInterface/BehaviorMiddle.png", "This is an image of a position of the Drawable mid-Behavior.")
-        Image("media/userInterface/BehaviorEnd.png", "This is an image of end position of the Drawable.")
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("You used "):Code("SetBehavior"):Text(" to react to a press and "):Code("AddBehavior"):Text(" to make
+something happen over time. Think of a game or app you know. Find one thing
+in it that would use "):Code("SetBehavior"):Text(" and one that would use "):Code("AddBehavior"):Text(".
+Explain your choices to a partner.")
     end
 end

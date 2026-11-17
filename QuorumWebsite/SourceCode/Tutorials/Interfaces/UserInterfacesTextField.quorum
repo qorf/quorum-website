@@ -1,0 +1,335 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Text Fields, part of the user interface series.
+*/
+class UserInterfacesTextField is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/textField.html")
+        SetShortTitle("Text Fields")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to use text fields in Quorum: add one to a page, read and check what a person typed, react to each change, and use password fields.")
+
+        Title("Text Fields")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A text field is a box where a person types one line of text, like a name, a
+search word or a password. It's one of the most common controls in any
+program. In this tutorial, you will add text fields to a page, read what a
+person typed, check it before you use it, decide what to do when it isn't
+right, and update the page while the person types.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a text field to a page and give it a clear label, name and description")
+        ListItem("Read the text with "):Code("GetText"):Text(" and change it with "):Code("SetText")
+        ListItem("Check what a person typed before using it, and compare ways to handle input
+that isn't right")
+        ListItem("Respond to each change in a text field with a "):Code("TextChangeListener")
+        ListItem("Find who a checking rule leaves out, and change the rule to fix it")
+        ListItem("Explain what a password field protects against, and what it costs")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of a sign-up page you have used. What did it do when you left a box
+empty, or typed something it didn't like? Was the message helpful? Where on
+the page did the message appear, and how would someone who can't see the
+screen find it?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/TextField/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/TextField/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_10)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_SECURITY_31)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_11)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_TESTING_AND_REFINING_7)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        FieldsAndBoxes()
+        MakingATextField()
+        ReadingAndChecking()
+        WhereScreenReaderUsersFindTheAnswer()
+        WhenTheInputIsNotRight()
+        RulesThatLeavePeopleOut()
+        ReactingWhileTyping()
+        PasswordFields()
+    end
+
+    private action FieldsAndBoxes
+        Subsection("Text fields and text boxes")
+        Paragraph("Quorum has two controls for typing:")
+
+        BulletList()
+        ListItem("a "):Strong("text field"):Text(" ("):Code("TextField"):Text(") holds "):Strong("one line"):Text(" of text. Use it for short
+answers like a name or a search;")
+        ListItem("a "):Strong("text box"):Text(" ("):Code("TextBox"):Text(") holds "):Strong("many lines"):Text(". Use it for longer writing,
+like notes or code. The "):Link("Text Boxes", "/tutorials/ui/textBox.html"):Text(" tutorial
+covers it.")
+
+        Paragraph("When a text field has the focus, a blinking line called the "):Strong("caret"):Text(" shows
+where the next letter will go. A person can type, select text and use the
+usual editing keys:")
+
+        Table("Editing keys in a text field")
+        TableHeader():Cell("Keys"):Cell("What they do")
+        TableRow():Cell("Left Arrow, Right Arrow"):Cell("Move the caret one letter")
+        TableRow():Cell("Home or Up Arrow"):Cell("Move the caret to the start")
+        TableRow():Cell("End or Down Arrow"):Cell("Move the caret to the end")
+        TableRow():Cell("Shift with any of the keys above"):Cell("Select text as the caret moves")
+        TableRow():Cell("Backspace, Delete"):Cell("Delete a letter, or the selected text")
+        TableRow():Cell("Ctrl+A"):Cell("Select all of the text")
+        TableRow():Cell("Ctrl+C, Ctrl+X, Ctrl+V"):Cell("Copy, cut and paste")
+        TableRow():Cell("Ctrl+Z, Ctrl+Y"):Cell("Undo and redo")
+        TableRow():Cell("Tab, Shift+Tab"):Cell("Leave the field and move the focus")
+
+        Paragraph("On a Mac, use "):Key("Cmd"):Text(" in place of "):Key("Ctrl"):Text(".")
+    end
+
+    private action MakingATextField
+        Subsection("Making a text field on a page")
+        Paragraph("A page's "):Code("AddTextField"):Text(" action makes a text field and adds it to the page. The
+text you pass in is the field's name. A screen reader says the name when the
+field gets the focus, so the name should say what to type. A description can
+add a hint.")
+
+        Paragraph("The field itself shows no words, so a person who can see the screen needs a
+label too. When you add a label right before a text field, the page puts the
+label beside the field, or above it if there isn't room.")
+
+        Paragraph("This program asks for a name and has a button that says hello. A second
+label, named "):DoubleQuote():Text("Greeting"):DoubleQuote():Text(", is where the program shows its answer.")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/Main.quorum")
+    end
+
+    private action ReadingAndChecking
+        Subsection("Reading and checking the text")
+        Paragraph():Code("GetText"):Text(" returns everything in the field. Before you use it, check it. This
+is called "):Strong("input validation"):Text(". Here, the program uses "):Code("Trim"):Text(" to remove spaces
+from the start and end, so that a field with only spaces counts as empty.
+Make a class in a file named "):Code("HelloBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/HelloBehavior.quorum")
+
+        Paragraph("When the name is good, the program shows the greeting and empties the field
+with "):Code("Empty"):Text(", ready for the next name. When it isn't, it explains what to fix.
+A good error message says what went wrong "):Strong("and"):Text(" what to do.")
+
+        Paragraph("Pressing "):Key("Enter"):Text(" in a text field doesn't run anything by itself. Give people a
+button, like "):DoubleQuote():Text("Say hello,"):DoubleQuote():Text(" to send what they typed.")
+    end
+
+    private action WhereScreenReaderUsersFindTheAnswer
+        Subsection("Where screen reader users find the answer")
+        Paragraph("The greeting appears in a label. On a page, labels are in the "):Key("Tab"):Text(" order, so
+a screen reader user can press "):Key("Tab"):Text(" from the button to reach the label and
+hear the answer. Keep the answer close to the button, so it's easy to find.")
+    end
+
+    private action WhenTheInputIsNotRight
+        Subsection("What to do when the input isn't right")
+        Paragraph("Typed text often has a "):Strong("data quality"):Text(" problem: extra spaces, a missing
+answer, a word that is too long, or the wrong kind of value. A program has
+several options. Each one has a cost:")
+
+        Table("Ways to handle input that isn't right")
+        TableHeader():Cell("Option"):Cell("Example"):Cell("Good"):Cell("Bad")
+        TableRowWriter fixRow = TableRow()
+        fixRow:Cell("Fix it for the person")
+        fixRow:Cell():Code("Trim"):Text(" removes spaces at the start and end")
+        fixRow:Cell("Nothing for the person to do"):Cell("The program might change what they meant")
+        TableRowWriter askRow = TableRow()
+        askRow:Cell("Ask the person to fix it")
+        askRow:Cell():DoubleQuote():Text("Please type your first name first."):DoubleQuote()
+        askRow:Cell("The person stays in charge"):Cell("It takes them another try")
+        TableRow():Cell("Warn while they type"):Cell("A count that says when a nickname is too long"):Cell("They find out before they press the button"):Cell("A message that changes on every key can be distracting")
+        TableRowWriter ruleRow = TableRow()
+        ruleRow:Cell("Say the rule first")
+        ruleRow:Cell():Text("A description: "):DoubleQuote():Text("Up to 12 characters."):DoubleQuote()
+        ruleRow:Cell("Fewer mistakes to begin with"):Cell("Some people won't read it")
+
+        Paragraph():Code("HelloBehavior"):Text(" uses two of these: it fixes extra spaces itself, and asks the
+person to fix an empty name. Real programs often mix options like this. When
+you choose, think about what could go wrong if the program guesses, and how
+much work you are asking the person to do.")
+    end
+
+    private action RulesThatLeavePeopleOut
+        Subsection("Rules that leave people out")
+        Paragraph("A checking rule is a small algorithm, and it carries the beliefs of the
+person who wrote it. Here is a made-up rule for a "):DoubleQuote():Text("Full name"):DoubleQuote():Text(" field. Its
+writer believed every name is a first name, a space and a last name, with
+only letters. Make a class in a file named "):Code("NameBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/NameBehavior.quorum")
+
+        Paragraph("Try it on paper with these made-up people: Ana Lopez-Garcia, Liam O'Brien,
+and Wati, who has only one name. The rule rejects all three, and each is
+told their own name is wrong. That is "):Strong("bias"):Text(": the rule works for some
+groups of people and fails others, even though nobody meant it to.")
+
+        Paragraph("These aren't rare cases. Real names can contain hyphens and apostrophes, and
+in parts of Southern India, Malaysia and Indonesia many people have only a
+given name, with no family name. Advice from the World Wide Web Consortium
+(W3C), which writes standards for the web, is to allow punctuation such as
+hyphens and apostrophes in names, and not to require a family name
+("):Link("source", "https://www.w3.org/International/questions/qa-personal-names"):Text(").")
+
+        Paragraph("A rule like this is harder to notice than a crash, because it only fails for
+some people, and those people may simply leave. Before you add a rule, ask
+what it protects, who it might reject, and what happens to a person it
+rejects by mistake. Sometimes the fairest fix is to remove a rule, not
+improve it.")
+    end
+
+    private action ReactingWhileTyping
+        Subsection("Reacting while a person types")
+        Paragraph("Sometimes a program should react to every letter, not wait for a button. A "):Strong("listener"):Text(" is an object that a control calls when something happens. A text
+field calls each of its text change listeners after every change: typing,
+deleting, pasting, or a call to "):Code("SetText"):Text(".")
+
+        Paragraph("This listener counts the letters in a nickname and warns when it's too long.
+Make a class in a file named "):Code("CountListener.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/CountListener.quorum")
+
+        Paragraph():Code("event:GetControl()"):Text(" returns the control that changed. The listener checks
+that it's a "):Code("TextField"):Text(" with "):Code("is"):Text(", then uses "):Code("cast"):Text(" to treat it as one, so it
+can call "):Code("GetSize"):Text(". Here is a program that uses it:")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/Main2.quorum")
+
+        Paragraph("Notice that the description tells people the limit before they start typing.
+Don't rely only on a message that appears after they have made a mistake.
+The count label is right after the field, so a screen reader user can press "):Key("Tab"):Text(" to check it at any time.")
+
+        BlockEditorFile("CountListener.quorum", "html/sources/tutorials/ui/TextField/CountListener.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/TextField/Main2.quorum", "", true, true)
+    end
+
+    private action PasswordFields
+        Subsection("Password fields")
+        Paragraph("For a password, call "):Code("SetPassword(true)"):Text(". The field draws a star ("):Code("*"):Text(") in
+place of each letter:")
+        CodeExampleFromFile("sources/tutorials/ui/TextField/Password.quorum")
+
+        Paragraph():Code("GetText"):Text(" still returns the real text, so your program can check it.")
+
+        Paragraph("Hiding the letters is a "):Strong("security measure"):Text(", and like every security
+measure it protects against some things and costs something. The stars
+protect against a physical risk: a person nearby reading the password off
+the screen. They do nothing for the password once it is inside your
+program. That needs other measures, of the cybersecurity kind, such as never
+putting the password in a label and never saving it as plain text. The stars
+also cost the user something: a typing mistake is hard to find.")
+
+        Paragraph("The US National Institute of Standards and Technology (NIST) publishes
+rules for how services should handle passwords. There are many of them.
+Among them:")
+
+        BulletList()
+        ListItem("A password that is the only step in signing in must be at least 15
+characters long, and services should allow at least 64.")
+        ListItem("Services should accept every character, including spaces, and must not
+require a mix of kinds of characters, such as a number and a symbol.")
+        ListItem("Services must not make people change passwords on a schedule, store
+password hints that anyone can read, or use security questions such as
+the name of a first pet.")
+        ListItem("Services must check a new password against a list of common or leaked
+passwords, and say why a password was turned down.")
+        ListItem("Services must allow password managers, and should allow pasting a
+password.")
+        ListItem("Services must store passwords in a scrambled form (salted and hashed),
+never as plain text.")
+
+        Paragraph("Long passwords with any characters are easy to mistype when every letter
+is a star. So a common feature of sign-in forms is a "):Strong("Show password"):Text("
+option. NIST says services should offer one, displaying the password
+instead of dots or asterisks while it is typed, so a person in a place
+where their screen is unlikely to be observed can confirm what they typed.
+It also allows a device to show each character for a moment after it is
+typed, which is common on phones
+("):Link("NIST SP 800-63B, Digital Identity Guidelines: Authentication and Authenticator Management", "https://pages.nist.gov/800-63-4/sp800-63b.html"):Text(").")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner each build a sign-up form, then test
+each other's. The goal is to read text from text fields, choose how to
+handle input that breaks a rule, and find out whether your rules treat
+people fairly. The form has a "):DoubleQuote():Text("Username"):DoubleQuote():Text(" field and a "):DoubleQuote():Text("Full name"):DoubleQuote():Text(" field. The
+username rules are:")
+
+        BulletList()
+        ListItem("the username isn't empty;")
+        ListItem("it has no more than 15 characters;")
+        ListItem("it has no spaces. As a hint, "):Code("name:Contains(" + DQ() + " " + DQ() + ")"):Text(" is "):Code("true"):Text(" if "):Code("name"):Text(" has
+a space.")
+
+        Paragraph("For the full name, start from the rule in "):Code("NameBehavior"):Text(". Add a "):DoubleQuote():Text("Check"):DoubleQuote():Text("
+button that shows, in a label, either that everything is good or which rule
+is broken and how to fix it. Put the username rules in the field's
+description, so people know them before they type. For each rule, decide
+which option from "):DoubleQuote():Text("What to do when the input isn't right"):DoubleQuote():Text(" you will use, and
+write your choice and your reason in a comment.")
+
+        Paragraph("Next, write a "):Strong("test plan"):Text(" for your own form: at least six usernames, with
+what the program should say for each. Include tricky cases, such as exactly
+15 characters, only spaces, and a space at the end. Run every test and fix
+any that fail.")
+
+        Paragraph("Then trade with your partner. Without reading each other's code, write at
+least five full names to try on your partner's form, chosen to find people
+the rule might reject: different punctuation, one-word names, very short or
+very long names. You can make them up. Your partner runs them and writes
+down which were rejected. Back on your own form, change the name rule so it
+stops rejecting real kinds of names, and ask your partner to run the same
+names again. In a comment, write who the old rule left out, and what your
+new rule still checks, and why.")
+
+        Paragraph("Finally, add a "):DoubleQuote():Text("Password"):DoubleQuote():Text(" field with "):Code("SetPassword(true)"):Text(". With your partner,
+list one thing the stars protect against, one thing they don't, and one
+thing they make harder for the user.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A text field holds one line of text. You read it with "):Code("GetText"):Text(", check it
+before you use it, and can react to every change with a listener. Think about
+the warm up: which error messages in your program would help a person the
+most, and which could be clearer?")
+    end
+
+    // A double quote, for code shown inside a sentence.
+    private action DQ returns text
+        text quote = ""
+        return quote:GetDoubleQuote()
+    end
+end

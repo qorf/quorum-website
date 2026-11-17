@@ -1,188 +1,319 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: ScrollPane.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Scroll Panes, part of the user interface series.
 */
 class UserInterfacesScrollPane is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/scrollPane.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("ScrollPane")
+        SetShortTitle("Scroll Panes")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about ScrollPanes in the Quorum programming language.")
-        SetSummary("how to use ScrollPanes")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("ScrollPane Tutorial - Quorum Programming Language")
-        Title("Tutorial: ScrollPane")
-        Paragraph("This tutorial tells you how to use ScrollPanes in Quorum")
-        AnIntroductionToScrollPanesInQuorum()
-        CreatingAScrollPane()
-        Indicies()
-        TryMakingAUserInterface()
+        // For search engines and link previews.
+        SetDescription("How a Quorum form page scrolls and follows the focus, how to put a long list of controls in a scroll pane on a page, how to add and remove items while the program runs, and how to check AI-generated code.")
+
+        Title("Scroll Panes")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToScrollPanesInQuorum
-        Section("An Introduction to ScrollPanes in Quorum")
-        Subsection("What is a ScrollPane?")
-        Paragraph("In this tutorial, we will learn how to use ScrollPanes in the Quorum Game Engine. ScrollPanes are interface tools which allows users to look at portion of a large region by use of a smaller pane and then navigate that region to change what part of the region they see by use of scroll bars. For example, the webpage for this tutorial is a ScrollPane with a vertical scrollbar and can be scrolled up or down to display only a portion of the webpage. In this webpage example, the pane would be the area of the window where the webpage is displayed, and the region would be the entire webpage.")
-        Paragraph("For this tutorial, we will create a ScrollPane that only displays a small portion of a much larger region, with Buttons located at the center and each corner of the region. Thus, the user must navigate the region using the vertical and horizontal scrollbars to find each Button. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("Sometimes there is more to show than fits on the screen: a list of a hundred
+songs, a long chat, or a map that is much bigger than the window. A "):Strong("scroll
+pane"):Text(" shows one part of a large area at a time, and scroll bars let the
+user move around to reach the rest. In this tutorial, you will find out that every
+form page already scrolls, put a long list into a scroll pane of its own on
+a page, and add and remove items while the program runs. You will also explore
+what scrolling means for people who use a keyboard or a screen reader
+instead of a mouse.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Explain the difference between a scroll pane's view and its scroll region")
+        ListItem("Explain how a form page scrolls, and how it follows the focus")
+        ListItem("Show a long list of controls in a scroll pane on a page")
+        ListItem("Add, insert and remove items in a scroll pane, and keep them reachable
+from the keyboard")
+        ListItem("Check AI-generated code against the library documentation and the
+program's requirements")
     end
 
-    private action CreatingAScrollPane
-        Section("Creating a ScrollPane")
-        Paragraph("In order to use a ScrollPane, we must include the ScrollPane library. In addition, we will need the libraries for Color, ManualLayout, and Button, requiring the following use statements:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Interface.Controls.ScrollPane
-use Libraries.Game.Graphics.Color
-use Libraries.Interface.Layouts.ManualLayout
-use Libraries.Interface.Controls.Button")
-        Paragraph("Since we want the ScrollPane to be usable as soon as the game begins, we’ll add our code to the CreateGame class. To start, we’ll simply declare the variables we’ll be using. We also need to set our game’s layout so the ScrollPane will render to the screen. We will need two ManualLayouts, which we will set to the Game and the ScrollPane. By default the Scrollpane has a FlowLayout, but we will manually lay out our Buttons so we will change that. Then we need a ScrollPane, and a Color variable, giving us the following lines of code:")
-        CodeExample("ManualLayout layout
-SetLayout(layout)
-ManualLayout layoutScroll
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about the apps you scrolled through today. How did you scroll in each
+one: a mouse wheel, a finger, a scroll bar, or the arrow keys? Now imagine
+you could not use a mouse or a touch screen at all. How would you get to the
+bottom of a long page?")
 
-ScrollPane scrollpane
-scrollpane:SetLayout(layoutScroll)
-Color color")
-        Paragraph("Next, we will take our ScrollPane and set its Background, Size, and Position. We are only setting its background for appearance to differentiate the region of the ScrollPane with the Background of the Game window. Also note that changing the Size and Position of the ScrollPane only affects the Pane and not the Region. After we set those values, we can Add our pane to the Game giving us the following code:")
-        CodeExample("scrollpane:SetBackgroundColor(color:Gray())
-scrollpane:SetSize(600, 400)
-scrollpane:SetPosition(100, 100)
-Add(scrollpane)")
-        Paragraph("If we were to run the program now, there would only be a Gray region in the center of the game window. You might be able to scroll through it due to the default size of the region, but you will find nothing in it. This is because we have not added anything to the region, and we will do that now by making the buttons that will be on different positions on the screen.")
-        Subsection("Buttons on a ScrollPane")
-        Subsubsection("Button Behavior")
-        Paragraph("Before we begin with the main class, we will create a Behavior class for our Buttons, which we will call "):DoubleQuote():Text("ButtonBehavior.quorum."):DoubleQuote():Text(" This class will use the libraries for Behavior, BehaviorEvent, and Speech. We need the Item library because we will be using the GetItem action from the BehaviorEvent.")
-        Paragraph("The ButtonBehavior class will inherit the Behavior class and in the Run action, we need to have the program output and say the button's name. To get the name we use GetItem action from event and since it returns an Item, we save it to an Item variable. For this example, we do not need any casting because the GetName action from the Button is inherited from the Item class.")
-        Paragraph("This gives us the completed ButtonBehavior class as follows:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Sound.Speech
-use Libraries.Interface.Item
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/ScrollPane/Vocabulary.csv")
 
-class ButtonBehavior is Behavior
-    action Run(BehaviorEvent event)
-            Item item = event:GetItem()
-            Speech speech
-            speech:Say(item:GetName())
-            output item:GetName()
-    end
-end")
-        Subsubsection("Adding to our ScrollPane")
-        Paragraph("Now with a behavior for the buttons made we can go back to the main class and add our buttons. You can start by adding these declarations:")
-        CodeExample("Button topLeft
-Button topRight
-Button center
-Button bottomLeft
-Button bottomRight")
-        Paragraph("Before we add our Buttons to the ScrollPane, we’ll make a behavior object for all of them to have set and we will set their names. This is done with the following lines of code:")
-        CodeExample("ButtonBehavior behavior
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/ScrollPane/Code.csv")
 
-topLeft:SetName(" + dq + "Top Left" + dq + ")
-topLeft:SetBehavior(behavior)
-
-topRight:SetName(" + dq + "Top Right" + dq + ")
-topRight:SetBehavior(behavior)
-
-center:SetName(" + dq + "Center" + dq + ")
-center:SetBehavior(behavior)
-
-bottomLeft:SetName(" + dq + "Bottom Left" + dq + ")
-bottomLeft:SetBehavior(behavior)
-
-bottomRight:SetName(" + dq + "Bottom Right" + dq + ")
-bottomRight:SetBehavior(behavior)")
-        Paragraph("Now that our Buttons are created, we can add them to the ScrollPane with the following code:")
-        CodeExample("scrollpane:Add(topLeft)
-scrollpane:Add(topRight)
-scrollpane:Add(center)
-scrollpane:Add(bottomLeft)
-scrollpane:Add(bottomRight)")
-        Paragraph("Now we need to set the position of each Button within the ScrollPane. Because we added each Button to the ScrollPane, that these positions are relative to region within the ScrollPane, not the game window. For example, since we set the ScrollPane’s position to the (x, y) coordinate of (100, 100), calling "):DoubleQuote():Text("bottomLeft:SetPosition(0, 0)"):DoubleQuote():Text(" will place the Button at the relative position of (0, 0) in region of the ScrollPane. Our Button positions are as follows:")
-        CodeExample("topLeft:SetPosition(0, 2000 - 30)
-topRight:SetPosition(2000 - 100, 2000 - 30)
-center:SetPosition((2000 / 2) - 50, (2000 / 2) - 15)
-bottomLeft:SetPosition(0, 0)
-bottomRight:SetPosition(2000 - 100, 0)")
-        Paragraph("Finally, we will call the FitRegionToContents action to automatically resize the region to fit all that we added to it. For example, we used "):DoubleQuote():Text("topRight:SetPosition(2000 - 100, 2000 - 30)"):DoubleQuote():Text(" to place our topRight Button. Thismoves the Button to the (x, y) coordinate of (1900, 1970). So, FitRegionToContents will make the region for the ScrollPane extend to (2000, 2000) since it will also account for the size of the button. The call will look like this:")
-        CodeExample("scrollpane:FitRegionToContents()")
-        Paragraph("Now when the program is run, it has a ScrollPane showing only a 600 x 400 portion of the 2000 x 2000 region. Thus, the scrollbars can be used to display other parts of the 2000 x 2000 region. For example, below is an image of the ScrollPane at the top left of the region and near the center of the region. When a Button is activated, the program will output and say its name aloud.")
-        Image("media/userInterface/scrollPaneMiddle.png", "This image shows the ScrollPane with the Center Button visible in the middle of the screen.")
-        Subsection("Manually Setting the Region Size")
-        Paragraph("Suppose we wanted to move the Buttons closer together now. We can move the Buttons again by simply calling the SetPosition action again, using the following lines:")
-        CodeExample("topLeft:SetPosition(0, 500 - 30)
-topRight:SetPosition(500 - 100, 500 - 30)
-center:SetPosition((500 / 2) - 50, (500 / 2) - 15)
-bottomLeft:SetPosition(0, 0)
-bottomRight:SetPosition(500 - 100, 0)")
-        Paragraph("By using 500 in our calculations instead of 2000, we've shrunk down the area containing all five buttons by a factor of 4. If we were to run the program now, the vast majority of the region for our ScrollPane would be unnecessary. As such, it is reasonable to shrink down the region itself to match our Buttons. Fortunately, Quorum allows you to manually set the region size, using the ScrollPane's SetRegionSize action with a width and height. Thus, we will add the following line:")
-        CodeExample("scrollpane:SetRegionSize(500, 500)")
-        Paragraph("However, recall that when we made our ScrollPane, we gave it the view area of 600 x 400. We cannot view more area than exists for our ScrollPane, so we need to change the view area as well. Fortunately, this is done by simply calling the SetSize action again, giving us the following line:")
-        CodeExample("scrollpane:SetSize(400, 300)")
-        Paragraph("Lastly, to fit the ScrollPane to the middle of our game window, we will add the following line of code:")
-        CodeExample("scrollpane:SetPosition(200, 150)")
-        Paragraph("Now, when we run the program, the area is much smaller, as shown in the following image:")
-        Image("media/userInterface/scrollPaneEnd.png", "This image shows a smaller version of the ScrollPane with the TopLeft and Center buttons visable.")
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following
+"):Link("2026 CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_13)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_READING_AND_DOCUMENTING_18)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_READING_AND_DOCUMENTING_18)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        StandardsList(computerScience)
     end
 
-    private action Indicies
-        Section("Indicies")
-        Paragraph("In Quorum, ScrollPanes have an additional tracking feature: indices. An index is simply an integer, starting from 0, associated with an object added to the ScrollPane. In the previous section, we added our Buttons to the ScrollPane without indicies, which simply gives an index in the order that objects were added. For example, since topLeft was the first thing we added, it has the index value of 0. Similarly, bottomLeft was the fourth thing we added, so it has the index value of 3. We could have also used the Add action with an index specified, in the form of "):DoubleQuote():Text("scrollpane:Add(0, topLeft)."):DoubleQuote():Text(" For example, the following Add actions would have given us the same indicies as the section above:")
-        CodeExample("scrollpane:Add(0, topLeft)
-scrollpane:Add(1, topRight)
-scrollpane:Add(2, center)
-scrollpane:Add(3, bottomLeft)
-scrollpane:Add(4, bottomRight)")
-        Paragraph("However, note that using the Add action this way must either use the very next index value, or a previous value, otherwise it will crash the program. For instance, starting with "):DoubleQuote():Text("scrollpane:Add(1, topLeft)"):DoubleQuote():Text(" instead would crash, as would finishing with "):DoubleQuote():Text("scrollpane:Add(5, bottomRight)."):DoubleQuote()
-        Paragraph("As for specifying a previously assigned index, the new object will push the preexisting object, and everything following it, up by 1. For example, consider the following Add actions:")
-        CodeExample("scrollpane:Add(0, topLeft)
-scrollpane:Add(0, topRight)
-scrollpane:Add(1, center)
-scrollpane:Add(0, bottomLeft)
-scrollpane:Add(2, bottomRight)")
-        Paragraph("In this case, the order of events is as follows:")
-        NumberedList()
-        ListItem("topLeft is assigned to index 0.")
-        ListItem("topRight is assigned to index 0, and topLeft is pushed from index 0 to index 1.")
-        ListItem("center is assigned to index 1, and topLeft is pushed from index 1 to index 2.")
-        ListItem("bottomLeft is assigned to index 0, topRight is pushed from index 0 to index 1, center is pushed from index 1 to index 2, and topLeft is pushed from index 2 to index 3.")
-        ListItem("bottomRight is assigned to index 2, center is pushed from index 2 to index 3, and topLeft is pushed from index 3 to index 4.")
-        Paragraph("Final Indicies are:")
+    action Explore
+        Section("Explore")
+        ViewAndScrollRegion()
+        EveryPageScrolls()
+        AScrollPaneOfItsOwn()
+        AddingInsertingAndRemoving()
+        ScrollingFromCode()
+        RegionsOfOtherShapes()
+        CheckingCodeAnAIWrote()
+    end
+
+    private action ViewAndScrollRegion
+        Subsection("The view and the scroll region")
+        Paragraph("A scroll pane has two sizes:")
         BulletList()
-        ListItem("topLeft = Index 4")
-        ListItem("topRight = Index 1")
-        ListItem("center = Index 3")
-        ListItem("bottomLeft = Index 0")
-        ListItem("bottomRight = Index 2")
-        Paragraph("In particular, indicies are used to remove objects from ScrollPanes. For example, if we wanted to Remove the Center Button using the previous example, we could either use "):DoubleQuote():Text("scrollpane:Remove(center)"):DoubleQuote():Text(" or "):DoubleQuote():Text("scrollpane:Remove(3)."):DoubleQuote():Text(" While we just call the Remove action like this, note that the Remove action with an Item parameter will return a boolean, True if the item was in the ScrollPane and successfully removed or False if the item was not in the ScrollPane. The Remove action with an integer parameter will return the Item that was previously contained at that index.")
-        Paragraph("The action of removing an object also has an impact on the indicies of other objects, though in this case, it will change the following indicies by 1 to fill in the space left by the removed object. Using the previous example again, consider the following Removes:")
-        CodeExample("scrollpane:Remove(3)
-scrollpane:Remove(0)")
-        Paragraph("In this case, the order of events is as follows:")
-        NumberedList()
-        ListItem("center (index 3) is removed, and topLeft is pulled down from index 4 to index 3.")
-        ListItem("bottomLeft (index 0) is removed, topRight is pulled down from index 1 to index 0, bottomRight is pulled down from index 2 to index 1, and topLeft is pulled down from index 3 to index 2.")
-        Paragraph("Final Indicies are:")
-        BulletList()
-        ListItem("topLeft = Index 2")
-        ListItem("topRight = Index 0")
-        ListItem("center = N/A (Removed)")
-        ListItem("bottomLeft = N/A (Removed)")
-        ListItem("bottomRight = Index 1")
+        ListItem("The "):Strong("view"):Text(" is the box shown on the screen.")
+        ListItem("The "):Strong("scroll region"):Text(" is the whole area that holds the items you add. It
+can be much bigger than the view. Anything in the region that is outside
+the view is hidden until the user scrolls to it.")
+
+        Paragraph("When the region is bigger than the view, the scroll pane shows a scroll bar.
+The user can turn the mouse wheel over the pane, drag the scroll bar, click
+the bar's track, or drag a finger on a touch screen to move the view.
+A scroll pane has no scroll keys yet. With the keyboard, the view moves by
+following the focus: press "):Key("Tab"):Text(" to a control outside the view, and the
+pane scrolls to show it. You will try this below.")
     end
 
-    private action TryMakingAUserInterface
-        Section("Try making a User Interface")
-        CodeEditorFromProject("Activity: ScrollPane", "ScrollPane.quorum", "examples/UserInterface/ScrollPane/Main.quorum")
+    private action EveryPageScrolls
+        Subsection("Every page already scrolls")
+        Paragraph("You have been using scroll panes since the "):Link("Forms", "/tutorials/ui/forms.html"):Text("
+tutorial without knowing it: in Quorum, a form "):Code("Page"):Text(" is a kind of
+"):Code("ScrollPane"):Text(". When a page has more rows than fit in the window, it shows a
+scroll bar.")
+
+        Paragraph("Replace "):Code("Main.quorum"):Text(" with this program. It puts 30 song buttons on one page.")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/Main.quorum")
+
+        Paragraph("Each button runs the same behavior, which writes the name of the button
+that was pressed. Put it in its own file, "):Code("OutputNameBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/OutputNameBehavior.quorum")
+
+        Paragraph("Run the program. Only the first songs fit in the window, and a scroll bar
+appears on the right. Now put the mouse aside and press "):Key("Tab"):Text(" again and
+again. Each time the focus moves to a song below the window, the page
+scrolls just far enough to show it. This is how a scroll pane works with
+the keyboard: it has no keys of its own for scrolling, but it "):Strong("follows the
+focus"):Text(". A screen reader reads each song's name and description as it gets
+the focus.")
+    end
+
+    private action AScrollPaneOfItsOwn
+        Subsection("A scroll pane of its own")
+        Paragraph("A long page is fine when the list is the only thing on it. Often, though,
+you want a list of a set size among other controls, such as a playlist with
+buttons below it. For that, put a scroll pane on the page.")
+
+        Paragraph("On a form, use a "):Code("FormScrollPane"):Text(". It is a scroll pane that the form knows
+how to look inside, so the form puts the controls in it into the page's
+"):Key("Tab"):Text(" order, after the controls above it and before the ones below it.
+(A plain "):Code("ScrollPane"):Text(" works in a game, but a form doesn't look inside it,
+so "):Key("Tab"):Text(" would skip its controls.)")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/Main2.quorum")
+
+        Paragraph("Some things to notice:")
+        BulletList()
+        ListItem():Code("page:Add(songs)"):Strong(" puts the scroll pane on the page."):Text(" A page has actions
+like "):Code("AddButton"):Text(" for many controls, but not for a scroll pane, so you
+make it yourself and add it. The page gives it its own row.")
+        ListItem():Code("SetPixelHeight(250)"):Strong(" sets the size of the view."):Text(" A page row is
+normally one line of text tall. The view is 250 pixels tall and as wide
+as the page's other rows. The scroll region is as wide as the view and
+grows taller to fit what you add.")
+        ListItem():Strong("The songs are made, not added with "):Code("AddButton"):Strong("."):Text(" "):Code("AddButton"):Text(" is a page
+action; inside the scroll pane you make each "):Code("Button"):Text(" and add it with
+"):Code("songs:Add"):Text(".")
+        ListItem():Code("FILL"):Strong(" makes each song a whole row."):Text(" A scroll pane places its items
+one after another from left to right, starting a new line when one is
+full. A button is normally only as wide as its text, so several songs
+would share a line. "):Code("FILL"):Text(" is a "):Strong("layout mode"):Text(" that makes the button fill
+the rest of the line. "):Code("FILL"):Text(" belongs to the "):Code("Control"):Text(" class, so a "):Code("Button"):Text("
+variable reaches it with "):Code("parent:Control:"):Text(". The
+"):Link("Layouts", "/tutorials/ui/layout.html"):Text(" tutorial explains layout modes.")
+
+        Paragraph("Run the program and press "):Key("Tab"):Text(". The focus moves from the title into the
+songs, the list scrolls to follow it, and after Song 20 it moves on to the
+two buttons below the list.")
+
+        BlockEditorFile("OutputNameBehavior.quorum", "html/sources/tutorials/ui/ScrollPane/OutputNameBehavior.quorum")
+        BlockEditorFile("AddSongBehavior.quorum", "html/sources/tutorials/ui/ScrollPane/AddSongBehavior.quorum")
+        BlockEditorFile("RemoveSongBehavior.quorum", "html/sources/tutorials/ui/ScrollPane/RemoveSongBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/ScrollPane/Main2.quorum", "", true, true)
+    end
+
+    private action AddingInsertingAndRemoving
+        Subsection("Adding, inserting and removing items")
+        Paragraph("Each item in a scroll pane has an "):Strong("index"):Text(", a number for its place in the
+order. The first item you add has index 0, the next has index 1, and so on.
+In a list like this one, the index is also the item's place on the screen,
+from the top.")
+
+        Paragraph():Code("songs:Add(0, song)"):Text(" adds a song at index 0. The song that was there, and
+everything after it, moves down one place. The index must be one that
+already exists, or one more than the last index.")
+
+        Paragraph("There are two ways to remove an item:")
+        BulletList()
+        ListItem():Code("songs:Remove(song)"):Text(" removes that item. It returns "):Code("true"):Text(" if the item was
+in the scroll pane, and "):Code("false"):Text(" if it was not.")
+        ListItem():Code("songs:Remove(0)"):Text(" removes the item at index 0 and returns it.")
+
+        Paragraph("A form works out its "):Key("Tab"):Text(" order once, when it is displayed. After you add
+or remove an item, ask the page to work it out again with
+"):Code("CalculateDefaultFocusOrdering"):Text(". Otherwise "):Key("Tab"):Text(" skips the new song, or
+tries to move to a song that is gone. This one line is all you need here;
+the "):Link("Focus", "/tutorials/ui/focus.html"):Text(" tutorial covers the focus order in
+full.")
+
+        Paragraph("The two behaviors need the page, so they come from "):Code("FormBehavior"):Text(", which
+has "):Code("GetPage"):Text(". Put this class in "):Code("AddSongBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/AddSongBehavior.quorum")
+
+        Paragraph():Code("song:Focus()"):Text(" moves the focus to the new song. The list scrolls to the top
+to show it, and a screen reader reads its name. Put this class in
+"):Code("RemoveSongBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/RemoveSongBehavior.quorum")
+    end
+
+    private action ScrollingFromCode
+        Subsection("Scrolling from code")
+        Paragraph("You can also move the view yourself. "):Code("SetScrollPercentageY"):Text(" moves it up or
+down, where 0 is the top and 1 is the bottom:")
+        CodeExampleFromFile("sources/tutorials/ui/ScrollPane/ScrollToTop.quorum")
+
+        Paragraph("You rarely need this for a list of controls, because the pane already
+follows the focus. It helps with content that can't take the focus, such
+as a picture. Keep in mind that a keyboard or screen reader user can only
+scroll by moving the focus, so anything a person must reach should be able
+to take the focus.")
+    end
+
+    private action RegionsOfOtherShapes
+        Subsection("Regions of other shapes")
+        Paragraph("By default, the scroll region is as wide as the view and grows taller to
+fit its items, which is right for a list. "):Code("SetScrollRegionResizing"):Text("
+chooses another rule:")
+        BulletList()
+        ListItem():Code("FIT_CONTENTS_VERTICALLY"):Text(", the default: as wide as the view, as tall as
+the items;")
+        ListItem():Code("FIT_CONTENTS_HORIZONTALLY"):Text(": as tall as the view, as wide as the items;")
+        ListItem():Code("MANUAL_REGION_SIZING"):Text(": the size you give to "):Code("SetRegionSize"):Text(", or the size
+"):Code("FitRegionToContents"):Text(" works out from the items in it.")
+
+        Paragraph("A large map that scrolls both ways would use "):Code("MANUAL_REGION_SIZING"):Text(" and
+place each item at a position of its own. Placing items at positions is
+what a "):Code("ManualLayout"):Text(" does, which you will learn in the next tutorial,
+"):Link("Layouts", "/tutorials/ui/layout.html"):Text(".")
+    end
+
+    private action CheckingCodeAnAIWrote
+        Subsection("Checking code an AI wrote")
+        Paragraph("The Playlist program on this page, with its three behaviors, was written by
+an AI system called Claude when this tutorial was drafted. So was the rest
+of the code in this tutorial. AI-generated code can look right and still be
+wrong. It can call an action that doesn't exist, use a real action the
+wrong way, or skip something the program was supposed to do. Before you
+trust code like this, check it, the same way you would check a classmate's
+work. Textbooks could have issues as well, but this is more rare.")
+
+        Paragraph("The Playlist program has these "):Strong("requirements"):Text(", the things it is supposed
+to do:")
+        NumberedList()
+        ListItem("It shows 20 songs in a list 250 pixels tall, with two buttons below it.")
+        ListItem("Every song has a name and a description, and can be reached with "):Key("Tab"):Text(".")
+        ListItem():DoubleQuote():Text("Add a song at the top"):DoubleQuote():Text(" puts a new song first in the list and moves the
+focus to it.")
+        ListItem():DoubleQuote():Text("Remove the top song"):DoubleQuote():Text(" removes the first song. When the list is empty,
+it says so and nothing breaks.")
+        ListItem("After any change, "):Key("Tab"):Text(" reaches every song in the list, and none that
+are gone.")
+
+        Paragraph("Check the code in three ways:")
+        BulletList()
+        ListItem():Strong("Accuracy:"):Text(" does every action it calls exist, and does it do what the
+code expects? Look each one up in the library documentation, starting
+with the "):Link("ScrollPane", "/Libraries/Interface/Controls/ScrollPane.html"):Text(" and
+"):Link("FormScrollPane", "/Libraries/Interface/Forms/FormScrollPane.html"):Text(" pages.
+For example, find "):Code("Remove(integer index)"):Text(" and read what it returns. If a
+class's page says little about an action, check the class it comes from.")
+        ListItem():Strong("Reliability:"):Text(" does it work every time, not just the first time? Try
+the unusual cases: remove songs until the list is empty, then press
+Remove again; add several songs in a row; add a song after removing them
+all.")
+        ListItem():Strong("Fit to the requirements:"):Text(" go through the list above one item at a
+time, and mark each one met, not met, or not sure. Also notice anything
+the code does that no requirement asked for.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you check the AI-generated Playlist program on your own,
+then turn it into a scrolling contact list and test it. The goal is to
+decide, with evidence, whether code you didn't write can be trusted, and to
+test, fix and record changes to a scroll pane program. Work through these
+steps:")
+        NumberedList()
+        ListItem():Strong("Check each action."):Text(" Make a table with one row for every action the
+Playlist program calls, such as "):Code("SetPixelHeight"):Text(", "):Code("Add"):Text(", "):Code("Remove"):Text(",
+"):Code("GetScrollRegionItems"):Text(", "):Code("CalculateDefaultFocusOrdering"):Text(" and "):Code("Focus"):Text(". For
+each, write the class whose documentation page describes it, what the
+documentation says it does, and whether the program uses it correctly.
+Mark any action you could not find.")
+        ListItem():Strong("Test each requirement."):Text(" Run the program and test the five
+requirements from "):DoubleQuote():Text("Checking code an AI wrote"):DoubleQuote():Text(", first with the mouse and
+then with only the keyboard. Include the unusual cases. Mark each
+requirement met, not met or not sure, and write down what you did that
+shows it.")
+        ListItem():Strong("Change and fix."):Text(" Change the program into a contact list with at least
+15 made-up contacts, each with a name and a description. Fix any problem
+you found in steps 1 and 2. Then use your keyboard results to improve one
+thing. For example, would the buttons be easier to reach above a long
+list?")
+        ListItem():Strong("Record your changes."):Text(" For every change, write what you changed, why,
+and how you tested it afterwards. Then run all five tests again.")
+
+        Paragraph("Finish with a short verdict: would you trust the AI-generated program as it
+was, with changes, or not at all? Give your two strongest reasons.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Scrolling is so common that people rarely think about it. What did you
+learn about how scrolling works for people who do not use a mouse? Which of
+your checks found something that running the program once would have
+missed? Would you check code that a person wrote any differently from code
+that an AI wrote?")
     end
 end

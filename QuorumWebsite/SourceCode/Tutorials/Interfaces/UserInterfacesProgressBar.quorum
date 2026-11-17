@@ -1,0 +1,224 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Progress Bars, part of the user interface series.
+*/
+class UserInterfacesProgressBar is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/progressBar.html")
+        SetShortTitle("Progress Bars")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to add a progress bar to a Quorum form, set its range, fill it over time or one step at a time, and keep it accessible.")
+
+        Title("Progress Bars")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("When a program does something that takes time, like loading a level or
+saving a big file, people want to know two things: is it still working, and
+how much is left? A "):Strong("progress bar"):Text(" answers both. It is a long box that fills
+up from left to right as the work gets done. In this tutorial, you will add a
+progress bar to a page, fill it over time, and fill it one step at a time
+with a button. You will also learn how often a progress bar should change so
+that it works well for people who use screen readers.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a progress bar to a page with "):Code("AddProgressBar"):Text(", and give it a name and description")
+        ListItem("Change how full the bar is with "):Code("SetValue"):Text(", using a minimum and a maximum")
+        ListItem("Fill a progress bar over time with a behavior's "):Code("Update"):Text(" action")
+        ListItem("Explain how often a progress bar should change so that it stays accessible")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about the last time you waited for something on a computer or phone:
+an app update, a video loading, or a game level starting. Did the program
+show you how long you had to wait? Was it a bar, a spinning circle, a
+percent, or nothing?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/ProgressBar/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/ProgressBar/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_20)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_20)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_ALGORITHMIC_PROBLEM_SOLVING_3)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        WhatAProgressBarDoes()
+        MakingAProgressBar()
+        ChangingTheRange()
+        FillingOverTime()
+        MovingOneStepAtATime()
+        ScreenReaders()
+    end
+
+    private action WhatAProgressBarDoes
+        Subsection("What a progress bar does")
+        Paragraph("A progress bar has three numbers inside it:")
+
+        BulletList()
+        ListItem("the "):Strong("minimum"):Text(", which means "):DoubleQuote():Text("nothing is done yet"):DoubleQuote():Text(";")
+        ListItem("the "):Strong("maximum"):Text(", which means "):DoubleQuote():Text("everything is done"):DoubleQuote():Text(";")
+        ListItem("the "):Strong("value"):Text(", which says where the task is right now.")
+
+        Paragraph("The bar fills in the same share as the value. By default, the minimum is 0
+and the maximum is 100, so you can think of the value as a percent. A value
+of 25 fills a quarter of the bar. A value of 100 fills all of it.")
+
+        Paragraph("A progress bar does not do the work for you. Your program does the work, and
+then tells the bar how far along it is by calling "):Code("SetValue"):Text(".")
+    end
+
+    private action MakingAProgressBar
+        Subsection("Making a progress bar")
+        Paragraph("To start, make a new Form project in Quorum Studio. Replace the code in "):Code("Main.quorum"):Text(" with the program below.")
+        CodeExampleFromFile("sources/tutorials/ui/ProgressBar/Main.quorum")
+
+        Paragraph("Here is what the program does:")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        BulletList()
+        ListItem():Code("page:AddLabel"):Text(" adds the words "):DoubleQuote():Text("Song download"):DoubleQuote():Text(". A label added just before
+a progress bar is shown beside it, so sighted people know what the bar is
+for.")
+        ListItem():Code("page:AddProgressBar(" + quote + "Song download" + quote + ")"):Text(" adds the bar. The name you give it
+is also the name a screen reader says. Without a name, it would only be
+called "):DoubleQuote():Text("Progress Bar"):DoubleQuote():Text(".")
+        ListItem():Code("SetDescription"):Text(" gives a screen reader a little more about what the bar
+shows. You can even add easter eggs, little surprises for fun, just like is possible for visual users. A classic example that did this visually is the loading screen for the game "):DoubleQuote():Text("The Sims."):DoubleQuote()
+        ListItem():Code("SetValue(40)"):Text(" fills 40 percent of the bar.")
+
+        Paragraph("Run the program. The bar is a little less than half full.")
+    end
+
+    private action ChangingTheRange
+        Subsection("Changing the range")
+        Paragraph("You don't have to count from 0 to 100. If a quiz has 5 questions, it can
+make more sense to count questions. "):Code("AddProgressBar"):Text(" can take a minimum and
+a maximum:")
+        CodeExampleFromFile("sources/tutorials/ui/ProgressBar/QuizBar.quorum")
+
+        Paragraph("This bar is two fifths full, because 2 of the 5 questions are answered.")
+
+        Paragraph("Keep the value between the minimum and the maximum. Quorum stores a value
+outside the range, but the bar only shows it as empty or full.")
+    end
+
+    private action FillingOverTime
+        Subsection("Filling the bar over time")
+        Paragraph("A "):Strong("behavior"):Text(" is a class with actions Quorum calls for you. You have used
+its "):Code("Run"):Text(" action, which runs once when a button is pressed. A behavior also
+has an "):Code("Update"):Text(" action. If you give a behavior to an item with "):Code("AddBehavior"):Text(", Quorum calls its "):Code("Update"):Text(" action many times every second,
+until its "):Code("IsFinished"):Text(" action returns "):Code("true"):Text(".")
+
+        Paragraph("This program has a button that starts loading a level. A behavior fills the
+bar by 10 every second until it is full.")
+
+        Paragraph("First, add a new class to the project named "):Code("FillBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/ProgressBar/FillBehavior.quorum")
+
+        Paragraph("Then change "):Code("Main.quorum"):Text(" to this:")
+        CodeExampleFromFile("sources/tutorials/ui/ProgressBar/Main2.quorum")
+
+        Paragraph("Here is what happens:")
+
+        BulletList()
+        ListItem():Code("Main"):Text(" is a "):Code("FormBehavior"):Text(", so it can be the button's behavior. Its "):Code("Run"):Text(" action runs when the button is pressed. "):Code("GetPage"):Text(" returns the page, and "):Code("GetProgressBar"):Text(" finds the bar by its name.")
+        ListItem("The "):Code("if"):Text(" check stops a second press from starting a second fill while the
+bar is still filling.")
+        ListItem():Code("bar:AddBehavior(fill)"):Text(" starts the fill. From now on, Quorum calls "):Code("fill:Update"):Text(" many times every second.")
+        ListItem():Code("Update"):Text(" is given "):Code("seconds"):Text(", how much time passed since the last call. It
+is usually a tiny number, like 0.016. The behavior adds it to "):Code("timePassed"):Text(". Once a whole second has added up, it moves the bar forward
+by 10.")
+        ListItem("When the bar is full, "):Code("IsFinished"):Text(" returns "):Code("true"):Text(", and Quorum stops
+calling "):Code("Update"):Text(".")
+
+        Paragraph("Run the program and press the button with "):Key("Space"):Text(" or "):Key("Enter"):Text(", or click it.
+The bar fills a little more each second. After ten seconds, it is full.
+Press the button again to start over.")
+    end
+
+    private action MovingOneStepAtATime
+        Subsection("Moving the bar one step at a time")
+        Paragraph("Many programs move a progress bar after each step of a task, not on a
+timer. This version moves the bar forward one step each time a button is
+pressed. When it is full, the next press starts it over.")
+
+        Paragraph("Change "):Code("Main.quorum"):Text(" to this:")
+        CodeExampleFromFile("sources/tutorials/ui/ProgressBar/Main3.quorum")
+
+        Paragraph("Each press moves the bar forward by one fifth, and the output window in
+Quorum Studio says which question you are on.")
+
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/ProgressBar/Main3.quorum", "", true, true)
+    end
+
+    private action ScreenReaders
+        Subsection("Progress bars and screen readers")
+        Paragraph("A progress bar can be reached with the "):Key("Tab"):Text(" key, like a button. A form puts
+it in the "):Key("Tab"):Text(" order for you. When it has the focus, a screen reader says
+its name.")
+
+        Paragraph("Each time your program calls "):Code("SetValue"):Text(", Quorum tells the screen reader that
+the value changed. You don't have to write any code for this. It happens on
+its own. Screen readers manage on their own how to deal with these events, even rapid ones. Often, they will skip many of them if they come quickly. Generally, this is expected and normal behavior that you should not try to adjust.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, one partner is the "):Strong("designer"):Text(" and the other is the "):Strong("tester"):Text(", and you adapt a progress bar to show the steps of a real task.
+The goal is to set a progress bar's range to match a task, to give it a name
+and description that make sense for that task, and then to improve it from
+your tester's feedback. The designer picks a task that takes steps, such as
+baking cookies in 6 steps or a science lab in 4 parts. Then the designer
+changes the last program on this page so the bar's maximum matches the
+number of steps, and so the label, the bar and the button have names and
+descriptions that fit the task.")
+
+        Paragraph("The tester then goes through every step using only the keyboard ("):Key("Tab"):Text(", "):Key("Space"):Text(" and "):Key("Enter"):Text("). If you have a screen reader, the tester turns it on and
+uses it instead of the screen. The tester tells the designer one
+thing that was clear and one thing that was confusing. The designer fixes
+the confusing part, and the tester tries it again to check the fix. Then
+switch roles with a new task. As a challenge, add a second button named "):DoubleQuote():Text("Start Over"):DoubleQuote():Text(" that sets the bar back to its minimum.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A progress bar is a small control, but it changes how a wait feels. When is
+a progress bar the wrong choice? Think about a task where your program can't
+know how much work is left. What could it show instead?")
+
+        Paragraph():Link("Next tutorial: Color Wells", "/tutorials/ui/colorWell.html")
+    end
+end

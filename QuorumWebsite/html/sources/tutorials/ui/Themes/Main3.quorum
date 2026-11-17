@@ -1,0 +1,50 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.ComboBox
+use Libraries.Containers.Array
+use Libraries.Game.Graphics.Label
+
+class Main is FormBehavior
+    boolean highContrast = false
+
+    action Main
+        Form form
+        Page page = form:GetMainPage()
+        page:SetTitle("Reading Settings")
+
+        Array<text> sizes
+        sizes:Add("Small")
+        sizes:Add("Medium")
+        sizes:Add("Large")
+        page:AddLabel("Text size")
+        ComboBox size = page:AddComboBox("Text size", sizes)
+        size:SetDescription("Choose how big the text should be.")
+
+        page:AddLabel("Status", "High contrast is off.")
+
+        Button contrast = page:AddButton("Turn high contrast on or off")
+        contrast:SetDescription("Switches between the normal colors and high contrast colors.")
+        contrast:SetBehavior(me)
+
+        form:Display()
+    end
+
+    action Run(BehaviorEvent event)
+        Form form = GetForm()
+        Page page = GetPage()
+        Label status = page:GetLabel("Status")
+
+        if highContrast
+            form:SetToLightMode()
+            status:SetText("High contrast is off.")
+        else
+            HighContrastOptions options
+            form:SetInterfaceOptions(options)
+            status:SetText("High contrast is on.")
+        end
+        highContrast = not highContrast
+    end
+end

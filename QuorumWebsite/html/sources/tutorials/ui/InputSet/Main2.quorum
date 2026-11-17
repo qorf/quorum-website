@@ -1,0 +1,70 @@
+use Libraries.Game.Game
+use Libraries.Game.InputSet
+use Libraries.Game.InputTable
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Color
+
+class Main is Game
+    KeyboardEvent keys
+    Color color
+    Drawable square
+    Drawable circle
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        square:LoadFilledRectangle(100, 100, color:Orange())
+        square:SetName("Orange square")
+        square:SetDescription("Press Space to turn the square.")
+        square:SetAccessibilityCode(square:parent:Item:ITEM)
+        square:SetFocusable(true)
+        square:SetPosition(200, 250)
+        Add(square)
+
+        circle:LoadFilledCircle(50, color:Purple())
+        circle:SetName("Purple circle")
+        circle:SetDescription("Press Enter to make the circle bigger or smaller.")
+        circle:SetAccessibilityCode(circle:parent:Item:ITEM)
+        circle:SetFocusable(true)
+        circle:SetPosition(500, 250)
+        Add(circle)
+
+        square:SetNextFocus(circle)
+        square:SetPreviousFocus(circle)
+        circle:SetNextFocus(square)
+        circle:SetPreviousFocus(square)
+        SetFocus(square)
+
+        // Space anywhere: say which item has the focus.
+        InputSet spaceSet
+        spaceSet:SetKeyboardInput(keys:SPACE)
+        OutputBehavior outputBehavior
+        InputTable defaultTable = GetDefaultInputTable()
+        defaultTable:Add(spaceSet, outputBehavior)
+
+        // Step 1: give each shape an input group.
+        square:SetInputGroup("Square")
+        circle:SetInputGroup("Circle")
+
+        // Step 2: make a table for each group, with a matching name.
+        InputSet enterSet
+        enterSet:SetKeyboardInput(keys:ENTER)
+
+        RotationBehavior rotationBehavior
+        InputTable squareTable
+        squareTable:SetIdentifier("Square")
+        squareTable:Add(spaceSet, rotationBehavior)
+
+        ScaleBehavior scaleBehavior
+        InputTable circleTable
+        circleTable:SetIdentifier("Circle")
+        circleTable:Add(enterSet, scaleBehavior)
+
+        // Step 3: add the new tables to the game.
+        AddInputTable(squareTable)
+        AddInputTable(circleTable)
+    end
+end

@@ -1,302 +1,332 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: InputSet.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Input Sets, part of the user interface series.
 */
 class UserInterfacesInputSet is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/inputSet.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("InputSet")
+        SetShortTitle("Input Sets")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about InputSets in the Quorum programming language.")
-        SetSummary("how to use InputSets")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("InputSet Tutorial - Quorum Programming Language")
-        Title("Tutorial: InputSet")
-        Paragraph("This tutorial tells you how to use InputSets in Quorum")
-        Paragraph("Now we'll create our main class. Inside it, we'll make an InputSet that triggers this Behavior. We'll also want to make a KeyboardEvent, which is used to provide values that represent the keys on the keyboard (e.g., spacebar). The fields will look like this:")
-        AnIntroductionToInputSetsAndInputTables()
-        UsingTheDefaultInputTable()
-        InputTablesAndInputGroups()
-        InputTriggers()
-        KeyboardModifiers()
-        DoubleClickAndEventCounts()
+        // For search engines and link previews.
+        SetDescription("How to use input sets and input tables in Quorum to add your own keys to a game, give different items different keys, choose when a behavior runs, and keep the keys keyboard and screen reader users depend on.")
+
+        Title("Input Sets")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToInputSetsAndInputTables
-        Section("An Introduction to InputSets and InputTables")
-        Paragraph("In this tutorial, we will learn how to use InputSets and InputTables in Quorum. InputSets are used to uniquely identify input, such as keyboard or mouse, and expand existing functionality in the language. These are used in conjunction with InputTables, which associate these inputs with Behaviors we intend to work across a set of items. For example, we could use an InputSet to trigger when the user clicks the mouse on a creature in a game, and then use an InputTable to tell it how to respond to that input.")
-        Paragraph("InputSets have several advantages compared to event listeners, but they do not replace them. Notably, unlike listeners, they can be used to make input act consistently across groups of similar Items by default. For example, buttons in a user interface should have default behaviors, like slightly changing colors when clicked to visually show that it happened.")
-        Paragraph("InputTables have similar advantages. With listeners and the event system, the programmer could make whatever they wished, but input tables make it easier to remap those commands in different ways. For example, they can be used to set multiple inputs to trigger the same Behaviors or as a way to remap keyboard or mouse input across an entire system.")
+    action Overview
+        Section("Overview")
+        Paragraph("Every program reacts to input. A person presses a key, clicks the mouse or
+taps a screen, and something happens. Quorum already knows what most keys
+should do in its controls: "):Key("Tab"):Text(" moves the focus, and "):Key("Space"):Text(" presses a
+button. An "):Strong("input set"):Text(" describes one kind of input, such as "):DoubleQuote():Text("the "):Key("Space"):Text("
+key is pressed"):DoubleQuote():Text(". An "):Strong("input table"):Text(" connects input sets to the
+"):Strong("behaviors"):Text(" that should run. In this tutorial, you will use input sets
+and input tables to add your own keys to a game, give different items
+different keys, and choose exactly when a behavior runs. You will also
+learn how to add keys without taking away the keys that keyboard and screen
+reader users depend on.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Create an "):Code("InputSet"):Text(" for a key or mouse button and connect it to a behavior with an "):Code("InputTable")
+        ListItem("Use input groups so that different items respond to the same key in different ways")
+        ListItem("Use triggers, modifier keys and event counts to control when a behavior runs")
+        ListItem("Add new keys without breaking the keys people already use to move around a program")
     end
 
-    private action UsingTheDefaultInputTable
-        Section("Using the Default InputTable")
-        Paragraph("Let's make a program which will perform a task by default when given a particular kind of input. We could choose any input, but for example, we will create a Behavior that outputs the name of the currently focused Item when the spacebar is pressed. The Behavior we will use is shown in the code block below. We can review how Behaviors work in the "):Link("Behavior tutorial", "/tutorials/ui/behavior.html"):Text(". We can also review the "):Link("Focus tutorial", "/tutorials/ui/focus.html"):Text(".")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Item
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of a game or app you use with a keyboard. Which keys does it use, and
+how did you learn them? Does the same key do different things in different
+places, like "):Key("Enter"):Text(" in a text box and "):Key("Enter"):Text(" on a button? If you could
+change one key in that program, which would it be and why? Who might need
+to change a key for a reason you have not thought of?")
 
-class OutputBehavior is Behavior
-    action Run(BehaviorEvent event)
-        Item item = event:GetItem()
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/InputSet/Vocabulary.csv")
 
-        // There may not be a focused Item. Output something different
-        // if there was something focused.
-        if item = undefined
-            output " + dq + "No item is in focus." + dq + "
-        else
-            output item:GetName() + " + dq + " is focused." + dq + "
-        end
-    end
-end")
-        CodeExample("InputSet spaceSet
-KeyboardEvent keys")
-        Paragraph("Inside our CreateGame action, we need to tell Quorum that we want to use these input sets. To do this, we set our InputSet to accept a particular input from the keyboard using the SetKeyboardInput action. We'll use our keys variable to provide the SPACE constant from the KeyboardEvent class.")
-        Paragraph("After we've set up our InputSet, we need to get the default InputTable from the system. We can retrieve this table using the Game's GetDefaultInputTable action. The default InputTable applies Behaviors whenever input is received in a structured and organized way.")
-        Paragraph("Now that we have our InputTable, we can set it to trigger our Behavior when the spacebar is pressed:")
-        CodeExample("OutputBehavior outputBehavior
-defaultTable:Add(spaceSet, outputBehavior)")
-        Paragraph("The default InputTable will now trigger when the spacebar is pressed. In the provided code sample, we've included some Drawables and set them up to allow for Focus in our Game.")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Game.InputSet
-use Libraries.Interface.Events.KeyboardEvent
-use Libraries.Game.InputTable
-use Libraries.Game.Graphics.Drawable
-use Libraries.Game.Graphics.Color
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/InputSet/Code.csv")
 
-class Main is Game
-    InputSet spaceSet
-    KeyboardEvent keys
-    Color color
-    Drawable square
-    Drawable circle
-
-    action Main
-        StartGame()
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_TESTING_AND_REFINING_7)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_ALGORITHMIC_PROBLEM_SOLVING_2)
+        StandardsList(computerScience)
     end
 
-    action CreateGame
-        // Set up our InputSet to trigger when the spacebar is pressed.
-        spaceSet:SetKeyboardInput(keys:SPACE)
-
-        // Get the default InputTable from the Game.
-        InputTable defaultTable = GetDefaultInputTable()
-
-       // Create our Behavior and make it trigger every time the spacebar is pressed.
-       OutputBehavior outputBehavior
-       defaultTable:Add(spaceSet, outputBehavior)
-
-       square:LoadFilledRectangle(100, 100, color:Orange())
-       square:SetName(" + dq + "Square" + dq + ")
-       square:SetFocusable(true)
-       square:SetPosition(200, 250)
-       Add(square)
-
-       circle:LoadFilledCircle(50, color:Purple())
-       circle:SetName(" + dq + "Circle" + dq + ")
-       circle:SetFocusable(true)
-       circle:SetPosition(500, 250)
-       Add(circle)
-
-       square:SetNextFocus(circle)
-       square:SetPreviousFocus(circle)
-       circle:SetNextFocus(square)
-       circle:SetPreviousFocus(square)
-       SetFocus(square)
-    end
-end")
+    action Explore
+        Section("Explore")
+        HowQuorumDecides()
+        ABehaviorToRun()
+        AddingAKeyToTheDefaultTable()
+        GivingEachItemItsOwnKeys()
+        WhichTableWins()
+        OneBehaviorMoreThanOneKey()
+        Triggers()
+        ModifierKeys()
+        DoubleClicksAndEventCounts()
+        KeysThatEveryoneCanUse()
     end
 
-    private action InputTablesAndInputGroups
-        Section("InputTables and Input Groups")
-        Paragraph("The default InputTable can be useful for default behaviors as a whole and, perhaps, even more so for assigning Behaviors to specific kinds of items. The reason this is the case is because different kinds of user interface components, like textboxes or buttons, act in unique ways and therefore might use unique default behaviors.")
-        Paragraph("In this code, we've added a circle and a square, and they're set to cycle the focus between them. Now let's set them to use special input. To start, let's make new Behaviors that we'll use for these Drawables. The first Behavior is listed below. This one will rotate the item by 45 degrees, which we'll use for our square.")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Item
-use Libraries.Interface.Item2D
+    private action HowQuorumDecides
+        Subsection("How Quorum decides what a key does")
+        Paragraph("When you press a key, Quorum looks at the item that has the "):Strong("focus"):Text(", which
+you learned about in the "):Link("Focus", "/tutorials/ui/focus.html"):Text(" tutorial. Quorum
+then checks input tables in this order:")
+        NumberedList()
+        ListItem("The input table whose name matches the focused item's "):Strong("input group"):Text(".")
+        ListItem("If that table has nothing for this key, the input tables of the item's
+parent, then its parent's parent, and so on.")
+        ListItem("If none of those has anything for this key, the "):Strong("default input
+table"):Text(".")
 
-class RotationBehavior is Behavior
-    action Run(BehaviorEvent event)
-        Item item = event:GetItem()
+        Paragraph("As soon as one table runs a behavior, Quorum stops looking. This is why the
+same key can do different things in different places. Quorum's own controls
+work this way. Every "):Code("Button"):Text(" has the input group "):DoubleQuote():Text("Button"):DoubleQuote():Text(", and the
+"):DoubleQuote():Text("Button"):DoubleQuote():Text(" table runs the button's behavior when you press "):Key("Space"):Text(" or
+"):Key("Enter"):Text(". The default input table is where "):Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(" live: they
+move the focus to the next or previous item in every game. It also holds
+"):Keys("Shift", "F1"):Text(", which shows the tooltip of the control that has the focus, and
+"):Key("Escape"):Text(", which closes it.")
 
-        // There may not be a focused Item. If not, put something in the console
-        // so that we know what happened.
-        if item = undefined
-            output " + dq + "Couldn't rotate because no item was focused." + dq + "
-        elseif item is Item2D
-            // Cast our item to an Item2D (Drawable is a kind of Item2D)
-            // and then rotate it.
-            Item2D item2D = cast(Item2D, item)
-            item2D:Rotate(45)
-            output item2D:GetName() + " + dq + " set to " + dq + " + item2D:GetRotation() + " + dq + " degrees." + dq + "
-        end
-    end
-end")
-        Paragraph("Our second Behavior is a sort of toggle. Each time it's activated, it will alternate between making the object smaller or larger by using the Scale action. We'll use this one for our circle. The code for this Behavior is listed below:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Item
-use Libraries.Interface.Item2D
+        Paragraph("The programs in this tutorial use the "):Code("Game"):Text(" class rather than a form. The
+controls on a form already come with their keys, and input tables are most
+useful when you draw your own items, as games do. You will make two shapes
+and give them keys of their own.")
 
-class ScaleBehavior is Behavior
-
-    boolean scaledUp = false
-
-    action Run(BehaviorEvent event)
-        Item item = event:GetItem()
-
-        // There may not be a focused Item. If not, put something in the console
-        // so that we know what happened.
-        if item = undefined
-            output " + dq + "Couldn't scale because no item was focused." + dq + "
-        elseif item is Item2D
-            // Cast our item to an Item2D (Drawable is a kind of Item2D)
-            // and then scale it.
-            Item2D item2D = cast(Item2D, item)
-            if scaledUp
-                item2D:SetScaleFromCenter(1.0)
-            else
-                item2D:SetScaleFromCenter(1.5)
-            end
-            scaledUp = not scaledUp
-            output item2D:GetName() + " + dq + " scaled to " + dq + " + item2D:GetScaleX() + " + dq + " times its normal size." + dq + "
-        end
-    end
-end")
-        Paragraph("Using these two Behaviors, we can specific functionality to specific kinds of items in our user interface. For example, suppose we would like to apply the RotationBehavior only to the square and the ScaleBehavior only to the circle. If this was our goal, we could use the SetInputGroup(text) action from our Drawables. The input groups are available to any Item, and are used to identify what InputTable should be applied to them. For our code, we'll set the following input groups:")
-        CodeExample("square:SetInputGroup(" + dq + "Square" + dq + ")
-circle:SetInputGroup(" + dq + "Circle" + dq + ")")
-        Paragraph("Now that we have set the input groups, we can make InputTables that correspond to them. When we create these tables, we'll use the SetIdentifier action in the InputTable. The important part is that we need to match these identifiers to the input groups of the Items we want them to correspond to, like so:")
-        CodeExample("InputTable squareTable
-squareTable:SetIdentifier(" + dq + "Square" + dq + ")
-InputTable circleTable
-circleTable:SetIdentifier(" + dq + "Circle" + dq + ")")
-        Paragraph("Once our tables are created and their identifiers are set, we can add our InputSets and Behaviors to them. To do this, we use the Game's AddInputTable action to add the tables to the Game. Note that we didn't need to do this for the default InputTable because it's already part of the Game, but these new tables must be added in order to tell our interface that we are adding a custom user interface component. When we do so, our main class looks like this:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Game.InputSet
-use Libraries.Interface.Events.KeyboardEvent
-use Libraries.Game.InputTable
-use Libraries.Game.Graphics.Drawable
-use Libraries.Game.Graphics.Color
-
-class Main is Game
-
-    InputSet spaceSet
-    KeyboardEvent keys
-
-    Color color
-    Drawable square
-    Drawable circle
-
-    action Main
-        StartGame()
+        Paragraph("A "):Strong("behavior"):Text(" is the code that runs. You may remember behaviors from the
+"):Link("Behaviors tutorial", "/tutorials/ui/behavior.html"):Text(". Every behavior has a
+"):Code("Run"):Text(" action, and the "):Code("BehaviorEvent"):Text(" it receives tells you which item had
+the focus.")
     end
 
-    action CreateGame
-        // Set up our InputSet to trigger when the spacebar is pressed.
-        spaceSet:SetKeyboardInput(keys:SPACE)
-
-        // Get the default InputTable from the Game.
-        InputTable defaultTable = GetDefaultInputTable()
-        
-        // Create our Behavior and make it trigger every time the spacebar is pressed.
-        OutputBehavior outputBehavior
-        defaultTable:Add(spaceSet, outputBehavior)
-
-        square:LoadFilledRectangle(100, 100, color:Orange())
-        square:SetName(" + dq + "Square" + dq + ")
-        square:SetFocusable(true)
-        square:SetPosition(200, 250)
-        Add(square)
-
-        circle:LoadFilledCircle(50, color:Purple())
-        circle:SetName(" + dq + "Circle" + dq + ")
-        circle:SetFocusable(true)
-        circle:SetPosition(500, 250)
-        Add(circle)
-        
-        // Setup our Drawables with the focus system.
-        square:SetNextFocus(circle)
-        square:SetPreviousFocus(circle)
-        circle:SetNextFocus(square)
-        circle:SetPreviousFocus(square)
-        SetFocus(square)
-
-        // Setup our Drawables' input groups and make InputTables with matching IDs.
-        square:SetInputGroup(" + dq + "Square" + dq + ")
-        circle:SetInputGroup(" + dq + "Circle" + dq + ")
-
-        InputTable squareTable
-        squareTable:SetIdentifier(" + dq + "Square" + dq + ")
-        InputTable circleTable
-        circleTable:SetIdentifier(" + dq + "Circle" + dq + ")
-
-        // Create our behaviors. In this example, we use the same InputSet from
-        // earlier for our square, and we'll use the Enter key for the circle.
-        RotationBehavior rotationBehavior
-        ScaleBehavior scaleBehavior
-        InputSet enterSet
-        enterSet:SetKeyboardInput(keys:ENTER)
-        squareTable:Add(enterSet, rotationBehavior)
-        circleTable:Add(enterSet, scaleBehavior)
-        
-        AddInputTable(squareTable)
-        AddInputTable(circleTable)
-    end
-end")
-        Paragraph("In our example, we use the same InputSet that we used previously for our OutputBehavior to trigger our RotationBehavior, while we use a new InputSet using the Enter key to trigger our Scale behavior.")
-        Paragraph("Notice, however, that when our square is focused, the spacebar no longer triggers the OutputBehavior. This is because the square's related InputTable has its own Behavior it triggers on spacebar presses, which takes priority over the default InputTable. For the circle, however, the spacebar still triggers the InputTable, because the circle's table does not intercept the spacebar.")
+    private action ABehaviorToRun
+        Subsection("A behavior to run")
+        Paragraph("Your first behavior writes out the name of the focused item. Add a new
+class named "):Code("OutputBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/OutputBehavior.quorum")
     end
 
-    private action InputTriggers
-        Section("Input Triggers")
-        Paragraph("When using InputTables, we may want to our Behaviors on different conditions. When using InputSets, we have three different "):DoubleQuote():Text("triggers"):DoubleQuote():Text(" that we can use to respond to input:")
+    private action AddingAKeyToTheDefaultTable
+        Subsection("Adding a key to the default input table")
+        Paragraph("Now make the game in "):Code("Main.quorum"):Text(". It has two shapes, an orange square and
+a purple circle. Each shape gets a name and a description, so a screen
+reader can say what it is. Shapes are not read by screen readers unless you
+give them an "):Strong("accessibility code"):Text(", so each shape also gets the code
+"):Code("ITEM"):Text(". Each shape can take the focus, and "):Key("Tab"):Text(" moves between them.")
+
+        Paragraph("The new part is at the end. The program makes an input set for the "):Key("Space"):Text("
+key, gets the default input table, and adds the input set with an
+"):Code("OutputBehavior"):Text(".")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/Main.quorum")
+
+        Paragraph("Run the program and press "):Key("Space"):Text(". The output says "):DoubleQuote():Text("Orange square has the
+focus."):DoubleQuote():Text(" Press "):Key("Tab"):Text(", then "):Key("Space"):Text(" again, and the output names the circle.
+With a screen reader running, "):Key("Tab"):Text(" also makes the screen reader say the
+shape's name.")
+
+        Paragraph():Code("KeyboardEvent"):Text(" holds a constant for every key, such as "):Code("keys:SPACE"):Text(",
+"):Code("keys:ENTER"):Text(" and "):Code("keys:R"):Text(". "):Code("ITEM"):Text(" is a constant of the "):Code("Item"):Text(" class, which
+a "):Code("Drawable"):Text(" inherits from, so the program reaches it through
+"):Code("square:parent:Item:ITEM"):Text(".")
+    end
+
+    private action GivingEachItemItsOwnKeys
+        Subsection("Giving each item its own keys")
+        Paragraph("The default input table is the same for every item. Often you want a key to
+do something different depending on what has the focus. In this part, the
+square turns when you press "):Key("Space"):Text(", and the circle grows or shrinks when
+you press "):Key("Enter"):Text(".")
+
+        Paragraph("Add two more behaviors to your project. The first turns the focused item by
+45 degrees. Put it in "):Code("RotationBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/RotationBehavior.quorum")
+
+        Paragraph("The second makes the item bigger, then back to normal, each time it runs.
+Put it in "):Code("ScaleBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/ScaleBehavior.quorum")
+
+        Paragraph("Now connect them. Three steps do it:")
+        NumberedList()
+        ListItem("Give each shape an "):Strong("input group"):Text(" with "):Code("SetInputGroup"):Text(".")
+        ListItem("Make an input table for each group, and name it with "):Code("SetIdentifier"):Text(".
+The name must match the input group exactly.")
+        ListItem("Add each table to the game with "):Code("AddInputTable"):Text(". The default input table
+is already part of the game, but new tables must be added.")
+
+        Paragraph("Here is the whole "):Code("Main.quorum"):Text(". The descriptions now tell a person which
+key to press:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/Main2.quorum")
+
+        BlockEditorFile("OutputBehavior.quorum", "html/sources/tutorials/ui/InputSet/OutputBehavior.quorum")
+        BlockEditorFile("RotationBehavior.quorum", "html/sources/tutorials/ui/InputSet/RotationBehavior.quorum")
+        BlockEditorFile("ScaleBehavior.quorum", "html/sources/tutorials/ui/InputSet/ScaleBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/InputSet/Main2.quorum", "", true, true)
+    end
+
+    private action WhichTableWins
+        Subsection("Which table wins?")
+        Paragraph("Try these keys and compare what happens with the order from the start of
+this tutorial:")
         BulletList()
-        ListItem():Strong("BEGIN"):Text(": The Behavior triggers as soon as the input is received, such as when a key is first pressed for keyboard events, or when the mouse begins to mouse over an Item for mouse movement events. This is the default trigger, and will be used if no other trigger is set.")
-        ListItem():Strong("FINISH"):Text(": The Behavior triggers when the input ends, such as when a key is released for keyboard events, or when the mouse moves off of an Item for mouse movement events.")
-        ListItem():Strong("CONTINUE"):Text(": The Behavior triggers as the input continues. For example, this will trigger on each frame of animation while a key is pressed for keyboard input, or trigger on each frame that the mouse is moving for a mouse movement event.")
-        Paragraph("To set an InputSet to trigger on one of these conditions, we use the SetInputTrigger action, providing it one of the above constants within the class, as shown here:")
-        CodeExample("InputSet enterSet
-enterSet:SetKeyboardInput(keys:ENTER)
-enterSet:SetInputTrigger(enterSet:CONTINUE)")
+        ListItem():Key("Space"):Strong(" on the square:"):Text(" the square turns. The "):DoubleQuote():Text("Square"):DoubleQuote():Text("
+table has "):Key("Space"):Text(", so Quorum stops there. "):Code("OutputBehavior"):Text(" does not run.")
+        ListItem():Key("Space"):Strong(" on the circle:"):Text(" the output names the circle. The "):DoubleQuote():Text("Circle"):DoubleQuote():Text("
+table has no "):Key("Space"):Text(", so Quorum falls back to the default input table.")
+        ListItem():Key("Enter"):Strong(" on the circle:"):Text(" the circle grows, or shrinks back.")
+        ListItem():Key("Enter"):Strong(" on the square:"):Text(" nothing happens. No table has "):Key("Enter"):Text(" for the
+square.")
+        ListItem():Key("Tab"):Strong(":"):Text(" the focus moves. Neither new table has "):Key("Tab"):Text(", so the default
+input table still handles it.")
     end
 
-    private action KeyboardModifiers
-        Section("Keyboard Modifiers")
-        Paragraph("When using InputSets on desktop platforms, we may also want to trigger Behaviors only if certain keyboard modifiers are being held down. For example, we may want to do something different if the user presses "):DoubleQuote():Text("space"):DoubleQuote():Text(" or "):DoubleQuote():Text("control-space,"):DoubleQuote():Text(" or if the user is holding down the shift key while clicking on something.")
-        Paragraph("The following keyboard modifiers may be used:")
+    private action OneBehaviorMoreThanOneKey
+        Subsection("One behavior, more than one key")
+        Paragraph("An input table can hold many input sets, and two input sets can run the
+same behavior. This is how a program offers a second key for the same job,
+or lets a person choose their own keys. Add these lines to "):Code("CreateGame"):Text(", and
+the "):Key("R"):Text(" key also turns the square:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/RKey.quorum")
+
+        Paragraph("To take a key away, use the table's "):Code("RemoveKey"):Text(" action with an input set for
+that key.")
+    end
+
+    private action Triggers
+        Subsection("Triggers: when a behavior runs")
+        Paragraph("Input has a beginning, a middle and an end. A key goes down, is held, and
+comes back up. The "):Strong("trigger"):Text(" chooses which of these moments runs the
+behavior. The triggers are constants in "):Code("InputSet"):Text(":")
         BulletList()
-        ListItem("SHIFT")
-        ListItem("ALT")
-        ListItem("CONTROL")
-        ListItem("META (Command on Mac, Windows key on Windows - Note that the Windows key is typically not allowed for user applications, as it is reserved for the operating system.)")
-        Paragraph("We can add modifiers to an InputSet using the AddModifier action, and remove modifiers with the RemoveModifier action. For example, the below code shows an example of how to set an InputSet to trigger on a control-left-click.")
-        CodeExample("MouseEvent mouse
-InputSet controlClick
-controlClick:SetMouseInput(mouse:LEFT)
-controlClick:AddModifier(controlClick:CONTROL)")
+        ListItem():Code("BEGIN"):Strong(":"):Text(" when the input starts, such as when a key is first pressed.
+This is the trigger an input set uses if you do not choose one.")
+        ListItem():Code("CONTINUE"):Strong(":"):Text(" on every frame while the input goes on, such as while a
+key is held down. This is useful for moving a character for as long as an
+arrow key is held.")
+        ListItem():Code("FINISH"):Strong(":"):Text(" when the input ends, such as when a key is let go.")
+        ListItem():Code("FINISH_UNCAUGHT"):Strong(":"):Text(" for keys only. When a key is let go, but only if it
+was not used as part of a key combination.")
+
+        Paragraph("Use "):Code("SetInputTrigger"):Text(" to choose one. Add these lines to "):Code("CreateGame"):Text(". Now
+the square keeps spinning for as long as the "):Key("Right Arrow"):Text(" key is held
+down:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/HoldRight.quorum")
     end
 
-    private action DoubleClickAndEventCounts
-        Section("Double-Click and EventCounts")
-        Paragraph("While using InputSets, we often trigger Behaviors only when an input occurs multiple times in short succession. This occurs most often with double-clicks, but can appear in other forms of input as well (e.g., double-taps on keyboard keys or a touch screen).")
-        Paragraph("By default, InputSets trigger on the first input, but we can adjust this using the SetEventCount action. For example, the below code can be used to create an InputSet that triggers on a double-left-click:")
-        CodeExample("MouseEvent mouse
-InputSet doubleClick
-doubleClick:SetMouseInput(mouse:LEFT)
-doubleClick:SetEventCount(2)")
+    private action ModifierKeys
+        Subsection("Modifier keys")
+        Paragraph("A "):Strong("modifier key"):Text(" is held down while you press another key or click. The
+modifiers are constants in "):Code("InputSet"):Text(":")
+        BulletList()
+        ListItem():Code("SHIFT"):Text(";")
+        ListItem():Code("CONTROL"):Text(", the "):Key("Ctrl"):Text(" key;")
+        ListItem():Code("ALT"):Text(", which is the "):Key("Option"):Text(" key on a Mac;")
+        ListItem():Code("META"):Text(", the "):Key("Command"):Text(" key on a Mac or the Windows key on Windows. Windows
+keeps most Windows key combinations for itself, so avoid "):Code("META"):Text(" there.")
+
+        Paragraph("Use "):Code("AddModifier"):Text(" to require one, and "):Code("RemoveModifier"):Text(" to take it away. This
+input set runs a behavior on "):Key("Ctrl"):Text("+click with the left mouse button:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/ControlClick.quorum")
+
+        Paragraph("A mouse input set needs a key that does the same thing, so it works from
+the keyboard too. When you add "):Code("controlClick"):Text(" to a table, add this input
+set for "):Keys("Ctrl", "Enter"):Text(" to the same table, with the same behavior:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/ControlEnter.quorum")
+
+        Paragraph("An input set with a modifier is a different input set from one without it.
+"):Keys("Shift", "Space"):Text(" and "):Key("Space"):Text(" can run different behaviors, even in the same
+table.")
+    end
+
+    private action DoubleClicksAndEventCounts
+        Subsection("Double-clicks and event counts")
+        Paragraph("Some input only counts when it happens quickly more than once, like a
+double-click. Use "):Code("SetEventCount"):Text(" to say how many times. This input set
+describes a double-click with the left mouse button:")
+        CodeExampleFromFile("sources/tutorials/ui/InputSet/DoubleClick.quorum")
+
+        Paragraph("The count can be from 1 to 4. As with "):Key("Ctrl"):Text("+click, a double-click needs
+a key too. Add "):Code("doubleClick"):Text(" and an input set for a key such as "):Key("Enter"):Text(" to
+the same table with the same behavior, as in "):DoubleQuote():Text("One behavior, more than one
+key"):DoubleQuote():Text(".")
+    end
+
+    private action KeysThatEveryoneCanUse
+        Subsection("Keys that everyone can use")
+        Paragraph("Input sets give you a lot of power over keys. Use it with care:")
+        BulletList()
+        ListItem():Strong("Leave "):Key("Tab"):Strong(" and "):Keys("Shift", "Tab"):Strong(" alone."):Text(" Keyboard and screen reader users
+move through a program with them. If you add "):Key("Tab"):Text(" to a table, that item
+may become a "):Strong("keyboard trap"):Text(": the focus goes in and cannot get out.")
+        ListItem():Strong("Give every mouse action a key too."):Text(" Some people cannot use a mouse. If
+a double-click opens something, a key such as "):Key("Enter"):Text(" should open it as
+well.")
+        ListItem():Strong("Say which keys to use."):Text(" Put the key in the item's description, as the
+program above does. A screen reader reads the description, and you can
+show the same words on screen.")
+        ListItem():Strong("Avoid keys Quorum already uses."):Text(" "):Key("Tab"):Text(", "):Keys("Shift", "Tab"):Text(", "):Keys("Shift", "F1"):Text(" and
+"):Key("Escape"):Text(" are in the default input table. If you add one of them to that
+table, your behavior takes its place in every part of the program.")
+        ListItem():Strong("Avoid keys the computer already uses."):Text(" Screen readers use many keys
+for themselves. For example, NVDA uses "):Key("Insert"):Text(" and VoiceOver uses
+"):Keys("Ctrl", "Option"):Text(".")
+
+        Paragraph("You can practice moving through programs without a mouse in
+"):Link("No-Mouse Practice", "/tutorials/accessibility/nomousepractice.html"):Text(".")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you design a new shape with its own keys for the game on
+this page, write a test plan for it before you try it, and then run the
+plan. The goal is to set up input groups and input tables, and to plan
+tests before trying a program. Add a third shape to the game, such as a
+filled rectangle of a different color. Give it a name, a description, the
+"):Code("ITEM"):Text(" accessibility code, and a place in the "):Key("Tab"):Text(" order. Then give the
+new shape its own input group and input table, with two keys. At least one
+key must use a modifier, such as "):Keys("Shift", "R"):Text(" to turn the other way with
+"):Code("Rotate(-45)"):Text(".")
+
+        Paragraph("Before you run the program, write a short test plan: for each shape, list
+each key, what should happen, and what should not happen, including keys
+that should do nothing. Then run the plan without touching the mouse, and
+mark each line "):DoubleQuote():Text("pass"):DoubleQuote():Text(" or "):DoubleQuote():Text("fail"):DoubleQuote():Text(". Fix any failures and run the plan again.
+Finally, add one change that lets a person use a second key for the same
+job, and add lines to your plan to test it. Then draw "):DoubleQuote():Text("Which table wins?"):DoubleQuote():Text("
+for one of your new keys as a flowchart or write it as pseudocode: which
+input table Quorum checks first, what happens when a key matches, and what
+happens when it doesn't. You may also be given a Parsons
+problem that asks you to put the lines of an input table setup in the right
+order.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Input sets and input tables let you decide what each key does, and where.
+Go back to your test plan. Which test found a problem you did not expect?
+If a person told you they could not press two keys at once, how would you
+change your program for them?")
     end
 end

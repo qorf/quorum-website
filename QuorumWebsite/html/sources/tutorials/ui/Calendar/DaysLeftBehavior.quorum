@@ -1,0 +1,33 @@
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.DateField
+use Libraries.System.CalendarDate
+
+class DaysLeftBehavior is FormBehavior
+    action Run(BehaviorEvent event)
+        Page page = GetPage()
+        DateField field = page:GetDateField("Project due date")
+        if field = undefined
+            return now
+        end
+
+        CalendarDate due = field:GetDate()
+        if due = undefined
+            output "Type a date such as March 12, 2027, or choose one from the calendar."
+            return now
+        end
+
+        CalendarDate today
+        today:SetToToday()
+        integer days = today:DaysUntil(due)
+        if days > 0
+            output "The project is due " + due:ToSpokenText() + ". That is " + days + " days from today."
+        elseif days = 0
+            output "The project is due today."
+        else
+            integer late = 0 - days
+            output "The due date was " + late + " days ago."
+        end
+    end
+end

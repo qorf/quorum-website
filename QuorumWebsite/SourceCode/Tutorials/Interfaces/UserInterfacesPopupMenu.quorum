@@ -1,0 +1,259 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Popup Menus, part of the user interface series.
+*/
+class UserInterfacesPopupMenu is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/popupMenu.html")
+        SetShortTitle("Popup Menus")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to make a Quorum popup menu, attach it to a control, open it from code or the keyboard, add a submenu, and make sure every command can be reached without a mouse.")
+
+        Title("Popup Menus")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("When you right-click a word in a word processor, or select it and press
+"):Keys("Shift", "F10"):Text(" or the Menu key on Windows, a small menu appears next to it, with commands like Cut, Copy and Paste. This is a
+"):Strong("popup menu"):Text(", also called a "):Strong("context menu"):Text(", because its commands fit
+the thing you are interacting with using the mouse or keyboard. Popup menus keep commands close to the content
+they change, without a menu bar. In this tutorial, you will attach a popup
+menu to a text field on a page, open one from a button, and add a submenu.
+You will also learn the keys that open a popup menu, and
+why a program should not hide a command only in a popup menu.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Create a "):Code("PopupMenu"):Text(" and fill it with "):Code("MenuItem"):Text(" commands")
+        ListItem("Attach a popup menu to a control with "):Code("SetPopupMenu"):Text(", so right-clicking or "):Keys("Shift", "F10"):Text(" opens it")
+        ListItem("Open a popup menu from your own code with "):Code("OpenAt")
+        ListItem("Explain how a keyboard or screen reader user reaches the commands in a popup menu")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Right-click (or "):Key("Ctrl"):Text("+click on a Mac) on three different things on your
+computer: a file, a word in a document, and an empty part of the desktop.
+On Windows, you can also select each one and press "):Keys("Shift", "F10"):Text(" or the Menu
+key instead. Write down which commands appear each time. Why are they different? Which
+way is faster for you: the mouse or the keys?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/PopupMenu/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/PopupMenu/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        PopupMenusAndMenuBars()
+        ABehaviorThatChangesText()
+        AttachingAPopupMenu()
+        OpeningWithTheKeyboard()
+        OpeningFromCode()
+        Submenus()
+    end
+
+    private action PopupMenusAndMenuBars
+        Subsection("Popup menus and menu bars")
+        Paragraph("A popup menu is built from the same "):Code("MenuItem"):Text(" objects as a menu bar, which
+you met in the "):Link("Menus", "/tutorials/ui/menu.html"):Text(" tutorial. The difference is
+where it lives:")
+        BulletList()
+        ListItem("a "):Strong("menu bar"):Text(" is always on screen, in a row of the page;")
+        ListItem("a "):Strong("popup menu"):Text(" is hidden until something opens it, appears on top of
+everything else, and closes as soon as a command is chosen, the user
+clicks somewhere else, or the user presses "):Key("Esc"):Text(" (keys below).")
+
+        Paragraph("You never add a popup menu to a page. You attach it to a control, and it
+shows itself when it opens.")
+    end
+
+    private action ABehaviorThatChangesText
+        Subsection("A behavior that changes text")
+        Paragraph("The commands in this tutorial change the text in a text field, which you
+met in the "):Link("Text Fields", "/tutorials/ui/textField.html"):Text(" tutorial. Add a new
+class named "):Code("ChangeTextBehavior"):Text(". It remembers which text field to
+change and what to do to it:")
+        CodeExampleFromFile("sources/tutorials/ui/PopupMenu/ChangeTextBehavior.quorum")
+    end
+
+    private action AttachingAPopupMenu
+        Subsection("Attaching a popup menu to a control")
+        Paragraph("Now replace "):Code("Main.quorum"):Text(". It adds a text field to the page, makes a popup
+menu with three commands, then attaches the menu to the field with
+"):Code("SetPopupMenu"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/PopupMenu/Main.quorum")
+
+        Paragraph("Run the program and right-click the text field, or press "):Key("Tab"):Text(" until the
+field has the focus and press "):Keys("Shift", "F10"):Text(". With a click, the menu opens
+where you clicked; with "):Keys("Shift", "F10"):Text(", it opens at the text cursor. Choose Uppercase, and the text changes. When the menu closes, the
+focus goes back to the text field.")
+
+        Paragraph("Notice that the text field's description tells the user that "):Keys("Shift", "F10"):Text("
+opens the options. A screen reader reads the description, so a user who
+cannot see the screen learns that the menu exists.")
+    end
+
+    private action OpeningWithTheKeyboard
+        Subsection("Opening a popup menu with the keyboard")
+        Paragraph("Many people open popup menus with the keyboard. People who don't use a
+mouse need the keys, and many others, such as programmers and other
+professionals who work mostly from the keyboard, use them because they are
+faster than reaching for the mouse. These keys open the popup menu attached to a control, when that control has the
+focus:")
+
+        Table("Keys that open a popup menu")
+        TableHeader():Cell("Control"):Cell("Keys that open its popup menu")
+        TableRowWriter fieldRow = TableRow()
+        fieldRow:Cell("Text field")
+        fieldRow:Cell():Text("Right-click, or "):Keys("Shift", "F10")
+        TableRowWriter boxRow = TableRow()
+        boxRow:Cell("Text box")
+        boxRow:Cell():Text("Right-click, "):Keys("Shift", "F10"):Text(", or "):Key("Ctrl"):Text("+click on a Mac")
+        TableRowWriter treeRow = TableRow()
+        treeRow:Cell("Tree")
+        treeRow:Cell():Text("Right-click, "):Keys("Shift", "F10"):Text(", or "):Key("Ctrl"):Text("+click on a Mac")
+        TableRowWriter buttonRow = TableRow()
+        buttonRow:Cell("Button")
+        buttonRow:Cell():Text("Right-click, or "):Key("Ctrl"):Text("+click on a Mac")
+
+        Paragraph("With the mouse, the menu opens where you clicked. With "):Keys("Shift", "F10"):Text(", it
+opens at the text cursor.")
+
+        Paragraph("Once a popup menu is open, it has the keyboard focus, but nothing in it is
+chosen yet. Press "):Key("Down"):Text(" or "):Key("Up"):Text(" first, then use these keys:")
+
+        Table("A popup menu's keys")
+        TableHeader():Cell("Key"):Cell("What it does")
+        TableRowWriter downRow = TableRow()
+        downRow:Cell():Key("Down arrow")
+        downRow:Cell("Chooses the first item or moves down one item.")
+        TableRowWriter upRow = TableRow()
+        upRow:Cell():Key("Up arrow")
+        upRow:Cell("Chooses the last item or moves up one item.")
+        TableRowWriter rightRow = TableRow()
+        rightRow:Cell():Key("Right arrow")
+        rightRow:Cell("Opens the submenu of the chosen item.")
+        TableRowWriter leftRow = TableRow()
+        leftRow:Cell():Key("Left arrow")
+        leftRow:Cell("Closes the submenu and goes back to its parent item.")
+        TableRowWriter enterRow = TableRow()
+        enterRow:Cell():Key("Enter"):Text(" or "):Key("Space")
+        enterRow:Cell("Runs the chosen command or opens the chosen submenu.")
+        TableRowWriter escapeRow = TableRow()
+        escapeRow:Cell():Key("Esc")
+        escapeRow:Cell("Closes the submenu or closes the popup menu.")
+
+        Paragraph("Check the Button row of the first table. A button has no key that opens
+its popup menu. If you attach a popup menu to a button, anyone using the
+keyboard cannot reach it. This is why a program should never put a command "):Strong("only"):Text("
+in a popup menu. Next, you will fix this by opening the menu from your own
+code.")
+    end
+
+    private action OpeningFromCode
+        Subsection("Opening a popup menu from code")
+        Paragraph("Any behavior can open a popup menu with "):Code("OpenAt(x, y)"):Text(". The numbers are a
+"):Strong("global position"):Text(", measured from the corner of the window, and the menu
+opens with its top-left corner there. A button's "):Code("GetGlobalX"):Text(" and
+"):Code("GetGlobalY"):Text(" give the global position of its bottom-left corner, so the
+menu opens just below the button. Make a class named "):Code("OpenMenuBehavior"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/PopupMenu/OpenMenuBehavior.quorum")
+
+        Paragraph("Then add a "):DoubleQuote():Text("Text options"):DoubleQuote():Text(" button to the page. Add
+"):Code("use Libraries.Interface.Controls.Button"):Text(" to the top of "):Code("Main"):Text(", and put
+these lines just after "):Code("field:SetPopupMenu(menu)"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/PopupMenu/ButtonLines.quorum")
+
+        Paragraph("Now the same menu opens three ways: right-clicking the field or the button,
+pressing "):Keys("Shift", "F10"):Text(" in the field, or pressing the button with a click,
+"):Key("Space"):Text(" or "):Key("Enter"):Text(". Every user can reach every command. The page puts the
+button in the "):Key("Tab"):Text(" order after the field, so a keyboard user finds it by
+pressing "):Key("Tab"):Text(".")
+
+        BlockEditorFile("ChangeTextBehavior.quorum", "html/sources/tutorials/ui/PopupMenu/ChangeTextBehavior.quorum")
+        BlockEditorFile("OpenMenuBehavior.quorum", "html/sources/tutorials/ui/PopupMenu/OpenMenuBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/PopupMenu/Main2.quorum", "", true, true)
+    end
+
+    private action Submenus
+        Subsection("Submenus in a popup menu")
+        Paragraph("A popup menu can hold submenus too, built just like the submenus in a
+menu bar. Add the submenu to the popup menu first, then add its commands.
+This version of the menu lines in "):Code("Main"):Text(" puts the two case commands in a
+"):DoubleQuote():Text("Change case"):DoubleQuote():Text(" submenu:")
+        CodeExampleFromFile("sources/tutorials/ui/PopupMenu/SubmenuLines.quorum")
+
+        Paragraph("Keep popup menus short. A long menu is slow to read with a screen reader
+and hard to use on a small screen. Usually, three to seven commands is
+plenty.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you add a popup menu to a program you've already written,
+and check on your own that it works with the mouse and with the keyboard.
+The goal is to choose commands that fit a control's context, and to give
+everyone a clear way to reach them. Pick a control from one of your earlier programs, such
+as a list or a text box, and write down three commands that would make
+sense in its context menu. Then add a popup menu with those commands. Make
+sure every command can also be reached without a mouse, with "):Keys("Shift", "F10"):Text(" or
+a button that calls "):Code("OpenAt"):Text(".")
+
+        Paragraph("When it works, test it both ways, with the mouse and with the keyboard, using
+this self-check. Write
+yes or no for each line, and what you did to find out:")
+        BulletList()
+        ListItem("I can reach the control with "):Key("Tab"):Text(", and open its menu with "):Keys("Shift", "F10"):Text(".")
+        ListItem("I can choose every command with the arrow keys and "):Key("Enter"):Text(".")
+        ListItem("After a command runs, the focus is back on the control.")
+        ListItem("The control's description tells a person that it has a menu, and how to
+open it.")
+        ListItem("Every command in the menu can also be reached some other way, such as a
+button or a menu bar.")
+
+        Paragraph("For each "):DoubleQuote():Text("no"):DoubleQuote():Text(", change your program and write down what you changed and
+why. Then run the whole self-check again.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Popup menus are fast for people who know they are there, with the mouse or
+the keyboard, and nearly invisible to everyone else.
+How does a user learn that a popup menu exists? Name two ways your program
+can tell them.")
+
+        Paragraph("The next tutorial covers "):Link("Toolbars", "/tutorials/ui/toolbar.html"):Text(", a row of
+buttons for the commands people use most.")
+    end
+end

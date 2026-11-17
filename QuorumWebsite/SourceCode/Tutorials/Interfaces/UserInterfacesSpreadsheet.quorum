@@ -1,146 +1,438 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: Spreadsheet.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Spreadsheets, part of the user interface series.
 */
 class UserInterfacesSpreadsheet is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/spreadsheet.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("Spreadsheet")
+        SetShortTitle("Spreadsheets")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about Spreadsheets in the Quorum programming language.")
-        SetSummary("how to use Spreadsheets")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("Spreadsheet Tutorial - Quorum Programming Language")
-        Title("Tutorial: Spreadsheet")
-        Paragraph("This tutorial tells you how to use Spreadsheets in Quorum")
-        IntroductionToSpreadsheetsInQuorum()
-        MakingASmallSpreadsheet()
-        CellBehavior()
-        SpreadsheetsAndLayouts()
-        TryMakingAUserInterface()
+        // For search engines and link previews.
+        SetDescription("How to add a spreadsheet to a Quorum form page, load CSV data into it, use it from the keyboard, read and change its cells from code to clean up messy data, and think about how cleaning choices change results.")
+
+        Title("Spreadsheets")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action IntroductionToSpreadsheetsInQuorum
-        Section("Introduction to Spreadsheets in Quorum")
-        Paragraph("In Quorum, a Spreadsheet is an interface component that allows for organizing and displaying interactive data in the form of a Table. Although the Spreadsheet does not actually hold the data, like a Tree or MenuBar, the Spreadsheet class is simply a view of the data. The data of a Spreadsheet is stored in Cells which are stored in Columns and Spreadsheets display Columns.")
-        Subsection("Cells and Columns")
-        Paragraph("The data found in a Spreadsheet is stored in a Cell. A Cell is an interface component that holds Text and can have its own behavior for when the Cell is activated. Cells are what the user can see and interact with in the Game. A Column is another interface tool that is used to organize Cells. When a Cell is added to a Column then that new Cell will be displayed below the previous cell in that column and new will continue to run down vertically. Columns can then be added to a Spreadsheet. Columns run horizontally so a new Column will be to the right of the next one. With Columns added a Spreadsheet can now display data.")
-        Paragraph("We will be making a small four cell spreadsheet in this tutorial. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("A "):Strong("spreadsheet"):Text(" shows data in a grid of rows and columns, like a table
+in a book or a sheet in a spreadsheet app. Each box in the grid is a
+"):Strong("cell"):Text(". Spreadsheets are a good fit for data where every row has the
+same kinds of facts, such as survey answers, sports statistics or sales.
+Real data is often messy: the same answer is typed in different ways, some
+answers are missing, and some have extra spaces. In this tutorial, you will
+load some practice survey answers into a spreadsheet on a page, move around
+it with the keyboard, clean up its messy values by hand and with code, and
+save them to a file.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a spreadsheet to a page and load CSV data into it")
+        ListItem("Move around, select and edit cells with the keyboard and the mouse")
+        ListItem("Read and change cells from code to clean up text data")
+        ListItem("Find and replace text, undo changes, and save a file")
+        ListItem("Compare how cleaning choices change results, and summarize a cleanup")
     end
 
-    private action MakingASmallSpreadsheet
-        Section("Making a Small Spreadsheet")
-        Paragraph("To use Spreadsheets you will need to include three different use statements. There are three because other than the Spreadsheet library, you will need the Column and Cell Libraries. The three use statements are shown below:")
-        CodeExample("use Libraries.Interface.Controls.Spreadsheet
-use Libraries.Interface.Controls.Column
-use Libraries.Interface.Controls.Cell")
-        Paragraph("We will start by making a spreadsheet that only has one Cell. In most cases a Spreadsheet will have more than one Cell but if you know how to add one Cell correctly than you can add as many as you want using the same method.")
-        Paragraph("First, you need to declare a Spreadsheet, a Column, and a Cell. Next, we will set the text of the Cell and the position of the Spreadsheet. Lastly, we will Add the Cell to the Column, Add the Column to the Spreadsheet, and then Add the Spreadsheet to the Game. We will also SetFocus to the Spreadsheet to make our application "):Strong("accessible"):Text(". The following code block shows how to do all of this and the code will be in the CreateGame action:")
-        CodeExample("Spreadsheet sheets
-Column colA
-Cell cellA_1
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about a table you have used, such as a class schedule, a sports
+standings table or a bus timetable. How do you find one value in it? You
+probably go across a row and down a column until they meet. Now imagine
+the table was filled in by many different people. One person writes
+"):DoubleQuote():Text("ninth"):DoubleQuote():Text(", another writes "):DoubleQuote():Text("9"):DoubleQuote():Text(", and another leaves the box empty. What
+problems would that cause if you wanted to count how many people are in
+each grade? What could you do about the empty box?")
 
-cellA_1:SetText(" + dq + "A1" + dq + ")
-sheets:SetPosition(200, 300)
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Spreadsheet/Vocabulary.csv")
 
-colA:Add(cellA_1)
-sheets:Add(colA)
-SetFocus(sheets)
-Add(sheets)")
-        Paragraph("Now if you run the program there will be a single cell on the screen and the text for the Cell will be "):DoubleQuote():Text("A1"):DoubleQuote():Text(" Interacting with it you will also notice how Cells can be selected and they can also be activated and run a Behavior which we will do so in the next section. To show Cell behaviors in action we will add 3 more cells and and a Column so the Spreadsheet becomes a 4 by 4 grid. The full main class with the 4 cells is provided in the code block below:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Interface.Controls.Spreadsheet
-use Libraries.Interface.Controls.Column
-use Libraries.Interface.Controls.Cell
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Spreadsheet/Code.csv")
 
-class Main is Game
-
-    action Main
-        StartGame()
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_23)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_DATA_SCIENCE_29)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_INVESTIGATION_27)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_HISTORY_OF_COMPUTING_39)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_22)
+        StandardsList(computerScience)
     end
 
-    action CreateGame
-    //declarations
-        Spreadsheet sheets
-        Column colA
-        Column colB
-        Cell cellA1
-        Cell cellA2
-        Cell cellB1
-        Cell cellB2
-
-    //setting up cells
-        cellA1:SetText(A1)
-        cellA2:SetText(" + dq + "A2" + dq + ")
-        cellB1:SetText(" + dq + "B1" + dq + ")
-        cellB2:SetText(" + dq + "B2" + dq + ")
-
-    //position spreadsheet
-        sheets:SetPosition(200, 300)
-
-    //Add children where needed
-        colA:Add(cellA1)
-        colA:Add(cellA2)
-        colB:Add(cellB1)
-        colB:Add(cellB2)
-        sheets:Add(colA)
-        sheets:Add(colB)
-        SetFocus(sheets)
-        Add(sheets)
+    action Explore
+        Section("Explore")
+        CodingASpreadsheet()
+        History()
+        PracticeData()
+        LoadingTheData()
+        UsingTheKeyboard()
+        ScreenReaders()
+        ReadingCells()
+        CleaningWithCode()
+        MissingGrade()
+        DifferentChoices()
+        MoreThings()
     end
 
-    action Update(number seconds)
-    end
-end")
+    private action CodingASpreadsheet
+        Subsection("Coding a spreadsheet")
+        Paragraph("A "):Code("Spreadsheet"):Text(" shows rows of text in a grid. Across the top are
+column letters: A, B, C and so on. Down the left side are row numbers,
+starting at 1. Together, a letter and a number name a cell, such as C2.")
+
+        Paragraph("Two things are different from the spreadsheet apps you may know:")
+
+        BulletList()
+        ListItem():Strong("Every value is text."):Text(" A cell holding 10 holds the characters "):DoubleQuote():Text("1"):DoubleQuote():Text(" and
+"):DoubleQuote():Text("0"):DoubleQuote():Text(", not a number. There are no formulas, no sorting, no number types and
+no charts. A Quorum spreadsheet is for exploring data, organizing it and
+fixing it.")
+        ListItem():Strong("Code counts from 0."):Text(" In your program, the first row is row 0 and the
+first column is column 0. So the cell a person knows as C2 is row 1,
+column 2 in code. The action "):Code("GetCellName"):Text(" turns one into the other for
+you.")
+
+        Paragraph("A spreadsheet reads and writes "):Strong("CSV files"):Text(". In a browser, writing a file downloads it to your computer.
+A CSV file is plain text, with
+one row per line and commas between the values. Most spreadsheet apps can
+save a CSV file, so it's an easy way to move data between programs.")
     end
 
-    private action CellBehavior
-        Section("Cell Behavior")
-        Paragraph("Spreadsheets also allow to give Cells an activation behavior. This behavior will run when a Cell is double-clicked or with the Spacebar when in focus. Like with "):Link("Lists", "/tutorials/ui/list.html"):Text(", Cells can have their own behavior specific to that Cell but the Spreadsheet also has a default Cell Activation Behavior that will Run if the specific Cell being activated does not have its own Behavior.")
-        Paragraph("We will make a default Cell Activation Behavior for the Spreadsheet so to start, make a new Quorum class and we will name it "):DoubleQuote():Text("OutputBehavior.quorum."):DoubleQuote()
-        Paragraph("OutputBehavior will need the Cell and Speech Libraries and will override the Run action. In the Run action all that we need is a call to event’s GetItem which we will cast to a Cell object. Then we will then output and then use a speech object to say the Text of the Cell using the Cell’s GetText action. The full behavior is shown in the code block below:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Controls.Cell
-use Libraries.Sound.Speech
+    private action History
+        Subsection("A short history of spreadsheets")
+        Paragraph("VisiCalc, released in 1979 by a company named Software Arts, was the first
+spreadsheet program for personal computers. Dan Bricklin built a first
+version while studying business at Harvard, and Bob Frankston joined him to
+write it for the Apple II computer. It became a "):DoubleQuote():Text("killer app"):DoubleQuote():Text(": many people
+bought an Apple II just to run VisiCalc, and spreadsheets from Lotus,
+Microsoft and others followed
+("):Link("source", "https://www.computerhistory.org/revolution/personal-computers/17/305"):Text(").")
 
-class OutputBehavior is Behavior
-    action Run(BehaviorEvent event)
-        Cell item = cast(Cell, event:GetItem())
-        output item:GetText()
-        Speech speech
-        speech:Say(item:GetText())
-    end
-end")
-        Paragraph("With the completed Behavior we can return to the Main class and append to the CreateGame action the declaration for the behavior and then setting the Behavior to the Spreadsheet. This is done with the following lines of code:")
-        CodeExample("OutputBehavior behavior
-sheets:SetCellActivationBehavior(behavior)")
-        Paragraph("Now when you run the program, activating a Cell will cause the game to say and output the text of that Cell.")
+        Paragraph("Think about the impacts of that one program. What do you think people
+hoped it would do for them? What changed that no one may have planned, such
+as who started buying computers, which jobs changed, or how many important
+decisions now rest on data typed into a grid by hand?")
     end
 
-    private action SpreadsheetsAndLayouts
-        Section("Spreadsheets and Layouts")
-        Paragraph("Spreadsheets are Controls so they have their own LayoutProperties, but if you want to resize or change how the table looks you would do that through the Columns and Cells. By default the Cells are sized to fit the width of the Column and the height of the Font. Columns have a default PixelWidth of 100 and are set to fit the height of its contents. To learn more about sizing with LayoutProperties it is covered in the Layout tutorial, but some example action calls that size the Columns and Cells are given below:")
-        CodeExample("colA:SetPixelWidth(300)
-colB:SetPixelWidth(200)
-cellA1:SetPercentageWidth(0.5)
-cellB2:SetFontSize(30)")
+    private action PracticeData
+        Subsection("The practice data")
+        Paragraph("The data on this page is made up for practice. It is not a real survey.
+Imagine that six students filled in a form for a school club fair, and
+the answers were saved as CSV text. Your program will hold this text
+itself, so it runs anywhere, including in a web browser:")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/Survey.csv", "")
+
+        Paragraph("Examine it closely. This small file already has several data quality problems:")
+
+        BulletList()
+        ListItem("Ben's grade is written as a word, "):DoubleQuote():Text("ninth"):DoubleQuote():Text(", and everyone else's is a
+number.")
+        ListItem("Cai's grade has a space before the 10, and Dee's club has a space after
+"):DoubleQuote():Text("robotics"):DoubleQuote():Text(".")
+        ListItem("The clubs are written with different capital letters: Chess and chess,
+ART and Art.")
+        ListItem("Eli's grade is missing.")
     end
 
-    private action TryMakingAUserInterface
-        Section("Try making a User Interface")
-        CodeEditorFromProject("Activity: Spreadsheet", "Spreadsheet.quorum", "examples/UserInterface/Spreadsheet/Main.quorum")
+    private action LoadingTheData
+        Subsection("Loading the data on a page")
+        Paragraph("Replace the code in "):Code("Main.quorum"):Text(" with this program:")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/Main.quorum")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        Paragraph("This program is built the same way as the last program in the
+"):Link("Trees tutorial", "/tutorials/ui/tree.html"):Text(":")
+
+        BulletList()
+        ListItem():Code("class Main is Form"):Text(" makes the program itself a form, and "):Code("Display()"):Text("
+opens the window.")
+        ListItem("A spreadsheet needs the window to be open, so the page is built in
+"):Code("CreateGame"):Text(", which Quorum calls once the window is open.")
+        ListItem():Code("parent:Form:CreateGame()"):Text(" lets the form finish its own setup: it shows
+the page and gives the first control the focus.")
+        ListItem():Code("survey"):Text(" holds the practice data as text, one row per line with commas
+between the values. A text value can go on for several lines, as long as
+it starts and ends with a quotation mark.")
+        ListItem():Code("page:AddSpreadsheet(" + quote + "Club survey" + quote + ")"):Text(" adds an empty spreadsheet. The
+spreadsheet is as wide as the page, with a set height; it scrolls when
+the data doesn't fit. "):DoubleQuote():Text("Club survey"):DoubleQuote():Text(" is the name a screen reader uses for
+it.")
+        ListItem():Code("LoadFromCommaSeparatedValue(survey)"):Text(" fills the spreadsheet from the
+text.")
+
+        Paragraph("Run the program. The spreadsheet shows the six students and the header row,
+plus some empty rows and columns after them to type into.")
+    end
+
+    private action UsingTheKeyboard
+        Subsection("Using a spreadsheet with the keyboard")
+        Paragraph("The keys work like the keys in popular spreadsheet apps. On a Mac, use
+"):Key("Command"):Text(" wherever this list says "):Key("Ctrl"):Text(", except for "):Keys("Ctrl", "Space"):Text(", which is
+"):Key("Ctrl"):Text(" on every computer.")
+
+        Paragraph():Strong("Moving around:")
+
+        BulletList()
+        ListItem("The arrow keys move one cell.")
+        ListItem():Key("Ctrl"):Text(" with an arrow key jumps to the edge of the data in that direction.")
+        ListItem():Key("Home"):Text(" goes to the start of the row. "):Keys("Ctrl", "Home"):Text(" goes to the first cell,
+and "):Keys("Ctrl", "End"):Text(" to the last cell with data.")
+        ListItem():Key("Page Up"):Text(" and "):Key("Page Down"):Text(" move one screen.")
+        ListItem():Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(" move right and left. "):Key("Enter"):Text(" and "):Keys("Shift", "Enter"):Text("
+move down and up.")
+
+        Paragraph():Strong("Selecting:")
+
+        BulletList()
+        ListItem():Key("Shift"):Text(" with an arrow key, "):Key("Home"):Text(", "):Key("Page Up"):Text(" or "):Key("Page Down"):Text(" makes the
+selection bigger.")
+        ListItem():Keys("Shift", "Space"):Text(" selects the whole row, "):Keys("Ctrl", "Space"):Text(" the whole column, and
+"):Keys("Ctrl", "A"):Text(" everything.")
+
+        Paragraph():Strong("Editing:")
+
+        BulletList()
+        ListItem("Typing replaces the cell's text with what you type. "):Key("F2"):Text(" edits the text
+that is already there.")
+        ListItem("While you edit, "):Key("Enter"):Text(", "):Key("Tab"):Text(", "):Keys("Shift", "Enter"):Text(" and "):Keys("Shift", "Tab"):Text(" keep your
+change and move. "):Key("Escape"):Text(" cancels it.")
+        ListItem():Key("Delete"):Text(" and "):Key("Backspace"):Text(" clear the selected cells.")
+        ListItem():Keys("Ctrl", "Plus"):Text(" adds rows or columns, and "):Keys("Ctrl", "Minus"):Text(" removes them. With
+whole rows or columns selected, it adds or removes those. With cells
+selected, a menu asks which.")
+        ListItem():Keys("Ctrl", "C"):Text(", "):Keys("Ctrl", "X"):Text(" and "):Keys("Ctrl", "V"):Text(" copy, cut and paste.")
+        ListItem():Keys("Ctrl", "Z"):Text(" undoes. "):Keys("Ctrl", "Y"):Text(" or "):Keys("Ctrl", "Shift", "Z"):Text(" redoes.")
+        ListItem():Keys("Shift", "F10"):Text(" opens a menu with these commands and more.")
+
+        Paragraph():Strong("With the mouse:"):Text(" drag across cells to select them. Click a column's
+letter or a row's number to select the whole column or row. Drag the right
+edge of a column's letter to make it wider or narrower, or double-click the
+edge to fit the column to its text. Right-click to open the menu. On a Mac,
+"):Key("Control"):Text("-click works too.")
+
+        Paragraph("Each of these has a keyboard way in the lists above: "):Key("Shift"):Text(" with an arrow
+key selects like a drag, "):Keys("Ctrl", "Space"):Text(" and "):Keys("Shift", "Space"):Text(" select like
+clicking a letter or a number, and "):Keys("Shift", "F10"):Text(" opens the menu. To fit a
+column from the keyboard, press "):Keys("Ctrl", "Space"):Text(" to select it, press
+"):Keys("Shift", "F10"):Text(", press "):Key("Down"):Text(" until "):DoubleQuote():Text("Fit column width"):DoubleQuote():Text(" is chosen, and press
+"):Key("Enter"):Text(". Dragging a column to a width of your own choosing has no keyboard
+way yet.")
+
+        Paragraph("Try it now. Fix Ben's grade by hand: move to B3, type "):Code("9"):Text(", and press
+"):Key("Enter"):Text(". Then press "):Keys("Ctrl", "Z"):Text(" to undo it, and "):Keys("Ctrl", "Y"):Text(" to put it back.")
+
+        Paragraph("This changes the spreadsheet only while the program is running. In a
+browser, nothing is written back: run the program again and Ben's grade
+says "):DoubleQuote():Text("ninth"):DoubleQuote():Text(" again, because it comes from the text in your program.")
+    end
+
+    private action ScreenReaders
+        Subsection("Spreadsheets and screen readers")
+        Paragraph("A screen reader treats the spreadsheet as a table. Moving to a cell reads
+its text and its name: a cell holding 71 in C2 is read as "):DoubleQuote():Text("71, C2"):DoubleQuote():Text(".
+Selecting a range reads the range, such as "):DoubleQuote():Text("D3 through E5 selected"):DoubleQuote():Text(".")
+    end
+
+    private action ReadingCells
+        Subsection("Reading cells from code")
+        Paragraph("Your program can read every cell. "):Code("GetRowSize"):Text(" says how many rows there
+are, and "):Code("GetText(row, column)"):Text(" returns one cell's text. Add this code to
+"):Code("CreateGame"):Text(", just before "):Code("parent:Form:CreateGame()"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/ReadCells.quorum")
+
+        Paragraph("The loop starts at row 1 to skip the header row. Run the program. The
+output shows a line for each student, such as "):DoubleQuote():Text("Ben is in grade ninth
+(cell B3)"):DoubleQuote():Text(". Find the line for Eli. What does "):Code("GetText"):Text(" return for a cell
+with nothing in it?")
+    end
+
+    private action CleaningWithCode
+        Subsection("Cleaning the data with code")
+        Paragraph("Fixing six rows by hand is fine. Fixing six thousand is not. Code can do
+the same fixes on every row. This version adds a "):Strong("Clean Up"):Text(" button that:")
+
+        BulletList()
+        ListItem("removes spaces from the start and end of every grade and club, with
+"):Code("Trim"):Text(";")
+        ListItem("writes every club in small letters, with "):Code("ToLowerCase"):Text(", so Chess, chess
+and CHESS all become chess;")
+        ListItem("replaces every cell that says exactly "):DoubleQuote():Text("ninth"):DoubleQuote():Text(" with "):DoubleQuote():Text("9"):DoubleQuote():Text(", with
+"):Code("ReplaceAll"):Text(".")
+
+        Paragraph("First, add a new class to the project named "):Code("CleanBehavior.quorum"):Text(". It
+comes from "):Code("FormBehavior"):Text(", which gives it the "):Code("GetPage"):Text(" action, so it can
+find the spreadsheet by its name with "):Code("GetSpreadsheet"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/CleanBehavior.quorum")
+
+        Paragraph("Then add a class named "):Code("SaveBehavior.quorum"):Text(". Saving writes a file, so it
+works on a computer and in a browser. In a browser, the file is
+downloaded, as files from a web page usually are:")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/SaveBehavior.quorum")
+
+        Paragraph("Last, change "):Code("Main.quorum"):Text(" to this:")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/Main2.quorum")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        Paragraph("Here is what is new:")
+
+        BulletList()
+        ListItem():Code("Trim"):Text(" and "):Code("ToLowerCase"):Text(" are actions on text. Each returns a new text,
+so the code stores the result and hands it to "):Code("SetText"):Text(".")
+        ListItem("In "):Code("ReplaceAll(" + quote + "ninth" + quote + ", " + quote + "9" + quote + ", false, true)"):Text(", "):Code("false"):Text(" means capital letters
+don't matter, so "):DoubleQuote():Text("Ninth"):DoubleQuote():Text(" would match too. "):Code("true"):Text(" means only cells whose
+whole text is "):DoubleQuote():Text("ninth"):DoubleQuote():Text(" change, so a club named "):DoubleQuote():Text("ninth grade band"):DoubleQuote():Text(" would
+be left alone.")
+        ListItem():Code("Save(file)"):Text(" writes the spreadsheet to "):Code("Survey.csv"):Text(". Values you didn't
+change are written exactly as they were. On a computer, the file is
+  saved in your program's folder. In a browser, it is downloaded.")
+
+        Paragraph("Run the program and press "):Strong("Clean Up"):Text(". Notice how the clubs and grades change.
+Then press "):Keys("Ctrl", "Z"):Text(" in the spreadsheet. The "):DoubleQuote():Text("ninth"):DoubleQuote():Text(" comes back, because
+"):Code("ReplaceAll"):Text(" can be undone. The "):Code("SetText"):Text(" changes stay: changes your
+program makes with "):Code("SetText"):Text(" can't be undone. Changes a person makes, and
+"):Code("Replace"):Text(" and "):Code("ReplaceAll"):Text(", can.")
+
+        Paragraph("The Clean Up button saves nothing. When you are happy with the data, press "):Strong("Save"):Text(". To start over with the original data, run the program again.")
+
+        BlockEditorFile("CleanBehavior.quorum", "html/sources/tutorials/ui/Spreadsheet/CleanBehavior.quorum")
+        BlockEditorFile("SaveBehavior.quorum", "html/sources/tutorials/ui/Spreadsheet/SaveBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Spreadsheet/Main2.quorum", "", true, true)
+    end
+
+    private action MissingGrade
+        Subsection("What about the missing grade?")
+        Paragraph("Code can't fix everything. Eli's grade is empty, and no program can know
+what it should be. You have a few options, and each has a cost:")
+
+        BulletList()
+        ListItem("Leave it empty. Anyone counting grades must remember to skip it.")
+        ListItem("Write a word such as "):DoubleQuote():Text("unknown"):DoubleQuote():Text(", so everyone knows it is missing on
+purpose.")
+        ListItem("Ask Eli, and type in the real answer.")
+        ListItem("Remove Eli's row. Then Eli's club choice is lost too.")
+
+        Paragraph("To check a value across the whole spreadsheet, use "):Code("Find"):Text(". It moves to
+the next cell holding the text and returns "):Code("true"):Text(" if it found one. It
+doesn't find empty cells, so search for those with a loop and "):Code("GetText"):Text(", as
+in "):DoubleQuote():Text("Reading cells from code"):DoubleQuote():Text(".")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/Find.quorum")
+
+        Paragraph("The last "):Code("true"):Text(" means search forward. Use "):Code("false"):Text(" to search back.")
+    end
+
+    private action DifferentChoices
+        Subsection("Different choices, different results")
+        Paragraph("Every choice you make while cleaning data changes what the data says. Here
+is the practice survey after Clean Up, with each club counted:")
+
+        BulletList()
+        ListItem("chess: Ana and Ben, 2 people")
+        ListItem("robotics: Cai and Dee, 2 people")
+        ListItem("art: Eli and Fay, 2 people")
+
+        Paragraph("Now suppose someone removes Eli's row because the grade is missing. Art
+drops to 1 person, and a report might say "):DoubleQuote():Text("art is the least popular club."):DoubleQuote():Text("
+That conclusion comes from a cleaning choice, not from the students. Other
+choices work the same way. If one student had written "):DoubleQuote():Text("9th"):DoubleQuote():Text(" instead of
+"):DoubleQuote():Text("ninth"):DoubleQuote():Text(", the "):Code("ReplaceAll"):Text(" on this page would miss it, and grade 9 would
+seem smaller than it is. Choices like these can make data "):Strong("biased"):Text(": some
+people count less than others, without anyone meaning it. The same is true
+when data is used to train an AI model: the model learns from the data as
+it was cleaned, mistakes and all.")
+
+        Paragraph("That's why careful data workers keep a short record of their cleanup:")
+
+        BulletList()
+        ListItem("what they changed, and how many cells changed ("):Code("ReplaceAll"):Text(" returns the
+count);")
+        ListItem("what they couldn't fix, such as missing answers, and what they did
+about each;")
+        ListItem("what the data can't tell you because of those choices.")
+
+        Paragraph("A record like this lets someone else check the work, or make a different
+choice.")
+    end
+
+    private action MoreThings
+        Subsection("More things a program can do")
+        Paragraph("A few more actions are useful when you organize data:")
+        CodeExampleFromFile("sources/tutorials/ui/Spreadsheet/MoreActions.quorum")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        BulletList()
+        ListItem():Code("AddColumn(3)"):Text(" adds an empty column at column 3, which is column D.
+"):Code("AddRow(index)"):Text(" does the same for rows, and "):Code("RemoveColumnAt"):Text(" and
+"):Code("RemoveRowAt"):Text(" take them out. These four also clear the undo history.")
+        ListItem():Code("SetText(0, 3, " + quote + "Checked" + quote + ")"):Text(" gives the new column a header.")
+        ListItem():Code("FitColumnWidth(2)"):Text(" makes column C as wide as its longest text.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("The goal of this activity is to discover how two people's cleaning
+choices change what the same data says, and to summarize your cleanup. With
+a partner, write 8 to 10 rows of made-up CSV data about something your
+class could survey, such as favorite lunch, number of pets, or how you get
+to school. On purpose, make it messy the way real data is: write some
+answers in two different ways, add a few extra spaces, use different
+capital letters, leave two answers blank, and include one answer that could
+be read more than one way, such as "):DoubleQuote():Text("2 or 3"):DoubleQuote():Text(" for number of pets.")
+
+        Paragraph("Next, each of you cleans your own copy of the data, without talking about
+your choices. Put it in the spreadsheet program from this page in place of
+the survey text, fix some problems by hand, and change "):Code("CleanBehavior"):Text(" to
+fix the rest with code, such as a "):Code("ReplaceAll"):Text(" for each answer that was
+written two ways. Remember that changes in a running program are not
+written back in a browser, so write down your hand fixes as you make them.
+Then write a short cleanup record, as in "):DoubleQuote():Text("Different choices,
+different results"):DoubleQuote():Text(": what you changed, what you couldn't fix and what you
+did about it, and one thing your clean data can't tell you. Add a short
+"):Strong("data dictionary"):Text(" to it: for each column, its name, the kind of value it
+holds (such as a whole number or a word) and the values it may have, such
+as grades 9 to 12.")
+
+        Paragraph("Last, compare. For each answer, count how many people chose it in your file
+and in your partner's copy. Where the counts differ, find the choice that
+caused it. Together, write two or three sentences: which conclusion about
+your class would change depending on whose copy you used, and which copy
+you would trust more, and why?")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Cleaning data takes up a large part of real data work: as one researcher
+put it, "):DoubleQuote():Text("A huge amount of effort is spent cleaning data to get it ready for
+analysis"):DoubleQuote():Text(" (Hadley Wickham, "):DoubleQuote():Text("Tidy Data,"):DoubleQuote():Text(" "):Emphasis("Journal of Statistical Software"):Text(",
+2014, "):Link("source", "https://www.jstatsoft.org/article/view/v059i10/"):Text("). Every
+choice you make changes what the data can tell you. Think about the missing grade.
+Which option did you pick, and who could be affected by that choice? Why do
+you think the spreadsheet keeps every value as text, instead of guessing
+which values are numbers?")
+
+        Paragraph():Link("Next tutorial: Tab Panes", "/tutorials/ui/tabPane.html")
     end
 end

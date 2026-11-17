@@ -1,197 +1,386 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: Layout.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Layouts, part of the user interface series.
 */
 class UserInterfacesLayout is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/layout.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("Layout")
+        SetShortTitle("Layouts")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about Layouts in the Quorum programming language.")
-        SetSummary("how to use Layouts")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("Layout Tutorial - Quorum Programming Language")
-        Title("Tutorial: Layout")
-        Paragraph("This tutorial tells you how to use Layouts in Quorum")
-        AnIntroductionToLayoutsInQuorum()
-        LayingOutASimpleUI()
-        FlowLayout()
+        // For search engines and link previews.
+        SetDescription("How a Quorum form lays out its controls, how to give a grouping its own FlowLayout or GridLayout, how to place controls in a window with pixels and percentages in a ManualLayout, and what a resized window can and can't tell you about a phone.")
+
+        Title("Layouts")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToLayoutsInQuorum
-        Section("An Introduction to Layouts in Quorum")
-        Subsection("What is a Layout?")
-        Paragraph("In this tutorial, we will learn how to use Layouts in the Quorum Game Engine. Layouts are interface tools which tell a container where and how items in the game are shown on the screen.")
-        Paragraph("There are two main layouts that you can use:")
+    action Overview
+        Section("Overview")
+        Paragraph("A user interface has to fit on many screens: a large monitor, a small
+laptop, a phone, or a window that someone drags to a new size. A "):Strong("layout"):Text("
+is a set of rules that decides where each control goes and how big it is.
+Every form you have built so far used a layout without you writing one. In
+this tutorial, you will give part of a form its own layout, so that buttons
+wrap onto new lines or sit in a grid. You will also lay out a whole window
+yourself, with sizes in pixels and percentages that change when the window
+does.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Explain what a layout and a container are, and what a form's layout does
+for you")
+        ListItem("Give a "):Code("Grouping"):Text(" on a page its own layout")
+        ListItem("Arrange a row of controls that wraps with a "):Code("FlowLayout"):Text(", and a grid of
+controls with a "):Code("GridLayout")
+        ListItem("Position and size controls with pixels and with percentages in a
+"):Code("ManualLayout")
+        ListItem("Use "):Code("LayoutProperties"):Text(" to describe how a control is sized, including a
+different arrangement for narrow windows")
+        ListItem("Explain what resizing a window can and can't tell you about a phone or a
+desktop screen")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Open a website you use often. Make the browser window wide, and then slowly
+make it narrow. What stays the same size? What gets smaller? What moves to a
+new place, or disappears into a menu? Why do you think the designers made
+those choices?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Layout/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Layout/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following
+"):Link("2026 CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_15)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_15)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_HARDWARE_AND_SOFTWARE_30)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        CoversStandard(computerScience, computerScience:SPECIALTY_2_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_6)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        WhatIsALayout()
+        PixelsAndPercentages()
+        LayoutModes()
+        AboutLayoutProperties()
+        AGroupingWithItsOwnLayout()
+        TheToolbar()
+        TheNumberPad()
+        TheTabOrderOfAGrouping()
+        AWholeWindow()
+        StandingInForAPhone()
+    end
+
+    private action WhatIsALayout
+        Subsection("What is a layout?")
+        Paragraph("Every control lives inside a "):Strong("container"):Text(". A page is a container, and so
+is a grouping, a game window, or any "):Code("Control"):Text(" that you add other items to.
+A container can have a "):Strong("layout"):Text(", which is an object that positions and
+sizes the items inside it. When the window changes size, the layout
+arranges everything again.")
+
+        Paragraph("A form page already has a layout. It puts each control in its own row, from
+top to bottom, centers the rows, and makes them 80% as wide as the page. It
+pairs a label with the field after it, and it puts the controls in a
+grouping side by side. That is why your forms have been tidy without any
+layout code, and why they still work when the window is narrow.")
+
+        Paragraph("Sometimes you want a different arrangement for one part of a page, such as
+a toolbar or a number pad. Quorum's library has many layout classes, but
+most are built for one kind of control. For example, "):Code("ButtonLayout"):Text("
+arranges the text and icon inside a button. Three layouts are meant for
+your own programs:")
         BulletList()
-        ListItem():Strong("ManualLayout"):Text(" – Layout where the positions and size of an item is defined by the item itself. This layout has no extra features and allows items to render where and how they want.")
-        ListItem():Strong("FlowLayout"):Text(" – Layout where items have control of their sizes but not their positions. This layout has all the objects contained inside it start from the top left of the container and flow to the right. If the items overflow the width of the container, then they will by default flow onto another line.")
-        Subsection("What are LayoutProperties?")
-        Paragraph("LayoutProperties are interface tools which allow you to preset how an Item2D, such as a Button or Icon, appears in the game. Controls like Buttons, Menus, and Icons have their own set of Default Properties that tells the game how they should be laid out. To alter how a control is laid out, you can either get the Control's current LayoutProperties and alter them or add your own LayoutProperties object for the Control to use instead. In this tutorial, we will show how to use both methods.")
-        Subsubsection("Layout Modes")
-        Paragraph("LayoutProperties also have several Layout Modes that tell the Control how it should calculate its dimensions either horizontally or vertically. There are five modes as follows:")
+        ListItem():Strong("FlowLayout"):Text(": items are placed in a row from left to right, starting
+at the top left. When a row is full, the next item starts a new row.")
+        ListItem():Strong("GridLayout"):Text(": items are placed in the cells of a grid of rows and
+columns.")
+        ListItem():Strong("ManualLayout"):Text(": you say exactly where each item goes and how big it
+is, in pixels, in percentages, or in both.")
+    end
+
+    private action PixelsAndPercentages
+        Subsection("Pixels and percentages")
+        Paragraph("Positions in Quorum are measured from the "):Strong("bottom left"):Text(" corner of the
+container. Moving right makes x bigger, and moving up makes y bigger.")
+
+        Paragraph("You can give a position or a size in two ways:")
         BulletList()
-        ListItem():Strong("STANDARD"):Text(" - This layout mode calculates the dimensions and positions of the Control using percentages of the Control's dimensions combined with static pixel values. This mode is for if you want to set exactly how the Control should be sized.")
-        ListItem():Strong("FILL"):Text(" - This layout mode will attempt to fill the remaining width or height of the container with the Control. Note this is only effective if the container's size is known independent of the element using this mode.")
-        ListItem():Strong("FIT_CONTENTS"):Text(" - This layout mode will calculate this Control's dimensions as the combined total dimensions of its children elements.")
-        ListItem():Strong("FIT_FONT"):Text(" - This layout mode is used to ensure a Control's height can fit the Font used in this LayoutProperties, plus padding from the children elements.")
-        ListItem():Strong("MAINTAIN_ASPECT_RATIO"):Text(" - This layout mode is used to calculate one of the dimensions of the Control relative to the other dimension. This mode can only be used to calculate one of the two dimensions (width or height) at a time.")
+        ListItem():Strong("Pixels"):Text(" stay the same. A button 200 pixels wide is 200 pixels wide in a
+small window and in a large one.")
+        ListItem():Strong("Percentages"):Text(" are a part of the container, written from 0.0 to 1.0. A
+button with a percentage width of 0.5 is always half as wide as its
+container.")
+
+        Paragraph("You can also use both at once. The layout adds them together. For example, a
+percentage y of 1.0 and a pixel y of -70 means "):DoubleQuote():Text("70 pixels below the top,"):DoubleQuote():Text("
+however tall the container is.")
     end
 
-    private action LayingOutASimpleUI
-        Section("Laying out a Simple UI")
-        Paragraph("In this tutorial, we will make a simple UI with two Buttons and an Icon. We will adjust the LayoutProperties of the three UI elements so that when the screen is resized, the elements will move or resize to adjust for the screen size change. We also make the Buttons change the properties of the Icon so the Icon changes position when the Buttons are clicked. To start, make a New Game Application.")
-        Subsection("Setting up the Window")
-        Paragraph("For this tutorial, we will use the DesktopConfiguration, ManualLayout, LayoutProperties, Button, Icon and Color Libraries.")
-        Paragraph("Before we create and adjust the Buttons, we will go to our main class, specifically the main action. Just before the StartGame() call, we'll use a DesktopConfiguration object to make our window resizable. This is so we can resize the window while the game is running, allowing us to see our Buttons and Icon change size and position in realtime based on the Screen size.")
-        Paragraph("For a LayoutProperties ojbect to have an effect, the container for the UI elements needs to have a Layout set. In our case, the container will be the game itself, so we simply need to make a ManualLayout object and set the game's layout to be that object inside of the CreateGame action. Before we start adding new UI elements, our main class should look like this:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Game.DesktopConfiguration
-use Libraries.Interface.Layouts.ManualLayout
-use Libraries.Interface.Layouts.LayoutProperties
-use Libraries.Interface.Controls.Button
-use Libraries.Interface.Controls.Icon
-use Libraries.Game.Graphics.Color
+    private action LayoutModes
+        Subsection("Layout modes")
+        Paragraph("A "):Strong("layout mode"):Text(" tells a control how to work out its width or height.
+There are five modes:")
+        BulletList()
+        ListItem():Strong("STANDARD"):Text(": the size is a percentage of the container plus a number of
+pixels. Use this when you want to set the size yourself.")
+        ListItem():Strong("FILL"):Text(": the control fills the space that is left in the container.")
+        ListItem():Strong("FIT_CONTENTS"):Text(": the control is just big enough to hold what is inside it.
+A button uses this for its width by default.")
+        ListItem():Strong("FIT_FONT"):Text(": the height fits one line of the control's font. A button uses
+this for its height by default. It only works for height.")
+        ListItem():Strong("MAINTAIN_ASPECT_RATIO"):Text(": one side is worked out from the other, so the
+shape stays the same. Only one side can use this mode at a time.")
 
-class Main is Game
-    action Main
-        DesktopConfiguration config = GetDesktopConfiguration()
-        config:resizable = true
-        StartGame()
+        Paragraph("A "):Code("FlowLayout"):Text(" and a "):Code("GridLayout"):Text(" read the modes to decide how big each
+control should be. A "):Code("ManualLayout"):Text(" doesn't: it uses the pixel and
+percentage sizes you set.")
     end
 
-    action CreateGame
-        ManualLayout man
-        SetLayout(man)
+    private action AboutLayoutProperties
+        Subsection("LayoutProperties")
+        Paragraph("Every control keeps its layout information in a "):Code("LayoutProperties"):Text(" object:
+its position, size, margins, grid cell and layout modes. Actions like
+"):Code("SetPixelWidth"):Text(" on a button are shortcuts that change the button's default
+"):Code("LayoutProperties"):Text(". You can also get that object with
+"):Code("GetDefaultLayoutProperties"):Text(" and change it yourself. Some settings, such as
+a minimum or maximum size, are only available this way.")
+
+        Paragraph("The layout modes are numbers stored in "):Code("LayoutProperties"):Text(", so it is the
+easiest place to set them:")
+        CodeExampleFromFile("sources/tutorials/ui/Layout/LayoutModes.quorum")
     end
 
-    action Update(number seconds)
-    end
-end")
-        Subsection("Making the UI Elements")
-        Paragraph("Buttons are one of the most common elements that will appear in a user interface. In Quorum, Buttons have their own Layout and LayoutProperties that they use to position and display their contents. To change the properties of the Button, there are two primary methods, which also apply to all other controls. We can either call the Buttons actions like SetPercentageX() to change its default properties, or we make a LayoutProperties object and set it to the Button's DefaultProperties and change it from our object. The outcomes of both methods are the same, the only difference being that the Button does not have an action to change every aspect of the property, so there some properties you can only change through a LayoutProperties object.")
-        Subsubsection("Changing Properties with Public Actions")
-        Paragraph("We will now make our first Button, and we will change its LayoutProperties using public actions. Note that from here on we will be adding code to the CreateGame action in our main class. First, we need to declare a Button and set its name to "):DoubleQuote():Text("Top Button."):DoubleQuote():Text(" By default, a Button calculates its width using the FIT_CONTENTS mode and its height with the FIT_FONT mode. In this case we want to define the Size ourselves, so we will change both of these modes to STANDARD. These constants are not defined inside of the Button class, so we need to make a LayoutProperties object and access the constants from there. For this Button, we will change its percentage x and y, as well as its size in pixels. This is done with the following lines of code:")
-        CodeExample("Button top
-LayoutProperties prop
+    private action AGroupingWithItsOwnLayout
+        Subsection("A grouping with its own layout")
+        Paragraph("In the "):Link("Pages", "/tutorials/ui/pages.html"):Text(" tutorial, you added groupings to a
+page with "):Code("AddGrouping"):Text(". A grouping can have its own layout:
+"):Code("SetLayout"):Text(" gives it one. The page still places the grouping as one row, but
+the grouping's layout arranges what is inside it.")
 
-top:SetName(" + dq + "Top Button" + dq + ")
-top:SetHorizontalLayoutMode(prop:STANDARD)
-top:SetVerticalLayoutMode(prop:STANDARD)
-top:SetPercentageX(0.35)
-top:SetPercentageY(0.6)
-top:SetSize(250, 175)")
-        Paragraph("Note the difference between Percentage and Pixel when using Layouts. For example, if a Control has a percentage width of 0.5 then the width of the Control will always be 50% of the width of its container. On the contrary, if you used SetPixelWidth or SetWidth and set the width to 300, then the Control will always be 300 pixels wide, regardless of the width of its container.")
-        Subsubsection("Using a LayoutProperties Object")
-        Paragraph("Now we will make the second Button, and for this one we will use a LayoutProperties object to change the default properties of the Button. To get the default properties of the Button, we need to set our new object to the Button's properties using the GetDefaultLayoutProperties action. Then we'll use actions from the LayoutProperties object to change the Button. This is done with the following lines of code:")
-        CodeExample("Button bottom
+        Paragraph("The program below makes the start of a phone app with two groupings: a
+toolbar that uses a "):Code("FlowLayout"):Text(", and a number pad that uses a
+"):Code("GridLayout"):Text(". Replace "):Code("Main.quorum"):Text(" with this program:")
+        CodeExampleFromFile("sources/tutorials/ui/Layout/Main.quorum")
 
-bottom:SetName(" + dq + "Bottom Button" + dq + ")
-prop = bottom:GetDefaultLayoutProperties()
-prop:SetHorizontalLayoutMode(prop:STANDARD)
-prop:SetVerticalLayoutMode(prop:STANDARD)
-prop:SetPercentageX(0.5)
-prop:SetPercentageOriginX(0.5)
-prop:SetPercentageY(0.1)
-prop:SetPercentageWidth(0.3)
-prop:SetPercentageHeight(0.3)")
-        Paragraph("Note in the above code that we used the LayoutProperties object from when we made the Top Button and that we used a new action. The SetPercentageOriginX changes the origin from where a Control calculates its position. This is a property that Buttons do not have a public action to change, so you would need to use this method to change that property.")
-        Subsubsection("AddLayoutProperties")
-        Paragraph("That last Control we will add is an Icon and we will change its LayoutProperties differently from how we did the Buttons. Controls have multiple LayoutProperties and they will use them either based on the size of their container or which one was used most recently. For the Icon, we will make a LayoutProperties object, change its properties, and then add it to the Icon using the AddLayoutProperties action. We will also give the Icon a filled rectangle for its graphic. This is done in the following lines of code:")
-        CodeExample("Icon selectBox
-Color color
-LayoutProperties boxProp
-
-selectBox:LoadFilledRectangle(10, 10, color:Blue())
-boxProp:SetPercentageX(0.25)
-boxProp:SetPercentageY(0.55)
-boxProp:SetPercentageWidth(0.5)
-boxProp:SetPercentageHeight(0.4)
-
-selectBox:AddLayoutProperties(boxProp)")
-        Paragraph("Now we'll add all three of the UI elements to the game so they appear when we run it. Note that we will add the Icon first, because we want it to be drawn under the Buttons.")
-        CodeExample("Add(selectBox)
-Add(top)
-Add(bottom)")
-        Paragraph("When you now run the game, there will be two Buttons and an Icon under one of them. But, if you were to resize the window, then the Bottom Button and the Icon will get larger or smaller depending on the size of the window. All three items will stay in the same relative position because we set their position to be based on a percentage. The Top Button will also stay the same size no matter the size of the window because we gave its dimensions in pixels.")
-        Subsubsection("Changing Properties with a Behavior")
-        Paragraph("Now we have the Controls sized and positioned, but a good UI will respond when you interact with it, so we will make a Behavior for our two Buttons that will move the Icon depending on the position of the Button that pressed it.")
-        Paragraph("We will have the Buttons take an Icon, which we will pass from our main class, get its current layout properties so it can change its y position, and then simply say and output that the Button was clicked. Previously we used the GetDefaultLayoutProperties, but since the object might not be using its default properties, we will use the GetCurrentLayoutProperties action to return the properties that the previous LayoutProperties was using to lay itself out.")
-        Paragraph("The Behavior will be its own Quorum class known as ButtonBehavior and is as follows:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Sound.Speech
-use Libraries.Interface.Controls.Icon
-use Libraries.Interface.Controls.Button
-use Libraries.Interface.Layouts.LayoutProperties
-
-class ButtonBehavior is Behavior
-    Icon shape
-    LayoutProperties prop
-
-    action setShape(Icon icon)
-        shape = icon
+        Paragraph("The first lines make the window resizable, so you can try it. Run the
+program and drag the edge of the window. To resize it with the keyboard on
+Windows, press "):Keys("Alt", "Space"):Text(", then "):Key("S"):Text(", then the arrow keys, and "):Key("Enter"):Text(" when
+it is the size you want. On any computer, you can also choose the size in
+the code: add "):Code("config:width = 360"):Text(" just after "):Code("config:resizable = true"):Text(" and
+run the program again. Try a few widths, such as 360 and 1000.")
     end
 
-    action Run(BehaviorEvent event)
-        Button item = cast(Button, event:GetItem())
-        number pos = item:GetPercentageY()
-        prop = shape:GetCurrentLayoutProperties()
-        prop:SetPercentageY(pos - 0.05)
-        Speech speech
-        speech:Say(item:GetName() + " + dq + " clicked" + dq + ", false)
-        output item:GetName() + " + dq + " clicked" + dq + "
+    private action TheToolbar
+        Subsection("The toolbar: a FlowLayout")
+        Paragraph("The toolbar's "):Code("FlowLayout"):Text(" puts the first button at the top left of the
+grouping and each next button to its right. When the next button doesn't
+fit in the row, it starts a new row underneath. Make the window narrow, and
+the buttons that no longer fit move to a second row. A grouping is as tall
+as what is inside it, so the toolbar grows to hold the new row, and the
+number pad moves down.")
+
+        Paragraph("Each button is as wide as its text, because a button's horizontal layout
+mode is "):Code("FIT_CONTENTS"):Text(" by default. The margins add 5 pixels of space around
+each button so they don't touch.")
+
+        Paragraph("A "):Code("FlowLayout"):Text(" decides where each control goes, so it ignores the x and y
+values you set on the controls inside it. It does use their sizes, layout
+modes and margins. It also has two options:")
+        BulletList()
+        ListItem():Code("flow:SetSingleLine(true)"):Text(" keeps every control on one row, even when the
+row is too long.")
+        ListItem():Code("flow:SetVerticalCentering(true)"):Text(" centers the controls in each row from top
+to bottom, which helps when they have different heights.")
     end
-end")
-        Paragraph("Now, with the Behavior complete, we can go back to our main class and set the shape for the Behavior and set the Behavior for the Buttons. This is done with the following lines of code:")
-        CodeExample("ButtonBehavior behavior
-behavior:setShape(selectBox)
-top:SetBehavior(behavior)
-bottom:SetBehavior(behavior)")
-        Paragraph("Now, when you run the program, the position and size of the items will still change with when the game is resized, but now clicking a Button will update the Layout of the Icon and change its y position.")
+
+    private action TheNumberPad
+        Subsection("The number pad: a GridLayout")
+        Paragraph("A "):Code("GridLayout"):Text(" divides its container into cells of equal size. You tell the
+container how many columns and rows it has, and you tell each control which
+cell it goes in. Columns are counted from the left, starting at 0. Rows are
+counted from the "):Strong("bottom"):Text(", starting at 0, because positions in Quorum go
+up from the bottom.")
+
+        Paragraph("Some things to notice:")
+        BulletList()
+        ListItem():Strong("The grid size belongs to the container."):Text(" "):Code("SetContainerGridWidth(3)"):Text(" and
+"):Code("SetContainerGridHeight(4)"):Text(" give the pad 3 columns and 4 rows. Always set
+both.")
+        ListItem():Strong("The pad needs a height of its own."):Text(" A grouping's height normally fits
+what is inside it, but a grid's cells get their size from the
+container, so the two would wait on each other. Setting the pad's
+vertical layout mode to "):Code("STANDARD"):Text(" and its height to 240 pixels breaks
+the tie. Without the "):Code("STANDARD"):Text(" line, the program stops with a message
+that the "):Code("GridLayout"):Text(" does not support the layout mode.")
+        ListItem():Strong("The top row is row 3."):Text(" The loop starts at row 3 and counts down, so the
+keys 1, 2 and 3 end up at the top, like on a phone.")
+        ListItem():Strong("FILL makes each key fill its cell."):Text(" With both layout modes set to
+"):Code("FILL"):Text(", each key fills its whole cell, minus its margins.")
+        ListItem():Strong("The 0 key spans three cells."):Text(" "):Code("SetGridWidth(3)"):Text(" makes it cover columns
+0, 1 and 2. "):Code("SetGridHeight"):Text(" does the same for rows.")
     end
 
-    private action FlowLayout
-        Section("FlowLayout")
-        Paragraph("In the above example, we used a ManualLayout to position the items in the UI, but the other main Layout you can use is the FlowLayout. As described previously, the Flow Layout allows for items to determine their own size, but the container and the layout determines their positions. The Flow Layout will force the children of the container to position themselves as far to the left as they can without overlapping other children, and if the width cannot contain them, then the items will try to form a new line under the full line and will start flowing to the right from there.")
-        Paragraph("To demonstrate how a FlowLayout works, we will go back to our previous example and change the ManualLayout to a FlowLayout, which also means we need to include the FlowLayout library using the following line of code:")
-        CodeExample("use Libraries.Interface.Layouts.FlowLayout")
-        Paragraph("We will first set a FlowLayout to the game window by adding these next two lines of code to the top of the CreateGame action:")
-        CodeExample("FlowLayout flow
-SetLayout(flow)")
-        Paragraph("Now, we will change how the Top Button calculates its width to demonstrate how the FlowLayout repositions items. We will simply delete the SetSize call and give the Top Button the same percentage size as the Bottom Button. This is done with the following lines of code:")
-        CodeExample("top:SetPercentageHeight(0.3)
-top:SetPercentageWidth(0.3)")
-        Paragraph("If you were to add up the percentage widths of the three items, you would notice that they add up to 1.1, which is greater than the width of the screen (1.0 means the entire width of the container). In this situation, the FlowLayout will move the item that will not fit in the line down to start its own line. In our example, that means that Bottom Button will be forced to its own line under the Icon.")
-        Subsection("Making a Container")
-        Paragraph("In our example's current state, you'll notice that our action calls to change the position no longer work because of the FlowLayout. But, what if we want a ManualLayout for other UI elements? We can easily solve this by creating a container object to hold those items, and internally the container will have a FlowLayout but will exist in a ManualLayout. We can accomplish this with the following lines of code:")
-        CodeExample("ManualLayout manual
-SetLayout(manual)
+    private action TheTabOrderOfAGrouping
+        Subsection("The Tab order of a grouping")
+        Paragraph("A layout only changes where controls appear on the screen. It doesn't change
+the order in which the "):Key("Tab"):Text(" key moves between them. On a form, the "):Key("Tab"):Text("
+order follows the order you "):Strong("add"):Text(" the controls: the toolbar's buttons
+from Contacts to Help, then the keys, then Call.")
 
-Control container
-FlowLayout containFlow
-container:SetLayout(containFlow)
-container:SetPercentageWidth(1.0)
-container:SetPercentageHeight(0.4)
-container:SetPosition(50, 300)
+        Paragraph("That is why "):Code("AddKey"):Text(" is called in reading order: 1, 2, 3, then 4, 5, 6, and
+so on, ending with 0. If the loop added the bottom row first, the pad would
+look the same, but "):Key("Tab"):Text(" would visit 7, 8 and 9 before 1, 2 and 3. Always
+add controls in the order a person reads them, usually left to right and
+top to bottom.")
 
-container:Add(selectBox)
-container:Add(top)
-container:Add(bottom)
-Add(container)")
-        Paragraph("The above code will replace the add actions we had at the bottom of the CreateGame action.")
-        Paragraph("Now, if you run the program, you will see that the Buttons and Icon are smaller since they are now part of a smaller container, but they are in a FlowLayout while everything else added to the game will be in a ManualLayout. This can be especially useful when adding elements like Menus to your game, which require a FlowLayout, but these will be covered in later tutorials.")
+        Paragraph("When a key has the focus, a screen reader reads its name, its description
+and that it is a button. Press "):Key("Space"):Text(" or "):Key("Enter"):Text(" to press the key.")
+    end
+
+    private action AWholeWindow
+        Subsection("A whole window: a ManualLayout")
+        Paragraph("A form arranges a whole page for you. Sometimes, such as in a game, you
+want to place everything in the window yourself. For that, a program uses
+the "):Code("Game"):Text(" class and gives the window a "):Code("ManualLayout"):Text(". Each control says
+where it goes and how big it is.")
+
+        Paragraph("The following program makes a window that you can resize. Each control uses
+a different rule:")
+        BulletList()
+        ListItem():Strong("Center"):Text(" stays in the middle of the window.")
+        ListItem():Strong("Corner"):Text(" is always 200 by 50 pixels, 20 pixels from the bottom left
+corner.")
+        ListItem():Strong("Sidebar"):Text(", a blue panel, takes the right quarter of a wide window. In a
+window 600 pixels wide or less, it moves to a strip across the top.")
+
+        Paragraph("Replace "):Code("Main.quorum"):Text(" with this game:")
+        CodeExampleFromFile("sources/tutorials/ui/Layout/Main2.quorum")
+
+        Paragraph("Run the program and drag the edge of the window, or use the keys or
+"):Code("config:width"):Text(" from the Phone form. The Center button stays in
+the middle, the Corner button does not change at all, and the sidebar
+grows and shrinks with the window until the window is narrow enough for
+the sidebar to jump to the top.")
+
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Layout/Main2.quorum", "", true, true)
+
+        Paragraph("A few details in this program are worth examining:")
+        BulletList()
+        ListItem():Strong("The origin."):Text(" By default, a control's position is its bottom left
+corner. "):Code("SetPercentageOriginX(0.5)"):Text(" and "):Code("SetPercentageOriginY(0.5)"):Text(" move
+that point to the center of the button, so a position of 0.5, 0.5 puts the
+center of the button at the center of the window.")
+        ListItem():Strong("A minimum size."):Text(" "):Code("GetDefaultLayoutProperties"):Text(" returns the sidebar's
+default properties, the ones the "):Code("SetPercentage"):Text(" actions above changed.
+"):Code("SetMinimumWidth(150)"):Text(" stops the sidebar from getting narrower than 150
+pixels. "):Code("SetMaximumWidth"):Text(" does the opposite.")
+        ListItem():Strong("A second set of properties."):Text(" "):Code("AddLayoutProperties"):Text(" gives the sidebar
+another "):Code("LayoutProperties"):Text(" object to choose from. "):Code("SetMaximumContainerWidth(600)"):Text("
+says it is only for containers 600 pixels wide or less. Each time the
+window is laid out, the sidebar uses the "):Code("narrow"):Text(" properties if they fit,
+and its default properties if not. Changing the arrangement to fit the
+window like this is called "):Strong("responsive design"):Text(".")
+        ListItem():Strong("A Tab order of your own."):Text(" A form sets the "):Key("Tab"):Text(" order for you, but a
+game doesn't. "):Code("SetNextFocus"):Text(" and "):Code("SetPreviousFocus"):Text(" link the two buttons
+so "):Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(" move between them, and "):Code("Focus"):Text(" gives the Center
+button the focus at the start. The "):Link("Focus", "/tutorials/ui/focus.html"):Text("
+tutorial explains these actions in more detail.")
+        ListItem():Strong("The sidebar is only a picture."):Text(" A screen reader skips it. An "):Code("Icon"):Text(" is
+not announced unless you give it an accessibility code, which the
+"):Link("Accessibility", "/tutorials/ui/accessibility.html"):Text(" tutorial explains. The
+buttons are read by their names, followed by their descriptions.")
+    end
+
+    private action StandingInForAPhone
+        Subsection("Standing in for a phone")
+        Paragraph("Programs run on screens of many sizes, and you may not have every device to
+test on. Resizing a window is a "):Strong("simulation"):Text(": the window stands in for a
+smaller or a larger screen. It can tell you what your layout does when there
+is less room: which controls move, shrink, overlap or disappear, and whether
+a narrow arrangement, like the sidebar's, takes over when it should.")
+
+        Paragraph("A simulation also has limits. A resized window on a computer is still used
+with a mouse and a keyboard. It can't tell you whether a button is big
+enough to tap with a finger, whether an on-screen keyboard covers your text
+field, or how the program feels in someone's hand. When a resized window
+says your layout works, treat that as a good first test, not the last one.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you work in a team of three to design and build a
+calculator on a form, and then test it in a window sized like a phone and
+like a desktop screen. The goal is to follow a team workflow with a design
+document and clear roles, to build a layout with a grouping that has its own
+layout, and to find out what a resized window can and can't tell you.")
+
+        Paragraph("Each person takes one role: the "):Strong("planner"):Text(" writes the design document, the
+"):Strong("builder"):Text(" writes the code, and the "):Strong("tester"):Text(" tests it. In a team of two,
+the planner also tests. On your next project, switch roles so that everyone
+gets a turn at each one. Work in this order:")
+        NumberedList()
+        ListItem():Strong("Design (planner, with the team)."):Text(" The calculator needs a text field
+at the top for the number being typed, a grid of number and operator
+keys, and a wide "):DoubleQuote():Text("equals"):DoubleQuote():Text(" key. The planner sketches the keypad twice,
+once for a wide window and once for a narrow one, and labels the column
+and row of every key; remember that row 0 is at the bottom. The planner
+also writes the layout out as a list in words, so every teammate can
+review it, including one who uses a screen reader. Each teammate
+suggests at least one change before the team agrees on the design.")
+        ListItem():Strong("Build (builder)."):Text(" The builder builds it with a "):Code("GridLayout"):Text(" inside a
+grouping, adding the keys in reading order so "):Key("Tab"):Text(" follows the rows
+from top to bottom. The builder writes down any place where the code
+had to differ from the design, and why.")
+        ListItem():Strong("Test (tester)."):Text(" Using only the keyboard, the tester checks that every
+key can be reached with "):Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(" and pressed with "):Key("Space"):Text(".
+Then the tester drags the window, or uses the keys or "):Code("config:width"):Text("
+from Explore, to make it as narrow as a phone held upright, and then as
+wide as a desktop screen, and writes down anything that
+overlaps, disappears or becomes too small to read.")
+        ListItem():Strong("Review (whole team)."):Text(" Compare the test results with the design
+document. Agree on one change, make it, and update the document.")
+
+        Paragraph("Finish by writing two things the resized window showed you about a phone,
+and two things it couldn't show you.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Think about an app on your phone that you also use on a computer. How does
+its layout change between the two? Which choices do you think were made for
+the size of the screen, and which were made for how people hold or use the
+device? Which of the three layouts would you pick for a game's inventory
+screen, and why? In your team, which role was the hardest, and how did the
+design document help the builder and the tester?")
+
+        Paragraph("In the next tutorial, "):Link("Input Sets", "/tutorials/ui/inputSet.html"):Text(", you will
+choose which keys and mouse buttons run your program's behaviors.")
     end
 end

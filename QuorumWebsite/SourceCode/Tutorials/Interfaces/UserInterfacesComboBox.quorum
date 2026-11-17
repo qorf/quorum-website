@@ -1,0 +1,310 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Combo Boxes, part of the user interface series.
+*/
+class UserInterfacesComboBox is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/comboBox.html")
+        SetShortTitle("Combo Boxes")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to add combo boxes to a Quorum form, fill them with choices, read the chosen choice, check typed text and react when the choice changes.")
+
+        Title("Combo Boxes")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A combo box is a text field with a list of choices attached to it. You meet
+them when a website asks for your state, your shirt size or your country. A
+person can open the list and pick a choice, or start typing, and the list
+shrinks to the choices that match. In this tutorial, you will add combo boxes
+to a form, fill them with choices, find out which choice was picked, and make
+your program react the moment the choice changes.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a combo box to a form with "):Code("AddComboBox"):Text(" and fill it with choices")
+        ListItem("Read the chosen choice with "):Code("GetSelectedIndex"):Text(" and "):Code("GetSelectedItem")
+        ListItem("Use a "):Code("ComboBoxListener"):Text(" to react when a person picks a different choice")
+        ListItem("Check whether typed text matches one of the choices")
+        ListItem("Explain how a person using a keyboard or a screen reader uses a combo box")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think of a form where you had to pick from a long list, such as a country or
+a birth year. Did you scroll through the list, or did you type the first few
+letters? What would make a long list of choices easier to use for someone
+who can't see the screen, or who can't use a mouse?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/ComboBox/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/ComboBox/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_9)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        WhatIsAComboBox()
+        MakingAComboBox()
+        PickingAChoice()
+        FindingTheChoice()
+        CheckingTypedText()
+        ReactingToChanges()
+        WhatAScreenReaderSays()
+        Colors()
+    end
+
+    private action WhatIsAComboBox
+        Subsection("What is a combo box?")
+        Paragraph("In the "):Link("Text Fields", "/tutorials/ui/textField.html"):Text(" tutorial, a person could
+type anything into a field. Sometimes a program wants one answer from a
+short list instead, such as a shirt size. A combo box does both jobs. It is a
+text field, so a person can type in it, and it has a list of choices that
+opens below the field.")
+
+        Paragraph("In Quorum, the "):Code("ComboBox"):Text(" class comes from the "):Code("TextField"):Text(" class. That means
+a combo box can do everything a text field can do, such as "):Code("GetText"):Text(", plus
+keep a list of choices and remember which one is chosen.")
+
+        Paragraph("A combo box isn't the only way to offer choices. "):Link("Radio buttons", "/tutorials/ui/radioButton.html"):Text(" show every choice at once, which is
+good for two to five choices. A combo box keeps the choices hidden until the
+list opens, so it fits a long list, such as a list of countries, in a small
+space.")
+    end
+
+    private action MakingAComboBox
+        Subsection("Making a combo box on a form")
+        Paragraph("The easiest way to make a combo box is on a form, which you met in the "):Link("Forms", "/tutorials/ui/forms.html"):Text(" tutorial. A page's "):Code("AddComboBox"):Text(" action
+makes a combo box, adds it to the page and returns it so that you can change
+it. There are two versions:")
+
+        BulletList()
+        ListItem():Code("AddComboBox(name, items)"):Text(" takes an "):Code("Array"):Text(" of text with the choices in
+order;")
+        ListItem():Code("AddComboBox(name)"):Text(" makes an empty combo box, and you add choices with its "):Code("Add"):Text(" action.")
+
+        Paragraph("The name is what a screen reader says when the combo box gets the focus. A
+label added with "):Code("AddLabel"):Text(" just before the combo box is shown beside it, the
+same way a label sits beside a text field.")
+
+        Paragraph("The program below makes a T-shirt order form with two combo boxes and a
+button.")
+        CodeExampleFromFile("sources/tutorials/ui/ComboBox/Main.quorum")
+
+        Paragraph("The size box starts empty, so it shows its placeholder, "):DoubleQuote():Text("Choose a size."):DoubleQuote():Text(" The
+color box starts with "):DoubleQuote():Text("Black"):DoubleQuote():Text(" chosen, because "):Code("Select(0)"):Text(" chose the choice at
+index 0. Remember that indexes start at 0: "):DoubleQuote():Text("Black"):DoubleQuote():Text(" is 0, "):DoubleQuote():Text("Blue"):DoubleQuote():Text(" is 1, and so
+on.")
+    end
+
+    private action PickingAChoice
+        Subsection("Picking a choice")
+        Paragraph("A person can pick a choice in several ways:")
+
+        BulletList()
+        ListItem():Strong("With the mouse:"):Text(" click the field to open the list, then click a choice.
+Clicking the field again, or anywhere outside the list, closes it.")
+        ListItem():Strong("With the arrow keys:"):Text(" press "):Key("Down"):Text(" to open the list, then "):Key("Down"):Text(" and "):Key("Up"):Text(" to move through it. Each choice is written into the field as you move.
+Press "):Key("Enter"):Text(" to choose it.")
+        ListItem():Strong("By typing:"):Text(" type the first letters of a choice. The list opens and
+shows only the choices that start with what you typed, ignoring upper and
+lower case. Typing "):DoubleQuote():Text("g"):DoubleQuote():Text(" in the color box leaves "):DoubleQuote():Text("Gray"):DoubleQuote():Text(" and "):DoubleQuote():Text("Green."):DoubleQuote()
+
+        Paragraph("Here are all of a combo box's keys:")
+
+        Table("A combo box's keys")
+        TableHeader():Cell("Key"):Cell("When the list is closed"):Cell("When the list is open")
+        TableRow():Cell("Typing"):Cell("Opens the list with only the matching choices"):Cell("Narrows the list")
+        TableRowWriter downRow = TableRow()
+        downRow:Cell():Key("Down"):Text(" or "):Keys("Alt", "Down")
+        downRow:Cell("Opens the list")
+        downRow:Cell("Moves to the next choice")
+        TableRowWriter upRow = TableRow()
+        upRow:Cell():Key("Up")
+        upRow:Cell("Opens the list")
+        upRow:Cell("Moves to the previous choice")
+        TableRowWriter homeRow = TableRow()
+        homeRow:Cell():Key("Home"):Text(", "):Key("End")
+        homeRow:Cell("Moves to the start or end of the text")
+        homeRow:Cell("Moves to the first or last choice")
+        TableRowWriter enterRow = TableRow()
+        enterRow:Cell():Key("Enter")
+        enterRow:Cell("Does nothing in the combo box")
+        enterRow:Cell("Chooses the highlighted choice and closes the list")
+        TableRowWriter escapeRow = TableRow()
+        escapeRow:Cell():Key("Escape")
+        escapeRow:Cell("Right after the list closed, puts back the text the field had when it opened")
+        escapeRow:Cell("Closes the list")
+        TableRowWriter tabRow = TableRow()
+        tabRow:Cell():Key("Tab")
+        tabRow:Cell("Moves to the next control")
+        tabRow:Cell("Closes the list, keeps the text, and moves on")
+
+        Paragraph("When the focus leaves a combo box, it looks at the text in the field. If the
+text is exactly one of the choices, that choice is chosen. If it isn't,
+nothing is chosen. So typing "):DoubleQuote():Text("Medium"):DoubleQuote():Text(" and pressing "):Key("Tab"):Text(" chooses "):DoubleQuote():Text("Medium."):DoubleQuote()
+    end
+
+    private action FindingTheChoice
+        Subsection("Finding out which choice was picked")
+        Paragraph("A combo box has two actions for reading the choice:")
+
+        BulletList()
+        ListItem():Code("GetSelectedIndex"):Text(" returns the chosen choice's index, or -1 if nothing is
+chosen;")
+        ListItem():Code("GetSelectedItem"):Text(" returns the chosen choice's text, or "):Code("undefined"):Text(" if
+nothing is chosen.")
+
+        Paragraph("The "):DoubleQuote():Text("Place order"):DoubleQuote():Text(" button uses both. Make a new class in a file named "):Code("OrderBehavior.quorum"):Text(". Like the behaviors in the "):Link("Checkboxes", "/tutorials/ui/checkbox.html"):Text(" tutorial, it comes from "):Code("FormBehavior"):Text(", which gives it the "):Code("GetPage"):Text(" action, so it can find each combo
+box by name with "):Code("GetComboBox"):Text(".")
+        CodeExampleFromFile("sources/tutorials/ui/ComboBox/OrderBehavior.quorum")
+
+        Paragraph("Run the program. Choose "):DoubleQuote():Text("Large"):DoubleQuote():Text(" and "):DoubleQuote():Text("Blue"):DoubleQuote():Text(" and press "):DoubleQuote():Text("Place order."):DoubleQuote():Text(" The
+output says you ordered a Blue shirt, size Large. Now type "):DoubleQuote():Text("Huge"):DoubleQuote():Text(" in the size
+box and press "):DoubleQuote():Text("Place order."):DoubleQuote():Text(" "):DoubleQuote():Text("Huge"):DoubleQuote():Text(" isn't one of the choices, so nothing is
+chosen, and the program asks for a size from the list.")
+
+        BlockEditorFile("OrderBehavior.quorum", "html/sources/tutorials/ui/ComboBox/OrderBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/ComboBox/Main.quorum", "", true, true)
+    end
+
+    private action CheckingTypedText
+        Subsection("Checking typed text")
+        Paragraph("Because a person can type anything into a combo box, the text in the field
+isn't always one of the choices. That is a "):Strong("data quality"):Text(" problem: a
+program that expects "):DoubleQuote():Text("Small,"):DoubleQuote():Text(" "):DoubleQuote():Text("Medium,"):DoubleQuote():Text(" "):DoubleQuote():Text("Large"):DoubleQuote():Text(" or "):DoubleQuote():Text("Extra large"):DoubleQuote():Text(" might get "):DoubleQuote():Text("Huge,"):DoubleQuote():Text(" "):DoubleQuote():Text("large"):DoubleQuote():Text(" or "):DoubleQuote():Text("L."):DoubleQuote():Text(" A combo box gives you two ways to tell the
+difference:")
+
+        BulletList()
+        ListItem():Code("GetText"):Text(", from "):Code("TextField"):Text(", returns whatever is in the field;")
+        ListItem():Code("GetSelectedIndex"):Text(" returns -1 when that text isn't exactly one of the
+choices.")
+
+        Paragraph("The order behavior above chose one way to handle a bad answer: it refuses the
+order and asks again. Other programs might take the closest choice, or keep
+the new text as a new choice. Which one is best depends on what the answer is
+used for.")
+    end
+
+    private action ReactingToChanges
+        Subsection("Reacting when the choice changes")
+        Paragraph("Sometimes a program should react the moment a person picks a choice, without
+waiting for a button. A combo box tells its "):Strong("listeners"):Text(" each time a person
+picks a different choice: by clicking it, by pressing "):Key("Enter"):Text(", or by leaving
+the field with text that chooses a different one.")
+
+        Paragraph("A listener is a class that comes from "):Code("ComboBoxListener"):Text(" and writes the "):Code("ComboBoxChanged"):Text(" action. The action gets a "):Code("ComboBoxChangedEvent"):Text(", which
+has:")
+
+        BulletList()
+        ListItem():Code("GetNewIndex"):Text(", the index of the new choice, or -1 for none;")
+        ListItem():Code("GetOldIndex"):Text(", the index before the change;")
+        ListItem():Code("GetText"):Text(", the new choice's text, or the field's text when nothing is
+chosen;")
+        ListItem():Code("GetComboBox"):Text(", the combo box that changed.")
+
+        Paragraph("Make a class in a file named "):Code("SizeListener.quorum"):Text(". It writes the new size
+into a label on the page.")
+        CodeExampleFromFile("sources/tutorials/ui/ComboBox/SizeListener.quorum")
+
+        Paragraph("Now give the listener to a combo box:")
+        CodeExampleFromFile("sources/tutorials/ui/ComboBox/Main2.quorum")
+
+        Paragraph("Pick a size and notice how the label changes. Then type "):DoubleQuote():Text("Huge"):DoubleQuote():Text(" and press "):Key("Tab"):Text(".
+The label says "):DoubleQuote():Text("Huge is not one of the sizes."):DoubleQuote()
+
+        Paragraph("A program's own "):Code("Select"):Text(" doesn't tell listeners, because a person didn't
+make the change. If you add "):Code("sizeBox:Select(1)"):Text(" to the program, the label still
+says "):DoubleQuote():Text("No size chosen yet."):DoubleQuote()
+    end
+
+    private action WhatAScreenReaderSays
+        Subsection("What a screen reader says")
+        Paragraph("When a combo box gets the focus, a screen reader says its name, that it is a
+combo box, and the text in the field. Then it reads the description. As the
+person presses "):Key("Down"):Text(" and "):Key("Up"):Text(", the focus stays in the field, but the screen
+reader is pointed at the highlighted choice, so it reads each choice as the
+person moves to it. The exact words depend on the screen reader.")
+
+        Paragraph("This is why the name matters. A combo box named "):DoubleQuote():Text("Combo Box,"):DoubleQuote():Text(" which is the
+name it gets if you never set one, tells a screen reader user nothing. A
+combo box named "):DoubleQuote():Text("Size"):DoubleQuote():Text(" says exactly what it asks for.")
+    end
+
+    private action Colors
+        Subsection("Colors")
+        Paragraph("A combo box takes its colors from the current theme, so it changes in dark
+mode too. The "):Link("Themes and Dark Mode", "/tutorials/ui/themes.html"):Text(" tutorial
+shows how to change them with the theme keys "):DoubleQuote():Text("ComboBox"):DoubleQuote():Text(" and "):DoubleQuote():Text("ComboBoxChoice."):DoubleQuote()
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you build a form for planning a made-up class field
+trip. The form needs at least two combo boxes: one for the place to visit,
+with at least eight choices, and one for the day of the week. Give each combo
+box a label, a clear name, a description and a placeholder. Add a "):DoubleQuote():Text("Submit"):DoubleQuote():Text(" button. When it is pressed, output the plan if both boxes have a choice. If a
+box has text that isn't one of the choices, output a message that names the
+box and asks for a choice from its list.")
+
+        Paragraph("Then decide what your form should do when someone types a place that isn't
+on the list. Should it refuse it, or add it as a new choice with "):Code("Add"):Text("? Think
+about two made-up users: a teacher who must approve every place, and a
+student who knows a great museum that isn't listed. Write one sentence that
+explains your choice and who it helps.")
+
+        Paragraph("When it works, test it with this self-check list, using only the keyboard: "):Key("Tab"):Text(", "):Key("Down"):Text(", "):Key("Up"):Text(", "):Key("Enter"):Text(", "):Key("Escape"):Text(" and typing.")
+
+        BulletList()
+        ListItem("Can you reach both combo boxes and the button, and open, move through and
+close each list?")
+        ListItem("Does typing a few letters narrow the list?")
+        ListItem("Does the message name the right box when you type something not on the list?")
+        ListItem("Does a person who has never seen the form know what each placeholder asks
+for?")
+        ListItem("Turn on a screen reader (CTRL + ALT + Z on a Chromebook): does it report each combo box's
+name and choice?")
+
+        Paragraph("Fix anything that fails, then rewrite one name, description or placeholder
+so it is clearer.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A combo box is a text field with a list of choices. You can read the choice
+with "):Code("GetSelectedIndex"):Text(" and "):Code("GetSelectedItem"):Text(", or react right away with a "):Code("ComboBoxListener"):Text(". Because a person can also type, a good program checks
+for -1 and decides what to do with text that isn't a choice. Think back to
+the warm up: which long lists on the forms you use would be easier to fill in
+by typing? In the next tutorial, "):Link("Sliders", "/tutorials/ui/slider.html"):Text(", you
+will let a person choose a number instead of a word.")
+    end
+end

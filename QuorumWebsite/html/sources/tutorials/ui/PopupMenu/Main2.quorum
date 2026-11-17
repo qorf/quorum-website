@@ -1,0 +1,48 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.MenuItem
+use Libraries.Interface.Controls.PopupMenu
+use Libraries.Interface.Controls.TextField
+
+class Main
+    action Main
+        Form form
+        Page page = form:GetMainPage()
+
+        page:AddLabel("Message label", "Message:")
+        TextField field = page:AddTextField("Message")
+        field:SetDescription("Type a message. Press Shift+F10 for text options.")
+        field:SetText("Hello, popup menus!")
+
+        PopupMenu menu
+        menu:SetName("Text options")
+        menu:Add(MakeCommand("Uppercase", "upper", field))
+        menu:Add(MakeCommand("Lowercase", "lower", field))
+        menu:Add(MakeCommand("Clear", "clear", field))
+
+        field:SetPopupMenu(menu)
+
+        Button options = page:AddButton("Text options")
+        options:SetDescription("Opens a menu of commands for the message")
+        options:SetPopupMenu(menu)
+
+        OpenMenuBehavior openBehavior
+        openBehavior:SetMenu(menu)
+        openBehavior:SetAnchor(options)
+        options:SetBehavior(openBehavior)
+
+        form:Display()
+    end
+
+    action MakeCommand(text name, text mode, TextField field) returns MenuItem
+        ChangeTextBehavior behavior
+        behavior:SetTextField(field)
+        behavior:SetMode(mode)
+
+        MenuItem item
+        item:SetName(name)
+        item:SetBehavior(behavior)
+        return item
+    end
+end

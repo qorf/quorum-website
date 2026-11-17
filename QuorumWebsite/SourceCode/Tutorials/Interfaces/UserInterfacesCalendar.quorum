@@ -1,0 +1,332 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Calendars and Dates, part of the user interface series.
+*/
+class UserInterfacesCalendar is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/calendar.html")
+        SetShortTitle("Calendars and Dates")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to add calendars and date fields to a Quorum form, read the chosen date as a CalendarDate, limit which days can be picked and react when a date changes.")
+
+        Title("Calendars and Dates")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Many forms ask for a date: a birthday, a due date, the day of a trip. A
+program can ask a person to type the date, but people write dates in many
+ways, and a typed date is easy to get wrong. Quorum has two controls for
+dates. A "):Strong("calendar"):Text(" shows a whole month, and a person picks a day from it. A "):Strong("date field"):Text(" is a text field for a date with a button that opens a calendar
+below it. In this tutorial, you will add both to a form, read the date a
+person chose, limit which days can be picked, and make your program react
+the moment a date changes.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a date field with "):Code("AddDateField"):Text(" and a calendar with "):Code("AddCalendar")
+        ListItem("Read the chosen date with "):Code("GetDate"):Text(" and work with it as a "):Code("CalendarDate")
+        ListItem("Limit the days a person can choose with "):Code("SetMinimumDate"):Text(" and "):Code("SetMaximumDate")
+        ListItem("Use a "):Code("CalendarListener"):Text(" to react when a person chooses a date")
+        ListItem("Decide how precise a piece of data needs to be, such as a day or an exact time")
+        ListItem("Explain how a person using a keyboard or a screen reader picks a date")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("How would you write the date of the first day of school? Would you write "):DoubleQuote():Text("9/2,"):DoubleQuote():Text(" "):DoubleQuote():Text("2 September,"):DoubleQuote():Text(" "):DoubleQuote():Text("2025-09-02"):DoubleQuote():Text(" or something else? Think of one other way
+someone might write it. If a friend in another country read "):DoubleQuote():Text("3/4,"):DoubleQuote():Text(" would they think
+March 4 or April 3? What problems could that cause on a form?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Calendar/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Calendar/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_9)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_VARIABLES_AND_DATA_STORAGE_16)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_COLLECTION_AND_PREPARATION_21)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_IMPACTS_OF_COMPUTING_SYSTEMS_37)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        DatesInQuorum()
+        HowPrecise()
+        MakingADateField()
+        ReadingTheDate()
+        MakingACalendar()
+        ReactingToChanges()
+        ChoosingWithTheKeyboard()
+        WhatAScreenReaderSays()
+        Colors()
+    end
+
+    private action DatesInQuorum
+        Subsection("Dates in Quorum")
+        Paragraph("Before a program can ask for a date, it needs a way to store one. Quorum's "):Code("CalendarDate"):Text(" class holds a single day: a year, a month from 1 to 12, and a
+day of the month. It has no time of day and no time zone.")
+
+        Paragraph():Code("SetDate"):Text(" sets a date from three numbers. It also checks them. There is no
+February 30, so "):Code("SetDate"):Text(" returns "):Code("false"):Text(" and leaves the date as it was:")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/Dates.quorum")
+
+        Paragraph():Code("ToText"):Text(" writes the date the way the international standard ISO 8601 does,
+year first: "):Code("2027-03-12"):Text(". Because the year, month and day are always in the
+same order, nobody can mix up the month and the day. "):Code("ToSpokenText"):Text(" writes
+the date in words, "):DoubleQuote():Text("Friday, March 12, 2027,"):DoubleQuote():Text(" which is how screen readers say
+dates in these controls. "):Code("DaysUntil"):Text(" counts the days from one date to another.")
+    end
+
+    private action HowPrecise
+        Subsection("How precise does a date need to be?")
+        Paragraph("A "):Code("CalendarDate"):Text(" is precise to the "):Strong("day"):Text(". Quorum's "):Code("DateTime"):Text(" class, which
+you may have used to read the clock, also keeps the hour, the minute and the
+second. Which one should a program use? It depends on the question the data
+answers:")
+
+        BulletList()
+        ListItem("a birthday or a due date needs only the day;")
+        ListItem("a race result needs minutes and seconds;")
+        ListItem("a bus schedule needs the minute.")
+
+        Paragraph("More precision isn't always better. A time of day also brings a time zone
+with it, and the same moment falls on different dates in different places.
+If a program stored a birthday as a moment in time, a person in another time
+zone could get the birthday a day early or late. Storing only the day avoids
+that problem and keeps less data. Keep this in mind for the Engage activity.")
+    end
+
+    private action MakingADateField
+        Subsection("Making a date field on a form")
+        Paragraph("A date field looks like a "):Link("text field", "/tutorials/ui/textField.html"):Text(", with a
+small calendar button at its right edge. A person can type a date, or press
+the button and pick one. A page's "):Code("AddDateField"):Text(" action makes one, adds it to
+the page and returns it. Its name is what a screen reader says, so put a
+label with the same words just before it. On a form, the label sits beside
+the field.")
+
+        Paragraph("The program below asks for a science fair project's due date and has a
+button that counts the days left.")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/ScienceFair.quorum")
+
+        Paragraph("The field shows the date as "):DoubleQuote():Text("March 12, 2027."):DoubleQuote():Text(" This is its "):Strong("date format"):Text(".
+Writing the month as a word means nobody can mix up the month and the day.")
+    end
+
+    private action ReadingTheDate
+        Subsection("Reading the date")
+        Paragraph("A date field's "):Code("GetDate"):Text(" action reads the text in the field and returns it as
+a "):Code("CalendarDate"):Text(". If the field is empty, or its text isn't a date in the
+field's format, "):Code("GetDate"):Text(" returns "):Code("undefined"):Text(", so always check for that
+first.")
+
+        Paragraph("Make a class in a file named "):Code("DaysLeftBehavior.quorum"):Text(". It comes from "):Code("FormBehavior"):Text(", which gives it the "):Code("GetPage"):Text(" action, so it can find the date
+field by its name with "):Code("GetDateField"):Text(".")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/DaysLeftBehavior.quorum")
+
+        Paragraph("Run the program and press "):DoubleQuote():Text("Count the days."):DoubleQuote():Text(" Then type "):Code("3/12/2027"):Text(" in the
+field, press "):Key("Tab"):Text(" and press the button again. The field's format is "):DoubleQuote():Text("March
+12, 2027,"):DoubleQuote():Text(" so "):Code("3/12/2027"):Text(" isn't a date to it, and "):Code("GetDate"):Text(" returns "):Code("undefined"):Text(". The text stays as typed, so the person can fix it.")
+
+        Paragraph("You can choose another format with "):Code("SetDateFormat"):Text(". A "):Code("DateFormat"):Text(" has three
+ready-made formats: "):Code("GetLongFormat"):Text(" ("):DoubleQuote():Text("March 12, 2027,"):DoubleQuote():Text(" the default), "):Code("GetNumericFormat"):Text(" ("):DoubleQuote():Text("03/12/2027"):DoubleQuote():Text(") and "):Code("GetISOFormat"):Text(" ("):DoubleQuote():Text("2027-03-12"):DoubleQuote():Text("):")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/IsoFormat.quorum")
+    end
+
+    private action MakingACalendar
+        Subsection("Making a calendar on a form")
+        Paragraph("Sometimes a person needs the whole month at once, for example to pick a day in
+the next few weeks. A page's "):Code("AddCalendar"):Text(" action adds a calendar. It shows
+one month, with the month and year at the top between "):Strong("Previous month"):Text(" and "):Strong("Next month"):Text(" buttons. Weeks start on Sunday. Today has a ring around it, and
+the chosen day is filled with color.")
+
+        Paragraph("A calendar can limit which days can be picked. "):Code("SetMinimumDate"):Text(" and "):Code("SetMaximumDate"):Text(" set the earliest and latest days. Days outside them are
+dimmed and struck through, and they can't be chosen.")
+
+        Paragraph("The program below lets a person book a museum tour in the next 30 days.")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/Main.quorum")
+
+        Paragraph():Code("Copy"):Text(" makes a second date for the same day, so "):Code("AddDays(30)"):Text(" moves "):Code("last"):Text(" without moving "):Code("first"):Text(". A calendar's "):Code("GetDate"):Text(" returns the chosen day, or "):Code("undefined"):Text(" before a day is chosen.")
+
+        BlockEditorFile("TourDayListener.quorum", "html/sources/tutorials/ui/Calendar/TourDayListener.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Calendar/Main.quorum", "", true, true)
+    end
+
+    private action ReactingToChanges
+        Subsection("Reacting when a date is chosen")
+        Paragraph("A calendar and a date field both tell "):Strong("listeners"):Text(" when a person chooses a
+date. A listener is a class that comes from "):Code("CalendarListener"):Text(" and writes one
+action, "):Code("CalendarChanged"):Text(". The event's "):Code("GetNewDate"):Text(" returns the date chosen
+now, and "):Code("GetOldDate"):Text(" the date before it. Either can be "):Code("undefined"):Text(": the old
+date when nothing was chosen before, and the new date when a person empties
+a date field.")
+
+        Paragraph("Make a class in a file named "):Code("TourDayListener.quorum"):Text(". It shows the chosen
+day in the label:")
+        CodeExampleFromFile("sources/tutorials/ui/Calendar/TourDayListener.quorum")
+
+        Paragraph("Run the program and choose a day. The label changes as soon as the day is
+chosen. Try to choose a day that is struck through. Nothing happens, and the
+listener isn't told.")
+
+        Paragraph("The same listener works on a date field. A date field tells its listeners
+when a person picks a day in its calendar, or types a new date and leaves the
+field. As with other controls, a program's own "):Code("SetDate"):Text(" doesn't tell
+listeners.")
+    end
+
+    private action ChoosingWithTheKeyboard
+        Subsection("Choosing a date with the keyboard")
+        Paragraph("In a calendar, the arrow keys move a ring around the "):Strong("current day"):Text(". Moving
+past the end of the month shows the next month. Choosing a day takes one
+more key.")
+
+        Table("A calendar's keys")
+        TableHeader():Cell("Key"):Cell("What it does")
+        TableRowWriter leftRow = TableRow()
+        leftRow:Cell():Key("Left"):Text(", "):Key("Right")
+        leftRow:Cell("The day before or after")
+        TableRowWriter upRow = TableRow()
+        upRow:Cell():Key("Up"):Text(", "):Key("Down")
+        upRow:Cell("The same day a week before or after")
+        TableRowWriter homeRow = TableRow()
+        homeRow:Cell():Key("Home"):Text(", "):Key("End")
+        homeRow:Cell("The first or last day of the week")
+        TableRowWriter pageRow = TableRow()
+        pageRow:Cell():Key("Page Up"):Text(", "):Key("Page Down")
+        pageRow:Cell("The same day of the previous or next month")
+        TableRowWriter shiftPageRow = TableRow()
+        shiftPageRow:Cell():Keys("Shift", "Page Up"):Text(", "):Keys("Shift", "Page Down")
+        shiftPageRow:Cell("The same day of the previous or next year")
+        TableRowWriter enterRow = TableRow()
+        enterRow:Cell():Key("Enter"):Text(" or "):Key("Space")
+        enterRow:Cell("Chooses the current day")
+        TableRowWriter tabRow = TableRow()
+        tabRow:Cell():Key("Tab")
+        tabRow:Cell("Moves from the days to the Previous month and Next month buttons, then on")
+
+        Paragraph("In a date field, a person can type the date, or open its calendar:")
+
+        Table("A date field's keys")
+        TableHeader():Cell("Key"):Cell("What it does")
+        TableRowWriter openRow = TableRow()
+        openRow:Cell():Keys("Alt", "Down")
+        openRow:Cell("Opens the calendar and moves the focus into it")
+        TableRowWriter closeRow = TableRow()
+        closeRow:Cell():Keys("Alt", "Up"):Text(" or "):Key("Escape")
+        closeRow:Cell("Closes the calendar without choosing a day")
+        TableRowWriter fieldTabRow = TableRow()
+        fieldTabRow:Cell():Key("Tab")
+        fieldTabRow:Cell("Moves from the text to the calendar button, then on")
+        TableRowWriter buttonRow = TableRow()
+        buttonRow:Cell():Key("Space"):Text(" or "):Key("Enter"):Text(" on the calendar button")
+        buttonRow:Cell("Opens the calendar and moves the focus into it")
+
+        Paragraph("In an open calendar, the keys are the ones in the first table. Choosing a day
+writes it in the field and closes the calendar. When the calendar closes, the
+focus goes back to the field. A click outside the calendar closes it too.")
+
+        Paragraph("These keys follow the date picker in the WAI-ARIA Authoring Practices, a
+guide from the W3C for accessible web controls, so they match many date
+pickers on the web.")
+    end
+
+    private action WhatAScreenReaderSays
+        Subsection("What a screen reader says")
+        Paragraph("The days of a calendar are drawn by the calendar, but each one still has
+words for screen readers. Each day says its full date, such as "):DoubleQuote():Text("Thursday,
+November 12, 2026,"):DoubleQuote():Text(" and adds "):DoubleQuote():Text("today"):DoubleQuote():Text(" when it is today. Because each day says
+the whole date, a person never has to remember which month they are in. As
+the arrow keys move the current day, the screen reader follows it.")
+
+        Paragraph("The calendar's name is the month it shows, such as "):DoubleQuote():Text("March 2027,"):DoubleQuote():Text(" and it
+changes with the month. That is why "):Code("AddCalendar"):Text(" uses your text, such as "):DoubleQuote():Text("Tour day,"):DoubleQuote():Text(" as the calendar's "):Strong("description"):Text(" instead of its name. The month
+buttons say where they go, such as "):DoubleQuote():Text("Next month, April 2027."):DoubleQuote()
+
+        Paragraph("A date field's name is the name you gave it, such as "):DoubleQuote():Text("Project due date."):DoubleQuote():Text(" Its
+description is the date in words, such as "):DoubleQuote():Text("Friday, March 12, 2027,"):DoubleQuote():Text(" whatever
+the field's format is. So a short format such as "):DoubleQuote():Text("03/12/2027"):DoubleQuote():Text(" is still read
+plainly. If the text isn't a date, the description is "):DoubleQuote():Text("Not a date"):DoubleQuote():Text(" until it is
+fixed. The field keeps its description up to date itself, so don't set it.")
+
+        Paragraph("The exact words depend on the screen reader. Nothing extra is spoken when a
+date is chosen; a person finds out about the change from the focused day or field, or
+by moving to the report label.")
+    end
+
+    private action Colors
+        Subsection("Colors")
+        Paragraph("A calendar takes its colors from the current theme, so it changes in dark
+mode too. The "):Link("Themes and Dark Mode", "/tutorials/ui/themes.html"):Text(" tutorial
+shows how to change them with the theme key "):DoubleQuote():Text("Calendar."):DoubleQuote()
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you build a sign-up form for a school club, for a
+made-up club member named Jill. Jill just moved from a country where "):DoubleQuote():Text("3/4"):DoubleQuote():Text("
+means April 3, and uses a keyboard instead of a mouse. First, decide
+what dates the club needs and how precise each one must be. For each piece
+of data, write one sentence: does it need the day, the time, or both? What
+would go wrong if you stored less? What would you have to store, and keep
+track of, if you stored more?")
+
+        Paragraph("Then build the form. It needs at least:")
+
+        BulletList()
+        ListItem("a date field for the person's birthday, with a label;")
+        ListItem("a calendar for the first meeting, limited to the next two weeks;")
+        ListItem("a "):DoubleQuote():Text("Sign up"):DoubleQuote():Text(" button.")
+
+        Paragraph("When the button is pressed, output the meeting day in words. If the birthday
+field is empty or isn't a date, output a message that asks for a date such
+as "):DoubleQuote():Text("March 12, 2010."):DoubleQuote():Text(" Try changing the birthday field's format to "):Code("GetNumericFormat"):Text(" or "):Code("GetISOFormat"):Text(". Which format do you think is clearest
+for Jill, and why?")
+
+        Paragraph("When it works, test the form the way Jill would: use only the keyboard, "):Key("Tab"):Text(", the arrow keys, "):Key("Page Up"):Text(", "):Key("Page Down"):Text(", "):Key("Enter"):Text(" and "):Keys("Alt", "Down"):Text(". If
+you have a screen reader, turn it on and notice what it reports for the
+days and the field. Check your form against Jill's needs:")
+
+        BulletList()
+        ListItem("Can Jill pick the meeting day without a mouse?")
+        ListItem("Could Jill read any date on the form the wrong way?")
+        ListItem("If Jill types a date wrong, does the message say how to fix it?")
+
+        Paragraph("Change one thing that would make the form easier for Jill to use.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A calendar shows a month to pick a day from, and a date field lets a person
+type a date or open a calendar. Both give you a "):Code("CalendarDate"):Text(", which you can
+read with "):Code("GetDate"):Text(", compare, count days with, and write in words. A "):Code("CalendarListener"):Text(" reacts as soon as a date is chosen. Think back to the warm
+up: how does a form that shows dates as "):DoubleQuote():Text("March 12, 2027"):DoubleQuote():Text(" and reads them aloud
+in full avoid the "):DoubleQuote():Text("3/4"):DoubleQuote():Text(" problem? In the next tutorial, "):Link("Lists", "/tutorials/ui/list.html"):Text(", you will show a person a list of items to
+choose from.")
+    end
+end

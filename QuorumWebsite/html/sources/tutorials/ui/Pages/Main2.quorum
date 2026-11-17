@@ -1,0 +1,89 @@
+use Libraries.Interface.Forms.Form
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.TextField
+use Libraries.Interface.Item
+use Libraries.Game.Graphics.Label
+
+class Main is FormBehavior
+    action Main
+        Form form
+        form:SetInteger("tickets", 1)
+
+        Page order = form:GetMainPage()
+        order:SetTitle("Movie Tickets")
+        order:AddLabel("Name prompt", "Your name")
+        order:AddTextField("Your name")
+        order:AddLabel("Tickets", "Tickets: 1")
+        Button addButton = order:AddButton("Add a ticket")
+        addButton:SetBehavior(me)
+        Button removeButton = order:AddButton("Remove a ticket")
+        removeButton:SetBehavior(me)
+        Button reviewButton = order:AddButton("Review my order")
+        reviewButton:SetBehavior(me)
+
+        Page review = form:AddPage("Review")
+        review:SetTitle("Check your order")
+        review:AddLabel("Name result", "Name:")
+        review:AddLabel("Tickets result", "Tickets:")
+        review:AddLabel("Group result", "Group price:")
+        Button changeButton = review:AddButton("Change my order")
+        changeButton:SetBehavior(me)
+
+        form:Display()
+    end
+
+    action Run(BehaviorEvent event)
+        Form form = GetForm()
+        Item pressed = event:GetItem()
+        text name = pressed:GetName()
+        integer tickets = form:GetInteger("tickets")
+
+        if name = "Add a ticket"
+            if tickets < 10
+                form:SetInteger("tickets", tickets + 1)
+            end
+            ShowTickets(form)
+        elseif name = "Remove a ticket"
+            if tickets > 1
+                form:SetInteger("tickets", tickets - 1)
+            end
+            ShowTickets(form)
+        elseif name = "Review my order"
+            Page order = form:GetPage("Main")
+            TextField nameField = order:GetTextField("Your name")
+            form:SetText("name", nameField:GetText())
+            form:SetBoolean("group price", tickets >= 4)
+
+            ShowReview(form)
+            form:SetPage("Review")
+        else
+            form:SetPage("Main")
+        end
+    end
+
+    action ShowTickets(Form form)
+        Page order = form:GetPage("Main")
+        Label ticketLabel = order:GetLabel("Tickets")
+        ticketLabel:SetText("Tickets: " + form:GetInteger("tickets"))
+    end
+
+    action ShowReview(Form form)
+        Page review = form:GetPage("Review")
+
+        Label nameLabel = review:GetLabel("Name result")
+        nameLabel:SetText("Name: " + form:GetText("name"))
+
+        Label ticketLabel = review:GetLabel("Tickets result")
+        ticketLabel:SetText("Tickets: " + form:GetInteger("tickets"))
+
+        Label groupLabel = review:GetLabel("Group result")
+        if form:GetBoolean("group price")
+            groupLabel:SetText("Group price: Yes")
+        else
+            groupLabel:SetText("Group price: No")
+        end
+    end
+end

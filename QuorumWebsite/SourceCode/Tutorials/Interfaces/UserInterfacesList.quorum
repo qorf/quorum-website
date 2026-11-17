@@ -1,92 +1,241 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: List.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Lists, part of the user interface series.
 */
 class UserInterfacesList is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/list.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("List")
+        SetShortTitle("Lists")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about Lists in the Quorum programming language.")
-        SetSummary("how to use Lists")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("List Tutorial - Quorum Programming Language")
-        Title("Tutorial: List")
-        Paragraph("This tutorial tells you how to use Lists in Quorum")
-        IntroductionToListsInQuorum()
-        MakingAList()
-        TryMakingAUserInterface()
+        // For search engines and link previews.
+        SetDescription("How to add a list to a Quorum form, fill it with items, react when a person activates an item and change the list while the program runs.")
+
+        Title("Lists")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action IntroductionToListsInQuorum
-        Section("Introduction to Lists in Quorum")
-        Subsection("What is a List?")
-        Paragraph("In this tutorial, we will learn how to use lists in the Quorum Game Engine. A list is simple interface tool that gives the user a group of items where they can select one. A behavior can be set to run when one of list items is activated.")
-        Paragraph("In Quorum, an item in a List is a string of text. Although, internally an entry in the list is represented as a ListItem, for this tutorial we only cover a simple use case of the List class and using ListItems is not necessary.")
-        Paragraph("For this tutorial we make a simple List with four items and we will set a behavior to run when any of the entries are clicked. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("A "):Strong("list"):Text(" shows a group of choices, one on each line. A person moves
+through the choices and picks one. You use lists all the time: a playlist,
+a list of files, or the contacts on a phone. In this tutorial, you will
+build a shopping list on a page. You will add items to it, react when a
+person picks an item, and change the list while the program runs. You will
+also make sure the list works with a keyboard and a screen reader.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a list to a page with "):Code("AddList"):Text(", and add text items to it")
+        ListItem("Run a behavior when a person activates an item in the list")
+        ListItem("Add, remove and read items from code while the program runs")
+        ListItem("Give a list a name and description so a screen reader can describe it")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about a list you used today, like a menu of songs or a list of
+messages. How did you move through it? Did you use a mouse, your finger,
+or the keyboard? What happened when you picked something? Write down two
+things a list must do so that anyone can use it, including a person who
+can't see the screen.")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/List/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/List/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_VARIABLES_AND_DATA_STORAGE_16)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_VARIABLES_AND_DATA_STORAGE_16)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_4)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        WhatIsAList()
+        MakingAList()
+        UsingAListWithTheKeyboard()
+        DoingSomethingWhenActivated()
+        ChangingAList()
+        AddingAPicture()
+        OneItemItsOwnBehavior()
+    end
+
+    private action WhatIsAList
+        Subsection("What is a list?")
+        Paragraph("A list is a control that shows a group of text items, one per line. A
+person can move through the items and "):Strong("activate"):Text(" one, which means
+choosing it. Each line in a Quorum list is a "):Code("ListItem"):Text(", but for most
+programs you only need to give the list some text. Quorum makes the
+"):Code("ListItem"):Text(" for you.")
+
+        Paragraph("Quorum has two classes named "):Code("List"):Text(". The one in this tutorial is a control
+in a user interface, and it lives in "):Code("Libraries.Interface.Controls"):Text(". The other one
+is a container for storing data, and it lives in "):Code("Libraries.Containers"):Text(".
+Make sure your "):Code("use"):Text(" line names the right one:")
+        CodeExampleFromFile("sources/tutorials/ui/List/UseList.quorum")
     end
 
     private action MakingAList
-        Section("Making a List")
-        Paragraph("In order to use a List, we need to include the List library. Note that there is another Quorum class with the same name but that List is part of the Containers library. Be sure to use the Interface List with the following use statement:")
-        CodeExample("use Libraries.Interface.Controls.List")
-        Paragraph("We want our list be usable as the game begins so we will create and populate the List in the CreateGame action. First we declare the List and then we add our entries with the Add action. Only ListItems can be added to Lists so Add will only accept ListItems or it will convert a text entry into a ListItem for you. For our project we will use text as our parameter.")
-        Paragraph("We will also position our List with the SetPosition action and after we add our entries to the List we will simply set the "):Strong("Focus"):Text(" to our List it is "):Strong("accessible"):Text(" and we can interact with it with the keyboard. Then we add the List to the Game. The CreateGame action so far will be as follows:")
-        CodeExample("action CreateGame
-    List shoppingList
-    shoppingList:SetPosition(300, 200)
+        Subsection("Making a list")
+        Paragraph("To start, make a new Form project in Quorum Studio. Replace the code in
+"):Code("Main.quorum"):Text(" with the program below. It adds a list with four items to a
+page and selects the first item.")
+        CodeExampleFromFile("sources/tutorials/ui/List/Main.quorum")
 
-    shoppingList:Add(" + dq + "Milk" + dq + ")
-    shoppingList:Add(" + dq + "Eggs" + dq + ")
-    shoppingList:Add(" + dq + "Ham" + dq + ")
-    shoppingList:Add(" + dq + "Cheese" + dq + ")
+        Paragraph("Here is what each part does:")
 
-    SetFocus(shoppingList)
-    Add(shoppingList)
-end")
-        Subsection("Setting an Entry Icon")
-        Paragraph("Lists have another customization feature where you can Add an Icon to go along with an entry. To add the icon you must include the Icon along with the text for the entry in the Add call. An example of this is shown below:")
-        CodeExample("Icon listIcon
-listIcon:LoadFilledCircle(50)
-shoppingList:Add(" + dq + "Apples" + dq + ", listIcon)")
-        Subsection("Setting Item Activation Behavior")
-        Paragraph("If you run the program now you will be able to either double-click on an item in the List or navigate to it with the arrow keys and press the Spacebar to select it and activate it. But, the List does nothing other than change font colors. We will change this by setting an Item Activation Behavior that will run when a ListItem is activated.")
-        Paragraph("ListItems can have their own Activation Behavior set to run when activated, but by default they do not have one. When a ListItem does not have its own Activation Behavior it will try torun the Item Activation Behavior provided by the parent List. For our example we will make a behavior and set it to the Item Activation Behavior our List so that it will run when any of the ListItems are activated.")
-        Paragraph("To start we will make a new Quorum class in our project and we will name it "):DoubleQuote():Text("ListBehavior.quorum."):DoubleQuote()
-        Paragraph("The class will inherit from the Behavior class and we will need the Speech and ListItem libraries. All we will have the Behavior do is get the text associated with the ListItem that called the behavior, where will need to use casting, and then we will say and output a simple phrase with that text. One thing to note here is to retrieve the text of a ListItem you will need the GetText action. The full ListBehavior class is in the following code block:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Sound.Speech
-use Libraries.Interface.Controls.ListItem
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        BulletList()
+        ListItem():Code("page:AddList(" + quote + "Shopping list" + quote + ")"):Text(" adds a list to the page. The page decides
+where it goes and how big it is. The name, "):DoubleQuote():Text("Shopping list"):DoubleQuote():Text(", is what a
+screen reader calls the list, instead of just "):DoubleQuote():Text("List"):DoubleQuote():Text(".")
+        ListItem():Code("SetDescription"):Text(" tells a screen reader a little more about the list.")
+        ListItem():Code("Add"):Text(" puts a line of text at the end of the list.")
+        ListItem():Code("Select(0)"):Text(" selects the top item, so the person starts on Milk.")
 
-class ListBehavior is Behavior
-    action Run(BehaviorEvent event)
-        ListItem item = cast(ListItem, event:GetItem())
-        Speech speech
-        speech:Say(" + dq + "I need to get " + dq + " + item:GetText())
-        output " + dq + "I need to get " + dq + " + item:GetText() + " + dq + "!" + dq + "
-    end
-end")
-        Paragraph("Now we go back to our main class and add to our CreateGame action the following two lines of code to set our behavior as the Item Activation Behavior:")
-        CodeExample("ListBehavior behavior
-shoppingList:SetItemActivationBehavior(behavior)")
-        Paragraph("Now we can run our project and we can activate ListItems either with either clicks or the Spacebar and the program will say and output the text associated with the ListItem we activated, giving us a simple and functional List.")
+        Paragraph("The list is the only control on the page, so the form gives it the keyboard
+focus when the program starts. A person can use it right away without a
+mouse.")
     end
 
-    private action TryMakingAUserInterface
-        Section("Try making a User Interface")
-        CodeEditorFromProject("Activity: List", "List.quorum", "examples/UserInterface/List/Main.quorum")
+    private action UsingAListWithTheKeyboard
+        Subsection("Using a list with the keyboard")
+        Paragraph("Run the program. You can use the list with the mouse or with these keys:")
+
+        BulletList()
+        ListItem():Key("Up Arrow"):Text(" and "):Key("Down Arrow"):Text(" move the selection one item.")
+        ListItem():Key("Home"):Text(" and "):Key("End"):Text(" jump to the first or last item.")
+        ListItem("Typing a letter, like "):Key("C"):Text(", jumps to the next item that starts with it. This type of operation is often called "):DoubleQuote():Text("first letter navigation."):DoubleQuote()
+        ListItem():Key("Space"):Text(" activates the selected item. Double-clicking an item also
+activates it.")
+
+        Paragraph("Right now, activating an item does nothing. Next, you will change that.")
+    end
+
+    private action DoingSomethingWhenActivated
+        Subsection("Doing something when an item is activated")
+        Paragraph("A "):Strong("behavior"):Text(" is a class with a "):Code("Run"):Text(" action. A list can have one
+"):Strong("item activation behavior"):Text(". Quorum runs it whenever any item in the list
+is activated.")
+
+        Paragraph("Add a new class to your project and name it "):Code("ListBehavior.quorum"):Text(". Put this
+code in it:")
+        CodeExampleFromFile("sources/tutorials/ui/List/ListBehavior.quorum")
+
+        Paragraph():Code("event:GetItem()"):Text(" returns the item that was activated. It comes back as a
+general "):Code("Item"):Text(", so the "):Code("cast"):Text(" tells Quorum to treat it as a "):Code("ListItem"):Text(".
+Then "):Code("GetText"):Text(" gives you the words on that line.")
+
+        Paragraph("Now go back to "):Code("Main.quorum"):Text(". Add these two lines just before
+"):Code("form:Display()"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/List/SetBehavior.quorum")
+
+        Paragraph("Run the program again. When you activate "):DoubleQuote():Text("Eggs"):DoubleQuote():Text(", the program writes
+"):DoubleQuote():Text("I need to get Eggs"):DoubleQuote():Text(" in Quorum Studio's output window.")
+    end
+
+    private action ChangingAList
+        Subsection("Changing a list while the program runs")
+        Paragraph("You can change a list while your program runs, for example when a person
+presses a button. Each item has a "):Strong("position"):Text(", starting at 0 for the top
+line.")
+
+        Paragraph("Change "):Code("Main.quorum"):Text(" to this program. It adds a button that puts Bread at
+the top of the list and takes Ham out.")
+        CodeExampleFromFile("sources/tutorials/ui/List/Main2.quorum")
+
+        Paragraph("Here is what the button's "):Code("Run"):Text(" action does:")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        BulletList()
+        ListItem():Code("GetPage"):Text(" returns the page, and "):Code("GetList"):Text(" finds the list by its name.")
+        ListItem():Code("Add(0, " + quote + "Bread" + quote + ")"):Text(" puts "):DoubleQuote():Text("Bread"):DoubleQuote():Text(" at the top.")
+        ListItem():Code("Remove(" + quote + "Ham" + quote + ")"):Text(" takes out the first item with that text. It returns the
+"):Code("ListItem"):Text(" it removed, or "):Code("undefined"):Text(" if there was no Ham.")
+        ListItem():Code("Get(0)"):Text(" returns the text at the top, and "):Code("GetSize"):Text(" returns how many
+items there are.")
+        ListItem():Code("Select(0)"):Text(" moves the selection to the top item.")
+
+        Paragraph("Press the button once. The output says "):DoubleQuote():Text("The first item is Bread. There are
+4 items."):DoubleQuote():Text(" What happens if you press it again?")
+
+        BlockEditorFile("ListBehavior.quorum", "html/sources/tutorials/ui/List/ListBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/List/Main2.quorum", "", true, true)
+    end
+
+    private action AddingAPicture
+        Subsection("Adding a picture")
+        Paragraph("An item can have a small picture, called an "):Strong("icon"):Text(", next to its text.
+Pictures can only be made while the program is running, so make them in a
+behavior's "):Code("Run"):Text(" action, like the one above. Make an "):Code("Icon"):Text(", load a shape or
+image into it, and pass it to "):Code("Add"):Text(" with the text:")
+        CodeExampleFromFile("sources/tutorials/ui/List/IconUse.quorum")
+        CodeExampleFromFile("sources/tutorials/ui/List/Icon.quorum")
+
+        Paragraph("An icon is only a picture. A screen reader still reads the text, so make
+sure the text says everything a person needs to know.")
+    end
+
+    private action OneItemItsOwnBehavior
+        Subsection("One item, its own behavior")
+        Paragraph("Every item uses the list's item activation behavior unless it has its own.
+To give one item a different behavior, get its "):Code("ListItem"):Text(" and set its
+activation behavior. Here, "):Code("SaleBehavior"):Text(" stands for another behavior
+class you write:")
+        CodeExampleFromFile("sources/tutorials/ui/List/ItemBehavior.quorum")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you build a list and test how easy it is to use with the
+keyboard. The goal is to create a list whose items do something useful when
+activated, and to find out how people move through a list without a mouse.
+Build a list of five songs, games or foods. When an item is activated, the
+program should write something about that item, not only its name, such as
+"):DoubleQuote():Text("Pizza: a favorite on Fridays."):DoubleQuote()
+
+        Paragraph("Then test your list with only the keyboard, no mouse. Answer these questions in writing:")
+
+        BulletList()
+        ListItem("Could you reach every item with the arrow keys and the first letter
+keys?")
+        ListItem("What would you change to make the list easier to use?")
+        ListItem("First letter navigation jumps to the next item that starts with that letter. What does that tell you about lists with many items that have the same first letter?")
+
+        Paragraph("Make that change, and test the list again.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Lists are one of the most common controls on any computer. Think about how
+your list stored its items and how a person moved through them. How is a
+"):Code("List"):Text(" control like the arrays you have used before, and how is it
+different?")
+
+        Paragraph():Link("Next tutorial: Trees", "/tutorials/ui/tree.html")
     end
 end

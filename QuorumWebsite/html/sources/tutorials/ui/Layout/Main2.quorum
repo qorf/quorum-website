@@ -1,0 +1,75 @@
+use Libraries.Game.Game
+use Libraries.Game.DesktopConfiguration
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.Icon
+use Libraries.Interface.Layouts.ManualLayout
+use Libraries.Interface.Layouts.LayoutProperties
+
+class Main is Game
+    action Main
+        DesktopConfiguration config = GetDesktopConfiguration()
+        config:resizable = true
+        config:title = "Manual Layout"
+        StartGame()
+    end
+
+    action CreateGame
+        ManualLayout layout
+        SetLayout(layout)
+
+        // Center: a fixed size, placed by percentage, centered on its position.
+        Button center
+        center:SetName("Center")
+        center:SetDescription("This button stays in the middle of the window.")
+        center:SetPixelWidth(200)
+        center:SetPixelHeight(60)
+        center:SetPercentageX(0.5)
+        center:SetPercentageY(0.5)
+        center:SetPercentageOriginX(0.5)
+        center:SetPercentageOriginY(0.5)
+        Add(center)
+
+        // Corner: everything in pixels.
+        Button corner
+        corner:SetName("Corner")
+        corner:SetDescription("This button stays near the bottom left corner.")
+        corner:SetPixelWidth(200)
+        corner:SetPixelHeight(50)
+        corner:SetPixelX(20)
+        corner:SetPixelY(20)
+        Add(corner)
+
+        // A game has no Tab order of its own, so link the two buttons.
+        center:SetNextFocus(corner)
+        center:SetPreviousFocus(corner)
+        corner:SetNextFocus(center)
+        corner:SetPreviousFocus(center)
+        center:Focus()
+
+        // Sidebar: the right quarter of a wide window, at least 150 pixels wide.
+        Color color
+        Icon sidebar
+        sidebar:LoadFilledRectangle(10, 10, color:Blue())
+        sidebar:SetName("Sidebar")
+        sidebar:SetPercentageX(0.75)
+        sidebar:SetPercentageY(0)
+        sidebar:SetPercentageWidth(0.25)
+        sidebar:SetPercentageHeight(1.0)
+        LayoutProperties wide = sidebar:GetDefaultLayoutProperties()
+        wide:SetMinimumWidth(150)
+
+        // In a window 600 pixels wide or less: a strip across the top.
+        LayoutProperties narrow
+        narrow:SetMaximumContainerWidth(600)
+        narrow:SetPercentageX(0)
+        narrow:SetPercentageY(0.85)
+        narrow:SetPercentageWidth(1.0)
+        narrow:SetPercentageHeight(0.15)
+        sidebar:AddLayoutProperties(narrow)
+        Add(sidebar)
+    end
+
+    action Update(number seconds)
+    end
+end

@@ -1,431 +1,308 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: Menu.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: Menus, part of the user interface series.
 */
 class UserInterfacesMenu is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/menu.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("Menu")
+        SetShortTitle("Menus")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about Menus in the Quorum programming language.")
-        SetSummary("how to use Menus")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("Menu Tutorial - Quorum Programming Language")
-        Title("Tutorial: Menu")
-        Paragraph("This tutorial tells you how to use Menus in Quorum")
-        AnIntroductionToMenusInQuorum()
-        CreatingAMenu()
-        SettingBehaviors()
-        MenuSelectionAndMenuPath()
-        TryMakingAUserInterface()
+        // For search engines and link previews.
+        SetDescription("How to put a menu bar on a Quorum form, fill it with menus and submenus, connect commands to behaviors, add mnemonics and keyboard shortcuts, and use a menu from the keyboard.")
+
+        Title("Menus")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action AnIntroductionToMenusInQuorum
-        Section("An Introduction to Menus in Quorum")
-        Paragraph("In this tutorial, we will learn how to use Menus in the Quorum Game Engine. Menus are GUI tools very similar to Trees in that the items have a similar hierarchical structure, but the MenuItems are arranged on a MenuBar differently than TreeItems on a Tree. You will typically see MenuBars run horizontally while trees run vertically. Another key difference is that only one submenu can be open at a time, whereas multiple subtrees can be expanded at a time. Typically, MenuBars are located at the top of an application and common headers found on those MenuBars are File, Edit, View, and so on.")
-        Image("media/userInterface/menuExample.png", "This image shows an example of a Menu in NetBeans. The File menu is chosen, with Import Project chosen under it and expanded. From Zip is the final choice highlighted.")
-        Paragraph("For this tutorial, we will create a simple Menu with several operations for editing a Drawable. Specifically, our Menu will allow us to scale, rotate, color, and reset a triangle. To start, create a new Game Application project.")
+    action Overview
+        Section("Overview")
+        Paragraph("Most desktop programs have a "):Strong("menu bar"):Text(": a row of words such as File,
+Edit and Help along the top of the window. Choosing one opens a "):Strong("menu"):Text(", a
+list of commands. Some commands open another, smaller menu called a
+"):Strong("submenu"):Text(". Menus let a program offer many commands without filling the
+screen with buttons. In this tutorial, you will put a menu bar at the top of
+a page, fill it with menus and submenus, connect each command to a
+behavior, and add keyboard shortcuts. You will also learn how a keyboard or
+screen reader user moves through a menu.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Build a "):Code("MenuBar"):Text(" out of "):Code("MenuItem"):Text(" objects, with menus and submenus, and put it on a page")
+        ListItem("Connect a menu command to a behavior so that choosing it does something")
+        ListItem("Add mnemonics and keyboard shortcuts to menu items")
+        ListItem("Use "):Code("GetMenuPath"):Text(" to find out where a chosen command sits in the menu")
+        ListItem("Compare the roles that people, companies and a government played in
+shaping menus and windows")
     end
 
-    private action CreatingAMenu
-        Section("Creating a Menu")
-        Subsection("Setup")
-        Paragraph("For our main class, we will need the libraries for MenuBar, MenuItem, FlowLayout, Array, Dawable, and Color, adding the following use statements:")
-        CodeExample("use Libraries.Game.Game
-use Libraries.Interface.Controls.MenuBar
-use Libraries.Interface.Controls.MenuItem
-use Libraries.Interface.Layouts.FlowLayout
-use Libraries.Containers.Array
-use Libraries.Game.Graphics.Drawable
-use Libraries.Game.Graphics.Color")
-        Paragraph("We need the FlowLayout library because the container of the menu needs to have a FlowLayout set for the menu to render properly. For this tutorial, we will not be making a container for the menu, since giving the game window a FlowLayout will work for our example. We will write the remaining code for the main class in the CreateGame action. To start, we will set a FlowLayout, declare our MenuBar and Array that will hold the highest-level headers, and create our triangle Drawable with the following lines of code:")
-        CodeExample("FlowLayout flow
-SetLayout(flow)
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Open a program you use often, like a word processor or a web browser, and
+explore its menu bar. Which menus does it have? Pick one command and write
+down every step it takes to reach it. Is there a faster way, like a
+shortcut shown next to the command? Why do you think most programs put
+File first and Help last?")
 
-Array<MenuItem> headers
-MenuBar menu
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Menu/Vocabulary.csv")
 
-Drawable triangle
-triangle:LoadFilledTriangle(0, 0, 150, 80, 200, 25)
-triangle:SetPosition(100, 100)
-Add(triangle)")
-        Paragraph("In this example, setting the game to have a FlowLayout will work properly, but if you need the game to have a ManualLayout in your own applications, look at the "):Link("Layout", "/tutorials/ui/layout.html"):Text(" tutorial where we go over how to make a container hold items in a FlowLayout.")
-        Subsection("Creating Headers with Arrays")
-        Paragraph("To start, we need to create our MenuItems for our first header. But there are two ways of adding the headers to the MenuBar and submenus: we can either call the Add action for each one individually, or we can add them to an Array and then add the Array of MenuItems to the MenuBar. Both methods will achieve the same results, the only thing to be careful of is that the Array must already be populated before you try to add it to a MenuItem or MenuBar. For this tutorial, only the first header's submenus will and the highest-level headers will be in an Array.")
-        Paragraph("We will declare the MenuItems for header1 and create three Arrays of MenuItems, which will be used to create our submenus. Our declarations are as follows:")
-        CodeExample("MenuItem header1        //size
-MenuItem header1_1          //increase size
-MenuItem header1_1_1            //horizontal
-MenuItem header1_1_2            //vertical
-MenuItem header1_1_3            //both
-MenuItem header1_2          //decrease size
-MenuItem header1_2_1            //horizontal
-MenuItem header1_2_2            //vertical
-MenuItem header1_2_3            //both
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Menu/Code.csv")
 
-Array <MenuItem> head1
-Array <MenuItem> head1_1
-Array <MenuItem> head1_2")
-        Paragraph("Note that the comments indicate the organization of our Menu, where submenus have an extra indentation level than their parent menu. For example, this means that header1_1_3 is one of the three submenus under header1_1, and header1_1 itself is a submenu under header1.")
-        Paragraph("Before we can Add our MenuItems, we need to set up our Arrays. The Arrays will contain the headers that will form a submenu in our MenuBar. The following code block shows which header goes to which array. Also note the order you add MenuItems because that will affect the order that they will be seen in the MenuBar.")
-        CodeExample("head1:Add(header1_1)
-head1:Add(header1_2)
-head1_1:Add(header1_1_1)
-head1_1:Add(header1_1_2)
-head1_1:Add(header1_1_3)
-head1_2:Add(header1_2_1)
-head1_2:Add(header1_2_2)
-head1_2:Add(header1_2_3)")
-        Paragraph("With our Arrays created, we can Add them to the higher level MenuItems. The MenuItems header1, header1_1, and header1_2 will have Array of MenuItems Added to them. And header1 will be added to the headers Array since it is a top level MenuItem.")
-        CodeExample("header1:Add(head1)
-header1_1:Add(head1_1)
-header1_2:Add(head1_2)
-headers:Add(header1)")
-        Paragraph("Now that the MenuItems are added to the MenuBar we can use the SetName action to give a name to each Menu Item which will be the Text that is displayed when viewing the MenuBar. This is done with the following lines:")
-        CodeExample("header1:SetName(" + dq + "Size" + dq + ")
-header1_1:SetName(" + dq + "Increase Size" + dq + ")
-header1_1_1:SetName(" + dq + "Horizontal Scale" + dq + ")
-header1_1_2:SetName(" + dq + "Vertical Scale" + dq + ")
-header1_1_3:SetName(" + dq + "Full Scale" + dq + ")
-header1_2:SetName(" + dq + "Decrease Size" + dq + ")
-header1_2_1:SetName(" + dq + "Horizontal Shrink" + dq + ")
-header1_2_2:SetName(" + dq + "Vertical Shrink" + dq + ")
-header1_2_3:SetName(" + dq + "Full Shrink" + dq + ")")
-        Subsection("Creating Headers with Add")
-        Paragraph("In addition to the Arrays method from the last section, we can also use the Add action to create submenus. This allows us to avoid having to set up an Array for different groups of MenuItems. We will be creating our second header and its submenus using this method. Below are our declarations of the MenuItems:")
-        CodeExample("MenuItem header2        //rotation
-MenuItem header2_1          //clockwise rotation
-MenuItem header2_1_1            //30 degrees
-MenuItem header2_1_2            //45 degrees
-MenuItem header2_2          //counter-clockwise rotation
-MenuItem header2_2_1            //30 degrees
-MenuItem header2_2_2            //45 degrees")
-        Paragraph("Next, to add the MenuItems to one another, we will use the Add action as follows:")
-        CodeExample("headers:Add(header2)
-header2:Add(header2_1)
-header2:Add(header2_2)
-header2_1:Add(header2_1_1)
-header2_1:Add(header2_1_2)
-header2_2:Add(header2_2_1)
-header2_2:Add(header2_2_2)")
-        Paragraph("Now we set the names for each header with the following lines of code:")
-        CodeExample("header2:SetName(" + dq + "Rotation" + dq + ")
-header2_1:SetName(" + dq + "Clockwise" + dq + ")
-header2_1_1:SetName(" + dq + "30 Degrees" + dq + ")
-header2_1_2:SetName(" + dq + "45 Degrees" + dq + ")
-header2_2:SetName(" + dq + "Counter-Clockwise" + dq + ")
-header2_2_1:SetName(" + dq + "30 Degrees" + dq + ")
-header2_2_2:SetName(" + dq + "45 Degrees" + dq + ")")
-        Paragraph("Next, let's add the last two headers, one for changing the Color and one to reset the triangle.")
-        Paragraph("We will create MenuItems for the third header, name them, and add them to the menu bar in the same manner as before, giving the following code:")
-        CodeExample("MenuItem header3        //color
-MenuItem header3_1          //red
-MenuItem header3_2          //green
-MenuItem header3_3          //blue
-
-header3:SetName(" + dq + "Color" + dq + ")
-header3_1:SetName(" + dq + "Red" + dq + ")
-header3_1:SetName(" + dq + "Green" + dq + ")
-header3_2:SetName(" + dq + "Blue" + dq + ")
-
-header3:Add(header3_1)
-header3:Add(header3_2)
-header3:Add(header3_3)
-headers:Add(header3)")
-        Paragraph("Now we'll add the final header. We will create MenuItems, name them, then add the header to the MenuBar and, giving us the following lines of code:")
-        CodeExample("MenuItem header4        //reset
-MenuItem header4_1          //reset all
-
-header4:SetName(" + dq + "Reset" + dq + ")
-header4_1:SetName(" + dq + "Reset All" + dq + ")
-
-header4:Add(header4_1)
-headers:Add(header4)")
-        Paragraph("Now we have all of the submenus created and our top-level headers in an Array so all we need to now is add the headers array to the MenuBar and add the MenuBar to the game which can be done with these lines of code:")
-        CodeExample("menu:Add(headers)
-Add(menu)")
-        Subsection("Accessibility")
-        Paragraph("We will now make our Menu accessible and when working with menus it is important to understand how a Menu interacts with Focus. What we will do make a hidden Button that will start with Focus and then you can Tab or Shift + Tab to Focus on the Menu. We will do it this way because when a Menu is closed or a MenuItem is activated, the Menu will return the Focus to whatever the last Item in Focus was. In our case it will be our Button. To do this for our example we will add the following lines of code:")
-        CodeExample("Button focuser
-focuser:SetName(" + dq + " " + dq + ")
-focuser:Hide()
-focuser:SetNextFocus(menu)
-focuser:SetPreviousFocus(menu)
-SetFocus(focuser)
-Add(focuser)")
-        Paragraph("Now when we run the program, the menu bar will be at the top of the screen and only the highest-level headers will be visible. You can hover over the headers with your mouse or with the menu in Focus you can navigate the menu with the keyboard. Hovering over or navigating to a MenuItem will its submenu if it has one. However, you might notice that trying to activate a MenuItem will only close the submenus and do nothing else. This is because we have not set any behaviors for the MenuItems to use which we will do in the next section.")
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_PROGRAM_DEVELOPMENT_12)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_20)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_HISTORY_OF_COMPUTING_38)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_5)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_HISTORY_OF_COMPUTING_38)
+        StandardsList(computerScience)
     end
 
-    private action SettingBehaviors
-        Section("Setting Behaviors")
-        Paragraph("Now we simply need to add Behaviors to our lowest-level MenuItems. Although any MenuItem can have a set behavior, typically, if a MenuItem has any submenus under it, it will not have a Behavior, as its purpose is only to open and show the related submenus. For this tutorial we only set behaviors for the lowest-level MenuItems.")
-        Paragraph("We will be using 4 behaviors for our MenuItems and they will be defined in their own files. The next 4 code blocks show the behaviors we will be using along with the name and brief description for each Quorum class.")
-        Paragraph("SizeBehavior will take a Drawable and scale it by a set factor on the X and Y axis. SizeBehavior.quorum:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
-
-class SizeBehavior is Behavior
-
-    Drawable triangle = undefined
-    number scaleX = 1.0
-    number scaleY = 1.0
-
-    action Run(BehaviorEvent behavior)
-        if triangle not= undefined
-            triangle:SetScale(scaleX, scaleY)
-            Speech speech
-            speech:Say(" + dq + "Scaled by a factor of " + dq + " + scaleX + " + dq + " horizontally, and a factor of " + dq + " + scaleY + " + dq + "vertically." + dq + ")
-        end
+    action Explore
+        Section("Explore")
+        HowAMenuIsBuilt()
+        ABehaviorForTheCommands()
+        PuttingAMenuBarOnAPage()
+        UsingTheKeyboard()
+        Mnemonics()
+        KeyboardShortcuts()
+        FindingThePath()
+        WhereMenusCameFrom()
     end
 
-    action SetDrawable(Drawable newTriangle)
-        triangle = newTriangle
+    private action HowAMenuIsBuilt
+        Subsection("How a menu is built")
+        Paragraph("In Quorum, every part of a menu is a "):Code("MenuItem"):Text(". A menu item on its own is a
+"):Strong("command"):Text(". When you add other items to it, it becomes a "):Strong("menu"):Text(" that
+holds them. This means a menu is built like a tree:")
+        BulletList()
+        ListItem("the "):Code("MenuBar"):Text(" holds the top-level items, such as Animals and Help;")
+        ListItem("each top-level item holds the commands or submenus in its menu;")
+        ListItem("a submenu, such as Pets, holds its own commands.")
+
+        Paragraph("In this tutorial you will build this menu:")
+        BulletList()
+        ListItem("Animals")
+        NestedBulletList()
+        ListItem("Pets: Dog, Cat")
+        ListItem("Farm: Cow, Duck")
+        EndNestedList()
+        ListItem("Help")
+        NestedBulletList()
+        ListItem("About")
+        EndNestedList()
     end
 
-    action SetScale(number newScaleX, number newScaleY)
-        scaleX = newScaleX
-        scaleY = newScaleY
-    end
-end")
-        Paragraph("RotationBehavior will take a Drawable and rotate it by a specified number of degrees. RotationBehavior.quorum:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
-
-class RotationBehavior is Behavior
-
-    Drawable triangle = undefined
-    number degrees = 0.0
-
-    action Run(BehaviorEvent behavior)
-        if triangle not= undefined
-            triangle:Rotate(degrees)
-            Speech speech
-            speech:Say(" + dq + "Rotated " + dq + " + degrees + " + dq + " degrees." + dq + ")
-        end
+    private action ABehaviorForTheCommands
+        Subsection("A behavior for the commands")
+        Paragraph("Each command needs something to do. Every command in this program shows a
+message, so one behavior class can serve all of them. Add a new class named
+"):Code("OutputBehavior"):Text(". It remembers a label and a message, and when it runs, it puts
+the message on the label and writes it to the output:")
+        CodeExampleFromFile("sources/tutorials/ui/Menu/OutputBehavior.quorum")
     end
 
-    action SetDrawable(Drawable newTriangle)
-        triangle = newTriangle
+    private action PuttingAMenuBarOnAPage
+        Subsection("Putting a menu bar on a page")
+        Paragraph("A page has an "):Code("Add"):Text(" action for each common control, like "):Code("AddButton"):Text(" and
+"):Code("AddLabel"):Text(". There is no "):Code("AddMenuBar"):Text(". Instead, you make the menu bar
+yourself and give it to the page's plain "):Code("Add"):Text(" action. The page puts it in
+a row of its own, like everything else, and stretches it across the full
+width of the window. Add the menu bar "):Strong("first"):Text(", so it sits at the top of
+the page, above everything else.")
+
+        Paragraph("Now replace "):Code("Main.quorum"):Text(". The "):Code("MakeCommand"):Text(" action builds one command,
+gives it an "):Code("OutputBehavior"):Text(", and returns it, so each command takes one line.")
+        CodeExampleFromFile("sources/tutorials/ui/Menu/Main.quorum")
+
+        Paragraph("Some things to notice:")
+        BulletList()
+        ListItem():Code("page:Add(bar)"):Strong(" comes first."):Text(" A page shows its controls from top to
+bottom in the order you add them, so the menu bar is the top row and the
+message is below it.")
+        ListItem():Code("AddLabel"):Strong(" gives back the label."):Text(" The program keeps it in "):Code("message"):Text(",
+so every "):Code("OutputBehavior"):Text(" can change its text.")
+        ListItem():Strong("Build from the top down."):Text(" Add a menu to its parent before you add
+items to it. For example, "):Code("animals:Add(pets)"):Text(" comes before
+"):Code("pets:Add(...)"):Text(". A submenu shows its small arrow only if it already has a
+parent menu when its first item is added.")
+        ListItem():Code("SetName"):Strong(" is the text on the item."):Text(" It is also what a screen reader
+reads, so keep it short and clear.")
+        ListItem():Strong("Only commands get behaviors."):Text(" Animals, Pets and Farm only open menus,
+so they have no behavior.")
+        ListItem():Strong("The form sets the "):Key("Tab"):Strong(" order for you."):Text(" The menu bar can take the
+keyboard focus, so it is part of the page's "):Key("Tab"):Text(" order, just like a
+button. Because it is first on the page, it has the focus when the app
+starts. Press "):Key("Tab"):Text(" to move to the message, and "):Keys("Shift", "Tab"):Text(" to move back.")
     end
 
-    action SetDegrees(number newDegrees)
-        degrees = newDegrees
-    end
-end")
-        Paragraph("ColorBehavior takes a Drawable and changes its color. ColorBehavior.quorum:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Drawable
-use Libraries.Game.Graphics.Color
-use Libraries.Sound.Speech
+    private action UsingTheKeyboard
+        Subsection("Using a menu with the keyboard")
+        Paragraph("Every Quorum menu works with the keyboard. When the menu bar first gets the
+focus, nothing on it is chosen yet. Press "):Key("Right"):Text(" to choose the first menu,
+or press a menu's mnemonic letter. Then use these keys:")
 
-class ColorBehavior is Behavior
+        Table("A menu's keys")
+        TableHeader():Cell("Key"):Cell("What it does")
+        TableRowWriter rightRow = TableRow()
+        rightRow:Cell():Key("Right arrow")
+        rightRow:Cell("Moves to the next menu on the menu bar. On an item that holds a submenu it opens the submenu.")
+        TableRowWriter leftRow = TableRow()
+        leftRow:Cell():Key("Left arrow")
+        leftRow:Cell("Moves to the previous menu on the menu bar or closes a submenu.")
+        TableRowWriter downRow = TableRow()
+        downRow:Cell():Key("Down arrow")
+        downRow:Cell("Opens the chosen menu or moves down one item.")
+        TableRowWriter upRow = TableRow()
+        upRow:Cell():Key("Up arrow")
+        upRow:Cell("Opens the chosen menu or moves up one item.")
+        TableRowWriter enterRow = TableRow()
+        enterRow:Cell():Key("Enter"):Text(" or "):Key("Space")
+        enterRow:Cell("Runs the chosen command or opens the chosen menu.")
+        TableRowWriter escapeRow = TableRow()
+        escapeRow:Cell():Key("Esc")
+        escapeRow:Cell("Closes the open submenu or menu. Pressed again it gives the focus back to where it was before the menu bar.")
+        TableRowWriter letterRow = TableRow()
+        letterRow:Cell("A letter")
+        letterRow:Cell("Chooses the item whose mnemonic is that letter.")
 
-    Drawable triangle = undefined
-    Color color = undefined
-    text colorName = undefined
+        Paragraph("When you choose a command, the menu closes and the keyboard focus goes back
+to the control that had it before you moved to the menu bar.")
 
-    action Run(BehaviorEvent behavior)
-        if triangle not= undefined
-            triangle:SetColor(color)
-            Speech speech
-            speech:Say(" + dq + "Color changed to " + dq + " + colorName + " + dq + "." + dq + ")
-        end
-    end
+        Paragraph("A screen reader reads each item's name as you move, so every item needs a
+clear name.")
 
-    action SetDrawable(Drawable newTriangle)
-        triangle = newTriangle
-    end
-
-    action SetColor(Color newColor, text newName)
-        color = newColor
-        colorName = newName
-    end
-end")
-        Paragraph("ResetBehavior will reset the triangle Drawable to its defaults. ResetBehavior.quorum:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
-
-class ResetBehavior is Behavior
-
-    Drawable triangle = undefined
-
-    action Run(BehaviorEvent behavior)
-        if triangle not= undefined
-            triangle:SetRotation(0)
-            triangle:SetScale(1)
-            triangle:LoadFilledTriangle(0, 0, 150, 80, 200, 25)
-            Speech speech
-            speech:Say(" + dq + "Reset" + dq + ")
-        end
+        Paragraph("Notice that no single key jumps to the menu bar from somewhere else on the
+page. In a form, you reach it with "):Key("Tab"):Text(" and "):Keys("Shift", "Tab"):Text(", like any other
+control. Putting it first on the page keeps it easy to find.")
     end
 
-    action SetDrawable(Drawable newTriangle)
-        triangle = newTriangle
-    end
-end")
-        Paragraph("Now we go back to our main class and make our Behavior objects and call their Set actions so can edit the triangle properly. With the behaviors made we then simply call SetBehavior for each MenuItem that we will use to alter the triangle. This is done whit the following lines of code:")
-        CodeExample("//header1 behaviors
-SizeBehavior horizontalScale
-SizeBehavior verticalScale
-SizeBehavior fullScale
-SizeBehavior horizontalShrink
-SizeBehavior verticalShrink
-SizeBehavior fullShrink
-
-horizontalScale:SetDrawable(triangle)
-verticalScale:SetDrawable(triangle)
-fullScale:SetDrawable(triangle)
-horizontalShrink:SetDrawable(triangle)
-verticalShrink:SetDrawable(triangle)
-fullShrink:SetDrawable(triangle)
-
-horizontalScale:SetScale(1.25, 1.00)
-verticalScale:SetScale(1.00, 1.25)
-fullScale:SetScale(1.25, 1.25)
-horizontalShrink:SetScale(0.75, 1.00)
-verticalShrink:SetScale(1.00, 0.75)
-fullShrink:SetScale(0.75, 0.75)
-
-header1_1_1:SetBehavior(horizontalScale)
-header1_1_2:SetBehavior(verticalScale)
-header1_1_3:SetBehavior(fullScale)
-header1_2_1:SetBehavior(horizontalShrink)
-header1_2_2:SetBehavior(verticalShrink)
-header1_2_3:SetBehavior(fullShrink)
-
-//header2 behaviors
-RotationBehavior clockwise30
-RotationBehavior clockwise45
-RotationBehavior counter30
-RotationBehavior counter45
-
-clockwise30:SetDrawable(triangle)
-clockwise45:SetDrawable(triangle)
-counter30:SetDrawable(triangle)
-counter45:SetDrawable(triangle)
-
-clockwise30:SetDegrees(30)
-clockwise45:SetDegrees(45)
-counter30:SetDegrees(-30)
-counter45:SetDegrees(-45)
-
-header2_1_1:SetBehavior(clockwise30)
-header2_1_2:SetBehavior(clockwise45)
-header2_2_1:SetBehavior(counter30)
-header2_2_2:SetBehavior(counter45)
-
-//header3 behaviors
-Color color
-ColorBehavior redBehavior
-ColorBehavior greenBehavior
-ColorBehavior blueBehavior
-
-redBehavior:SetDrawable(triangle)
-greenBehavior:SetDrawable(triangle)
-blueBehavior:SetDrawable(triangle)
-
-redBehavior:SetColor(color:Red(), " + dq + "Red" + dq + ")
-greenBehavior:SetColor(color:Green(), " + dq + "Green" + dq + ")
-blueBehavior:SetColor(color:Blue(), " + dq + "Blue" + dq + ")
-
-header3_1:SetBehavior(redBehavior)
-header3_2:SetBehavior(greenBehavior)
-header3_3:SetBehavior(blueBehavior)
-
-//header4 behaviors
-ResetBehavior resetBehavior
-resetBehavior:SetDrawable(triangle)
-header4_1:SetBehavior(resetBehavior)")
-        Paragraph("Now when we run our program, you can still navigate the menu, but when you activate a one of the lowest-level MenuItems the triangle Drawable will change depending on the behavior you activated.")
-        Image("media/userInterface/MenuFinal.png", "This image shows the final expected Game window with the Decrease Size submenu open")
+    private action Mnemonics
+        Subsection("Mnemonics")
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        Paragraph("A "):Strong("mnemonic"):Text(" is one letter that chooses a menu item from the keyboard.
+In "):Code("Main"):Text(", "):Code("animals:SetMnemonic(" + quote + "a" + quote + ")"):Text(" means that pressing "):Key("A"):Text(" while the
+menu bar has the focus opens the Animals menu and chooses its first item.
+Mnemonics work for the items of an open menu too, so you could give Pets
+the mnemonic "):Code("p"):Text(" and Farm the mnemonic "):Code("f"):Text(". Pick letters that are in the
+item's name, and do not use the same letter twice in one menu.")
     end
 
-    private action MenuSelectionAndMenuPath
-        Section("MenuSelection and MenuPath")
-        Paragraph("In Quorum, Menus use their own selection class, MenuSelection, to keep track of information regarding the currently selected MenuItem. In particular, the MenuSelection keeps track of the unique and specific path to the current selection, causing another similarity between Trees and Menus. This path is stored in the form of an Array of MenuItems and Menus allow for us to easily get this Array with the GetMenuPath action. To demonstrate this, we will add a small amount of code to each of our Behavior classes we created in the tutorial thus far.")
-        Paragraph("To start, we will need the libraries for MenuItem and Array, adding the following use statements:")
-        CodeExample("use Libraries.Interface.Controls.MenuItem
-use Libraries.Containers.Array")
-        Paragraph("Next, we will add to the end of the Run action, outside of the conditional if statement. First, we need to obtain the currently selected MenuItem. This can be done with BehaviorEvent's GetItem action, but this returns an Item, not a MenuItem, so we will need to cast it. This is done with the following line:")
-        CodeExample("MenuItem tempItem = cast(MenuItem, behavior:GetItem())")
-        Paragraph("Now that we have the MenuItem that called the behavior we can use its GetMenuPath action to get the Array of MenuItems. This gives the following line:")
-        CodeExample("Array<MenuItem> items = tempItem:GetMenuPath()")
-        Paragraph("Now that we have the path to the currently selected MenuItem, we can traverse the Array from the beginning to the end to obtain the full path. We will simply output this as text, so we will use each MenuItem's GetName action as we go through the Array in a repeat while loop. This is gives the following code:")
-        CodeExample("integer counter = 0
-integer size = items:GetSize()
-text path = " + dq + dq + "
-repeat while counter < size
-    path = path + items:Get(counter):GetName() + " + dq + "\" + dq + "
-    counter = counter + 1
-end
+    private action KeyboardShortcuts
+        Subsection("Keyboard shortcuts")
+        Paragraph("A "):Strong("shortcut"):Text(" runs a command without opening any menu. Shortcuts are made
+from an "):Code("InputSet"):Text(", which describes a key and any modifier keys held with
+it. You only need four lines of it here: "):Code("KeyboardEvent"):Text(" holds a constant
+for every key, such as "):Code("keys:D"):Text(", "):Code("SetKeyboardInput"):Text(" chooses the key, and
+"):Code("AddModifier"):Text(" adds a key that must be held with it, such as "):Code("CONTROL"):Text(". The
+"):Link("Input Sets", "/tutorials/ui/inputSet.html"):Text(" tutorial covers input sets in
+full.")
 
-output path")
-        Paragraph("As an example, the updated SizeBehavior class is as follows:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Controls.MenuItem
-use Libraries.Containers.Arrayuse Libraries.Game.Graphics.Drawable
-use Libraries.Sound.Speech
+        Paragraph("There is one catch. A shortcut is added to the running app's list of keys,
+so it can only be set once the app's window is open. The lines in
+"):Code("action Main"):Text(" run before "):Code("form:Display()"):Text(" opens the window. To set a
+shortcut after the window opens, the program itself becomes a "):Code("Form"):Text(": the
+class says "):Code("is Form"):Text(", and its "):Code("CreateGame"):Text(" action runs once the window is
+open. "):Code("CreateGame"):Text(" first calls "):Code("parent:Form:CreateGame()"):Text(", so the form still
+does all of its own setup, then sets the shortcut.")
 
-class SizeBehavior is Behavior
+        Paragraph("Here is the whole program again, now with the shortcut "):Keys("Ctrl", "D"):Text(" for Dog:")
+        CodeExampleFromFile("sources/tutorials/ui/Menu/Main2.quorum")
 
-    Drawable triangle = undefined
-    number scaleX = 1.0
-    number scaleY = 1.0
+        Paragraph("What changed:")
+        BulletList()
+        ListItem():Code("class Main is Form"):Text(" means "):Code("Main"):Text(" is the form. So it calls
+"):Code("GetMainPage()"):Text(" and "):Code("Display()"):Text(" itself, with no "):Code("form:"):Text(" in front.")
+        ListItem("Dog is kept in the "):Code("dog"):Text(" variable so "):Code("CreateGame"):Text(" can reach it.")
+        ListItem():Code("CreateGame"):Text(" sets the shortcut once the window is open.")
 
-    action Run(BehaviorEvent behavior)
-        if triangle not= undefined
-            triangle:SetScale(scaleX, scaleY)
-            Speech speech
-            speech:Say(" + dq + "Scaled by a factor of " + dq + " + scaleX + " + dq + " horizontally, and a factor of " + dq + " + scaleY + " + dq + "vertically." + dq + ")
-        end
-
-        MenuItem tempItem = cast(MenuItem, behavior:GetItem())
-        Array<MenuItem> items = tempItem:GetMenuPath()
-
-        integer counter = 0
-        integer size = items:GetSize()
-        text path = " + dq + dq + "
-        repeat while counter < size
-            path = path + items:Get(counter):GetName() + " + dq + "\" + dq + "
-            counter = counter + 1
-        end
-        output path
+        Paragraph("The menu now shows "):DoubleQuote():Text("Control + D"):DoubleQuote():Text(" next to Dog, and pressing "):Keys("Ctrl", "D"):Text(" runs
+the Dog command even when the menu is closed. Shortcuts help everyone work
+faster, and they matter most to people who use only a keyboard.")
     end
 
-    action SetDrawable(Drawable newTriangle)
-        triangle = newTriangle
+    private action FindingThePath
+        Subsection("Finding the path to a command")
+        Paragraph("Sometimes a behavior needs to know which menu item ran it. The
+"):Code("BehaviorEvent"):Text(" that "):Code("Run"):Text(" gets holds that item, and a menu item's
+"):Code("GetMenuPath"):Text(" action returns every item from the top of the menu down to
+it. For Dog, the path is Animals, Pets, Dog. Here is "):Code("OutputBehavior"):Text(" again,
+now writing the path to the output as well:")
+        CodeExampleFromFile("sources/tutorials/ui/Menu/OutputBehavior2.quorum")
+
+        Paragraph("The "):Code("is MenuItem"):Text(" check matters. A behavior can be used by other controls
+too, such as a button, and then the item is not a menu item. You will use
+"):Code("OutputBehavior"):Text(" with buttons in the "):Link("Toolbars", "/tutorials/ui/toolbar.html"):Text("
+tutorial.")
+
+        BlockEditorFile("OutputBehavior.quorum", "html/sources/tutorials/ui/Menu/OutputBehavior2.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Menu/Main2.quorum", "", true, true)
     end
 
-    action SetScale(number newScaleX, number newScaleY)
-        scaleX = newScaleX
-        scaleY = newScaleY
-    end
-end")
-        Paragraph("Now, when the SizeBehavior is run, it will output the path to the currently selected MenuItem. This change is done the same way for all five Behavior classes we made, so the use statements and addition to the Run action can simply be copied into the other classes.")
+    private action WhereMenusCameFrom
+        Subsection("Where menus came from")
+        Paragraph("Menus and windows were shaped by people, companies and a government. In
+1968, Douglas Engelbart and his team at the Stanford Research Institute
+showed NLS, a system with a mouse and windows on the screen. Its funding
+came from DARPA, a research agency of the US government, and the US Air
+Force ("):Link("source", "https://www.darpa.mil/node/2102"):Text("). In the 1970s, researchers
+at Xerox's Palo Alto Research Center (PARC) built the Alto, a computer
+used through windows, icons, menus and a mouse. In 1979, a group from Apple
+led by Steve Jobs visited PARC. Apple's Lisa, released in 1983, had a menu
+bar of pull-down menus at the top of the screen, and the Macintosh followed
+in 1984. Microsoft first released Windows in 1985
+("):Link("source", "https://computerhistory.org/blog/the-lisa-apples-most-influential-failure/"):Text(").")
     end
 
-    private action TryMakingAUserInterface
-        Section("Try making a User Interface")
-        CodeEditorFromProject("Activity: Menu", "Menu.quorum", "examples/UserInterface/Menu/Main.quorum")
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner design and build the menu bar for a
+simple drawing program, and test how quickly it can be used. The goal is to organize commands into menus, and to choose
+mnemonics and shortcuts that make common commands fast. Plan it first, on
+paper or with physical manipulatives such as sticky notes or index cards: decide on three menus, the commands in each, at least one submenu, a
+mnemonic for each top-level menu, and two shortcuts. Then build it in
+Quorum on a page, using "):Code("OutputBehavior"):Text(" so each command writes what it would
+do.")
+
+        Paragraph("When it works, swap programs. Your partner runs every command with the
+keyboard, the mouse or another device they use, and says out loud how they
+reached each one. Find the command your partner used most, and count the
+steps it took, such as key presses, clicks or taps. Could a
+shortcut, or moving it to a different menu, make it shorter? Ask your
+partner which command was the hardest to find. Change one thing in your
+design based on what your partner told you and what you counted.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Menus hide commands until you ask for them. That saves space but makes
+commands harder to discover. How do mnemonics and shortcuts change that
+trade-off? Which commands in your own program deserve a shortcut, and why?
+In "):DoubleQuote():Text("Where menus came from"):DoubleQuote():Text(", what did the government do that a company
+could not, and what did the companies do that the researchers did not?")
+
+        Paragraph("The next tutorial covers "):Link("Popup Menus", "/tutorials/ui/popupMenu.html"):Text(", menus
+that appear right where you need them instead of on a bar.")
     end
 end

@@ -1,141 +1,254 @@
-use Libraries.Web.Page.QuorumPage
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
 
 /*
-    Tutorial: File Chooser.
-    Converted from the old Lesson page by plan 13's generator: the same
-    words, now without Tailwind.
+    Tutorial: File Choosers, the computer's own windows for opening and
+    saving files and choosing folders, in the user interface series. This
+    lesson is offline only, so it has no block editor.
 */
 class UserInterfacesFileChooser is QuorumPage
-    // A double quote, for code and words that hold one.
-    text dq = ""
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
 
     on create
         SetLocation("tutorials/ui/fileChooser.html")
-        // The name lists and links use, and the series and track it belongs
-        // to: its section and picture.
-        SetShortTitle("File Chooser")
+        SetShortTitle("File Choosers")
         SetSectionName("User Interfaces")
-        // For search engines and link previews, and what lists of pages say.
-        SetDescription("Learn about File Choosers in the Quorum programming language.")
-        SetSummary("how to use File Choosers")
     end
 
     action Setup
-        dq = dq:GetDoubleQuote()
-        SetWebPageTitle("File Chooser Tutorial - Quorum Programming Language")
-        Title("Tutorial: File Chooser")
-        Paragraph("This tutorial tells you how to use File Choosers in Quorum")
-        IntroductionToFileChoosersInQuorum()
-        MakingFileChooserDialogs()
+        // For search engines and link previews.
+        SetDescription("Use Quorum's FileChooser to open a file, save a file and choose a folder from buttons on a Form, limit the choice with a FileFilter, and keep saved files safe with the CIA triad.")
+
+        Title("File Choosers")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
     end
 
-    private action IntroductionToFileChoosersInQuorum
-        Section("Introduction to File Choosers in Quorum")
-        Paragraph("As noted in the name, File Choosers are meant to be used when interacting with Files and it is important to have at least a small understanding of how Files work in Quorum to use them. For this tutorial we will be doing minimal interaction with Files as the focus of this tutorial is with the File Chooser GUI component instead of the Files themselves which deal more with the internals of the System.")
-        Subsection("Files in Quorum")
-        Paragraph("The File class is used to access and gather information about files on disk. They can represent a file or a directory, and actions are provided for both manipulation and gathering of file data (such as file name, last time modified, etc). But a File object is not used for modifying the contents of files, but actions are provided that allow this functionality through other classes. For more information on the File class and modifying the contents of files, see the "):Link("File", "/Libraries/System/File.html"):Text(", "):Link("FileReader", "/Libraries/System/FileReader.html"):Text(", "):Link("FileWriter", "/Libraries/System/FileWriter.html"):Text(", and "):Link("FileRandomAccess", "/Libraries/System/FileRandomAccess.html"):Text(" documentation.")
-        Subsection("What is a File Chooser?")
-        Paragraph("A File Chooser is an interface tool that gives users a way to navigate the File System, usually in the form of a system dialog. In Quorum, the File Chooser class gives you the actions necessary to open a File Chooser dialog but the dialog itself is provided by the Operating System. How the dialog looks and functions may vary from system to system but generally a dialog will appear where you can view the Files and Folders on the system and then you will be able to choose a file and the dialog will return the file the user chose.")
-        Subsubsection("File Filters")
-        Paragraph("A File Filter is a class that represents a filter for files in an open or save dialog. It does not do much on its own, but is used in relation to the FileChooser class. An example of a filter in action may be in a File Chooser dialog that is meant for opening an image. You may when the user to only select a valid image file so you can add a filter so only files with a "):DoubleQuote():Text("png"):DoubleQuote():Text(" will be shown and allowed to be selected. We will show how to use filters with file choosers in Quorum in later section in this tutorial.")
+    action Overview
+        Section("Overview")
+        Paragraph("Many programs let people open and save files: a text editor opens a story,
+a drawing app saves a picture, a game loads a saved level. To do this, the
+program needs to ask the person "):Strong("which"):Text(" file. A "):Strong("file chooser"):Text(" is the
+window that lets them browse their folders and pick one. In Quorum,
+the "):Code("FileChooser"):Text(" class opens the computer's own file window, the same one
+other programs use, and gives your program back the file that was picked.
+In this tutorial, you will open a file, save a file, choose a folder, and
+limit which kinds of files can be picked, all from buttons on a page.")
+
+        Paragraph():Strong("This lesson works only offline, in Quorum Studio on a desktop computer."):Text("
+Unlike the other lessons in this series, its programs can't run in the
+online code editor, because a program in a web browser can't open your
+computer's file windows.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Open the computer's open, save and choose folder windows with "):Code("FileChooser")
+        ListItem("Use the "):Code("File"):Text(" that comes back, and handle the case where the person
+cancels")
+        ListItem("Limit the kinds of files a person can pick with a "):Code("FileFilter")
+        ListItem("Explain why Quorum uses the operating system's own file window")
+        ListItem("Explain what can go wrong with saved files when confidentiality,
+integrity or availability is ignored")
     end
 
-    private action MakingFileChooserDialogs
-        Section("Making File Chooser Dialogs")
-        Paragraph("For this tutorial we will be using buttons and behaviors to trigger the File Chooser Dialogs. We will start by making three Behavior classes that will open one of three File Chooser Dialogs.")
-        Paragraph("The three File Chooser Dialogs are the Open File Dialogs, the Save File Dialog, and the Choose Folder Dialog. The difference between them is that the Dialog will look slightly different and that depends on the OS and exact appearance depends on the OS, for the Quorum side all we need to worry about is calling the right actions with the right parameters and getting the return value.")
-        Subsection("Open File Dialog")
-        Paragraph("The first Behavior we will make will call the Open File Dialog. We will make a Quorum class file for it and we will name it "):DoubleQuote():Text("openFile.quorum."):DoubleQuote()
-        Paragraph("For all three of these behaviors we will need the File Chooser and File Libraries. You can include them with the following use statements:")
-        CodeExample("use Libraries.Interface.Controls.FileChooser
-use Libraries.System.File")
-        Paragraph("We want to open the file chooser when the button is clicked so we will overwrite the Run action. To open the File Chooser all we need to do is make a FileChooser object and then call the OpenFileDialog action. But OpenFileDialog returns the File that was chosen so we need to make a File object that will hold the returned file. Then if the user chooses a file to open we will output the absolute path of the file and its name. The full openFile Behavior is provided in the code block below:")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Controls.FileChooser
-use Libraries.System.File
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about the window that opens when you choose "):DoubleQuote():Text("Open"):DoubleQuote():Text(" in any app on your
+computer. Is it the same in every app? Why might it be a good idea for
+every app on a computer to use the same file window? Think about people who
+use a keyboard or a screen reader. What would happen if every program made
+its own?")
 
-class openFile is Behavior
-    action Run(BehaviorEvent event)
-        FileChooser chooser
-        File file = chooser:OpenFileDialog()
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/FileChooser/Vocabulary.csv")
 
-        if file not= undefined
-            output file:GetAbsolutePath()
-            output file:GetFileName()
-        end
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/FileChooser/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_HARDWARE_AND_SOFTWARE_29)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_19)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_TESTING_AND_REFINING_7)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_SECURITY_32)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_SECURITY_33)
+        StandardsList(computerScience)
     end
-end")
-        Subsubsection("Save File Dialog")
-        Paragraph("Now we will make the behavior that will call the Save File Dialog, we will make a new Quorum class file and name it "):DoubleQuote():Text("saveFile.quorum."):DoubleQuote():Text(" This behavior is almost exactly the same as openFile but with the name saveFile and replacing the OpenFileDialog action with the SaveFileDialog action. The call for the Save File Dialog is shown in the following line of code:")
-        CodeExample("File file = chooser:SaveFileDialog()")
-        Paragraph("In the Save File Dialog the user provides a name for the File and they choose a directory. This is useful when you want to the user to create a new File at a location they want. To create a new file and then write to it you can go to the File class documentation to learn how.")
-        Subsubsection("Choose Folder Dialog")
-        Paragraph("Lastly we will make the behavior that will open the Choose Folder Dialog, we make another new Quorum class file and name it "):DoubleQuote():Text("chooseFolder.quorum."):DoubleQuote():Text(" This dialog is opened a bit differently because you need provide a file as a parameter. The file parameter is used as the location where the Dialog will open to. The other two Dialogs also can take a File as parameter for location, but if none is provided or the File’s Path was not set then it will open to either to default of the system or the path to your project.")
-        Paragraph("In the following code block is the chooseFolder behavior but with the use statements excluded. You will notice that other than calling the ChooseFolderDialog action we also add a new output statement that will output true if the File is a directory.")
-        CodeExample("use Libraries.Interface.Behaviors.Behavior
-use Libraries.Interface.Events.BehaviorEvent
-use Libraries.Interface.Controls.FileChooser
-use Libraries.System.File
 
-class chooseFolder is Behavior
-    action Run(BehaviorEvent event)
-        FileChooser chooser
-        File location
-        File folder = chooser:ChooseFolderDialog(location)
+    action Explore
+        Section("Explore")
 
-        if file not= undefined
-            output folder:GetAbsolutePath()
-            output folder:GetFileName()
-            output folder:isDirectory()
-        end
+        FilesAndFileChoosers()
+        OpeningAFile()
+        SavingAFile()
+        ChoosingAFolder()
+        AddingTheButtonsToAPage()
+        KeepingSavedFilesSafe()
     end
-end")
-        Subsubsection("Adding a File Filter")
-        Paragraph("File Chooser dialogs have an option to add File Filter which will force the user to choose a file or only view Files with a specific file extension. You do need to add it for this tutorial but to use File Filter you will need the FileFilter library which you can include using the following use statement:")
-        CodeExample("use Libraries.Interface.Controls.FileFilter")
-        Paragraph("To show how you set the filter and use it for a dialog an example of how you would add one so the user can only select Quorum files is shown below:")
-        CodeExample("FileFilter filter
-filter:Add(" + dq + "quorum" + dq + ")
-File file = chooser:OpenFileDialog(filter)")
-        Paragraph("Since the File Filter only works on files only the Open File and Save File Dialogs can accept a filter. If you need to add a Filter and a Location then the first parameter for the action call will be the location and the second parameter is the filter.")
-        Subsection("Adding Buttons to Open File Choosers")
-        Paragraph("To open the File Choosers we will simply make Buttons that when clicked will call a behavior that will open the file choosers for us. We will make Three Buttons for the three different dialogs you can open. The code for this will be in the CreateGame action of the main class and is provided below:")
-        CodeExample("action CreateGame
-    Button open
-    Button save
-    Button folder
 
-    open:SetName(" + dq + "Open File" + dq + ")
-    save:SetName(" + dq + "Save File" + dq + ")
-    folder:SetName(" + dq + "Choose Folder" + dq + ")
+    private action FilesAndFileChoosers
+        Subsection("Files and file choosers")
+        Paragraph("In Quorum, the "):Code("File"):Text(" class stands for one file or folder on the computer.
+A "):Code("File"):Text(" knows its name and its path, and it can read or write the text
+inside the file. This tutorial uses only a few of its actions. The
+"):Link("File documentation", "/Libraries/System/File.html"):Text(" lists the rest.")
 
-    open:SetPosition(300, 400)
-    save:SetPosition(300, 350)
-    folder:SetPosition(300, 300)
+        Paragraph("A "):Code("FileChooser"):Text(" does not draw its own window. Instead, it asks the
+"):Strong("operating system"):Text(" to open the same file window that every other program
+on the computer uses. This has two big benefits:")
+        BulletList()
+        ListItem("People already know how to use it.")
+        ListItem("It already works with the computer's screen reader and keyboard
+shortcuts, so you don't have to build that yourself.")
 
-    openFile openBehavior
-    open:SetBehavior(openBehavior)
+        Paragraph("Because the window comes from the operating system, it looks different on
+Windows and on macOS. Your Quorum code is the same on both.")
 
-    saveFile saveBehavior
-    save:SetBehavior(saveBehavior)
+        Paragraph("File choosers work in Quorum Studio on a desktop computer. They don't work
+in the online code editor, which can't reach the files on your computer.")
 
-    chooseFolder foldBehavior
-    folder:SetBehavior(foldBehavior)
+        Paragraph("There are three kinds of file window:")
+        BulletList()
+        ListItem():Strong("Open"):Text(": pick a file that already exists.")
+        ListItem():Strong("Save"):Text(": pick a folder and type a name for a file. The file might not
+exist yet.")
+        ListItem():Strong("Choose folder"):Text(": pick a folder instead of a file.")
+    end
 
-    open:SetNextFocus(save)
-    save:SetNextFocus(folder)
-    folder:SetNextFocus(open)
-    open:SetPreviousFocus(folder)
-    save:SetPreviousFocus(open)
-    folder:SetPreviousFocus(save)
-    SetFocus(open)
+    private action OpeningAFile
+        Subsection("Opening a file")
+        Paragraph("In Quorum Studio, make a new project. Under "):Strong("General"):Text(", choose "):Strong("App"):Text(".
+Each window will be opened by a button on the page, with its own behavior.
+Add a class named "):Code("OpenFileBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/FileChooser/OpenFileBehavior.quorum")
 
-    Add(open)
-    Add(save)
-    Add(folder)
-end")
-        Paragraph("Note that we also added to a Focus Cycle to ensure that our application is accessible.")
-        Paragraph("Now we can run the program and there will be three Buttons and you can activate a Button to open one of the File Chooser Dialogs. After interacting with the Dialogs the File chosen will be returned and the program will output the absolute path to the File and the File’s name.")
+        Paragraph("Here is what it does:")
+        BulletList()
+        ListItem("The "):Code("FileFilter"):Text(" lists the file extensions the window should allow. Here,
+it is only "):Code("txt"):Text(", so the person can pick text files. Write the extension
+without the dot.")
+        ListItem():Strong("A new filter allows every file."):Text(" Until you call "):Code("SetAcceptAll(false)"):Text(",
+the extensions you added are not used at all. Always call it when you want
+the filter to limit the choice.")
+        ListItem():Code("OpenFileDialog(filter)"):Text(" opens the window and "):Strong("waits"):Text(" until the person
+picks a file or cancels.")
+        ListItem("If the person cancels, the result is "):Code("undefined"):Text(". Always check for this.
+If you don't, your program stops with an error the first time someone
+changes their mind.")
+        ListItem():Code("file:Read()"):Text(" returns all the text in the file.")
+    end
+
+    private action SavingAFile
+        Subsection("Saving a file")
+        Paragraph("Add a class named "):Code("SaveFileBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/FileChooser/SaveFileBehavior.quorum")
+
+        Paragraph("In a save window, the person types a new name, or picks a file that is
+already there. "):Code("file:Exists()"):Text(" tells you which one happened. "):Code("file:Write"):Text("
+creates the file if needed, and "):Strong("replaces"):Text(" everything in it if it was
+already there. Most save windows warn the person before they replace a
+file.")
+    end
+
+    private action ChoosingAFolder
+        Subsection("Choosing a folder")
+        Paragraph("Add a class named "):Code("ChooseFolderBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/FileChooser/ChooseFolderBehavior.quorum")
+
+        Paragraph():Code("ChooseFolderDialog"):Text(" needs a "):Code("File"):Text(" that says which folder to start in. A new
+"):Code("File"):Text(" that has no path refers to your program's working folder, so the
+window starts there.")
+
+        Paragraph("The open and save windows can take a starting folder too. Give the folder
+first and the filter second:")
+        CodeExampleFromFile("sources/tutorials/ui/FileChooser/OpenWithStart.quorum")
+
+        Paragraph("A filter only makes sense for files, so "):Code("ChooseFolderDialog"):Text(" doesn't take one.")
+    end
+
+    private action AddingTheButtonsToAPage
+        Subsection("Adding the buttons to a page")
+        Paragraph("Now replace "):Code("Main.quorum"):Text(". It puts one button on the page for each window.")
+        CodeExampleFromFile("sources/tutorials/ui/FileChooser/Main.quorum")
+
+        Paragraph("The page stacks the buttons in rows and puts them in the "):Key("Tab"):Text(" order for
+you, so a keyboard user can reach every one.")
+
+        Paragraph("Run the program. Use the Save File button first to make a text file, then
+open it with the Open File button. The output window shows what happened
+each time.")
+    end
+
+    private action KeepingSavedFilesSafe
+        Subsection("Keeping saved files safe")
+        Paragraph("Security experts often check how data is protected with three ideas, called
+the "):Strong("CIA triad"):Text(". "):Strong("Confidentiality"):Text(" means only the people who should read
+information can read it. "):Strong("Integrity"):Text(" means information isn't changed or
+destroyed in ways it shouldn't be. "):Strong("Availability"):Text(" means people can get to
+their information when they need it
+("):Link("source", "https://csrc.nist.gov/glossary/term/security"):Text(").")
+
+        Paragraph("Each one matters when a program saves files. Here is what can happen when a
+program ignores them:")
+        BulletList()
+        ListItem():Strong("Confidentiality:"):Text(" a person saves a private diary into a folder that
+everyone on a shared computer can open, and anyone can read it. A program
+can help by suggesting a private folder, and by never saving somewhere
+the person didn't choose.")
+        ListItem():Strong("Integrity:"):Text(" "):Code("file:Write"):Text(" replaces everything in a file that is already
+there. If the program never checks "):Code("file:Exists()"):Text(" and asks first, one
+wrong click or key press destroys someone's work. The
+"):Link("Option Dialogs", "/tutorials/ui/optionDialog.html"):Text(" tutorial shows how to
+ask.")
+        ListItem():Strong("Availability:"):Text(" if the only copy of a file is on one drive, and that
+drive breaks or is lost, the file is gone. Keeping a backup copy
+somewhere else means the work can still be reached.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you write a "):Strong("test plan"):Text(" for the file chooser program,
+run it, and record what really happens. The goal is to
+think about everything a person might do with a file chooser, including the
+unexpected, before you trust your program. A test plan is a list of things
+to try and what should happen for each. Include at least these cases:")
+        BulletList()
+        ListItem("picking a file, then pressing Cancel instead;")
+        ListItem("saving with a new name, and saving over a file that's already there;")
+        ListItem("trying to open a file that isn't a "):Code(".txt"):Text(" file;")
+        ListItem("one test for each part of the CIA triad, such as saving into a folder
+other people can open, or saving over a file with the only copy of
+your work;")
+        ListItem("doing everything with only the keyboard ("):Key("Tab"):Text(", "):Key("Space"):Text(", "):Key("Enter"):Text(", the
+arrow keys and "):Key("Escape"):Text(").")
+
+        Paragraph("Run each test and write down what really happened next to what you
+expected. If you can, run the same tests on a second operating system, and
+write down what was different about its file window. Did anything surprise
+you? For each CIA test, write what the person would lose if the program
+got it wrong. Then pick one of the made-up flaws from "):DoubleQuote():Text("Keeping saved files
+safe"):DoubleQuote():Text(", such as the diary saved in a shared folder, and write a fix for it:
+what the program should do differently, and which part of the CIA triad
+your fix protects. Fix one problem you found, or change the program so it
+saves text that the person typed into a text field on the page. The
+"):Link("Text Fields tutorial", "/tutorials/ui/textField.html"):Text(" shows how to get typed
+text.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Your program used a window it didn't build. The operating system made it.
+What are the good and bad sides of handing part of your program to the
+operating system? What can you no longer control?")
     end
 end

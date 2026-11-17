@@ -1,0 +1,36 @@
+use Libraries.Interface.Forms.FormBehavior
+use Libraries.Interface.Forms.Page
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.ColorWell
+use Libraries.Game.Graphics.Color
+
+class CheckColorsBehavior is FormBehavior
+    action Run(BehaviorEvent event)
+        Page page = GetPage()
+        ColorWell backgroundWell = page:GetColorWell("Background color")
+        ColorWell textWell = page:GetColorWell("Text color")
+        if backgroundWell = undefined
+            return now
+        end
+        if textWell = undefined
+            return now
+        end
+
+        Color back = backgroundWell:GetColor()
+        Color front = textWell:GetColor()
+        number contrast = back:CalculateContrast(front)
+
+        // Round to one decimal place, such as 8.6.
+        integer tenths = cast(integer, contrast * 10 + 0.5)
+        number rounded = tenths / 10.0
+
+        output "Background: " + backgroundWell:GetColorText()
+        output "Text: " + textWell:GetColorText()
+        output "Contrast: " + rounded + " to 1"
+        if contrast >= 4.5
+            output "Text on this background is easy to read."
+        else
+            output "Text on this background is hard to read. Try colors that are farther apart in lightness."
+        end
+    end
+end

@@ -1,0 +1,261 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Option Dialogs, ready-made dialogs that ask one yes or no
+    question, in the user interface series.
+*/
+class UserInterfacesOptionDialog is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+    // A double quote, for code that holds one.
+    text dq = ""
+
+    on create
+        SetLocation("tutorials/ui/optionDialog.html")
+        SetShortTitle("Option Dialogs")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        dq = dq:GetDoubleQuote()
+
+        // For search engines and link previews.
+        SetDescription("Ask a yes or no question with a Quorum OptionDialog, react to Yes and No, use it with a keyboard, and learn how fake warning dialogs trick people.")
+
+        Title("Option Dialogs")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Many programs need to ask a quick yes or no question before they do
+something: "):DoubleQuote():Text("Delete this file?"):DoubleQuote():Text(", "):DoubleQuote():Text("Quit without saving?"):DoubleQuote():Text(", "):DoubleQuote():Text("Start a new game?"):DoubleQuote():Text("
+Quorum has a ready-made dialog for this, called an "):Strong("option dialog"):Text(". It
+shows one question with a Yes button and a No button. You don't have to
+build its layout. You give it the question and tell it what to do when the
+person picks Yes. In this tutorial, you will ask a question with an
+"):Code("OptionDialog"):Text(" from a button on a page, react to Yes and to No, and test
+what the dialog is like to use with a keyboard.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Create an "):Code("OptionDialog"):Text(" and set its question with "):Code("SetLabelTitle")
+        ListItem("Run your own code when the person picks Yes, with "):Code("SetBehavior")
+        ListItem("Run your own code when the person picks No, with "):Code("SetCancelBehavior")
+        ListItem("Explain when a program should ask before it acts")
+        ListItem("Recognize how a fake warning dialog tricks people, and design honest ones")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Programs ask "):DoubleQuote():Text("Are you sure?"):DoubleQuote():Text(" all the time. Think of one time this saved
+you from a mistake, and one time it just got in your way. What was
+different about the two? Make a short list of actions that "):Strong("should"):Text(" ask
+first, and actions that should "):Strong("not"):Text(".")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/OptionDialog/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/OptionDialog/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_TESTING_AND_REFINING_20)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_TESTING_AND_REFINING_20)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_SOFTWARE_DEVELOPMENT_USER_EXPERIENCE_5)
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_SECURITY_33)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_SECURITY_32)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+
+        WhatAnOptionDialogIs()
+        AskingAQuestion()
+        DoingSomethingOnNo()
+        UsingTheKeyboard()
+        WhenToUseAnOptionDialog()
+        DialogsThatTrickPeople()
+    end
+
+    private action WhatAnOptionDialogIs
+        Subsection("What an option dialog is")
+        Paragraph("An "):Code("OptionDialog"):Text(" is a kind of "):Code("Dialog"):Text(" that Quorum has already built for
+you. (The "):Link("Dialogs tutorial", "/tutorials/ui/dialog.html"):Text(" shows how to build
+your own.) It comes with:")
+        BulletList()
+        ListItem("a question, which says "):DoubleQuote():Text("Are you sure?"):DoubleQuote():Text(" until you change it;")
+        ListItem("a "):Strong("No"):Text(" button, which closes the dialog;")
+        ListItem("a "):Strong("Yes"):Text(" button, which runs the behavior you give it;")
+        ListItem("a top bar with the dialog's name and an X button.")
+
+        Paragraph("It is always "):Strong("modal"):Text(": while it is open, the rest of the program ignores
+the mouse and keyboard.")
+    end
+
+    private action AskingAQuestion
+        Subsection("Asking a question")
+        Paragraph("In this program, a "):DoubleQuote():Text("New Game"):DoubleQuote():Text(" button on the page asks before it sets the
+score back to 0.")
+
+        Paragraph("First, add a class named "):Code("YesBehavior.quorum"):Text(". It runs when the person
+picks Yes. It sets the score label back to 0, then closes the dialog.")
+        CodeExampleFromFile("sources/tutorials/ui/OptionDialog/YesBehavior.quorum")
+
+        Paragraph("The Yes button does "):Strong("not"):Text(" close the dialog on its own. Your behavior has
+to call "):Code("Hide"):Text(", or the dialog stays open.")
+
+        Paragraph("Now replace "):Code("Main.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/OptionDialog/Main.quorum")
+
+        Paragraph("Here is what is new:")
+        BulletList()
+        ListItem():Code("Main"):Text(" is the New Game button's behavior, as in the
+"):Link("Forms", "/tutorials/ui/forms.html"):Text(" tutorial. Its "):Code("Run"):Text(" action opens the
+question.")
+        ListItem():Strong("The dialog is made inside "):Code("Run"):Strong("."):Text(" An option dialog gets its drawing
+ready as soon as it is made, and that only works once the app's window is
+open. "):Code("Run"):Text(" happens when someone presses the button, which is always
+after "):Code("form:Display()"):Text(". The "):Code("if question = undefined"):Text(" check makes the
+dialog only the first time, and keeps it in "):Code("question"):Text(" to reuse.")
+        ListItem():Code("SetLabelTitle(" + dq + "Start a new game?" + dq + ")"):Text(" sets the question. It also names the
+dialog "):DoubleQuote():Text("Start a new game? Dialog"):DoubleQuote():Text(", which is shown in the top bar and read
+by a screen reader.")
+        ListItem():Code("SetDescription"):Text(" adds more detail for screen reader users, so they know
+what Yes and No will do.")
+        ListItem():Code("SetBehavior(yesBehavior)"):Text(" connects your "):Code("YesBehavior"):Text(" to the Yes button.")
+
+        Paragraph("Run the program and press New Game. Pick No, and the score stays at 50.
+Press New Game again and pick Yes, and the score goes to 0.")
+    end
+
+    private action DoingSomethingOnNo
+        Subsection("Doing something when the person picks No")
+        Paragraph("By default, No only closes the dialog. If your program needs to do
+something on No, write a behavior and give it to "):Code("SetCancelBehavior"):Text(". Add a
+class named "):Code("NoBehavior.quorum"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/OptionDialog/NoBehavior.quorum")
+
+        Paragraph("Then add these lines to "):Code("Run"):Text(" in "):Code("Main"):Text(", right after
+"):Code("dialog:SetBehavior(yesBehavior)"):Text(":")
+        CodeExampleFromFile("sources/tutorials/ui/OptionDialog/NoLines.quorum")
+
+        Paragraph("Just like Yes, once you replace the No behavior, your behavior must call
+"):Code("Hide"):Text(".")
+
+        BlockEditorFile("YesBehavior.quorum", "html/sources/tutorials/ui/OptionDialog/YesBehavior.quorum")
+        BlockEditorFile("NoBehavior.quorum", "html/sources/tutorials/ui/OptionDialog/NoBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/OptionDialog/Main2.quorum", "", true, true)
+    end
+
+    private action UsingTheKeyboard
+        Subsection("Using the keyboard")
+        Paragraph("When the dialog opens, Quorum puts the focus on the Yes button. Here is what
+the keys do:")
+        BulletList()
+        ListItem():Key("Tab"):Text(" moves between Yes and No.")
+        ListItem():Key("Space"):Text(" or "):Key("Enter"):Text(" presses the button that has the focus.")
+        ListItem():Key("Escape"):Text(" closes the dialog "):Strong("without"):Text(" running either behavior. Treat
+"):Key("Escape"):Text(" the same as No: your program should not change anything.")
+
+        Paragraph("When the dialog closes, the focus goes back to the New Game button.")
+
+        Paragraph("Because the focus starts on Yes, a person who presses "):Key("Enter"):Text(" right away
+picks Yes. That is fine for "):DoubleQuote():Text("Start a new game?"):DoubleQuote():Text(", but think carefully before
+using an option dialog for something that can't be undone, like deleting a
+file.")
+    end
+
+    private action WhenToUseAnOptionDialog
+        Subsection("When to use an option dialog")
+        Paragraph("An option dialog is a good choice when:")
+        BulletList()
+        ListItem("the question has two answers, yes or no;")
+        ListItem("the action is hard to undo, like starting over or deleting;")
+        ListItem("the person might have chosen the action by mistake.")
+
+        Paragraph("It is a poor choice when the action is small or easy to undo. Asking too
+often teaches people to press Yes without reading. If you need different
+answers, more text, or other controls, build your own dialog with a page,
+as shown in the "):Link("Dialogs tutorial", "/tutorials/ui/dialog.html"):Text(".")
+    end
+
+    private action DialogsThatTrickPeople
+        Subsection("Dialogs that trick people")
+        Paragraph("People trust dialogs, because a dialog seems to come from the computer
+itself. Attackers use that trust. Tricking a person into doing something
+unsafe, such as paying, downloading a program or typing a password, is
+called "):Strong("social engineering"):Text(". One kind uses fake warnings, called
+"):Strong("scareware"):Text(": a message that claims your computer has a problem, so you
+will pay for a fix you don't need.")
+
+        Paragraph("In 2008, the US Federal Trade Commission (FTC) took a group of companies to
+court for scareware. The FTC said that the companies placed ads that sent
+people to web sites claiming to scan their computers. The scans reported
+viruses, spyware and errors that weren't there, and urged people to buy
+security programs for $39.95 or more. The FTC said more than one million
+people were tricked. The ads also fooled the web sites that showed them,
+since the companies pretended to buy ad space for real businesses. A court
+ordered the companies to stop making the false claims
+("):Link("source", "https://www.ftc.gov/news-events/news/press-releases/2008/12/court-halts-bogus-computer-scans"):Text(").")
+
+        Paragraph("Here is a made-up fake warning, written for this tutorial:")
+        Callout("Made-up fake warning")
+        Paragraph():Strong("WARNING!"):Text(" 37 viruses found! Your files will be deleted in 60 seconds.
+Press Yes to fix your computer now.")
+        EndCallout()
+
+        Paragraph("Notice the tricks: a scary claim with an exact number, a countdown that
+rushes you, and a Yes button that only leads to a payment. An honest dialog
+does the opposite. It says exactly what will happen, it doesn't invent a
+deadline, it makes No as easy to pick as Yes, and its name matches the
+program that opened it. To protect yourself, don't trust a warning that
+appears inside a web page or an ad. Close it, and check with the security
+program that is really installed on your computer.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you and a partner change an option dialog so it asks a
+clear question before an action that can't be undone. The goal is to decide
+when a program should ask first, and to write a question whose answer is
+obvious. Start with the program above. Then pick an action from your Warm
+up list that "):Strong("should"):Text(" ask first, and change the program so the button, the
+question and the description all match that action. Change what
+"):Code("YesBehavior"):Text(" does to fit.")
+
+        Paragraph("Have your partner use the program with only the keyboard, and ask them: did
+they know what Yes would do before they pressed it? Then rewrite the
+question so the answer is clear even without the description. For example,
+"):DoubleQuote():Text("Delete my_story.txt?"):DoubleQuote():Text(" is clearer than "):DoubleQuote():Text("Are you sure?"):DoubleQuote()
+
+        Paragraph("Next, each of you writes, on paper or with physical manipulatives, a made-up
+fake warning in the style of the scareware example, with at least two tricks
+in it. Swap them.
+Find every trick in your partner's warning, and rewrite it as an honest
+dialog. Then debate it together: in the FTC case, who was harmed, and how?
+Sort your answers into people, businesses, and governments, and agree on
+one way to prevent each harm.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("An option dialog is a small speed bump. When does a speed bump protect
+people, and when does it only slow them down? Who should decide which
+actions get one: the programmer, or the person using the program? A fake
+warning and a real one can use the same dialog. What makes one honest?")
+    end
+end

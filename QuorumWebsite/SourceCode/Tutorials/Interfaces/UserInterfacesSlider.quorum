@@ -1,0 +1,343 @@
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+/*
+    Tutorial: Sliders, part of the user interface series.
+*/
+class UserInterfacesSlider is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/ui/slider.html")
+        SetShortTitle("Sliders")
+        SetSectionName("User Interfaces")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("How to add sliders and slider fields to a Quorum form, set their range and step, read the number a person chose and react when it changes.")
+
+        Title("Sliders")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A slider lets a person choose a number by moving a small knob, called the
+thumb, along a line, called the track. You use sliders to set the volume on
+a phone, the brightness of a screen, or the size of a brush in a drawing
+program. In this tutorial, you will add sliders to a form, set the smallest
+and largest numbers they allow and how far one key press moves them, read the
+number a person chose, and make your program react when the number changes.")
+
+        Subsection("Goals")
+        Paragraph("You have the following goals for this tutorial:")
+        Goals()
+        ListItem("Add a slider to a form with "):Code("AddSlider"):Text(", and a slider with a number box
+with "):Code("AddSliderField")
+        ListItem("Set a slider's minimum, maximum and step, and explain how the step limits
+which numbers can be chosen")
+        ListItem("Read a slider's number with "):Code("GetValue"):Text(" and "):Code("GetNumberText")
+        ListItem("Use a "):Code("SliderListener"):Text(" to react when a person moves a slider")
+        ListItem("Explain how a person using a keyboard or a screen reader uses a slider")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Think about the volume on a phone or a computer. How many different volume
+levels do you think it has? Would it be better with fewer levels, or with
+more? When does it matter to choose an exact number, and when is "):DoubleQuote():Text("about
+right"):DoubleQuote():Text(" good enough?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/userInterface/Slider/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/userInterface/Slider/Code.csv")
+
+        Subsection("CSTA Standards")
+        Paragraph("This tutorial covers the following "):Link("CSTA standards", "https://csteachers.org/pk12standards/view/"):Text(":")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:MIDDLE_SCHOOL_DATA_COLLECTION_AND_PREPARATION_21)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_DATA_COLLECTION_AND_PREPARATION_24)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_IMPACTS_OF_ALGORITHMS_AND_DESIGN_9)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        WhatIsASlider()
+        MakingSliders()
+        MovingASlider()
+        MinimumMaximumAndStep()
+        PrecisionAndGranularity()
+        ReadingTheNumber()
+        ReactingToChanges()
+        WhatAScreenReaderSays()
+        Colors()
+    end
+
+    private action WhatIsASlider
+        Subsection("What is a slider?")
+        Paragraph("In the "):Link("Combo Boxes", "/tutorials/ui/comboBox.html"):Text(" tutorial, a person picked a
+word from a list. A slider is for picking a number from a "):Strong("range"):Text(": every
+number between a "):Strong("minimum"):Text(" and a "):Strong("maximum"):Text(". The thumb's place on the
+track shows the number. At the left end, the slider is at its minimum. At the
+right end, it is at its maximum. The part of the track up to the thumb is
+filled in with color, so it shows how far along it is.")
+
+        Paragraph("A slider can never go outside its range. If a program sets a number that is
+too big, the slider uses the maximum instead, and if it is too small, the
+slider uses the minimum. That makes a slider a good way to collect a number
+that must stay within limits, such as a volume from 0 to 100.")
+    end
+
+    private action MakingSliders
+        Subsection("Making sliders on a form")
+        Paragraph("Forms have two actions for sliders:")
+
+        BulletList()
+        ListItem():Code("AddSlider"):Text(" adds a plain slider. It shows no number, so it is good for a
+setting where the feel matters more than the exact number, such as
+brightness.")
+        ListItem():Code("AddSliderField"):Text(" adds a "):Strong("slider field"):Text(": a slider with a small number box
+beside it. The box shows the number, and a person can type an exact number
+in it. It is good when the number matters, such as a price.")
+
+        Paragraph("A label added with "):Code("AddLabel"):Text(" just before either one is shown beside it.")
+
+        Paragraph("The program below makes a settings form with one of each.")
+        CodeExampleFromFile("sources/tutorials/ui/Slider/Main.quorum")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        Paragraph():Code("AddSlider(" + quote + "Brightness" + quote + ")"):Text(" makes a slider from 0 to 100. The temperature
+slider field goes from 60 to 80, and each key press moves it by 0.5.")
+
+        Paragraph("A slider field is really three parts: a label, a slider and a number box. Its "):Code("GetSlider"):Text(" and "):Code("GetField"):Text(" actions return the slider and the number box. A
+screen reader reads the slider and the box separately, so the sample gives
+each one the same description.")
+    end
+
+    private action MovingASlider
+        Subsection("Moving a slider")
+        Paragraph("The form sets the focus order for you. A plain slider is one "):Key("Tab"):Text(" stop. A
+slider field is two: first the slider, then the number box.")
+
+        Paragraph("With the focus on a slider, these keys change its number:")
+
+        Table("A slider's keys")
+        TableHeader():Cell("Key"):Cell("What it does")
+        TableRowWriter upRow = TableRow()
+        upRow:Cell():Key("Right"):Text(" or "):Key("Up")
+        upRow:Cell("Moves up one step")
+        TableRowWriter downRow = TableRow()
+        downRow:Cell():Key("Left"):Text(" or "):Key("Down")
+        downRow:Cell("Moves down one step")
+        TableRowWriter shiftRow = TableRow()
+        shiftRow:Cell():Key("Shift"):Text(" with an arrow")
+        shiftRow:Cell("Moves a tenth of a step")
+        TableRowWriter pageRow = TableRow()
+        pageRow:Cell():Key("Page Up"):Text(", "):Key("Page Down")
+        pageRow:Cell("Moves up or down one page step")
+        TableRowWriter homeRow = TableRow()
+        homeRow:Cell():Key("Home")
+        homeRow:Cell("Moves to the minimum")
+        TableRowWriter endRow = TableRow()
+        endRow:Cell():Key("End")
+        endRow:Cell("Moves to the maximum")
+
+        Paragraph("With a mouse, you can drag the thumb, or click anywhere on the track to jump
+the thumb there. On a touch screen, you can drag the thumb with a finger.")
+
+        Paragraph("In a slider field's number box, you can type an exact number. The slider
+moves to it when the focus leaves the box, for example when you press "):Key("Tab"):Text(".
+A number outside the range is moved to the nearest end, and text that isn't
+a number is put back the way it was.")
+    end
+
+    private action MinimumMaximumAndStep
+        Subsection("Minimum, maximum and step")
+        Paragraph("The "):Strong("step"):Text(" is how much one press of an arrow key changes the number.
+Dragging the thumb and clicking the track also move in steps. The "):Strong("page
+step"):Text(" is how much "):Key("Page Up"):Text(" and "):Key("Page Down"):Text(" change it.")
+
+        Paragraph("You can give the minimum, the maximum and the step when you add the slider:")
+        CodeExampleFromFile("sources/tutorials/ui/Slider/Zoom.quorum")
+
+        Paragraph("This slider goes from 0 to 4, and each key press moves it by 0.25. Its page
+step is ten steps, 2.5.")
+
+        Paragraph("If you leave out the step, the form picks one for you:")
+
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+        Table("Steps the form picks")
+        TableHeader():Cell("You write"):Cell("Range"):Cell("Step"):Cell("Page step")
+        TableRowWriter volumeRow = TableRow()
+        volumeRow:Cell():Code("AddSlider(" + quote + "Volume" + quote + ")")
+        volumeRow:Cell("0 to 100"):Cell("1"):Cell("10")
+        TableRowWriter speedRow = TableRow()
+        speedRow:Cell():Code("AddSlider(" + quote + "Speed" + quote + ", 1, 10)")
+        speedRow:Cell("1 to 10"):Cell("0.09"):Cell("0.9")
+        TableRowWriter opacityRow = TableRow()
+        opacityRow:Cell():Code("AddSlider(" + quote + "Opacity" + quote + ", 0, 1)")
+        opacityRow:Cell("0 to 1"):Cell("0.01"):Cell("0.1")
+        TableRowWriter scoreRow = TableRow()
+        scoreRow:Cell():Code("AddSlider(" + quote + "Score" + quote + ", 0, 50)")
+        scoreRow:Cell("0 to 50"):Cell("1"):Cell("5")
+
+        Paragraph("The rule is: a step of 1 when the range is 10 or more, or a hundredth of the
+range when it is less. The page step is a tenth of the range. (The "):Code("AddSliderField"):Text(" versions work the same way.)")
+
+        Paragraph("You can also change these after the slider is made, with "):Code("SetMinimum"):Text(", "):Code("SetMaximum"):Text(", "):Code("SetRange(minimum, maximum)"):Text(", "):Code("SetStep"):Text(" and "):Code("SetPageStep"):Text(".")
+    end
+
+    private action PrecisionAndGranularity
+        Subsection("Precision and granularity")
+        Paragraph("The step decides which numbers a person can choose. A slider from 0 to 10
+with a step of 1 has only 11 choices: 0, 1, 2 and so on, up to 10. With a
+step of 0.5, it has 21 choices. With a step of 0.01, it has 1,001. How finely
+a person can choose is called "):Strong("granularity"):Text(".")
+
+        Paragraph("Finer isn't always better. Imagine a survey that asks students how many
+hours they slept last night:")
+
+        BulletList()
+        ListItem("with a step of 1, every answer is a whole number of hours. "):DoubleQuote():Text("7"):DoubleQuote():Text(" might mean
+anything from about 6 and a half to 7 and a half hours;")
+        ListItem("with a step of 0.25, a student can answer "):DoubleQuote():Text("7.25,"):DoubleQuote():Text(" to the nearest quarter
+hour;")
+        ListItem("with a step of 0.01, a student could answer "):DoubleQuote():Text("7.38,"):DoubleQuote():Text(" but almost nobody knows
+their sleep to the minute. The answer looks exact, but it isn't more
+accurate, and it is harder for a person to set with the keys.")
+
+        Paragraph("The step also changes how the number looks. "):Code("GetNumberText"):Text(" returns the
+number with as many decimal places as the step needs: a step of 0.25 gives
+two places, such as "):DoubleQuote():Text("7.25,"):DoubleQuote():Text(" and a step of 1 gives none, such as "):DoubleQuote():Text("7."):DoubleQuote():Text(" A screen
+reader reads the number the same way. If you want a different number of
+places, use "):Code("SetDecimalPlaces"):Text(".")
+
+        Paragraph("When you choose a step, ask: how exact can a person's answer really be, and
+how exact does my program need it to be?")
+    end
+
+    private action ReadingTheNumber
+        Subsection("Reading the number")
+        Paragraph("A slider's "):Code("GetValue"):Text(" action returns its number. "):Code("GetNumberText"):Text(" returns the
+same number as text, written the way the slider shows it. The "):DoubleQuote():Text("Save"):DoubleQuote():Text(" button
+uses both. Make a new class in a file named "):Code("SaveBehavior.quorum"):Text(". It comes
+from "):Code("FormBehavior"):Text(", which gives it the "):Code("GetPage"):Text(" action, so it can find the
+slider with "):Code("GetSlider"):Text(" and the slider field with "):Code("GetSliderField"):Text(".")
+        CodeExampleFromFile("sources/tutorials/ui/Slider/SaveBehavior.quorum")
+
+        Paragraph("Run the program, move both sliders and press "):DoubleQuote():Text("Save."):DoubleQuote():Text(" The output shows the
+two numbers.")
+
+        Paragraph():Code("GetSlider"):Text(" doesn't look inside a slider field, so it can't find "):DoubleQuote():Text("Temperature."):DoubleQuote():Text(" Use "):Code("GetSliderField"):Text(" for slider fields.")
+
+        BlockEditorFile("SaveBehavior.quorum", "html/sources/tutorials/ui/Slider/SaveBehavior.quorum")
+        BlockEditor("Main.quorum", "html/sources/tutorials/ui/Slider/Main.quorum", "", true, true)
+    end
+
+    private action ReactingToChanges
+        Subsection("Reacting when the number changes")
+        Paragraph("A slider tells its "):Strong("listeners"):Text(" each time a person changes its number. A
+listener is a class that comes from "):Code("SliderListener"):Text(" and writes the "):Code("SliderChanged"):Text(" action. The action gets a "):Code("SliderChangedEvent"):Text(", which has:")
+
+        BulletList()
+        ListItem():Code("GetNewValue"):Text(", the number after the change;")
+        ListItem():Code("GetOldValue"):Text(", the number before the change;")
+        ListItem():Code("IsFinal"):Text(", which is "):Code("false"):Text(" while the person is still dragging the thumb,
+and "):Code("true"):Text(" once the change is done;")
+        ListItem():Code("GetSlider"):Text(", the slider that changed.")
+
+        Paragraph("While a person drags the thumb, the slider tells its listeners many times. If
+your program does something slow with the number, such as saving it to a
+file, check "):Code("IsFinal"):Text(" and do it only once the drag ends.")
+
+        Paragraph("Make a class in a file named "):Code("VolumeListener.quorum"):Text(". It writes the volume
+into a label on the page, and says in the output when a change is finished.")
+        CodeExampleFromFile("sources/tutorials/ui/Slider/VolumeListener.quorum")
+
+        Paragraph("Now give the listener to a slider:")
+        CodeExampleFromFile("sources/tutorials/ui/Slider/Main2.quorum")
+
+        Paragraph("Drag the thumb slowly. The label changes the whole time, but the output has
+one line, when you let go. Then press "):Key("Right"):Text(" a few times: each key press is
+a finished change, so each one adds a line.")
+
+        Paragraph("A program's own "):Code("SetValue"):Text(" doesn't tell listeners, because a person didn't
+make the change. That is why the label starts at "):DoubleQuote():Text("Volume: 50"):DoubleQuote():Text(" by hand.")
+    end
+
+    private action WhatAScreenReaderSays
+        Subsection("What a screen reader says")
+        Paragraph("When a slider gets the focus, a screen reader says its name, its number and
+that it is a slider, and reads the description. If you set units with "):Code("SetUnits"):Text(", it says them after the number, such as "):DoubleQuote():Text("70 degrees."):DoubleQuote():Text(" When the
+person presses an arrow key, the screen reader reads the new number. The
+exact words depend on the screen reader. Screen readers also have their own
+ways to change a slider; for example, VoiceOver on the Mac uses "):Keys("VO", "Up"):Text(" and "):Keys("VO", "Down"):Text(".")
+
+        Paragraph("For a slider field, a screen reader user can use the slider or type in the
+number box. Both parts have the same name, so it is clear they belong
+together.")
+    end
+
+    private action Colors
+        Subsection("Colors")
+        Paragraph("When a slider has the focus, its thumb grows, so the focus is easy to spot.
+A slider takes its colors from the current theme, so it changes in dark mode
+too; the "):Link("Themes and Dark Mode", "/tutorials/ui/themes.html"):Text(" tutorial shows how
+to change them with the theme key "):DoubleQuote():Text("Slider."):DoubleQuote()
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("In this activity, you build a short sleep survey form. The goal is to
+choose the range and step of each slider on purpose. The form needs at least
+three sliders or slider fields, for example hours of sleep last night, how
+rested you feel from 1 to 10, and minutes of screen time before bed. Give
+each a label, a clear name, a description and units where they help. Add a "):DoubleQuote():Text("Submit"):DoubleQuote():Text(" button that outputs every answer with "):Code("GetNumberText"):Text(".")
+
+        Paragraph("Before you write any code, decide each slider's minimum, maximum and step,
+and write one sentence about each step: why is it not finer, and why is it
+not coarser?")
+
+        Paragraph("When it works, fill in your survey three times as three made-up people: one
+who slept 4 hours, one who slept 9 and a half, and one who had no screen
+time at all. Use only the keyboard: "):Key("Tab"):Text(", the arrow keys, "):Key("Page Up"):Text(", "):Key("Page Down"):Text(", "):Key("Home"):Text(" and "):Key("End"):Text(". For each person, check:")
+
+        BulletList()
+        ListItem("Can every answer be given exactly, or does the step force a different
+number?")
+        ListItem("How many key presses did the longest answer take? Would a different page
+step help?")
+        ListItem("Does the output match what you chose?")
+        ListItem("If you have a screen reader, turn it on: does it report each slider's
+name, number and units?")
+
+        Paragraph("Pick one slider whose range or step you would change after this test, change
+it, and write a sentence explaining why.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("A slider chooses a number between a minimum and a maximum, moving by a step.
+You can read the number with "):Code("GetValue"):Text(" or "):Code("GetNumberText"):Text(", or react right
+away with a "):Code("SliderListener"):Text(". The step decides how finely a person can
+answer, and a finer step isn't always a more accurate one. Think back to the
+warm up: for the sliders you use every day, is the step about right? In the
+next tutorial, "):Link("Progress Bars", "/tutorials/ui/progressBar.html"):Text(", you will show
+a number that the program changes instead of the person.")
+    end
+end
