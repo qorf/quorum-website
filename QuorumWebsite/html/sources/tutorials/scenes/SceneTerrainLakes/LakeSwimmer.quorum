@@ -1,0 +1,84 @@
+use Libraries.Game.Game
+use Libraries.Game.InputMonitor
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.Color
+use Libraries.Game.Graphics.Worlds.TerrainItem
+use Libraries.Game.Graphics.Worlds.TerrainWater
+use Libraries.Game.Graphics.Worlds.TerrainData
+use Libraries.Interface.Item3D
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Compute.Math
+
+class Main is Game
+    TerrainItem ground = undefined
+    Model ball
+    InputMonitor monitor
+    KeyboardEvent keys
+    Math math
+    number speed = 5
+    number sinceReport = 0
+
+    action Main
+        UseVulkan(true)
+        StartGame()
+    end
+
+    action CreateGame
+        LoadScene("Scenes/Scene.qs")
+        Item3D found = FindItem3DByName("Terrain")
+        if found is TerrainItem
+            ground = cast(TerrainItem, found)
+        else
+            output "This scene has no terrain named Terrain."
+        end
+        Color colors
+        ball:LoadSphere(1, 1, 1, colors:Red())
+        ball:SetPosition(0, 0, 0)
+        Add(ball)
+        GetCamera3D():Follow(ball, 12, 5)
+    end
+
+    action Update(number seconds)
+        if ground = undefined
+            return now
+        end
+        number x = ball:GetX()
+        number z = ball:GetZ()
+        if monitor:IsKeyPressed(keys:UP)
+            z = z + speed * seconds
+        end
+        if monitor:IsKeyPressed(keys:DOWN)
+            z = z - speed * seconds
+        end
+        if monitor:IsKeyPressed(keys:LEFT)
+            x = x - speed * seconds
+        end
+        if monitor:IsKeyPressed(keys:RIGHT)
+            x = x + speed * seconds
+        end
+
+        // Keep the ball on the ground: its middle is half a unit above it.
+        TerrainData data = ground:GetWorldTerrain():GetData()
+        if data:HasHeight(x, z)
+            ball:SetPosition(x, data:GetSurfaceHeight(x, z) + 0.5, z)
+        end
+
+        sinceReport = sinceReport + seconds
+        if sinceReport >= 1
+            sinceReport = 0
+            Report()
+        end
+    end
+
+    action Report
+        TerrainWater water = ground:GetWater()
+        number depth = water:GetWaterDepthAt(ball:GetX(), ball:GetZ())
+        if ground:IsUnderWater(ball:GetX(), ball:GetY(), ball:GetZ())
+            output "Swimming: the water is " + math:Round(depth, 1) + " deep here."
+        elseif depth > 0
+            output "Wading: the water is " + math:Round(depth, 1) + " deep here."
+        else
+            output "On dry ground."
+        end
+    end
+end

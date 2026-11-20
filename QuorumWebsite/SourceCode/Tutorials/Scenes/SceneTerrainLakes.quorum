@@ -1,0 +1,277 @@
+package Lessons
+
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+class SceneTerrainLakes is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/Scenes/terrainLakes.html")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("Learn to make lakes and puddles on a Quorum Studio terrain with the Fill water and Paint water tools, and the algorithm that fills a hollow.")
+
+        Title("Lakes")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("A sea covers everything below one height, but lakes, ponds and puddles sit
+at their own heights, in the hollows of the land. Quorum Studio has two
+tools for them. "):Strong("Fill water"):Text(" pours water into a hollow and lets it rise
+the way real water does, until it would spill over the edge. "):Strong("Paint
+water"):Text(" lays a thin layer of water exactly where you brush it, for
+puddles, marshes and shallow streams. In this tutorial, you will make
+lakes with both tools, change a lake's level, and learn the step-by-step
+rule, an algorithm, that Quorum Studio follows to fill a hollow. At the
+end, a short program checks whether a player is standing in the water.")
+
+        Subsection("Goals")
+        Goals()
+        ListItem("Fill a hollow with the Fill water tool, and change the lake's level")
+        ListItem("Paint and erase shallow water with the Paint water tool")
+        ListItem("Describe the algorithm that fills a hollow, and test it with cases where
+it should and shouldn't make a lake")
+        ListItem("Write a program that asks a terrain whether a point is under water, and
+how deep the water is there")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Pour a glass of water onto a bumpy table in your mind. Where does it go
+first? When does it stop spreading? What happens if one side of a dip is
+lower than the others? Try to write the rules down in three or four short
+steps that anyone could follow.")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Terrain/Lakes/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/scenes/Terrain/Lakes/Code.csv")
+
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_ALGORITHMIC_PROBLEM_SOLVING_1)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_ALGORITHMIC_PROBLEM_SOLVING_3)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        Paragraph("This tutorial needs a terrain with hollows: a few dips made with the Lower
+tool in "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(", or a
+generated landscape from
+"):Link("Generating Terrain", "/tutorials/Scenes/terrainGenerate.html"):Text(". It also helps
+to make one long slope with no dip in it, for testing. The water's colors
+and ripples are the same as the sea's, set in the Water section's
+"):Strong("Look"):Text(" part, as "):Link("The Sea", "/tutorials/Scenes/terrainSea.html"):Text(" explains.")
+        WaterTools()
+        FillingHollow()
+        HowFillWaterDecides()
+        ChangingLake()
+        PaintingWater()
+        WaterInGame()
+    end
+
+    private action WaterTools
+        Subsection("The water tools")
+        Table("The Water Tools", "media/scenes/Terrain/Lakes/Keys.csv")
+        Paragraph("Both tools are also in the Brush section's Tool group, and in the
+"):Strong("Scenes"):Text(" menu ("):Keys("Alt", "C"):Text(", or "):Keys("Option", "C"):Text(" on Mac) under "):Strong("Terrain"):Text(" and then
+"):Strong("Tools"):Text(". With either tool chosen, the Brush section shows a "):Strong("Water"):Text("
+card with one field, "):Strong("Water depth:"):Text(". It is how far above the ground
+under the brush the water's surface goes. It starts at 2.")
+        Paragraph("With the mouse, a gray ring follows the pointer. A click outside the
+brush's ring moves the brush there, and a click inside it uses the tool.
+Holding the button down for a moment uses the tool wherever the pointer
+is.")
+    end
+
+    private action FillingHollow
+        Subsection("Filling a hollow")
+        NumberedList()
+        ListItem("Choose "):Strong("Fill water"):Text(": press "):Keys("Shift", "Alt", "5"):Text(" ("):Keys("Shift", "Option", "5"):Text(" on Mac).")
+        ListItem("Set the "):Strong("Water depth:"):Text(" in the Brush section's Water card. A bigger
+number lets the water rise higher.")
+        ListItem("Move the brush into a hollow, and press "):Key("Space"):Text(" or click inside the
+ring.")
+        Paragraph("The water's highest allowed level is the ground's height under the brush
+plus the water depth. Quorum Studio then fills the hollow and says what
+happened, such as "):DoubleQuote():Output("Filled the hollow: water at 4.3, 812 cells, about 30.0
+by 24.0."):DoubleQuote():Text(" The new lake is named "):DoubleQuote():Output("Lake 1"):DoubleQuote():Text(", then "):DoubleQuote():Output("Lake 2"):DoubleQuote():Text(", and so on. Each
+fill can be undone.")
+        Paragraph("Fill water ignores the brush's size: the water goes wherever it would
+really flow, however big the brush is. Pouring again inside a lake that
+was filled before fills that lake again from the new spot, and the lake
+keeps its name.")
+        // Image to add: /media/scenes/Terrain/Lakes/FilledLake.png — A round lake filling a valley between green hills, its shore following the ground.
+    end
+
+    private action HowFillWaterDecides
+        Subsection("How Fill water decides where water goes")
+        Paragraph("Fill water follows an algorithm that copies what real water does. The
+ground is treated as a grid of small square "):Term("cells"):Text(", each as wide as the
+space between the terrain's height samples. Each cell has one height.")
+        NumberedList()
+        ListItem():Strong("Run downhill."):Text(" Starting at the brush, the water looks at the four
+cells around it, and moves to the lowest one, if it is lower. It repeats
+this until no neighbor is lower. Now it is at the bottom of the hollow.
+It only runs so far (64 cells), so water poured on a long slope doesn't
+end up in a valley far away.")
+        ListItem():Strong("Rise, lowest first."):Text(" The water keeps a waiting list of the cells
+touching its edge, sorted so the "):Strong("lowest"):Text(" cell always comes out first.
+A list like this is called a "):Term("priority queue"):Text(". Each time, the water
+covers the lowest waiting cell, and adds that cell's dry neighbors to
+the list. Because it always takes the lowest one, it fills the bottom
+of the hollow first and spreads upward evenly, as real water does.")
+        ListItem():Strong("Stop at the first of three limits:")
+        NestedBulletList()
+        ListItem():Strong("The level."):Text(" The next lowest cell is at or above the highest level
+allowed (the ground under the brush plus the water depth).")
+        ListItem():Strong("The rim."):Text(" The next lowest cell is lower than ground the water has
+already covered. That means the water has gone over the edge of the
+hollow and would run away downhill. The water stops at the rim's
+height.")
+        ListItem():Strong("The edge of the terrain."):Text(" The water reached a cell with no ground,
+so it would run off the world. It stops there too.")
+        EndNestedList()
+        ListItem():Strong("Wet the low cells."):Text(" Every cell the water reached whose ground is
+below the final level gets water. The rest stay dry.")
+        Paragraph("When the rim or the edge stopped the water, the report says so, such as
+"):DoubleQuote():Output("Filled the hollow: water at 3.1, the hollow's rim, 640 cells, about 26.0
+by 20.0."):DoubleQuote():Text(" On a slope with no hollow, the water runs down, then spills over
+right away, so no cell is low enough to hold it. Then nothing fills, and
+Quorum Studio says "):DoubleQuote():Output("There is no hollow here to hold water: the ground
+slopes away, so the water would run off."):DoubleQuote():Text(" Past the edge of the ground, it
+says "):DoubleQuote():Output("There is no ground there to pour water on."):DoubleQuote()
+        Paragraph("A lake can never float in the air or flood a valley by accident, because
+the water only ever stands where ground surrounds it.")
+    end
+
+    private action ChangingLake
+        Subsection("Changing a lake in the Water section")
+        Paragraph("The Water section's "):Strong("Lakes"):Text(" part lists each lake as a part of its own,
+which opens with its chevron. Its title says the lake's name, its water
+level and about how big it is, such as "):DoubleQuote():Output("Lake 1, level 4.3, about 30 by
+24"):DoubleQuote():Text(". Opened, it has two fields and a button:")
+        BulletList()
+        ListItem():Strong("Name:"):Text(" gives the lake a better name, such as "):Quoted("Mill pond"):Text(".")
+        ListItem():Strong("Water level:"):Text(" changes the lake's height. A filled lake is filled
+again from its lowest point, so it grows or shrinks to fit the hollow,
+and it still stops at the rim. Quorum Studio says, for example, "):DoubleQuote():Output("Mill
+pond: water at height 4.8, filling its hollow, about 32.0 by 25.0."):DoubleQuote():Text(" If
+the new level is higher than the rim, it says "):DoubleQuote():Output("Mill pond: the hollow
+spills over its rim at height 5.2, so the water stops there, about 34.0
+by 27.0."):DoubleQuote()
+        ListItem():Strong("Remove lake"):Text(" takes the lake away. Quorum Studio says "):DoubleQuote():Output("Removed Mill
+pond."):DoubleQuote()
+        Paragraph("Each change can be undone, and saving the scene saves the lakes in the
+terrain's "):Code("water.json"):Text(" file.")
+    end
+
+    private action PaintingWater
+        Subsection("Painting water")
+        Paragraph("Sometimes you want water that isn't flat: a puddle on a path, a marsh, or a
+shallow stream running down a hill. "):Strong("Paint water"):Text(" puts water exactly
+where you brush it, standing the water depth above the ground, so it
+follows the ground up and down and thins out at its edges.")
+        NumberedList()
+        ListItem("Choose "):Strong("Paint water"):Text(": press "):Keys("Shift", "Alt", "6"):Text(" ("):Keys("Shift", "Option", "6"):Text(" on Mac).")
+        ListItem("Set the brush's "):Strong("Size"):Text(" with "):Keys("Alt", "="):Text(" and "):Keys("Alt", "-"):Text(" ("):Key("Option"):Text(" on Mac), and
+a small "):Strong("Water depth:"):Text(", such as 0.3, for a puddle or a stream.")
+        ListItem("Hold "):Key("Space"):Text(", or hold the mouse button, and move the brush. Let go to
+finish the stroke.")
+        Paragraph("If the stroke starts in a lake, it adds water to that lake. Otherwise, it
+starts a new lake. When you let go, Quorum Studio says, for example,
+"):DoubleQuote():Output("Painted water into Lake 2: 120 cells, water at 6.2."):DoubleQuote():Text(" Painting into a
+filled lake only adds water where the ground is below that lake's level,
+so the water never floats.")
+        Paragraph():Strong("Erasing:"):Text(" hold "):Key("Ctrl"):Text(" as the stroke starts (on a Mac, the "):Key("Control"):Text("
+key, then "):Key("Space"):Text(") to erase water from the lake under the brush. Quorum
+Studio says "):DoubleQuote():Output("Erased water from Lake 2: 40 cells left."):DoubleQuote():Text(" A lake erased to
+nothing is removed: "):DoubleQuote():Output("Erased all of Lake 2, so it was removed."):DoubleQuote():Text(" If there's
+no water under the brush, it says "):DoubleQuote():Output("There is no water under the brush to
+erase."):DoubleQuote():Text(" Pressing "):Key("Escape"):Text(" while still holding cancels the stroke and puts
+the water back, and Quorum Studio says "):DoubleQuote():Output("Stroke canceled"):DoubleQuote():Text(".")
+    end
+
+    private action WaterInGame
+        // A double quote, for code that has one.
+        text quote = ""
+        quote = quote:GetDoubleQuote()
+
+        Subsection("Water in a game")
+        Paragraph("A game that loads the scene gets its lakes and sea with no extra code. It
+can also ask about the water. This program puts a red ball on the ground,
+lets the arrow keys roll it around, and once a second writes to Quorum
+Studio's output window whether the ball is on dry ground, wading or
+swimming. Put it in your project's "):Code("Main.quorum"):Text(", and change the scene's
+path and the terrain's name if yours are different.")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneTerrainLakes/LakeSwimmer.quorum")
+        Paragraph("How it works:")
+        BulletList()
+        ListItem():Code("FindItem3DByName(" + quote + "Terrain" + quote + ")"):Text(" finds the scene's terrain. It returns an
+"):Code("Item3D"):Text(", so the program checks that it really is a "):Code("TerrainItem"):Text(" before
+using it as one.")
+        ListItem("In "):Code("Update"):Text(", the arrow keys change the ball's x and z, and the ball's
+height is set from the ground's height there, so it rolls over hills and
+down into the lakes.")
+        ListItem():Code("GetWaterDepthAt"):Text(" says how deep the water is above the ground at the
+ball's place. It counts the sea and every lake, and is 0 on dry ground.")
+        ListItem():Code("IsUnderWater"):Text(" checks one point: here, the middle of the ball, half a
+unit above the ground. In water deeper than that, the middle is under
+the surface, so the ball is swimming. In shallower water, the ball is
+only wading.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("The goal of this activity is to design a fill algorithm yourselves, and
+then to test Quorum Studio's with cases where you know the right answer.
+Work with a partner. First, unplugged: draw a grid of 6 by 6 squares on
+paper, and write a height from 0 to 9 in each square, so that there is a
+hollow in the middle with one low notch in its edge. Choose a square to
+pour water on. Together, write the steps you would follow to decide which
+squares get water, and at what level it stops. Decide how you will keep
+track of the squares at the water's edge that are waiting to be covered,
+and which one you take next. Then follow your steps by hand, shading the
+wet squares. Compare your steps with the four steps in "):Quoted("How Fill water
+decides where water goes"):Text(". Did you use a list sorted lowest first? Did your
+water stop at the notch?")
+        Paragraph("Next, test the real tool. On a terrain, make four test cases, and before
+pouring, write down what you expect Quorum Studio to say for each:")
+        BulletList()
+        ListItem("a round hollow, poured with a small water depth, so the level stops it;")
+        ListItem("the same hollow with a large water depth, so the rim stops it;")
+        ListItem("a long slope with no dip at all;")
+        ListItem("a hollow that reaches the edge of the terrain.")
+        Paragraph("Pour water in each, and record what Quorum Studio actually said or did and how
+the lake looks, either visually or using the math behind the lake. Mark each test as passed or failed, and for any that
+failed, write what you think went wrong. Finally, try the lake's Water
+level field: raise it past the rim and check the result against what you
+expected.")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Fill water turns a simple idea, "):Quoted("water runs downhill and fills the lowest
+place first"):Text(", into steps a computer can follow, with a priority queue to
+choose the next cell. Paint water trades that realism for control, for
+small water the algorithm wouldn't make. Where else might "):Quoted("always take the
+lowest one next"):Text(" be a useful rule? In the next tutorial, "):Link("Rivers", "/tutorials/Scenes/terrainRivers.html"):Text(", you will draw water that
+flows along a path from the hills down to a lake or the sea.")
+    end
+end

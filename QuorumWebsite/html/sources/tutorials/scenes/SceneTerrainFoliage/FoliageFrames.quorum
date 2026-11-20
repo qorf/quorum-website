@@ -1,0 +1,43 @@
+use Libraries.Game.Game
+use Libraries.System.File
+use Libraries.System.FileWriter
+
+class Main is Game
+    integer frames = 0
+    number elapsed = 0
+    integer secondCount = 0
+    FileWriter log
+
+    action Main
+        UseVulkan(true)
+        StartGame()
+    end
+
+    action CreateGame
+        LoadScene("Scenes/Scene.qs")
+        // Each run starts a new log. Use a different name for each version,
+        // such as FramesA.csv and FramesB.csv.
+        File file
+        file:SetPath("FramesA.csv")
+        log:OpenForWrite(file)
+        log:WriteLine("second,frames")
+    end
+
+    action Update(number seconds)
+        frames = frames + 1
+        elapsed = elapsed + seconds
+        if elapsed >= 1
+            secondCount = secondCount + 1
+            output "Frames this second: " + frames
+            log:WriteLine("" + secondCount + "," + frames)
+            log:PushToDisk()
+            frames = 0
+            elapsed = elapsed - 1
+        end
+    end
+
+    action OnExit returns boolean
+        log:Close()
+        return true
+    end
+end

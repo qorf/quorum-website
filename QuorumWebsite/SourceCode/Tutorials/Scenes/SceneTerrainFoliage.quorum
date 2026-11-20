@@ -1,0 +1,367 @@
+package Lessons
+
+use Libraries.Web.Page.all
+use Libraries.Web.Page.Standards.ComputerScienceStandards2026
+use Libraries.Web.Page.Standards.QuorumStandards
+
+class SceneTerrainFoliage is QuorumPage
+    // The site's sets of standards, built once for every page.
+    QuorumStandards standards
+
+    on create
+        SetLocation("tutorials/Scenes/terrainFoliage.html")
+    end
+
+    action Setup
+        // For search engines and link previews.
+        SetDescription("Learn to add foliage to a terrain in Quorum Studio, paint and remove it with a brush, and measure how it changes a game's frame rate.")
+
+        Title("Foliage")
+
+        Overview()
+        WarmUp()
+        Explore()
+        Engage()
+        WrapUp()
+    end
+
+    action Overview
+        Section("Overview")
+        Paragraph("Bare ground looks empty. Real land is covered with rocks, bushes, trees and
+grass, and placing each one by hand would take forever. In Quorum Studio,
+these are called "):Term("foliage"):Text(": models or pictures that the terrain scatters
+over the ground in many copies. You choose which ones a terrain can use, and
+then paint them on with a brush, the way you paint ground materials. In this
+tutorial, you will add rocks to a terrain, paint them, remove them, and
+change their settings. You will also learn why thousands of copies can slow
+a game down, and which settings keep it running smoothly.")
+
+        Subsection("Goals")
+        Goals()
+        ListItem("Add a foliage asset to a terrain, and paint and remove its copies with
+the Foliage tool")
+        ListItem("Change an asset's settings, such as its density, size, lean, color,
+wind, levels of detail and shadows")
+        ListItem("Explain what foliage costs the computer each frame, and how density and
+draw distance change the frame rate")
+        ListItem("Compare two versions of a scene and decide which one plays better")
+    end
+
+    action WarmUp
+        Section("Warm up")
+        Paragraph("Imagine drawing a forest by hand, one tree at a time, and then being asked
+to draw it again 60 times every second. What shortcuts would you take? Would
+you draw the trees far away as carefully as the ones close to you? Would you
+draw the ones behind you at all?")
+
+        Subsection("Vocabulary")
+        Paragraph("You will be learning about the following vocabulary words:")
+        Table("Vocabulary", "media/scenes/Terrain/Foliage/Vocabulary.csv")
+
+        Subsection("New Code to Learn")
+        Paragraph("You will be using the following new pieces of code:")
+        Table("New Code to Learn", "media/scenes/Terrain/Foliage/Code.csv")
+
+        Subsection("CSTA Standards")
+        ComputerScienceStandards2026 computerScience = standards:GetComputerScience2026()
+        CoversStandard(computerScience, computerScience:SPECIALTY_2_GAME_DEVELOPMENT_ARCHITECTURE_6)
+        CoversStandard(computerScience, computerScience:SPECIALTY_2_GAME_DEVELOPMENT_PLAYER_EXPERIENCE_5)
+        CoversStandard(computerScience, computerScience:SPECIALTY_1_DATA_SCIENCE_CREATION_AND_CURATION_1)
+        CoversStandard(computerScience, computerScience:HIGH_SCHOOL_HARDWARE_AND_SOFTWARE_30)
+        StandardsList(computerScience)
+    end
+
+    action Explore
+        Section("Explore")
+        Paragraph("This tutorial uses a terrain from the earlier tutorials, with some hills and
+flat places. Select it before you start, from the scene tree or by clicking
+the ground. Like the terrain itself, foliage is drawn with Vulkan.")
+        GettingAModel()
+        AddingAnAsset()
+        PaintingFoliage()
+        RemovingFoliage()
+        FoliageFollowsTheGround()
+        AnAssetsSettings()
+        WhatFoliageCosts()
+        MeasuringTheFrameRate()
+    end
+
+    private action GettingAModel
+        Subsection("Getting a model")
+        Paragraph("Foliage starts with a model file. Quorum Studio can use models in the
+"):Code(".glb"):Text(", "):Code(".gltf"):Text(", "):Code(".fbx"):Text(" and "):Code(".obj"):Text(" formats, or a "):Code(".png"):Text(" picture for a card.
+Small, simple models work best, because there will be many copies of them.")
+        Paragraph("The examples in this tutorial use three rock models, "):Code("RockA.glb"):Text(",
+"):Code("RockB.glb"):Text(" and "):Code("RockC.glb"):Text(", from the demo of Terrain3D, a free terrain tool
+for the Godot game engine. They are shared under the MIT license, which
+lets anyone use them as long as the license notice goes with them. Put the
+models in a folder in your project, such as "):Code("Models/Foliage"):Text(", with the
+license file beside them. As with any art you didn't make, add a line to
+your game's credits saying where the rocks came from.")
+    end
+
+    private action AddingAnAsset
+        Subsection("Adding an asset")
+        NumberedList()
+        ListItem("Select the terrain, and go to the "):Strong("Foliage"):Text(" section of the Properties
+panel. With the keyboard, press "):Keys("Ctrl", "P"):Text(" ("):Keys("Cmd", "P"):Text(" on Mac) and "):Key("Tab"):Text(" until
+you reach it.")
+        ListItem("Press "):Strong("Add asset..."):Text(", and choose a model or a picture.")
+        ListItem("Quorum Studio reports the change to accessibility tools, which may give
+a phrase such as "):DoubleQuote():Output("Added RockA as foliage asset 1, a model. Paint it with
+the Foliage tool."):DoubleQuote()
+        Paragraph("The first time you add an asset, Quorum Studio makes a "):Term("foliage list"):Text(" for
+the terrain: a file in the project's "):Code("Scenes/Foliage"):Text(" folder, named after
+the terrain's folder, such as "):Code("Scenes/Foliage/Terrain1.json"):Text(". The list
+holds the assets and their settings. The copies themselves are saved beside
+the terrain's own files, one file for each region that has foliage.")
+        Paragraph("The section's first line says how many copies the terrain has in all, such
+as "):DoubleQuote():Output("20719 copies in all."):DoubleQuote():Text(" Under it, the assets are listed in alphabetical
+order. Each asset is a heading that opens and closes, like the other parts
+of the Properties panel, with a line under it that says whether it is a
+model or a card and how many copies it has, such as "):DoubleQuote():Output("Card, 20529 copies"):DoubleQuote():Text(".
+Click an asset's name or its arrow to open it, or move to it with "):Key("Tab"):Text("
+and press "):Key("Enter"):Text("; the same opens and closes each group of settings. Only
+one asset is open at a time.")
+        Paragraph("An open asset shows:")
+        BulletList()
+        ListItem():Strong("Name:"):Text(" what the asset is called in the section and in Quorum Studio's
+reports.")
+        ListItem():Strong("Its settings,"):Text(" in five groups that open and close: Placement, Lean
+and turn, Color and wind, Levels of detail, and Shadows. They are
+described below.")
+        ListItem():Strong("Remove"):Text(" (for example, "):Quoted("Remove Grass"):Text("), which takes the asset away with
+every copy of it. This can't be undone, so take care with it.")
+        Paragraph("Adding and removing assets can't be undone yet.")
+        // Image to add: /media/scenes/Terrain/Foliage/FoliageSection.png — The Foliage section listing rock and grass assets, with Grass open and its Color and wind settings showing.
+    end
+
+    private action PaintingFoliage
+        Subsection("Painting foliage")
+        Paragraph("The "):Strong("Foliage"):Text(" tool paints copies of one asset onto the ground under the
+brush.")
+        NumberedList()
+        ListItem("Choose the Foliage tool: press "):Keys("Shift", "Alt", "4"):Text(" ("):Keys("Shift", "Option", "4"):Text(" on Mac),
+or choose "):Strong("Foliage"):Text(" in the Brush section's Tool group. You can also
+find it in the "):Strong("Scenes"):Text(" menu ("):Keys("Alt", "C"):Text(", or "):Keys("Option", "C"):Text(" on Mac), under
+"):Strong("Terrain"):Text(" and then "):Strong("Tools"):Text(".")
+        ListItem("Choose the asset to paint in the Brush section's "):Strong("Foliage Asset"):Text("
+card. It lists the terrain's assets in the same alphabetical order as
+the Foliage section.")
+        ListItem("Set the brush. "):Strong("Size"):Text(" is the brush's radius. "):Strong("Strength"):Text(" changes how
+many copies each dab places: twice the strength places about twice as
+many. Press "):Keys("Alt", "="):Text(" and "):Keys("Alt", "-"):Text(" for a larger or smaller brush, and
+"):Keys("Alt", "]"):Text(" and "):Keys("Alt", "["):Text(" for a stronger or weaker one (on Mac, "):Key("Option"):Text(").")
+        ListItem("Paint:")
+        NestedBulletList()
+        ListItem():Strong("With the keyboard:"):Text(" move the brush with the arrow keys and hold
+"):Key("Space"):Text(". Keep holding it and move the brush to paint a trail.")
+        ListItem():Strong("With the mouse:"):Text(" a gray ring follows the pointer, showing where the
+brush would go. Click outside the brush's ring to move the brush
+there, and click inside it to paint once. Hold the button down for a
+moment, anywhere, to start painting there, and drag to keep painting.")
+        EndNestedList()
+        Paragraph("Each dab places copies at random spots under the brush, with random sizes
+and turns, but only where the ground's slope suits the asset. To keep a
+held brush from piling copies on top of each other, a new dab is made only
+after the brush has moved about its own radius. When you let go, Quorum
+Studio reports what changed and what is now under the brush, as a phrase
+such as "):DoubleQuote():Output("Added 14 RockA. Under the brush: 14 RockA."):DoubleQuote():Text(" The whole stroke is one step for Undo.")
+        Paragraph("If the terrain has no assets yet, the report is "):DoubleQuote():Output("The Foliage tool needs a
+foliage asset. Add one in the Foliage section."):DoubleQuote()
+        // Image to add: /media/scenes/Terrain/Foliage/PaintedRocks.png — Gray rocks scattered over a grassy hill, with the brush's ring among them.
+    end
+
+    private action RemovingFoliage
+        Subsection("Removing foliage")
+        Paragraph("The same tool removes copies. Hold a key down "):Strong("as the stroke starts"):Text(":")
+        Table("Keys for foliage", "media/scenes/Terrain/Foliage/Keys.csv")
+        Paragraph("With the mouse, hold "):Key("Ctrl"):Text(" while you start the stroke. On a Mac, use the
+"):Key("Control"):Text(" key, not "):Key("Command"):Text(". Because Control and a click is a right click
+on a Mac, press "):Key("Control"):Text(" first and then hold "):Key("Space"):Text(". Quorum Studio reports
+what it removed, such as "):DoubleQuote():Output("Removed 5 RockA."):DoubleQuote():Text(" When every asset's copies are
+removed, the report names "):Quoted("foliage"):Text(" instead of an asset's name.")
+    end
+
+    private action FoliageFollowsTheGround
+        Subsection("Foliage follows the ground")
+        Paragraph("You can keep shaping the ground after painting foliage. When you raise or
+lower the ground, stamp a hill, erode it, or undo a change, the copies move
+up or down with the ground, so rocks never float in the air or sink out of
+sight. Nothing needs to be turned on for this; it always happens.")
+    end
+
+    private action AnAssetsSettings
+        Subsection("An asset's settings")
+        Paragraph("Open an asset in the Foliage section to change how its copies are placed
+and drawn. A field takes its new value when you leave it, with "):Key("Tab"):Text(" or a
+click elsewhere. A value that isn't a number, or is out of range, is
+ignored.")
+        Paragraph("Settings come in two kinds, and it helps to know which is which:")
+        BulletList()
+        ListItem():Strong("Settings used while painting."):Text(" Density, the slopes, height offset,
+scale, size varies, shade varies and random turn are decided for each
+copy at the moment it's painted, and saved with it. Changing them
+changes the copies you paint "):Strong("next"):Text(", not the ones already on the
+ground. To change old copies, remove them and paint them again.")
+        ListItem():Strong("Settings used while drawing."):Text(" Everything else (lean, turn, tint,
+hue, wind, levels of detail and shadows) is applied to "):Strong("every"):Text(" copy
+each time the foliage is drawn, so a change shows at once on the copies
+already painted.")
+
+        Subsubsection("Placement")
+        Table("Placement settings", "media/scenes/Terrain/Foliage/SettingsPlacement.csv")
+
+        Subsubsection("Lean and turn")
+        Table("Lean and turn settings", "media/scenes/Terrain/Foliage/SettingsLean.csv")
+
+        Subsubsection("Color and wind")
+        Table("Color and wind settings", "media/scenes/Terrain/Foliage/SettingsColor.csv")
+
+        Subsubsection("Levels of detail")
+        Paragraph("Far from the camera, a detailed model is only a few pixels tall, so
+drawing all its triangles is wasted work. "):Term("Levels of detail"):Text(" let a copy
+switch to something simpler when it's far away. The asset's own model or
+picture is used up close. Each level after it is used from a distance you
+choose, and the farthest level that has been reached is the one drawn.
+Levels are chosen for a whole cell of foliage at a time, measured from the
+camera to the cell's nearest side.")
+        Table("Levels of detail settings", "media/scenes/Terrain/Foliage/SettingsLevels.csv")
+        Paragraph("For example, a tree might use its full model up close, a simpler model
+from 40 units, a flat card from 100 units, and nothing past 250.")
+
+        Subsubsection("Shadows")
+        Table("Shadow settings", "media/scenes/Terrain/Foliage/SettingsShadows.csv")
+    end
+
+    private action WhatFoliageCosts
+        Subsection("What foliage costs")
+        Paragraph("Every copy of a rock is drawn from the same model, but each copy is still
+real work for the computer, and the work is split between two of its parts,
+which work in very different ways. The "):Term("Central Processing Unit (CPU)"):Text("
+runs your program. It follows the program's steps one after another, very
+quickly, and makes the decisions, such as what the player pressed and what
+should happen next. Even a fast CPU has only a handful of cores, each doing
+one thing at a time. The "):Term("Graphics Processing Unit (GPU)"):Text(" is a separate
+processor built for one job: working out pictures. It has thousands of small
+cores that all do the same simple calculation at the same time, each on a
+different triangle or point of the screen. A CPU is like a few expert chefs
+who can cook anything, one dish at a time. A GPU is like a thousand kitchen
+helpers who can each only chop, but all chop at once. So the CPU decides
+what to draw, and the GPU draws it.")
+        BulletList()
+        ListItem():Strong("The GPU draws the triangles."):Text(" A model is made of small flat
+triangles. A rock might have a few hundred. A thousand copies of that
+rock means a few hundred thousand triangles, and the GPU has to draw
+them all again on every frame. A detailed tree can have many thousands of
+triangles, so a forest adds up very fast. Shadows cost more: the GPU
+draws every copy that casts a shadow a second time, from the light's
+point of view.")
+        ListItem():Strong("The CPU prepares and culls."):Text(" Before the GPU can draw, the program has
+to decide what to draw. Each frame, it checks which copies are close
+enough and in front of the camera, and skips the rest. That skipping is
+called "):Term("culling"):Text(". The more copies there are, the more there is to
+check.")
+        Paragraph("A game has very little time for all of this. At 60 frames a second, each
+frame has about 16 thousandths of a second for everything: the player's
+input, the physics, the terrain, the water and the foliage. If drawing
+takes longer than that, the game draws fewer frames each second, and
+movement starts to look jerky.")
+        Paragraph("Quorum's terrain uses a few tricks to keep foliage fast:")
+        BulletList()
+        ListItem():Strong("Cells."):Text(" The ground is split into squares about 32 units wide, and each
+square holds one asset's copies. The program culls a whole cell at once,
+instead of checking every copy one at a time. Cells of foliage that
+casts no shadows, such as grass, are skipped when they're outside the
+camera's view, so grass behind the player costs nothing. Cells that
+cast shadows are kept, since a tree just out of view can still throw
+its shadow into it.")
+        ListItem():Strong("Drawing copies together."):Text(" All the copies in a cell are sent to the GPU
+in one go, which the GPU can draw much faster than the same copies sent
+one by one. The copies are worked out once and kept ready, so on each
+frame the CPU only copies them over, instead of working out every copy
+again.")
+        ListItem():Strong("Draw distance."):Text(" Cells farther away than the asset's draw distance
+aren't drawn at all, and copies thin out near that distance, so they
+fade out gradually instead of all vanishing at once.")
+        ListItem():Strong("Levels of detail."):Text(" Far away, an asset can switch to a simpler model or
+a flat card, with far fewer triangles. Up close, it looks the same.")
+        ListItem():Strong("Cheaper shadows."):Text(" Far levels can skip shadows, and a simple level can
+cast the shadow for a detailed one.")
+        Paragraph("So two settings matter most for speed. "):Strong("Density"):Text(" decides how many copies
+there are in all. "):Strong("Draw distance"):Text(" decides how many of them are drawn on
+each frame. Halving the draw distance leaves only about a quarter of the
+area around the camera to draw, because the area of a circle grows with
+the square of its radius.")
+    end
+
+    private action MeasuringTheFrameRate
+        Subsection("Measuring the frame rate")
+        Paragraph("A game can count its own frames. Quorum calls a game's "):Code("Update"):Text(" action once
+every frame, and its "):Code("seconds"):Text(" value says how long the last frame took.
+This program loads your scene and counts the frames. Once a second, it
+writes the count to Quorum Studio's output window, and also adds it as a
+line to a "):Term("log file"):Text(", so you can study the whole run afterward as data.
+Put it in your project's "):Code("Main.quorum"):Text(", and change the scene's path if yours
+is different.")
+        CodeExampleFromFile("sources/tutorials/scenes/SceneTerrainFoliage/FoliageFrames.quorum")
+        Paragraph("The log is a small table in a format called "):Term("CSV"):Text(", for comma-separated
+values. Its first line names the columns, "):Code("second,frames"):Text(", and each line
+after it is one second of the run, such as "):Code("12,58"):Text(": in the twelfth second,
+the game drew 58 frames. You can open it in a spreadsheet, or read it in
+any text editor or with a screen reader, one line at a time. "):Code("PushToDisk"):Text("
+saves each line as soon as it's written, so nothing is lost if the game
+stops suddenly. "):Code("OnExit"):Text(" is called when the game's window closes, and it
+closes the file. Taking away 1 from "):Code("elapsed"):Text(", instead of setting it to 0,
+keeps the bit of time left over, so every line covers a full second.")
+        Paragraph("Games usually limit how many frames they draw a second, often to about 60
+or 70, so a fast computer may show the same number with or without
+foliage. The number matters when it drops below that limit.")
+    end
+
+    action Engage
+        Section("Engage")
+        Paragraph("The goal of this activity is to find out, with real numbers, how much
+foliage a scene can hold before the game slows down, and to decide which
+of two versions plays better. Work in pairs, with one computer. First,
+agree on a test: the same scene, the same camera, and the frame-logging
+program above. For each run, let the game run for 30 seconds without
+touching anything, then close its window. Give each run its own log name:
+"):Code("FramesNone.csv"):Text(", "):Code("FramesA.csv"):Text(" and "):Code("FramesB.csv"):Text(".")
+        Paragraph("Run it with no foliage. Then make "):Strong("Version A"):Text(": paint rocks thickly over a
+large area, with a high density and a long draw distance, such as 400, and
+run it. Then make "):Strong("Version B"):Text(" from the same rocks: keep them only where a
+player would notice them, lower the density, and shorten the draw distance,
+such as 100, and run it once more. If your computer is fast enough that
+nothing changes, keep making Version A denser until the frame rate drops.
+If you can, also run Version A on a second, different computer, and keep
+that log too.")
+        Paragraph("Compare the versions using your logs. Write a short report that answers
+these questions:")
+        BulletList()
+        ListItem("How many copies did each version have? The Foliage section's first line
+gives the total.")
+        ListItem("From each log, what were the average, lowest and highest frames per
+second? How many seconds were below 60?")
+        ListItem("Did the frame rate stay steady, or were there sudden drops? Which rows of
+the log show it?")
+        ListItem("Move the brush to where the player starts, choose the Foliage tool, and
+read what's under the brush in each version ("):DoubleQuote():Output("Under the brush: 14
+RockA"):DoubleQuote():Text("). Did Version B remove copies near the player, or far away? Why is
+far away the cheaper place to cut?")
+        ListItem("If you ran Version A on a second computer, how did its log differ? What
+about that computer might explain it?")
+        ListItem("Which version would you ship, and why? What would you change for a
+player with an older or slower computer?")
+    end
+
+    action WrapUp
+        Section("Wrap up")
+        Paragraph("Foliage turns bare ground into a place, but every copy is work for the CPU
+and the GPU on every frame. Density, draw distance, shadows and simpler far
+models are the levers that trade looks for speed. Professional games make
+the same trade, and many let players choose between "):Quoted("high"):Text(" and "):Quoted("low"):Text("
+settings. In the next tutorial, "):Link("Lakes", "/tutorials/Scenes/terrainLakes.html"):Text(",
+you will fill the hollows in your terrain with water.")
+    end
+end
