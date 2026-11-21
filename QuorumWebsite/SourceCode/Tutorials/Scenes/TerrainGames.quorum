@@ -14,7 +14,7 @@ class TerrainGames is QuorumPage
 
     action Setup
         // For search engines and link previews.
-        SetDescription("Learn how a game car works as a physics simulation, and drive a toy car on a Quorum Studio terrain.")
+        SetDescription("Learn how a game car works as a physics simulation, set up a toy car in Quorum Studio, and drive it on a terrain.")
 
         Title("Driving on Terrain: Vehicles and Physics")
 
@@ -28,18 +28,17 @@ class TerrainGames is QuorumPage
     action Overview
         Section("Overview")
         Paragraph("Racing games, delivery games and open-world adventures all have one thing in common: something with
-wheels moving over the ground. In this tutorial, you will load a toy car into a scene with a terrain
-and drive it over the hills you made. Along the way you will see how a game turns a car into
-physics: a body with weight, four wheels on springs, an engine that pushes and brakes that hold, and
-tires that grip until they slide. The car comes from AllTerrainVehicle, a Quorum test project for
-driving over large terrains.")
+wheels moving over the ground. In this tutorial, you will add a toy car to a scene with a terrain,
+set it up in Quorum Studio with a Vehicle controller, and drive it over the hills you made. Along the
+way you will see how a game turns a car into physics: a body with weight, four wheels on springs, an
+engine that pushes and brakes that hold, and tires that grip until they slide.")
 
         Subsection("Goals")
         Goals()
         ListItem("Explain how a game models a car: a body, wheels on springs, an engine, steering and brakes")
-        ListItem("Load the toy car into a scene with a terrain, and drive it with the keyboard")
+        ListItem("Set up a car in Quorum Studio and drive it with a short program")
         ListItem("Describe how mass, springs, grip and the width between the wheels change the way a car drives")
-        ListItem("Read a program built from small actions, and change one setting at a time to see what it does")
+        ListItem("Change one setting at a time and describe what it does")
     end
 
     action WarmUp
@@ -70,14 +69,17 @@ car that matter for how it moves.")
         Paragraph("A car in a game is a physics simulation, built from the same ideas as the falling ball in "):Link("Properties", "/tutorials/Scenes/properties.html"):Text(": mass, forces, gravity and friction. What makes a car special is how those ideas are put together.
 A heavy body sits on four springs, each spring rests on a wheel, the engine pushes the wheels, the
 brakes hold them, and the tires grip the ground until they are pushed too hard. Quorum has classes
-for each of these parts. In this tutorial you will load the toy car from AllTerrainVehicle, a Quorum
-project for testing cars on large terrains, and look at how its program builds the car piece by
-piece.")
+for each of these parts. In this tutorial you will add a toy car to a scene, give it a Vehicle
+controller in Quorum Studio, and tune how it drives with sliders. A short program then drives it.")
         HowAGameCarWorks()
         GettingTheCar()
+        AddingTheCar()
+        GivingTheCarAController()
+        PhysicsAndGravity()
+        WhereTheCameraFollowsFrom()
         TheProgram()
         Driving()
-        HowTheProgramBuildsTheCar()
+        HowTheSceneBuildsTheCar()
         WhyCarsTipAndSkid()
     end
 
@@ -92,8 +94,9 @@ pushes. This is the car's "):Term("suspension"):Text(", and it is why the body r
 bouncing on and on.")
         Paragraph("The wheels also push the car along and turn it. The engine's force is applied where each driving
 wheel touches the ground, the front wheels turn to steer, and each tire grips the ground sideways.
-If a tire is pushed sideways harder than its grip, which Quorum calls its "):Term("friction slip"):Text(", it slides, and the car skids. The body you see is the car's model, moving with the physics body;
-the wheels drawn on it are part of the model.")
+If a tire is pushed sideways harder than its grip, which Quorum calls its "):Term("friction slip"):Text(", it slides, and the car skids.")
+        Paragraph("In Quorum, the car has two parts that move together. Its "):Term("physics body"):Text(" is an invisible box that the physics moves; the wheels' rays hang under it. The "):Strong("model"):Text(", the car you see, rides on the body. Because they are separate, the model can be any shape, and the
+box can be smaller than it, so it doesn't catch on hills.")
     end
 
     private action GettingTheCar
@@ -112,62 +115,81 @@ and scene by Eric Chadwick, and they released it under the "):Strong("CC0"):Text
         EndNestedList()
         ListItem("For each file, open it on GitHub and use its "):Strong("Download raw file"):Text(" button, then move the file into your "):Code("Car"):Text(" folder. All ten files must be in the same folder, because "):Code("ToyCar.gltf"):Text(" finds the others by name.")
         ListItem("Also download the folder's "):Code("LICENSE.md"):Text(", from the "):Link("Toy Car folder", "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar"):Text(", into "):Code("Car"):Text(", so the license stays with the model.")
-
-        Subsubsection("Centering the car")
-        Paragraph("The toy car sits on a small blanket, and the model's center is not in the middle of the car's body.
-For driving, the car needs a copy with the blanket left out and its center moved to the middle of
-the body, because a physics box is centered on its item.")
-        Paragraph("You don't make this copy by hand. The program on this page does it for you: the first time it runs,
-its "):Code("MakeCenteredCar"):Text(" action reads "):Code("ToyCar.gltf"):Text(", changes it, and saves the result as "):Code("ToyCarCentered.gltf"):Text(" in the same folder. "):Quoted("How the program builds the car"):Text(" explains how.")
-        Paragraph("Finally, use a scene with a terrain, such as one you shaped and painted in the earlier tutorials,
-saved as "):Code("Scenes/Scene.qs"):Text(".")
+        Paragraph("Use a scene with a terrain, such as one you shaped and painted in the earlier tutorials, saved as "):Code("Scenes/Scene.qs"):Text(".")
 
         Subsubsection("Giving credit")
         Paragraph("The car is CC0, so credit isn't required, but it is good practice, as in "):Link("Terrain Materials and Painting", "/tutorials/Scenes/terrainMaterials.html"):Text(". Add the car to your project's "):Code("Credits.txt"):Text(":")
         CodeExampleFromFile("sources/tutorials/scenes/TerrainGames/Credits.txt", "")
     end
 
+    private action AddingTheCar
+        Subsection("Adding the car to the scene")
+        NumberedList()
+        ListItem("Open your scene with a terrain. In the palette, under "):Strong("Custom 3D"):Text(", choose "):Strong("Custom Model"):Text(", then choose "):Code("Car/ToyCar.gltf"):Text(". A tile named "):Strong("ToyCar"):Text(" is added to a new "):Strong("Project Models"):Text(" group at the top of the palette. The toy is only a few centimeters long, so its tile starts it many
+times larger, as its description says. The scene keeps the tile, so it is there the next time you
+open the scene.")
+        ListItem("Drag the ToyCar tile onto the terrain, or press Enter on it, and place the car.")
+        ListItem("In the Properties panel, set its "):Strong("Name"):Text(" to "):Code("Car"):Text(", and its "):Strong("Scale"):Text(" to "):Code("150"):Text(" for x, y and z, so it's about the size of a real car.")
+        ListItem("The toy car sits on a blanket, which is its own part of the model. In the "):Strong("Parts"):Text(" card, uncheck "):Strong("Show Fabric"):Text(". The blanket is hidden, in the editor and in the game, and the model's file isn't changed.")
+    end
+
+    private action GivingTheCarAController
+        Subsection("Giving the car a controller")
+        Paragraph("Select the car. In the "):Strong("Controller"):Text(" section, choose "):Strong("Vehicle"):Text(". The car is fitted at once: a physics box, four wheels and their springs are worked out from the
+shape of the parts that show. Lines drawn over the car show them, and the car is drawn see-through
+while they show:")
+        BulletList()
+        ListItem("a light blue box: the physics body, with an arrow out of its front;")
+        ListItem("orange circles: the front wheels, which steer; yellow circles: the back wheels;")
+        ListItem("green lines: the springs, as long as they are at rest;")
+        ListItem("a pink cross: where the game's camera starts.")
+        Paragraph("The same values are in the Controller section's sliders. The toy car's front points along its own
+-Z, so if the arrow points out of the back of the car, choose "):Strong("-Z"):Text(" under "):Strong("Front faces"):Text(", and press "):Strong("Fit to model"):Text(" again.")
+        Paragraph("The Controller section has six cards:")
+        Table("Controller cards", "media/scenes/Terrain/Vehicles/ControllerCards.csv")
+        Paragraph("Every change is one step to undo. The car's own "):Strong("Physics"):Text(" card is replaced by a note while it has a controller, since the controller sets its physics.")
+    end
+
+    private action PhysicsAndGravity
+        Subsection("Physics and gravity")
+        Paragraph("Select the 3D layer itself in the Scene tree. Its "):Strong("Physics"):Text(" section has "):Strong("Physics in games"):Text(", which turned on when you chose Vehicle, and "):Strong("Gravity x"):Text(", "):Strong("y"):Text(" and "):Strong("z"):Text(", which start at 0, -9.8 and 0: Earth's pull, straight down. The editor itself never runs physics;
+these are for the game.")
+    end
+
+    private action WhereTheCameraFollowsFrom
+        Subsection("Where the camera follows from")
+        Paragraph("Choose "):Strong("Game Camera"):Text(" in the Scene tree. The view moves to where the game's camera will start, behind and above the car,
+facing it. Move it with the camera keys or the mouse; it keeps facing the car, and when you stop,
+its place becomes the car's "):Strong("Behind"):Text(", "):Strong("Above"):Text(" and "):Strong("Angle"):Text(".")
+    end
+
     private action TheProgram
         Subsection("The program")
-        Paragraph("Replace the code in "):Code("Main.quorum"):Text(" with this program. It is QuincyWorld's program, a small version of a driving demo, with one action
-added, "):Code("MakeCenteredCar"):Text(", to prepare the car:")
+        Paragraph("Replace the code in "):Code("Main.quorum"):Text(" with this program:")
         CodeExampleFromFile("sources/tutorials/scenes/TerrainGames/Main.quorum")
-        Paragraph("Run it. The car drops onto the middle of the terrain, settles on its springs, and the camera follows
-from behind and above.")
+        Paragraph("Run it. The car drops onto its springs where you placed it, and the camera follows from where you
+set it.")
     end
 
     private action Driving
         Subsection("Driving")
         Table("Driving", "media/scenes/Terrain/Vehicles/DrivingKeys.csv")
-        Paragraph("The "):Code("VehicleMovementBehavior"):Text(" turns these keys into three commands for the car: "):Term("throttle"):Text(", from full reverse to full forward; "):Term("steering"):Text(", from full left to full right; and "):Term("braking"):Text(". Every key can be changed. For example, to drive with the arrow keys, add these lines in "):Code("BuildVehicle"):Text(", before "):Code("AddBehavior"):Text(":")
+        Paragraph("The car's driving behavior turns these keys into three commands: "):Term("throttle"):Text(", from full reverse to full forward; "):Term("steering"):Text(", from full left to full right; and "):Term("braking"):Text(". Every key can be changed. For example, to drive with the arrow keys, add "):Code("use Libraries.Interface.Behaviors.Games.VehicleMovementBehavior"):Text(" at the top, and these lines in "):Code("CreateGame"):Text(", after the car is found:")
         CodeExampleFromFile("sources/tutorials/scenes/TerrainGames/ArrowKeys.quorum")
     end
 
-    private action HowTheProgramBuildsTheCar
-        // A double quote, for code that has one.
-        text quote = ""
-        quote = quote:GetDoubleQuote()
-
-        Subsection("How the program builds the car")
-        Paragraph("The program is made of small actions, each building one part, which makes it easier to read and to
-change one thing at a time.")
+    private action HowTheSceneBuildsTheCar
+        Subsection("How the scene builds the car")
+        Paragraph("When the game loads the scene, the car's controller builds it, so the program only finds it and
+drives it.")
         BulletList()
-        ListItem():Code("BuildChassis"):Text(" makes the body. It loads the toy car model and scales it up: the toy is about 4 centimeters long,
-and a scale of 152 makes it about car-sized, with wheels about 0.4 meters in radius. It gives the
-body a "):Strong("box"):Text(" for physics, a little smaller than the model so it doesn't catch on hills, and a mass of "):Strong("800 kilograms"):Text(". Its angular damping of 0.9 makes a tilt die down before it grows into a roll.")
-        ListItem():Code("MakeCenteredCar"):Text(" prepares the model, once. A "):Code(".gltf"):Text(" file is plain text, written in JSON, like the scene and material files in "):Link("Creating a Scene", "/tutorials/Scenes/create.html"):Text(". It lists the model's pieces, and each piece names its shape with a line such as "):Code(quote + "mesh" + quote + ": 0,"):Text(". The action reads the file as text and uses "):Code("Replace"):Text(" to change three of those lines. It adds a "):Term("translation"):Text(", a move along x, y and z, to the body (piece 0) and the glass (piece 2), lowering them a little
-less than a centimeter in the model's own tiny units. It also takes the shape away from the blanket
-(piece 1), so the blanket draws nothing. Then it writes the result to "):Code("ToyCarCentered.gltf"):Text(", which still uses the same "):Code("ToyCar.bin"):Text(" and images. If that file is already there, the action does nothing, so it only works once. To make
-it again, delete "):Code("ToyCarCentered.gltf"):Text(".")
-        ListItem():Code("BuildVehicle"):Text(" joins the body to four wheels. Each wheel is attached 1.6 meters to the side of the body's center,
-2.06 meters ahead for the front wheels and 1.58 meters behind for the back ones. Only the front
-wheels steer. It then adds the vehicle to the 3D layer, so the layer updates it on every physics
-step, and gives the body the "):Code("VehicleMovementBehavior"):Text(", with an engine force of 5,000 newtons forward and 3,000 in reverse.")
-        ListItem():Code("AddWheel"):Text(" makes one wheel. The ray points straight down, the spring is 0.4 meters long at rest, and the
-wheel's radius is 0.4 meters. Its "):Strong("stiffness"):Text(" of 20 decides how far the springs sag under the car's weight; its "):Strong("damping"):Text(" settles the car after a bump; and its "):Strong("friction slip"):Text(" of 6 is its grip.")
-        ListItem():Code("ResetVehicle"):Text(" puts the car upright in the middle of the terrain, a little above the ground, and stops it. "):Code("Update"):Text(" calls it when you press R, or when the car falls off the edge of the world.")
-        ListItem():Code("FindTerrain"):Text(" and "):Code("GetGroundHeight"):Text(" find the scene's terrain and ask how high the ground is at a place, so the car can start just above
-it.")
+        ListItem():Strong("The body"):Text(" is a box, lower and shorter than the model, so its nose, tail and belly clear slopes. It weighs 800
+kilograms, and its turn damping of 0.3 makes 30 percent of its turning speed fade each second.")
+        ListItem():Strong("The model"):Text(" rides on the body, at the offset in the Model card, and has no physics of its own.")
+        ListItem():Strong("Four wheels"):Text(" hang under the body, each a ray straight down with a spring. The springs sag under the car's weight
+by 9.8 divided by 4 times the stiffness, whatever the car's mass: about 0.25 at a stiffness of 10.
+The front two steer, and the engine turns the ones chosen in the Wheels card, the rear two at first.")
+        ListItem():Strong("The camera"):Text(" follows the body from behind and above, if Camera follows this is checked.")
     end
 
     private action WhyCarsTipAndSkid
@@ -176,33 +198,36 @@ it.")
 the ground, but the car's weight is centered higher up, at its "):Term("center of mass"):Text(". The higher the center of mass, and the faster the turn, the more that sideways pull tries to roll
 the car over its outside wheels. What holds it down is its weight, resting on those outside wheels.
 The farther apart the wheels are, the harder the weight resists tipping.")
-        Paragraph("The program's settings near the top are tuned for this:")
+        Paragraph("The car's settings are tuned for this:")
         BulletList()
-        ListItem():Code("wheelSide"):Text(", 1.6, sets the wheels well out to each side. The test car in AllTerrainVehicle had them at 1.12,
-and the wider track resists tipping about 40 percent harder.")
-        ListItem():Code("rollInfluence"):Text(", 0, applies the tires' sideways pull at the height of the body's center instead of at the ground,
+        ListItem():Strong("Wheels out"):Text(" sets how far out to each side the wheels are. A wider stance resists tipping.")
+        ListItem():Strong("Roll influence"):Text(", 0, applies the tires' sideways pull at the height of the body's center instead of at the ground,
 so turning doesn't roll the car at all. Real cars aren't that lucky; this is one of the places a
 game makes driving easier than real life.")
-        ListItem():Code("frictionSlip"):Text(", 6, lets the tires slide a little sooner, so a turn that is too hard makes the car skid rather than
-flip.")
-        ListItem():Code("maximumSteering"):Text(", 0.35, keeps the front wheels from turning too sharply.")
+        ListItem():Strong("Tire grip"):Text(", 3, is about three times a real tire's. The more grip, the more suddenly a slide comes when it does.")
+        ListItem():Strong("Steering lock"):Text(", 0.35, keeps the front wheels from turning too sharply, and "):Strong("Steering speed"):Text(", 3, turns them in over a third of a second instead of at once.")
+        ListItem():Strong("Turn damping"):Text(", 0.3: much more fights the tires in a turn.")
+        Paragraph("Slopes test the body and the springs. A low, short box clears the start and end of a hill, and soft
+springs let the wheels drop and stay on the ground over a crest. A raycast wheel can't reach past
+its rest length, so it can drop only as far as the car's weight presses its spring.")
     end
 
     action Engage
         Section("Engage")
-        Paragraph("In this activity, you and a partner load the toy car into a scene with a terrain and drive it
-around. The goal is to get a working vehicle running in your own scene and feel how the physics
-settings change the way it drives. Use a scene with a terrain that has some hills and valleys, such
-as one you made in "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(" or "):Link("Generating Terrain", "/tutorials/Scenes/terrainGenerate.html"):Text(". Follow "):Quoted("Getting the car"):Text(" to download the car from GitHub into a "):Code("Car"):Text(" folder and credit it, replace "):Code("Main.quorum"):Text(" with the program on this page, and run it. Take turns driving: one partner drives while the other
+        Paragraph("In this activity, you and a partner add the toy car to a scene with a terrain and drive it around.
+The goal is to get a working vehicle running in your own scene and feel how the physics settings
+change the way it drives. Use a scene with a terrain that has some hills and valleys, such as one you
+made in "):Link("Shaping Terrain", "/tutorials/Scenes/terrainShape.html"):Text(" or "):Link("Generating Terrain", "/tutorials/Scenes/terrainGenerate.html"):Text(". Follow "):Quoted("Getting the car"):Text(", "):Quoted("Adding the car to the scene"):Text(" and "):Quoted("Giving the car a controller"):Text(", replace "):Code("Main.quorum"):Text(" with the program on this page, and run it. Take turns driving: one partner drives while the other
 gives directions, such as "):Quoted("drive to the top of the nearest hill"):Text(", "):Quoted("go down into the valley and back up"):Text(", or "):Quoted("make a full circle without tipping over"):Text(". Press R whenever the car needs a fresh start.")
-        Paragraph("When you've both had a turn, try changing one setting at a time, running the game again after each
-change and writing down what you notice. For example:")
+        Paragraph("When you've both had a turn, try changing one setting at a time in the Controller section, running
+the game again after each change and writing down what you notice. For example:")
         BulletList()
-        ListItem("halve the engine force, from 5000 to 2500: can the car still climb the same hill?")
-        ListItem("set "):Code("wheelSide"):Text(" back to 1.12, or "):Code("rollInfluence"):Text(" to 0.5: does the car tip more easily on sharp turns?")
-        ListItem("set "):Code("frictionSlip"):Text(" to 2, then to 20: what happens to turning and skidding?")
-        ListItem("double the suspension stiffness, from 20 to 40: does the ride over bumps feel different?")
-        Paragraph("Put each setting back before trying the next, so you know which change did what.")
+        ListItem("halve "):Strong("Engine force"):Text(", from 3000 to 1500: can the car still climb the same hill?")
+        ListItem("set "):Strong("Wheels out"):Text(" to about two thirds of what it is, or "):Strong("Roll influence"):Text(" to 0.5: does the car tip more easily on sharp turns?")
+        ListItem("set "):Strong("Tire grip"):Text(" to 1, then to 10: what happens to turning and skidding?")
+        ListItem("double "):Strong("Stiffness"):Text(", from 10 to 20: does the ride over bumps change?")
+        ListItem("in the layer's Physics section, set "):Strong("Gravity y"):Text(" from -9.8 to -1.6, the Moon's: how do hills and bumps change?")
+        Paragraph("Undo each change before trying the next, so you know which change did what.")
     end
 
     action WrapUp
