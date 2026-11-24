@@ -9,7 +9,8 @@ class CodeForIDE
    action AddFileText(text fileName, text code)
         JavaScriptObjectNotation json
         json:Add("file", fileName)
-        json:Add("data", formatCode(code))
+        // ToText escapes the code's quotes, line breaks and tabs.
+        json:Add("data", code)
         outerJson:Add(json)
    end
 
@@ -19,7 +20,7 @@ class CodeForIDE
         File codeFile
         codeFile:SetPath(url)
         text code = codeFile:Read()
-        json:Add("data", formatCode(code))
+        json:Add("data", code)
         outerJson:Add(json)
     end
 
@@ -44,14 +45,4 @@ class CodeForIDE
             result = result:Replace(dq, "&quot;" )
             return result
        end
-
-      private action formatCode(text unformattedCode) returns text
-        text lf = unformattedCode:GetLineFeed()
-text tab = unformattedCode:GetTab()
-        text dq = unformattedCode:GetDoubleQuote()
-        unformattedCode = unformattedCode:Replace(lf, "\n")
-unformattedCode = unformattedCode:Replace(tab, "\t")
-        text formattedCode = unformattedCode:Replace(dq, "\" + dq)
-        return formattedCode
-    end
 end
